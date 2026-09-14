@@ -235,7 +235,7 @@ function installPWA(){
           <div class="stat-card"><div class="stat-num" id="st_aides">—</div><div class="stat-lbl">Active Aides</div></div>
         </div>
         <div class="card">
-          <div class="search-bar"><input type="text" id="tsSearch" placeholder="🔍 Search by aide, client or week..." oninput="renderTimesheets()"></div>
+          <div class="search-bar"><input type="text" id="tsSearch" placeholder="🔍 Search by aide, client or week..." oninput="paintTimesheets()"></div>
           <div style="overflow-x:auto">
             <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
           </div>
@@ -245,7 +245,7 @@ function installPWA(){
 
       <!-- AIDES TAB -->
       <div class="tab-panel" id="tab_aides">
-        <div class="page-hdr"><div><h1>Aides</h1><p>All registered caregivers and their location status</p></div><button class="btn btn-teal" onclick="renderAides()">🔄 Refresh</button></div>
+        <div class="page-hdr"><div><h1>Aides</h1><p>All registered caregivers and their location status</p></div><button class="btn btn-teal" onclick="renderAides(true)">🔄 Refresh</button></div>
         <div id="aidesContainer"><p style="color:var(--muted)">Loading...</p></div>
       </div>
 
@@ -269,12 +269,12 @@ function installPWA(){
         <div class="page-hdr">
           <div><h1>Clients</h1><p>Manage client addresses and assign aides for location verification</p></div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="renderClients()">🔄 Refresh</button>
+            <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
         </div>
         <div class="card">
-          <div class="search-bar"><input type="text" id="clientSearch" placeholder="&#128269; Search clients..." oninput="renderClients()"></div>
+          <div class="search-bar"><input type="text" id="clientSearch" placeholder="&#128269; Search clients..." oninput="paintClients()"></div>
           <div id="clientsContainer"></div>
         </div>
       </div>
@@ -283,7 +283,7 @@ function installPWA(){
       <div class="tab-panel" id="tab_inservices">
         <div class="page-hdr">
           <div><h1>Inservice Training</h1><p>Assign topics and track completion across all aides</p></div>
-          <button class="btn btn-teal" onclick="renderInservices()">&#8635; Refresh</button>
+          <button class="btn btn-teal" onclick="renderInservices(true)">&#8635; Refresh</button>
         </div>
 
         <!-- ASSIGN -->
@@ -492,6 +492,57 @@ const NUT=['Meal set up','Assist w/feeding'];
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 let allRecords=[],currentRec=null,adminSigPads={};
 
+const GAS_HEADERS={'Content-Type':'text/plain;charset=utf-8'};
+const CACHE_TTL_MS=5*60*1000;
+const _memCache={};
+const _inflight={};
+
+async function apiPost(payload){
+  const res=await fetch(SHEETS_URL,{method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload)});
+  return res.json();
+}
+function _cacheKey(action){return 'ec_cache_'+action;}
+function cacheGet(action){
+  const key=_cacheKey(action);
+  const mem=_memCache[key];
+  if(mem&&(Date.now()-mem.t)<CACHE_TTL_MS)return mem.v;
+  try{
+    const raw=sessionStorage.getItem(key);
+    if(!raw)return null;
+    const rec=JSON.parse(raw);
+    if(rec&&(Date.now()-rec.t)<CACHE_TTL_MS){_memCache[key]=rec;return rec.v;}
+  }catch(e){}
+  return null;
+}
+function cacheSet(action,v){
+  const key=_cacheKey(action);
+  const rec={t:Date.now(),v};
+  _memCache[key]=rec;
+  try{sessionStorage.setItem(key,JSON.stringify(rec));}catch(e){}
+}
+function cacheInvalidate(action){
+  const key=_cacheKey(action);
+  delete _memCache[key];
+  try{sessionStorage.removeItem(key);}catch(e){}
+}
+async function apiGetCached(action,extra,force){
+  if(!force){
+    const hit=cacheGet(action);
+    if(hit)return hit;
+  }
+  if(_inflight[action])return _inflight[action];
+  _inflight[action]=(async()=>{
+    try{
+      const data=await apiPost(Object.assign({action:action},extra||{}));
+      if(data&&data.success)cacheSet(action,data);
+      return data;
+    }finally{delete _inflight[action];}
+  })();
+  return _inflight[action];
+}
+
+
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function openModal(id){document.getElementById(id).classList.add('show');}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
@@ -578,6 +629,7 @@ async function mgrLogin(){
       document.getElementById('sidebarRoleName').textContent=data.role;
       showScreen('adminScreen');renderTimesheets();renderBroadcastPreview();
       logActivity('Logged in');
+      Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
     }else{
       errEl.textContent='Incorrect password.';
       errEl.style.display='block';
@@ -624,11 +676,9 @@ function adminLogout(){logActivity('Logged out');currentAdminRole=null;showScree
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
-  const empty=document.getElementById('tsEmpty');
   if(tbody)tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr>';
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_all'})});
-    const data=await res.json();
+    const data=await apiPost({action:'get_all'});
     if(data.success&&data.data){
       allRecords=data.data.filter(r=>r.submitted).map(r=>({
         id:r.id,submitted:r.submitted,empName:r.empName||r.emp_name||'',username:r.username||'',
@@ -641,7 +691,13 @@ async function renderTimesheets(){
       store.set('admin_records',allRecords);
     }
   }catch(e){allRecords=store.get('admin_records')||[];}
+  paintTimesheets();
+}
 
+function paintTimesheets(){
+  const tbody=document.getElementById('tsBody');
+  const empty=document.getElementById('tsEmpty');
+  if(!tbody)return;
   const q=(document.getElementById('tsSearch')?.value||'').toLowerCase();
   let recs=allRecords.slice().reverse();
   if(q)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(q)||(r.clientName||'').toLowerCase().includes(q)||(r.weekStart||'').includes(q));
@@ -681,12 +737,13 @@ async function renderTimesheets(){
     </tr>`;}).join('');
 }
 
-async function renderAides(){
+async function renderAides(force){
   const container=document.getElementById('aidesContainer');
-  container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
+  if(force===true||!cacheGet('get_users')){
+    container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
+  }
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_users'})});
-    const data=await res.json();
+    const data=await apiGetCached('get_users',null,force===true);
     if(data.success&&data.data&&data.data.length){
       const aides=data.data.filter(u=>u.username);
       const tsCount=username=>allRecords.filter(r=>r.username===username).length;
@@ -810,8 +867,7 @@ async function showLocationMap(dayIndex){
   // Look up the client's registered home coordinates
   let clientLat=null, clientLng=null;
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_clients'})});
-    const data=await res.json();
+    const data=await apiGetCached('get_clients');
     if(data.success&&data.data){
       const match=data.data.find(c=>c.name===currentRec.clientName);
       if(match&&match.lat&&match.lng){clientLat=parseFloat(match.lat);clientLng=parseFloat(match.lng);}
@@ -1185,7 +1241,7 @@ async function adminResetCaregiverPwd(){
   err.style.display='none';ok.style.display='none';
   if(!user||!pwd){err.textContent='Fill in both fields.';err.style.display='block';return;}
   try{
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'reset_password',username:user,password:pwd})});
+    await apiPost({action:'reset_password',username:user,password:pwd});cacheInvalidate('get_users');
     document.getElementById('cg_reset_user').value='';document.getElementById('cg_reset_pwd').value='';
     ok.textContent=`✅ Password reset for @${user}!`;ok.style.display='block';
     logActivity('Reset caregiver password for @'+user);
@@ -1636,7 +1692,7 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 
 
 // ─── INSERVICE ADMIN ────────────────────────────────────
-async function renderInservices(){
+async function renderInservices(force){
   // Populate select
   const sel=document.getElementById('assignTopicSel');
   if(sel&&sel.options.length===0){
@@ -1646,12 +1702,16 @@ async function renderInservices(){
       sel.appendChild(opt);
     });
   }
-  // Show current assignment - now fetched from Google Sheets so it works across all devices
+  if(force===true){
+    cacheInvalidate('get_assigned_topic');
+    cacheInvalidate('get_users');
+  }
+  // Start compliance fetches first so get_assigned_topic shares in-flight with the badge below
+  loadISCompliance(force===true);
   const assignEl=document.getElementById('currentAssignment');
   if(assignEl)assignEl.textContent='Loading...';
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_assigned_topic'})});
-    const data=await res.json();
+    const data=await apiGetCached('get_assigned_topic',null,force===true);
     if(data.success&&data.topicId){
       const is=INSERVICES.find(i=>i.id==data.topicId);
       if(assignEl&&is)assignEl.innerHTML='<span style="background:var(--teal-light);color:var(--teal-dark);padding:4px 12px;border-radius:20px;font-weight:600">Currently assigned: '+is.title+'</span>';
@@ -1662,7 +1722,6 @@ async function renderInservices(){
   }catch(e){
     if(assignEl)assignEl.textContent='Error loading assignment status.';
   }
-  loadISCompliance();
 }
 
 async function assignTopic(){
@@ -1672,9 +1731,10 @@ async function assignTopic(){
   const is=INSERVICES.find(i=>i.id==id);
   showTempMsg('Assigning topic...','var(--teal)');
   try{
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'set_assigned_topic',topicId:id})});
+    await apiPost({action:'set_assigned_topic',topicId:id});
+    cacheInvalidate('get_assigned_topic');
     showTempMsg('✅ Topic assigned: '+is.shortTitle,'var(--success)');
-    renderInservices();
+    renderInservices(true);
   }catch(e){
     showTempMsg('Error assigning topic. Try again.','var(--danger)');
   }
@@ -1683,36 +1743,33 @@ async function assignTopic(){
 async function clearAssignment(){
   showTempMsg('Clearing assignment...','var(--teal)');
   try{
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'clear_assigned_topic'})});
+    await apiPost({action:'clear_assigned_topic'});
+    cacheInvalidate('get_assigned_topic');
     showTempMsg('Assignment cleared.','var(--teal)');
-    renderInservices();
+    renderInservices(true);
   }catch(e){
     showTempMsg('Error clearing assignment.','var(--danger)');
   }
 }
 
-async function loadISCompliance(){
+async function loadISCompliance(force){
   const tbody=document.getElementById('isComplianceBody');
   const empty=document.getElementById('isComplianceEmpty');
   if(!tbody)return;
   tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
 
   try{
-    // Get current assignment from Google Sheets (works across all devices)
-    const assignRes=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_assigned_topic'})});
-    const assignData=await assignRes.json();
-    const assignedTopicId=assignData.success?assignData.topicId:null;
+    const [assignData, usersData, isData]=await Promise.all([
+      apiGetCached('get_assigned_topic',null,force===true),
+      apiGetCached('get_users',null,force===true),
+      apiPost({action:'get_inservices'})
+    ]);
+    const assignedTopicId=assignData&&assignData.success?assignData.topicId:null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
 
-    // Get all aides
-    const usersRes=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_users'})});
-    const usersData=await usersRes.json();
-    const aides=(usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
+    const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
 
-    // Get all completions
-    const isRes=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_inservices'})});
-    const isData=await isRes.json();
-    const completions=(isData.success&&isData.data)?isData.data:[];
+    const completions=(isData&&isData.success&&isData.data)?isData.data:[];
 
     if(!aides.length){
       empty.style.display='block';
@@ -1755,9 +1812,8 @@ async function loadISCompliance(){
 
 async function sendISReminder(username,name){
   try{
-    const assignRes=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_assigned_topic'})});
-    const assignData=await assignRes.json();
-    const assignedTopicId=assignData.success?assignData.topicId:null;
+    const assignData=await apiGetCached('get_assigned_topic');
+    const assignedTopicId=assignData&&assignData.success?assignData.topicId:null;
     if(!assignedTopicId){showTempMsg('No topic currently assigned.','var(--danger)');return;}
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_is_reminder',username,topicId:assignedTopicId})});
     showTempMsg(`📢 Reminder sent to ${name}!`,'var(--success)');
@@ -1854,17 +1910,23 @@ function printCert(r){
 // ─── CLIENT MANAGEMENT ──────────────────────────────────
 let allClients=[], allAidesForAssign=[];
 
-async function renderClients(){
+async function renderClients(force){
   const container=document.getElementById('clientsContainer');
-  container.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:24px;margin-bottom:8px">⏳</div><p style="color:var(--muted);font-size:0.82rem">Loading clients from Google Sheets...</p></div>';
+  if(force===true||!cacheGet('get_clients')){
+    container.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:24px;margin-bottom:8px">⏳</div><p style="color:var(--muted);font-size:0.82rem">Loading clients from Google Sheets...</p></div>';
+  }
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_clients'})});
-    const data=await res.json();
+    const data=await apiGetCached('get_clients',null,force===true);
     if(data.success){
       allClients=data.data||[];
     }
-  }catch(e){allClients=[];}
+  }catch(e){if(force===true||!allClients.length)allClients=[];}
+  paintClients();
+}
 
+function paintClients(){
+  const container=document.getElementById('clientsContainer');
+  if(!container)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
   let list=allClients;
   if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q));
@@ -1893,10 +1955,11 @@ async function renderClients(){
 
 async function loadAidesForAssignment(selectedIds=[]){
   const container=document.getElementById('assignAidesList');
-  container.innerHTML='<p style="color:var(--muted);font-size:0.78rem">Loading aides...</p>';
+  if(!cacheGet('get_users')){
+    container.innerHTML='<p style="color:var(--muted);font-size:0.78rem">Loading aides...</p>';
+  }
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_users'})});
-    const data=await res.json();
+    const data=await apiGetCached('get_users');
     if(data.success&&data.data){
       allAidesForAssign=data.data.filter(u=>u.username);
       if(!allAidesForAssign.length){
@@ -1989,11 +2052,12 @@ async function saveClient(){
   if(id)payload.id=id;
 
   try{
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    await apiPost(payload);
+    cacheInvalidate('get_clients');
     closeModal('clientModal');
     showTempMsg('&#10003; Client saved!','var(--success)');
     logActivity((id?'Updated':'Added')+' client: '+name);
-    renderClients();
+    renderClients(true);
   }catch(e){
     showTempMsg('Error saving client.','var(--danger)');
   }
@@ -2003,10 +2067,11 @@ async function deleteClient(id){
   if(!confirm('Delete this client? This cannot be undone.'))return;
   const client=allClients.find(c=>String(c.id)===String(id));
   try{
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete_client',id})});
+    await apiPost({action:'delete_client',id});
+    cacheInvalidate('get_clients');
     showTempMsg('Client deleted.','var(--danger)');
     logActivity('Deleted client: '+(client?.name||id));
-    renderClients();
+    renderClients(true);
   }catch(e){
     showTempMsg('Error deleting client.','var(--danger)');
   }
@@ -2016,8 +2081,7 @@ async function deleteClient(id){
 async function exportAllToExcel(){
   showTempMsg('Preparing export...','var(--teal)');
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_all'})});
-    const data=await res.json();
+    const data=await apiPost({action:'get_all'});
     if(!data.success||!data.data||!data.data.length){
       showTempMsg('No timesheets to export yet.','var(--warn)');
       return;
