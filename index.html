@@ -852,6 +852,27 @@ function formatWeekLabel(val){
   return `Week of ${get('month')}/${get('day')}/${get('year')}`;
 }
 
+
+function formatDateTimeLabel(val){
+  if(val==null||val==='')return '—';
+  const s=String(val).trim();
+  if(!/\d{4}-\d{2}-\d{2}T/.test(s) && !/^\d{4}-\d{2}-\d{2}/.test(s) && !/Z$/i.test(s))return s;
+  const plain=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(plain){
+    const d=new Date(Number(plain[1]),Number(plain[2])-1,Number(plain[3]));
+    return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric'}).format(d);
+  }
+  const d=(val instanceof Date)?val:new Date(s);
+  if(isNaN(d.getTime()))return s;
+  return new Intl.DateTimeFormat('en-US',{
+    timeZone:'America/New_York',
+    month:'short',day:'numeric',year:'numeric',
+    hour:'numeric',minute:'2-digit'
+  }).format(d);
+}
+
+
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')warmUpSheets();}
 let _modalScrollY=0;
 function lockBodyScroll(){
@@ -1027,7 +1048,7 @@ async function renderActivityLog(){
     if(data.success&&data.data&&data.data.length){
       empty.style.display='none';
       tbody.innerHTML=data.data.slice().reverse().map(r=>`<tr>
-        <td style="font-size:0.78rem">${r.timestamp}</td>
+        <td style="font-size:0.78rem">${formatDateTimeLabel(r.timestamp)}</td>
         <td><span style="background:${r.role==='Admin'?'#e8f4f4':'#fff3e0'};color:${r.role==='Admin'?'var(--teal-dark)':'var(--warn)'};padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600">${r.role}</span></td>
         <td style="font-size:0.82rem">${r.activity}</td>
       </tr>`).join('');
@@ -1101,7 +1122,7 @@ function paintTimesheets(){
     const locs=[...new Set(Object.values(days).filter(d=>d&&d.location&&!d.location.includes('not')).map(d=>d.location))];
     const locSum=locs.length?`📍 ${locs[0].split(',')[0]}`:'—';
     return`<tr>
-      <td style="font-size:0.73rem">${r.submitted}</td>
+      <td style="font-size:0.73rem">${formatDateTimeLabel(r.submitted)}</td>
       <td><strong>${r.empName}</strong></td>
       <td>${r.clientName}</td>
       <td>${formatWeekLabel(r.weekStart)}</td>
@@ -1179,7 +1200,7 @@ function paintBackupRequests(){
       <td><strong>${r.empName||'—'}</strong><div style="font-size:0.7rem;color:var(--muted)">@${r.username||''}</div></td>
       <td>${r.clientName||'—'}</td>
       <td>${formatWeekLabel(r.weekStart)}</td>
-      <td style="font-size:0.73rem">${r.backedUpAt||'—'}</td>
+      <td style="font-size:0.73rem">${formatDateTimeLabel(r.backedUpAt)}</td>
       <td><strong style="color:var(--teal)">${r.totalHrs||'—'}</strong></td>
       <td><span class="badge badge-backup">☁️ Cloud backup</span></td>
       <td><div class="actions">
@@ -1221,7 +1242,7 @@ function viewBackup(id){
       <div class="det-kv"><div class="lbl">Service Type</div><div style="font-size:0.88rem;font-weight:600">${r.svcType||'—'}</div></div>
       <div class="det-kv"><div class="lbl">Week Starting</div><div style="font-size:0.88rem;font-weight:600">${formatWeekLabel(r.weekStart)}</div></div>
       <div class="det-kv"><div class="lbl">Total Hours</div><div style="font-size:1.2rem;font-weight:700;color:var(--teal)">${r.totalHrs||'—'}</div></div>
-      <div class="det-kv"><div class="lbl">Backed up</div><div style="font-size:0.88rem;font-weight:600">${r.backedUpAt||'—'}</div></div>
+      <div class="det-kv"><div class="lbl">Backed up</div><div style="font-size:0.88rem;font-weight:600">${formatDateTimeLabel(r.backedUpAt)}</div></div>
       <div class="det-kv"><div class="lbl">Status</div><div><span class="badge badge-backup">☁️ Cloud backup</span></div></div>
     </div>
     <p style="font-size:0.75rem;color:var(--muted);margin:8px 0 12px">Read-only — this is an office cloud backup, not a payroll submission.</p>
@@ -1251,7 +1272,7 @@ async function renderAides(force){
           const dot=ls==='granted'?'loc-green':ls==='denied'?'loc-red':'loc-grey';
           const label=ls==='granted'?'Location Enabled':ls==='denied'?'Location Denied — Contact Aide':'Location Unknown';
           return`<div class="aide-card">
-            <div><h4>${u.name}</h4><p>@${u.username} · ${u.email||''} · Joined ${u.joined}</p><p style="margin-top:3px"><span class="loc-dot ${dot}"></span>${label}${u.lastSeen?` · Last seen ${u.lastSeen}`:''}</p></div>
+            <div><h4>${u.name}</h4><p>@${u.username} · ${u.email||''} · Joined ${formatDateTimeLabel(u.joined)}</p><p style="margin-top:3px"><span class="loc-dot ${dot}"></span>${label}${u.lastSeen?` · Last seen ${formatDateTimeLabel(u.lastSeen)}`:''}</p></div>
             <div style="font-size:0.75rem;color:var(--muted)">${tsCount(u.username)} timesheet${tsCount(u.username)!==1?'s':''}</div>
           </div>`;}).join('')+`</div>`;
       return;
