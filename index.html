@@ -657,6 +657,23 @@ const CACHE_TTL_MS=5*60*1000;
 const _memCache={};
 const _inflight={};
 
+
+/** Wake Apps Script before Sign In (cold start). Prefer GET; fallback POST ping.
+ *  Requires Sheets doGet→OK or action ping — hold push until Mo OK + Sheets live. */
+function warmUpSheets(){
+  if(window._sheetsWarmUpStarted)return;
+  window._sheetsWarmUpStarted=true;
+  // GET first (doGet). Ignore failures — warm-up is best-effort.
+  fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'}).catch(()=>{});
+  // POST ping also (if Sheets adds it). text/plain CORS preserved.
+  fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(()=>{});
+}
+
+
+document.addEventListener('DOMContentLoaded',function(){
+  if(document.getElementById('loginScreen')?.classList.contains('active'))warmUpSheets();
+});
+
 async function apiPost(payload){
   const res=await fetch(SHEETS_URL,{method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload)});
   return res.json();
@@ -722,7 +739,7 @@ function formatWeekLabel(val){
   return `Week of ${get('month')}/${get('day')}/${get('year')}`;
 }
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')warmUpSheets();}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
@@ -842,16 +859,28 @@ async function mgrLogin(){
         currentNurseName=data.name||data.supervisorName||data.displayName||'Nurse';
         const nRole=document.getElementById('nurseSidebarRoleName');
         if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
+        // Paint Nurse home first — do not await compliance before unlocking Sign In
         showScreen('nurseScreen');
-        loadNurseCompliance(true);
-        logActivity('Logged in (Nurse)');
+        if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+        window._mgrLoginInFlight=false;
+        requestAnimationFrame(function(){
+          setTimeout(function(){ loadNurseCompliance(true); logActivity('Logged in (Nurse)'); }, 0);
+        });
       }else{
         currentNurseName=null;
         document.getElementById('currentRoleLabel').textContent='Logged in as: '+data.role;
         document.getElementById('sidebarRoleName').textContent=data.role;
-        showScreen('adminScreen');renderTimesheets();renderBroadcastPreview();
-        logActivity('Logged in');
-        Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
+        showScreen('adminScreen');
+        if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+        window._mgrLoginInFlight=false;
+        requestAnimationFrame(function(){
+          setTimeout(function(){
+            renderTimesheets();
+            renderBroadcastPreview();
+            logActivity('Logged in');
+            Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
+          }, 0);
+        });
       }
     }else{
       errEl.textContent='Incorrect password.';
