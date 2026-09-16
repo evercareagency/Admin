@@ -203,7 +203,7 @@ function installPWA(){
     <button onclick="installPWA()" style="background:var(--off);border:1.5px solid var(--border);color:var(--navy);padding:8px 18px;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px">
       📱 Add App to Home Screen
     </button>
-    <div class="field"><label>Password</label><input type="password" id="mgr_pass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')mgrLogin()"></div>
+    <div class="field"><label>Password</label><div style="position:relative"><input type="password" id="mgr_pass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')mgrLogin()" style="padding-right:64px"><button type="button" onclick="togglePasswordVisibility('mgr_pass',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted,#6b7a90);font-size:0.78rem;font-weight:600;cursor:pointer;padding:4px 6px;font-family:inherit">Show</button></div></div>
     <button class="btn btn-navy btn-full" onclick="mgrLogin()">Sign In →</button>
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
     <div style="text-align:center;margin-top:12px">
@@ -795,6 +795,14 @@ let currentAdminRole=null;
 let currentNurseName=null;
 let nurseSigPads={};
 let nurseComplianceRows=[];
+
+function togglePasswordVisibility(id,btn){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const show=el.type==='password';
+  el.type=show?'text':'password';
+  if(btn)btn.textContent=show?'Hide':'Show';
+}
 
 async function mgrLogin(){
   const pwd=document.getElementById('mgr_pass').value;
