@@ -237,7 +237,7 @@ function installPWA(){
         <div class="card">
           <div class="search-bar"><input type="text" id="tsSearch" placeholder="🔍 Search by aide, client or week..." oninput="paintTimesheets()"></div>
           <div style="overflow-x:auto">
-            <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
+            <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>PDF</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
           </div>
           <div id="tsEmpty" class="empty-state" style="display:none"><p>📭 No timesheets yet.</p></div>
         </div>
@@ -703,6 +703,7 @@ async function renderTimesheets(){
         id:r.id,submitted:r.submitted,empName:r.empName||r.emp_name||'',username:r.username||'',
         clientName:r.clientName||r.client_name||'',svcType:r.svcType||r.svc_type||'',
         weekStart:r.weekStart||r.week_start||'',
+        pdfLink:r.PdfLink||r.pdfLink||r.pdf_link||r.PDFLink||'',
         totalHrs:r.totalHrs||r.total_hours||r.totalHours||'0:00',
         notes:r.notes||'',days:r.days||{},
         status:r.status||'submitted',correctionDays:r.correctionDays||[],correctionNote:r.correctionNote||''
@@ -711,6 +712,14 @@ async function renderTimesheets(){
     }
   }catch(e){allRecords=store.get('admin_records')||[];}
   paintTimesheets();
+}
+
+
+function openTimesheetPdf(id){
+  const r=allRecords.find(x=>String(x.id)===String(id));
+  const url=(r&&(r.pdfLink||'')).trim();
+  if(!url){alert('No archived PDF yet for this timesheet.');return;}
+  window.open(url,'_blank','noopener');
 }
 
 function paintTimesheets(){
@@ -749,6 +758,7 @@ function paintTimesheets(){
       <td><strong style="color:var(--teal)">${r.totalHrs}</strong></td>
       <td style="font-size:0.72rem;color:var(--teal)">${locSum}</td>
       <td>${statusBadge(r.status)}</td>
+      <td>${(r.pdfLink||'').trim()?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="openTimesheetPdf('${r.id}')">📄 View</button>`:`<span style="font-size:0.72rem;color:var(--muted)">No PDF yet</span>`}</td>
       <td><div class="actions">
         <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewRec('${r.id}')">👁 View</button>
         <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="quickDelete('${r.id}')">🗑</button>
@@ -828,6 +838,7 @@ function buildDetailBody(){
       <div class="det-kv"><div class="lbl">Week Starting</div><div style="font-size:0.88rem;font-weight:600">${formatWeekLabel(r.weekStart)}</div></div>
       <div class="det-kv"><div class="lbl">Total Hours</div><div style="font-size:1.2rem;font-weight:700;color:var(--teal)">${r.totalHrs}</div></div>
       <div class="det-kv"><div class="lbl">Status</div><div>${r.status==='correction_requested'?'⚠️ Needs Fix':r.status==='corrected'?'🔄 Corrected':'✅ Submitted'}</div></div>
+      <div class="det-kv"><div class="lbl">Archived PDF</div><div>${(r.pdfLink||'').trim()?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="openTimesheetPdf('${r.id}')">📄 View PDF</button>`:`<span style="font-size:0.8rem;color:var(--muted)">No PDF yet</span>`}</div></div>
     </div>
     <div style="overflow-x:auto">
       <table class="hours-tbl">
