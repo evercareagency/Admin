@@ -543,6 +543,25 @@ async function apiGetCached(action,extra,force){
 
 
 
+
+function formatWeekLabel(val){
+  if(val==null||val==='')return '—';
+  const s=String(val).trim();
+  if(/^Week of \d{1,2}\/\d{1,2}\/\d{4}$/i.test(s))return s;
+  // Plain YYYY-MM-DD (no timezone) — use calendar date as written
+  const plain=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(plain)return `Week of ${plain[2]}/${plain[3]}/${plain[1]}`;
+  const d=(val instanceof Date)?val:new Date(s);
+  if(isNaN(d.getTime())){
+    const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m)return `Week of ${m[2]}/${m[3]}/${m[1]}`;
+    return s;
+  }
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',month:'2-digit',day:'2-digit',year:'numeric'}).formatToParts(d);
+  const get=t=>(parts.find(p=>p.type===t)||{}).value;
+  return `Week of ${get('month')}/${get('day')}/${get('year')}`;
+}
+
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function openModal(id){document.getElementById(id).classList.add('show');}
 function closeModal(id){document.getElementById(id).classList.remove('show');}
@@ -700,7 +719,7 @@ function paintTimesheets(){
   if(!tbody)return;
   const q=(document.getElementById('tsSearch')?.value||'').toLowerCase();
   let recs=allRecords.slice().reverse();
-  if(q)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(q)||(r.clientName||'').toLowerCase().includes(q)||(r.weekStart||'').includes(q));
+  if(q)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(q)||(r.clientName||'').toLowerCase().includes(q)||(r.weekStart||'').toLowerCase().includes(q)||formatWeekLabel(r.weekStart).toLowerCase().includes(q));
 
   document.getElementById('st_total').textContent=allRecords.length;
   const now=new Date();
@@ -726,7 +745,7 @@ function paintTimesheets(){
       <td style="font-size:0.73rem">${r.submitted}</td>
       <td><strong>${r.empName}</strong></td>
       <td>${r.clientName}</td>
-      <td>${r.weekStart}</td>
+      <td>${formatWeekLabel(r.weekStart)}</td>
       <td><strong style="color:var(--teal)">${r.totalHrs}</strong></td>
       <td style="font-size:0.72rem;color:var(--teal)">${locSum}</td>
       <td>${statusBadge(r.status)}</td>
@@ -766,7 +785,7 @@ function viewRec(id){
   currentRec=allRecords.find(r=>String(r.id)===String(id));
   if(!currentRec)return;
   document.getElementById('correctionPanel').style.display='none';
-  document.getElementById('detailTitle').textContent=`${currentRec.empName} → ${currentRec.clientName} | Week of ${currentRec.weekStart}`;
+  document.getElementById('detailTitle').textContent=`${currentRec.empName} → ${currentRec.clientName} | ${formatWeekLabel(currentRec.weekStart)}`;
   buildDetailBody();
   openModal('detailModal');
 }
@@ -806,7 +825,7 @@ function buildDetailBody(){
       <div class="det-kv"><div class="lbl">Client</div><input class="edit-f" id="ei_client" value="${r.clientName}"></div>
       <div class="det-kv"><div class="lbl">Employee</div><input class="edit-f" id="ei_emp" value="${r.empName}"></div>
       <div class="det-kv"><div class="lbl">Service Type</div><div style="font-size:0.88rem;font-weight:600">${r.svcType}</div></div>
-      <div class="det-kv"><div class="lbl">Week Starting</div><div style="font-size:0.88rem;font-weight:600">${r.weekStart}</div></div>
+      <div class="det-kv"><div class="lbl">Week Starting</div><div style="font-size:0.88rem;font-weight:600">${formatWeekLabel(r.weekStart)}</div></div>
       <div class="det-kv"><div class="lbl">Total Hours</div><div style="font-size:1.2rem;font-weight:700;color:var(--teal)">${r.totalHrs}</div></div>
       <div class="det-kv"><div class="lbl">Status</div><div>${r.status==='correction_requested'?'⚠️ Needs Fix':r.status==='corrected'?'🔄 Corrected':'✅ Submitted'}</div></div>
     </div>
@@ -2091,7 +2110,7 @@ async function exportAllToExcel(){
     // Sheet 1: Summary
     const summaryRows=[['Submitted','Employee','Client','Week Starting','Total Hours','Status','Notes']];
     records.forEach(r=>{
-      summaryRows.push([r.submitted,r.empName,r.clientName,r.weekStart,r.totalHrs,r.status,r.notes||'']);
+      summaryRows.push([r.submitted,r.empName,r.clientName,formatWeekLabel(r.weekStart),r.totalHrs,r.status,r.notes||'']);
     });
 
     // Sheet 2: Daily Details
@@ -2102,7 +2121,7 @@ async function exportAllToExcel(){
         const d=days[i];
         if(d&&d.tin){
           dailyRows.push([
-            r.empName, r.clientName, r.weekStart, DAYS[i]||i, d.date||'',
+            r.empName, r.clientName, formatWeekLabel(r.weekStart), DAYS[i]||i, d.date||'',
             d.tin||'', d.tout||'', d.hrs||'', d.location||'',
             d.verified===true?'Yes':d.verified===false?'No':'N/A',
             (d.svcs||[]).join(', ')
