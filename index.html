@@ -109,6 +109,17 @@ textarea{resize:vertical;min-height:80px;}
 .broadcast-active{background:#c0392b;color:white;padding:11px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:14px;}
 .correction-section{border:1.5px solid var(--warn);border-radius:8px;padding:14px;margin-top:12px;}
 .correction-section h4{color:var(--warn);font-size:0.85rem;font-weight:600;margin-bottom:10px;}
+
+/* Nurse supervisory contacts */
+.badge-ontrack{background:#e8f8f0;color:var(--success);}
+.badge-needs{background:#fff3e0;color:var(--warn);}
+.badge-behind{background:#fde8e8;color:var(--danger);}
+.nurse-form-section{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.nurse-form-section h4{font-size:0.88rem;color:var(--navy);margin-bottom:12px;font-weight:600;}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+.perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.nurse-actions{display:flex;flex-wrap:wrap;gap:6px;}
+@media(max-width:768px){.pc-grid,.perf-grid{grid-template-columns:1fr 1fr;}}
 </style>
 
 <!-- PWA -->
@@ -411,6 +422,155 @@ Call (216) 377-5991 with any questions.</textarea>
   </div>
 </div>
 
+<!-- NURSE SUPERVISORY CONTACTS -->
+<div class="screen" id="nurseScreen">
+  <div class="admin-layout">
+    <div class="sidebar">
+      <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px">
+        <img src="data:image/jpeg;base64,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" id="nurseLogoImg" alt="EverCare" style="width:36px;height:36px;object-fit:cover;border-radius:50%;flex-shrink:0">
+        <div><h2>EverCare</h2><p>Nurse Portal</p></div>
+      </div>
+      <div style="padding:8px 18px;background:rgba(255,255,255,0.06);font-size:0.7rem;color:rgba(255,255,255,0.7);border-bottom:1px solid rgba(255,255,255,0.1)">&#128100; Logged in as: <strong id="nurseSidebarRoleName">Nurse</strong></div>
+      <div class="nav-item active" id="nav_nurse_compliance"><span class="ni">&#9989;</span> Compliance</div>
+      <div class="sidebar-bottom"><button onclick="adminLogout()">&#8592; Sign Out</button></div>
+    </div>
+    <div class="main-content">
+      <div class="page-hdr">
+        <div>
+          <h1>Supervisory Compliance</h1>
+          <p>Rolling 60-day window — 2 in-home visits + 4 counting phone calls per client</p>
+        </div>
+        <button class="btn btn-teal" onclick="loadNurseCompliance(true)">&#128260; Refresh</button>
+      </div>
+      <div class="card" style="background:var(--teal-light);margin-bottom:16px">
+        <p style="font-size:0.82rem;color:var(--teal-dark);margin:0"><strong>Cadence tip:</strong> every 60 days = 2 in-home visits + 4 phone calls (client or family, call must be Reached). Flexible scheduling — no board.</p>
+      </div>
+      <div class="card">
+        <div style="overflow-x:auto">
+          <table class="data-table" id="nurseComplianceTable">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Visits</th>
+                <th>Counting calls</th>
+                <th>Days in window</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="nurseComplianceBody">
+              <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Sign in as Nurse to load compliance.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="nurseComplianceEmpty" class="empty-state" style="display:none">
+          <p>&#128203; No compliance rows yet.</p>
+          <p style="font-size:0.8rem;color:var(--muted);margin-top:8px" id="nurseComplianceNote">Backend pending — UI walkthrough available with empty list.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUPERVISORY CONTACT MODAL -->
+<div class="modal-bg" id="supervisoryContactModal">
+  <div class="modal" style="max-width:720px;max-height:92vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <h3 id="scModalTitle" style="margin-bottom:0">Log Contact</h3>
+      <button class="mbtn mbtn-cancel" onclick="closeSupervisoryContactModal()">&#10005; Close</button>
+    </div>
+    <input type="hidden" id="sc_contactType" value="">
+    <input type="hidden" id="sc_clientId" value="">
+
+    <div class="nurse-form-section">
+      <h4>Basic info</h4>
+      <div class="det-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label>Contact Date</label><input type="date" id="sc_contactDate"></div>
+        <div class="field"><label>Contact Type</label><input type="text" id="sc_contactTypeLabel" readonly style="background:var(--off)"></div>
+        <div class="field"><label>Client</label><input type="text" id="sc_clientName" readonly style="background:var(--off)"></div>
+        <div class="field"><label>Aide Name</label><input type="text" id="sc_aideName" placeholder="Aide present / assigned"></div>
+        <div class="field"><label>Supervisor Name</label><input type="text" id="sc_supervisorName" readonly style="background:var(--off)"></div>
+        <div class="field"><label>Client Lives With</label>
+          <select id="sc_clientLivesWith"><option value="">—</option><option>Alone</option><option>With family</option><option>Other</option></select>
+        </div>
+      </div>
+      <div class="field"><label>Functional Limitations</label><textarea id="sc_functionalLimitations" placeholder="Brief notes"></textarea></div>
+      <div class="det-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label>Pleased With Aide</label>
+          <select id="sc_pleasedWithAide"><option value="">—</option><option>Pleased</option><option>Displeased</option><option>Not discussed</option></select>
+        </div>
+        <div class="field"><label>Aide Attitude / Communication</label><input type="text" id="sc_aideAttitudeCommunication" placeholder="Notes"></div>
+      </div>
+    </div>
+
+    <div class="nurse-form-section" id="sc_visitOnly">
+      <h4>Visit-only</h4>
+      <div class="field"><label>Aide Present</label>
+        <select id="sc_aidePresent"><option value="">—</option><option>Yes</option><option>No</option></select>
+      </div>
+      <p style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">Personal care items — rate 1 | 2 | 3 | 4 | N/A</p>
+      <div class="pc-grid" id="sc_personalCareGrid"></div>
+      <div class="det-grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="field"><label>Aide Appearance</label><input type="text" id="sc_aideAppearance"></div>
+        <div class="field"><label>Client Appearance</label><input type="text" id="sc_clientAppearance"></div>
+      </div>
+      <div class="field"><label>Home Observations (optional)</label><textarea id="sc_homeObservations"></textarea></div>
+    </div>
+
+    <div class="nurse-form-section" id="sc_phoneOnly" style="display:none">
+      <h4>Phone call-only</h4>
+      <div class="det-grid" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label>Spoke With</label>
+          <select id="sc_spokeWith"><option value="">—</option><option>Client</option><option>Family</option><option>Aide</option><option>Other</option></select>
+        </div>
+        <div class="field"><label>Call Connected</label>
+          <select id="sc_callConnected"><option value="">—</option><option>Yes</option><option>No</option></select>
+        </div>
+        <div class="field"><label>Call Outcome</label>
+          <select id="sc_callOutcome"><option value="">—</option><option>Reached</option><option>Left message</option><option>No answer</option><option>Wrong number</option></select>
+        </div>
+      </div>
+      <div class="field"><label>Topics Covered</label><textarea id="sc_topicsCovered"></textarea></div>
+    </div>
+
+    <div class="nurse-form-section">
+      <h4>Performance checks (Yes / No)</h4>
+      <div class="perf-grid" id="sc_perfGrid"></div>
+    </div>
+
+    <div class="nurse-form-section">
+      <h4>Comments</h4>
+      <div class="field"><label>Client Comments (optional)</label><textarea id="sc_clientComments"></textarea></div>
+      <div class="field"><label>Supervisor Comments (optional)</label><textarea id="sc_supervisorComments"></textarea></div>
+    </div>
+
+    <div class="nurse-form-section" id="sc_clientSigSection">
+      <h4>Client signature (Visit required)</h4>
+      <canvas class="sig-canvas" id="sc_clientSigCanvas" height="60"></canvas>
+      <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem" onclick="clearNurseSig('sc_clientSigCanvas')">Clear</button>
+        <div class="field" style="margin:0;flex:1;min-width:140px"><label>Client Signature Date</label><input type="date" id="sc_clientSignatureDate"></div>
+      </div>
+    </div>
+
+    <div class="nurse-form-section" style="border-bottom:none">
+      <h4>Supervisor signature</h4>
+      <canvas class="sig-canvas" id="sc_supervisorSigCanvas" height="60"></canvas>
+      <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem" onclick="clearNurseSig('sc_supervisorSigCanvas')">Clear</button>
+        <div class="field" style="margin:0;flex:1;min-width:140px"><label>Supervisor Signature Date</label><input type="date" id="sc_supervisorSignatureDate"></div>
+      </div>
+    </div>
+
+    <div id="scFormErr" style="color:var(--danger);font-size:0.8rem;margin-bottom:10px;display:none"></div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-cancel" onclick="closeSupervisoryContactModal()">Cancel</button>
+      <button class="mbtn mbtn-confirm" onclick="saveSupervisoryContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- ADD/EDIT CLIENT MODAL -->
 <div class="modal-bg" id="clientModal">
   <div class="modal" style="max-width:600px">
@@ -632,6 +792,9 @@ async function doAdminReset(){
 }
 
 let currentAdminRole=null;
+let currentNurseName=null;
+let nurseSigPads={};
+let nurseComplianceRows=[];
 
 async function mgrLogin(){
   const pwd=document.getElementById('mgr_pass').value;
@@ -644,11 +807,22 @@ async function mgrLogin(){
     if(data.success&&data.role){
       currentAdminRole=data.role;
       document.getElementById('mgr_pass').value='';
-      document.getElementById('currentRoleLabel').textContent='Logged in as: '+data.role;
-      document.getElementById('sidebarRoleName').textContent=data.role;
-      showScreen('adminScreen');renderTimesheets();renderBroadcastPreview();
-      logActivity('Logged in');
-      Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
+      // Nurse: limited home only — no full Admin tools
+      if(data.role==='Nurse'){
+        currentNurseName=data.name||data.supervisorName||data.displayName||'Nurse';
+        const nRole=document.getElementById('nurseSidebarRoleName');
+        if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
+        showScreen('nurseScreen');
+        loadNurseCompliance(true);
+        logActivity('Logged in (Nurse)');
+      }else{
+        currentNurseName=null;
+        document.getElementById('currentRoleLabel').textContent='Logged in as: '+data.role;
+        document.getElementById('sidebarRoleName').textContent=data.role;
+        showScreen('adminScreen');renderTimesheets();renderBroadcastPreview();
+        logActivity('Logged in');
+        Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
+      }
     }else{
       errEl.textContent='Incorrect password.';
       errEl.style.display='block';
@@ -691,7 +865,7 @@ async function renderActivityLog(){
   }
 }
 
-function adminLogout(){logActivity('Logged out');currentAdminRole=null;showScreen('loginScreen');}
+function adminLogout(){logActivity('Logged out');currentAdminRole=null;currentNurseName=null;nurseSigPads={};showScreen('loginScreen');}
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
@@ -2154,6 +2328,329 @@ async function exportAllToExcel(){
     showTempMsg('Error exporting. Try again.','var(--danger)');
   }
 }
+
+
+// ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
+// LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
+// list_supervisory_contacts; reuse get_clients. AdminUsers = Role|Password only.
+
+const SC_PERSONAL_CARE=['Bathing','MealPrep','Exercises','Grooming','Housekeeping','TurnReposition','Shaving','Laundry','VitalSigns','HairCare','ErrandsShopping','CatheterCare','OralHygiene','Ambulation','Appointments','SkinCare','PersonalCare'];
+const SC_PERF=['WashesHands','FollowsPOC','DocumentsCare','NotifiesOffice','Accountability','ReportsAsScheduled','WorksAssignedHours'];
+const SC_PERF_LABELS={WashesHands:'Washes hands',FollowsPOC:'Follows POC',DocumentsCare:'Documents care',NotifiesOffice:'Notifies office',Accountability:'Accountability',ReportsAsScheduled:'Reports as scheduled',WorksAssignedHours:'Works assigned hours'};
+
+function scField(row,pascal,camel){
+  if(!row)return undefined;
+  if(row[pascal]!==undefined&&row[pascal]!==null&&row[pascal]!=='')return row[pascal];
+  if(row[camel]!==undefined&&row[camel]!==null&&row[camel]!=='')return row[camel];
+  const lower=pascal.charAt(0).toLowerCase()+pascal.slice(1);
+  if(row[lower]!==undefined)return row[lower];
+  return row[pascal]??row[camel];
+}
+
+function nurseStatusBadge(status){
+  const s=String(status||'');
+  let cls='badge-needs';
+  if(s==='On track')cls='badge-ontrack';
+  else if(s==='Behind')cls='badge-behind';
+  else if(s==='Needs visits'||s==='Needs calls')cls='badge-needs';
+  return `<span class="badge ${cls}" style="padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600">${s||'—'}</span>`;
+}
+
+function escapeHtml(str){
+  return String(str==null?'':str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeAttr(str){
+  return escapeHtml(str).replace(/'/g,'&#39;');
+}
+
+async function loadNurseCompliance(force){
+  const tbody=document.getElementById('nurseComplianceBody');
+  const empty=document.getElementById('nurseComplianceEmpty');
+  const note=document.getElementById('nurseComplianceNote');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr>';
+  if(empty)empty.style.display='none';
+  try{
+    // TODO: Sheets live — action name locked: get_supervisory_compliance
+    const data=await apiPost({action:'get_supervisory_compliance'});
+    let rows=[];
+    if(data&&data.success&&Array.isArray(data.data)){
+      rows=data.data.map(r=>{
+        // Live Sheets fields: visitCount/callCount/daysLeftInWindow/windowDays
+        // Locked contract aliases: visits/countingCalls/daysInWindow
+        const visits=Number(scField(r,'Visits','visits')??r.visitCount??r.visitsDone??0)||0;
+        const countingCalls=Number(scField(r,'CountingCalls','countingCalls')??r.callCount??r.callsDone??0)||0;
+        const status=scField(r,'Status','status')||deriveNurseStatus(visits,countingCalls);
+        const daysLeft=Number(r.daysLeftInWindow??scField(r,'DaysLeftInWindow','daysLeftInWindow')??r.daysLeft??scField(r,'DaysInWindow','daysInWindow')??60)||60;
+        const daysInWindow=Number(r.windowDays??scField(r,'DaysInWindow','daysInWindow')??r.daysInWindow??60)||60;
+        return{
+          clientId:scField(r,'ClientId','clientId')||'',
+          clientName:scField(r,'ClientName','clientName')||'—',
+          visits,countingCalls,status,
+          daysLeft,
+          daysInWindow:daysLeft // table "Days left" column uses this key historically
+        };
+      });
+    }else if(data&&data.success&&data.contacts&&data.clients){
+      // Optional client-side compute if API returns raw contacts + clients
+      rows=computeComplianceFromRaw(data.clients,data.contacts);
+    }else{
+      throw new Error((data&&data.error)||'Compliance API unavailable');
+    }
+    nurseComplianceRows=rows;
+    renderNurseComplianceTable(rows);
+    if(note)note.textContent='Cadence: 2 visits + 4 counting calls (Reached + Client/Family) per rolling 60 days.';
+  }catch(e){
+    nurseComplianceRows=[];
+    tbody.innerHTML='';
+    if(empty)empty.style.display='block';
+    if(note)note.textContent='Could not load compliance — check connection and try Refresh.';
+  }
+}
+
+function deriveNurseStatus(visits,calls){
+  const vOk=visits>=2,cOk=calls>=4;
+  if(vOk&&cOk)return 'On track';
+  if(!vOk&&!cOk)return 'Behind';
+  if(!vOk)return 'Needs visits';
+  return 'Needs calls';
+}
+
+function computeComplianceFromRaw(clients,contacts){
+  const since=Date.now()-60*24*60*60*1000;
+  return (clients||[]).map(c=>{
+    const id=c.id||c.clientId||'';
+    const name=c.name||c.clientName||'—';
+    const mine=(contacts||[]).filter(ct=>{
+      const cn=scField(ct,'ClientName','clientName')||'';
+      const cid=scField(ct,'ClientId','clientId')||'';
+      const d=new Date(scField(ct,'ContactDate','contactDate')||0).getTime();
+      return d>=since&&(cid===id||cn===name);
+    });
+    const visits=mine.filter(ct=>(scField(ct,'ContactType','contactType')||'')==='Visit').length;
+    const countingCalls=mine.filter(ct=>{
+      return (scField(ct,'ContactType','contactType')||'')==='PhoneCall'
+        && (scField(ct,'CallOutcome','callOutcome')||'')==='Reached'
+        && ['Client','Family'].includes(scField(ct,'SpokeWith','spokeWith')||'');
+    }).length;
+    return{clientId:id,clientName:name,visits,countingCalls,status:deriveNurseStatus(visits,countingCalls),daysInWindow:60};
+  });
+}
+
+function renderNurseComplianceTable(rows){
+  const tbody=document.getElementById('nurseComplianceBody');
+  const empty=document.getElementById('nurseComplianceEmpty');
+  if(!tbody)return;
+  if(!rows||!rows.length){
+    tbody.innerHTML='';
+    if(empty)empty.style.display='block';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  tbody.innerHTML=rows.map((r,i)=>{
+    const name=escapeHtml(r.clientName);
+    return `<tr>
+      <td style="font-weight:600">${name}</td>
+      <td>${r.visits}</td>
+      <td>${r.countingCalls}</td>
+      <td>${r.daysInWindow}</td>
+      <td>${nurseStatusBadge(r.status)}</td>
+      <td><div class="nurse-actions">
+        <button class="btn btn-sm btn-teal" onclick="openSupervisoryContactForm('Visit',${i})">Log Visit</button>
+        <button class="btn btn-sm btn-navy" onclick="openSupervisoryContactForm('PhoneCall',${i})">Log Phone Call</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function buildScPersonalCareGrid(){
+  const grid=document.getElementById('sc_personalCareGrid');
+  if(!grid||grid.dataset.built)return;
+  grid.innerHTML=SC_PERSONAL_CARE.map(k=>{
+    const id='sc_pc_'+k;
+    return `<div class="field" style="margin-bottom:0"><label>${k}</label>
+      <select id="${id}"><option value="N/A">N/A</option><option>1</option><option>2</option><option>3</option><option>4</option></select>
+    </div>`;
+  }).join('');
+  grid.dataset.built='1';
+}
+
+function buildScPerfGrid(){
+  const grid=document.getElementById('sc_perfGrid');
+  if(!grid||grid.dataset.built)return;
+  grid.innerHTML=SC_PERF.map(k=>{
+    const id='sc_perf_'+k;
+    const label=SC_PERF_LABELS[k]||k;
+    return `<div class="field" style="margin-bottom:0"><label>${label}</label>
+      <select id="${id}"><option value="">—</option><option>Yes</option><option>No</option></select>
+    </div>`;
+  }).join('');
+  grid.dataset.built='1';
+}
+
+function initNurseSig(id){
+  const c=document.getElementById(id);if(!c)return;
+  const neo=c.cloneNode(true);
+  c.parentNode.replaceChild(neo,c);
+  const canvas=document.getElementById(id);
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||280;canvas.height=60;
+  nurseSigPads[id]={ctx,drawing:false,hasData:false};
+  const pos=e=>{const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return{x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};};
+  const start=e=>{const p=pos(e);nurseSigPads[id].drawing=true;nurseSigPads[id].hasData=true;ctx.beginPath();ctx.moveTo(p.x,p.y);canvas.classList.add('signed');};
+  const move=e=>{if(!nurseSigPads[id].drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a2744';ctx.lineWidth=1.8;ctx.lineCap='round';ctx.stroke();};
+  const stop=()=>nurseSigPads[id].drawing=false;
+  canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();start(e);},{passive:false});
+  canvas.addEventListener('touchmove',e=>{e.preventDefault();move(e);},{passive:false});
+  canvas.addEventListener('touchend',stop);
+}
+
+function clearNurseSig(id){
+  const c=document.getElementById(id);if(!c)return;
+  c.getContext('2d').clearRect(0,0,c.width,c.height);c.classList.remove('signed');
+  if(nurseSigPads[id])nurseSigPads[id].hasData=false;
+}
+
+function todayISO(){
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const get=t=>(parts.find(p=>p.type===t)||{}).value;
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
+function openSupervisoryContactForm(contactType,rowIndex){
+  const row=nurseComplianceRows[rowIndex]||{};
+  buildScPersonalCareGrid();
+  buildScPerfGrid();
+  document.getElementById('sc_contactType').value=contactType;
+  document.getElementById('sc_contactTypeLabel').value=contactType==='Visit'?'Visit':'Phone Call';
+  document.getElementById('sc_clientId').value=row.clientId||'';
+  document.getElementById('sc_clientName').value=row.clientName||'';
+  document.getElementById('sc_supervisorName').value=currentNurseName||'Nurse';
+  document.getElementById('sc_contactDate').value=todayISO();
+  document.getElementById('sc_aideName').value='';
+  document.getElementById('sc_clientLivesWith').value='';
+  document.getElementById('sc_functionalLimitations').value='';
+  document.getElementById('sc_pleasedWithAide').value='';
+  document.getElementById('sc_aideAttitudeCommunication').value='';
+  document.getElementById('sc_aidePresent').value='';
+  document.getElementById('sc_aideAppearance').value='';
+  document.getElementById('sc_clientAppearance').value='';
+  document.getElementById('sc_homeObservations').value='';
+  document.getElementById('sc_spokeWith').value='';
+  document.getElementById('sc_callConnected').value='';
+  document.getElementById('sc_callOutcome').value='';
+  document.getElementById('sc_topicsCovered').value='';
+  document.getElementById('sc_clientComments').value='';
+  document.getElementById('sc_supervisorComments').value='';
+  document.getElementById('sc_clientSignatureDate').value=todayISO();
+  document.getElementById('sc_supervisorSignatureDate').value=todayISO();
+  SC_PERSONAL_CARE.forEach(k=>{const el=document.getElementById('sc_pc_'+k);if(el)el.value='N/A';});
+  SC_PERF.forEach(k=>{const el=document.getElementById('sc_perf_'+k);if(el)el.value='';});
+  const err=document.getElementById('scFormErr');if(err){err.style.display='none';err.textContent='';}
+
+  const isVisit=contactType==='Visit';
+  document.getElementById('sc_visitOnly').style.display=isVisit?'block':'none';
+  document.getElementById('sc_phoneOnly').style.display=isVisit?'none':'block';
+  document.getElementById('sc_clientSigSection').style.display=isVisit?'block':'none';
+  document.getElementById('scModalTitle').textContent=isVisit?'Log Visit — '+(row.clientName||''):'Log Phone Call — '+(row.clientName||'');
+
+  openModal('supervisoryContactModal');
+  setTimeout(()=>{
+    if(isVisit)initNurseSig('sc_clientSigCanvas');
+    initNurseSig('sc_supervisorSigCanvas');
+  },80);
+}
+
+function closeSupervisoryContactModal(){
+  closeModal('supervisoryContactModal');
+}
+
+async function saveSupervisoryContact(){
+  const err=document.getElementById('scFormErr');
+  err.style.display='none';
+  const contactType=document.getElementById('sc_contactType').value;
+  const isVisit=contactType==='Visit';
+  const contactDate=document.getElementById('sc_contactDate').value;
+  if(!contactDate){err.textContent='Contact date is required.';err.style.display='block';return;}
+  if(!document.getElementById('sc_clientName').value){err.textContent='Client is required.';err.style.display='block';return;}
+
+  const supPad=nurseSigPads['sc_supervisorSigCanvas'];
+  const clientPad=nurseSigPads['sc_clientSigCanvas'];
+  if(!supPad||!supPad.hasData){err.textContent='Supervisor signature is required.';err.style.display='block';return;}
+  if(isVisit&&(!clientPad||!clientPad.hasData)){err.textContent='Client signature is required for visits.';err.style.display='block';return;}
+
+  // camelCase payload per locked Sheets contract
+  const payload={
+    action:'save_supervisory_contact',
+    contactDate,
+    contactType,
+    clientId:document.getElementById('sc_clientId').value||'',
+    clientName:document.getElementById('sc_clientName').value||'',
+    aideName:document.getElementById('sc_aideName').value||'',
+    supervisorName:document.getElementById('sc_supervisorName').value||currentNurseName||'Nurse',
+    clientLivesWith:document.getElementById('sc_clientLivesWith').value||'',
+    functionalLimitations:document.getElementById('sc_functionalLimitations').value||'',
+    pleasedWithAide:document.getElementById('sc_pleasedWithAide').value||'',
+    aideAttitudeCommunication:document.getElementById('sc_aideAttitudeCommunication').value||'',
+    clientComments:document.getElementById('sc_clientComments').value||'',
+    supervisorComments:document.getElementById('sc_supervisorComments').value||'',
+    supervisorSignatureCaptured:'Yes',
+    supervisorSignatureDate:document.getElementById('sc_supervisorSignatureDate').value||contactDate,
+    supervisorSignatureData:document.getElementById('sc_supervisorSigCanvas').toDataURL('image/png'),
+    formComplete:'Yes'
+  };
+  SC_PERF.forEach(k=>{
+    const v=document.getElementById('sc_perf_'+k).value||'';
+    payload[k.charAt(0).toLowerCase()+k.slice(1)]=v;
+    payload[k]=v;
+  });
+
+  if(isVisit){
+    payload.aidePresent=document.getElementById('sc_aidePresent').value||'';
+    payload.aideAppearance=document.getElementById('sc_aideAppearance').value||'';
+    payload.clientAppearance=document.getElementById('sc_clientAppearance').value||'';
+    payload.homeObservations=document.getElementById('sc_homeObservations').value||'';
+    SC_PERSONAL_CARE.forEach(k=>{
+      const v=document.getElementById('sc_pc_'+k).value||'N/A';
+      payload[k.charAt(0).toLowerCase()+k.slice(1)]=v;
+      payload[k]=v;
+    });
+    payload.clientSignatureCaptured='Yes';
+    payload.clientSignatureDate=document.getElementById('sc_clientSignatureDate').value||contactDate;
+    payload.clientSignatureData=document.getElementById('sc_clientSigCanvas').toDataURL('image/png');
+  }else{
+    payload.spokeWith=document.getElementById('sc_spokeWith').value||'';
+    payload.callConnected=document.getElementById('sc_callConnected').value||'';
+    payload.callOutcome=document.getElementById('sc_callOutcome').value||'';
+    payload.topicsCovered=document.getElementById('sc_topicsCovered').value||'';
+    payload.clientSignatureCaptured='No';
+  }
+
+  try{
+    // TODO: Sheets live — action name locked: save_supervisory_contact
+    const data=await apiPost(payload);
+    if(data&&data.success){
+      closeSupervisoryContactModal();
+      showTempMsg('Contact saved'+(data.contactId?' (#'+data.contactId+')':'')+'.','var(--success)');
+      loadNurseCompliance(true);
+    }else{
+      err.textContent=(data&&data.error)||'Save failed — backend may still be pending. Form data was not stored.';
+      err.style.display='block';
+    }
+  }catch(e){
+    err.textContent='Backend pending or unreachable. Stub action: save_supervisory_contact. Try again when Sheets is live.';
+    err.style.display='block';
+  }
+}
+
+/** Optional: list/filter contacts (locked action list_supervisory_contacts) */
+async function listSupervisoryContacts(filters){
+  // TODO: Sheets live — action: list_supervisory_contacts
+  return apiPost(Object.assign({action:'list_supervisory_contacts'},filters||{}));
+}
+
 
 window.addEventListener('load',()=>{renderBroadcastPreview();});
 </script>
