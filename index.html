@@ -68,6 +68,7 @@ textarea{resize:vertical;min-height:80px;}
 .badge-warn{background:#fff3e0;color:var(--warn);}
 .badge-fix{background:#fde8e8;color:var(--danger);}
 .badge-corrected{background:var(--teal-light);color:var(--teal-dark);}
+.badge-backup{background:#e3f2fd;color:#1565c0;}
 .search-bar{display:flex;gap:9px;margin-bottom:14px;}
 .search-bar input{flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;}
 .search-bar input:focus{outline:none;border-color:var(--teal);}
@@ -296,6 +297,7 @@ else setupEverCarePWA();
       <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px"><img src="data:image/jpeg;base64,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" style="width:36px;height:36px;object-fit:cover;border-radius:50%;flex-shrink:0"><div><h2>EverCare</h2><p>Admin Portal</p></div></div>
       <div style="padding:8px 18px;background:rgba(255,255,255,0.06);font-size:0.7rem;color:rgba(255,255,255,0.7);border-bottom:1px solid rgba(255,255,255,0.1)" id="sidebarRoleLabel">&#128100; Logged in as: <strong id="sidebarRoleName">&mdash;</strong></div>
       <div class="nav-item active" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</div>
+      <div class="nav-item" onclick="showTab('backups')" id="nav_backups"><span class="ni">☁️</span> Backup requests</div>
       <div class="nav-item" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</div>
       <div class="nav-item" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</div>
       <div class="nav-item" onclick="showTab('inservices')" id="nav_inservices"><span class="ni">📚</span> Inservices</div>
@@ -332,6 +334,25 @@ else setupEverCarePWA();
       </div>
 
       <!-- AIDES TAB -->
+      <div class="tab-panel" id="tab_backups">
+        <div class="page-hdr">
+          <div><h1>Backup requests</h1><p>Cloud backups from aides — distinct from payroll submits</p></div>
+          <div class="page-actions">
+            <button class="btn btn-teal" onclick="renderBackupRequests()">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="search-bar" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="bakSearchAide" placeholder="Filter username..." style="max-width:160px" oninput="paintBackupRequests()">
+          <input type="text" id="bakSearchClient" placeholder="Filter client..." style="max-width:180px" oninput="paintBackupRequests()">
+          <input type="text" id="bakSearchWeek" placeholder="Week YYYY-MM-DD..." style="max-width:160px" oninput="paintBackupRequests()">
+          <button class="btn btn-ghost btn-sm" onclick="renderBackupRequests(true)">Apply server filters</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table"><thead><tr><th>Aide</th><th>Client</th><th>Week</th><th>Backed up</th><th>Hours</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bakBody"></tbody></table>
+        </div>
+        <div id="bakEmpty" class="empty-state" style="display:none"><p>☁️ No cloud backups yet.</p></div>
+      </div>
+
       <div class="tab-panel" id="tab_aides">
         <div class="page-hdr"><div><h1>Aides</h1><p>All registered caregivers and their location status</p></div><button class="btn btn-teal" onclick="renderAides(true)">🔄 Refresh</button></div>
         <div id="aidesContainer"><p style="color:var(--muted)">Loading...</p></div>
@@ -717,6 +738,20 @@ Call (216) 377-5991 with any questions.</textarea>
   </div>
 </div>
 
+
+<div class="modal-bg" id="backupDetailModal">
+  <div class="modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <h3 id="backupDetailTitle" style="margin-bottom:0">Cloud backup</h3>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">
+        <span class="badge badge-backup">☁️ Cloud backup</span>
+        <button class="mbtn mbtn-cancel" onclick="closeModal('backupDetailModal')">✕ Close</button>
+      </div>
+    </div>
+    <div id="backupDetailBody"></div>
+  </div>
+</div>
+
 <script>
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
 const MGR_PASSWORD='evercare2024';
@@ -728,6 +763,7 @@ const HH=['Make Bed','Change Linen','Light housekeeping'];
 const NUT=['Meal set up','Assist w/feeding'];
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 let allRecords=[],currentRec=null,adminSigPads={};
+let allBackupRecords=[],currentBackupRec=null;
 
 const GAS_HEADERS={'Content-Type':'text/plain;charset=utf-8'};
 const CACHE_TTL_MS=5*60*1000;
@@ -844,6 +880,7 @@ function showTab(tab){
   document.getElementById(`tab_${tab}`).classList.add('active');
   document.getElementById(`nav_${tab}`).classList.add('active');
   if(tab==='aides')renderAides();
+  if(tab==='backups')renderBackupRequests();
   if(tab==='broadcast')renderBroadcastPreview();
   if(tab==='clients')renderClients();
   if(tab==='inservices')renderInservices();
@@ -1077,6 +1114,125 @@ function paintTimesheets(){
         <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="quickDelete('${r.id}')">🗑</button>
       </div></td>
     </tr>`;}).join('');
+}
+
+
+async function renderBackupRequests(useServerFilters){
+  const tbody=document.getElementById('bakBody');
+  if(tbody)tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading backups...</td></tr>';
+  const payload={action:'list_timesheet_backups'};
+  if(useServerFilters){
+    const u=(document.getElementById('bakSearchAide')?.value||'').trim();
+    const c=(document.getElementById('bakSearchClient')?.value||'').trim();
+    const w=(document.getElementById('bakSearchWeek')?.value||'').trim();
+    if(u)payload.username=u;
+    if(c)payload.clientName=c;
+    if(w)payload.weekStart=w;
+  }
+  try{
+    const data=await apiPost(payload);
+    if(data&&data.success&&Array.isArray(data.data)){
+      allBackupRecords=data.data.map(r=>({
+        id:r.id,
+        backedUpAt:r.backedUpAt||r.submitted||'',
+        empName:r.empName||r.emp_name||'',
+        username:r.username||'',
+        clientName:r.clientName||r.client_name||'',
+        svcType:r.svcType||r.svc_type||'',
+        weekStart:r.weekStart||r.week_start||'',
+        totalHrs:r.totalHrs||r.total_hours||r.totalHours||'0:00',
+        notes:r.notes||'',
+        days:r.days||{},
+        status:r.status||'backup'
+      }));
+    }else{
+      allBackupRecords=[];
+    }
+  }catch(e){
+    allBackupRecords=[];
+    if(tbody)tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--danger)">Could not load backups (API may not be live yet).</td></tr>';
+    const empty=document.getElementById('bakEmpty');
+    if(empty)empty.style.display='none';
+    return;
+  }
+  paintBackupRequests();
+}
+
+function paintBackupRequests(){
+  const tbody=document.getElementById('bakBody');
+  const empty=document.getElementById('bakEmpty');
+  if(!tbody)return;
+  const qAide=(document.getElementById('bakSearchAide')?.value||'').toLowerCase();
+  const qClient=(document.getElementById('bakSearchClient')?.value||'').toLowerCase();
+  const qWeek=(document.getElementById('bakSearchWeek')?.value||'').toLowerCase();
+  let recs=allBackupRecords.slice().reverse();
+  if(qAide)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(qAide)||(r.username||'').toLowerCase().includes(qAide));
+  if(qClient)recs=recs.filter(r=>(r.clientName||'').toLowerCase().includes(qClient));
+  if(qWeek)recs=recs.filter(r=>(r.weekStart||'').toLowerCase().includes(qWeek)||formatWeekLabel(r.weekStart).toLowerCase().includes(qWeek));
+  if(!recs.length){
+    tbody.innerHTML='';
+    if(empty)empty.style.display='block';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  tbody.innerHTML=recs.map(r=>`<tr>
+      <td><strong>${r.empName||'—'}</strong><div style="font-size:0.7rem;color:var(--muted)">@${r.username||''}</div></td>
+      <td>${r.clientName||'—'}</td>
+      <td>${formatWeekLabel(r.weekStart)}</td>
+      <td style="font-size:0.73rem">${r.backedUpAt||'—'}</td>
+      <td><strong style="color:var(--teal)">${r.totalHrs||'—'}</strong></td>
+      <td><span class="badge badge-backup">☁️ Cloud backup</span></td>
+      <td><div class="actions">
+        <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewBackup('${r.id}')">👁 View</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function viewBackup(id){
+  currentBackupRec=allBackupRecords.find(r=>String(r.id)===String(id));
+  if(!currentBackupRec)return;
+  const r=currentBackupRec;
+  document.getElementById('backupDetailTitle').textContent=`${r.empName||'Aide'} → ${r.clientName||'Client'} | ${formatWeekLabel(r.weekStart)}`;
+  const days=r.days||{};
+  let dayRows='';
+  DAYS.forEach((day,i)=>{
+    const d=days[i]||days[String(i)]||days[day]||days[day.slice(0,3)]||null;
+    if(!d)return;
+    const tin=d.tin||d.in||'—';
+    const tout=d.tout||d.out||'—';
+    const aideSigHTML=d.aideSig&&d.aideSig.length>100?`<img src="${d.aideSig}" class="sig-mini">`:'—';
+    const clientSigHTML=d.clientSig&&d.clientSig.length>100?`<img src="${d.clientSig}" class="sig-mini">`:'—';
+    dayRows+=`<tr>
+      <td><strong>${day}</strong></td>
+      <td>${d.date||'—'}</td>
+      <td>${tin}</td>
+      <td>${tout}</td>
+      <td><strong>${d.hrs||'—'}</strong></td>
+      <td style="font-size:0.68rem;color:var(--teal)">${d.location?`📍 ${d.location}`:'—'}</td>
+      <td>${aideSigHTML}</td>
+      <td>${clientSigHTML}</td>
+      <td style="font-size:0.7rem;max-width:160px">${(d.svcs||[]).join(', ')||'—'}</td>
+    </tr>`;
+  });
+  document.getElementById('backupDetailBody').innerHTML=`
+    <div class="det-grid">
+      <div class="det-kv"><div class="lbl">Client</div><div style="font-size:0.88rem;font-weight:600">${r.clientName||'—'}</div></div>
+      <div class="det-kv"><div class="lbl">Employee</div><div style="font-size:0.88rem;font-weight:600">${r.empName||'—'}</div></div>
+      <div class="det-kv"><div class="lbl">Service Type</div><div style="font-size:0.88rem;font-weight:600">${r.svcType||'—'}</div></div>
+      <div class="det-kv"><div class="lbl">Week Starting</div><div style="font-size:0.88rem;font-weight:600">${formatWeekLabel(r.weekStart)}</div></div>
+      <div class="det-kv"><div class="lbl">Total Hours</div><div style="font-size:1.2rem;font-weight:700;color:var(--teal)">${r.totalHrs||'—'}</div></div>
+      <div class="det-kv"><div class="lbl">Backed up</div><div style="font-size:0.88rem;font-weight:600">${r.backedUpAt||'—'}</div></div>
+      <div class="det-kv"><div class="lbl">Status</div><div><span class="badge badge-backup">☁️ Cloud backup</span></div></div>
+    </div>
+    <p style="font-size:0.75rem;color:var(--muted);margin:8px 0 12px">Read-only — this is an office cloud backup, not a payroll submission.</p>
+    <div style="overflow-x:auto">
+      <table class="hours-tbl">
+        <thead><tr><th>Day</th><th>Date</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>📍 Location</th><th>Aide Signature</th><th>Client Signature</th><th>Services</th></tr></thead>
+        <tbody>${dayRows||'<tr><td colspan="9" style="text-align:center;padding:14px;color:var(--muted)">No daily data</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div class="field"><label>Notes</label><div style="font-size:0.84rem;padding:8px;background:var(--off);border-radius:8px;min-height:40px">${(r.notes||'').replace(/</g,'&lt;')||'—'}</div></div>`;
+  openModal('backupDetailModal');
 }
 
 async function renderAides(force){
