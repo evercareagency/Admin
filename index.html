@@ -80,7 +80,7 @@ textarea{resize:vertical;min-height:80px;}
 .modal-bg{display:none;position:fixed;inset:0;height:100%;height:100dvh;background:rgba(0,0,0,0.65);z-index:999;align-items:flex-start;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) 16px max(32px,env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .modal-bg.show{display:flex;}
 .modal{background:white;border-radius:12px;padding:28px 24px;max-width:900px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);margin:12px auto 32px;max-height:none;overflow:visible;}
-#nciToast{display:none;position:fixed;top:max(14px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));margin:0 auto;max-width:min(420px,calc(100vw - 24px));color:white;padding:12px 16px;border-radius:8px;font-weight:600;font-size:0.84rem;z-index:10050;box-shadow:0 4px 20px rgba(0,0,0,0.2);pointer-events:none;}
+#nciToast{display:none;position:fixed;top:max(14px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));margin:0 auto;max-width:min(420px,calc(100vw - 24px));color:white;padding:12px 16px;border-radius:8px;font-weight:600;font-size:0.84rem;z-index:2147483647;box-shadow:0 4px 20px rgba(0,0,0,0.2);pointer-events:none;white-space:pre-wrap;line-height:1.35;}
 .modal h3{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--navy);margin-bottom:14px;}
 .modal-btns{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
 .mbtn{padding:9px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;border:none;}
@@ -124,16 +124,48 @@ textarea{resize:vertical;min-height:80px;}
 .nurse-actions{display:flex;flex-wrap:wrap;gap:6px;}
 @media(max-width:768px){.pc-grid,.perf-grid{grid-template-columns:1fr 1fr;}}
 
-/* Nurse — Open new client intake wizard */
-#newClientIntakeModal{align-items:stretch;justify-content:center;padding:0;overflow:hidden;overscroll-behavior:none;}
-#newClientIntakeModal .nci-modal{max-width:920px;width:100%;height:100%;height:100dvh;max-height:100%;max-height:100dvh;margin:0 auto;padding:0;display:flex;flex-direction:column;overflow:hidden;border-radius:0;box-sizing:border-box;}
-.nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0;flex-wrap:nowrap;flex-shrink:0;padding:max(14px,env(safe-area-inset-top,0px)) 16px 10px;}
+/* Nurse — Open new client intake wizard (head + scroll body + foot on screen) */
+#newClientIntakeModal.modal-bg{
+  display:none;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:stretch;
+  padding:0;
+  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:hidden;
+  overscroll-behavior:none;
+  position:fixed;
+  inset:0;
+  top:0;right:0;bottom:0;left:0;
+  width:auto;
+  height:auto;
+  max-height:none;
+  min-height:0;
+}
+#newClientIntakeModal.modal-bg.show{display:flex;}
+#newClientIntakeModal .modal.nci-modal{
+  max-width:920px;
+  width:100%;
+  flex:1 1 0%;
+  min-height:0;
+  max-height:100%;
+  height:0;
+  margin:0 auto;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:0;
+  box-sizing:border-box;
+}
+.nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0;flex-wrap:nowrap;flex:0 0 auto;min-height:0;padding:max(14px,env(safe-area-inset-top,0px)) 16px 10px;}
 .nci-head h3{padding-right:8px;}
 .nci-head-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .nci-close{flex-shrink:0;min-height:44px;min-width:44px;}
 .nci-x{min-width:44px;min-height:44px;width:44px;height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;font-size:1.45rem;line-height:1;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:600;padding:0;}
 .nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
-.nci-body{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 16px 16px;touch-action:pan-y;}
+.nci-body{flex:1 1 0%;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 16px 16px;touch-action:pan-y;}
 .nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
 .nci-dot{flex:1;min-width:56px;min-height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.66rem;font-weight:700;color:var(--muted);padding:6px 4px;text-align:center;}
 .nci-dot strong{display:block;font-size:0.85rem;color:var(--navy);}
@@ -156,7 +188,7 @@ textarea{resize:vertical;min-height:80px;}
 .nci-docs ol{margin:8px 0 0 18px;font-size:0.8rem;color:var(--navy);line-height:1.55;}
 .nci-ack{display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--teal);background:var(--teal-light);border-radius:10px;min-height:56px;cursor:pointer;font-weight:600;}
 .nci-ack input{width:22px;height:22px;margin-top:2px;accent-color:var(--teal);flex-shrink:0;}
-.nci-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin:0;padding:12px 16px max(14px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);flex-shrink:0;position:sticky;bottom:0;background:white;z-index:3;}
+.nci-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin:0;padding:12px 16px max(14px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);flex:0 0 auto;position:relative;background:white;z-index:3;}
 .nci-foot .btn{min-height:44px;}
 .nci-err{display:none;color:var(--danger);font-size:0.8rem;margin-bottom:10px;line-height:1.4;}
 .nci-radios{display:flex;gap:10px;flex-wrap:wrap;}
@@ -166,8 +198,8 @@ textarea{resize:vertical;min-height:80px;}
 .nci-draft-row:last-child{border-bottom:none;}
 @media(max-width:700px){.nci-dot{min-width:calc(20% - 6px);}.nci-checks{grid-template-columns:1fr;}}
 @media(min-width:701px){
-  #newClientIntakeModal{padding:max(12px,env(safe-area-inset-top,0px)) 16px max(12px,env(safe-area-inset-bottom,0px));}
-  #newClientIntakeModal .nci-modal{height:100%;max-height:100%;border-radius:12px;}
+  #newClientIntakeModal.modal-bg{padding:max(12px,env(safe-area-inset-top,0px)) 16px max(12px,env(safe-area-inset-bottom,0px));}
+  #newClientIntakeModal .modal.nci-modal{border-radius:12px;flex:1 1 0%;min-height:0;height:0;max-height:100%;}
   .nci-head{padding:18px 18px 10px;}
   .nci-body{padding:0 18px 16px;}
   .nci-foot{padding:12px 18px 16px;}
@@ -2214,12 +2246,14 @@ async function adminResetCaregiverPwd(){
 
 function showTempMsg(msg,color){
   let el=document.getElementById('nciToast');
-  if(!el){el=document.createElement('div');el.id='nciToast';document.body.appendChild(el);}
-  el.style.background=color||'var(--teal)';
+  if(!el){el=document.createElement('div');el.id='nciToast';}
+  if(el.parentNode!==document.body)document.body.appendChild(el);
+  const bg=color||'var(--teal)';
+  el.style.cssText='display:block;position:fixed;top:max(14px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));margin:0 auto;max-width:min(420px,calc(100vw - 24px));background:'+bg+';color:#fff;padding:12px 16px;border-radius:8px;font-weight:600;font-size:0.84rem;z-index:2147483647;box-shadow:0 4px 20px rgba(0,0,0,0.2);pointer-events:none;white-space:pre-wrap;line-height:1.35';
   el.textContent=msg;
-  el.style.display='block';
+  el.setAttribute('role','status');
   clearTimeout(showTempMsg._t);
-  showTempMsg._t=setTimeout(function(){el.style.display='none';},3500);
+  showTempMsg._t=setTimeout(function(){el.style.display='none';},5000);
 }
 
 const INSERVICES = [
@@ -3357,7 +3391,7 @@ function initNurseSig(id){
   canvas.width=canvas.offsetWidth||280;canvas.height=60;
   nurseSigPads[id]={canvas,ctx,drawing:false,hasData:false};
   const pos=e=>{const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return{x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};};
-  const start=e=>{const p=pos(e);nurseSigPads[id].drawing=true;nurseSigPads[id].hasData=true;ctx.beginPath();ctx.moveTo(p.x,p.y);canvas.classList.add('signed');};
+  const start=e=>{const p=pos(e);nurseSigPads[id].drawing=true;nurseSigPads[id].hasData=true;ctx.beginPath();ctx.moveTo(p.x,p.y);canvas.classList.add('signed');if(canvas.closest('#newClientIntakeModal')&&typeof nciMarkDirty==='function')nciMarkDirty();};
   const move=e=>{if(!nurseSigPads[id].drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a2744';ctx.lineWidth=1.8;ctx.lineCap='round';ctx.stroke();};
   const stop=()=>nurseSigPads[id].drawing=false;
   canvas.addEventListener('mousedown',start);canvas.addEventListener('mousemove',move);canvas.addEventListener('mouseup',stop);canvas.addEventListener('mouseleave',stop);
@@ -3790,6 +3824,7 @@ let nciResumePayload=null;
 let nciDirty=false;
 let nciSaving=false;
 let nciDirtyBound=false;
+let nciOpenSnapshot='';
 
 function todayEasternMDY(){return toEasternMDY(new Date());}
 
@@ -3828,6 +3863,27 @@ function nciShowErr(msg){
 function nciFail(msg){
   nciShowErr(msg);
   showTempMsg(msg,'var(--danger)');
+}
+function nciMarkDirty(){nciDirty=true;}
+function nciFormFingerprint(){
+  const modal=nciEl('newClientIntakeModal');
+  if(!modal)return '';
+  const bits=[];
+  modal.querySelectorAll('input,textarea,select').forEach(function(el){
+    if(el.type==='checkbox'||el.type==='radio')bits.push((el.name||el.id)+'='+(el.checked?'1':'0')+':'+(el.value||''));
+    else bits.push((el.id||el.name)+'='+(el.value||''));
+  });
+  modal.querySelectorAll('.nci-score-opts button.sel').forEach(function(b){bits.push('sc:'+(b.getAttribute('data-v')||b.textContent||''));});
+  NCI_SIGS.forEach(function(s){bits.push('sig:'+s.id+'='+(nciInk(s.id)?'1':'0'));});
+  return bits.join('\n');
+}
+function nciIsDirty(){
+  if(nciDirty)return true;
+  try{return nciFormFingerprint()!==nciOpenSnapshot;}catch(e){return !!nciDirty;}
+}
+function nciCaptureClean(){
+  nciDirty=false;
+  nciOpenSnapshot=nciFormFingerprint();
 }
 function nciPick(obj,keys){
   if(!obj||typeof obj!=='object')return '';
@@ -3934,6 +3990,7 @@ function nciSetScore(btn){
   const row=btn.closest('.nci-score-row');
   if(!row)return;
   row.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b===btn));
+  nciMarkDirty();
 }
 function nciGetScore(key){
   const row=document.querySelector('[data-nci-field="'+key+'"]');
@@ -4098,11 +4155,12 @@ function nciBindDirty(){
   const modal=nciEl('newClientIntakeModal');
   if(!modal)return;
   nciDirtyBound=true;
-  modal.addEventListener('input',function(){nciDirty=true;});
-  modal.addEventListener('change',function(){nciDirty=true;});
-  modal.addEventListener('click',function(e){
-    if(e.target.closest('.nci-score-opts button')||e.target.closest('.sig-canvas'))nciDirty=true;
-  });
+  modal.addEventListener('input',nciMarkDirty,true);
+  modal.addEventListener('change',nciMarkDirty,true);
+  modal.addEventListener('keyup',nciMarkDirty,true);
+  modal.addEventListener('pointerdown',function(e){
+    if(e.target.closest('.sig-canvas')||e.target.closest('.nci-score-opts'))nciMarkDirty();
+  },true);
 }
 function nciLooksLikeUnknownAction(text){
   return /unknown action|not implemented|stub action/i.test(String(text||''));
@@ -4136,19 +4194,20 @@ function openNewClientIntake(){
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
-  nciDirty=false;
+  nciCaptureClean();
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
   setTimeout(()=>nciInitPageSigs(1),80);
 }
 
 function closeNewClientIntake(force){
-  if(force!==true && nciDirty){
-    if(!confirm('Discard this intake? Unsaved changes will be lost.'))return;
+  if(force!==true && nciIsDirty()){
+    if(!confirm('Discard unsaved changes?'))return;
   }
   nciSnapshotSigs();
   closeModal('newClientIntakeModal');
   nciDirty=false;
+  nciOpenSnapshot='';
   if(!document.querySelector('.modal-bg.show'))unlockBodyScroll();
 }
 
@@ -4321,7 +4380,7 @@ function collectNewClientIntake(status){
 
 function validateNewClientIntake(payload){
   const miss=[];
-  const a=payload.assessment,p=payload.activityPlan,c=payload.consent,r=payload.passport,m=payload.admission;
+  const a=(payload&&payload.assessment)||{},p=(payload&&payload.activityPlan)||{},c=(payload&&payload.consent)||{},r=(payload&&payload.passport)||{},m=(payload&&payload.admission)||{};
   if(!a.clientName && !payload.clientName)miss.push('Assessment: client name');
   if(!a.socDate && !payload.socDate)miss.push('Assessment: date');
   if(!a.clientSignatureData)miss.push('Assessment: client signature');
@@ -4503,25 +4562,25 @@ function applyNewClientIntake(data){
 }
 
 async function saveNewClientIntake(status){
+  let payload;
+  try{
+    payload=collectNewClientIntake(status);
+  }catch(collectErr){
+    nciFail((status==='Complete'?'Mark Complete needs: ':'Could not collect intake. ')+((collectErr&&collectErr.message)?collectErr.message:String(collectErr)));
+    return;
+  }
+  if(status==='Complete'){
+    const miss=validateNewClientIntake(payload)||[];
+    if(miss.length){
+      nciFail('Mark Complete needs: '+miss.join('; ')+'.');
+      return;
+    }
+  }
   if(nciSaving)return;
   nciSaving=true;
   nciShowErr('');
   nciSetSaving(true,status);
   try{
-    let payload;
-    try{
-      payload=collectNewClientIntake(status);
-    }catch(collectErr){
-      nciFail('Could not collect intake. Intake was not saved as '+status+'. '+(collectErr&&collectErr.message?collectErr.message:String(collectErr)));
-      return;
-    }
-    if(status==='Complete'){
-      const miss=validateNewClientIntake(payload);
-      if(miss.length){
-        nciFail('Mark Complete needs: '+miss.join('; ')+'.');
-        return;
-      }
-    }
     const data=await apiPost(payload);
     nciForceIntakeId(data);
     if(!(data&&data.success)){
@@ -4537,7 +4596,7 @@ async function saveNewClientIntake(status){
     }
     // Ace list returns numeric ids — always persist as string so Complete never posts blank.
     nciState.intakeId=String(data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'');
-    nciDirty=false;
+    nciCaptureClean();
     if(status==='Complete'){
       archiveNewClientIntakePdf(nciState.intakeId);
       closeNewClientIntake(true);
@@ -4574,7 +4633,7 @@ async function resumeNewClientIntake(intakeId){
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
-  nciDirty=false;
+  nciCaptureClean();
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
   try{
@@ -4608,7 +4667,7 @@ async function resumeNewClientIntake(intakeId){
         }else{
           showTempMsg('Draft resumed.','var(--teal)');
         }
-        nciDirty=false;
+        nciCaptureClean();
       },100);
     }else{
       nciFail((data&&data.error)||'Backend pending — get_new_client_intake could not load this draft.');
