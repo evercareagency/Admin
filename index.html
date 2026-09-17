@@ -80,6 +80,7 @@ textarea{resize:vertical;min-height:80px;}
 .modal-bg{display:none;position:fixed;inset:0;height:100%;height:100dvh;background:rgba(0,0,0,0.65);z-index:999;align-items:flex-start;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) 16px max(32px,env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .modal-bg.show{display:flex;}
 .modal{background:white;border-radius:12px;padding:28px 24px;max-width:900px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);margin:12px auto 32px;max-height:none;overflow:visible;}
+#nciToast{display:none;position:fixed;top:max(14px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));margin:0 auto;max-width:min(420px,calc(100vw - 24px));color:white;padding:12px 16px;border-radius:8px;font-weight:600;font-size:0.84rem;z-index:10050;box-shadow:0 4px 20px rgba(0,0,0,0.2);pointer-events:none;}
 .modal h3{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--navy);margin-bottom:14px;}
 .modal-btns{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
 .mbtn{padding:9px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;border:none;}
@@ -124,9 +125,13 @@ textarea{resize:vertical;min-height:80px;}
 @media(max-width:768px){.pc-grid,.perf-grid{grid-template-columns:1fr 1fr;}}
 
 /* Nurse — Open new client intake wizard */
-.nci-modal{max-width:920px;padding:20px 18px 16px;}
-.nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+#newClientIntakeModal{align-items:stretch;justify-content:center;padding:0;overflow:hidden;overscroll-behavior:none;}
+#newClientIntakeModal .nci-modal{max-width:920px;width:100%;height:100%;height:100dvh;max-height:100%;max-height:100dvh;margin:0 auto;padding:0;display:flex;flex-direction:column;overflow:hidden;border-radius:0;box-sizing:border-box;}
+.nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0;flex-wrap:nowrap;flex-shrink:0;padding:max(14px,env(safe-area-inset-top,0px)) 16px 10px;}
+.nci-head h3{padding-right:8px;}
+.nci-close{flex-shrink:0;min-height:44px;min-width:44px;}
 .nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
+.nci-body{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 16px 16px;touch-action:pan-y;}
 .nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
 .nci-dot{flex:1;min-width:56px;min-height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.66rem;font-weight:700;color:var(--muted);padding:6px 4px;text-align:center;}
 .nci-dot strong{display:block;font-size:0.85rem;color:var(--navy);}
@@ -137,9 +142,9 @@ textarea{resize:vertical;min-height:80px;}
 .nci-page.on{display:block;}
 .nci-hint{font-size:0.75rem;color:var(--muted);margin:0 0 12px;line-height:1.45;}
 .nci-legend{font-size:0.72rem;color:var(--muted);margin:0 0 8px;}
-.nci-score-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px;min-height:48px;}
+.nci-score-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px;min-height:48px;flex-wrap:wrap;}
 .nci-score-row span{font-size:0.82rem;font-weight:600;color:var(--navy);}
-.nci-score-opts{display:flex;gap:6px;}
+.nci-score-opts{display:flex;gap:6px;flex-wrap:wrap;}
 .nci-score-opts button{min-width:44px;min-height:40px;border:1.5px solid var(--border);background:white;border-radius:7px;font-weight:700;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;}
 .nci-score-opts button.sel{background:var(--teal);color:white;border-color:var(--teal);}
 .nci-checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;}
@@ -149,7 +154,7 @@ textarea{resize:vertical;min-height:80px;}
 .nci-docs ol{margin:8px 0 0 18px;font-size:0.8rem;color:var(--navy);line-height:1.55;}
 .nci-ack{display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--teal);background:var(--teal-light);border-radius:10px;min-height:56px;cursor:pointer;font-weight:600;}
 .nci-ack input{width:22px;height:22px;margin-top:2px;accent-color:var(--teal);flex-shrink:0;}
-.nci-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);}
+.nci-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin:0;padding:12px 16px max(14px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);flex-shrink:0;position:sticky;bottom:0;background:white;z-index:3;}
 .nci-foot .btn{min-height:44px;}
 .nci-err{display:none;color:var(--danger);font-size:0.8rem;margin-bottom:10px;line-height:1.4;}
 .nci-radios{display:flex;gap:10px;flex-wrap:wrap;}
@@ -157,7 +162,14 @@ textarea{resize:vertical;min-height:80px;}
 .nci-radio input{width:18px;height:18px;accent-color:var(--teal);}
 .nci-draft-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .nci-draft-row:last-child{border-bottom:none;}
-@media(max-width:700px){.nci-modal{padding:16px 12px;}.nci-dot{min-width:calc(20% - 6px);}}
+@media(max-width:700px){.nci-dot{min-width:calc(20% - 6px);}.nci-checks{grid-template-columns:1fr;}}
+@media(min-width:701px){
+  #newClientIntakeModal{padding:max(12px,env(safe-area-inset-top,0px)) 16px max(12px,env(safe-area-inset-bottom,0px));}
+  #newClientIntakeModal .nci-modal{height:100%;max-height:100%;border-radius:12px;}
+  .nci-head{padding:18px 18px 10px;}
+  .nci-body{padding:0 18px 16px;}
+  .nci-foot{padding:12px 18px 16px;}
+}
 </style>
 
 <!-- PWA -->
@@ -725,8 +737,9 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="nci-sub">In-person on-site intake visit with the client (not a phone call)</p>
         <p class="nci-sub" id="nciStepLabel">Page 1 of 5 — Initial visit assessment (in person)</p>
       </div>
-      <button type="button" class="mbtn mbtn-cancel" onclick="closeNewClientIntake()">Close</button>
+      <button type="button" class="mbtn mbtn-cancel nci-close" onclick="closeNewClientIntake()" aria-label="Close">&#10005; Close</button>
     </div>
+    <div class="nci-body" id="nciBody">
     <div class="nci-steps" id="nciSteps"></div>
     <div id="nciErr" class="nci-err"></div>
 
@@ -1057,6 +1070,7 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
     </div>
+    </div>
 
     <div class="nci-foot">
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1064,8 +1078,8 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="btn btn-teal" id="nciNextBtn" onclick="nciGo(1)">Next</button>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button type="button" class="btn btn-ghost" onclick="saveNewClientIntake('Draft')">Save Draft</button>
-        <button type="button" class="btn btn-navy" onclick="saveNewClientIntake('Complete')">Mark Complete</button>
+        <button type="button" class="btn btn-ghost" id="nciDraftBtn" onclick="saveNewClientIntake('Draft')">Save Draft</button>
+        <button type="button" class="btn btn-navy" id="nciCompleteBtn" onclick="saveNewClientIntake('Complete')">Mark Complete</button>
       </div>
     </div>
   </div>
@@ -2193,7 +2207,15 @@ async function adminResetCaregiverPwd(){
   }catch(e){err.textContent='Error. Try again.';err.style.display='block';}
 }
 
-function showTempMsg(msg,color){const el=document.createElement('div');el.style.cssText=`position:fixed;top:18px;right:18px;background:${color};color:white;padding:11px 20px;border-radius:8px;font-weight:600;font-size:0.84rem;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2)`;el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
+function showTempMsg(msg,color){
+  let el=document.getElementById('nciToast');
+  if(!el){el=document.createElement('div');el.id='nciToast';document.body.appendChild(el);}
+  el.style.background=color||'var(--teal)';
+  el.textContent=msg;
+  el.style.display='block';
+  clearTimeout(showTempMsg._t);
+  showTempMsg._t=setTimeout(function(){el.style.display='none';},3500);
+}
 
 const INSERVICES = [
   {
@@ -3760,6 +3782,9 @@ function nciAceOnly(obj,keys){
 let nciState={intakeId:'',clientId:'',step:1};
 let nciSigStore={};
 let nciResumePayload=null;
+let nciDirty=false;
+let nciSaving=false;
+let nciDirtyBound=false;
 
 function todayEasternMDY(){return toEasternMDY(new Date());}
 
@@ -3792,6 +3817,8 @@ function nciShowErr(msg){
   if(!msg){err.style.display='none';err.textContent='';return;}
   err.textContent=msg;
   err.style.display='block';
+  const body=nciEl('nciBody');
+  if(body)body.scrollTop=0;
 }
 function nciFail(msg){
   nciShowErr(msg);
@@ -4021,6 +4048,8 @@ function nciJump(step){
   nciState.step=Math.max(1,Math.min(5,step));
   if(nciState.step>=2)nciSyncFromAssessment();
   nciRenderSteps();
+  const body=nciEl('nciBody');
+  if(body)body.scrollTop=0;
   setTimeout(()=>nciInitPageSigs(nciState.step),80);
 }
 function nciGo(delta){nciJump(nciState.step+delta);}
@@ -4059,18 +4088,47 @@ function nciPrefillDates(){
   if(!nciVal('nci_p_supervisorName'))nciSet('nci_p_supervisorName',currentNurseName||'');
 }
 
+function nciBindDirty(){
+  if(nciDirtyBound)return;
+  const modal=nciEl('newClientIntakeModal');
+  if(!modal)return;
+  nciDirtyBound=true;
+  modal.addEventListener('input',function(){nciDirty=true;});
+  modal.addEventListener('change',function(){nciDirty=true;});
+  modal.addEventListener('click',function(e){
+    if(e.target.closest('.nci-score-opts button')||e.target.closest('.sig-canvas'))nciDirty=true;
+  });
+}
+function nciSetSaving(on){
+  [['nciDraftBtn','Save Draft'],['nciCompleteBtn','Mark Complete']].forEach(function(pair){
+    const b=nciEl(pair[0]);
+    if(!b)return;
+    b.disabled=!!on;
+    b.textContent=on?'Saving…':pair[1];
+  });
+}
+
 function openNewClientIntake(){
+  nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
+  nciDirty=false;
+  const body=nciEl('nciBody');
+  if(body)body.scrollTop=0;
   setTimeout(()=>nciInitPageSigs(1),80);
 }
 
-function closeNewClientIntake(){
+function closeNewClientIntake(force){
+  if(force!==true && nciDirty){
+    if(!confirm('Discard unsaved intake changes?'))return;
+  }
   nciSnapshotSigs();
   closeModal('newClientIntakeModal');
+  nciDirty=false;
+  if(!document.querySelector('.modal-bg.show'))unlockBodyScroll();
 }
 
 function nciInk(id){
@@ -4424,36 +4482,40 @@ function applyNewClientIntake(data){
 }
 
 async function saveNewClientIntake(status){
+  if(nciSaving)return;
+  nciSaving=true;
   nciShowErr('');
-  const payload=collectNewClientIntake(status);
-  if(status==='Complete'){
-    const miss=validateNewClientIntake(payload);
-    if(miss.length){
-      nciFail('Mark Complete needs: '+miss.join('; ')+'.');
-      return;
-    }
-  }
+  nciSetSaving(true);
   try{
+    const payload=collectNewClientIntake(status);
+    if(status==='Complete'){
+      const miss=validateNewClientIntake(payload);
+      if(miss.length){
+        nciFail('Mark Complete needs: '+miss.join('; ')+'.');
+        return;
+      }
+    }
     const data=await apiPost(payload);
     if(status==='Complete' && (!data||data.status!=='Complete')){
       nciForceIntakeId(data);
       const why=(!data||data.success===false)
-        ?(data&&data.error?('Sheets: '+data.error):'Stub action: save_new_client_intake.')
+        ?(data&&data.error?('Sheets: '+data.error):'save_new_client_intake did not confirm Complete.')
         :('Complete was not stored (status '+((data&&data.status)!=null?data.status:'missing')+').');
       nciFail('Intake was not saved as Complete. '+why);
       return;
     }
     if(!(data&&data.success)){
       nciForceIntakeId(data);
-      nciFail('Intake was not saved as '+status+'. '+(data&&data.error?('Sheets: '+data.error):'Stub action: save_new_client_intake.'));
+      nciFail('Intake was not saved as '+status+'. '+(data&&data.error?('Sheets: '+data.error):'save_new_client_intake did not return success.'));
       return;
     }
     nciForceIntakeId(data);
     // Ace list returns numeric ids — always persist as string so Complete never posts blank.
     nciState.intakeId=String(data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'');
+    nciDirty=false;
     if(status==='Complete'){
       archiveNewClientIntakePdf(nciState.intakeId);
-      closeNewClientIntake();
+      closeNewClientIntake(true);
       showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       loadNewClientIntakeDrafts();
     }else{
@@ -4461,7 +4523,11 @@ async function saveNewClientIntake(status){
       loadNewClientIntakeDrafts();
     }
   }catch(e){
-    nciFail('Backend pending or unreachable. Stub action: save_new_client_intake. Intake was not saved as '+status+'.');
+    const why=(e&&e.message)?String(e.message):'Request failed.';
+    nciFail('Intake was not saved as '+status+'. '+why);
+  }finally{
+    nciSaving=false;
+    nciSetSaving(false);
   }
 }
 
@@ -4477,12 +4543,16 @@ async function getNewClientIntake(intakeId){
 }
 
 async function resumeNewClientIntake(intakeId){
+  nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
   nciState.intakeId=(intakeId==null||intakeId==='')?'':String(intakeId);
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
+  nciDirty=false;
+  const body=nciEl('nciBody');
+  if(body)body.scrollTop=0;
   try{
     const data=await getNewClientIntake(nciState.intakeId);
     if(data&&data.success){
@@ -4514,6 +4584,7 @@ async function resumeNewClientIntake(intakeId){
         }else{
           showTempMsg('Draft resumed.','var(--teal)');
         }
+        nciDirty=false;
       },100);
     }else{
       nciFail((data&&data.error)||'Backend pending — get_new_client_intake could not load this draft.');
