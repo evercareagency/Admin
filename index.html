@@ -2856,33 +2856,59 @@ async function loadAidesForInserviceAssign(force){
   }
 }
 
+function isAssignTopicIdFrom(data){
+  if(!data)return null;
+  if(data.topicId!=null&&data.topicId!=='')return data.topicId;
+  if(data.inserviceId!=null&&data.inserviceId!=='')return data.inserviceId;
+  return null;
+}
+
+function isAssignUsernamesFrom(data){
+  if(!data)return [];
+  const raw=data.usernames||data.selectedUsernames||data.aides||data.aideIds;
+  if(!Array.isArray(raw))return [];
+  return raw.map(v=>String(v==null?'':v).trim()).filter(Boolean);
+}
+
+function paintIsCurrentAssignment(data){
+  const assignEl=document.getElementById('currentAssignment');
+  if(!assignEl)return;
+  const topicId=isAssignTopicIdFrom(data);
+  const topic=INSERVICES.find(i=>i.id==topicId);
+  if(!(data&&data.success&&topicId&&topic)){
+    assignEl.textContent='No topic currently assigned.';
+    return;
+  }
+  const names=isAssignUsernamesFrom(data);
+  const assignAll=data.assignAll===true||(data.assignAll!==false&&!names.length);
+  const extra=assignAll?' — all aides':' — '+names.length+' aide'+(names.length===1?'':'s');
+  assignEl.innerHTML='<span style="background:var(--teal-light);color:var(--teal-dark);padding:4px 12px;border-radius:20px;font-weight:600">Currently assigned: '+escapeHtml(topic.title)+extra+'</span>';
+}
+
 function isAssignSheetsFailMsg(data,err){
   const raw=(data&&(data.error||data.message))||(err&&err.message)||'';
   const text=String(raw||'').trim();
-  if(/unknown action|not implemented|stub action/i.test(text)){
-    return 'Sheets error: unknown action assign_inservice_aides'+(text?(' — '+text):'');
-  }
   if(text)return /^Sheets(\serror)?:/i.test(text)?text:('Sheets error: '+text);
-  return 'Sheets error: could not assign to selected aides.';
+  return 'Sheets error: could not assign topic.';
 }
 
 async function assignTopicToSelected(){
   const sel=document.getElementById('assignTopicSel');
   if(!sel)return;
   const id=sel.value;
-  const aideUsernames=Array.from(isAssignAideSelected);
-  if(!aideUsernames.length){
+  const usernames=Array.from(isAssignAideSelected);
+  if(!usernames.length){
     showTempMsg('Select at least one aide.','var(--danger)');
     return;
   }
   const btn=document.getElementById('isAssignSelectedBtn');
   if(btn){btn.dataset.busy='1';btn.disabled=true;}
-  showTempMsg('Assigning to '+aideUsernames.length+' aides...','var(--teal)');
+  showTempMsg('Assigning to '+usernames.length+' aides...','var(--teal)');
   try{
-    const data=await apiPost({action:'assign_inservice_aides',topicId:id,aideUsernames:aideUsernames});
+    const data=await apiPost({action:'set_assigned_topic',topicId:id,usernames:usernames});
     if(data&&data.success){
       cacheInvalidate('get_assigned_topic');
-      showTempMsg('Assigned to '+aideUsernames.length+' aides','var(--success)');
+      showTempMsg('Assigned to '+usernames.length+' aides','var(--success)');
       renderInservices(true);
     }else{
       showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
@@ -2916,13 +2942,7 @@ async function renderInservices(force){
   if(assignEl)assignEl.textContent='Loading...';
   try{
     const data=await apiGetCached('get_assigned_topic',null,force===true);
-    if(data.success&&data.topicId){
-      const is=INSERVICES.find(i=>i.id==data.topicId);
-      if(assignEl&&is)assignEl.innerHTML='<span style="background:var(--teal-light);color:var(--teal-dark);padding:4px 12px;border-radius:20px;font-weight:600">Currently assigned: '+is.title+'</span>';
-      else if(assignEl)assignEl.textContent='No topic currently assigned.';
-    } else {
-      if(assignEl)assignEl.textContent='No topic currently assigned.';
-    }
+    paintIsCurrentAssignment(data);
   }catch(e){
     if(assignEl)assignEl.textContent='Error loading assignment status.';
   }
@@ -2935,12 +2955,16 @@ async function assignTopic(){
   const is=INSERVICES.find(i=>i.id==id);
   showTempMsg('Assigning topic...','var(--teal)');
   try{
-    await apiPost({action:'set_assigned_topic',topicId:id});
+    const data=await apiPost({action:'set_assigned_topic',topicId:id});
+    if(data&&data.success===false){
+      showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
+      return;
+    }
     cacheInvalidate('get_assigned_topic');
     showTempMsg('✅ Topic assigned: '+is.shortTitle,'var(--success)');
     renderInservices(true);
   }catch(e){
-    showTempMsg('Error assigning topic. Try again.','var(--danger)');
+    showTempMsg(isAssignSheetsFailMsg(null,e),'var(--danger)');
   }
 }
 
@@ -2968,7 +2992,7 @@ async function loadISCompliance(force){
       apiGetCached('get_users',null,force===true),
       apiPost({action:'get_inservices'})
     ]);
-    const assignedTopicId=assignData&&assignData.success?assignData.topicId:null;
+    const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
 
     const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
@@ -3017,7 +3041,7 @@ async function loadISCompliance(force){
 async function sendISReminder(username,name){
   try{
     const assignData=await apiGetCached('get_assigned_topic');
-    const assignedTopicId=assignData&&assignData.success?assignData.topicId:null;
+    const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
     if(!assignedTopicId){showTempMsg('No topic currently assigned.','var(--danger)');return;}
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_is_reminder',username,topicId:assignedTopicId})});
     showTempMsg(`📢 Reminder sent to ${name}!`,'var(--success)');
