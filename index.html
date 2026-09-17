@@ -3866,7 +3866,7 @@ async function saveNewClientIntake(status){
         loadNewClientIntakeDrafts();
       }
     }else{
-      nciShowErr((data&&data.error)||'Backend pending — save_new_client_intake did not store this intake. Nothing was marked '+status+'.');
+      nciShowErr('Backend pending — intake was not saved as '+status+'. '+(data&&data.error?('Sheets: '+data.error):'Stub action: save_new_client_intake.'));
     }
   }catch(e){
     nciShowErr('Backend pending or unreachable. Stub action: save_new_client_intake. Intake was not saved as '+status+'.');
