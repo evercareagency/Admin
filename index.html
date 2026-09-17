@@ -575,7 +575,7 @@ Call (216) 377-5991 with any questions.</textarea>
           <p>Rolling 60-day window — 2 in-home visits + 4 counting phone calls per client</p>
         </div>
         <div class="nurse-actions">
-          <button type="button" class="btn btn-navy" onclick="openNewClientIntake()">Open new client</button>
+          <button type="button" class="btn btn-navy" onclick="openNewClientIntake()">Open new client — on-site intake visit</button>
           <button type="button" class="btn btn-teal" onclick="loadNurseCompliance(true)">&#128260; Refresh</button>
         </div>
       </div>
@@ -720,8 +720,8 @@ Call (216) 377-5991 with any questions.</textarea>
   <div class="modal nci-modal">
     <div class="nci-head">
       <div>
-        <h3 id="nciTitle" style="margin-bottom:0">Open new client</h3>
-        <p class="nci-sub" id="nciStepLabel">Page 1 of 5 — Initial Visit Assessment</p>
+        <h3 id="nciTitle" style="margin-bottom:0">Open new client — on-site intake visit</h3>
+        <p class="nci-sub" id="nciStepLabel">Page 1 of 5 — Initial visit assessment (in person)</p>
       </div>
       <button type="button" class="mbtn mbtn-cancel" onclick="closeNewClientIntake()">Close</button>
     </div>
@@ -731,8 +731,8 @@ Call (216) 377-5991 with any questions.</textarea>
     <!-- 1. Initial Visit Assessment -->
     <div class="nci-page on" data-nci-page="1">
       <div class="nurse-form-section">
-        <h4>Demographics</h4>
-        <p class="nci-hint">Dates are MM/DD/YYYY (America/New_York). MR# is entered on the Activity Plan — nurses type it; it is not auto-generated.</p>
+        <h4>Initial visit assessment (in person)</h4>
+        <p class="nci-hint">On-site intake with the client — not a phone call. Dates are MM/DD/YYYY (America/New_York). MR# is typed on the Activity Plan (never auto-generated).</p>
         <div class="det-grid" style="grid-template-columns:1fr 1fr">
           <div class="field"><label>Assessment date</label><input type="text" id="nci_a_assessmentDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
           <div class="field"><label>Client name</label><input type="text" id="nci_a_clientName" placeholder="Full name"></div>
@@ -3416,24 +3416,28 @@ async function listSupervisoryContacts(filters){
 
 
 
-// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED — Friday-approved names) ───
-// POST save_new_client_intake:
+// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED — Friday-approved names only) ───
+// POST save_new_client_intake — nested objects only, no alias keys:
 // {
-//   action, intakeId: ""|existing, status: "Draft"|"Complete", nurseName,
-//   assessment: { page1 fields + agencySignatureData, clientSignatureData,
-//                 *SignatureDate MM/DD/YYYY, *SignatureCaptured Yes|No },
+//   action: "save_new_client_intake",
+//   intakeId: "" | existing,
+//   status: "Draft" | "Complete",
+//   nurseName,
+//   assessment: { page1 + agencySignatureData, clientSignatureData },
 //   activityPlan: { mrNumber free text, nursePocSignatureData,
 //                   clientFamilySignatureData, optional pcaSignatureData },
-//   consent: { patientPrintedName separate from patientSignatureData, ROI checks },
+//   consent: { patientPrintedName separate from patientSignatureData },
 //   passport: { printedName, patientGuardianSignatureData, witnessSignatureData, dates },
-//   admission: { folderReceivedAck Yes|No ONE checkbox, clientRepSignatureData,
-//                agencyRepSignatureData, proxyYes/proxyNo, healthAgent* }
+//   admission: { folderReceivedAck Yes|No, clientRepSignatureData,
+//                agencyRepSignatureData, proxyYes, proxyNo, healthAgent* }
 // }
-// Ink = PNG data URLs from canvas — never the text "Signed".
+// *SignatureData = PNG data URLs only (never the text "Signed").
+// dates = MM/DD/YYYY America/New_York.
 // Resume: get_new_client_intake / list_new_client_intakes. Stub: archive_new_client_intake_pdf.
+// In-person on-site intake — no CallOutcome / SpokeWith / callConnected.
 
 const NCI_STEPS=[
-  {n:1,label:'Assessment'},
+  {n:1,label:'In person'},
   {n:2,label:'Activity Plan'},
   {n:3,label:'Consent'},
   {n:4,label:'Release'},
@@ -3643,7 +3647,7 @@ function nciRenderSteps(){
   document.querySelectorAll('.nci-page').forEach(p=>{
     p.classList.toggle('on',Number(p.getAttribute('data-nci-page'))===nciState.step);
   });
-  const labels=['Initial Visit Assessment','Activity Plan','Client Consent Form','Release of Information','Review of Admission Documents'];
+  const labels=['Initial visit assessment (in person)','Activity Plan','Client Consent Form','Release of Information','Review of Admission Documents'];
   const lab=nciEl('nciStepLabel');
   if(lab)lab.textContent=`Page ${nciState.step} of 5 — ${labels[nciState.step-1]}`;
   const back=nciEl('nciBackBtn');const next=nciEl('nciNextBtn');
@@ -3707,6 +3711,11 @@ function closeNewClientIntake(){
   closeModal('newClientIntakeModal');
 }
 
+function nciInk(id){
+  const png=nciSigPng(id);
+  return nurseSigHasInk(png)?png:'';
+}
+
 function collectNewClientIntake(status){
   nciSnapshotSigs();
   const assessment={};
@@ -3719,12 +3728,12 @@ function collectNewClientIntake(status){
   NCI_BARRIERS.forEach(it=>assessment[it.key]=nciYesNo('nci_a_'+it.key));
   NCI_SAFETY.forEach(it=>assessment[it.key]=nciYesNo('nci_a_'+it.key));
   assessment.homeAppropriate=nciRadio('nci_a_homeAppropriate');
-  const aClient=nciSigPng('nci_assess_clientSig');
-  const aAgency=nciSigPng('nci_assess_agencySig');
+  const aClient=nciInk('nci_assess_clientSig');
+  const aAgency=nciInk('nci_assess_agencySig');
   assessment.clientSignatureData=aClient;
-  assessment.clientSignatureCaptured=aClient?'Yes':'No';
+  assessment.clientSignatureDate=nciDate('nci_a_clientSignatureDate');
   assessment.agencySignatureData=aAgency;
-  assessment.agencySignatureCaptured=aAgency?'Yes':'No';
+  assessment.agencySignatureDate=nciDate('nci_a_agencySignatureDate');
 
   const activityPlan={};
   NCI_TEXT_P.forEach(k=>{
@@ -3732,37 +3741,41 @@ function collectNewClientIntake(status){
     activityPlan[k]=v;
   });
   activityPlan.evacuationClass=nciRadio('nci_p_evacuationClass');
-  const pNurse=nciSigPng('nci_plan_nursePocSig');
-  const pFam=nciSigPng('nci_plan_clientFamilySig');
-  const pPca=nciSigPng('nci_plan_pcaSig');
+  activityPlan.mrNumber=nciVal('nci_p_mrNumber');
+  const pNurse=nciInk('nci_plan_nursePocSig');
+  const pFam=nciInk('nci_plan_clientFamilySig');
+  const pPca=nciInk('nci_plan_pcaSig');
   activityPlan.nursePocSignatureData=pNurse;
-  activityPlan.nursePocSignatureCaptured=pNurse?'Yes':'No';
+  activityPlan.nursePocSignatureDate=nciDate('nci_p_nursePocSignatureDate');
   activityPlan.clientFamilySignatureData=pFam;
-  activityPlan.clientFamilySignatureCaptured=pFam?'Yes':'No';
-  activityPlan.pcaSignatureData=pPca;
-  activityPlan.pcaSignatureCaptured=pPca?'Yes':'No';
+  activityPlan.clientFamilySignatureDate=nciDate('nci_p_clientFamilySignatureDate');
+  if(pPca){
+    activityPlan.pcaSignatureData=pPca;
+  }else{
+    delete activityPlan.pcaSignatureDate;
+  }
 
-  const consent={};
-  NCI_TEXT_C.forEach(k=>{
-    const v=(k.toLowerCase().includes('date'))?nciDate('nci_c_'+k):nciVal('nci_c_'+k);
-    consent[k]=v;
-  });
+  const consent={
+    patientPrintedName:nciVal('nci_c_patientPrintedName'),
+    patientSignatureDate:nciDate('nci_c_patientSignatureDate'),
+    emergencyName:nciVal('nci_c_emergencyName'),
+    emergencyPhone:nciVal('nci_c_emergencyPhone'),
+    emergencyRelationship:nciVal('nci_c_emergencyRelationship')
+  };
   NCI_CONSENT_CHECKS.forEach(k=>consent[k]=nciYesNo('nci_c_'+k));
-  const cSig=nciSigPng('nci_consent_patientSig');
-  consent.patientSignatureData=cSig;
-  consent.patientSignatureCaptured=cSig?'Yes':'No';
+  consent.patientSignatureData=nciInk('nci_consent_patientSig');
 
+  const gDate=nciDate('nci_r_patientGuardianSignatureDate');
+  const wDate=nciDate('nci_r_witnessSignatureDate');
   const passport={
     printedName:nciVal('nci_r_printedName'),
-    patientGuardianSignatureDate:nciDate('nci_r_patientGuardianSignatureDate'),
-    witnessSignatureDate:nciDate('nci_r_witnessSignatureDate')
+    patientGuardianSignatureData:nciInk('nci_passport_patientGuardianSig'),
+    witnessSignatureData:nciInk('nci_passport_witnessSig'),
+    dates:{
+      patientGuardianSignatureDate:gDate,
+      witnessSignatureDate:wDate
+    }
   };
-  const gSig=nciSigPng('nci_passport_patientGuardianSig');
-  const wSig=nciSigPng('nci_passport_witnessSig');
-  passport.patientGuardianSignatureData=gSig;
-  passport.patientGuardianSignatureCaptured=gSig?'Yes':'No';
-  passport.witnessSignatureData=wSig;
-  passport.witnessSignatureCaptured=wSig?'Yes':'No';
 
   const proxy=nciRadio('nci_m_proxy');
   const admission={
@@ -3773,14 +3786,10 @@ function collectNewClientIntake(status){
     healthAgentPhone:nciVal('nci_m_healthAgentPhone'),
     healthAgentRelationship:nciVal('nci_m_healthAgentRelationship'),
     clientRepSignatureDate:nciDate('nci_m_clientRepSignatureDate'),
-    agencyRepSignatureDate:nciDate('nci_m_agencyRepSignatureDate')
+    agencyRepSignatureDate:nciDate('nci_m_agencyRepSignatureDate'),
+    clientRepSignatureData:nciInk('nci_admit_clientRepSig'),
+    agencyRepSignatureData:nciInk('nci_admit_agencyRepSig')
   };
-  const cr=nciSigPng('nci_admit_clientRepSig');
-  const ar=nciSigPng('nci_admit_agencyRepSig');
-  admission.clientRepSignatureData=cr;
-  admission.clientRepSignatureCaptured=cr?'Yes':'No';
-  admission.agencyRepSignatureData=ar;
-  admission.agencyRepSignatureCaptured=ar?'Yes':'No';
 
   return {
     action:'save_new_client_intake',
@@ -3840,8 +3849,11 @@ function applyNewClientIntake(data){
 
   const r=root.passport||{};
   if(r.printedName!=null)nciSet('nci_r_printedName',r.printedName);
-  if(r.patientGuardianSignatureDate)nciSet('nci_r_patientGuardianSignatureDate',toEasternMDY(r.patientGuardianSignatureDate));
-  if(r.witnessSignatureDate)nciSet('nci_r_witnessSignatureDate',toEasternMDY(r.witnessSignatureDate));
+  const rDates=r.dates&&typeof r.dates==='object'?r.dates:{};
+  const gDate=rDates.patientGuardianSignatureDate||r.patientGuardianSignatureDate||(typeof r.dates==='string'?r.dates:'');
+  const wDate=rDates.witnessSignatureDate||r.witnessSignatureDate||'';
+  if(gDate)nciSet('nci_r_patientGuardianSignatureDate',toEasternMDY(gDate));
+  if(wDate)nciSet('nci_r_witnessSignatureDate',toEasternMDY(wDate));
   if(r.patientGuardianSignatureData)nciPaintSig('nci_passport_patientGuardianSig',r.patientGuardianSignatureData);
   if(r.witnessSignatureData)nciPaintSig('nci_passport_witnessSig',r.witnessSignatureData);
 
