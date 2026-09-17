@@ -3622,14 +3622,17 @@ function nciParsePage(v){
   return null;
 }
 function nciMergePages(parts){
+  // Field-union deep merge. Later sources overlay earlier ones.
+  // Skip null/'' so empty Ace unwraps cannot clobber populated pages.
   const out={};
   (parts||[]).forEach(src=>{
-    if(!src)return;
+    if(!src||typeof src!=='object'||Array.isArray(src))return;
     Object.keys(src).forEach(k=>{
       const raw=src[k];
       if(raw==null||raw==='')return;
       if(typeof raw==='object'&&!Array.isArray(raw)){
-        out[k]=raw;
+        const prev=(out[k]&&typeof out[k]==='object'&&!Array.isArray(out[k]))?out[k]:{};
+        out[k]=nciMergePages([prev,raw]);
         return;
       }
       const s=nciStr(raw);
@@ -3883,6 +3886,40 @@ function nciJoinClientAddress(){
   const parts=[nciVal('nci_a_address'),nciVal('nci_a_city'),nciVal('nci_a_state'),nciVal('nci_a_zip')].filter(Boolean);
   return parts.join(', ')||nciVal('nci_p_address');
 }
+function nciSplitClientAddress(addr){
+  // Best-effort "street, city, ST ZIP" / "street, city, ZIP" into empty city/state/zip.
+  const s=nciStr(addr);
+  if(!s)return;
+  const bits=s.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  if(bits.length<2)return;
+  let zip='',state='',city='',street='';
+  const last=bits[bits.length-1];
+  const stateZip=last.match(/^([A-Za-z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+  const zipOnly=last.match(/^(\d{5}(?:-\d{4})?)$/);
+  if(stateZip){
+    state=stateZip[1].toUpperCase();
+    zip=stateZip[2];
+    bits.pop();
+  }else if(zipOnly){
+    zip=zipOnly[1];
+    bits.pop();
+    if(bits.length>=2 && /^[A-Za-z]{2}$/.test(bits[bits.length-1])){
+      state=bits.pop().toUpperCase();
+    }
+  }
+  if(bits.length>=2){
+    city=bits.pop();
+    street=bits.join(', ');
+  }else if(bits.length===1){
+    if(zip||state)city=bits[0];
+    else street=bits[0];
+  }
+  if(street&&!nciVal('nci_a_address'))nciSet('nci_a_address',street);
+  else if(street&&nciVal('nci_a_address')===s)nciSet('nci_a_address',street);
+  if(city&&!nciVal('nci_a_city'))nciSet('nci_a_city',city);
+  if(state&&!nciVal('nci_a_state'))nciSet('nci_a_state',state);
+  if(zip&&!nciVal('nci_a_zip'))nciSet('nci_a_zip',zip);
+}
 function nciJoinCheckedLabels(items,prefix){
   return items.filter(it=>nciYesNo(prefix+it.key)==='Yes').map(it=>it.label).join('; ');
 }
@@ -4072,7 +4109,8 @@ function applyNewClientIntake(data){
   if(!nciState.clientId&&root&&root.clientId!=null&&root.clientId!=='')nciState.clientId=String(root.clientId);
 
   const a=nciPage(root,data,'assessment');
-  const p=nciPage(root,data,'activityPlan');
+  const pRaw=[data.activityPlan, root.activityPlan, data.data&&data.data.activityPlan].map(nciParsePage).filter(Boolean);
+  const p=nciMergePages(pRaw.concat([nciPage(root,data,'activityPlan')]));
   const c=nciPage(root,data,'consent');
   const r=nciPage(root,data,'passport');
   const m=nciPage(root,data,'admission');
@@ -4085,9 +4123,13 @@ function applyNewClientIntake(data){
 
   nciPut('nci_a_clientName',clientName);
   nciPut('nci_a_assessmentDate',socDate);
-  nciPut('nci_a_dateOfBirth',dob);
-  nciPut('nci_a_phone',phone);
-  nciPut('nci_a_address',address);
+  nciSet('nci_a_dateOfBirth',dob||nciVal('nci_a_dateOfBirth'));
+  nciSet('nci_a_phone',phone||nciVal('nci_a_phone'));
+  nciSet('nci_a_address',address||nciVal('nci_a_address'));
+  nciSet('nci_p_dateOfBirth',dob||nciVal('nci_p_dateOfBirth'));
+  nciSet('nci_p_phone',phone||nciVal('nci_p_phone'));
+  nciSet('nci_p_address',address||nciVal('nci_p_address'));
+  nciSplitClientAddress(address||nciVal('nci_a_address')||nciVal('nci_p_address'));
   nciPut('nci_a_language',nciPick(a,['language']));
   nciPut('nci_a_livesWith',nciPick(a,['livesWith']));
   nciPut('nci_a_caregiverName',nciPick(a,['primaryCaregiverName']));
@@ -4128,9 +4170,9 @@ function applyNewClientIntake(data){
 
   nciPut('nci_p_mrNumber',nciPick(p,['mrNumber']));
   nciPut('nci_p_clientName',nciPick(p,['clientName'])||clientName);
-  nciPut('nci_p_dateOfBirth',dob);
-  nciPut('nci_p_phone',phone);
-  nciPut('nci_p_address',address);
+  nciSet('nci_p_dateOfBirth',dob||nciVal('nci_p_dateOfBirth'));
+  nciSet('nci_p_phone',phone||nciVal('nci_p_phone'));
+  nciSet('nci_p_address',address||nciVal('nci_p_address'));
   nciPut('nci_p_emergencyName',nciPick(p,['emergencyContactName'])||nciPick(p,['emergencyContact'])||nciPick(c,['emergencyContactName']));
   nciPut('nci_p_emergencyPhone',nciPick(p,['emergencyContactPhone'])||nciPick(c,['emergencyContactPhone']));
   nciPut('nci_p_emergencyRelationship',nciPick(p,['emergencyContactRelationship'])||nciPick(c,['emergencyContactRelationship']));
@@ -4270,8 +4312,17 @@ async function resumeNewClientIntake(intakeId){
         reapply();
         nciInitPageSigs(nciState.step);
         const name=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName');
+        const src=nciResumePayload||data;
+        const srcRoot=nciUnwrapIntake(src);
+        const srcPlan=nciMergePages([src.activityPlan, srcRoot.activityPlan, src.data&&src.data.activityPlan].map(nciParsePage).filter(Boolean).concat([nciPage(srcRoot,src,'activityPlan')]));
+        const hadDob=!!(nciPickDate(srcPlan,['dob'])||nciPickDate(srcRoot,['dob']));
+        const hadPhone=!!(nciPick(srcPlan,['clientPhone'])||nciPick(srcRoot,['clientPhone']));
+        const aDob=nciVal('nci_a_dateOfBirth');
+        const aPhone=nciVal('nci_a_phone');
         if(!name){
           nciFail('Resume opened but client name was empty — Ace fields may not have restored. Save Draft again after filling the name.');
+        }else if((hadDob&&!aDob)||(hadPhone&&!aPhone)){
+          nciFail('Resume opened but page 1 DOB/phone stayed blank even though Ace activityPlan had the value(s). Save Draft again after filling date of birth and phone.');
         }else{
           showTempMsg('Draft resumed.','var(--teal)');
         }
