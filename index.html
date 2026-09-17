@@ -1141,8 +1141,22 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 async function apiPost(payload){
-  const res=await fetch(SHEETS_URL,{method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload)});
-  return res.json();
+  if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
+    throw new Error('SHEETS_URL missing or not Apps Script /exec');
+  }
+  const res=await fetch(SHEETS_URL,{method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload),mode:'cors',cache:'no-store'});
+  const raw=await res.text();
+  let data=null;
+  try{data=JSON.parse(raw);}catch(parseErr){
+    // GAS crashes return HTML Error pages — surface the real message (not "stub")
+    let msg='Sheets returned non-JSON (HTTP '+res.status+').';
+    const m=raw.match(/Error:\s*([^<\n]+)/i)||raw.match(/TypeError:\s*([^<\n]+)/i);
+    if(m)msg='Sheets error: '+m[1].trim();
+    else if(/<!DOCTYPE html/i.test(raw))msg='Sheets script crashed (HTML error page). Check Apps Script deploy.';
+    return {success:false,error:msg,httpStatus:res.status,_nonJson:true};
+  }
+  if(!res.ok&&data&&!data.error)data.error='HTTP '+res.status;
+  return data;
 }
 function _cacheKey(action){return 'ec_cache_'+action;}
 function cacheGet(action){
@@ -3385,11 +3399,11 @@ async function saveSupervisoryContact(){
       showTempMsg('Contact saved'+(data.contactId?' (#'+data.contactId+')':'')+'. clientSignatureDataLen='+(data.clientSignatureDataLen!=null?data.clientSignatureDataLen:'—')+' supervisorSignatureDataLen='+(data.supervisorSignatureDataLen!=null?data.supervisorSignatureDataLen:'—'),'var(--success)');
       loadNurseCompliance(true);
     }else{
-      err.textContent=(data&&data.error)||'Save failed — backend may still be pending. Form data was not stored.';
+      err.textContent=(data&&data.error)||'Save failed — Sheets did not store this contact. Form data was not saved.';
       err.style.display='block';
     }
   }catch(e){
-    err.textContent='Backend pending or unreachable. Stub action: save_supervisory_contact. Try again when Sheets is live.';
+    err.textContent=(e&&e.message)?('Save failed: '+e.message):'Save failed — network or Sheets error. Check connection and try again.';
     err.style.display='block';
   }
 }
