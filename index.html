@@ -143,9 +143,10 @@ textarea{resize:vertical;min-height:80px;}
   flex-direction:column;
   max-width:920px;
   width:100%;
-  flex:1;
+  flex:1 1 0%;
   min-height:0;
   height:100%;
+  height:100dvh;
   max-height:100%;
   max-height:100dvh;
   margin:0 auto;
@@ -161,7 +162,7 @@ textarea{resize:vertical;min-height:80px;}
 .nci-close{flex-shrink:0;min-height:44px;min-width:44px;}
 .nci-x{min-width:44px;min-height:44px;width:44px;height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;font-size:1.45rem;line-height:1;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:600;padding:0;}
 .nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
-.nci-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
+.nci-body,#nciBody{flex:1 1 0%;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
 .nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
 .nci-dot{flex:1;min-width:56px;min-height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.66rem;font-weight:700;color:var(--muted);padding:6px 4px;text-align:center;}
 .nci-dot strong{display:block;font-size:0.85rem;color:var(--navy);}
@@ -184,9 +185,9 @@ textarea{resize:vertical;min-height:80px;}
 .nci-docs ol{margin:8px 0 0 18px;font-size:0.8rem;color:var(--navy);line-height:1.55;}
 .nci-ack{display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--teal);background:var(--teal-light);border-radius:10px;min-height:56px;cursor:pointer;font-weight:600;}
 .nci-ack input{width:22px;height:22px;margin-top:2px;accent-color:var(--teal);flex-shrink:0;}
-.nci-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;flex-shrink:0;position:sticky;bottom:0;background:#fff;z-index:5;margin:0;padding:12px 0 max(12px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);}
+.nci-foot,#nciFoot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;flex:0 0 auto;flex-shrink:0;position:relative;background:#fff;z-index:5;margin:0;padding:12px 0 max(12px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);}
 .nci-foot .btn{min-height:44px;}
-.nci-err{display:none;color:var(--danger);font-size:0.8rem;margin-bottom:10px;line-height:1.4;}
+.nci-err{display:none;color:var(--danger);font-size:0.8rem;margin-bottom:10px;line-height:1.4;background:#fde8e8;padding:10px 12px;border-radius:8px;}
 .nci-radios{display:flex;gap:10px;flex-wrap:wrap;}
 .nci-radio{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;min-height:44px;cursor:pointer;font-size:0.82rem;}
 .nci-radio input{width:18px;height:18px;accent-color:var(--teal);}
@@ -757,8 +758,8 @@ Call (216) 377-5991 with any questions.</textarea>
 
 <!-- NEW CLIENT INTAKE WIZARD (Nurse only) — Ace locked save_new_client_intake -->
 <div class="modal-bg" id="newClientIntakeModal">
-  <div class="modal nci-modal">
-    <div class="nci-head">
+  <div class="modal nci-modal" oninput="nciMarkDirty()" onchange="nciMarkDirty()">
+    <div class="nci-head" id="nciHead">
       <div>
         <h3 id="nciTitle" style="margin-bottom:0">Open new client</h3>
         <p class="nci-sub">In-person on-site intake visit with the client (not a phone call)</p>
@@ -1102,7 +1103,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     </div>
 
-    <div class="nci-foot">
+    <div class="nci-foot" id="nciFoot">
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button type="button" class="btn btn-ghost" id="nciBackBtn" onclick="nciGo(-1)">Back</button>
         <button type="button" class="btn btn-teal" id="nciNextBtn" onclick="nciGo(1)">Next</button>
@@ -3814,10 +3815,10 @@ function nciAceOnly(obj,keys){
 let nciState={intakeId:'',clientId:'',step:1};
 let nciSigStore={};
 let nciResumePayload=null;
-let nciDirty=false;
-let nciSaving=false;
-let nciDirtyBound=false;
-let nciOpenSnapshot='';
+var nciDirty=false;
+var nciSaving=false;
+var nciDirtyBound=false;
+var nciOpenSnapshot='';
 
 function todayEasternMDY(){return toEasternMDY(new Date());}
 
@@ -4144,16 +4145,27 @@ function nciPrefillDates(){
 }
 
 function nciBindDirty(){
-  if(nciDirtyBound)return;
   const modal=nciEl('newClientIntakeModal');
   if(!modal)return;
-  nciDirtyBound=true;
-  modal.addEventListener('input',nciMarkDirty,true);
-  modal.addEventListener('change',nciMarkDirty,true);
-  modal.addEventListener('keyup',nciMarkDirty,true);
-  modal.addEventListener('pointerdown',function(e){
-    if(e.target.closest('.sig-canvas')||e.target.closest('.nci-score-opts'))nciMarkDirty();
-  },true);
+  if(!nciDirtyBound){
+    nciDirtyBound=true;
+    modal.addEventListener('input',nciMarkDirty,true);
+    modal.addEventListener('change',nciMarkDirty,true);
+    modal.addEventListener('keyup',nciMarkDirty,true);
+    modal.addEventListener('pointerdown',function(e){
+      if(e.target.closest('.sig-canvas')||e.target.closest('.nci-score-opts')||e.target.closest('.nci-radio')||e.target.closest('.nci-check')||e.target.closest('.nci-ack'))nciMarkDirty();
+    },true);
+  }
+}
+function nciEnsureShell(){
+  const shell=document.querySelector('#newClientIntakeModal .nci-modal');
+  const head=nciEl('nciHead');
+  const body=nciEl('nciBody');
+  const foot=nciEl('nciFoot');
+  if(!shell||!head||!body||!foot)return;
+  if(head.parentElement!==shell)shell.insertBefore(head,shell.firstChild);
+  if(body.parentElement!==shell)shell.insertBefore(body,head.nextSibling);
+  if(foot.parentElement!==shell || body.contains(foot))shell.appendChild(foot);
 }
 function nciLooksLikeUnknownAction(text){
   return /unknown action|not implemented|stub action/i.test(String(text||''));
@@ -4181,12 +4193,14 @@ function nciSetSaving(on,status){
 }
 
 function openNewClientIntake(){
+  nciEnsureShell();
   nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
+  nciDirty=false;
   nciCaptureClean();
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
@@ -4194,8 +4208,8 @@ function openNewClientIntake(){
 }
 
 function closeNewClientIntake(force){
-  if(force!==true && nciIsDirty()){
-    if(!confirm('Discard this intake?'))return;
+  if(force!==true && (nciDirty || nciIsDirty())){
+    if(!confirm('Discard unsaved changes?'))return;
   }
   nciSnapshotSigs();
   closeModal('newClientIntakeModal');
@@ -4374,21 +4388,22 @@ function collectNewClientIntake(status){
 function validateNewClientIntake(payload){
   const miss=[];
   const a=(payload&&payload.assessment)||{},p=(payload&&payload.activityPlan)||{},c=(payload&&payload.consent)||{},r=(payload&&payload.passport)||{},m=(payload&&payload.admission)||{};
-  if(!a.clientName && !payload.clientName)miss.push('Assessment: client name');
-  if(!a.socDate && !payload.socDate)miss.push('Assessment: date');
-  if(!a.clientSignatureData)miss.push('Assessment: client signature');
-  if(!a.agencySignatureData)miss.push('Assessment: agency/nurse signature');
-  if(!p.mrNumber)miss.push('Activity Plan: MR# (type it — not auto-generated)');
-  if(!p.nursePocSignatureData)miss.push('Activity Plan: nurse/POC signature');
-  if(!p.clientFamilySignatureData)miss.push('Activity Plan: client/family signature');
-  if(!c.patientPrintedName)miss.push('Consent: patient printed name');
-  if(!c.patientSignatureData)miss.push('Consent: patient signature');
-  if(!r.printedName)miss.push('Release: printed name');
-  if(!r.patientGuardianSignatureData)miss.push('Release: patient/guardian signature');
-  if(!r.witnessSignatureData)miss.push('Release: witness signature');
-  if(m.folderReceivedAck!=='Yes')miss.push('Admission: “I received the Client Information Folder”');
-  if(!m.clientRepSignatureData)miss.push('Admission: client/rep signature');
-  if(!m.agencyRepSignatureData)miss.push('Admission: agency signature');
+  const clientName=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||a.clientName||(payload&&payload.clientName)||'';
+  if(!clientName)miss.push('Assessment: client name');
+  if(!(nciDate('nci_a_socDate')||nciDate('nci_p_socDate')||a.socDate||(payload&&payload.socDate)))miss.push('Assessment: date');
+  if(!nciInk('nci_assess_clientSig') && !a.clientSignatureData)miss.push('Assessment: client signature');
+  if(!nciInk('nci_assess_agencySig') && !a.agencySignatureData)miss.push('Assessment: agency/nurse signature');
+  if(!(nciVal('nci_p_mrNumber')||p.mrNumber))miss.push('Activity Plan: MR# (type it — not auto-generated)');
+  if(!nciInk('nci_plan_nursePocSig') && !p.nursePocSignatureData)miss.push('Activity Plan: nurse/POC signature');
+  if(!nciInk('nci_plan_clientFamilySig') && !p.clientFamilySignatureData)miss.push('Activity Plan: client/family signature');
+  if(!(nciVal('nci_c_patientPrintedName')||c.patientPrintedName||clientName))miss.push('Consent: patient printed name');
+  if(!nciInk('nci_consent_patientSig') && !c.patientSignatureData)miss.push('Consent: patient signature');
+  if(!(nciVal('nci_r_printedName')||r.printedName))miss.push('Release: printed name');
+  if(!nciInk('nci_passport_patientGuardianSig') && !r.patientGuardianSignatureData)miss.push('Release: patient/guardian signature');
+  if(!nciInk('nci_passport_witnessSig') && !r.witnessSignatureData)miss.push('Release: witness signature');
+  if(nciYesNo('nci_m_folderReceivedAck')!=='Yes' && m.folderReceivedAck!=='Yes')miss.push('Admission: “I received the Client Information Folder”');
+  if(!nciInk('nci_admit_clientRepSig') && !m.clientRepSignatureData)miss.push('Admission: client/rep signature');
+  if(!nciInk('nci_admit_agencyRepSig') && !m.agencyRepSignatureData)miss.push('Admission: agency signature');
   return miss;
 }
 
@@ -4584,6 +4599,7 @@ async function saveNewClientIntake(status){
     }
     // Ace list returns numeric ids — always persist as string so Complete never posts blank.
     nciState.intakeId=String(data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'');
+    nciDirty=false;
     nciCaptureClean();
     if(status==='Complete'){
       archiveNewClientIntakePdf(nciState.intakeId);
@@ -4616,6 +4632,7 @@ async function getNewClientIntake(intakeId){
 }
 
 async function resumeNewClientIntake(intakeId){
+  nciEnsureShell();
   nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
