@@ -204,6 +204,33 @@ textarea{resize:vertical;min-height:80px;}
 @media(min-width:701px){
   #newClientIntakeModal .modal.nci-modal{border-radius:12px;}
 }
+
+/* Inservice assign: Assign to all + Choose aides */
+.is-assign-modes{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;}
+.is-assign-mode{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;min-height:44px;cursor:pointer;font-size:0.84rem;font-weight:600;color:var(--navy);background:white;flex:1 1 160px;}
+.is-assign-mode.on,.is-assign-mode:has(input:checked){border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.is-assign-mode input{width:18px;height:18px;flex-shrink:0;accent-color:var(--teal);}
+.is-assign-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;}
+.is-assign-actions .btn,#isAssignCard #isAssignAllBtn{min-height:44px;}
+#isAssignCard #assignTopicSel,#isAssignCard #isAideSearch{min-height:44px;}
+.is-assign-choose{margin-top:2px;}
+#isAssignChoosePanel[hidden]{display:none !important;}
+.is-aide-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.is-aide-toolbar .btn{min-height:44px;}
+.is-aide-count{font-size:0.82rem;font-weight:700;color:var(--navy);margin-left:auto;}
+.is-aide-list{max-height:min(320px,50vh);overflow-y:auto;-webkit-overflow-scrolling:touch;border:1.5px solid var(--border);border-radius:8px;background:white;}
+.is-aide-row{display:flex;align-items:center;gap:12px;padding:10px 12px;min-height:44px;border-bottom:1px solid var(--border);cursor:pointer;margin:0;}
+.is-aide-row:last-child{border-bottom:none;}
+.is-aide-row input{width:22px;height:22px;flex-shrink:0;accent-color:var(--teal);}
+.is-aide-row .nm{font-size:0.86rem;font-weight:600;color:var(--navy);}
+.is-aide-row .un{font-size:0.78rem;color:var(--muted);font-weight:500;}
+.is-aide-list .empty{padding:14px 12px;color:var(--muted);font-size:0.8rem;margin:0;}
+.is-aide-list .empty.err{color:var(--danger);}
+#isAssignSelectedBtn:disabled{cursor:not-allowed;opacity:0.5;}
+@media(max-width:420px){
+  .is-assign-mode{flex:1 1 100%;}
+  .is-aide-count{margin-left:0;width:100%;}
+}
 </style>
 
 <!-- PWA -->
@@ -479,16 +506,42 @@ else setupEverCarePWA();
         </div>
 
         <!-- ASSIGN -->
-        <div class="card">
+        <div class="card" id="isAssignCard">
           <div class="card-title"><span class="ico">&#128204;</span> Assign This Month's Topic</div>
-          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px">Select a topic to assign to all aides for this month. They will see a notification when they log in.</p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-            <div class="field" style="flex:1;min-width:200px">
-              <label>Select Topic</label>
-              <select id="assignTopicSel"></select>
+          <p id="isAssignHelp" style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;line-height:1.45">Select a topic, then choose who should get it. Aides see a notification when they log in.<br><strong>Assign to all aides</strong> = everyone gets this month's topic.<br><strong>Choose aides</strong> = only the aides you check (for example, new hires after a group assign).</p>
+          <div class="field" style="margin-bottom:12px">
+            <label for="assignTopicSel">Select Topic</label>
+            <select id="assignTopicSel"></select>
+          </div>
+          <div class="is-assign-modes" role="radiogroup" aria-label="Who should get this topic">
+            <label class="is-assign-mode on" id="isAssignModeAllLbl">
+              <input type="radio" name="isAssignMode" id="isAssignModeAll" value="all" checked onchange="onIsAssignModeChange()">
+              Assign to all aides
+            </label>
+            <label class="is-assign-mode" id="isAssignModeChooseLbl">
+              <input type="radio" name="isAssignMode" id="isAssignModeChoose" value="choose" onchange="onIsAssignModeChange()">
+              Choose aides
+            </label>
+          </div>
+          <div id="isAssignAllActions" class="is-assign-actions">
+            <button type="button" class="btn btn-teal" id="isAssignAllBtn" onclick="assignTopic()">&#128204; Assign to All Aides</button>
+            <button type="button" class="btn btn-ghost" onclick="clearAssignment()">&#10005; Clear Assignment</button>
+          </div>
+          <div id="isAssignChoosePanel" class="is-assign-choose" hidden>
+            <div class="field" style="margin-bottom:8px">
+              <label for="isAideSearch">Search aides</label>
+              <input type="text" id="isAideSearch" placeholder="Search by name or @username" oninput="renderIsAssignAideList()" autocomplete="off">
             </div>
-            <button class="btn btn-teal" onclick="assignTopic()">&#128204; Assign to All Aides</button>
-            <button class="btn btn-ghost" onclick="clearAssignment()">&#10005; Clear Assignment</button>
+            <div class="is-aide-toolbar">
+              <button type="button" class="btn btn-ghost" onclick="isAssignSelectAllVisible()">Select all visible</button>
+              <button type="button" class="btn btn-ghost" onclick="isAssignClearSelection()">Clear selection</button>
+              <span id="isAideSelectedCount" class="is-aide-count">0 selected</span>
+            </div>
+            <div id="isAssignAideList" class="is-aide-list" role="group" aria-label="Aides"></div>
+            <div class="is-assign-actions" style="margin-top:12px">
+              <button type="button" class="btn btn-teal" id="isAssignSelectedBtn" onclick="assignTopicToSelected()" disabled>Assign to selected</button>
+              <button type="button" class="btn btn-ghost" onclick="clearAssignment()">&#10005; Clear Assignment</button>
+            </div>
           </div>
           <div id="currentAssignment" style="margin-top:12px;font-size:0.8rem;color:var(--muted)"></div>
         </div>
@@ -2707,6 +2760,141 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 
 
 // ─── INSERVICE ADMIN ────────────────────────────────────
+let isAssignAideRoster=[];
+let isAssignAideSelected=new Set();
+
+function getIsAssignMode(){
+  const el=document.querySelector('input[name="isAssignMode"]:checked');
+  return (el&&el.value==='choose')?'choose':'all';
+}
+
+function onIsAssignModeChange(){
+  const mode=getIsAssignMode();
+  document.querySelectorAll('.is-assign-mode').forEach(el=>{
+    el.classList.toggle('on',!!(el.querySelector&&el.querySelector('input:checked')));
+  });
+  const allEl=document.getElementById('isAssignAllActions');
+  const chooseEl=document.getElementById('isAssignChoosePanel');
+  if(allEl)allEl.style.display=mode==='all'?'flex':'none';
+  if(chooseEl){
+    chooseEl.hidden=mode!=='choose';
+    if(mode==='choose')loadAidesForInserviceAssign();
+  }
+}
+
+function updateIsAssignSelectedUI(){
+  const n=isAssignAideSelected.size;
+  const count=document.getElementById('isAideSelectedCount');
+  if(count)count.textContent=n+' selected';
+  const btn=document.getElementById('isAssignSelectedBtn');
+  if(btn&&!btn.dataset.busy)btn.disabled=n===0;
+}
+
+function renderIsAssignAideList(){
+  const list=document.getElementById('isAssignAideList');
+  if(!list)return;
+  const q=(document.getElementById('isAideSearch')?.value||'').trim().toLowerCase();
+  const aides=isAssignAideRoster.filter(a=>{
+    if(!q)return true;
+    const hay=((a.name||'')+' @'+(a.username||'')+' '+(a.username||'')).toLowerCase();
+    return hay.indexOf(q)>=0;
+  });
+  if(!isAssignAideRoster.length){
+    list.innerHTML='<p class="empty">No aides registered yet.</p>';
+    updateIsAssignSelectedUI();
+    return;
+  }
+  if(!aides.length){
+    list.innerHTML='<p class="empty">No aides match that search.</p>';
+    updateIsAssignSelectedUI();
+    return;
+  }
+  list.innerHTML=aides.map(a=>{
+    const un=String(a.username||'');
+    const checked=isAssignAideSelected.has(un)?'checked':'';
+    return '<label class="is-aide-row"><input type="checkbox" class="is-assign-aide-cb" value="'+escapeAttr(un)+'" '+checked+' onchange="onIsAssignAideToggle(this)"><span><span class="nm">'+escapeHtml(a.name||un)+'</span> <span class="un">@'+escapeHtml(un)+'</span></span></label>';
+  }).join('');
+  updateIsAssignSelectedUI();
+}
+
+function onIsAssignAideToggle(cb){
+  if(!cb)return;
+  if(cb.checked)isAssignAideSelected.add(cb.value);
+  else isAssignAideSelected.delete(cb.value);
+  updateIsAssignSelectedUI();
+}
+
+function isAssignSelectAllVisible(){
+  document.querySelectorAll('#isAssignAideList .is-assign-aide-cb').forEach(cb=>{
+    cb.checked=true;
+    isAssignAideSelected.add(cb.value);
+  });
+  updateIsAssignSelectedUI();
+}
+
+function isAssignClearSelection(){
+  isAssignAideSelected.clear();
+  document.querySelectorAll('#isAssignAideList .is-assign-aide-cb').forEach(cb=>{cb.checked=false;});
+  updateIsAssignSelectedUI();
+}
+
+async function loadAidesForInserviceAssign(force){
+  const list=document.getElementById('isAssignAideList');
+  if(!list)return;
+  if(!isAssignAideRoster.length)list.innerHTML='<p class="empty">Loading aides...</p>';
+  try{
+    const data=await apiGetCached('get_users',null,force===true);
+    if(data&&data.success&&data.data){
+      isAssignAideRoster=data.data.filter(u=>u.username);
+      renderIsAssignAideList();
+      return;
+    }
+    const err=(data&&(data.error||data.message))||'Could not load aides.';
+    list.innerHTML='<p class="empty err">'+escapeHtml(err)+'</p>';
+  }catch(e){
+    list.innerHTML='<p class="empty err">Error loading aides.</p>';
+  }
+}
+
+function isAssignSheetsFailMsg(data,err){
+  const raw=(data&&(data.error||data.message))||(err&&err.message)||'';
+  const text=String(raw||'').trim();
+  if(/unknown action|not implemented|stub action/i.test(text)){
+    return 'Sheets error: unknown action assign_inservice_aides'+(text?(' — '+text):'');
+  }
+  if(text)return /^Sheets(\serror)?:/i.test(text)?text:('Sheets error: '+text);
+  return 'Sheets error: could not assign to selected aides.';
+}
+
+async function assignTopicToSelected(){
+  const sel=document.getElementById('assignTopicSel');
+  if(!sel)return;
+  const id=sel.value;
+  const aideUsernames=Array.from(isAssignAideSelected);
+  if(!aideUsernames.length){
+    showTempMsg('Select at least one aide.','var(--danger)');
+    return;
+  }
+  const btn=document.getElementById('isAssignSelectedBtn');
+  if(btn){btn.dataset.busy='1';btn.disabled=true;}
+  showTempMsg('Assigning to '+aideUsernames.length+' aides...','var(--teal)');
+  try{
+    const data=await apiPost({action:'assign_inservice_aides',topicId:id,aideUsernames:aideUsernames});
+    if(data&&data.success){
+      cacheInvalidate('get_assigned_topic');
+      showTempMsg('Assigned to '+aideUsernames.length+' aides','var(--success)');
+      renderInservices(true);
+    }else{
+      showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
+    }
+  }catch(e){
+    showTempMsg(isAssignSheetsFailMsg(null,e),'var(--danger)');
+  }finally{
+    if(btn)delete btn.dataset.busy;
+    updateIsAssignSelectedUI();
+  }
+}
+
 async function renderInservices(force){
   // Populate select
   const sel=document.getElementById('assignTopicSel');
@@ -2723,6 +2911,7 @@ async function renderInservices(force){
   }
   // Start compliance fetches first so get_assigned_topic shares in-flight with the badge below
   loadISCompliance(force===true);
+  if(getIsAssignMode()==='choose')loadAidesForInserviceAssign(force===true);
   const assignEl=document.getElementById('currentAssignment');
   if(assignEl)assignEl.textContent='Loading...';
   try{
