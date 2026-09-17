@@ -736,7 +736,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <h4>Initial visit assessment (in person)</h4>
         <p class="nci-hint">Complete this packet during the in-person on-site intake visit with the client (not a phone call). Dates are MM/DD/YYYY (America/New_York). DOB, phone, and address are on the Activity Plan. MR# is typed there (never auto-generated).</p>
         <div class="det-grid" style="grid-template-columns:1fr 1fr">
-          <div class="field"><label>SOC date</label><input type="text" id="nci_a_socDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+          <div class="field"><label>SOC Date</label><input type="text" id="nci_a_socDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
           <div class="field"><label>Client name</label><input type="text" id="nci_a_clientName" placeholder="Full name"></div>
           <div class="field"><label>Language</label><input type="text" id="nci_a_language" placeholder="Primary language" value="English"></div>
         </div>
@@ -752,12 +752,13 @@ Call (216) 377-5991 with any questions.</textarea>
       <div class="nurse-form-section">
         <h4>Lives with</h4>
         <div class="nci-radios">
-          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Alone"> Alone</label>
-          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Spouse"> Spouse</label>
-          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Relative"> Relative</label>
-          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Friend"> Friend</label>
-          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Other"> Other</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Alone" onchange="nciToggleLivesWithOther()"> Alone</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Spouse" onchange="nciToggleLivesWithOther()"> Spouse</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Relative" onchange="nciToggleLivesWithOther()"> Relative</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Friend" onchange="nciToggleLivesWithOther()"> Friend</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_livesWith" value="Other" onchange="nciToggleLivesWithOther()"> Other</label>
         </div>
+        <div class="field" id="nciLivesWithOtherWrap" style="display:none;margin-top:10px"><label>If Other, specify</label><input type="text" id="nci_a_livesWithOther"></div>
       </div>
       <div class="nurse-form-section">
         <h4>Primary caregiver</h4>
@@ -816,6 +817,10 @@ Call (216) 377-5991 with any questions.</textarea>
           <label class="nci-radio"><input type="radio" name="nci_a_homeSituationAppropriate" value="No" onchange="nciToggleHomeExplain()"> No</label>
         </div>
         <div class="field" id="nciHomeExplainWrap" style="display:none"><label style="text-transform:none;letter-spacing:0">If no, explain</label><textarea id="nci_a_homeSituationExplain"></textarea></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>COMMENTS</h4>
+        <div class="field"><textarea id="nci_a_comments"></textarea></div>
       </div>
       <div class="nurse-form-section">
         <h4>Client signature</h4>
@@ -1002,7 +1007,7 @@ Call (216) 377-5991 with any questions.</textarea>
           <ol>
             <li>Client Bill of Rights</li>
             <li>Notice of Privacy Practices (HIPAA)</li>
-            <li>Advance Directives / Health Care Proxy information</li>
+            <li>Ohio Health Care Proxy / Advance Directives information</li>
             <li>Grievance and complaint procedure</li>
             <li>Emergency preparedness / disaster plan</li>
             <li>Infection prevention and control</li>
@@ -3727,7 +3732,7 @@ const NCI_SIGS=[
   {id:'nci_admit_agencyRepSig',page:5},
   {id:'nci_admit_proxyAgencySig',page:5}
 ];
-const NCI_TEXT_A=['socDate','clientName','language','caregiverName','caregiverPhone','barriers','safetyHazards','otherIssues','homeSituationExplain','clientSignatureDate','agencySignatureDate'];
+const NCI_TEXT_A=['socDate','clientName','language','livesWithOther','caregiverName','caregiverPhone','barriers','safetyHazards','otherIssues','homeSituationExplain','comments','clientSignatureDate','agencySignatureDate'];
 const NCI_TEXT_P=['mrNumber','clientName','dateOfBirth','phone','address','socDate','livesWithDetail','livesWithRelationship','emergencyName','emergencyPhone','emergencyRelationship','evacuationPlan','primaryCareProvider','identifiedServiceNeeds','allergies','diet','functionalStatus','psychosocialStatus','serviceDuration','serviceFrequency','serviceHours','specialRequests','supervisorName','supervisorPhone','nursePocSignatureDate','clientFamilySignatureDate','pcaSignatureDate'];
 const NCI_TEXT_C=['patientPrintedName','patientSignatureDate','emergencyName','emergencyPhone','emergencyRelationship'];
 const NCI_TEXT_R=['printedName','patientGuardianSignatureDate','witnessSignatureDate'];
@@ -3965,6 +3970,10 @@ function nciInitPageSigs(page){
   });
 }
 
+function nciToggleLivesWithOther(){
+  const wrap=nciEl('nciLivesWithOtherWrap');
+  if(wrap)wrap.style.display=nciRadio('nci_a_livesWith')==='Other'?'block':'none';
+}
 function nciToggleCaregiverFields(){
   const wrap=nciEl('nciCaregiverDetailWrap');
   const cg=nciRadio('nci_a_primaryCaregiver');
@@ -3978,6 +3987,7 @@ function nciSyncFromAssessment(){
   if(!nciVal('nci_p_clientName'))nciSet('nci_p_clientName',nciVal('nci_a_clientName'));
   if(!nciVal('nci_p_socDate'))nciSet('nci_p_socDate',nciVal('nci_a_socDate'));
   if(!nciVal('nci_a_socDate'))nciSet('nci_a_socDate',nciVal('nci_p_socDate'));
+  if(!nciVal('nci_p_livesWithDetail')&&nciRadio('nci_a_livesWith')==='Other')nciSet('nci_p_livesWithDetail',nciVal('nci_a_livesWithOther'));
   if(!nciVal('nci_p_supervisorName'))nciSet('nci_p_supervisorName',currentNurseName||'');
   if(!nciVal('nci_c_patientPrintedName'))nciSet('nci_c_patientPrintedName',nciVal('nci_a_clientName')||nciVal('nci_p_clientName'));
   if(!nciVal('nci_c_emergencyName'))nciSet('nci_c_emergencyName',nciVal('nci_p_emergencyName'));
@@ -4032,6 +4042,7 @@ function resetNewClientIntake(){
   document.querySelectorAll('#newClientIntakeModal .nci-score-opts button').forEach(b=>b.classList.remove('sel'));
   NCI_SIGS.forEach(s=>nciClearSig(s.id));
   nciShowErr('');
+  nciToggleLivesWithOther();
   nciToggleCaregiverFields();
   nciToggleHomeExplain();
 }
@@ -4109,6 +4120,7 @@ function collectNewClientIntake(status){
     otherIssues:nciVal('nci_a_otherIssues'),
     homeSituationAppropriate:nciRadio('nci_a_homeSituationAppropriate'),
     homeSituationExplain:nciVal('nci_a_homeSituationExplain'),
+    comments:nciVal('nci_a_comments'),
     clientSignatureData:nciInk('nci_assess_clientSig'),
     clientSignatureDate:nciDate('nci_a_clientSignatureDate'),
     agencySignatureData:nciInk('nci_assess_agencySig'),
@@ -4136,7 +4148,7 @@ function collectNewClientIntake(status){
     socDate:nciDate('nci_p_socDate')||socDate,
     clientPhone:nciVal('nci_p_phone'),
     clientAddress:clientAddress,
-    livesWithDetail:nciVal('nci_p_livesWithDetail'),
+    livesWithDetail:nciVal('nci_p_livesWithDetail')||nciVal('nci_a_livesWithOther'),
     livesWithRelationship:nciVal('nci_p_livesWithRelationship'),
     emergencyContactName:emergName,
     emergencyContactRelationship:emergRel,
@@ -4282,6 +4294,8 @@ function applyNewClientIntake(data){
   if(marital)nciSetRadio('nci_a_maritalStatus',nciEnum(marital,NCI_MARITAL)||marital);
   const lives=nciPick(a,['livesWith']);
   if(lives)nciSetRadio('nci_a_livesWith',nciEnum(lives==='Family'?'Relative':lives,NCI_LIVES_WITH)||lives);
+  if(nciRadio('nci_a_livesWith')==='Other')nciPut('nci_a_livesWithOther',nciPick(p,['livesWithDetail']));
+  nciToggleLivesWithOther();
   const cg=nciPick(a,['primaryCaregiver']);
   if(cg)nciSetRadio('nci_a_primaryCaregiver',nciEnum(cg,NCI_PRIMARY_CAREGIVER)||cg);
   nciToggleCaregiverFields();
@@ -4299,7 +4313,8 @@ function applyNewClientIntake(data){
   nciPut('nci_a_barriers',nciPick(a,['barriers']));
   nciPut('nci_a_safetyHazards',nciPick(a,['safetyHazards']));
   nciPut('nci_a_otherIssues',nciPick(a,['otherIssues']));
-  nciPut('nci_a_homeSituationExplain',nciPick(a,['homeSituationExplain','comments']));
+  nciPut('nci_a_homeSituationExplain',nciPick(a,['homeSituationExplain']));
+  nciPut('nci_a_comments',nciPick(a,['comments']));
 
   const home=nciPick(a,['homeSituationAppropriate','homeAppropriate']);
   if(home)nciSetRadio('nci_a_homeSituationAppropriate',home);
