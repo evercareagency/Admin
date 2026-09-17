@@ -818,10 +818,6 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="field" id="nciHomeExplainWrap" style="display:none"><label style="text-transform:none;letter-spacing:0">If no, explain</label><textarea id="nci_a_homeSituationExplain"></textarea></div>
       </div>
       <div class="nurse-form-section">
-        <h4>COMMENTS</h4>
-        <div class="field"><textarea id="nci_a_comments"></textarea></div>
-      </div>
-      <div class="nurse-form-section">
         <h4>Client signature</h4>
         <canvas class="sig-canvas" id="nci_assess_clientSig" height="60"></canvas>
         <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
@@ -3731,7 +3727,7 @@ const NCI_SIGS=[
   {id:'nci_admit_agencyRepSig',page:5},
   {id:'nci_admit_proxyAgencySig',page:5}
 ];
-const NCI_TEXT_A=['socDate','clientName','language','caregiverName','caregiverPhone','barriers','safetyHazards','otherIssues','homeSituationExplain','comments','clientSignatureDate','agencySignatureDate'];
+const NCI_TEXT_A=['socDate','clientName','language','caregiverName','caregiverPhone','barriers','safetyHazards','otherIssues','homeSituationExplain','clientSignatureDate','agencySignatureDate'];
 const NCI_TEXT_P=['mrNumber','clientName','dateOfBirth','phone','address','socDate','livesWithDetail','livesWithRelationship','emergencyName','emergencyPhone','emergencyRelationship','evacuationPlan','primaryCareProvider','identifiedServiceNeeds','allergies','diet','functionalStatus','psychosocialStatus','serviceDuration','serviceFrequency','serviceHours','specialRequests','supervisorName','supervisorPhone','nursePocSignatureDate','clientFamilySignatureDate','pcaSignatureDate'];
 const NCI_TEXT_C=['patientPrintedName','patientSignatureDate','emergencyName','emergencyPhone','emergencyRelationship'];
 const NCI_TEXT_R=['printedName','patientGuardianSignatureDate','witnessSignatureDate'];
@@ -4113,7 +4109,6 @@ function collectNewClientIntake(status){
     otherIssues:nciVal('nci_a_otherIssues'),
     homeSituationAppropriate:nciRadio('nci_a_homeSituationAppropriate'),
     homeSituationExplain:nciVal('nci_a_homeSituationExplain'),
-    comments:nciVal('nci_a_comments'),
     clientSignatureData:nciInk('nci_assess_clientSig'),
     clientSignatureDate:nciDate('nci_a_clientSignatureDate'),
     agencySignatureData:nciInk('nci_assess_agencySig'),
@@ -4304,8 +4299,7 @@ function applyNewClientIntake(data){
   nciPut('nci_a_barriers',nciPick(a,['barriers']));
   nciPut('nci_a_safetyHazards',nciPick(a,['safetyHazards']));
   nciPut('nci_a_otherIssues',nciPick(a,['otherIssues']));
-  nciPut('nci_a_homeSituationExplain',nciPick(a,['homeSituationExplain']));
-  nciPut('nci_a_comments',nciPick(a,['comments']));
+  nciPut('nci_a_homeSituationExplain',nciPick(a,['homeSituationExplain','comments']));
 
   const home=nciPick(a,['homeSituationAppropriate','homeAppropriate']);
   if(home)nciSetRadio('nci_a_homeSituationAppropriate',home);
