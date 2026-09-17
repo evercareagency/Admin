@@ -3549,26 +3549,25 @@ function nciClearSig(id){
 function nciSnapshotSigs(){
   NCI_SIGS.forEach(s=>{
     const pad=nurseSigPads[s.id];
-    const c=nciEl(s.id);
-    if(pad&&pad.hasData&&c)nciSigStore[s.id]=c.toDataURL('image/png');
+    const live=nurseSigPngData(s.id);
+    if(pad&&pad.hasData&&nurseSigHasInk(live))nciSigStore[s.id]=live;
   });
 }
 function nciSigPng(id){
   const pad=nurseSigPads[id];
-  const c=nciEl(id);
-  if(pad&&pad.hasData&&c){
-    const url=c.toDataURL('image/png');
-    nciSigStore[id]=url;
-    return url;
+  const live=nurseSigPngData(id);
+  if(pad&&pad.hasData&&nurseSigHasInk(live)){
+    nciSigStore[id]=live;
+    return live;
   }
-  return nciSigStore[id]||'';
+  const stored=nciSigStore[id]||'';
+  return nurseSigHasInk(stored)?stored:'';
 }
 function nciHasInk(id){
-  const png=nciSigPng(id);
-  return !!(png&&png.indexOf('data:image')===0);
+  return nurseSigHasInk(nciSigPng(id));
 }
 function nciPaintSig(id,dataUrl){
-  if(!dataUrl||String(dataUrl).indexOf('data:image')!==0)return;
+  if(!nurseSigHasInk(dataUrl))return;
   nciSigStore[id]=dataUrl;
   const c=nciEl(id);if(!c)return;
   const img=new Image();
