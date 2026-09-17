@@ -121,6 +121,42 @@ textarea{resize:vertical;min-height:80px;}
 .perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
 .nurse-actions{display:flex;flex-wrap:wrap;gap:6px;}
 @media(max-width:768px){.pc-grid,.perf-grid{grid-template-columns:1fr 1fr;}}
+
+/* Nurse — Open new client intake wizard */
+.nci-modal{max-width:920px;padding:20px 18px 16px;}
+.nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
+.nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
+.nci-dot{flex:1;min-width:56px;min-height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.66rem;font-weight:700;color:var(--muted);padding:6px 4px;text-align:center;}
+.nci-dot strong{display:block;font-size:0.85rem;color:var(--navy);}
+.nci-dot.on{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.nci-dot.on strong{color:var(--teal-dark);}
+.nci-dot.done{border-color:var(--teal);}
+.nci-page{display:none;}
+.nci-page.on{display:block;}
+.nci-hint{font-size:0.75rem;color:var(--muted);margin:0 0 12px;line-height:1.45;}
+.nci-legend{font-size:0.72rem;color:var(--muted);margin:0 0 8px;}
+.nci-score-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px;min-height:48px;}
+.nci-score-row span{font-size:0.82rem;font-weight:600;color:var(--navy);}
+.nci-score-opts{display:flex;gap:6px;}
+.nci-score-opts button{min-width:44px;min-height:40px;border:1.5px solid var(--border);background:white;border-radius:7px;font-weight:700;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;}
+.nci-score-opts button.sel{background:var(--teal);color:white;border-color:var(--teal);}
+.nci-checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;}
+.nci-check{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;min-height:48px;cursor:pointer;font-size:0.82rem;}
+.nci-check input{width:20px;height:20px;accent-color:var(--teal);flex-shrink:0;}
+.nci-docs{background:var(--off);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:10px 0 14px;}
+.nci-docs ol{margin:8px 0 0 18px;font-size:0.8rem;color:var(--navy);line-height:1.55;}
+.nci-ack{display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--teal);background:var(--teal-light);border-radius:10px;min-height:56px;cursor:pointer;font-weight:600;}
+.nci-ack input{width:22px;height:22px;margin-top:2px;accent-color:var(--teal);flex-shrink:0;}
+.nci-foot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);}
+.nci-foot .btn{min-height:44px;}
+.nci-err{display:none;color:var(--danger);font-size:0.8rem;margin-bottom:10px;line-height:1.4;}
+.nci-radios{display:flex;gap:10px;flex-wrap:wrap;}
+.nci-radio{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;min-height:44px;cursor:pointer;font-size:0.82rem;}
+.nci-radio input{width:18px;height:18px;accent-color:var(--teal);}
+.nci-draft-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.nci-draft-row:last-child{border-bottom:none;}
+@media(max-width:700px){.nci-modal{padding:16px 12px;}.nci-dot{min-width:calc(20% - 6px);}}
 </style>
 
 <!-- PWA -->
@@ -538,7 +574,10 @@ Call (216) 377-5991 with any questions.</textarea>
           <h1>Supervisory Compliance</h1>
           <p>Rolling 60-day window — 2 in-home visits + 4 counting phone calls per client</p>
         </div>
-        <button class="btn btn-teal" onclick="loadNurseCompliance(true)">&#128260; Refresh</button>
+        <div class="nurse-actions">
+          <button type="button" class="btn btn-navy" onclick="openNewClientIntake()">Open new client</button>
+          <button type="button" class="btn btn-teal" onclick="loadNurseCompliance(true)">&#128260; Refresh</button>
+        </div>
       </div>
       <div class="card" style="background:var(--teal-light);margin-bottom:16px">
         <p style="font-size:0.82rem;color:var(--teal-dark);margin:0"><strong>Cadence tip:</strong> every 60 days = 2 in-home visits + 4 phone calls (client or family, call must be Reached). Flexible scheduling — no board.</p>
@@ -565,6 +604,11 @@ Call (216) 377-5991 with any questions.</textarea>
           <p>&#128203; No compliance rows yet.</p>
           <p style="font-size:0.8rem;color:var(--muted);margin-top:8px" id="nurseComplianceNote">Backend pending — UI walkthrough available with empty list.</p>
         </div>
+      </div>
+      <div class="card" id="nciDraftsCard" style="display:none">
+        <div class="card-title"><span class="ico">📝</span> Intake drafts</div>
+        <p class="nci-hint" style="margin-bottom:8px">Resume a saved draft from Sheets when Ace’s list_new_client_intakes is live.</p>
+        <div id="nciDraftsList"></div>
       </div>
     </div>
   </div>
@@ -666,6 +710,313 @@ Call (216) 377-5991 with any questions.</textarea>
     <div class="modal-btns">
       <button class="mbtn mbtn-cancel" onclick="closeSupervisoryContactModal()">Cancel</button>
       <button class="mbtn mbtn-confirm" onclick="saveSupervisoryContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- NEW CLIENT INTAKE WIZARD (Nurse only) — Ace locked save_new_client_intake -->
+<div class="modal-bg" id="newClientIntakeModal">
+  <div class="modal nci-modal">
+    <div class="nci-head">
+      <div>
+        <h3 id="nciTitle" style="margin-bottom:0">Open new client</h3>
+        <p class="nci-sub" id="nciStepLabel">Page 1 of 5 — Initial Visit Assessment</p>
+      </div>
+      <button type="button" class="mbtn mbtn-cancel" onclick="closeNewClientIntake()">Close</button>
+    </div>
+    <div class="nci-steps" id="nciSteps"></div>
+    <div id="nciErr" class="nci-err"></div>
+
+    <!-- 1. Initial Visit Assessment -->
+    <div class="nci-page on" data-nci-page="1">
+      <div class="nurse-form-section">
+        <h4>Demographics</h4>
+        <p class="nci-hint">Dates are MM/DD/YYYY (America/New_York). MR# is entered on the Activity Plan — nurses type it; it is not auto-generated.</p>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>Assessment date</label><input type="text" id="nci_a_assessmentDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+          <div class="field"><label>Client name</label><input type="text" id="nci_a_clientName" placeholder="Full name"></div>
+          <div class="field"><label>Date of birth</label><input type="text" id="nci_a_dateOfBirth" placeholder="MM/DD/YYYY" inputmode="numeric" onblur="nciFillAgeFromDob()"></div>
+          <div class="field"><label>Age</label><input type="text" id="nci_a_age" placeholder="Years"></div>
+          <div class="field"><label>Sex</label>
+            <select id="nci_a_sex"><option value="">—</option><option>Female</option><option>Male</option><option>Other</option></select>
+          </div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_a_phone" placeholder="Phone"></div>
+          <div class="field"><label>Language</label><input type="text" id="nci_a_language" placeholder="Primary language" value="English"></div>
+        </div>
+        <div class="field"><label>Address</label><input type="text" id="nci_a_address" placeholder="Street"></div>
+        <div class="det-grid" style="grid-template-columns:2fr 1fr 1fr">
+          <div class="field"><label>City</label><input type="text" id="nci_a_city"></div>
+          <div class="field"><label>State</label><input type="text" id="nci_a_state" placeholder="MA"></div>
+          <div class="field"><label>ZIP</label><input type="text" id="nci_a_zip"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Lives with</h4>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>Lives with</label>
+            <select id="nci_a_livesWith"><option value="">—</option><option>Alone</option><option>Spouse</option><option>Family</option><option>Other</option></select>
+          </div>
+          <div class="field"><label>If other, specify</label><input type="text" id="nci_a_livesWithOther"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Primary caregiver</h4>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>Caregiver name</label><input type="text" id="nci_a_caregiverName"></div>
+          <div class="field"><label>Relationship</label><input type="text" id="nci_a_caregiverRelationship"></div>
+          <div class="field"><label>Caregiver phone</label><input type="text" id="nci_a_caregiverPhone"></div>
+          <div class="field"><label>Lives in home</label>
+            <select id="nci_a_caregiverInHome"><option value="">—</option><option>Yes</option><option>No</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>IADLs — 1 Independent / A Assist / U Unable</h4>
+        <p class="nci-legend">Score each item. Leave blank if not assessed yet (required to Mark Complete).</p>
+        <div id="nciIadlGrid"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>ADLs — 1 Independent / A Assist / U Unable</h4>
+        <div id="nciAdlGrid"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Barriers to care</h4>
+        <div class="nci-checks" id="nciBarrierGrid"></div>
+        <div class="field" style="margin-top:10px"><label>Other barrier</label><input type="text" id="nci_a_barrierOtherText"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Safety</h4>
+        <div class="nci-checks" id="nciSafetyGrid"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Home appropriate for services</h4>
+        <div class="nci-radios" style="margin-bottom:10px">
+          <label class="nci-radio"><input type="radio" name="nci_a_homeAppropriate" value="Yes"> Yes</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_homeAppropriate" value="No"> No</label>
+        </div>
+        <div class="field"><label>Comments</label><textarea id="nci_a_comments" placeholder="Nurse comments"></textarea></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Client signature</h4>
+        <canvas class="sig-canvas" id="nci_assess_clientSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_assess_clientSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Client signature date</label><input type="text" id="nci_a_clientSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section" style="border-bottom:none">
+        <h4>Agency / Nurse signature</h4>
+        <canvas class="sig-canvas" id="nci_assess_agencySig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_assess_agencySig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Agency signature date</label><input type="text" id="nci_a_agencySignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Activity Plan -->
+    <div class="nci-page" data-nci-page="2">
+      <div class="nurse-form-section">
+        <h4>Activity Plan</h4>
+        <p class="nci-hint">MR# is free text — the nurse types it. It is never auto-generated.</p>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>MR#</label><input type="text" id="nci_p_mrNumber" placeholder="Type medical record number"></div>
+          <div class="field"><label>Client name</label><input type="text" id="nci_p_clientName"></div>
+          <div class="field"><label>Date of birth</label><input type="text" id="nci_p_dateOfBirth" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_p_phone"></div>
+        </div>
+        <div class="field"><label>Address</label><input type="text" id="nci_p_address"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Emergency contact</h4>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>Name</label><input type="text" id="nci_p_emergencyName"></div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_p_emergencyPhone"></div>
+          <div class="field"><label>Relationship</label><input type="text" id="nci_p_emergencyRelationship"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Evacuation class</h4>
+        <div class="nci-radios">
+          <label class="nci-radio"><input type="radio" name="nci_p_evacuationClass" value="I"> I — Bedbound / total assist</label>
+          <label class="nci-radio"><input type="radio" name="nci_p_evacuationClass" value="II"> II — Wheelchair</label>
+          <label class="nci-radio"><input type="radio" name="nci_p_evacuationClass" value="III"> III — Ambulatory with assist</label>
+          <label class="nci-radio"><input type="radio" name="nci_p_evacuationClass" value="IV"> IV — Independent</label>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Primary care physician</h4>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>PCP name</label><input type="text" id="nci_p_pcpName"></div>
+          <div class="field"><label>PCP phone</label><input type="text" id="nci_p_pcpPhone"></div>
+        </div>
+        <div class="field"><label>Medical needs</label><textarea id="nci_p_medicalNeeds"></textarea></div>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>Allergies</label><input type="text" id="nci_p_allergies"></div>
+          <div class="field"><label>Diet</label><input type="text" id="nci_p_diet"></div>
+        </div>
+        <div class="field"><label>Functional status</label><textarea id="nci_p_functionalStatus"></textarea></div>
+        <div class="field"><label>Psychosocial status</label><textarea id="nci_p_psychosocialStatus"></textarea></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Service</h4>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="field"><label>Duration</label><input type="text" id="nci_p_serviceDuration" placeholder="e.g. 90 days"></div>
+          <div class="field"><label>Frequency</label><input type="text" id="nci_p_serviceFrequency" placeholder="e.g. 5 days/week"></div>
+          <div class="field"><label>Hours</label><input type="text" id="nci_p_serviceHours" placeholder="e.g. 20 hrs/week"></div>
+        </div>
+        <div class="field"><label>Special requests</label><textarea id="nci_p_specialRequests"></textarea></div>
+        <div class="field"><label>Supervisor</label><input type="text" id="nci_p_supervisorName"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Nurse / POC signature</h4>
+        <canvas class="sig-canvas" id="nci_plan_nursePocSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_plan_nursePocSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Nurse signature date</label><input type="text" id="nci_p_nursePocSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Client / Family signature</h4>
+        <canvas class="sig-canvas" id="nci_plan_clientFamilySig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_plan_clientFamilySig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Client/family signature date</label><input type="text" id="nci_p_clientFamilySignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section" style="border-bottom:none">
+        <h4>PCA signature (optional)</h4>
+        <canvas class="sig-canvas" id="nci_plan_pcaSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_plan_pcaSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>PCA signature date</label><input type="text" id="nci_p_pcaSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Client Consent Form -->
+    <div class="nci-page" data-nci-page="3">
+      <div class="nurse-form-section">
+        <h4>Client Consent Form</h4>
+        <p class="nci-hint">Check each authorization the client agrees to. Printed name is stored separately from the ink signature.</p>
+        <label class="nci-check"><input type="checkbox" id="nci_c_consentServices"> I consent to receive home care services from EverCare Home Agency.</label>
+        <label class="nci-check"><input type="checkbox" id="nci_c_consentRoi"> I authorize release of information to my physician, payers, and care team (ROI).</label>
+        <label class="nci-check"><input type="checkbox" id="nci_c_consentBilling"> I assign insurance benefits and authorize billing for covered services.</label>
+        <label class="nci-check"><input type="checkbox" id="nci_c_consentRights"> I acknowledge I have been informed of my Client Rights.</label>
+        <label class="nci-check"><input type="checkbox" id="nci_c_consentEmergency"> I consent to emergency medical treatment if needed while services are provided.</label>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Patient printed name</h4>
+        <div class="field"><label>Printed name</label><input type="text" id="nci_c_patientPrintedName" placeholder="Print patient name"></div>
+        <canvas class="sig-canvas" id="nci_consent_patientSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_consent_patientSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Patient signature date</label><input type="text" id="nci_c_patientSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section" style="border-bottom:none">
+        <h4>Emergency contact</h4>
+        <div class="det-grid" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label>Name</label><input type="text" id="nci_c_emergencyName"></div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_c_emergencyPhone"></div>
+          <div class="field"><label>Relationship</label><input type="text" id="nci_c_emergencyRelationship"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Release of Information (passport) -->
+    <div class="nci-page" data-nci-page="4">
+      <div class="nurse-form-section">
+        <h4>Release of Information</h4>
+        <p class="nci-hint">I authorize EverCare Home Agency to obtain and/or release medical and care information as needed to provide services (passport / ROI).</p>
+        <div class="field"><label>Printed name</label><input type="text" id="nci_r_printedName" placeholder="Print name"></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Patient / Guardian signature</h4>
+        <canvas class="sig-canvas" id="nci_passport_patientGuardianSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_passport_patientGuardianSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Patient/guardian signature date</label><input type="text" id="nci_r_patientGuardianSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section" style="border-bottom:none">
+        <h4>Witness signature</h4>
+        <canvas class="sig-canvas" id="nci_passport_witnessSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_passport_witnessSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Witness signature date</label><input type="text" id="nci_r_witnessSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Review of Admission Documents -->
+    <div class="nci-page" data-nci-page="5">
+      <div class="nurse-form-section">
+        <h4>Review of Admission Documents</h4>
+        <p class="nci-hint">One acknowledgement only. The folder contents below are read-only information — not 14 required checks.</p>
+        <div class="nci-docs">
+          <strong style="font-size:0.8rem;color:var(--navy)">Client Information Folder includes:</strong>
+          <ol>
+            <li>Client Bill of Rights</li>
+            <li>Notice of Privacy Practices (HIPAA)</li>
+            <li>Advance Directives / Health Care Proxy information</li>
+            <li>Grievance and complaint procedure</li>
+            <li>Emergency preparedness / disaster plan</li>
+            <li>Infection prevention and control</li>
+            <li>After-hours and on-call contact numbers</li>
+            <li>Copy of the Activity Plan / service plan</li>
+            <li>Fee schedule and payment information</li>
+            <li>Abuse, neglect, and exploitation reporting</li>
+            <li>Medication reminder policy</li>
+            <li>Home safety guidelines</li>
+            <li>Discharge and transfer policy</li>
+            <li>Non-discrimination notice</li>
+          </ol>
+        </div>
+        <label class="nci-ack"><input type="checkbox" id="nci_m_folderReceivedAck"> I received the Client Information Folder</label>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Health care proxy</h4>
+        <div class="nci-radios" style="margin-bottom:10px">
+          <label class="nci-radio"><input type="radio" name="nci_m_proxy" value="Yes" onchange="nciToggleHealthAgent()"> Yes — client has a proxy</label>
+          <label class="nci-radio"><input type="radio" name="nci_m_proxy" value="No" onchange="nciToggleHealthAgent()"> No</label>
+        </div>
+        <div id="nciHealthAgentFields" style="display:none">
+          <div class="det-grid" style="grid-template-columns:1fr 1fr">
+            <div class="field"><label>Health agent name</label><input type="text" id="nci_m_healthAgentName"></div>
+            <div class="field"><label>Health agent phone</label><input type="text" id="nci_m_healthAgentPhone"></div>
+            <div class="field"><label>Health agent relationship</label><input type="text" id="nci_m_healthAgentRelationship"></div>
+          </div>
+        </div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>Client / Representative signature</h4>
+        <canvas class="sig-canvas" id="nci_admit_clientRepSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_admit_clientRepSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Client/rep signature date</label><input type="text" id="nci_m_clientRepSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+      <div class="nurse-form-section" style="border-bottom:none">
+        <h4>Agency representative signature</h4>
+        <canvas class="sig-canvas" id="nci_admit_agencyRepSig" height="60"></canvas>
+        <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" style="padding:6px 12px;font-size:0.75rem;min-height:40px" onclick="nciClearSig('nci_admit_agencyRepSig')">Clear</button>
+          <div class="field" style="margin:0;flex:1;min-width:140px"><label>Agency signature date</label><input type="text" id="nci_m_agencyRepSignatureDate" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nci-foot">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-ghost" id="nciBackBtn" onclick="nciGo(-1)">Back</button>
+        <button type="button" class="btn btn-teal" id="nciNextBtn" onclick="nciGo(1)">Next</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-ghost" onclick="saveNewClientIntake('Draft')">Save Draft</button>
+        <button type="button" class="btn btn-navy" onclick="saveNewClientIntake('Complete')">Mark Complete</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1003,6 +1354,7 @@ async function mgrLogin(){
         requestAnimationFrame(function(){
           setTimeout(function(){
             loadNurseCompliance(true);
+            loadNewClientIntakeDrafts();
             apiGetCached('get_clients').then(d=>{ if(d&&d.success) allClients=d.data||[]; }).catch(()=>{});
             apiGetCached('get_users').then(d=>{ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(u=>u.username); }).catch(()=>{});
             logActivity('Logged in (Nurse)');
@@ -1069,7 +1421,7 @@ async function renderActivityLog(){
   }
 }
 
-function adminLogout(){logActivity('Logged out');currentAdminRole=null;currentNurseName=null;nurseSigPads={};showScreen('loginScreen');}
+function adminLogout(){logActivity('Logged out');currentAdminRole=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();showScreen('loginScreen');}
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
@@ -3046,6 +3398,541 @@ async function saveSupervisoryContact(){
 async function listSupervisoryContacts(filters){
   // TODO: Sheets live — action: list_supervisory_contacts
   return apiPost(Object.assign({action:'list_supervisory_contacts'},filters||{}));
+}
+
+
+
+// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED — Friday-approved names) ───
+// POST save_new_client_intake:
+// {
+//   action, intakeId: ""|existing, status: "Draft"|"Complete", nurseName,
+//   assessment: { page1 fields + agencySignatureData, clientSignatureData,
+//                 *SignatureDate MM/DD/YYYY, *SignatureCaptured Yes|No },
+//   activityPlan: { mrNumber free text, nursePocSignatureData,
+//                   clientFamilySignatureData, optional pcaSignatureData },
+//   consent: { patientPrintedName separate from patientSignatureData, ROI checks },
+//   passport: { printedName, patientGuardianSignatureData, witnessSignatureData, dates },
+//   admission: { folderReceivedAck Yes|No ONE checkbox, clientRepSignatureData,
+//                agencyRepSignatureData, proxyYes/proxyNo, healthAgent* }
+// }
+// Ink = PNG data URLs from canvas — never the text "Signed".
+// Resume: get_new_client_intake / list_new_client_intakes. Stub: archive_new_client_intake_pdf.
+
+const NCI_STEPS=[
+  {n:1,label:'Assessment'},
+  {n:2,label:'Activity Plan'},
+  {n:3,label:'Consent'},
+  {n:4,label:'Release'},
+  {n:5,label:'Admission'}
+];
+const NCI_IADLS=[
+  {key:'iadlShopping',label:'Shopping'},
+  {key:'iadlMealPrep',label:'Meal preparation'},
+  {key:'iadlHousekeeping',label:'Housekeeping'},
+  {key:'iadlLaundry',label:'Laundry'},
+  {key:'iadlTransportation',label:'Transportation'},
+  {key:'iadlTelephone',label:'Telephone'},
+  {key:'iadlMedications',label:'Medication management'},
+  {key:'iadlFinances',label:'Managing finances'}
+];
+const NCI_ADLS=[
+  {key:'adlBathing',label:'Bathing'},
+  {key:'adlDressing',label:'Dressing'},
+  {key:'adlGrooming',label:'Grooming'},
+  {key:'adlToileting',label:'Toileting'},
+  {key:'adlTransfer',label:'Transferring'},
+  {key:'adlAmbulation',label:'Ambulation'},
+  {key:'adlEating',label:'Eating'}
+];
+const NCI_BARRIERS=[
+  {key:'barrierLanguage',label:'Language'},
+  {key:'barrierHearing',label:'Hearing'},
+  {key:'barrierVision',label:'Vision'},
+  {key:'barrierCognitive',label:'Cognitive'},
+  {key:'barrierCultural',label:'Cultural'},
+  {key:'barrierPhysical',label:'Physical environment'},
+  {key:'barrierFinancial',label:'Financial'}
+];
+const NCI_SAFETY=[
+  {key:'safetySmokeDetector',label:'Smoke detector'},
+  {key:'safetyCoDetector',label:'CO detector'},
+  {key:'safetyFireExtinguisher',label:'Fire extinguisher'},
+  {key:'safetyEmergencyNumbers',label:'Emergency numbers posted'},
+  {key:'safetyLighting',label:'Adequate lighting'},
+  {key:'safetyGrabBars',label:'Grab bars'},
+  {key:'safetyPathways',label:'Clear pathways'},
+  {key:'safetyTelephone',label:'Working telephone'},
+  {key:'safetyFallHazards',label:'Fall hazards noted'},
+  {key:'safetyPets',label:'Pets in home'},
+  {key:'safetyWeapons',label:'Weapons in home'},
+  {key:'safetySmoking',label:'Smoking in home'}
+];
+const NCI_SIGS=[
+  {id:'nci_assess_clientSig',page:1},
+  {id:'nci_assess_agencySig',page:1},
+  {id:'nci_plan_nursePocSig',page:2},
+  {id:'nci_plan_clientFamilySig',page:2},
+  {id:'nci_plan_pcaSig',page:2},
+  {id:'nci_consent_patientSig',page:3},
+  {id:'nci_passport_patientGuardianSig',page:4},
+  {id:'nci_passport_witnessSig',page:4},
+  {id:'nci_admit_clientRepSig',page:5},
+  {id:'nci_admit_agencyRepSig',page:5}
+];
+const NCI_TEXT_A=['assessmentDate','clientName','dateOfBirth','age','sex','phone','language','address','city','state','zip','livesWith','livesWithOther','caregiverName','caregiverRelationship','caregiverPhone','caregiverInHome','barrierOtherText','comments','clientSignatureDate','agencySignatureDate'];
+const NCI_TEXT_P=['mrNumber','clientName','dateOfBirth','phone','address','emergencyName','emergencyPhone','emergencyRelationship','pcpName','pcpPhone','medicalNeeds','allergies','diet','functionalStatus','psychosocialStatus','serviceDuration','serviceFrequency','serviceHours','specialRequests','supervisorName','nursePocSignatureDate','clientFamilySignatureDate','pcaSignatureDate'];
+const NCI_TEXT_C=['patientPrintedName','patientSignatureDate','emergencyName','emergencyPhone','emergencyRelationship'];
+const NCI_TEXT_R=['printedName','patientGuardianSignatureDate','witnessSignatureDate'];
+const NCI_TEXT_M=['healthAgentName','healthAgentPhone','healthAgentRelationship','clientRepSignatureDate','agencyRepSignatureDate'];
+const NCI_CONSENT_CHECKS=['consentServices','consentRoi','consentBilling','consentRights','consentEmergency'];
+
+let nciState={intakeId:'',step:1};
+let nciSigStore={};
+
+function todayEasternMDY(){return toEasternMDY(new Date());}
+
+function nciEl(id){return document.getElementById(id);}
+function nciVal(id){const el=nciEl(id);return el?String(el.value||'').trim():'';}
+function nciSet(id,v){const el=nciEl(id);if(el)el.value=v==null?'':v;}
+function nciDate(id){return toEasternMDY(nciVal(id));}
+function nciYesNo(id){const el=nciEl(id);return (el&&el.checked)?'Yes':'No';}
+function nciRadio(name){const el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:'';}
+function nciSetRadio(name,v){
+  document.querySelectorAll('input[name="'+name+'"]').forEach(r=>{r.checked=r.value===v;});
+}
+function nciShowErr(msg){
+  const err=nciEl('nciErr');
+  if(!err)return;
+  if(!msg){err.style.display='none';err.textContent='';return;}
+  err.textContent=msg;
+  err.style.display='block';
+}
+
+function nciBuildScores(containerId,items){
+  const el=nciEl(containerId);if(!el||el.dataset.built)return;
+  el.innerHTML=items.map(it=>`<div class="nci-score-row" data-nci-field="${it.key}">
+    <span>${it.label}</span>
+    <div class="nci-score-opts">
+      <button type="button" data-v="1" onclick="nciSetScore(this)">1</button>
+      <button type="button" data-v="A" onclick="nciSetScore(this)">A</button>
+      <button type="button" data-v="U" onclick="nciSetScore(this)">U</button>
+    </div>
+  </div>`).join('');
+  el.dataset.built='1';
+}
+function nciBuildChecks(containerId,items,prefix){
+  const el=nciEl(containerId);if(!el||el.dataset.built)return;
+  el.innerHTML=items.map(it=>`<label class="nci-check"><input type="checkbox" id="${prefix}${it.key}"> ${it.label}</label>`).join('');
+  el.dataset.built='1';
+}
+function nciSetScore(btn){
+  const row=btn.closest('.nci-score-row');
+  if(!row)return;
+  row.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b===btn));
+}
+function nciGetScore(key){
+  const row=document.querySelector('[data-nci-field="'+key+'"]');
+  if(!row)return '';
+  const sel=row.querySelector('button.sel');
+  return sel?sel.getAttribute('data-v'):'';
+}
+function nciPutScore(key,v){
+  const row=document.querySelector('[data-nci-field="'+key+'"]');
+  if(!row)return;
+  row.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-v')===v));
+}
+
+function nciClearSig(id){
+  clearNurseSig(id);
+  delete nciSigStore[id];
+}
+function nciSnapshotSigs(){
+  NCI_SIGS.forEach(s=>{
+    const pad=nurseSigPads[s.id];
+    const c=nciEl(s.id);
+    if(pad&&pad.hasData&&c)nciSigStore[s.id]=c.toDataURL('image/png');
+  });
+}
+function nciSigPng(id){
+  const pad=nurseSigPads[id];
+  const c=nciEl(id);
+  if(pad&&pad.hasData&&c){
+    const url=c.toDataURL('image/png');
+    nciSigStore[id]=url;
+    return url;
+  }
+  return nciSigStore[id]||'';
+}
+function nciHasInk(id){
+  const png=nciSigPng(id);
+  return !!(png&&png.indexOf('data:image')===0);
+}
+function nciPaintSig(id,dataUrl){
+  if(!dataUrl||String(dataUrl).indexOf('data:image')!==0)return;
+  nciSigStore[id]=dataUrl;
+  const c=nciEl(id);if(!c)return;
+  const img=new Image();
+  img.onload=function(){
+    const ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.drawImage(img,0,0,c.width,c.height);
+    c.classList.add('signed');
+    if(nurseSigPads[id])nurseSigPads[id].hasData=true;
+  };
+  img.src=dataUrl;
+}
+function nciInitPageSigs(page){
+  NCI_SIGS.filter(s=>s.page===page).forEach(s=>{
+    const saved=nciSigStore[s.id];
+    initNurseSig(s.id);
+    if(saved)nciPaintSig(s.id,saved);
+  });
+}
+
+function nciFillAgeFromDob(){
+  const m=nciVal('nci_a_dateOfBirth').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m)return;
+  const b=new Date(+m[3],+m[1]-1,+m[2]);
+  if(isNaN(b.getTime()))return;
+  const now=new Date();
+  let age=now.getFullYear()-b.getFullYear();
+  const md=(now.getMonth()-b.getMonth())*32+(now.getDate()-b.getDate());
+  if(md<0)age--;
+  if(age>=0&&age<130)nciSet('nci_a_age',String(age));
+}
+function nciToggleHealthAgent(){
+  const box=nciEl('nciHealthAgentFields');
+  if(box)box.style.display=nciRadio('nci_m_proxy')==='Yes'?'block':'none';
+}
+function nciSyncFromAssessment(){
+  if(!nciVal('nci_p_clientName'))nciSet('nci_p_clientName',nciVal('nci_a_clientName'));
+  if(!nciVal('nci_p_dateOfBirth'))nciSet('nci_p_dateOfBirth',nciVal('nci_a_dateOfBirth'));
+  if(!nciVal('nci_p_phone'))nciSet('nci_p_phone',nciVal('nci_a_phone'));
+  if(!nciVal('nci_p_address')){
+    const parts=[nciVal('nci_a_address'),nciVal('nci_a_city'),nciVal('nci_a_state'),nciVal('nci_a_zip')].filter(Boolean);
+    nciSet('nci_p_address',parts.join(', '));
+  }
+  if(!nciVal('nci_p_supervisorName'))nciSet('nci_p_supervisorName',currentNurseName||'');
+  if(!nciVal('nci_c_patientPrintedName'))nciSet('nci_c_patientPrintedName',nciVal('nci_a_clientName')||nciVal('nci_p_clientName'));
+  if(!nciVal('nci_c_emergencyName'))nciSet('nci_c_emergencyName',nciVal('nci_p_emergencyName'));
+  if(!nciVal('nci_c_emergencyPhone'))nciSet('nci_c_emergencyPhone',nciVal('nci_p_emergencyPhone'));
+  if(!nciVal('nci_c_emergencyRelationship'))nciSet('nci_c_emergencyRelationship',nciVal('nci_p_emergencyRelationship'));
+  if(!nciVal('nci_r_printedName'))nciSet('nci_r_printedName',nciVal('nci_c_patientPrintedName')||nciVal('nci_a_clientName'));
+}
+
+function nciRenderSteps(){
+  const wrap=nciEl('nciSteps');if(!wrap)return;
+  wrap.innerHTML=NCI_STEPS.map(s=>{
+    const on=s.n===nciState.step?' on':'';
+    const done=s.n<nciState.step?' done':'';
+    return `<button type="button" class="nci-dot${on}${done}" onclick="nciJump(${s.n})"><strong>${s.n}</strong>${s.label}</button>`;
+  }).join('');
+  document.querySelectorAll('.nci-page').forEach(p=>{
+    p.classList.toggle('on',Number(p.getAttribute('data-nci-page'))===nciState.step);
+  });
+  const labels=['Initial Visit Assessment','Activity Plan','Client Consent Form','Release of Information','Review of Admission Documents'];
+  const lab=nciEl('nciStepLabel');
+  if(lab)lab.textContent=`Page ${nciState.step} of 5 — ${labels[nciState.step-1]}`;
+  const back=nciEl('nciBackBtn');const next=nciEl('nciNextBtn');
+  if(back)back.disabled=nciState.step<=1;
+  if(next)next.style.display=nciState.step>=5?'none':'inline-flex';
+}
+
+function nciJump(step){
+  nciSnapshotSigs();
+  nciState.step=Math.max(1,Math.min(5,step));
+  if(nciState.step===2||nciState.step===3||nciState.step===4)nciSyncFromAssessment();
+  nciRenderSteps();
+  setTimeout(()=>nciInitPageSigs(nciState.step),80);
+}
+function nciGo(delta){nciJump(nciState.step+delta);}
+
+function nciBuildGrids(){
+  nciBuildScores('nciIadlGrid',NCI_IADLS);
+  nciBuildScores('nciAdlGrid',NCI_ADLS);
+  nciBuildChecks('nciBarrierGrid',NCI_BARRIERS,'nci_a_');
+  nciBuildChecks('nciSafetyGrid',NCI_SAFETY,'nci_a_');
+}
+
+function resetNewClientIntake(){
+  nciState={intakeId:'',step:1};
+  nciSigStore={};
+  const modal=nciEl('newClientIntakeModal');
+  if(!modal)return;
+  modal.querySelectorAll('input[type="text"],textarea').forEach(el=>{el.value='';});
+  modal.querySelectorAll('select').forEach(el=>{el.value='';});
+  modal.querySelectorAll('input[type="checkbox"],input[type="radio"]').forEach(el=>{el.checked=false;});
+  document.querySelectorAll('#newClientIntakeModal .nci-score-opts button').forEach(b=>b.classList.remove('sel'));
+  NCI_SIGS.forEach(s=>nciClearSig(s.id));
+  nciShowErr('');
+  nciToggleHealthAgent();
+}
+
+function nciPrefillDates(){
+  const today=todayEasternMDY();
+  ['nci_a_assessmentDate','nci_a_clientSignatureDate','nci_a_agencySignatureDate',
+   'nci_p_nursePocSignatureDate','nci_p_clientFamilySignatureDate',
+   'nci_c_patientSignatureDate','nci_r_patientGuardianSignatureDate','nci_r_witnessSignatureDate',
+   'nci_m_clientRepSignatureDate','nci_m_agencyRepSignatureDate'].forEach(id=>{
+    if(!nciVal(id))nciSet(id,today);
+  });
+  if(!nciVal('nci_a_language'))nciSet('nci_a_language','English');
+  if(!nciVal('nci_p_supervisorName'))nciSet('nci_p_supervisorName',currentNurseName||'');
+}
+
+function openNewClientIntake(){
+  nciBuildGrids();
+  resetNewClientIntake();
+  nciPrefillDates();
+  nciRenderSteps();
+  openModal('newClientIntakeModal');
+  setTimeout(()=>nciInitPageSigs(1),80);
+}
+
+function closeNewClientIntake(){
+  nciSnapshotSigs();
+  closeModal('newClientIntakeModal');
+}
+
+function collectNewClientIntake(status){
+  nciSnapshotSigs();
+  const assessment={};
+  NCI_TEXT_A.forEach(k=>{
+    const v=(k.toLowerCase().includes('date'))?nciDate('nci_a_'+k):nciVal('nci_a_'+k);
+    assessment[k]=v;
+  });
+  NCI_IADLS.forEach(it=>assessment[it.key]=nciGetScore(it.key));
+  NCI_ADLS.forEach(it=>assessment[it.key]=nciGetScore(it.key));
+  NCI_BARRIERS.forEach(it=>assessment[it.key]=nciYesNo('nci_a_'+it.key));
+  NCI_SAFETY.forEach(it=>assessment[it.key]=nciYesNo('nci_a_'+it.key));
+  assessment.homeAppropriate=nciRadio('nci_a_homeAppropriate');
+  const aClient=nciSigPng('nci_assess_clientSig');
+  const aAgency=nciSigPng('nci_assess_agencySig');
+  assessment.clientSignatureData=aClient;
+  assessment.clientSignatureCaptured=aClient?'Yes':'No';
+  assessment.agencySignatureData=aAgency;
+  assessment.agencySignatureCaptured=aAgency?'Yes':'No';
+
+  const activityPlan={};
+  NCI_TEXT_P.forEach(k=>{
+    const v=(k.toLowerCase().includes('date'))?nciDate('nci_p_'+k):nciVal('nci_p_'+k);
+    activityPlan[k]=v;
+  });
+  activityPlan.evacuationClass=nciRadio('nci_p_evacuationClass');
+  const pNurse=nciSigPng('nci_plan_nursePocSig');
+  const pFam=nciSigPng('nci_plan_clientFamilySig');
+  const pPca=nciSigPng('nci_plan_pcaSig');
+  activityPlan.nursePocSignatureData=pNurse;
+  activityPlan.nursePocSignatureCaptured=pNurse?'Yes':'No';
+  activityPlan.clientFamilySignatureData=pFam;
+  activityPlan.clientFamilySignatureCaptured=pFam?'Yes':'No';
+  activityPlan.pcaSignatureData=pPca;
+  activityPlan.pcaSignatureCaptured=pPca?'Yes':'No';
+
+  const consent={};
+  NCI_TEXT_C.forEach(k=>{
+    const v=(k.toLowerCase().includes('date'))?nciDate('nci_c_'+k):nciVal('nci_c_'+k);
+    consent[k]=v;
+  });
+  NCI_CONSENT_CHECKS.forEach(k=>consent[k]=nciYesNo('nci_c_'+k));
+  const cSig=nciSigPng('nci_consent_patientSig');
+  consent.patientSignatureData=cSig;
+  consent.patientSignatureCaptured=cSig?'Yes':'No';
+
+  const passport={
+    printedName:nciVal('nci_r_printedName'),
+    patientGuardianSignatureDate:nciDate('nci_r_patientGuardianSignatureDate'),
+    witnessSignatureDate:nciDate('nci_r_witnessSignatureDate')
+  };
+  const gSig=nciSigPng('nci_passport_patientGuardianSig');
+  const wSig=nciSigPng('nci_passport_witnessSig');
+  passport.patientGuardianSignatureData=gSig;
+  passport.patientGuardianSignatureCaptured=gSig?'Yes':'No';
+  passport.witnessSignatureData=wSig;
+  passport.witnessSignatureCaptured=wSig?'Yes':'No';
+
+  const proxy=nciRadio('nci_m_proxy');
+  const admission={
+    folderReceivedAck:nciYesNo('nci_m_folderReceivedAck'),
+    proxyYes:proxy==='Yes'?'Yes':'No',
+    proxyNo:proxy==='No'?'Yes':'No',
+    healthAgentName:nciVal('nci_m_healthAgentName'),
+    healthAgentPhone:nciVal('nci_m_healthAgentPhone'),
+    healthAgentRelationship:nciVal('nci_m_healthAgentRelationship'),
+    clientRepSignatureDate:nciDate('nci_m_clientRepSignatureDate'),
+    agencyRepSignatureDate:nciDate('nci_m_agencyRepSignatureDate')
+  };
+  const cr=nciSigPng('nci_admit_clientRepSig');
+  const ar=nciSigPng('nci_admit_agencyRepSig');
+  admission.clientRepSignatureData=cr;
+  admission.clientRepSignatureCaptured=cr?'Yes':'No';
+  admission.agencyRepSignatureData=ar;
+  admission.agencyRepSignatureCaptured=ar?'Yes':'No';
+
+  return {
+    action:'save_new_client_intake',
+    intakeId:nciState.intakeId||'',
+    status:status,
+    nurseName:currentNurseName||'Nurse',
+    assessment,activityPlan,consent,passport,admission
+  };
+}
+
+function validateNewClientIntake(payload){
+  const miss=[];
+  const a=payload.assessment,p=payload.activityPlan,c=payload.consent,r=payload.passport,m=payload.admission;
+  if(!a.clientName)miss.push('Assessment: client name');
+  if(!a.assessmentDate)miss.push('Assessment: date');
+  if(!a.clientSignatureData)miss.push('Assessment: client signature');
+  if(!a.agencySignatureData)miss.push('Assessment: agency/nurse signature');
+  if(!p.mrNumber)miss.push('Activity Plan: MR# (type it — not auto-generated)');
+  if(!p.nursePocSignatureData)miss.push('Activity Plan: nurse/POC signature');
+  if(!p.clientFamilySignatureData)miss.push('Activity Plan: client/family signature');
+  if(!c.patientPrintedName)miss.push('Consent: patient printed name');
+  if(!c.patientSignatureData)miss.push('Consent: patient signature');
+  if(!r.printedName)miss.push('Release: printed name');
+  if(!r.patientGuardianSignatureData)miss.push('Release: patient/guardian signature');
+  if(!r.witnessSignatureData)miss.push('Release: witness signature');
+  if(m.folderReceivedAck!=='Yes')miss.push('Admission: “I received the Client Information Folder”');
+  if(!m.clientRepSignatureData)miss.push('Admission: client/rep signature');
+  if(!m.agencyRepSignatureData)miss.push('Admission: agency signature');
+  return miss;
+}
+
+function applyNewClientIntake(data){
+  if(!data)return;
+  const root=data.assessment||data.activityPlan?data:(data.data||{});
+  nciState.intakeId=root.intakeId||data.intakeId||nciState.intakeId||'';
+  const a=root.assessment||{};
+  NCI_TEXT_A.forEach(k=>{if(a[k]!=null)nciSet('nci_a_'+k,k.toLowerCase().includes('date')?toEasternMDY(a[k]):a[k]);});
+  NCI_IADLS.forEach(it=>nciPutScore(it.key,a[it.key]||''));
+  NCI_ADLS.forEach(it=>nciPutScore(it.key,a[it.key]||''));
+  NCI_BARRIERS.forEach(it=>{const el=nciEl('nci_a_'+it.key);if(el)el.checked=a[it.key]==='Yes';});
+  NCI_SAFETY.forEach(it=>{const el=nciEl('nci_a_'+it.key);if(el)el.checked=a[it.key]==='Yes';});
+  nciSetRadio('nci_a_homeAppropriate',a.homeAppropriate||'');
+  if(a.clientSignatureData)nciPaintSig('nci_assess_clientSig',a.clientSignatureData);
+  if(a.agencySignatureData)nciPaintSig('nci_assess_agencySig',a.agencySignatureData);
+
+  const p=root.activityPlan||{};
+  NCI_TEXT_P.forEach(k=>{if(p[k]!=null)nciSet('nci_p_'+k,k.toLowerCase().includes('date')?toEasternMDY(p[k]):p[k]);});
+  nciSetRadio('nci_p_evacuationClass',p.evacuationClass||'');
+  if(p.nursePocSignatureData)nciPaintSig('nci_plan_nursePocSig',p.nursePocSignatureData);
+  if(p.clientFamilySignatureData)nciPaintSig('nci_plan_clientFamilySig',p.clientFamilySignatureData);
+  if(p.pcaSignatureData)nciPaintSig('nci_plan_pcaSig',p.pcaSignatureData);
+
+  const c=root.consent||{};
+  NCI_TEXT_C.forEach(k=>{if(c[k]!=null)nciSet('nci_c_'+k,k.toLowerCase().includes('date')?toEasternMDY(c[k]):c[k]);});
+  NCI_CONSENT_CHECKS.forEach(k=>{const el=nciEl('nci_c_'+k);if(el)el.checked=c[k]==='Yes';});
+  if(c.patientSignatureData)nciPaintSig('nci_consent_patientSig',c.patientSignatureData);
+
+  const r=root.passport||{};
+  if(r.printedName!=null)nciSet('nci_r_printedName',r.printedName);
+  if(r.patientGuardianSignatureDate)nciSet('nci_r_patientGuardianSignatureDate',toEasternMDY(r.patientGuardianSignatureDate));
+  if(r.witnessSignatureDate)nciSet('nci_r_witnessSignatureDate',toEasternMDY(r.witnessSignatureDate));
+  if(r.patientGuardianSignatureData)nciPaintSig('nci_passport_patientGuardianSig',r.patientGuardianSignatureData);
+  if(r.witnessSignatureData)nciPaintSig('nci_passport_witnessSig',r.witnessSignatureData);
+
+  const m=root.admission||{};
+  const folder=nciEl('nci_m_folderReceivedAck');
+  if(folder)folder.checked=m.folderReceivedAck==='Yes';
+  const proxy=m.proxyYes==='Yes'?'Yes':(m.proxyNo==='Yes'?'No':'');
+  nciSetRadio('nci_m_proxy',proxy);
+  nciToggleHealthAgent();
+  NCI_TEXT_M.forEach(k=>{if(m[k]!=null)nciSet('nci_m_'+k,k.toLowerCase().includes('date')?toEasternMDY(m[k]):m[k]);});
+  if(m.clientRepSignatureData)nciPaintSig('nci_admit_clientRepSig',m.clientRepSignatureData);
+  if(m.agencyRepSignatureData)nciPaintSig('nci_admit_agencyRepSig',m.agencyRepSignatureData);
+}
+
+async function saveNewClientIntake(status){
+  nciShowErr('');
+  const payload=collectNewClientIntake(status);
+  if(status==='Complete'){
+    const miss=validateNewClientIntake(payload);
+    if(miss.length){
+      nciShowErr('Mark Complete needs: '+miss.join('; ')+'.');
+      return;
+    }
+  }
+  try{
+    const data=await apiPost(payload);
+    if(data&&data.success){
+      nciState.intakeId=data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'';
+      if(status==='Complete'){
+        archiveNewClientIntakePdf(nciState.intakeId);
+        closeNewClientIntake();
+        showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
+        loadNewClientIntakeDrafts();
+      }else{
+        showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
+        loadNewClientIntakeDrafts();
+      }
+    }else{
+      nciShowErr((data&&data.error)||'Backend pending — save_new_client_intake did not store this intake. Nothing was marked '+status+'.');
+    }
+  }catch(e){
+    nciShowErr('Backend pending or unreachable. Stub action: save_new_client_intake. Intake was not saved as '+status+'.');
+  }
+}
+
+async function archiveNewClientIntakePdf(intakeId){
+  // Ace PDF archive — stub until Sheets live. Failures are ignored.
+  try{
+    await apiPost({action:'archive_new_client_intake_pdf',intakeId:intakeId||''});
+  }catch(e){}
+}
+
+async function getNewClientIntake(intakeId){
+  return apiPost({action:'get_new_client_intake',intakeId:intakeId||''});
+}
+
+async function resumeNewClientIntake(intakeId){
+  nciBuildGrids();
+  resetNewClientIntake();
+  nciState.intakeId=intakeId||'';
+  nciPrefillDates();
+  nciRenderSteps();
+  openModal('newClientIntakeModal');
+  try{
+    const data=await getNewClientIntake(intakeId);
+    if(data&&data.success){
+      applyNewClientIntake(data);
+      nciRenderSteps();
+      setTimeout(()=>nciInitPageSigs(nciState.step),80);
+    }else{
+      nciShowErr((data&&data.error)||'Backend pending — get_new_client_intake could not load this draft.');
+      setTimeout(()=>nciInitPageSigs(1),80);
+    }
+  }catch(e){
+    nciShowErr('Backend pending or unreachable. Stub action: get_new_client_intake.');
+    setTimeout(()=>nciInitPageSigs(1),80);
+  }
+}
+
+async function loadNewClientIntakeDrafts(){
+  const card=nciEl('nciDraftsCard');
+  const list=nciEl('nciDraftsList');
+  if(!card||!list)return;
+  try{
+    const data=await apiPost({action:'list_new_client_intakes',nurseName:currentNurseName||'',status:'Draft'});
+    let rows=[];
+    if(data&&data.success){
+      rows=data.data||data.intakes||data.rows||[];
+    }
+    if(!rows.length){card.style.display='none';list.innerHTML='';return;}
+    card.style.display='block';
+    list.innerHTML=rows.map(r=>{
+      const id=r.intakeId||r.id||'';
+      const name=escapeHtml(r.clientName||(r.assessment&&r.assessment.clientName)||'Untitled');
+      const st=escapeHtml(r.status||'Draft');
+      const when=escapeHtml(toEasternMDY(r.updatedAt||r.savedAt||r.assessmentDate||'')||'');
+      return `<div class="nci-draft-row">
+        <div><strong>${name}</strong><div style="font-size:0.72rem;color:var(--muted)">${st}${when?' · '+when:''}</div></div>
+        <button type="button" class="btn btn-sm btn-navy" onclick="resumeNewClientIntake('${escapeAttr(id)}')">Resume</button>
+      </div>`;
+    }).join('');
+  }catch(e){
+    card.style.display='none';
+  }
 }
 
 
