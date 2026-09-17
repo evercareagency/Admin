@@ -783,21 +783,24 @@ Call (216) 377-5991 with any questions.</textarea>
         <div id="nciAdlGrid"></div>
       </div>
       <div class="nurse-form-section">
-        <h4>Barriers to care</h4>
-        <div class="nci-checks" id="nciBarrierGrid"></div>
-        <div class="field" style="margin-top:10px"><label>Other barrier</label><input type="text" id="nci_a_barrierOtherText"></div>
+        <h4>BARRIERS</h4>
+        <div class="field"><textarea id="nci_a_barriers"></textarea></div>
       </div>
       <div class="nurse-form-section">
-        <h4>Safety</h4>
-        <div class="nci-checks" id="nciSafetyGrid"></div>
+        <h4>SAFETY HAZARDS</h4>
+        <div class="field"><textarea id="nci_a_safetyHazards"></textarea></div>
       </div>
       <div class="nurse-form-section">
-        <h4>Home appropriate for services</h4>
+        <h4>OTHER ISSUES</h4>
+        <div class="field"><textarea id="nci_a_otherIssues"></textarea></div>
+      </div>
+      <div class="nurse-form-section">
+        <h4>HOME SITUATION APPROPRIATE FOR SERVICES</h4>
         <div class="nci-radios" style="margin-bottom:10px">
-          <label class="nci-radio"><input type="radio" name="nci_a_homeAppropriate" value="Yes"> Yes</label>
-          <label class="nci-radio"><input type="radio" name="nci_a_homeAppropriate" value="No"> No</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_homeSituationAppropriate" value="Yes" onchange="nciToggleHomeExplain()"> Yes</label>
+          <label class="nci-radio"><input type="radio" name="nci_a_homeSituationAppropriate" value="No" onchange="nciToggleHomeExplain()"> No</label>
         </div>
-        <div class="field"><label>Comments</label><textarea id="nci_a_comments" placeholder="Nurse comments"></textarea></div>
+        <div class="field" id="nciHomeExplainWrap" style="display:none"><label style="text-transform:none;letter-spacing:0">If no, explain</label><textarea id="nci_a_homeSituationExplain"></textarea></div>
       </div>
       <div class="nurse-form-section">
         <h4>Client signature</h4>
@@ -3671,29 +3674,6 @@ const NCI_ADLS=[
   {key:'adlAmbulation',label:'Ambulation'},
   {key:'adlEating',label:'Eating'}
 ];
-const NCI_BARRIERS=[
-  {key:'barrierLanguage',label:'Language'},
-  {key:'barrierHearing',label:'Hearing'},
-  {key:'barrierVision',label:'Vision'},
-  {key:'barrierCognitive',label:'Cognitive'},
-  {key:'barrierCultural',label:'Cultural'},
-  {key:'barrierPhysical',label:'Physical environment'},
-  {key:'barrierFinancial',label:'Financial'}
-];
-const NCI_SAFETY=[
-  {key:'safetySmokeDetector',label:'Smoke detector'},
-  {key:'safetyCoDetector',label:'CO detector'},
-  {key:'safetyFireExtinguisher',label:'Fire extinguisher'},
-  {key:'safetyEmergencyNumbers',label:'Emergency numbers posted'},
-  {key:'safetyLighting',label:'Adequate lighting'},
-  {key:'safetyGrabBars',label:'Grab bars'},
-  {key:'safetyPathways',label:'Clear pathways'},
-  {key:'safetyTelephone',label:'Working telephone'},
-  {key:'safetyFallHazards',label:'Fall hazards noted'},
-  {key:'safetyPets',label:'Pets in home'},
-  {key:'safetyWeapons',label:'Weapons in home'},
-  {key:'safetySmoking',label:'Smoking in home'}
-];
 const NCI_SIGS=[
   {id:'nci_assess_clientSig',page:1},
   {id:'nci_assess_agencySig',page:1},
@@ -3706,7 +3686,7 @@ const NCI_SIGS=[
   {id:'nci_admit_clientRepSig',page:5},
   {id:'nci_admit_agencyRepSig',page:5}
 ];
-const NCI_TEXT_A=['assessmentDate','clientName','dateOfBirth','age','sex','phone','language','address','city','state','zip','livesWith','livesWithOther','caregiverName','caregiverRelationship','caregiverPhone','caregiverInHome','barrierOtherText','comments','clientSignatureDate','agencySignatureDate'];
+const NCI_TEXT_A=['assessmentDate','clientName','dateOfBirth','age','sex','phone','language','address','city','state','zip','livesWith','livesWithOther','caregiverName','caregiverRelationship','caregiverPhone','caregiverInHome','barriers','safetyHazards','otherIssues','homeSituationExplain','clientSignatureDate','agencySignatureDate'];
 const NCI_TEXT_P=['mrNumber','clientName','dateOfBirth','phone','address','emergencyName','emergencyPhone','emergencyRelationship','pcpName','pcpPhone','medicalNeeds','allergies','diet','functionalStatus','psychosocialStatus','serviceDuration','serviceFrequency','serviceHours','specialRequests','supervisorName','nursePocSignatureDate','clientFamilySignatureDate','pcaSignatureDate'];
 const NCI_TEXT_C=['patientPrintedName','patientSignatureDate','emergencyName','emergencyPhone','emergencyRelationship'];
 const NCI_TEXT_R=['printedName','patientGuardianSignatureDate','witnessSignatureDate'];
@@ -3886,11 +3866,6 @@ function nciBuildScores(containerId,items){
   </div>`).join('');
   el.dataset.built='1';
 }
-function nciBuildChecks(containerId,items,prefix){
-  const el=nciEl(containerId);if(!el||el.dataset.built)return;
-  el.innerHTML=items.map(it=>`<label class="nci-check"><input type="checkbox" id="${prefix}${it.key}"> ${it.label}</label>`).join('');
-  el.dataset.built='1';
-}
 function nciSetScore(btn){
   const row=btn.closest('.nci-score-row');
   if(!row)return;
@@ -3971,6 +3946,10 @@ function nciToggleHealthAgent(){
   const box=nciEl('nciHealthAgentFields');
   if(box)box.style.display=nciRadio('nci_m_proxy')==='Yes'?'block':'none';
 }
+function nciToggleHomeExplain(){
+  const box=nciEl('nciHomeExplainWrap');
+  if(box)box.style.display=nciRadio('nci_a_homeSituationAppropriate')==='No'?'block':'none';
+}
 function nciSyncFromAssessment(){
   if(!nciVal('nci_p_clientName'))nciSet('nci_p_clientName',nciVal('nci_a_clientName'));
   if(!nciVal('nci_p_dateOfBirth'))nciSet('nci_p_dateOfBirth',nciVal('nci_a_dateOfBirth'));
@@ -4017,8 +3996,6 @@ function nciGo(delta){nciJump(nciState.step+delta);}
 function nciBuildGrids(){
   nciBuildScores('nciIadlGrid',NCI_IADLS);
   nciBuildScores('nciAdlGrid',NCI_ADLS);
-  nciBuildChecks('nciBarrierGrid',NCI_BARRIERS,'nci_a_');
-  nciBuildChecks('nciSafetyGrid',NCI_SAFETY,'nci_a_');
 }
 
 function resetNewClientIntake(){
@@ -4034,6 +4011,7 @@ function resetNewClientIntake(){
   NCI_SIGS.forEach(s=>nciClearSig(s.id));
   nciShowErr('');
   nciToggleHealthAgent();
+  nciToggleHomeExplain();
 }
 
 function nciPrefillDates(){
@@ -4108,9 +4086,6 @@ function nciSplitClientAddress(addr){
   if(state&&!nciVal('nci_a_state'))nciSet('nci_a_state',state);
   if(zip&&!nciVal('nci_a_zip'))nciSet('nci_a_zip',zip);
 }
-function nciJoinCheckedLabels(items,prefix){
-  return items.filter(it=>nciYesNo(prefix+it.key)==='Yes').map(it=>it.label).join('; ');
-}
 function nciEnum(val,allowed){
   const s=nciStr(val);
   return (s&&allowed.indexOf(s)>=0)?s:'';
@@ -4121,16 +4096,6 @@ function nciPutYesNo(id,v){
   if(nciIsYes(v))el.checked=true;
   else if(nciStr(v)==='No')el.checked=false;
 }
-function nciApplyJoinedChecks(items,prefix,joined){
-  const s=nciStr(joined);
-  if(!s)return;
-  const low=s.toLowerCase();
-  items.forEach(it=>{
-    const el=nciEl(prefix+it.key);
-    if(el&&low.indexOf(String(it.label).toLowerCase())>=0)el.checked=true;
-  });
-}
-
 function collectNewClientIntake(status){
   nciSnapshotSigs();
   const clientName=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName')||'';
@@ -4149,11 +4114,11 @@ function collectNewClientIntake(status){
     livesWith:livesWith,
     primaryCaregiverName:nciVal('nci_a_caregiverName'),
     primaryCaregiverPhone:nciVal('nci_a_caregiverPhone'),
-    barriers:nciJoinCheckedLabels(NCI_BARRIERS,'nci_a_'),
-    safetyHazards:nciJoinCheckedLabels(NCI_SAFETY,'nci_a_'),
-    otherIssues:nciVal('nci_a_barrierOtherText'),
-    homeSituationAppropriate:nciRadio('nci_a_homeAppropriate'),
-    comments:nciVal('nci_a_comments'),
+    barriers:nciVal('nci_a_barriers'),
+    safetyHazards:nciVal('nci_a_safetyHazards'),
+    otherIssues:nciVal('nci_a_otherIssues'),
+    homeSituationAppropriate:nciRadio('nci_a_homeSituationAppropriate'),
+    homeSituationExplain:nciVal('nci_a_homeSituationExplain'),
     clientSignatureData:nciInk('nci_assess_clientSig'),
     clientSignatureDate:nciDate('nci_a_clientSignatureDate'),
     agencySignatureData:nciInk('nci_assess_agencySig'),
@@ -4326,15 +4291,16 @@ function applyNewClientIntake(data){
   nciPut('nci_a_livesWithOther',nciPick(p,['livesWithDetail']));
   nciPut('nci_a_clientSignatureDate',nciPickDate(a,['clientSignatureDate']));
   nciPut('nci_a_agencySignatureDate',nciPickDate(a,['agencySignatureDate']));
-  nciPut('nci_a_comments',nciPick(a,['comments'])||nciPick(a,['homeSituationExplain']));
-  nciPut('nci_a_barrierOtherText',nciPick(a,['otherIssues']));
+  nciPut('nci_a_barriers',nciPick(a,['barriers']));
+  nciPut('nci_a_safetyHazards',nciPick(a,['safetyHazards']));
+  nciPut('nci_a_otherIssues',nciPick(a,['otherIssues']));
+  nciPut('nci_a_homeSituationExplain',nciPick(a,['homeSituationExplain','comments']));
   nciPut('nci_a_sex',nciPick(p,['gender']));
   if(dob)nciFillAgeFromDob();
 
-  const home=nciPick(a,['homeSituationAppropriate']);
-  if(home)nciSetRadio('nci_a_homeAppropriate',home);
-  nciApplyJoinedChecks(NCI_BARRIERS,'nci_a_',nciPick(a,['barriers']));
-  nciApplyJoinedChecks(NCI_SAFETY,'nci_a_',nciPick(a,['safetyHazards']));
+  const home=nciPick(a,['homeSituationAppropriate','homeAppropriate']);
+  if(home)nciSetRadio('nci_a_homeSituationAppropriate',home);
+  nciToggleHomeExplain();
 
   Object.keys(NCI_IADL_TO_ACE).forEach(ui=>{
     const sc=nciPick(a,[NCI_IADL_TO_ACE[ui]]);
