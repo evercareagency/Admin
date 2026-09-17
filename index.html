@@ -586,7 +586,9 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="field"><label>Contact Date</label><input type="date" id="sc_contactDate"></div>
         <div class="field"><label>Contact Type</label><input type="text" id="sc_contactTypeLabel" readonly style="background:var(--off)"></div>
         <div class="field"><label>Client</label><input type="text" id="sc_clientName" readonly style="background:var(--off)"></div>
-        <div class="field"><label>Aide Name</label><input type="text" id="sc_aideName" placeholder="Aide present / assigned"></div>
+        <div class="field"><label>Aide Name</label>
+          <select id="sc_aideName"><option value="">— Select aide —</option></select>
+        </div>
         <div class="field"><label>Supervisor Name</label><input type="text" id="sc_supervisorName" readonly style="background:var(--off)"></div>
         <div class="field"><label>Client Lives With</label>
           <select id="sc_clientLivesWith"><option value="">—</option><option>Alone</option><option>With family</option><option>Other</option></select>
@@ -999,7 +1001,12 @@ async function mgrLogin(){
         if(btn){btn.disabled=false;btn.textContent='Sign In →';}
         window._mgrLoginInFlight=false;
         requestAnimationFrame(function(){
-          setTimeout(function(){ loadNurseCompliance(true); logActivity('Logged in (Nurse)'); }, 0);
+          setTimeout(function(){
+            loadNurseCompliance(true);
+            apiGetCached('get_clients').then(d=>{ if(d&&d.success) allClients=d.data||[]; }).catch(()=>{});
+            apiGetCached('get_users').then(d=>{ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(u=>u.username); }).catch(()=>{});
+            logActivity('Logged in (Nurse)');
+          }, 0);
         });
       }else{
         currentNurseName=null;
@@ -2703,6 +2710,7 @@ async function loadNurseCompliance(force){
         return{
           clientId:scField(r,'ClientId','clientId')||'',
           clientName:scField(r,'ClientName','clientName')||'—',
+          assignedAides:r.assignedAides||r.AssignedAides||[],
           visits,countingCalls,status,
           daysLeft,
           daysInWindow:daysLeft // table "Days left" column uses this key historically
@@ -2750,7 +2758,7 @@ function computeComplianceFromRaw(clients,contacts){
         && (scField(ct,'CallOutcome','callOutcome')||'')==='Reached'
         && ['Client','Family'].includes(scField(ct,'SpokeWith','spokeWith')||'');
     }).length;
-    return{clientId:id,clientName:name,visits,countingCalls,status:deriveNurseStatus(visits,countingCalls),daysInWindow:60};
+    return{clientId:id,clientName:name,assignedAides:c.assignedAides||c.AssignedAides||[],visits,countingCalls,status:deriveNurseStatus(visits,countingCalls),daysInWindow:60};
   });
 }
 
@@ -2835,7 +2843,63 @@ function todayISO(){
   return `${get('year')}-${get('month')}-${get('day')}`;
 }
 
-function openSupervisoryContactForm(contactType,rowIndex){
+/** Ace/PDF locked date format: MM/DD/YYYY in America/New_York. */
+function toEasternMDY(val){
+  if(val==null||val==='')return '';
+  const s=String(val).trim();
+  const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(iso)return `${iso[2]}/${iso[3]}/${iso[1]}`;
+  const mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(mdy)return `${mdy[1].padStart(2,'0')}/${mdy[2].padStart(2,'0')}/${mdy[3]}`;
+  const d=(val instanceof Date)?val:new Date(s);
+  if(isNaN(d.getTime()))return s;
+  const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+  const get=t=>(parts.find(p=>p.type===t)||{}).value;
+  return `${get('month')}/${get('day')}/${get('year')}`;
+}
+
+function normalizeAssignedAides(raw){
+  if(!raw)return [];
+  const list=Array.isArray(raw)?raw:String(raw).split(/[,;|]/).map(s=>s.trim()).filter(Boolean);
+  return list.map(a=>{
+    if(a&&typeof a==='object')return a.name||a.aideName||a.username||a.id||'';
+    return String(a).trim();
+  }).filter(Boolean);
+}
+
+function aideDisplayName(aideId){
+  if(!aideId)return '';
+  const users=allAidesForAssign.length?allAidesForAssign:((cacheGet('get_users')||{}).data||[]);
+  const u=(users||[]).find(x=>x.username===aideId||x.name===aideId||String(x.id)===String(aideId));
+  return (u&&u.name)||aideId;
+}
+
+async function ensureNurseLookups(){
+  try{
+    if(!allClients.length){
+      const data=await apiGetCached('get_clients');
+      if(data&&data.success)allClients=data.data||[];
+    }
+  }catch(e){}
+  try{
+    if(!allAidesForAssign.length){
+      const data=await apiGetCached('get_users');
+      if(data&&data.success&&data.data)allAidesForAssign=data.data.filter(u=>u.username);
+    }
+  }catch(e){}
+}
+
+function fillAideNameFromAssignment(row){
+  const sel=document.getElementById('sc_aideName');
+  if(!sel)return;
+  const client=allClients.find(c=>String(c.id)===String(row.clientId||'')||(c.name||'')===(row.clientName||''))||row||{};
+  const raw=client.assignedAides||client.AssignedAides||row.assignedAides||[];
+  const names=[...new Set(normalizeAssignedAides(raw).map(aideDisplayName).filter(Boolean))];
+  sel.innerHTML='<option value="">— Select aide —</option>'+names.map(n=>`<option value="${escapeAttr(n)}">${escapeHtml(n)}</option>`).join('');
+  sel.value=names.length===1?names[0]:'';
+}
+
+async function openSupervisoryContactForm(contactType,rowIndex){
   const row=nurseComplianceRows[rowIndex]||{};
   buildScPersonalCareGrid();
   buildScPerfGrid();
@@ -2845,7 +2909,8 @@ function openSupervisoryContactForm(contactType,rowIndex){
   document.getElementById('sc_clientName').value=row.clientName||'';
   document.getElementById('sc_supervisorName').value=currentNurseName||'Nurse';
   document.getElementById('sc_contactDate').value=todayISO();
-  document.getElementById('sc_aideName').value='';
+  await ensureNurseLookups();
+  fillAideNameFromAssignment(row);
   document.getElementById('sc_clientLivesWith').value='';
   document.getElementById('sc_functionalLimitations').value='';
   document.getElementById('sc_pleasedWithAide').value='';
@@ -2897,10 +2962,10 @@ async function saveSupervisoryContact(){
   if(!supPad||!supPad.hasData){err.textContent='Supervisor signature is required.';err.style.display='block';return;}
   if(isVisit&&(!clientPad||!clientPad.hasData)){err.textContent='Client signature is required for visits.';err.style.display='block';return;}
 
-  // camelCase payload per locked Sheets contract
+  // Ace-locked camelCase only — no ClientSignature/SupervisorSignature/supervisorSig aliases
   const payload={
     action:'save_supervisory_contact',
-    contactDate,
+    contactDate:toEasternMDY(contactDate),
     contactType,
     clientId:document.getElementById('sc_clientId').value||'',
     clientName:document.getElementById('sc_clientName').value||'',
@@ -2913,7 +2978,7 @@ async function saveSupervisoryContact(){
     clientComments:document.getElementById('sc_clientComments').value||'',
     supervisorComments:document.getElementById('sc_supervisorComments').value||'',
     supervisorSignatureCaptured:'Yes',
-    supervisorSignatureDate:document.getElementById('sc_supervisorSignatureDate').value||contactDate,
+    supervisorSignatureDate:toEasternMDY(document.getElementById('sc_supervisorSignatureDate').value||contactDate),
     supervisorSignatureData:document.getElementById('sc_supervisorSigCanvas').toDataURL('image/png'),
     formComplete:'Yes'
   };
@@ -2934,7 +2999,7 @@ async function saveSupervisoryContact(){
       payload[k]=v;
     });
     payload.clientSignatureCaptured='Yes';
-    payload.clientSignatureDate=document.getElementById('sc_clientSignatureDate').value||contactDate;
+    payload.clientSignatureDate=toEasternMDY(document.getElementById('sc_clientSignatureDate').value||contactDate);
     payload.clientSignatureData=document.getElementById('sc_clientSigCanvas').toDataURL('image/png');
   }else{
     payload.spokeWith=document.getElementById('sc_spokeWith').value||'';
