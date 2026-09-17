@@ -3417,15 +3417,20 @@ async function listSupervisoryContacts(filters){
 
 
 
-// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED — Friday-approved names only) ───
-// POST save_new_client_intake — nested pages + Ace canonical aliases (dual-write).
-// Top-level clientName + socDate. UI keys kept; Ace aliases written alongside:
-//   assessment: socDate, primaryCaregiverName, iadlMealPrepFull/iadlKitchenWork,
-//               iadlPhone, iadlSelfMeds, iadlPayingBills, *SignatureData
-//   activityPlan: dob, clientPhone, clientAddress, emergencyContactName
-//   consent: consentToTreatAck, releaseToCareProviders, consentDate
-//   passport: patientGuardianSignDate / witnessSignDate (flat; nested dates also sent)
-//   admission: proxyInPlace / proxyNoneNotInterested, clientRepSignDate / agencyRepSignDate
+// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED — canonical keys only) ───
+// POST save_new_client_intake — nested pages use Ace write names (no Ghost dual-write).
+// Top-level: action, intakeId (String), status Draft|Complete, nurseName, clientName, socDate.
+//   assessment: clientName, socDate, language, livesWith, primaryCaregiverName,
+//               primaryCaregiverPhone, clientSignatureData, agencySignatureData,
+//               clientSignatureDate, agencySignatureDate (+ Ace iadl*/adl* if present)
+//   activityPlan: clientName, dob, mrNumber, socDate, clientPhone, clientAddress,
+//                 nursePocSignatureData, clientFamilySignatureData, pcaSignatureData
+//                 (+ *SignatureDate)
+//   consent: patientPrintedName, consentToTreatAck, consentDate, patientSignatureData
+//   passport: printedName, patientGuardianSignatureData, patientGuardianSignDate,
+//             witnessSignatureData, witnessSignDate (flat — no nested dates)
+//   admission: clientName, folderReceivedAck, clientRepSignatureData, clientRepSignDate,
+//              agencyRepSignatureData, agencyRepSignDate, proxyInPlace, proxyNoneNotInterested
 // *SignatureData = PNG data URLs only (never the text "Signed").
 // dates = MM/DD/YYYY America/New_York.
 // Resume: get_new_client_intake / list_new_client_intakes.
@@ -3508,12 +3513,27 @@ const NCI_IADL_ALIASES={
 
 let nciState={intakeId:'',step:1};
 let nciSigStore={};
+let nciResumePayload=null;
 
 function todayEasternMDY(){return toEasternMDY(new Date());}
 
 function nciEl(id){return document.getElementById(id);}
 function nciVal(id){const el=nciEl(id);return el?String(el.value||'').trim():'';}
-function nciSet(id,v){const el=nciEl(id);if(el)el.value=v==null?'':v;}
+function nciStr(v){
+  if(v==null||v===undefined)return '';
+  if(typeof v==='object')return '';
+  const s=String(v).trim();
+  return (s==='undefined'||s==='null')?'':s;
+}
+function nciSet(id,v){
+  const el=nciEl(id);
+  if(!el)return;
+  el.value=v==null||v===''?'':String(v);
+}
+function nciPut(id,v){
+  const s=nciStr(v);
+  if(s!=='')nciSet(id,s);
+}
 function nciDate(id){return toEasternMDY(nciVal(id));}
 function nciYesNo(id){const el=nciEl(id);return (el&&el.checked)?'Yes':'No';}
 function nciRadio(name){const el=document.querySelector('input[name="'+name+'"]:checked');return el?el.value:'';}
@@ -3532,11 +3552,11 @@ function nciFail(msg){
   showTempMsg(msg,'var(--danger)');
 }
 function nciPick(obj,keys){
-  if(!obj)return '';
+  if(!obj||typeof obj!=='object')return '';
   const list=Array.isArray(keys)?keys:Array.prototype.slice.call(arguments,1);
   for(let i=0;i<list.length;i++){
-    const v=obj[list[i]];
-    if(v!=null && String(v).trim()!=='')return v;
+    const s=nciStr(obj[list[i]]);
+    if(s!=='')return s;
   }
   return '';
 }
@@ -3544,7 +3564,34 @@ function nciPickDate(obj,keys){
   const v=nciPick(obj,keys);
   return v?toEasternMDY(v):'';
 }
-function nciIsYes(v){return v==='Yes'||v===true||v==='true'||v==='Y';}
+function nciIsYes(v){return v==='Yes'||v===true||v==='true'||v==='Y'||nciStr(v)==='Yes';}
+function nciParsePage(v){
+  if(!v)return null;
+  if(typeof v==='string'){
+    const s=v.trim();
+    if(!s)return null;
+    try{v=JSON.parse(s);}catch(e){return null;}
+  }
+  if(v&&typeof v==='object'&&!Array.isArray(v))return v;
+  return null;
+}
+function nciMergePages(parts){
+  const out={};
+  (parts||[]).forEach(src=>{
+    if(!src)return;
+    Object.keys(src).forEach(k=>{
+      const raw=src[k];
+      if(raw==null||raw==='')return;
+      if(typeof raw==='object'&&!Array.isArray(raw)){
+        out[k]=raw;
+        return;
+      }
+      const s=nciStr(raw);
+      if(s!=='')out[k]=s;
+    });
+  });
+  return out;
+}
 function nciInnerData(data){
   if(!data||typeof data!=='object')return null;
   let nested=data.data;
@@ -3555,17 +3602,20 @@ function nciInnerData(data){
   return null;
 }
 function nciUnwrapIntake(data){
-  // Ace get returns BOTH flat keys and data:{...} — prefer nested.
+  // Ace get: root = data.data || data. Keep top-level pages if nested is partial.
   if(!data||typeof data!=='object')return {};
-  return nciInnerData(data)||data;
+  const inner=nciInnerData(data);
+  if(!inner)return data;
+  return nciMergePages([data,inner]);
 }
 function nciPage(root,outer,key){
-  const n=root&&root[key];
-  const o=outer&&outer[key];
-  if(n&&typeof n==='object'&&!Array.isArray(n)&&o&&typeof o==='object'&&!Array.isArray(o))return Object.assign({},o,n);
-  if(n&&typeof n==='object'&&!Array.isArray(n))return n;
-  if(o&&typeof o==='object'&&!Array.isArray(o))return o;
-  return {};
+  const from=obj=>{
+    if(!obj||typeof obj!=='object')return null;
+    const direct=nciParsePage(obj[key]);
+    const nested=obj.data?nciParsePage(obj.data[key]):null;
+    return nciMergePages([direct,nested].filter(Boolean));
+  };
+  return nciMergePages([from(outer),from(root)]);
 }
 function nciForceIntakeId(data){
   const inner=nciInnerData(data);
@@ -3731,6 +3781,7 @@ function nciBuildGrids(){
 function resetNewClientIntake(){
   nciState={intakeId:'',step:1};
   nciSigStore={};
+  nciResumePayload=null;
   const modal=nciEl('newClientIntakeModal');
   if(!modal)return;
   modal.querySelectorAll('input[type="text"],textarea').forEach(el=>{el.value='';});
@@ -3775,107 +3826,78 @@ function nciInk(id){
 
 function collectNewClientIntake(status){
   nciSnapshotSigs();
-  const assessment={};
-  NCI_TEXT_A.forEach(k=>{
-    const v=(k.toLowerCase().includes('date'))?nciDate('nci_a_'+k):nciVal('nci_a_'+k);
-    assessment[k]=v;
-  });
-  NCI_IADLS.forEach(it=>assessment[it.key]=nciGetScore(it.key));
-  NCI_ADLS.forEach(it=>assessment[it.key]=nciGetScore(it.key));
-  Object.keys(NCI_IADL_ALIASES).forEach(k=>{
-    NCI_IADL_ALIASES[k].forEach(alias=>{assessment[alias]=assessment[k]||'';});
-  });
-  NCI_BARRIERS.forEach(it=>assessment[it.key]=nciYesNo('nci_a_'+it.key));
-  NCI_SAFETY.forEach(it=>assessment[it.key]=nciYesNo('nci_a_'+it.key));
-  assessment.homeAppropriate=nciRadio('nci_a_homeAppropriate');
-  const aClient=nciInk('nci_assess_clientSig');
-  const aAgency=nciInk('nci_assess_agencySig');
-  assessment.clientSignatureData=aClient;
-  assessment.clientSignatureDate=nciDate('nci_a_clientSignatureDate');
-  assessment.agencySignatureData=aAgency;
-  assessment.agencySignatureDate=nciDate('nci_a_agencySignatureDate');
-  // Ace canonical aliases (Sheets keeps overlapping keys only)
-  assessment.socDate=assessment.assessmentDate||'';
-  assessment.primaryCaregiverName=assessment.caregiverName||'';
-  assessment.primaryCaregiverRelationship=assessment.caregiverRelationship||'';
-  assessment.primaryCaregiverPhone=assessment.caregiverPhone||'';
-  assessment.primaryCaregiverInHome=assessment.caregiverInHome||'';
+  const clientName=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName')||'';
+  const socDate=nciDate('nci_a_assessmentDate')||'';
 
-  const activityPlan={};
-  NCI_TEXT_P.forEach(k=>{
-    const v=(k.toLowerCase().includes('date'))?nciDate('nci_p_'+k):nciVal('nci_p_'+k);
-    activityPlan[k]=v;
+  const assessment={
+    clientName:clientName,
+    socDate:socDate,
+    language:nciVal('nci_a_language'),
+    livesWith:nciVal('nci_a_livesWith'),
+    primaryCaregiverName:nciVal('nci_a_caregiverName'),
+    primaryCaregiverPhone:nciVal('nci_a_caregiverPhone'),
+    clientSignatureData:nciInk('nci_assess_clientSig'),
+    agencySignatureData:nciInk('nci_assess_agencySig'),
+    clientSignatureDate:nciDate('nci_a_clientSignatureDate'),
+    agencySignatureDate:nciDate('nci_a_agencySignatureDate')
+  };
+  NCI_IADLS.forEach(it=>{
+    const v=nciGetScore(it.key);
+    if(!v)return;
+    assessment[it.key]=v;
+    (NCI_IADL_ALIASES[it.key]||[]).forEach(alias=>{assessment[alias]=v;});
   });
-  activityPlan.evacuationClass=nciRadio('nci_p_evacuationClass');
-  activityPlan.mrNumber=nciVal('nci_p_mrNumber');
-  const pNurse=nciInk('nci_plan_nursePocSig');
-  const pFam=nciInk('nci_plan_clientFamilySig');
+  NCI_ADLS.forEach(it=>{
+    const v=nciGetScore(it.key);
+    if(v)assessment[it.key]=v;
+  });
+
+  const addrParts=[nciVal('nci_a_address'),nciVal('nci_a_city'),nciVal('nci_a_state'),nciVal('nci_a_zip')].filter(Boolean);
+  const activityPlan={
+    clientName:nciVal('nci_p_clientName')||clientName,
+    dob:nciDate('nci_a_dateOfBirth')||nciDate('nci_p_dateOfBirth'),
+    mrNumber:nciVal('nci_p_mrNumber'),
+    socDate:socDate,
+    clientPhone:nciVal('nci_a_phone')||nciVal('nci_p_phone'),
+    clientAddress:addrParts.join(', ')||nciVal('nci_p_address'),
+    nursePocSignatureData:nciInk('nci_plan_nursePocSig'),
+    clientFamilySignatureData:nciInk('nci_plan_clientFamilySig'),
+    nursePocSignatureDate:nciDate('nci_p_nursePocSignatureDate'),
+    clientFamilySignatureDate:nciDate('nci_p_clientFamilySignatureDate')
+  };
   const pPca=nciInk('nci_plan_pcaSig');
-  activityPlan.nursePocSignatureData=pNurse;
-  activityPlan.nursePocSignatureDate=nciDate('nci_p_nursePocSignatureDate');
-  activityPlan.clientFamilySignatureData=pFam;
-  activityPlan.clientFamilySignatureDate=nciDate('nci_p_clientFamilySignatureDate');
   if(pPca){
     activityPlan.pcaSignatureData=pPca;
-  }else{
-    delete activityPlan.pcaSignatureDate;
+    activityPlan.pcaSignatureDate=nciDate('nci_p_pcaSignatureDate');
   }
-  activityPlan.dob=activityPlan.dateOfBirth||'';
-  activityPlan.clientPhone=activityPlan.phone||'';
-  activityPlan.clientAddress=activityPlan.address||'';
-  activityPlan.emergencyContactName=activityPlan.emergencyName||'';
-  activityPlan.emergencyContactPhone=activityPlan.emergencyPhone||'';
-  activityPlan.emergencyContactRelationship=activityPlan.emergencyRelationship||'';
 
   const consent={
-    patientPrintedName:nciVal('nci_c_patientPrintedName'),
-    patientSignatureDate:nciDate('nci_c_patientSignatureDate'),
-    emergencyName:nciVal('nci_c_emergencyName'),
-    emergencyPhone:nciVal('nci_c_emergencyPhone'),
-    emergencyRelationship:nciVal('nci_c_emergencyRelationship')
+    patientPrintedName:nciVal('nci_c_patientPrintedName')||clientName,
+    consentToTreatAck:nciYesNo('nci_c_consentServices'),
+    consentDate:nciDate('nci_c_patientSignatureDate'),
+    patientSignatureData:nciInk('nci_consent_patientSig')
   };
-  NCI_CONSENT_CHECKS.forEach(k=>consent[k]=nciYesNo('nci_c_'+k));
-  consent.patientSignatureData=nciInk('nci_consent_patientSig');
-  consent.consentToTreatAck=consent.consentServices||'No';
-  consent.releaseToCareProviders=consent.consentRoi||'No';
-  consent.consentDate=consent.patientSignatureDate||'';
 
-  const gDate=nciDate('nci_r_patientGuardianSignatureDate');
-  const wDate=nciDate('nci_r_witnessSignatureDate');
   const passport={
     printedName:nciVal('nci_r_printedName'),
     patientGuardianSignatureData:nciInk('nci_passport_patientGuardianSig'),
+    patientGuardianSignDate:nciDate('nci_r_patientGuardianSignatureDate'),
     witnessSignatureData:nciInk('nci_passport_witnessSig'),
-    patientGuardianSignDate:gDate,
-    witnessSignDate:wDate,
-    dates:{
-      patientGuardianSignatureDate:gDate,
-      witnessSignatureDate:wDate,
-      patientGuardianSignDate:gDate,
-      witnessSignDate:wDate
-    }
+    witnessSignDate:nciDate('nci_r_witnessSignatureDate')
   };
 
   const proxy=nciRadio('nci_m_proxy');
   const admission={
+    clientName:clientName,
     folderReceivedAck:nciYesNo('nci_m_folderReceivedAck'),
-    proxyYes:proxy==='Yes'?'Yes':'No',
-    proxyNo:proxy==='No'?'Yes':'No',
-    proxyInPlace:proxy==='Yes'?'Yes':'No',
-    proxyNoneNotInterested:proxy==='No'?'Yes':'No',
-    healthAgentName:nciVal('nci_m_healthAgentName'),
-    healthAgentPhone:nciVal('nci_m_healthAgentPhone'),
-    healthAgentRelationship:nciVal('nci_m_healthAgentRelationship'),
-    clientRepSignatureDate:nciDate('nci_m_clientRepSignatureDate'),
-    agencyRepSignatureDate:nciDate('nci_m_agencyRepSignatureDate'),
-    clientRepSignDate:nciDate('nci_m_clientRepSignatureDate'),
-    agencyRepSignDate:nciDate('nci_m_agencyRepSignatureDate'),
     clientRepSignatureData:nciInk('nci_admit_clientRepSig'),
-    agencyRepSignatureData:nciInk('nci_admit_agencyRepSig')
+    clientRepSignDate:nciDate('nci_m_clientRepSignatureDate'),
+    agencyRepSignatureData:nciInk('nci_admit_agencyRepSig'),
+    agencyRepSignDate:nciDate('nci_m_agencyRepSignatureDate'),
+    proxyInPlace:proxy==='Yes'?'Yes':'No',
+    proxyNoneNotInterested:proxy==='No'?'Yes':'No'
   };
 
-  const clientName=assessment.clientName||activityPlan.clientName||consent.patientPrintedName||'';
-  const socDate=assessment.socDate||assessment.assessmentDate||'';
   return {
     action:'save_new_client_intake',
     intakeId:(nciState.intakeId==null||nciState.intakeId==='')?'':String(nciState.intakeId),
@@ -3891,7 +3913,7 @@ function validateNewClientIntake(payload){
   const miss=[];
   const a=payload.assessment,p=payload.activityPlan,c=payload.consent,r=payload.passport,m=payload.admission;
   if(!a.clientName && !payload.clientName)miss.push('Assessment: client name');
-  if(!a.assessmentDate && !a.socDate && !payload.socDate)miss.push('Assessment: date');
+  if(!a.socDate && !payload.socDate)miss.push('Assessment: date');
   if(!a.clientSignatureData)miss.push('Assessment: client signature');
   if(!a.agencySignatureData)miss.push('Assessment: agency/nurse signature');
   if(!p.mrNumber)miss.push('Activity Plan: MR# (type it — not auto-generated)');
@@ -3910,103 +3932,105 @@ function validateNewClientIntake(payload){
 
 function applyNewClientIntake(data){
   if(!data)return;
-  const root=nciUnwrapIntake(data); // data.data||data (Ace returns both)
+  const root=nciUnwrapIntake(data); // data.data||data
   nciForceIntakeId(data);
   if(!nciState.intakeId&&root&&root.intakeId!=null&&root.intakeId!=='')nciState.intakeId=String(root.intakeId);
+
   const a=nciPage(root,data,'assessment');
-  NCI_TEXT_A.forEach(k=>{
-    let v='';
-    if(k==='assessmentDate')v=nciPickDate(a,['assessmentDate','socDate'])||nciPickDate(root,['socDate','assessmentDate'])||nciPickDate(data,['socDate','assessmentDate']);
-    else if(k==='clientName')v=nciPick(a,['clientName'])||nciPick(root,['clientName'])||nciPick(data,['clientName']);
-    else if(k==='caregiverName')v=nciPick(a,['caregiverName','primaryCaregiverName']);
-    else if(k==='caregiverRelationship')v=nciPick(a,['caregiverRelationship','primaryCaregiverRelationship']);
-    else if(k==='caregiverPhone')v=nciPick(a,['caregiverPhone','primaryCaregiverPhone']);
-    else if(k==='caregiverInHome')v=nciPick(a,['caregiverInHome','primaryCaregiverInHome']);
-    else if(k==='dateOfBirth')v=nciPickDate(a,['dateOfBirth','dob']);
-    else if(k.toLowerCase().includes('date'))v=nciPickDate(a,[k,k.replace('SignatureDate','SignDate')]);
-    else v=nciPick(a,[k]);
-    if(v!=='')nciSet('nci_a_'+k,v);
-  });
+  const p=nciPage(root,data,'activityPlan');
+  const c=nciPage(root,data,'consent');
+  const r=nciPage(root,data,'passport');
+  const m=nciPage(root,data,'admission');
+
+  const clientName=nciPick(a,['clientName'])||nciPick(root,['clientName'])||nciPick(data,['clientName'])||nciPick(p,['clientName'])||nciPick(c,['patientPrintedName'])||nciPick(m,['clientName']);
+  const socDate=nciPickDate(a,['socDate','assessmentDate'])||nciPickDate(root,['socDate','assessmentDate'])||nciPickDate(data,['socDate'])||nciPickDate(p,['socDate']);
+  const dob=nciPickDate(p,['dob','dateOfBirth'])||nciPickDate(a,['dob','dateOfBirth']);
+  const phone=nciPick(p,['clientPhone','phone'])||nciPick(a,['clientPhone','phone']);
+  const address=nciPick(p,['clientAddress','address'])||nciPick(a,['clientAddress','address']);
+
+  nciPut('nci_a_clientName',clientName);
+  nciPut('nci_a_assessmentDate',socDate);
+  nciPut('nci_a_dateOfBirth',dob);
+  nciPut('nci_a_phone',phone);
+  nciPut('nci_a_address',address);
+  nciPut('nci_a_language',nciPick(a,['language']));
+  nciPut('nci_a_livesWith',nciPick(a,['livesWith']));
+  nciPut('nci_a_caregiverName',nciPick(a,['primaryCaregiverName','caregiverName']));
+  nciPut('nci_a_caregiverPhone',nciPick(a,['primaryCaregiverPhone','caregiverPhone']));
+  nciPut('nci_a_clientSignatureDate',nciPickDate(a,['clientSignatureDate','clientSignDate']));
+  nciPut('nci_a_agencySignatureDate',nciPickDate(a,['agencySignatureDate','agencySignDate']));
+  if(dob)nciFillAgeFromDob();
+
   NCI_IADLS.forEach(it=>{
     const aliases=NCI_IADL_ALIASES[it.key]||[];
-    nciPutScore(it.key,nciPick(a,[it.key].concat(aliases)));
+    const sc=nciPick(a,[it.key].concat(aliases));
+    if(sc)nciPutScore(it.key,sc);
   });
-  NCI_ADLS.forEach(it=>nciPutScore(it.key,nciPick(a,[it.key])));
-  NCI_BARRIERS.forEach(it=>{const el=nciEl('nci_a_'+it.key);if(el)el.checked=nciIsYes(a[it.key]);});
-  NCI_SAFETY.forEach(it=>{const el=nciEl('nci_a_'+it.key);if(el)el.checked=nciIsYes(a[it.key]);});
-  nciSetRadio('nci_a_homeAppropriate',a.homeAppropriate||'');
+  NCI_ADLS.forEach(it=>{
+    const sc=nciPick(a,[it.key]);
+    if(sc)nciPutScore(it.key,sc);
+  });
+
   const aClientInk=nciPick(a,['clientSignatureData'])||nciPick(root,['clientSignatureData'])||nciPick(data,['clientSignatureData']);
   const aAgencyInk=nciPick(a,['agencySignatureData'])||nciPick(root,['agencySignatureData'])||nciPick(data,['agencySignatureData']);
   if(aClientInk)nciPaintSig('nci_assess_clientSig',aClientInk);
   if(aAgencyInk)nciPaintSig('nci_assess_agencySig',aAgencyInk);
 
-  const p=nciPage(root,data,'activityPlan');
-  NCI_TEXT_P.forEach(k=>{
-    let v='';
-    if(k==='dateOfBirth')v=nciPickDate(p,['dateOfBirth','dob']);
-    else if(k==='phone')v=nciPick(p,['phone','clientPhone']);
-    else if(k==='address')v=nciPick(p,['address','clientAddress']);
-    else if(k==='emergencyName')v=nciPick(p,['emergencyName','emergencyContactName']);
-    else if(k==='emergencyPhone')v=nciPick(p,['emergencyPhone','emergencyContactPhone']);
-    else if(k==='emergencyRelationship')v=nciPick(p,['emergencyRelationship','emergencyContactRelationship']);
-    else if(k==='clientName')v=nciPick(p,['clientName'])||nciPick(root,['clientName'])||nciPick(data,['clientName'])||nciPick(a,['clientName']);
-    else if(k.toLowerCase().includes('date'))v=nciPickDate(p,[k,k.replace('SignatureDate','SignDate')]);
-    else v=nciPick(p,[k]);
-    if(v!=='')nciSet('nci_p_'+k,v);
-  });
-  nciSetRadio('nci_p_evacuationClass',p.evacuationClass||'');
-  if(p.nursePocSignatureData)nciPaintSig('nci_plan_nursePocSig',p.nursePocSignatureData);
-  if(p.clientFamilySignatureData)nciPaintSig('nci_plan_clientFamilySig',p.clientFamilySignatureData);
-  if(p.pcaSignatureData)nciPaintSig('nci_plan_pcaSig',p.pcaSignatureData);
+  nciPut('nci_p_mrNumber',nciPick(p,['mrNumber']));
+  nciPut('nci_p_clientName',nciPick(p,['clientName'])||clientName);
+  nciPut('nci_p_dateOfBirth',dob);
+  nciPut('nci_p_phone',phone);
+  nciPut('nci_p_address',address);
+  nciPut('nci_p_nursePocSignatureDate',nciPickDate(p,['nursePocSignatureDate','nursePocSignDate']));
+  nciPut('nci_p_clientFamilySignatureDate',nciPickDate(p,['clientFamilySignatureDate','clientFamilySignDate']));
+  nciPut('nci_p_pcaSignatureDate',nciPickDate(p,['pcaSignatureDate','pcaSignDate']));
+  const pNurseInk=nciPick(p,['nursePocSignatureData']);
+  const pFamInk=nciPick(p,['clientFamilySignatureData']);
+  const pPcaInk=nciPick(p,['pcaSignatureData']);
+  if(pNurseInk)nciPaintSig('nci_plan_nursePocSig',pNurseInk);
+  if(pFamInk)nciPaintSig('nci_plan_clientFamilySig',pFamInk);
+  if(pPcaInk)nciPaintSig('nci_plan_pcaSig',pPcaInk);
 
-  const c=nciPage(root,data,'consent');
-  NCI_TEXT_C.forEach(k=>{
-    let v='';
-    if(k==='patientSignatureDate')v=nciPickDate(c,['patientSignatureDate','consentDate']);
-    else if(k.toLowerCase().includes('date'))v=nciPickDate(c,[k,k.replace('SignatureDate','SignDate')]);
-    else v=nciPick(c,[k]);
-    if(v!=='')nciSet('nci_c_'+k,v);
-  });
-  NCI_CONSENT_CHECKS.forEach(k=>{
-    const el=nciEl('nci_c_'+k);
-    if(!el)return;
-    let v=c[k];
-    if(k==='consentServices')v=nciPick(c,['consentServices','consentToTreatAck']);
-    if(k==='consentRoi')v=nciPick(c,['consentRoi','releaseToCareProviders']);
-    el.checked=nciIsYes(v);
-  });
-  if(c.patientSignatureData)nciPaintSig('nci_consent_patientSig',c.patientSignatureData);
+  nciPut('nci_c_patientPrintedName',nciPick(c,['patientPrintedName'])||clientName);
+  nciPut('nci_c_patientSignatureDate',nciPickDate(c,['consentDate','patientSignatureDate']));
+  const consentAck=nciEl('nci_c_consentServices');
+  if(consentAck){
+    const ack=nciPick(c,['consentToTreatAck','consentServices']);
+    if(nciIsYes(ack))consentAck.checked=true;
+    else if(nciStr(ack)==='No')consentAck.checked=false;
+  }
+  const cInk=nciPick(c,['patientSignatureData']);
+  if(cInk)nciPaintSig('nci_consent_patientSig',cInk);
 
-  const r=nciPage(root,data,'passport');
-  if(nciPick(r,['printedName']))nciSet('nci_r_printedName',nciPick(r,['printedName']));
-  const rDates=r.dates&&typeof r.dates==='object'?r.dates:{};
-  const gDate=nciPickDate(r,['patientGuardianSignDate','patientGuardianSignatureDate'])||
-    nciPickDate(rDates,['patientGuardianSignDate','patientGuardianSignatureDate'])||
-    (typeof r.dates==='string'?toEasternMDY(r.dates):'');
-  const wDate=nciPickDate(r,['witnessSignDate','witnessSignatureDate'])||
-    nciPickDate(rDates,['witnessSignDate','witnessSignatureDate']);
-  if(gDate)nciSet('nci_r_patientGuardianSignatureDate',gDate);
-  if(wDate)nciSet('nci_r_witnessSignatureDate',wDate);
-  if(r.patientGuardianSignatureData)nciPaintSig('nci_passport_patientGuardianSig',r.patientGuardianSignatureData);
-  if(r.witnessSignatureData)nciPaintSig('nci_passport_witnessSig',r.witnessSignatureData);
+  nciPut('nci_r_printedName',nciPick(r,['printedName'])||clientName);
+  const rDates=nciParsePage(r.dates)||{};
+  nciPut('nci_r_patientGuardianSignatureDate',
+    nciPickDate(r,['patientGuardianSignDate','patientGuardianSignatureDate'])||
+    nciPickDate(rDates,['patientGuardianSignDate','patientGuardianSignatureDate']));
+  nciPut('nci_r_witnessSignatureDate',
+    nciPickDate(r,['witnessSignDate','witnessSignatureDate'])||
+    nciPickDate(rDates,['witnessSignDate','witnessSignatureDate']));
+  const gInk=nciPick(r,['patientGuardianSignatureData']);
+  const wInk=nciPick(r,['witnessSignatureData']);
+  if(gInk)nciPaintSig('nci_passport_patientGuardianSig',gInk);
+  if(wInk)nciPaintSig('nci_passport_witnessSig',wInk);
 
-  const m=nciPage(root,data,'admission');
   const folder=nciEl('nci_m_folderReceivedAck');
-  if(folder)folder.checked=nciIsYes(m.folderReceivedAck);
-  const proxy=(nciIsYes(m.proxyYes)||nciIsYes(m.proxyInPlace))?'Yes':
-    ((nciIsYes(m.proxyNo)||nciIsYes(m.proxyNoneNotInterested))?'No':'');
-  nciSetRadio('nci_m_proxy',proxy);
+  if(folder){
+    const fv=nciPick(m,['folderReceivedAck']);
+    if(nciIsYes(fv))folder.checked=true;
+    else if(nciStr(fv)==='No')folder.checked=false;
+  }
+  const proxy=(nciIsYes(m.proxyInPlace)||nciIsYes(m.proxyYes))?'Yes':
+    ((nciIsYes(m.proxyNoneNotInterested)||nciIsYes(m.proxyNo))?'No':'');
+  if(proxy)nciSetRadio('nci_m_proxy',proxy);
   nciToggleHealthAgent();
-  NCI_TEXT_M.forEach(k=>{
-    let v='';
-    if(k==='clientRepSignatureDate')v=nciPickDate(m,['clientRepSignatureDate','clientRepSignDate']);
-    else if(k==='agencyRepSignatureDate')v=nciPickDate(m,['agencyRepSignatureDate','agencyRepSignDate']);
-    else if(k.toLowerCase().includes('date'))v=nciPickDate(m,[k,k.replace('SignatureDate','SignDate')]);
-    else v=nciPick(m,[k]);
-    if(v!=='')nciSet('nci_m_'+k,v);
-  });
-  if(m.clientRepSignatureData)nciPaintSig('nci_admit_clientRepSig',m.clientRepSignatureData);
-  if(m.agencyRepSignatureData)nciPaintSig('nci_admit_agencyRepSig',m.agencyRepSignatureData);
+  nciPut('nci_m_clientRepSignatureDate',nciPickDate(m,['clientRepSignDate','clientRepSignatureDate']));
+  nciPut('nci_m_agencyRepSignatureDate',nciPickDate(m,['agencyRepSignDate','agencyRepSignatureDate']));
+  const mClientInk=nciPick(m,['clientRepSignatureData']);
+  const mAgencyInk=nciPick(m,['agencyRepSignatureData']);
+  if(mClientInk)nciPaintSig('nci_admit_clientRepSig',mClientInk);
+  if(mAgencyInk)nciPaintSig('nci_admit_agencyRepSig',mAgencyInk);
 }
 
 async function saveNewClientIntake(status){
@@ -4072,16 +4096,26 @@ async function resumeNewClientIntake(intakeId){
   try{
     const data=await getNewClientIntake(nciState.intakeId);
     if(data&&data.success){
+      nciResumePayload=data;
       applyNewClientIntake(data);
       nciForceIntakeId(data);
       nciRenderSteps();
-      setTimeout(()=>nciInitPageSigs(nciState.step),80);
-      const name=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName');
-      if(!name){
-        nciFail('Resume opened but client name was empty — Ace fields may not have restored. Save Draft again after filling the name.');
-      }else{
-        showTempMsg('Draft resumed.','var(--teal)');
-      }
+      const reapply=function(){
+        if(!nciResumePayload)return;
+        applyNewClientIntake(nciResumePayload);
+        nciForceIntakeId(nciResumePayload);
+      };
+      setTimeout(reapply,0);
+      setTimeout(function(){
+        reapply();
+        nciInitPageSigs(nciState.step);
+        const name=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName');
+        if(!name){
+          nciFail('Resume opened but client name was empty — Ace fields may not have restored. Save Draft again after filling the name.');
+        }else{
+          showTempMsg('Draft resumed.','var(--teal)');
+        }
+      },100);
     }else{
       nciFail((data&&data.error)||'Backend pending — get_new_client_intake could not load this draft.');
       setTimeout(()=>nciInitPageSigs(1),80);
