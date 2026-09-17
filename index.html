@@ -129,7 +129,9 @@ textarea{resize:vertical;min-height:80px;}
 #newClientIntakeModal .nci-modal{max-width:920px;width:100%;height:100%;height:100dvh;max-height:100%;max-height:100dvh;margin:0 auto;padding:0;display:flex;flex-direction:column;overflow:hidden;border-radius:0;box-sizing:border-box;}
 .nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0;flex-wrap:nowrap;flex-shrink:0;padding:max(14px,env(safe-area-inset-top,0px)) 16px 10px;}
 .nci-head h3{padding-right:8px;}
+.nci-head-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .nci-close{flex-shrink:0;min-height:44px;min-width:44px;}
+.nci-x{min-width:44px;min-height:44px;width:44px;height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;font-size:1.45rem;line-height:1;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:600;padding:0;}
 .nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
 .nci-body{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 16px 16px;touch-action:pan-y;}
 .nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
@@ -737,7 +739,10 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="nci-sub">In-person on-site intake visit with the client (not a phone call)</p>
         <p class="nci-sub" id="nciStepLabel">Page 1 of 5 — Initial visit assessment (in person)</p>
       </div>
-      <button type="button" class="mbtn mbtn-cancel nci-close" onclick="closeNewClientIntake()" aria-label="Close">&#10005; Close</button>
+      <div class="nci-head-actions">
+        <button type="button" class="mbtn mbtn-cancel nci-close" onclick="closeNewClientIntake()">Close</button>
+        <button type="button" class="nci-x" onclick="closeNewClientIntake()" aria-label="Close" title="Close">×</button>
+      </div>
     </div>
     <div class="nci-body" id="nciBody">
     <div class="nci-steps" id="nciSteps"></div>
@@ -4099,13 +4104,29 @@ function nciBindDirty(){
     if(e.target.closest('.nci-score-opts button')||e.target.closest('.sig-canvas'))nciDirty=true;
   });
 }
-function nciSetSaving(on){
-  [['nciDraftBtn','Save Draft'],['nciCompleteBtn','Mark Complete']].forEach(function(pair){
-    const b=nciEl(pair[0]);
-    if(!b)return;
-    b.disabled=!!on;
-    b.textContent=on?'Saving…':pair[1];
-  });
+function nciLooksLikeUnknownAction(text){
+  return /unknown action|not implemented|stub action/i.test(String(text||''));
+}
+function nciSaveFailWhy(data,status,err){
+  const bits=[];
+  if(err){
+    const m=(err&&err.message)?err.message:String(err);
+    if(m)bits.push(m);
+  }
+  if(data){
+    if(data.error)bits.push('Sheets: '+data.error);
+    const echo=nciEchoStatus(data);
+    if(status==='Complete' && echo && echo!=='Complete')bits.push('Complete was not stored (status '+echo+').');
+  }
+  const joined=bits.join(' ')||'Save failed.';
+  const blob=joined+' '+((data&&data.error)||'')+' '+((err&&err.message)||'');
+  return (nciLooksLikeUnknownAction(blob)?'Stub action: save_new_client_intake. ':'')+joined;
+}
+function nciSetSaving(on,status){
+  const d=nciEl('nciDraftBtn');
+  const c=nciEl('nciCompleteBtn');
+  if(d){d.disabled=!!on;d.textContent=(on&&status==='Draft')?'Saving…':'Save Draft';}
+  if(c){c.disabled=!!on;c.textContent=(on&&status==='Complete')?'Completing…':'Mark Complete';}
 }
 
 function openNewClientIntake(){
@@ -4123,7 +4144,7 @@ function openNewClientIntake(){
 
 function closeNewClientIntake(force){
   if(force!==true && nciDirty){
-    if(!confirm('Discard unsaved intake changes?'))return;
+    if(!confirm('Discard this intake? Unsaved changes will be lost.'))return;
   }
   nciSnapshotSigs();
   closeModal('newClientIntakeModal');
@@ -4485,9 +4506,15 @@ async function saveNewClientIntake(status){
   if(nciSaving)return;
   nciSaving=true;
   nciShowErr('');
-  nciSetSaving(true);
+  nciSetSaving(true,status);
   try{
-    const payload=collectNewClientIntake(status);
+    let payload;
+    try{
+      payload=collectNewClientIntake(status);
+    }catch(collectErr){
+      nciFail('Could not collect intake. Intake was not saved as '+status+'. '+(collectErr&&collectErr.message?collectErr.message:String(collectErr)));
+      return;
+    }
     if(status==='Complete'){
       const miss=validateNewClientIntake(payload);
       if(miss.length){
@@ -4496,20 +4523,18 @@ async function saveNewClientIntake(status){
       }
     }
     const data=await apiPost(payload);
-    if(status==='Complete' && (!data||data.status!=='Complete')){
-      nciForceIntakeId(data);
-      const why=(!data||data.success===false)
-        ?(data&&data.error?('Sheets: '+data.error):'save_new_client_intake did not confirm Complete.')
-        :('Complete was not stored (status '+((data&&data.status)!=null?data.status:'missing')+').');
-      nciFail('Intake was not saved as Complete. '+why);
-      return;
-    }
-    if(!(data&&data.success)){
-      nciForceIntakeId(data);
-      nciFail('Intake was not saved as '+status+'. '+(data&&data.error?('Sheets: '+data.error):'save_new_client_intake did not return success.'));
-      return;
-    }
     nciForceIntakeId(data);
+    if(!(data&&data.success)){
+      nciFail('Intake was not saved as '+status+'. '+nciSaveFailWhy(data,status));
+      return;
+    }
+    if(status==='Complete'){
+      const echo=nciEchoStatus(data);
+      if(echo && echo!=='Complete'){
+        nciFail('Intake was not saved as Complete. '+nciSaveFailWhy(data,status));
+        return;
+      }
+    }
     // Ace list returns numeric ids — always persist as string so Complete never posts blank.
     nciState.intakeId=String(data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'');
     nciDirty=false;
@@ -4523,11 +4548,10 @@ async function saveNewClientIntake(status){
       loadNewClientIntakeDrafts();
     }
   }catch(e){
-    const why=(e&&e.message)?String(e.message):'Request failed.';
-    nciFail('Intake was not saved as '+status+'. '+why);
+    nciFail('Intake was not saved as '+status+'. '+nciSaveFailWhy(null,status,e));
   }finally{
     nciSaving=false;
-    nciSetSaving(false);
+    nciSetSaving(false,status);
   }
 }
 
