@@ -2865,7 +2865,7 @@ function isAssignTopicIdFrom(data){
 
 function isAssignUsernamesFrom(data){
   if(!data)return [];
-  const raw=data.usernames||data.selectedUsernames||data.aides||data.aideIds;
+  const raw=data.aideUsernames||data.usernames||data.selectedUsernames||data.aides||data.aideIds;
   if(!Array.isArray(raw))return [];
   return raw.map(v=>String(v==null?'':v).trim()).filter(Boolean);
 }
@@ -2896,19 +2896,19 @@ async function assignTopicToSelected(){
   const sel=document.getElementById('assignTopicSel');
   if(!sel)return;
   const id=sel.value;
-  const usernames=Array.from(isAssignAideSelected);
-  if(!usernames.length){
+  const aideUsernames=Array.from(isAssignAideSelected).map(u=>String(u||'').trim()).filter(Boolean);
+  if(!aideUsernames.length){
     showTempMsg('Select at least one aide.','var(--danger)');
     return;
   }
   const btn=document.getElementById('isAssignSelectedBtn');
   if(btn){btn.dataset.busy='1';btn.disabled=true;}
-  showTempMsg('Assigning to '+usernames.length+' aides...','var(--teal)');
+  showTempMsg('Assigning to '+aideUsernames.length+' aides...','var(--teal)');
   try{
-    const data=await apiPost({action:'set_assigned_topic',topicId:id,usernames:usernames});
+    const data=await apiPost({action:'assign_inservice_aides',topicId:id,aideUsernames:aideUsernames});
     if(data&&data.success){
       cacheInvalidate('get_assigned_topic');
-      showTempMsg('Assigned to '+usernames.length+' aides','var(--success)');
+      showTempMsg('Assigned to '+aideUsernames.length+' aides','var(--success)');
       renderInservices(true);
     }else{
       showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
