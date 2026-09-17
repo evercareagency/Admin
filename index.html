@@ -2820,7 +2820,7 @@ function initNurseSig(id){
   const canvas=document.getElementById(id);
   const ctx=canvas.getContext('2d');
   canvas.width=canvas.offsetWidth||280;canvas.height=60;
-  nurseSigPads[id]={ctx,drawing:false,hasData:false};
+  nurseSigPads[id]={canvas,ctx,drawing:false,hasData:false};
   const pos=e=>{const r=canvas.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return{x:(t.clientX-r.left)*(canvas.width/r.width),y:(t.clientY-r.top)*(canvas.height/r.height)};};
   const start=e=>{const p=pos(e);nurseSigPads[id].drawing=true;nurseSigPads[id].hasData=true;ctx.beginPath();ctx.moveTo(p.x,p.y);canvas.classList.add('signed');};
   const move=e=>{if(!nurseSigPads[id].drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#1a2744';ctx.lineWidth=1.8;ctx.lineCap='round';ctx.stroke();};
@@ -2832,9 +2832,21 @@ function initNurseSig(id){
 }
 
 function clearNurseSig(id){
-  const c=document.getElementById(id);if(!c)return;
+  const pad=nurseSigPads[id];
+  const c=(pad&&pad.canvas)||document.getElementById(id);if(!c)return;
   c.getContext('2d').clearRect(0,0,c.width,c.height);c.classList.remove('signed');
-  if(nurseSigPads[id])nurseSigPads[id].hasData=false;
+  if(pad)pad.hasData=false;
+}
+
+const NURSE_SIG_PNG_MIN=100;
+function nurseSigPngData(id){
+  const pad=nurseSigPads[id];
+  const c=(pad&&pad.canvas)||document.getElementById(id);
+  if(!c||typeof c.toDataURL!=='function')return '';
+  try{return c.toDataURL('image/png')||'';}catch(e){return '';}
+}
+function nurseSigHasInk(data){
+  return typeof data==='string'&&data.indexOf('data:image/png')===0&&data.length>NURSE_SIG_PNG_MIN;
 }
 
 function todayISO(){
@@ -2957,12 +2969,13 @@ async function saveSupervisoryContact(){
   if(!contactDate){err.textContent='Contact date is required.';err.style.display='block';return;}
   if(!document.getElementById('sc_clientName').value){err.textContent='Client is required.';err.style.display='block';return;}
 
-  const supPad=nurseSigPads['sc_supervisorSigCanvas'];
-  const clientPad=nurseSigPads['sc_clientSigCanvas'];
-  if(!supPad||!supPad.hasData){err.textContent='Supervisor signature is required.';err.style.display='block';return;}
-  if(isVisit&&(!clientPad||!clientPad.hasData)){err.textContent='Client signature is required for visits.';err.style.display='block';return;}
+  const supervisorSignatureData=nurseSigPngData('sc_supervisorSigCanvas');
+  const clientSignatureData=isVisit?nurseSigPngData('sc_clientSigCanvas'):'';
+  if(!nurseSigHasInk(supervisorSignatureData)){err.textContent='Supervisor signature is required.';err.style.display='block';return;}
+  if(isVisit&&!nurseSigHasInk(clientSignatureData)){err.textContent='Client signature is required for visits.';err.style.display='block';return;}
 
   // Ace-locked camelCase only — no ClientSignature/SupervisorSignature/supervisorSig aliases
+  // Captured=Yes never ships without PNG ink bytes; *SignatureDataLen is for Ace v17 diagnostics
   const payload={
     action:'save_supervisory_contact',
     contactDate:toEasternMDY(contactDate),
@@ -2979,7 +2992,8 @@ async function saveSupervisoryContact(){
     supervisorComments:document.getElementById('sc_supervisorComments').value||'',
     supervisorSignatureCaptured:'Yes',
     supervisorSignatureDate:toEasternMDY(document.getElementById('sc_supervisorSignatureDate').value||contactDate),
-    supervisorSignatureData:document.getElementById('sc_supervisorSigCanvas').toDataURL('image/png'),
+    supervisorSignatureData,
+    supervisorSignatureDataLen:supervisorSignatureData.length,
     formComplete:'Yes'
   };
   SC_PERF.forEach(k=>{
@@ -3000,13 +3014,15 @@ async function saveSupervisoryContact(){
     });
     payload.clientSignatureCaptured='Yes';
     payload.clientSignatureDate=toEasternMDY(document.getElementById('sc_clientSignatureDate').value||contactDate);
-    payload.clientSignatureData=document.getElementById('sc_clientSigCanvas').toDataURL('image/png');
+    payload.clientSignatureData=clientSignatureData;
+    payload.clientSignatureDataLen=clientSignatureData.length;
   }else{
     payload.spokeWith=document.getElementById('sc_spokeWith').value||'';
     payload.callConnected=document.getElementById('sc_callConnected').value||'';
     payload.callOutcome=document.getElementById('sc_callOutcome').value||'';
     payload.topicsCovered=document.getElementById('sc_topicsCovered').value||'';
     payload.clientSignatureCaptured='No';
+    payload.clientSignatureDataLen=0;
   }
 
   try{
@@ -3014,7 +3030,7 @@ async function saveSupervisoryContact(){
     const data=await apiPost(payload);
     if(data&&data.success){
       closeSupervisoryContactModal();
-      showTempMsg('Contact saved'+(data.contactId?' (#'+data.contactId+')':'')+'.','var(--success)');
+      showTempMsg('Contact saved'+(data.contactId?' (#'+data.contactId+')':'')+'. clientSignatureDataLen='+(data.clientSignatureDataLen!=null?data.clientSignatureDataLen:'—')+' supervisorSignatureDataLen='+(data.supervisorSignatureDataLen!=null?data.supervisorSignatureDataLen:'—'),'var(--success)');
       loadNurseCompliance(true);
     }else{
       err.textContent=(data&&data.error)||'Save failed — backend may still be pending. Form data was not stored.';
