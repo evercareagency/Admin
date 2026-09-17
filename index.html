@@ -124,48 +124,46 @@ textarea{resize:vertical;min-height:80px;}
 .nurse-actions{display:flex;flex-wrap:wrap;gap:6px;}
 @media(max-width:768px){.pc-grid,.perf-grid{grid-template-columns:1fr 1fr;}}
 
-/* Nurse — Open new client: inner .nci-body scrolls; foot stays on screen (overrides .modal max-height:none) */
-.modal-bg#newClientIntakeModal{
-  flex-direction:column;
-  align-items:stretch;
-  justify-content:stretch;
-  height:100%;
-  height:100dvh;
-  max-height:100dvh;
-  overflow:hidden;
-  padding:max(8px,env(safe-area-inset-top,0px)) 8px 0;
-  overscroll-behavior:none;
-}
-.modal-bg#newClientIntakeModal.show{display:flex;}
-.modal-bg#newClientIntakeModal .modal{
+/* Nurse — Open new client: overlay is a 100dvh column; ONLY #nciBody scrolls; #nciFoot stays on screen */
+#newClientIntakeModal.modal-bg,
+#newClientIntakeModal{
+  flex-direction:column !important;
+  align-items:stretch !important;
+  justify-content:stretch !important;
+  height:100dvh !important;
   max-height:100dvh !important;
   overflow:hidden !important;
-  margin:0 auto;
+  padding:0 !important;
+  overscroll-behavior:none;
 }
-.modal-bg#newClientIntakeModal .modal.nci-modal,
-.nci-modal{
-  display:flex;
-  flex-direction:column;
+#newClientIntakeModal.modal-bg.show,
+#newClientIntakeModal.show{
+  display:flex !important;
+}
+#newClientIntakeModal .modal.nci-modal{
+  flex:1 !important;
+  min-height:0 !important;
+  height:100% !important;
+  max-height:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+  margin:0 !important;
   max-width:920px;
   width:100%;
-  flex:1 1 0%;
-  min-height:0;
-  height:auto;
-  max-height:100%;
-  margin:0 auto;
-  overflow:hidden;
   padding:16px 18px 0;
   padding-bottom:0;
   box-sizing:border-box;
-  border-radius:12px 12px 0 0;
+  border-radius:0;
+  position:relative;
 }
-.nci-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 0 8px;flex-wrap:nowrap;flex-shrink:0;padding:0;}
+.nci-head,#nciHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 0 8px;flex-wrap:nowrap;flex-shrink:0 !important;padding:0;}
 .nci-head h3{padding-right:8px;}
 .nci-head-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .nci-close{flex-shrink:0;min-height:44px;min-width:44px;}
 .nci-x{min-width:44px;min-height:44px;width:44px;height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;font-size:1.45rem;line-height:1;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:600;padding:0;}
 .nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
-.nci-body,#nciBody{flex:1 1 0%;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
+.nci-body,#nciBody{flex:1 1 0% !important;min-height:0 !important;overflow-x:hidden;overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
 .nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
 .nci-dot{flex:1;min-width:56px;min-height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.66rem;font-weight:700;color:var(--muted);padding:6px 4px;text-align:center;}
 .nci-dot strong{display:block;font-size:0.85rem;color:var(--navy);}
@@ -188,18 +186,23 @@ textarea{resize:vertical;min-height:80px;}
 .nci-docs ol{margin:8px 0 0 18px;font-size:0.8rem;color:var(--navy);line-height:1.55;}
 .nci-ack{display:flex;align-items:flex-start;gap:12px;padding:14px;border:2px solid var(--teal);background:var(--teal-light);border-radius:10px;min-height:56px;cursor:pointer;font-weight:600;}
 .nci-ack input{width:22px;height:22px;margin-top:2px;accent-color:var(--teal);flex-shrink:0;}
-.nci-foot,#nciFoot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;flex-shrink:0;position:sticky;bottom:0;background:#fff;z-index:5;margin:0;padding:12px 0 max(12px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);}
+.nci-foot,#nciFoot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;flex-shrink:0 !important;position:relative !important;background:#fff;z-index:5;margin:0;padding:12px 16px max(14px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);}
 .nci-foot .btn{min-height:44px;}
+.nci-discard{display:none;position:absolute;inset:0;z-index:40;align-items:center;justify-content:center;padding:20px;background:rgba(26,39,68,0.45);}
+.nci-discard.show{display:flex !important;}
+.nci-discard-card{background:white;border-radius:12px;padding:20px 18px;max-width:340px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,0.28);text-align:center;}
+.nci-discard-card p{font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 16px;line-height:1.4;}
+.nci-discard-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.nci-discard-btn{min-height:44px;min-width:44px;padding:10px 18px;}
 .nci-err{display:none;color:var(--danger);font-size:0.8rem;margin-bottom:10px;line-height:1.4;background:#fde8e8;padding:10px 12px;border-radius:8px;}
 .nci-radios{display:flex;gap:10px;flex-wrap:wrap;}
 .nci-radio{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;min-height:44px;cursor:pointer;font-size:0.82rem;}
 .nci-radio input{width:18px;height:18px;accent-color:var(--teal);}
 .nci-draft-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .nci-draft-row:last-child{border-bottom:none;}
-@media(max-width:700px){.nci-modal{padding:12px 12px 0;}.nci-dot{min-width:calc(20% - 6px);}.nci-checks{grid-template-columns:1fr;}}
+@media(max-width:700px){#newClientIntakeModal .modal.nci-modal{padding:12px 12px 0;}.nci-dot{min-width:calc(20% - 6px);}.nci-checks{grid-template-columns:1fr;}}
 @media(min-width:701px){
-  .modal-bg#newClientIntakeModal{padding:max(12px,env(safe-area-inset-top,0px)) 16px 0;}
-  .modal-bg#newClientIntakeModal .nci-modal{border-radius:12px;}
+  #newClientIntakeModal .modal.nci-modal{border-radius:12px;}
 }
 </style>
 
@@ -1114,6 +1117,15 @@ Call (216) 377-5991 with any questions.</textarea>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button type="button" class="btn btn-ghost" id="nciDraftBtn" onclick="saveNewClientIntake('Draft')">Save Draft</button>
         <button type="button" class="btn btn-navy" id="nciCompleteBtn" onclick="saveNewClientIntake('Complete')">Mark Complete</button>
+      </div>
+    </div>
+  </div>
+  <div id="nciDiscardConfirm" class="nci-discard" hidden>
+    <div class="nci-discard-card" role="dialog" aria-modal="true" aria-labelledby="nciDiscardTitle">
+      <p id="nciDiscardTitle">Discard unsaved changes?</p>
+      <div class="nci-discard-actions">
+        <button type="button" class="btn btn-ghost nci-discard-btn" id="nciDiscardCancelBtn" onclick="nciCancelDiscard()">Cancel</button>
+        <button type="button" class="btn btn-danger nci-discard-btn" id="nciDiscardGoBtn" onclick="nciConfirmDiscard()">Discard</button>
       </div>
     </div>
   </div>
@@ -4154,9 +4166,8 @@ function nciBindDirty(){
     nciDirtyBound=true;
     modal.addEventListener('input',nciMarkDirty,true);
     modal.addEventListener('change',nciMarkDirty,true);
-    modal.addEventListener('keyup',nciMarkDirty,true);
-    modal.addEventListener('pointerdown',function(e){
-      if(e.target.closest('.sig-canvas')||e.target.closest('.nci-score-opts')||e.target.closest('.nci-radio')||e.target.closest('.nci-check')||e.target.closest('.nci-ack'))nciMarkDirty();
+    modal.addEventListener('pointerup',function(e){
+      if(e.target&&e.target.closest&&e.target.closest('.sig-canvas'))nciMarkDirty();
     },true);
   }
 }
@@ -4169,6 +4180,26 @@ function nciEnsureShell(){
   if(head.parentElement!==shell)shell.insertBefore(head,shell.firstChild);
   if(body.parentElement!==shell)shell.insertBefore(body,head.nextSibling);
   if(foot.parentElement!==shell || body.contains(foot))shell.appendChild(foot);
+}
+function nciHideDiscard(){
+  const el=nciEl('nciDiscardConfirm');
+  if(!el)return;
+  el.classList.remove('show');
+  el.hidden=true;
+  el.style.display='none';
+}
+function nciShowDiscard(){
+  const el=nciEl('nciDiscardConfirm');
+  if(!el)return;
+  el.hidden=false;
+  el.classList.add('show');
+  el.style.display='flex';
+}
+function nciCancelDiscard(){
+  nciHideDiscard();
+}
+function nciConfirmDiscard(){
+  closeNewClientIntake(true);
 }
 function nciLooksLikeUnknownAction(text){
   return /unknown action|not implemented|stub action/i.test(String(text||''));
@@ -4197,12 +4228,14 @@ function nciSetSaving(on,status){
 
 function openNewClientIntake(){
   nciEnsureShell();
+  nciHideDiscard();
   nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
+  nciEnsureShell();
   nciDirty=false;
   nciCaptureClean();
   const body=nciEl('nciBody');
@@ -4212,13 +4245,15 @@ function openNewClientIntake(){
 
 function closeNewClientIntake(force){
   if(force!==true && (nciDirty || nciIsDirty())){
-    if(!confirm('Discard this intake?'))return;
+    nciShowDiscard();
+    return;
   }
+  nciHideDiscard();
   nciSnapshotSigs();
   closeModal('newClientIntakeModal');
   nciDirty=false;
   nciOpenSnapshot='';
-  if(!document.querySelector('.modal-bg.show'))unlockBodyScroll();
+  unlockBodyScroll();
 }
 
 function nciInk(id){
@@ -4636,6 +4671,7 @@ async function getNewClientIntake(intakeId){
 
 async function resumeNewClientIntake(intakeId){
   nciEnsureShell();
+  nciHideDiscard();
   nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
@@ -4643,6 +4679,7 @@ async function resumeNewClientIntake(intakeId){
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
+  nciEnsureShell();
   nciCaptureClean();
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
