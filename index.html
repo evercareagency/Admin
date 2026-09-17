@@ -756,7 +756,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <h4>Lives with</h4>
         <div class="det-grid" style="grid-template-columns:1fr 1fr">
           <div class="field"><label>Lives with</label>
-            <select id="nci_a_livesWith"><option value="">—</option><option>Alone</option><option>Spouse</option><option>Family</option><option>Other</option></select>
+            <select id="nci_a_livesWith"><option value="">—</option><option>Alone</option><option>Spouse</option><option>Relative</option><option>Friend</option><option>Other</option></select>
           </div>
           <div class="field"><label>If other, specify</label><input type="text" id="nci_a_livesWithOther"></div>
         </div>
@@ -3417,25 +3417,45 @@ async function listSupervisoryContacts(filters){
 
 
 
-// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED — canonical keys only) ───
-// POST save_new_client_intake — nested pages use Ace write names (no Ghost dual-write).
-// Top-level: action, intakeId (String), status Draft|Complete, nurseName, clientName, socDate.
-//   assessment: clientName, socDate, language, livesWith, primaryCaregiverName,
-//               primaryCaregiverPhone, clientSignatureData, agencySignatureData,
-//               clientSignatureDate, agencySignatureDate (+ Ace iadl*/adl* if present)
-//   activityPlan: clientName, dob, mrNumber, socDate, clientPhone, clientAddress,
-//                 nursePocSignatureData, clientFamilySignatureData, pcaSignatureData
-//                 (+ *SignatureDate)
-//   consent: patientPrintedName, consentToTreatAck, consentDate, patientSignatureData
-//   passport: printedName, patientGuardianSignatureData, patientGuardianSignDate,
-//             witnessSignatureData, witnessSignDate (flat — no nested dates)
-//   admission: clientName, folderReceivedAck, clientRepSignatureData, clientRepSignDate,
-//              agencyRepSignatureData, agencyRepSignDate, proxyInPlace, proxyNoneNotInterested
-// *SignatureData = PNG data URLs only (never the text "Signed").
-// dates = MM/DD/YYYY America/New_York.
-// Resume: get_new_client_intake / list_new_client_intakes.
-// Archive: archive_new_client_intake_pdf (Ace lock).
-// In-person on-site intake — no CallOutcome / SpokeWith / callConnected.
+// ─── NURSE NEW CLIENT INTAKE (Ace LOCKED dictionary — do not invent aliases) ───
+// POST save_new_client_intake top-level: intakeId, clientName, socDate, status
+//   Draft|Complete, nurseName (+ clientId only if Ace already assigned one).
+// Nested pages use ONLY Ace keys below. UI ids are mapped; Ghost names are not written.
+//   assessment: intakeId, clientId, clientName, socDate, maritalStatus (S|M|W|D),
+//     language, livesWith (Alone|Spouse|Relative|Friend|Other),
+//     primaryCaregiver (Self|Spouse|Relative|Friend|Other), primaryCaregiverName,
+//     primaryCaregiverPhone, clientCaregiverSupport (Good|Fair|Poor),
+//     ableToReceiveInstructions (Yes|No), iadlKitchenWork, iadlHousekeeping,
+//     iadlTransportation, iadlAmbulation, iadlPhoneUse, iadlMealPrepFull,
+//     iadlMealPrepLight, iadlLaundry, iadlShopping, iadlBillPaying, iadlSelfAdminMeds,
+//     adlBathing, adlDressing, adlToileting, adlGrooming (each 1|A|U),
+//     barriers, safetyHazards, otherIssues, homeSituationAppropriate,
+//     homeSituationExplain, comments, agencySignatureData, agencySignatureDate,
+//     clientSignatureData, clientSignatureDate
+//   activityPlan: DOB/phone/MR#/address live HERE (not assessment).
+//     intakeId, clientName, dob, gender (Male|Female), mrNumber, socDate,
+//     clientPhone, clientAddress, livesWithDetail, livesWithRelationship,
+//     emergencyContact, emergencyContactName, emergencyContactRelationship,
+//     emergencyContactPhone, evacuationPlan, emergencyClassLevel (I|II|III|IV),
+//     primaryCareProvider, identifiedServiceNeeds, allergies, diet,
+//     functionalStatusLimitations, psychosocial, serviceDuration, serviceFrequency,
+//     serviceHoursAmPm, specialRequests, supervisorNamePhone, supervisorVisitFrequency,
+//     nursePocSignatureData, nursePocSignatureDate, clientFamilySignatureData,
+//     clientFamilySignatureDate, pcaSignatureData, pcaSignatureDate
+//   consent: intakeId, releaseToCareProviders, releaseToInsurance, releaseToPeerReview,
+//     consentToTreatAck, photoConsent, electronicRecordsConsent, servicePlanConsentAck
+//     (Yes|No), patientPrintedName, consentDate, patientSignatureData,
+//     emergencyContactName, emergencyContactRelationship, emergencyContactPhone
+//   passport: intakeId, printedName, patientGuardianSignatureData,
+//     patientGuardianSignDate, witnessSignatureData, witnessSignDate
+//   admission: intakeId, clientName, clientAddress, folderReceivedAck (Yes|No),
+//     clientRepSignatureData, clientRepSignDate, agencyRepSignatureData,
+//     agencyRepSignDate, proxyNoneNotInterested, proxyInPlace,
+//     proxyUnableToCommunicate, proxyInfoProvided, healthAgentName, healthAgentPhone,
+//     proxyAgencyRepSignatureData, proxyAgencyRepSignDate
+// *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
+// Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
+// Archive: archive_new_client_intake_pdf. No CallOutcome on intake.
 
 const NCI_STEPS=[
   {n:1,label:'In person'},
@@ -3504,14 +3524,40 @@ const NCI_TEXT_C=['patientPrintedName','patientSignatureDate','emergencyName','e
 const NCI_TEXT_R=['printedName','patientGuardianSignatureDate','witnessSignatureDate'];
 const NCI_TEXT_M=['healthAgentName','healthAgentPhone','healthAgentRelationship','clientRepSignatureDate','agencyRepSignatureDate'];
 const NCI_CONSENT_CHECKS=['consentServices','consentRoi','consentBilling','consentRights','consentEmergency'];
-const NCI_IADL_ALIASES={
-  iadlMealPrep:['iadlMealPrepFull','iadlKitchenWork'],
-  iadlTelephone:['iadlPhone'],
-  iadlMedications:['iadlSelfMeds'],
-  iadlFinances:['iadlPayingBills']
+// Existing UI score keys → one Ace locked name (never write UI keys or extra aliases).
+const NCI_IADL_TO_ACE={
+  iadlShopping:'iadlShopping',
+  iadlMealPrep:'iadlMealPrepFull',
+  iadlHousekeeping:'iadlHousekeeping',
+  iadlLaundry:'iadlLaundry',
+  iadlTransportation:'iadlTransportation',
+  iadlTelephone:'iadlPhoneUse',
+  iadlMedications:'iadlSelfAdminMeds',
+  iadlFinances:'iadlBillPaying'
 };
+const NCI_ADL_TO_ACE={
+  adlBathing:'adlBathing',
+  adlDressing:'adlDressing',
+  adlToileting:'adlToileting',
+  adlGrooming:'adlGrooming'
+};
+const NCI_LIVES_WITH=['Alone','Spouse','Relative','Friend','Other'];
+const NCI_PRIMARY_CAREGIVER=['Self','Spouse','Relative','Friend','Other'];
+const NCI_GENDER=['Male','Female'];
+const ACE_TOP_KEYS=['action','intakeId','clientId','clientName','socDate','status','nurseName'];
+const ACE_ASSESSMENT_KEYS=['intakeId','clientId','clientName','socDate','maritalStatus','language','livesWith','primaryCaregiver','primaryCaregiverName','primaryCaregiverPhone','clientCaregiverSupport','ableToReceiveInstructions','iadlKitchenWork','iadlHousekeeping','iadlTransportation','iadlAmbulation','iadlPhoneUse','iadlMealPrepFull','iadlMealPrepLight','iadlLaundry','iadlShopping','iadlBillPaying','iadlSelfAdminMeds','adlBathing','adlDressing','adlToileting','adlGrooming','barriers','safetyHazards','otherIssues','homeSituationAppropriate','homeSituationExplain','comments','agencySignatureData','agencySignatureDate','clientSignatureData','clientSignatureDate'];
+const ACE_PLAN_KEYS=['intakeId','clientName','dob','gender','mrNumber','socDate','clientPhone','clientAddress','livesWithDetail','livesWithRelationship','emergencyContact','emergencyContactName','emergencyContactRelationship','emergencyContactPhone','evacuationPlan','emergencyClassLevel','primaryCareProvider','identifiedServiceNeeds','allergies','diet','functionalStatusLimitations','psychosocial','serviceDuration','serviceFrequency','serviceHoursAmPm','specialRequests','supervisorNamePhone','supervisorVisitFrequency','nursePocSignatureData','nursePocSignatureDate','clientFamilySignatureData','clientFamilySignatureDate','pcaSignatureData','pcaSignatureDate'];
+const ACE_CONSENT_KEYS=['intakeId','releaseToCareProviders','releaseToInsurance','releaseToPeerReview','consentToTreatAck','photoConsent','electronicRecordsConsent','servicePlanConsentAck','patientPrintedName','consentDate','patientSignatureData','emergencyContactName','emergencyContactRelationship','emergencyContactPhone'];
+const ACE_PASSPORT_KEYS=['intakeId','printedName','patientGuardianSignatureData','patientGuardianSignDate','witnessSignatureData','witnessSignDate'];
+const ACE_ADMISSION_KEYS=['intakeId','clientName','clientAddress','folderReceivedAck','clientRepSignatureData','clientRepSignDate','agencyRepSignatureData','agencyRepSignDate','proxyNoneNotInterested','proxyInPlace','proxyUnableToCommunicate','proxyInfoProvided','healthAgentName','healthAgentPhone','proxyAgencyRepSignatureData','proxyAgencyRepSignDate'];
+function nciAceOnly(obj,keys){
+  const out={};
+  if(!obj)return out;
+  keys.forEach(k=>{ if(Object.prototype.hasOwnProperty.call(obj,k)) out[k]=obj[k]; });
+  return out;
+}
 
-let nciState={intakeId:'',step:1};
+let nciState={intakeId:'',clientId:'',step:1};
 let nciSigStore={};
 let nciResumePayload=null;
 
@@ -3625,6 +3671,10 @@ function nciForceIntakeId(data){
     :(inner&&inner.id!=null&&inner.id!=='')?inner.id
     :nciState.intakeId;
   nciState.intakeId=(raw==null||raw==='')?'':String(raw);
+  const cid=(data&&data.clientId!=null&&data.clientId!=='')?data.clientId
+    :(inner&&inner.clientId!=null&&inner.clientId!=='')?inner.clientId
+    :nciState.clientId;
+  nciState.clientId=(cid==null||cid==='')?'':String(cid);
 }
 function nciEchoStatus(data){
   if(!data||typeof data!=='object')return '';
@@ -3662,9 +3712,11 @@ function nciGetScore(key){
   return sel?sel.getAttribute('data-v'):'';
 }
 function nciPutScore(key,v){
+  const s=nciStr(v);
+  if(!s)return;
   const row=document.querySelector('[data-nci-field="'+key+'"]');
   if(!row)return;
-  row.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-v')===v));
+  row.querySelectorAll('button').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-v')===s));
 }
 
 function nciClearSig(id){
@@ -3779,7 +3831,7 @@ function nciBuildGrids(){
 }
 
 function resetNewClientIntake(){
-  nciState={intakeId:'',step:1};
+  nciState={intakeId:'',clientId:'',step:1};
   nciSigStore={};
   nciResumePayload=null;
   const modal=nciEl('newClientIntakeModal');
@@ -3823,60 +3875,131 @@ function nciInk(id){
   const png=nciSigPng(id);
   return nurseSigHasInk(png)?png:'';
 }
+function nciAssign(obj,key,val){
+  const s=nciStr(val);
+  if(s!=='')obj[key]=s;
+}
+function nciJoinClientAddress(){
+  const parts=[nciVal('nci_a_address'),nciVal('nci_a_city'),nciVal('nci_a_state'),nciVal('nci_a_zip')].filter(Boolean);
+  return parts.join(', ')||nciVal('nci_p_address');
+}
+function nciJoinCheckedLabels(items,prefix){
+  return items.filter(it=>nciYesNo(prefix+it.key)==='Yes').map(it=>it.label).join('; ');
+}
+function nciEnum(val,allowed){
+  const s=nciStr(val);
+  return (s&&allowed.indexOf(s)>=0)?s:'';
+}
+function nciPutYesNo(id,v){
+  const el=nciEl(id);
+  if(!el)return;
+  if(nciIsYes(v))el.checked=true;
+  else if(nciStr(v)==='No')el.checked=false;
+}
+function nciApplyJoinedChecks(items,prefix,joined){
+  const s=nciStr(joined);
+  if(!s)return;
+  const low=s.toLowerCase();
+  items.forEach(it=>{
+    const el=nciEl(prefix+it.key);
+    if(el&&low.indexOf(String(it.label).toLowerCase())>=0)el.checked=true;
+  });
+}
 
 function collectNewClientIntake(status){
   nciSnapshotSigs();
   const clientName=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName')||'';
   const socDate=nciDate('nci_a_assessmentDate')||'';
+  const intakeId=(nciState.intakeId==null||nciState.intakeId==='')?'':String(nciState.intakeId);
+  const clientId=(nciState.clientId==null||nciState.clientId==='')?'':String(nciState.clientId);
+  const clientAddress=nciJoinClientAddress();
+  const livesWith=nciEnum(nciVal('nci_a_livesWith')==='Family'?'Relative':nciVal('nci_a_livesWith'),NCI_LIVES_WITH);
+  const primaryCaregiver=nciEnum(nciVal('nci_a_caregiverRelationship'),NCI_PRIMARY_CAREGIVER);
+  const gender=nciEnum(nciVal('nci_a_sex'),NCI_GENDER);
 
   const assessment={
     clientName:clientName,
     socDate:socDate,
     language:nciVal('nci_a_language'),
-    livesWith:nciVal('nci_a_livesWith'),
+    livesWith:livesWith,
     primaryCaregiverName:nciVal('nci_a_caregiverName'),
     primaryCaregiverPhone:nciVal('nci_a_caregiverPhone'),
+    barriers:nciJoinCheckedLabels(NCI_BARRIERS,'nci_a_'),
+    safetyHazards:nciJoinCheckedLabels(NCI_SAFETY,'nci_a_'),
+    otherIssues:nciVal('nci_a_barrierOtherText'),
+    homeSituationAppropriate:nciRadio('nci_a_homeAppropriate'),
+    comments:nciVal('nci_a_comments'),
     clientSignatureData:nciInk('nci_assess_clientSig'),
-    agencySignatureData:nciInk('nci_assess_agencySig'),
     clientSignatureDate:nciDate('nci_a_clientSignatureDate'),
+    agencySignatureData:nciInk('nci_assess_agencySig'),
     agencySignatureDate:nciDate('nci_a_agencySignatureDate')
   };
-  NCI_IADLS.forEach(it=>{
-    const v=nciGetScore(it.key);
-    if(!v)return;
-    assessment[it.key]=v;
-    (NCI_IADL_ALIASES[it.key]||[]).forEach(alias=>{assessment[alias]=v;});
+  nciAssign(assessment,'intakeId',intakeId);
+  nciAssign(assessment,'clientId',clientId);
+  nciAssign(assessment,'primaryCaregiver',primaryCaregiver);
+  Object.keys(NCI_IADL_TO_ACE).forEach(ui=>{
+    const v=nciGetScore(ui);
+    if(v==='1'||v==='A'||v==='U')assessment[NCI_IADL_TO_ACE[ui]]=v;
   });
-  NCI_ADLS.forEach(it=>{
-    const v=nciGetScore(it.key);
-    if(v)assessment[it.key]=v;
+  Object.keys(NCI_ADL_TO_ACE).forEach(ui=>{
+    const v=nciGetScore(ui);
+    if(v==='1'||v==='A'||v==='U')assessment[NCI_ADL_TO_ACE[ui]]=v;
   });
+  const amb=nciGetScore('adlAmbulation');
+  if(amb==='1'||amb==='A'||amb==='U')assessment.iadlAmbulation=amb;
 
-  const addrParts=[nciVal('nci_a_address'),nciVal('nci_a_city'),nciVal('nci_a_state'),nciVal('nci_a_zip')].filter(Boolean);
+  const emergName=nciVal('nci_p_emergencyName')||nciVal('nci_c_emergencyName');
+  const emergPhone=nciVal('nci_p_emergencyPhone')||nciVal('nci_c_emergencyPhone');
+  const emergRel=nciVal('nci_p_emergencyRelationship')||nciVal('nci_c_emergencyRelationship');
+  const pcpName=nciVal('nci_p_pcpName');
+  const pcpPhone=nciVal('nci_p_pcpPhone');
   const activityPlan={
     clientName:nciVal('nci_p_clientName')||clientName,
     dob:nciDate('nci_a_dateOfBirth')||nciDate('nci_p_dateOfBirth'),
     mrNumber:nciVal('nci_p_mrNumber'),
     socDate:socDate,
     clientPhone:nciVal('nci_a_phone')||nciVal('nci_p_phone'),
-    clientAddress:addrParts.join(', ')||nciVal('nci_p_address'),
+    clientAddress:clientAddress,
+    livesWithDetail:nciVal('nci_a_livesWithOther'),
+    livesWithRelationship:nciVal('nci_a_caregiverRelationship'),
+    emergencyContactName:emergName,
+    emergencyContactRelationship:emergRel,
+    emergencyContactPhone:emergPhone,
+    emergencyClassLevel:nciEnum(nciRadio('nci_p_evacuationClass'),['I','II','III','IV']),
+    primaryCareProvider:[pcpName,pcpPhone].filter(Boolean).join(', '),
+    identifiedServiceNeeds:nciVal('nci_p_medicalNeeds'),
+    allergies:nciVal('nci_p_allergies'),
+    diet:nciVal('nci_p_diet'),
+    functionalStatusLimitations:nciVal('nci_p_functionalStatus'),
+    psychosocial:nciVal('nci_p_psychosocialStatus'),
+    serviceDuration:nciVal('nci_p_serviceDuration'),
+    serviceFrequency:nciVal('nci_p_serviceFrequency'),
+    serviceHoursAmPm:nciVal('nci_p_serviceHours'),
+    specialRequests:nciVal('nci_p_specialRequests'),
+    supervisorNamePhone:nciVal('nci_p_supervisorName'),
     nursePocSignatureData:nciInk('nci_plan_nursePocSig'),
-    clientFamilySignatureData:nciInk('nci_plan_clientFamilySig'),
     nursePocSignatureDate:nciDate('nci_p_nursePocSignatureDate'),
-    clientFamilySignatureDate:nciDate('nci_p_clientFamilySignatureDate')
+    clientFamilySignatureData:nciInk('nci_plan_clientFamilySig'),
+    clientFamilySignatureDate:nciDate('nci_p_clientFamilySignatureDate'),
+    pcaSignatureData:nciInk('nci_plan_pcaSig'),
+    pcaSignatureDate:nciDate('nci_p_pcaSignatureDate')
   };
-  const pPca=nciInk('nci_plan_pcaSig');
-  if(pPca){
-    activityPlan.pcaSignatureData=pPca;
-    activityPlan.pcaSignatureDate=nciDate('nci_p_pcaSignatureDate');
-  }
+  nciAssign(activityPlan,'intakeId',intakeId);
+  nciAssign(activityPlan,'gender',gender);
+  nciAssign(activityPlan,'emergencyContact',emergName);
 
   const consent={
-    patientPrintedName:nciVal('nci_c_patientPrintedName')||clientName,
+    releaseToCareProviders:nciYesNo('nci_c_consentRoi'),
+    releaseToInsurance:nciYesNo('nci_c_consentBilling'),
     consentToTreatAck:nciYesNo('nci_c_consentServices'),
+    patientPrintedName:nciVal('nci_c_patientPrintedName')||clientName,
     consentDate:nciDate('nci_c_patientSignatureDate'),
-    patientSignatureData:nciInk('nci_consent_patientSig')
+    patientSignatureData:nciInk('nci_consent_patientSig'),
+    emergencyContactName:nciVal('nci_c_emergencyName')||emergName,
+    emergencyContactRelationship:nciVal('nci_c_emergencyRelationship')||emergRel,
+    emergencyContactPhone:nciVal('nci_c_emergencyPhone')||emergPhone
   };
+  nciAssign(consent,'intakeId',intakeId);
 
   const passport={
     printedName:nciVal('nci_r_printedName'),
@@ -3885,28 +4008,39 @@ function collectNewClientIntake(status){
     witnessSignatureData:nciInk('nci_passport_witnessSig'),
     witnessSignDate:nciDate('nci_r_witnessSignatureDate')
   };
+  nciAssign(passport,'intakeId',intakeId);
 
   const proxy=nciRadio('nci_m_proxy');
   const admission={
     clientName:clientName,
+    clientAddress:clientAddress,
     folderReceivedAck:nciYesNo('nci_m_folderReceivedAck'),
     clientRepSignatureData:nciInk('nci_admit_clientRepSig'),
     clientRepSignDate:nciDate('nci_m_clientRepSignatureDate'),
     agencyRepSignatureData:nciInk('nci_admit_agencyRepSig'),
     agencyRepSignDate:nciDate('nci_m_agencyRepSignatureDate'),
     proxyInPlace:proxy==='Yes'?'Yes':'No',
-    proxyNoneNotInterested:proxy==='No'?'Yes':'No'
+    proxyNoneNotInterested:proxy==='No'?'Yes':'No',
+    healthAgentName:nciVal('nci_m_healthAgentName'),
+    healthAgentPhone:nciVal('nci_m_healthAgentPhone')
   };
+  nciAssign(admission,'intakeId',intakeId);
 
-  return {
+  const payload={
     action:'save_new_client_intake',
-    intakeId:(nciState.intakeId==null||nciState.intakeId==='')?'':String(nciState.intakeId),
+    intakeId:intakeId,
     status:status,
     nurseName:currentNurseName||'Nurse',
     clientName:clientName,
     socDate:socDate,
-    assessment,activityPlan,consent,passport,admission
+    assessment:nciAceOnly(assessment,ACE_ASSESSMENT_KEYS),
+    activityPlan:nciAceOnly(activityPlan,ACE_PLAN_KEYS),
+    consent:nciAceOnly(consent,ACE_CONSENT_KEYS),
+    passport:nciAceOnly(passport,ACE_PASSPORT_KEYS),
+    admission:nciAceOnly(admission,ACE_ADMISSION_KEYS)
   };
+  nciAssign(payload,'clientId',clientId);
+  return nciAceOnly(payload,ACE_TOP_KEYS.concat(['assessment','activityPlan','consent','passport','admission']));
 }
 
 function validateNewClientIntake(payload){
@@ -3935,6 +4069,7 @@ function applyNewClientIntake(data){
   const root=nciUnwrapIntake(data); // data.data||data
   nciForceIntakeId(data);
   if(!nciState.intakeId&&root&&root.intakeId!=null&&root.intakeId!=='')nciState.intakeId=String(root.intakeId);
+  if(!nciState.clientId&&root&&root.clientId!=null&&root.clientId!=='')nciState.clientId=String(root.clientId);
 
   const a=nciPage(root,data,'assessment');
   const p=nciPage(root,data,'activityPlan');
@@ -3943,10 +4078,10 @@ function applyNewClientIntake(data){
   const m=nciPage(root,data,'admission');
 
   const clientName=nciPick(a,['clientName'])||nciPick(root,['clientName'])||nciPick(data,['clientName'])||nciPick(p,['clientName'])||nciPick(c,['patientPrintedName'])||nciPick(m,['clientName']);
-  const socDate=nciPickDate(a,['socDate','assessmentDate'])||nciPickDate(root,['socDate','assessmentDate'])||nciPickDate(data,['socDate'])||nciPickDate(p,['socDate']);
-  const dob=nciPickDate(p,['dob','dateOfBirth'])||nciPickDate(a,['dob','dateOfBirth']);
-  const phone=nciPick(p,['clientPhone','phone'])||nciPick(a,['clientPhone','phone']);
-  const address=nciPick(p,['clientAddress','address'])||nciPick(a,['clientAddress','address']);
+  const socDate=nciPickDate(a,['socDate'])||nciPickDate(root,['socDate'])||nciPickDate(data,['socDate'])||nciPickDate(p,['socDate']);
+  const dob=nciPickDate(p,['dob'])||nciPickDate(root,['dob']);
+  const phone=nciPick(p,['clientPhone'])||nciPick(root,['clientPhone']);
+  const address=nciPick(p,['clientAddress'])||nciPick(m,['clientAddress'])||nciPick(root,['clientAddress']);
 
   nciPut('nci_a_clientName',clientName);
   nciPut('nci_a_assessmentDate',socDate);
@@ -3955,24 +4090,39 @@ function applyNewClientIntake(data){
   nciPut('nci_a_address',address);
   nciPut('nci_a_language',nciPick(a,['language']));
   nciPut('nci_a_livesWith',nciPick(a,['livesWith']));
-  nciPut('nci_a_caregiverName',nciPick(a,['primaryCaregiverName','caregiverName']));
-  nciPut('nci_a_caregiverPhone',nciPick(a,['primaryCaregiverPhone','caregiverPhone']));
-  nciPut('nci_a_clientSignatureDate',nciPickDate(a,['clientSignatureDate','clientSignDate']));
-  nciPut('nci_a_agencySignatureDate',nciPickDate(a,['agencySignatureDate','agencySignDate']));
+  nciPut('nci_a_caregiverName',nciPick(a,['primaryCaregiverName']));
+  nciPut('nci_a_caregiverPhone',nciPick(a,['primaryCaregiverPhone']));
+  nciPut('nci_a_caregiverRelationship',nciPick(a,['primaryCaregiver'])||nciPick(p,['livesWithRelationship']));
+  nciPut('nci_a_livesWithOther',nciPick(p,['livesWithDetail']));
+  nciPut('nci_a_clientSignatureDate',nciPickDate(a,['clientSignatureDate']));
+  nciPut('nci_a_agencySignatureDate',nciPickDate(a,['agencySignatureDate']));
+  nciPut('nci_a_comments',nciPick(a,['comments'])||nciPick(a,['homeSituationExplain']));
+  nciPut('nci_a_barrierOtherText',nciPick(a,['otherIssues']));
+  nciPut('nci_a_sex',nciPick(p,['gender']));
   if(dob)nciFillAgeFromDob();
 
-  NCI_IADLS.forEach(it=>{
-    const aliases=NCI_IADL_ALIASES[it.key]||[];
-    const sc=nciPick(a,[it.key].concat(aliases));
-    if(sc)nciPutScore(it.key,sc);
-  });
-  NCI_ADLS.forEach(it=>{
-    const sc=nciPick(a,[it.key]);
-    if(sc)nciPutScore(it.key,sc);
-  });
+  const home=nciPick(a,['homeSituationAppropriate']);
+  if(home)nciSetRadio('nci_a_homeAppropriate',home);
+  nciApplyJoinedChecks(NCI_BARRIERS,'nci_a_',nciPick(a,['barriers']));
+  nciApplyJoinedChecks(NCI_SAFETY,'nci_a_',nciPick(a,['safetyHazards']));
 
-  const aClientInk=nciPick(a,['clientSignatureData'])||nciPick(root,['clientSignatureData'])||nciPick(data,['clientSignatureData']);
-  const aAgencyInk=nciPick(a,['agencySignatureData'])||nciPick(root,['agencySignatureData'])||nciPick(data,['agencySignatureData']);
+  Object.keys(NCI_IADL_TO_ACE).forEach(ui=>{
+    const sc=nciPick(a,[NCI_IADL_TO_ACE[ui]]);
+    if(sc)nciPutScore(ui,sc);
+  });
+  const mealLight=nciPick(a,['iadlMealPrepLight']);
+  if(mealLight&&!nciGetScore('iadlMealPrep'))nciPutScore('iadlMealPrep',mealLight);
+  const kitchen=nciPick(a,['iadlKitchenWork']);
+  if(kitchen&&!nciGetScore('iadlMealPrep'))nciPutScore('iadlMealPrep',kitchen);
+  Object.keys(NCI_ADL_TO_ACE).forEach(ui=>{
+    const sc=nciPick(a,[NCI_ADL_TO_ACE[ui]]);
+    if(sc)nciPutScore(ui,sc);
+  });
+  const amb=nciPick(a,['iadlAmbulation']);
+  if(amb)nciPutScore('adlAmbulation',amb);
+
+  const aClientInk=nciPick(a,['clientSignatureData'])||nciPick(root,['clientSignatureData']);
+  const aAgencyInk=nciPick(a,['agencySignatureData'])||nciPick(root,['agencySignatureData']);
   if(aClientInk)nciPaintSig('nci_assess_clientSig',aClientInk);
   if(aAgencyInk)nciPaintSig('nci_assess_agencySig',aAgencyInk);
 
@@ -3981,9 +4131,25 @@ function applyNewClientIntake(data){
   nciPut('nci_p_dateOfBirth',dob);
   nciPut('nci_p_phone',phone);
   nciPut('nci_p_address',address);
-  nciPut('nci_p_nursePocSignatureDate',nciPickDate(p,['nursePocSignatureDate','nursePocSignDate']));
-  nciPut('nci_p_clientFamilySignatureDate',nciPickDate(p,['clientFamilySignatureDate','clientFamilySignDate']));
-  nciPut('nci_p_pcaSignatureDate',nciPickDate(p,['pcaSignatureDate','pcaSignDate']));
+  nciPut('nci_p_emergencyName',nciPick(p,['emergencyContactName'])||nciPick(p,['emergencyContact'])||nciPick(c,['emergencyContactName']));
+  nciPut('nci_p_emergencyPhone',nciPick(p,['emergencyContactPhone'])||nciPick(c,['emergencyContactPhone']));
+  nciPut('nci_p_emergencyRelationship',nciPick(p,['emergencyContactRelationship'])||nciPick(c,['emergencyContactRelationship']));
+  const classLv=nciPick(p,['emergencyClassLevel']);
+  if(classLv)nciSetRadio('nci_p_evacuationClass',classLv);
+  nciPut('nci_p_pcpName',nciPick(p,['primaryCareProvider']));
+  nciPut('nci_p_medicalNeeds',nciPick(p,['identifiedServiceNeeds']));
+  nciPut('nci_p_allergies',nciPick(p,['allergies']));
+  nciPut('nci_p_diet',nciPick(p,['diet']));
+  nciPut('nci_p_functionalStatus',nciPick(p,['functionalStatusLimitations']));
+  nciPut('nci_p_psychosocialStatus',nciPick(p,['psychosocial']));
+  nciPut('nci_p_serviceDuration',nciPick(p,['serviceDuration']));
+  nciPut('nci_p_serviceFrequency',nciPick(p,['serviceFrequency']));
+  nciPut('nci_p_serviceHours',nciPick(p,['serviceHoursAmPm']));
+  nciPut('nci_p_specialRequests',nciPick(p,['specialRequests']));
+  nciPut('nci_p_supervisorName',nciPick(p,['supervisorNamePhone']));
+  nciPut('nci_p_nursePocSignatureDate',nciPickDate(p,['nursePocSignatureDate']));
+  nciPut('nci_p_clientFamilySignatureDate',nciPickDate(p,['clientFamilySignatureDate']));
+  nciPut('nci_p_pcaSignatureDate',nciPickDate(p,['pcaSignatureDate']));
   const pNurseInk=nciPick(p,['nursePocSignatureData']);
   const pFamInk=nciPick(p,['clientFamilySignatureData']);
   const pPcaInk=nciPick(p,['pcaSignatureData']);
@@ -3992,45 +4158,39 @@ function applyNewClientIntake(data){
   if(pPcaInk)nciPaintSig('nci_plan_pcaSig',pPcaInk);
 
   nciPut('nci_c_patientPrintedName',nciPick(c,['patientPrintedName'])||clientName);
-  nciPut('nci_c_patientSignatureDate',nciPickDate(c,['consentDate','patientSignatureDate']));
-  const consentAck=nciEl('nci_c_consentServices');
-  if(consentAck){
-    const ack=nciPick(c,['consentToTreatAck','consentServices']);
-    if(nciIsYes(ack))consentAck.checked=true;
-    else if(nciStr(ack)==='No')consentAck.checked=false;
-  }
+  nciPut('nci_c_patientSignatureDate',nciPickDate(c,['consentDate']));
+  nciPutYesNo('nci_c_consentServices',nciPick(c,['consentToTreatAck']));
+  nciPutYesNo('nci_c_consentRoi',nciPick(c,['releaseToCareProviders']));
+  nciPutYesNo('nci_c_consentBilling',nciPick(c,['releaseToInsurance']));
+  nciPutYesNo('nci_c_consentRights',nciPick(c,['servicePlanConsentAck']));
+  nciPut('nci_c_emergencyName',nciPick(c,['emergencyContactName']));
+  nciPut('nci_c_emergencyPhone',nciPick(c,['emergencyContactPhone']));
+  nciPut('nci_c_emergencyRelationship',nciPick(c,['emergencyContactRelationship']));
   const cInk=nciPick(c,['patientSignatureData']);
   if(cInk)nciPaintSig('nci_consent_patientSig',cInk);
 
   nciPut('nci_r_printedName',nciPick(r,['printedName'])||clientName);
-  const rDates=nciParsePage(r.dates)||{};
-  nciPut('nci_r_patientGuardianSignatureDate',
-    nciPickDate(r,['patientGuardianSignDate','patientGuardianSignatureDate'])||
-    nciPickDate(rDates,['patientGuardianSignDate','patientGuardianSignatureDate']));
-  nciPut('nci_r_witnessSignatureDate',
-    nciPickDate(r,['witnessSignDate','witnessSignatureDate'])||
-    nciPickDate(rDates,['witnessSignDate','witnessSignatureDate']));
+  nciPut('nci_r_patientGuardianSignatureDate',nciPickDate(r,['patientGuardianSignDate']));
+  nciPut('nci_r_witnessSignatureDate',nciPickDate(r,['witnessSignDate']));
   const gInk=nciPick(r,['patientGuardianSignatureData']);
   const wInk=nciPick(r,['witnessSignatureData']);
   if(gInk)nciPaintSig('nci_passport_patientGuardianSig',gInk);
   if(wInk)nciPaintSig('nci_passport_witnessSig',wInk);
 
-  const folder=nciEl('nci_m_folderReceivedAck');
-  if(folder){
-    const fv=nciPick(m,['folderReceivedAck']);
-    if(nciIsYes(fv))folder.checked=true;
-    else if(nciStr(fv)==='No')folder.checked=false;
-  }
-  const proxy=(nciIsYes(m.proxyInPlace)||nciIsYes(m.proxyYes))?'Yes':
-    ((nciIsYes(m.proxyNoneNotInterested)||nciIsYes(m.proxyNo))?'No':'');
+  nciPutYesNo('nci_m_folderReceivedAck',nciPick(m,['folderReceivedAck']));
+  const proxy=nciIsYes(m.proxyInPlace)?'Yes':(nciIsYes(m.proxyNoneNotInterested)?'No':'');
   if(proxy)nciSetRadio('nci_m_proxy',proxy);
   nciToggleHealthAgent();
-  nciPut('nci_m_clientRepSignatureDate',nciPickDate(m,['clientRepSignDate','clientRepSignatureDate']));
-  nciPut('nci_m_agencyRepSignatureDate',nciPickDate(m,['agencyRepSignDate','agencyRepSignatureDate']));
+  nciPut('nci_m_healthAgentName',nciPick(m,['healthAgentName']));
+  nciPut('nci_m_healthAgentPhone',nciPick(m,['healthAgentPhone']));
+  nciPut('nci_m_clientRepSignatureDate',nciPickDate(m,['clientRepSignDate']));
+  nciPut('nci_m_agencyRepSignatureDate',nciPickDate(m,['agencyRepSignDate']));
   const mClientInk=nciPick(m,['clientRepSignatureData']);
-  const mAgencyInk=nciPick(m,['agencyRepSignatureData']);
+  const mAgencyInk=nciPick(m,['agencyRepSignatureData'])||nciPick(m,['proxyAgencyRepSignatureData']);
   if(mClientInk)nciPaintSig('nci_admit_clientRepSig',mClientInk);
   if(mAgencyInk)nciPaintSig('nci_admit_agencyRepSig',mAgencyInk);
+  const proxyAgencyDate=nciPickDate(m,['proxyAgencyRepSignDate']);
+  if(proxyAgencyDate&&!nciVal('nci_m_agencyRepSignatureDate'))nciPut('nci_m_agencyRepSignatureDate',proxyAgencyDate);
 }
 
 async function saveNewClientIntake(status){
