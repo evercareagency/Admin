@@ -3545,23 +3545,42 @@ function nciPickDate(obj,keys){
   return v?toEasternMDY(v):'';
 }
 function nciIsYes(v){return v==='Yes'||v===true||v==='true'||v==='Y';}
-function nciUnwrapIntake(data){
-  if(!data||typeof data!=='object')return {};
-  let root=data;
-  const hasPages=function(o){return !!(o&&(o.assessment||o.activityPlan||o.consent||o.passport||o.admission));};
-  if(!hasPages(root)){
-    let inner=root.data;
-    if(typeof inner==='string'){
-      try{inner=JSON.parse(inner);}catch(e){inner=null;}
-    }
-    if(inner&&typeof inner==='object')root=inner;
+function nciInnerData(data){
+  if(!data||typeof data!=='object')return null;
+  let nested=data.data;
+  if(typeof nested==='string'){
+    try{nested=JSON.parse(nested);}catch(e){nested=null;}
   }
-  if(!hasPages(root)&&root.data&&typeof root.data==='object')root=root.data;
-  return root;
+  if(nested&&typeof nested==='object'&&!Array.isArray(nested))return nested;
+  return null;
+}
+function nciUnwrapIntake(data){
+  // Ace get returns BOTH flat keys and data:{...} — prefer nested.
+  if(!data||typeof data!=='object')return {};
+  return nciInnerData(data)||data;
+}
+function nciPage(root,outer,key){
+  const n=root&&root[key];
+  const o=outer&&outer[key];
+  if(n&&typeof n==='object'&&!Array.isArray(n)&&o&&typeof o==='object'&&!Array.isArray(o))return Object.assign({},o,n);
+  if(n&&typeof n==='object'&&!Array.isArray(n))return n;
+  if(o&&typeof o==='object'&&!Array.isArray(o))return o;
+  return {};
+}
+function nciForceIntakeId(data){
+  const inner=nciInnerData(data);
+  const raw=(data&&data.intakeId!=null&&data.intakeId!=='')?data.intakeId
+    :(inner&&inner.intakeId!=null&&inner.intakeId!=='')?inner.intakeId
+    :(data&&data.id!=null&&data.id!=='')?data.id
+    :(inner&&inner.id!=null&&inner.id!=='')?inner.id
+    :nciState.intakeId;
+  nciState.intakeId=(raw==null||raw==='')?'':String(raw);
 }
 function nciEchoStatus(data){
   if(!data||typeof data!=='object')return '';
-  return String(data.status||(data.data&&data.data.status)||'').trim();
+  if(data.status!=null&&String(data.status).trim()!=='')return String(data.status).trim();
+  const inner=nciInnerData(data);
+  return inner&&inner.status!=null?String(inner.status).trim():'';
 }
 
 function nciBuildScores(containerId,items){
@@ -3859,7 +3878,7 @@ function collectNewClientIntake(status){
   const socDate=assessment.socDate||assessment.assessmentDate||'';
   return {
     action:'save_new_client_intake',
-    intakeId:nciState.intakeId||'',
+    intakeId:(nciState.intakeId==null||nciState.intakeId==='')?'':String(nciState.intakeId),
     status:status,
     nurseName:currentNurseName||'Nurse',
     clientName:clientName,
@@ -3891,13 +3910,14 @@ function validateNewClientIntake(payload){
 
 function applyNewClientIntake(data){
   if(!data)return;
-  const root=nciUnwrapIntake(data);
-  nciState.intakeId=root.intakeId||data.intakeId||nciState.intakeId||'';
-  const a=root.assessment||{};
+  const root=nciUnwrapIntake(data); // data.data||data (Ace returns both)
+  nciForceIntakeId(data);
+  if(!nciState.intakeId&&root&&root.intakeId!=null&&root.intakeId!=='')nciState.intakeId=String(root.intakeId);
+  const a=nciPage(root,data,'assessment');
   NCI_TEXT_A.forEach(k=>{
     let v='';
-    if(k==='assessmentDate')v=nciPickDate(a,['assessmentDate','socDate'])||nciPickDate(root,['socDate','assessmentDate']);
-    else if(k==='clientName')v=nciPick(a,['clientName'])||nciPick(root,['clientName']);
+    if(k==='assessmentDate')v=nciPickDate(a,['assessmentDate','socDate'])||nciPickDate(root,['socDate','assessmentDate'])||nciPickDate(data,['socDate','assessmentDate']);
+    else if(k==='clientName')v=nciPick(a,['clientName'])||nciPick(root,['clientName'])||nciPick(data,['clientName']);
     else if(k==='caregiverName')v=nciPick(a,['caregiverName','primaryCaregiverName']);
     else if(k==='caregiverRelationship')v=nciPick(a,['caregiverRelationship','primaryCaregiverRelationship']);
     else if(k==='caregiverPhone')v=nciPick(a,['caregiverPhone','primaryCaregiverPhone']);
@@ -3915,12 +3935,12 @@ function applyNewClientIntake(data){
   NCI_BARRIERS.forEach(it=>{const el=nciEl('nci_a_'+it.key);if(el)el.checked=nciIsYes(a[it.key]);});
   NCI_SAFETY.forEach(it=>{const el=nciEl('nci_a_'+it.key);if(el)el.checked=nciIsYes(a[it.key]);});
   nciSetRadio('nci_a_homeAppropriate',a.homeAppropriate||'');
-  const aClientInk=nciPick(a,['clientSignatureData'])||nciPick(root,['clientSignatureData']);
-  const aAgencyInk=nciPick(a,['agencySignatureData'])||nciPick(root,['agencySignatureData']);
+  const aClientInk=nciPick(a,['clientSignatureData'])||nciPick(root,['clientSignatureData'])||nciPick(data,['clientSignatureData']);
+  const aAgencyInk=nciPick(a,['agencySignatureData'])||nciPick(root,['agencySignatureData'])||nciPick(data,['agencySignatureData']);
   if(aClientInk)nciPaintSig('nci_assess_clientSig',aClientInk);
   if(aAgencyInk)nciPaintSig('nci_assess_agencySig',aAgencyInk);
 
-  const p=root.activityPlan||{};
+  const p=nciPage(root,data,'activityPlan');
   NCI_TEXT_P.forEach(k=>{
     let v='';
     if(k==='dateOfBirth')v=nciPickDate(p,['dateOfBirth','dob']);
@@ -3929,7 +3949,7 @@ function applyNewClientIntake(data){
     else if(k==='emergencyName')v=nciPick(p,['emergencyName','emergencyContactName']);
     else if(k==='emergencyPhone')v=nciPick(p,['emergencyPhone','emergencyContactPhone']);
     else if(k==='emergencyRelationship')v=nciPick(p,['emergencyRelationship','emergencyContactRelationship']);
-    else if(k==='clientName')v=nciPick(p,['clientName'])||nciPick(root,['clientName'])||nciPick(a,['clientName']);
+    else if(k==='clientName')v=nciPick(p,['clientName'])||nciPick(root,['clientName'])||nciPick(data,['clientName'])||nciPick(a,['clientName']);
     else if(k.toLowerCase().includes('date'))v=nciPickDate(p,[k,k.replace('SignatureDate','SignDate')]);
     else v=nciPick(p,[k]);
     if(v!=='')nciSet('nci_p_'+k,v);
@@ -3939,7 +3959,7 @@ function applyNewClientIntake(data){
   if(p.clientFamilySignatureData)nciPaintSig('nci_plan_clientFamilySig',p.clientFamilySignatureData);
   if(p.pcaSignatureData)nciPaintSig('nci_plan_pcaSig',p.pcaSignatureData);
 
-  const c=root.consent||{};
+  const c=nciPage(root,data,'consent');
   NCI_TEXT_C.forEach(k=>{
     let v='';
     if(k==='patientSignatureDate')v=nciPickDate(c,['patientSignatureDate','consentDate']);
@@ -3957,7 +3977,7 @@ function applyNewClientIntake(data){
   });
   if(c.patientSignatureData)nciPaintSig('nci_consent_patientSig',c.patientSignatureData);
 
-  const r=root.passport||{};
+  const r=nciPage(root,data,'passport');
   if(nciPick(r,['printedName']))nciSet('nci_r_printedName',nciPick(r,['printedName']));
   const rDates=r.dates&&typeof r.dates==='object'?r.dates:{};
   const gDate=nciPickDate(r,['patientGuardianSignDate','patientGuardianSignatureDate'])||
@@ -3970,7 +3990,7 @@ function applyNewClientIntake(data){
   if(r.patientGuardianSignatureData)nciPaintSig('nci_passport_patientGuardianSig',r.patientGuardianSignatureData);
   if(r.witnessSignatureData)nciPaintSig('nci_passport_witnessSig',r.witnessSignatureData);
 
-  const m=root.admission||{};
+  const m=nciPage(root,data,'admission');
   const folder=nciEl('nci_m_folderReceivedAck');
   if(folder)folder.checked=nciIsYes(m.folderReceivedAck);
   const proxy=(nciIsYes(m.proxyYes)||nciIsYes(m.proxyInPlace))?'Yes':
@@ -4001,24 +4021,30 @@ async function saveNewClientIntake(status){
   }
   try{
     const data=await apiPost(payload);
-    const savedStatus=nciEchoStatus(data);
-    const completeMismatch=status==='Complete' && savedStatus && savedStatus.toLowerCase()!=='complete';
-    if(data&&data.success&&!completeMismatch){
-      nciState.intakeId=data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'';
-      if(status==='Complete'){
-        archiveNewClientIntakePdf(nciState.intakeId);
-        closeNewClientIntake();
-        showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
-        loadNewClientIntakeDrafts();
-      }else{
-        showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
-        loadNewClientIntakeDrafts();
-      }
+    if(status==='Complete' && (!data||data.status!=='Complete')){
+      nciForceIntakeId(data);
+      const why=(!data||data.success===false)
+        ?(data&&data.error?('Sheets: '+data.error):'Stub action: save_new_client_intake.')
+        :('Complete was not stored (status '+((data&&data.status)!=null?data.status:'missing')+').');
+      nciFail('Intake was not saved as Complete. '+why);
+      return;
+    }
+    if(!(data&&data.success)){
+      nciForceIntakeId(data);
+      nciFail('Intake was not saved as '+status+'. '+(data&&data.error?('Sheets: '+data.error):'Stub action: save_new_client_intake.'));
+      return;
+    }
+    nciForceIntakeId(data);
+    // Ace list returns numeric ids — always persist as string so Complete never posts blank.
+    nciState.intakeId=String(data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'');
+    if(status==='Complete'){
+      archiveNewClientIntakePdf(nciState.intakeId);
+      closeNewClientIntake();
+      showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
+      loadNewClientIntakeDrafts();
     }else{
-      const why=completeMismatch
-        ?('Complete was not stored (status '+(savedStatus||'unknown')+').')
-        :(data&&data.error?('Sheets: '+data.error):'Stub action: save_new_client_intake.');
-      nciFail('Intake was not saved as '+status+'. '+why);
+      showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
+      loadNewClientIntakeDrafts();
     }
   }catch(e){
     nciFail('Backend pending or unreachable. Stub action: save_new_client_intake. Intake was not saved as '+status+'.');
@@ -4028,25 +4054,26 @@ async function saveNewClientIntake(status){
 async function archiveNewClientIntakePdf(intakeId){
   // Ace PDF archive — action locked: archive_new_client_intake_pdf. Failures are ignored.
   try{
-    await apiPost({action:'archive_new_client_intake_pdf',intakeId:intakeId||''});
+    await apiPost({action:'archive_new_client_intake_pdf',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
   }catch(e){}
 }
 
 async function getNewClientIntake(intakeId){
-  return apiPost({action:'get_new_client_intake',intakeId:intakeId||''});
+  return apiPost({action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
 }
 
 async function resumeNewClientIntake(intakeId){
   nciBuildGrids();
   resetNewClientIntake();
-  nciState.intakeId=intakeId||'';
+  nciState.intakeId=(intakeId==null||intakeId==='')?'':String(intakeId);
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
   try{
-    const data=await getNewClientIntake(intakeId);
+    const data=await getNewClientIntake(nciState.intakeId);
     if(data&&data.success){
       applyNewClientIntake(data);
+      nciForceIntakeId(data);
       nciRenderSteps();
       setTimeout(()=>nciInitPageSigs(nciState.step),80);
       const name=nciVal('nci_a_clientName')||nciVal('nci_p_clientName')||nciVal('nci_c_patientPrintedName');
@@ -4078,7 +4105,7 @@ async function loadNewClientIntakeDrafts(){
     if(!rows.length){card.style.display='none';list.innerHTML='';return;}
     card.style.display='block';
     list.innerHTML=rows.map(r=>{
-      const id=r.intakeId||r.id||'';
+      const id=String(r.intakeId!=null&&r.intakeId!==''?r.intakeId:(r.id!=null&&r.id!==''?r.id:''));
       const name=escapeHtml(r.clientName||(r.assessment&&r.assessment.clientName)||'Untitled');
       const st=escapeHtml(r.status||'Draft');
       const when=escapeHtml(toEasternMDY(r.updatedAt||r.savedAt||r.socDate||r.assessmentDate||(r.assessment&&(r.assessment.socDate||r.assessment.assessmentDate))||'')||'');
