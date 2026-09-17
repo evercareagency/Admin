@@ -34,6 +34,7 @@ textarea{resize:vertical;min-height:80px;}
 .btn-warn{background:var(--warn);color:white;}
 .btn-full{width:100%;justify-content:center;padding:12px;}
 .btn-sm{padding:5px 12px;font-size:0.75rem;}
+.btn:disabled{opacity:0.65;cursor:wait;}
 .admin-layout{display:flex;min-height:100vh;min-height:100dvh;}
 .sidebar{width:220px;background:var(--navy);color:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
 .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
@@ -1334,6 +1335,8 @@ let currentAdminRole=null;
 let currentNurseName=null;
 let nurseSigPads={};
 let nurseComplianceRows=[];
+let nurseVisitPdfStash={};
+let scFormRowIndex=-1;
 
 function togglePasswordVisibility(id,btn){
   const el=document.getElementById(id);
@@ -3022,7 +3025,8 @@ async function exportAllToExcel(){
 
 // ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
 // LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
-// list_supervisory_contacts; reuse get_clients. AdminUsers = Role|Password only.
+// list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);
+// reuse get_clients. AdminUsers = Role|Password only.
 
 const SC_PERSONAL_CARE=['Bathing','MealPrep','Exercises','Grooming','Housekeeping','TurnReposition','Shaving','Laundry','VitalSigns','HairCare','ErrandsShopping','CatheterCare','OralHygiene','Ambulation','Appointments','SkinCare','PersonalCare'];
 const SC_PERF=['WashesHands','FollowsPOC','DocumentsCare','NotifiesOffice','Accountability','ReportsAsScheduled','WorksAssignedHours'];
@@ -3035,6 +3039,110 @@ function scField(row,pascal,camel){
   const lower=pascal.charAt(0).toLowerCase()+pascal.slice(1);
   if(row[lower]!==undefined)return row[lower];
   return row[pascal]??row[camel];
+}
+
+function pickVisitPdfLink(obj){
+  if(!obj)return '';
+  const v=obj.visitPdfLink||obj.VisitPdfLink||obj.pdfLink||obj.PdfLink||obj.PDFLink||obj.pdf_link||'';
+  return String(v||'').trim();
+}
+
+function pickContactId(obj){
+  if(!obj)return '';
+  const v=obj.contactId??obj.ContactId??obj.lastVisitContactId??obj.lastContactId??'';
+  if(v==null||v==='')return '';
+  return String(v);
+}
+
+function nurseClientKey(row){
+  const id=String(row&&row.clientId||'').trim();
+  if(id)return 'id:'+id;
+  return 'name:'+String(row&&row.clientName||'').trim().toLowerCase();
+}
+
+function rememberNurseVisitStash(row){
+  if(!row)return;
+  const k=nurseClientKey(row);
+  const prev=nurseVisitPdfStash[k]||{};
+  nurseVisitPdfStash[k]={
+    lastVisitContactId:row.lastVisitContactId||prev.lastVisitContactId||'',
+    lastContactId:row.lastContactId||prev.lastContactId||'',
+    visitPdfLink:pickVisitPdfLink(row)||prev.visitPdfLink||''
+  };
+}
+
+function applyNurseVisitStash(row){
+  if(!row)return row;
+  const prev=nurseVisitPdfStash[nurseClientKey(row)]||{};
+  if(!row.lastVisitContactId&&prev.lastVisitContactId)row.lastVisitContactId=prev.lastVisitContactId;
+  if(!row.lastContactId&&prev.lastContactId)row.lastContactId=prev.lastContactId;
+  if(!pickVisitPdfLink(row)&&prev.visitPdfLink)row.visitPdfLink=prev.visitPdfLink;
+  return row;
+}
+
+function scContactsFromList(data){
+  if(!data)return [];
+  if(Array.isArray(data))return data;
+  if(Array.isArray(data.data))return data.data;
+  if(Array.isArray(data.contacts))return data.contacts;
+  if(Array.isArray(data.rows))return data.rows;
+  if(data.data&&Array.isArray(data.data.contacts))return data.data.contacts;
+  if(data.data&&Array.isArray(data.data.data))return data.data.data;
+  return [];
+}
+
+function scIsVisit(ct){
+  return String(scField(ct,'ContactType','contactType')||'').toLowerCase()==='visit';
+}
+
+function scSameClient(ct,row){
+  const cid=String(scField(ct,'ClientId','clientId')||'').trim();
+  const cn=String(scField(ct,'ClientName','clientName')||'').trim();
+  const rid=String(row&&row.clientId||'').trim();
+  const rn=String(row&&row.clientName||'').trim();
+  if(rid&&cid&&cid===rid)return true;
+  if(rn&&cn&&cn.toLowerCase()===rn.toLowerCase())return true;
+  return false;
+}
+
+function scContactDateMs(ct){
+  const raw=scField(ct,'ContactDate','contactDate')||'';
+  const s=String(raw).trim();
+  if(s){
+    const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(iso)return Date.UTC(+iso[1],+iso[2]-1,+iso[3]);
+    const mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(mdy)return Date.UTC(+mdy[3],+mdy[1]-1,+mdy[2]);
+    const t=Date.parse(s);
+    if(!isNaN(t))return t;
+  }
+  const id=Number(scField(ct,'ContactId','contactId'));
+  return isFinite(id)?id:0;
+}
+
+function scLatestVisitSort(a,b){
+  const d=scContactDateMs(b)-scContactDateMs(a);
+  if(d)return d;
+  return Number(scField(b,'ContactId','contactId')||0)-Number(scField(a,'ContactId','contactId')||0);
+}
+
+function hydrateNurseComplianceRow(r,extra){
+  const visits=Number(scField(r,'Visits','visits')??r.visitCount??r.visitsDone??0)||0;
+  const countingCalls=Number(scField(r,'CountingCalls','countingCalls')??r.callCount??r.callsDone??0)||0;
+  const status=scField(r,'Status','status')||deriveNurseStatus(visits,countingCalls);
+  const daysLeft=Number(r.daysLeftInWindow??scField(r,'DaysLeftInWindow','daysLeftInWindow')??r.daysLeft??scField(r,'DaysInWindow','daysInWindow')??60)||60;
+  const row=Object.assign({
+    clientId:scField(r,'ClientId','clientId')||'',
+    clientName:scField(r,'ClientName','clientName')||'—',
+    assignedAides:r.assignedAides||r.AssignedAides||[],
+    visits,countingCalls,status,
+    daysLeft,
+    daysInWindow:daysLeft,
+    lastVisitContactId:String(scField(r,'LastVisitContactId','lastVisitContactId')||scField(r,'LastContactId','lastContactId')||''),
+    lastContactId:String(scField(r,'LastContactId','lastContactId')||''),
+    visitPdfLink:pickVisitPdfLink(r)
+  },extra||{});
+  return applyNurseVisitStash(row);
 }
 
 function nurseStatusBadge(status){
@@ -3066,23 +3174,7 @@ async function loadNurseCompliance(force){
     const data=await apiPost({action:'get_supervisory_compliance'});
     let rows=[];
     if(data&&data.success&&Array.isArray(data.data)){
-      rows=data.data.map(r=>{
-        // Live Sheets fields: visitCount/callCount/daysLeftInWindow/windowDays
-        // Locked contract aliases: visits/countingCalls/daysInWindow
-        const visits=Number(scField(r,'Visits','visits')??r.visitCount??r.visitsDone??0)||0;
-        const countingCalls=Number(scField(r,'CountingCalls','countingCalls')??r.callCount??r.callsDone??0)||0;
-        const status=scField(r,'Status','status')||deriveNurseStatus(visits,countingCalls);
-        const daysLeft=Number(r.daysLeftInWindow??scField(r,'DaysLeftInWindow','daysLeftInWindow')??r.daysLeft??scField(r,'DaysInWindow','daysInWindow')??60)||60;
-        const daysInWindow=Number(r.windowDays??scField(r,'DaysInWindow','daysInWindow')??r.daysInWindow??60)||60;
-        return{
-          clientId:scField(r,'ClientId','clientId')||'',
-          clientName:scField(r,'ClientName','clientName')||'—',
-          assignedAides:r.assignedAides||r.AssignedAides||[],
-          visits,countingCalls,status,
-          daysLeft,
-          daysInWindow:daysLeft // table "Days left" column uses this key historically
-        };
-      });
+      rows=data.data.map(r=>hydrateNurseComplianceRow(r));
     }else if(data&&data.success&&data.contacts&&data.clients){
       // Optional client-side compute if API returns raw contacts + clients
       rows=computeComplianceFromRaw(data.clients,data.contacts);
@@ -3125,7 +3217,7 @@ function computeComplianceFromRaw(clients,contacts){
         && (scField(ct,'CallOutcome','callOutcome')||'')==='Reached'
         && ['Client','Family'].includes(scField(ct,'SpokeWith','spokeWith')||'');
     }).length;
-    return{clientId:id,clientName:name,assignedAides:c.assignedAides||c.AssignedAides||[],visits,countingCalls,status:deriveNurseStatus(visits,countingCalls),daysInWindow:60};
+    return applyNurseVisitStash({clientId:id,clientName:name,assignedAides:c.assignedAides||c.AssignedAides||[],visits,countingCalls,status:deriveNurseStatus(visits,countingCalls),daysInWindow:60,lastVisitContactId:'',lastContactId:'',visitPdfLink:''});
   });
 }
 
@@ -3150,6 +3242,7 @@ function renderNurseComplianceTable(rows){
       <td><div class="nurse-actions">
         <button class="btn btn-sm btn-teal" onclick="openSupervisoryContactForm('Visit',${i})">Log Visit</button>
         <button class="btn btn-sm btn-navy" onclick="openSupervisoryContactForm('PhoneCall',${i})">Log Phone Call</button>
+        <button class="btn btn-sm" id="scViewPdfBtn${i}" style="background:#e8f5e9;color:#2e7d32" onclick="viewSupervisoryVisitPdf(${i})">📄 View PDF</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -3279,6 +3372,7 @@ function fillAideNameFromAssignment(row){
 }
 
 async function openSupervisoryContactForm(contactType,rowIndex){
+  scFormRowIndex=rowIndex;
   const row=nurseComplianceRows[rowIndex]||{};
   buildScPersonalCareGrid();
   buildScPerfGrid();
@@ -3396,6 +3490,22 @@ async function saveSupervisoryContact(){
     // TODO: Sheets live — action name locked: save_supervisory_contact
     const data=await apiPost(payload);
     if(data&&data.success){
+      if(isVisit){
+        let i=scFormRowIndex;
+        if(!(i>=0&&nurseComplianceRows[i])){
+          i=nurseComplianceRows.findIndex(r=>(payload.clientId&&String(r.clientId)===String(payload.clientId))||(payload.clientName&&r.clientName===payload.clientName));
+        }
+        if(i>=0&&nurseComplianceRows[i]){
+          const savedId=pickContactId(data);
+          if(savedId){
+            nurseComplianceRows[i].lastVisitContactId=savedId;
+            nurseComplianceRows[i].lastContactId=savedId;
+          }
+          const savedPdf=pickVisitPdfLink(data);
+          if(savedPdf)nurseComplianceRows[i].visitPdfLink=savedPdf;
+          rememberNurseVisitStash(nurseComplianceRows[i]);
+        }
+      }
       closeSupervisoryContactModal();
       showTempMsg('Contact saved'+(data.contactId?' (#'+data.contactId+')':'')+'. clientSignatureDataLen='+(data.clientSignatureDataLen!=null?data.clientSignatureDataLen:'—')+' supervisorSignatureDataLen='+(data.supervisorSignatureDataLen!=null?data.supervisorSignatureDataLen:'—'),'var(--success)');
       loadNurseCompliance(true);
@@ -3413,6 +3523,84 @@ async function saveSupervisoryContact(){
 async function listSupervisoryContacts(filters){
   // TODO: Sheets live — action: list_supervisory_contacts
   return apiPost(Object.assign({action:'list_supervisory_contacts'},filters||{}));
+}
+
+function openVisitPdfUrl(url){
+  const href=String(url||'').trim();
+  if(!href)return false;
+  window.open(href,'_blank','noopener');
+  return true;
+}
+
+function setViewPdfButtonWorking(rowIndex,working){
+  const btn=document.getElementById('scViewPdfBtn'+rowIndex);
+  if(!btn)return;
+  btn.disabled=!!working;
+  btn.textContent=working?'Working…':'📄 View PDF';
+}
+
+async function resolveLatestVisitContact(row){
+  const listed=await listSupervisoryContacts({
+    clientId:row.clientId||'',
+    clientName:row.clientName||'',
+    contactType:'Visit'
+  });
+  if(!(listed&&listed.success!==false)){
+    const err=(listed&&(listed.error||listed.message))||'Could not list supervisory contacts.';
+    throw new Error(err);
+  }
+  const visits=scContactsFromList(listed).filter(ct=>scIsVisit(ct)&&scSameClient(ct,row)).sort(scLatestVisitSort);
+  return visits[0]||null;
+}
+
+/** View archived supervisory visit PDF — Ace v24 archive_supervisory_visit_pdf. */
+async function viewSupervisoryVisitPdf(rowIndex){
+  const row=nurseComplianceRows[rowIndex];
+  if(!row){showTempMsg('No client row.','var(--danger)');return;}
+  const existing=pickVisitPdfLink(row);
+  if(existing){openVisitPdfUrl(existing);return;}
+
+  const btn=document.getElementById('scViewPdfBtn'+rowIndex);
+  if(btn&&btn.disabled)return;
+  setViewPdfButtonWorking(rowIndex,true);
+  try{
+    let contactId=row.lastVisitContactId||row.lastContactId||'';
+    if(!contactId){
+      const latest=await resolveLatestVisitContact(row);
+      if(!latest){
+        showTempMsg('No visit logged yet — Log Visit first.','var(--warn)');
+        return;
+      }
+      contactId=pickContactId(latest);
+      const listedPdf=pickVisitPdfLink(latest);
+      if(listedPdf){
+        row.visitPdfLink=listedPdf;
+        if(contactId)row.lastVisitContactId=contactId;
+        rememberNurseVisitStash(row);
+        openVisitPdfUrl(listedPdf);
+        return;
+      }
+    }
+    if(!contactId){
+      showTempMsg('No visit logged yet — Log Visit first.','var(--warn)');
+      return;
+    }
+    const data=await apiPost({action:'archive_supervisory_visit_pdf',contactId:String(contactId)});
+    const url=(data&&data.success)?pickVisitPdfLink(data):'';
+    if(url){
+      row.visitPdfLink=url;
+      row.lastVisitContactId=String(contactId);
+      row.lastContactId=String(contactId);
+      rememberNurseVisitStash(row);
+      openVisitPdfUrl(url);
+    }else{
+      showTempMsg((data&&(data.error||data.message))||'Could not archive visit PDF.','var(--danger)');
+    }
+  }catch(e){
+    showTempMsg((e&&e.message)||'Could not archive visit PDF.','var(--danger)');
+  }finally{
+    setViewPdfButtonWorking(rowIndex,false);
+  }
 }
 
 
