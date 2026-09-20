@@ -263,7 +263,7 @@ textarea{resize:vertical;min-height:80px;}
 .ts-mo .ts-sigbox img{height:36px;max-width:100%;}
 .ts-mo .ts-sigline{border-bottom:1px solid #111;height:36px;margin-bottom:6px;}
 .ts-mo .ts-sigmeta{font-size:10px;}
-.ts-gps-mi{display:inline;margin-left:6px;font-size:0.65rem;font-weight:700;}
+.ts-gps-mi{display:inline;margin-left:6px;font-size:0.65rem;font-weight:700;white-space:nowrap;}
 @media(max-width:700px){
   .ts-print-sheet{padding:14px 10px;width:100%;}
   .ts-mo .ts-sigs{grid-template-columns:1fr;}
@@ -1436,9 +1436,9 @@ function gpsDistanceUi(d){
   if(!d)return '';
   if(isFinite(resolveDistanceFt(d))){
     const col=d.verified===true?'var(--success)':'var(--danger)';
-    return '<span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d)+' from client</span>';
+    return ' <span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d)+' from client</span>';
   }
-  if(d.verified===true)return '<span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
+  if(d.verified===true)return ' <span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
   return '';
 }
 function serviceCodeFor(rec,day){
