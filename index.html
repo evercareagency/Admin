@@ -321,9 +321,25 @@ body.ts-print-open{overflow:hidden;}
     padding:0 !important;
   }
   body > *:not(#tsPrintOverlay){display:none !important;}
-  .no-print,.ts-print-toolbar,#tsPrintToolbar,.sidebar,.modal-bg,#pwaBanner,.screen{
+  .no-print,.ts-print-toolbar,#tsPrintToolbar,.sidebar,.modal-bg,#pwaBanner,.screen,
+  #tsPrintOverlay .no-print,
+  #tsPrintOverlay .ts-print-toolbar,
+  #tsPrintOverlay.show .ts-print-toolbar,
+  #tsPrintOverlay.ts-print-overlay.show .ts-print-toolbar,
+  #tsPrintOverlay.show #tsPrintToolbar,
+  #tsPrintOverlay.show #tsPrintBackBtn,
+  #tsPrintOverlay.show #tsPrintCloseBtn,
+  #tsPrintOverlay.show #tsPrintDoBtn,
+  #tsPrintOverlay.show .ts-print-actions,
+  #tsPrintOverlay.show .ts-print-toolbar h2{
     display:none !important;
     visibility:hidden !important;
+    height:0 !important;
+    max-height:0 !important;
+    overflow:hidden !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
   }
   #tsPrintOverlay,
   #tsPrintOverlay.ts-print-overlay,
