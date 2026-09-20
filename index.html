@@ -45,8 +45,17 @@ textarea{resize:vertical;min-height:80px;}
 .nav-item:hover{background:rgba(255,255,255,0.07);color:white;}
 .nav-item.active{background:rgba(42,127,127,0.3);color:white;border-left-color:var(--teal);}
 .nav-item .ni{font-size:15px;}
-#adminScreen #nav_completes,
+#adminScreen #nav_nurse,
 #nurseScreen #nav_nurse_completes{display:flex !important;visibility:visible !important;opacity:1 !important;}
+/* Old Completed intakes nav redirects to Nurse — hide to avoid a duplicate item. */
+#adminScreen #nav_completes{display:none !important;}
+.nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c0392b;color:#fff;font-size:0.65rem;font-weight:700;display:none;align-items:center;justify-content:center;line-height:1;}
+.nav-badge.is-on{display:inline-flex;}
+.nurse-alert-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.nurse-alert-row:last-child{border-bottom:none;}
+.nurse-alert-row:hover{background:var(--off);}
+.nurse-type-visit{background:#e8f4f4;color:var(--teal-dark);}
+.nurse-type-phone{background:#e3f2fd;color:#1565c0;}
 .sidebar-bottom{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,0.1);}
 .sidebar-bottom button{width:100%;padding:8px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.7);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;}
 .sidebar-bottom button:hover{background:rgba(255,255,255,0.15);color:white;}
@@ -615,7 +624,8 @@ else setupEverCarePWA();
       <div class="nav-item" onclick="showTab('backups')" id="nav_backups"><span class="ni">☁️</span> Backup requests</div>
       <div class="nav-item" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</div>
       <div class="nav-item" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</div>
-      <div class="nav-item" onclick="showTab('completes')" id="nav_completes" aria-label="Completed intakes"><span class="ni">📄</span> Completed intakes</div>
+      <div class="nav-item" onclick="showTab('nurse')" id="nav_nurse" aria-label="Nurse"><span class="ni">🩺</span> Nurse <span class="nav-badge" id="nav_nurse_badge" hidden>0</span></div>
+      <div class="nav-item" onclick="showTab('completes')" id="nav_completes" aria-label="Completed intakes" aria-hidden="true"><span class="ni">📄</span> Completed intakes</div>
       <div class="nav-item" onclick="showTab('inservices')" id="nav_inservices"><span class="ni">📚</span> Inservices</div>
       <div class="nav-item" onclick="showTab('broadcast')" id="nav_broadcast"><span class="ni">📢</span> Broadcast Alert</div>
       <div class="nav-item" onclick="showTab('links')" id="nav_links"><span class="ni">🔗</span> Links</div>
@@ -704,19 +714,28 @@ else setupEverCarePWA();
         </div>
       </div>
 
-      <!-- COMPLETED INTAKES TAB (Admin + Scheduler) -->
-      <div class="tab-panel" id="tab_completes">
+      <!-- NURSE TAB (Admin + Scheduler) — what the nurse did. Old Completes nav redirects here. -->
+      <div class="tab-panel" id="tab_nurse">
         <div class="page-hdr">
           <div>
-            <h1>Completed intakes</h1>
-            <p>Nurses’ completed Open-new-client packets. View opens the PDF when Ace has archived it. Edit reopens the 5-page wizard and saves as Complete.</p>
+            <h1>Nurse</h1>
+            <p>What the nurse did — completed new-client intakes and supervisory visits or calls.</p>
           </div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-teal" onclick="loadCompletedNewClientIntakes()">🔄 Refresh</button>
+            <button class="btn btn-teal" onclick="loadAdminNurseSection()">🔄 Refresh</button>
           </div>
         </div>
+
+        <div class="card" id="adminNurseAlertsCard">
+          <div class="card-title"><span class="ico">🔔</span> Recent nurse activity</div>
+          <p class="nci-hint" style="margin-bottom:10px">Unread alerts from Ace. Opening this tab marks them read. If the alerts Version is not live yet, this stays empty.</p>
+          <div id="adminNurseAlertsList">
+            <p class="nci-hint" style="margin:0">No unread nurse alerts.</p>
+          </div>
+        </div>
+
         <div class="card" id="nciCompletedAdminCard">
-          <div class="card-title"><span class="ico">📄</span> Completed intakes</div>
+          <div class="card-title"><span class="ico">📄</span> Completed new client intakes</div>
           <p class="nci-hint" style="margin-bottom:10px">View opens pdfLink when Ace has it. Edit reopens the same 5-page wizard and saves as Complete.</p>
           <div style="overflow-x:auto">
             <table class="data-table" id="nciCompletedAdminTable">
@@ -733,6 +752,27 @@ else setupEverCarePWA();
               </thead>
               <tbody id="nciCompletedAdminBody">
                 <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading completed intakes…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" id="adminSupervisoryCard">
+          <div class="card-title"><span class="ico">🩺</span> Supervisory visits &amp; calls</div>
+          <p class="nci-hint" style="margin-bottom:10px">Contacts the nurse logged. Type is Ace <code>Visit</code> or <code>PhoneCall</code>. View opens pdfLink, or archives the visit PDF when Ace has none yet.</p>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="adminSupervisoryTable">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                  <th>Nurse</th>
+                  <th>PDF</th>
+                </tr>
+              </thead>
+              <tbody id="adminSupervisoryBody">
+                <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Loading supervisory contacts…</td></tr>
               </tbody>
             </table>
           </div>
@@ -1974,15 +2014,19 @@ function unlockBodyScroll(){
 function openModal(id){document.getElementById(id).classList.add('show');lockBodyScroll();}
 function closeModal(id){document.getElementById(id).classList.remove('show');if(!document.querySelector('.modal-bg.show'))unlockBodyScroll();}
 function showTab(tab){
+  // Old top-level Completed intakes → Nurse tab (Completes card). Admin + Scheduler only.
+  if(tab==='completes')tab='nurse';
   document.querySelectorAll('#adminScreen .tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('#adminScreen .nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById(`tab_${tab}`).classList.add('active');
-  document.getElementById(`nav_${tab}`).classList.add('active');
+  const panel=document.getElementById(`tab_${tab}`);
+  const nav=document.getElementById(`nav_${tab}`);
+  if(panel)panel.classList.add('active');
+  if(nav)nav.classList.add('active');
   if(tab==='aides')renderAides();
   if(tab==='backups')renderBackupRequests();
   if(tab==='broadcast')renderBroadcastPreview();
   if(tab==='clients')renderClients();
-  if(tab==='completes')loadCompletedNewClientIntakes();
+  if(tab==='nurse')loadAdminNurseSection();
   if(tab==='inservices')renderInservices();
   if(tab==='activity')renderActivityLog();
   if(tab==='settings'){
@@ -2042,6 +2086,7 @@ async function doAdminReset(){
 }
 
 let currentAdminRole=null;
+let currentAdminUsername=null;
 let currentNurseName=null;
 let nurseSigPads={};
 let nurseComplianceRows=[];
@@ -2069,6 +2114,7 @@ async function mgrLogin(){
     const data=await res.json();
     if(data.success&&data.role){
       currentAdminRole=data.role;
+      currentAdminUsername=data.username||data.nurseUsername||data.name||data.displayName||data.role||'';
       document.getElementById('mgr_pass').value='';
       // Nurse: limited home only — no full Admin tools
       if(data.role==='Nurse'){
@@ -2101,6 +2147,7 @@ async function mgrLogin(){
           setTimeout(function(){
             renderTimesheets();
             renderBroadcastPreview();
+            refreshNurseAlertBadge();
             loadCompletedNewClientIntakes();
             logActivity('Logged in');
             Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
@@ -2152,7 +2199,7 @@ async function renderActivityLog(){
   }
 }
 
-function adminLogout(){logActivity('Logged out');currentAdminRole=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();showScreen('loginScreen');}
+function adminLogout(){logActivity('Logged out');currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
@@ -4598,8 +4645,8 @@ async function viewSupervisoryVisitPdf(rowIndex){
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
 // Archive: archive_new_client_intake_pdf (optional fallback). Complete save auto-rearchives.
 // List Complete rows (Ace locked): intakeId, clientId, clientName, socDate, status,
-//   nurseName, pdfLink, pdfFileId, createdAt, updatedAt, submittedAt.
-// submittedAt → Completed column. Edit Complete: save_new_client_intake status Complete.
+//   nurseUsername/nurseName, pdfLink, pdfFileId, createdAt, updatedAt, completedAt.
+// completedAt (fallback submittedAt) → Completed column. Edit: save_new_client_intake Complete.
 
 const NCI_STEPS=[
   {n:1,label:'In person'},
@@ -5658,7 +5705,7 @@ function nciIntakeOpened(r){
 
 function nciIntakeCompletedAt(r){
   if(!r)return '';
-  return r.submittedAt||'';
+  return r.completedAt||r.submittedAt||'';
 }
 
 function nciIntakeClientName(r){
@@ -5688,7 +5735,7 @@ function nciCompletedTableHtml(rows){
     const st=escapeHtml(r.status||'Complete');
     const opened=escapeHtml(toEasternMDY(nciIntakeOpened(r))||'—');
     const done=escapeHtml(toEasternMDY(nciIntakeCompletedAt(r))||'—');
-    const nurse=escapeHtml(r.nurseName||'—');
+    const nurse=escapeHtml(r.nurseName||r.nurseUsername||'—');
     const pdf=pickIntakePdfLink(r);
     const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
     const viewDis=pdf?'':' disabled';
@@ -5739,11 +5786,13 @@ async function loadCompletedNewClientIntakes(){
         clientName:r.clientName||'',
         socDate:r.socDate||'',
         status:r.status||'Complete',
-        nurseName:r.nurseName||'',
+        nurseName:r.nurseName||r.nurseUsername||'',
+        nurseUsername:r.nurseUsername||'',
         pdfLink:r.pdfLink||'',
         pdfFileId:r.pdfFileId||'',
         createdAt:r.createdAt||'',
         updatedAt:r.updatedAt||'',
+        completedAt:r.completedAt||'',
         submittedAt:r.submittedAt||''
       };
     });
@@ -5767,6 +5816,315 @@ async function viewCompletedIntakePdf(intakeId){
     return;
   }
   showTempMsg('PDF not ready yet','var(--warn)');
+}
+
+// ─── ADMIN / SCHEDULER NURSE SECTION ─────────────────────
+// Ace FINAL LOCK — stub ONLY against these. Do not invent actions or columns.
+// A) list_new_client_intakes { status:"Complete" }
+// B) list_supervisory_contacts { sinceDays?:60, clientName?, contactType? }
+//    View PDF: pdfLink, else archive_supervisory_visit_pdf { contactId }
+// C) list_nurse_alerts { username } unread only; mark_nurse_alerts_read { username, ids }
+// Optional: list_nurse_activity { limit?:50 } for the Recent nurse activity feed.
+// FORBIDDEN: list_admin_alerts, get_nurse_activity_unread, visitId, nurseName (visits),
+//   inHome|phone, save_supervisory_visit. contactType is Visit|PhoneCall.
+// Graceful empty if list_nurse_alerts Version is not live yet.
+
+let adminSupervisoryRows=[];
+let adminNurseAlerts=[];
+
+function portalUsername(){
+  return String(currentAdminUsername||currentNurseName||currentAdminRole||'').trim();
+}
+
+function nurseListRows(data,keys){
+  if(!data)return [];
+  if(Array.isArray(data))return data;
+  const names=keys||['data','alerts','items','rows','contacts','records','activity'];
+  for(let i=0;i<names.length;i++){
+    const v=data[names[i]];
+    if(Array.isArray(v))return v;
+  }
+  if(data.data&&typeof data.data==='object'){
+    for(let i=0;i<names.length;i++){
+      const v=data.data[names[i]];
+      if(Array.isArray(v))return v;
+    }
+  }
+  return [];
+}
+
+function setNurseAlertBadge(n){
+  const count=Number(n)||0;
+  const badge=document.getElementById('nav_nurse_badge');
+  if(!badge)return;
+  badge.textContent=String(count);
+  if(count>0){
+    badge.hidden=false;
+    badge.classList.add('is-on');
+  }else{
+    badge.hidden=true;
+    badge.classList.remove('is-on');
+  }
+}
+
+function scContactTypeLabel(ct){
+  const raw=String(scField(ct,'ContactType','contactType')||'').trim();
+  if(raw==='Visit')return 'Visit';
+  if(raw==='PhoneCall')return 'Phone call';
+  return raw||'—';
+}
+
+function scContactTypeBadge(ct){
+  const raw=String(scField(ct,'ContactType','contactType')||'').trim();
+  if(raw==='Visit')return '<span class="badge nurse-type-visit">Visit</span>';
+  if(raw==='PhoneCall')return '<span class="badge nurse-type-phone">Phone call</span>';
+  return '<span class="badge">'+escapeHtml(raw||'—')+'</span>';
+}
+
+function nurseAlertTypeLabel(type){
+  const t=String(type||'').trim();
+  if(t==='intake')return 'Completed intake';
+  if(t==='visit')return 'Supervisory contact';
+  return t||'Alert';
+}
+
+function paintAdminNurseAlerts(alerts){
+  const box=document.getElementById('adminNurseAlertsList');
+  if(!box)return;
+  if(!alerts||!alerts.length){
+    box.innerHTML='<p class="nci-hint" style="margin:0">No unread nurse alerts.</p>';
+    return;
+  }
+  box.innerHTML=alerts.map(a=>{
+    const type=escapeAttr(a.type||'');
+    const ref=escapeAttr(a.refId||'');
+    const name=escapeHtml(a.clientName||'—');
+    const nurse=escapeHtml(a.nurseUsername||'—');
+    const when=escapeHtml(formatDateTimeLabel(a.createdAt)||'—');
+    return `<div class="nurse-alert-row" onclick="focusNurseAlertItem('${type}','${ref}')">
+      <div>
+        <strong>${escapeHtml(nurseAlertTypeLabel(a.type))}</strong>
+        <div style="font-size:0.78rem;margin-top:2px">${name}</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px">${nurse} · ${when}</div>
+      </div>
+      <span class="badge badge-warn">Unread</span>
+    </div>`;
+  }).join('');
+}
+
+function focusNurseAlertItem(type,refId){
+  const t=String(type||'');
+  const el=t==='intake'?document.getElementById('nciCompletedAdminCard'):document.getElementById('adminSupervisoryCard');
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  void refId;
+}
+
+async function refreshNurseAlertBadge(){
+  // Admin + Scheduler only. Nurse role has its own UI.
+  if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler'){
+    setNurseAlertBadge(0);
+    return [];
+  }
+  const username=portalUsername();
+  if(!username){
+    setNurseAlertBadge(0);
+    paintAdminNurseAlerts([]);
+    return [];
+  }
+  try{
+    const data=await apiPost({action:'list_nurse_alerts',username});
+    if(!(data&&data.success)){
+      adminNurseAlerts=[];
+      setNurseAlertBadge(0);
+      paintAdminNurseAlerts([]);
+      return [];
+    }
+    const rows=nurseListRows(data,['alerts','data','items','rows']).map(a=>({
+      id:a&&a.id!=null?String(a.id):'',
+      type:a&&a.type?String(a.type):'',
+      refId:a&&a.refId!=null?String(a.refId):'',
+      clientName:(a&&a.clientName)||'',
+      nurseUsername:(a&&a.nurseUsername)||'',
+      createdAt:(a&&a.createdAt)||''
+    })).filter(a=>a.id);
+    adminNurseAlerts=rows;
+    setNurseAlertBadge(rows.length);
+    paintAdminNurseAlerts(rows);
+    return rows;
+  }catch(e){
+    // Ace unread Version not live yet — keep badge hidden / 0.
+    adminNurseAlerts=[];
+    setNurseAlertBadge(0);
+    paintAdminNurseAlerts([]);
+    return [];
+  }
+}
+
+async function markNurseAlertsRead(ids){
+  const username=portalUsername();
+  const list=(ids||[]).map(String).filter(Boolean);
+  if(!username||!list.length)return;
+  try{
+    await apiPost({action:'mark_nurse_alerts_read',username,ids:list});
+  }catch(e){}
+}
+
+function paintAdminSupervisoryContacts(){
+  const tbody=document.getElementById('adminSupervisoryBody');
+  if(!tbody)return;
+  const rows=adminSupervisoryRows||[];
+  if(!rows.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">No supervisory visits or calls yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=rows.map(r=>{
+    const id=escapeAttr(pickContactId(r));
+    const name=escapeHtml(scField(r,'ClientName','clientName')||'—');
+    const date=escapeHtml(toEasternMDY(scField(r,'ContactDate','contactDate')||scField(r,'CreatedAt','createdAt')||'')||'—');
+    const nurse=escapeHtml(scField(r,'SupervisorName','supervisorName')||'—');
+    const pdf=pickVisitPdfLink(r);
+    const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
+    return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${scContactTypeBadge(r)}</td>
+      <td>${date}</td>
+      <td>${nurse}</td>
+      <td><div class="nci-complete-actions">
+        ${pdfCell}
+        <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewAdminSupervisoryPdf('${id}')">📄 View PDF</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadAdminSupervisoryContacts(){
+  const tbody=document.getElementById('adminSupervisoryBody');
+  if(tbody)tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Loading supervisory contacts…</td></tr>';
+  try{
+    const data=await listSupervisoryContacts({sinceDays:60});
+    if(data&&data.success!==false){
+      adminSupervisoryRows=scContactsFromList(data).slice().sort(scLatestVisitSort);
+    }else{
+      adminSupervisoryRows=[];
+    }
+  }catch(e){
+    adminSupervisoryRows=[];
+  }
+  paintAdminSupervisoryContacts();
+}
+
+async function viewAdminSupervisoryPdf(contactId){
+  const id=String(contactId||'');
+  if(!id){showTempMsg('No contactId for this row.','var(--danger)');return;}
+  const row=adminSupervisoryRows.find(r=>pickContactId(r)===id)||{};
+  const existing=pickVisitPdfLink(row);
+  if(existing){openVisitPdfUrl(existing);return;}
+  try{
+    const data=await apiPost({action:'archive_supervisory_visit_pdf',contactId:id});
+    const url=(data&&data.success)?pickVisitPdfLink(data):'';
+    if(url){
+      row.pdfLink=url;
+      if(data.pdfFileId)row.pdfFileId=data.pdfFileId;
+      paintAdminSupervisoryContacts();
+      openVisitPdfUrl(url);
+    }else{
+      showTempMsg((data&&(data.error||data.message))||'Could not archive visit PDF.','var(--danger)');
+    }
+  }catch(e){
+    showTempMsg((e&&e.message)||'Could not archive visit PDF.','var(--danger)');
+  }
+}
+
+function nurseActivityCreatedMs(item){
+  const raw=item&&(item.createdAt||item.visitDate||item.socDate||item.completedAt||'');
+  const s=String(raw||'').trim();
+  if(!s)return 0;
+  const t=Date.parse(s);
+  if(!isNaN(t))return t;
+  const mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(mdy)return Date.UTC(+mdy[3],+mdy[1]-1,+mdy[2]);
+  return 0;
+}
+
+function deriveNurseActivityFromLists(){
+  const items=[];
+  (nciCompletedRows||[]).forEach(r=>{
+    items.push({
+      type:'intake',
+      refId:nciIntakeIdOf(r),
+      clientName:r.clientName||'',
+      nurseUsername:r.nurseUsername||r.nurseName||'',
+      socDate:r.socDate||'',
+      pdfLink:r.pdfLink||'',
+      pdfFileId:r.pdfFileId||'',
+      createdAt:r.completedAt||r.submittedAt||r.updatedAt||r.createdAt||''
+    });
+  });
+  (adminSupervisoryRows||[]).forEach(r=>{
+    items.push({
+      type:'visit',
+      refId:pickContactId(r),
+      clientName:scField(r,'ClientName','clientName')||'',
+      nurseUsername:scField(r,'SupervisorName','supervisorName')||'',
+      contactType:scField(r,'ContactType','contactType')||'',
+      visitDate:scField(r,'ContactDate','contactDate')||'',
+      pdfLink:pickVisitPdfLink(r),
+      pdfFileId:r.pdfFileId||'',
+      createdAt:scField(r,'CreatedAt','createdAt')||scField(r,'UpdatedAt','updatedAt')||scField(r,'ContactDate','contactDate')||''
+    });
+  });
+  return items.sort((a,b)=>nurseActivityCreatedMs(b)-nurseActivityCreatedMs(a)).slice(0,50);
+}
+
+function appendNurseActivityFeed(items){
+  const box=document.getElementById('adminNurseAlertsList');
+  if(!box||!items||!items.length)return;
+  const unreadHtml=box.innerHTML;
+  const recent=items.slice(0,8).map(it=>{
+    const type=it.type==='intake'?'Completed intake':(it.contactType==='PhoneCall'?'Phone call':'Visit');
+    const name=escapeHtml(it.clientName||'—');
+    const nurse=escapeHtml(it.nurseUsername||'—');
+    const when=escapeHtml(formatDateTimeLabel(it.createdAt||it.visitDate||it.socDate)||'—');
+    const jump=it.type==='intake'?'intake':'visit';
+    return `<div class="nurse-alert-row" onclick="focusNurseAlertItem('${jump}','${escapeAttr(it.refId||'')}')">
+      <div>
+        <strong>${escapeHtml(type)}</strong>
+        <div style="font-size:0.78rem;margin-top:2px">${name}</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:2px">${nurse} · ${when}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const hasUnread=adminNurseAlerts&&adminNurseAlerts.length;
+  box.innerHTML=(hasUnread?unreadHtml+'<div class="nci-hint" style="margin:12px 0 6px;font-weight:600">Latest from lists</div>':'')+recent;
+}
+
+async function loadNurseActivityFeed(){
+  try{
+    const data=await apiPost({action:'list_nurse_activity',limit:50});
+    if(data&&data.success){
+      const rows=nurseListRows(data,['activity','data','items','rows']);
+      if(rows.length){
+        appendNurseActivityFeed(rows);
+        return;
+      }
+    }
+  }catch(e){}
+  appendNurseActivityFeed(deriveNurseActivityFromLists());
+}
+
+async function loadAdminNurseSection(){
+  if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler')return;
+  const alerts=await refreshNurseAlertBadge();
+  const ids=alerts.map(a=>a.id).filter(Boolean);
+  if(ids.length){
+    await markNurseAlertsRead(ids);
+    setNurseAlertBadge(0);
+  }
+  await Promise.all([
+    loadCompletedNewClientIntakes(),
+    loadAdminSupervisoryContacts()
+  ]);
+  await loadNurseActivityFeed();
 }
 
 async function loadNewClientIntakeDrafts(){
