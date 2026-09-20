@@ -264,48 +264,50 @@ textarea{resize:vertical;min-height:80px;}
 .ts-print-toolbar .btn{min-height:44px;min-width:44px;display:inline-flex !important;visibility:visible !important;}
 #tsPrintBackBtn,#tsPrintCloseBtn{background:#fff !important;color:#1a2744 !important;border:2px solid #fff !important;}
 body.ts-print-open{overflow:hidden;}
-.ts-print-wrap{flex:1;padding:18px 12px 40px;display:flex;justify-content:center;}
-.ts-print-sheet{background:white;width:8.5in;max-width:100%;padding:0.45in 0.5in;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;}
-.ts-mo{width:100%;color:#111;}
-.ts-mo .ts-agency{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:8px;}
-.ts-mo .ts-agency h1{font-size:18px;letter-spacing:0.6px;margin:0 0 2px;text-transform:uppercase;}
-.ts-mo .ts-agency .addr{font-size:11px;margin:2px 0 0;line-height:1.45;}
-.ts-mo .ts-title{text-align:center;font-size:16px;font-weight:700;text-transform:uppercase;margin:8px 0 2px;letter-spacing:0.8px;}
-.ts-mo .ts-week{text-align:center;font-size:12px;margin:0 0 10px;}
-.ts-mo .ts-names{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.ts-mo .ts-namebox{border:1px solid #111;padding:6px 8px;min-height:72px;}
-.ts-mo .ts-namebox .lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;}
-.ts-mo .ts-namebox .val{font-size:13px;font-weight:700;margin:2px 0 4px;}
-.ts-mo .ts-namebox img{height:34px;max-width:100%;display:block;}
-.ts-mo .ts-namebox .sigline{border-bottom:1px solid #111;min-height:34px;}
-.ts-mo .ts-days{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px;}
-.ts-mo .ts-days th,.ts-mo .ts-days td{border:1px solid #111;padding:5px 4px;text-align:center;height:28px;vertical-align:middle;}
-.ts-mo .ts-days th{background:#111;color:#fff;font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.ts-mo .ts-days td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;}
-.ts-mo .ts-days img{height:22px;max-width:72px;}
-.ts-mo .ts-totals{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;margin:6px 0 10px;font-weight:700;}
-.ts-mo .ts-totals span{border-bottom:1px solid #111;min-width:90px;display:inline-block;text-align:center;}
-.ts-mo .ts-notice{font-size:10px;font-weight:700;text-align:center;border:1px solid #111;padding:7px 8px;margin:8px 0;line-height:1.4;text-transform:uppercase;}
-.ts-mo .ts-sandata{font-size:10.5px;text-align:center;margin:0 0 12px;line-height:1.4;}
-.ts-mo .ts-svcsec{margin-bottom:8px;}
-.ts-mo .ts-svcsec h3{font-size:11px;margin:0 0 3px;letter-spacing:0.4px;}
-.ts-mo .ts-svc{width:100%;border-collapse:collapse;font-size:8.5px;}
-.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:2px 3px;}
-.ts-mo .ts-svc th{background:#111;color:#fff;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.ts-mo .ts-svc td.svc{text-align:left;white-space:nowrap;}
-.ts-mo .ts-svc td.mark{text-align:center;width:22px;font-weight:700;}
-.ts-mo .ts-other{font-size:10px;margin:2px 0 8px;}
-.ts-mo .ts-comments{border:1px solid #111;min-height:52px;padding:6px 8px;font-size:11px;margin:8px 0;}
-.ts-mo .ts-comments .lbl{font-size:9px;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
-.ts-mo .ts-legal{font-size:9.5px;line-height:1.45;text-align:center;margin-top:10px;border-top:1px solid #111;padding-top:8px;}
+.ts-print-wrap{flex:1;padding:10px 8px 28px;display:flex;justify-content:center;}
+.ts-print-sheet{background:#fff;width:8.5in;max-width:100%;min-height:11in;padding:0.28in 0.32in 0.24in;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;}
+.ts-mo{width:100%;color:#111;line-height:1.15;}
+.ts-mo .ts-agency{text-align:center;border-bottom:1.5px solid #111;padding-bottom:3px;margin-bottom:4px;}
+.ts-mo .ts-agency h1{font-size:13.5px;letter-spacing:0.5px;margin:0;text-transform:uppercase;}
+.ts-mo .ts-agency .addr{font-size:8px;margin:1px 0 0;line-height:1.25;}
+.ts-mo .ts-title{text-align:center;font-size:12.5px;font-weight:700;text-transform:uppercase;margin:3px 0 0;letter-spacing:0.7px;}
+.ts-mo .ts-week{text-align:center;font-size:9px;margin:0 0 5px;}
+.ts-mo .ts-names{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px;}
+.ts-mo .ts-namebox{border:1px solid #111;padding:3px 5px;min-height:48px;}
+.ts-mo .ts-namebox .lbl{font-size:7px;text-transform:uppercase;letter-spacing:0.3px;font-weight:700;}
+.ts-mo .ts-namebox .val{font-size:10.5px;font-weight:700;margin:0 0 2px;}
+.ts-mo .ts-namebox img{height:22px;max-width:100%;display:block;}
+.ts-mo .ts-namebox .sigline{border-bottom:1px solid #111;min-height:22px;}
+.ts-mo .ts-days{width:100%;border-collapse:collapse;font-size:8px;margin-bottom:4px;}
+.ts-mo .ts-days th,.ts-mo .ts-days td{border:1px solid #111;padding:1px 2px;text-align:center;height:16px;vertical-align:middle;}
+.ts-mo .ts-days th{background:#111;color:#fff;font-weight:700;font-size:7.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-days td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;padding-left:4px;}
+.ts-mo .ts-days img{height:14px;max-width:56px;}
+.ts-mo .ts-totals{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;margin:2px 0 4px;font-weight:700;}
+.ts-mo .ts-totals span{border-bottom:1px solid #111;min-width:64px;display:inline-block;text-align:center;}
+.ts-mo .ts-notice{font-size:7.5px;font-weight:700;text-align:center;border:1px solid #111;padding:3px 4px;margin:3px 0;line-height:1.25;text-transform:uppercase;}
+.ts-mo .ts-sandata{font-size:8px;text-align:center;margin:0 0 4px;line-height:1.25;}
+.ts-mo .ts-svccols{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-items:start;margin:0 0 3px;}
+.ts-mo .ts-svccol{min-width:0;}
+.ts-mo .ts-svcsec{margin-bottom:3px;}
+.ts-mo .ts-svcsec h3{font-size:7.5px;margin:0;letter-spacing:0.3px;background:#111;color:#fff;padding:1px 4px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-svc{width:100%;border-collapse:collapse;font-size:6.6px;table-layout:fixed;}
+.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:0 2px;height:11px;line-height:1.05;vertical-align:middle;}
+.ts-mo .ts-svc th{background:#111;color:#fff;font-weight:700;font-size:6.4px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-svc th.svc,.ts-mo .ts-svc td.svc{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:auto;}
+.ts-mo .ts-svc td.mark,.ts-mo .ts-svc th.d{text-align:center;width:14px;font-weight:700;padding:0;}
+.ts-mo .ts-other{font-size:7px;margin:1px 0 2px;}
+.ts-mo .ts-comments{border:1px solid #111;min-height:28px;padding:3px 5px;font-size:8px;margin:3px 0;}
+.ts-mo .ts-comments .lbl{font-size:7px;font-weight:700;text-transform:uppercase;margin-bottom:1px;}
+.ts-mo .ts-legal{font-size:7px;line-height:1.25;text-align:center;margin-top:4px;border-top:1px solid #111;padding-top:3px;}
 .ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
 @media(max-width:700px){
-  .ts-print-sheet{padding:14px 10px;width:100%;}
-  .ts-mo .ts-names{grid-template-columns:1fr;}
-  .ts-mo .ts-days,.ts-mo .ts-svc{font-size:8px;}
+  .ts-print-sheet{padding:10px 8px;width:100%;min-height:0;}
+  .ts-mo .ts-names,.ts-mo .ts-svccols{grid-template-columns:1fr;}
+  .ts-mo .ts-days,.ts-mo .ts-svc{font-size:7px;}
 }
-/* iOS Safari Print Options: only the sheet may print. Do not hide a parent of #tsPrintSheet.
-   Screen rules use position:fixed !important + body overflow:hidden — those blank iOS preview. */
+/* iOS Safari Print Options: show ONLY the form sheet. Overlay is static.
+   Screen rules use position:fixed + body overflow:hidden — those blank iOS preview. */
 @media print{
   html,body,body.ts-print-open,html.ts-printing,html.ts-printing body{
     background:#fff !important;
@@ -319,8 +321,10 @@ body.ts-print-open{overflow:hidden;}
     left:auto !important;
     margin:0 !important;
     padding:0 !important;
+    visibility:visible !important;
   }
-  body > *:not(#tsPrintOverlay){display:none !important;}
+  /* Hide every body child except the print sheet (reparented) or its overlay host. */
+  body > *:not(#tsPrintSheet):not(#tsPrintOverlay){display:none !important;visibility:hidden !important;}
   .no-print,.ts-print-toolbar,#tsPrintToolbar,.sidebar,.modal-bg,#pwaBanner,.screen,
   #tsPrintOverlay .no-print,
   #tsPrintOverlay .ts-print-toolbar,
@@ -373,19 +377,25 @@ body.ts-print-open{overflow:hidden;}
     overflow:visible !important;
     height:auto !important;
   }
+  html.ts-printing body > #tsPrintSheet,
   #tsPrintSheet,.ts-print-sheet,.ts-mo,.ts-mo *{
     visibility:visible !important;
   }
+  html.ts-printing body > #tsPrintSheet,
   #tsPrintSheet,.ts-print-sheet{
+    display:block !important;
     box-shadow:none !important;
     width:100% !important;
     max-width:none !important;
+    min-height:0 !important;
     padding:0 !important;
+    margin:0 !important;
     position:static !important;
     overflow:visible !important;
     background:#fff !important;
+    color:#111 !important;
   }
-  @page{size:letter;margin:0.5in;}
+  @page{size:letter;margin:0.35in;}
 }
 
 /* Inservice assign: Assign to all + Choose aides */
@@ -1478,14 +1488,46 @@ const AGENCY={
   cityLine:'Cleveland, OH 44129',
   phone:'(216) 377-5991'
 };
+/* Exact TimesheetArchive.gs SVC_* task lists (full paper checklist, not the condensed caregiver subset). */
+const SVC_PERSONAL_CARE=['Bed Bath','Assist w/chair bath','Tub Bath','Shower','Shower w/chair','Shampoo hair','Hair care/Comb','Oral care','Skin Care','Pericare','Nail Care','Shave','Assist w/dressing','Med. Reminders'];
+const SVC_ELIMINATION=['Assist w/bed pan/urinal','Assist w/BSC','Incontinence Care','Empty drainage bag','Empty Colostomy Bag','Record bowel movement','Catheter Care'];
+const SVC_HOUSEHOLD=['Make Bed','Change Linen','Light housekeeping','Tidy Work Area/Trash Removal','Clear Pathways','Laundry','Sweep/Wet Mop','Dusting/Vacuum','Dishes','Refrigerator','Bathroom (Toilet, Tub, Sink)','Grocery Shopping','Other (specify)'];
+const SVC_MOBILITY=['Dangle side of bed','Turn & position','Assist w/transfer','Range of Motion','Assist w/ambulation','Equipment care','Walker/Wheelchair/Crutches','Bedbound','Encourage Deep Breathing'];
+const SVC_TREATMENTS=['Medication Reminder (Verbal)','Prescription Pick Up'];
+const SVC_NUTRITION=['Meal set up','Assist w/feeding','Diet','Meal Prep. (B/L/D)','Encourage Fluids'];
 const PAPER_SERVICES=[
-  {n:'PERSONAL CARE',items:['Assist W/Bath-Bed/Tub/Shower','Hair Care/Shampoo','Shave','Skin Care','Nail Care/Foot Care','Oral Care/Denture Care','Assist W/Dressing']},
-  {n:'ELIMINATION',items:['Bedpan/Urinal/Bedside Commode/Foley','Cath. Care','Incontinence/Perineal Care','Empty Drainage Bag','Empty Colostomy Bag']},
-  {n:'HOUSEHOLD SERVICES',items:['Make Bed/Change Linen','Tidy Work Area/Trash Removal','Clear Pathways','Laundry','Sweep/Wet Mop','Dusting/Vacuum','Dishes','Refrigerator','Bathroom (Toilet, Tub, Sink)','Grocery Shopping','Other (specify)']},
-  {n:'MOBILITY',items:['Dangle','Transfer Chair/Commode/Bed','Assist W/Ambulation','Walker/Wheelchair/Crutches','Bedbound','Turn & Position','Encourage Deep Breathing']},
-  {n:'TREATMENTS',items:['Medication Reminder (Verbal)','Prescription Pick Up']},
-  {n:'NUTRITION',items:['Diet','Meal Prep. (B/L/D)','Assist W/ Feeding','Encourage Fluids']}
+  {n:'PERSONAL CARE',items:SVC_PERSONAL_CARE},
+  {n:'HOUSEHOLD SERVICES',items:SVC_HOUSEHOLD},
+  {n:'ELIMINATION',items:SVC_ELIMINATION},
+  {n:'MOBILITY',items:SVC_MOBILITY},
+  {n:'TREATMENTS',items:SVC_TREATMENTS},
+  {n:'NUTRITION',items:SVC_NUTRITION}
 ];
+const PAPER_SVC_LEFT=['PERSONAL CARE','HOUSEHOLD SERVICES'];
+const PAPER_SVC_RIGHT=['ELIMINATION','MOBILITY','TREATMENTS','NUTRITION'];
+/* Map condensed caregiver / archive aliases onto the full TimesheetArchive rows. */
+const SVC_MARK_ALIASES={
+  assistwbathtubshower:['bedbath','assistwchairbath','tubbath','shower','showerwchair'],
+  haircareshampoo:['shampoohair','haircarecomb'],
+  oralcaredenturecare:['oralcare'],
+  nailcarefootcare:['nailcare'],
+  assistwdressing:['assistwdressing'],
+  bedpanurinalbedsidecommodelfoley:['assistwbedpanurinal','assistwbsc','cathetercare'],
+  cathcare:['cathetercare'],
+  incontinenceperinealcare:['incontinencecare','pericare'],
+  emptydrainagebag:['emptydrainagebag'],
+  emptycolostomybag:['emptydrainagebag'],
+  makebedchangelinen:['makebed','changelinen'],
+  tidyworkareatrashremoval:['lighthousekeeping','tidyworkareatrashremoval'],
+  dangle:['danglesideofbed'],
+  transferchaircommodedbed:['assistwtransfer'],
+  assistwambulation:['assistwambulation'],
+  walkerwheelchaircrutches:['equipmentcare'],
+  turnposition:['turnposition'],
+  medicationreminderverbal:['medreminders'],
+  mealprepbld:['mealsetup'],
+  assistwfeeding:['assistwfeeding']
+};
 const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
 const SIG_REQUIRED_MSG='Client and HHA signatures are required';
 const FT_PER_MI=5280;
@@ -1701,7 +1743,13 @@ function dayHasPaperService(d,label){
   if(!t)return false;
   return svcs.some(s=>{
     const x=paperSvcKey(s);
-    return x===t||(x.length>4&&t.indexOf(x)!==-1)||(t.length>4&&x.indexOf(t)!==-1);
+    if(!x)return false;
+    if(x===t)return true;
+    const mapped=SVC_MARK_ALIASES[x];
+    if(mapped&&mapped.indexOf(t)!==-1)return true;
+    if(x.length>6&&t.indexOf(x)!==-1)return true;
+    if(t.length>6&&x.indexOf(t)!==-1)return true;
+    return false;
   });
 }
 function formatHrsDisplay(hrs){
@@ -2501,11 +2549,28 @@ function deleteRec(){
   quickDelete(currentRec.id);closeModal('detailModal');currentRec=null;
 }
 
+function buildPaperSvcSection(sec,days,otherSpecify){
+  const head=PAPER_DAY_LETTERS.map((L,i)=>`<th class="d" title="${DAYS[i]}">${L}</th>`).join('');
+  const rows=sec.items.map(label=>{
+    const marks=PRINT_DAYS.map(i=>{
+      const d=dayEntry(days,i);
+      return `<td class="mark">${dayHasPaperService(d,label)?'✓':''}</td>`;
+    }).join('');
+    return `<tr><td class="svc">${escapePrint(label)}</td>${marks}</tr>`;
+  }).join('');
+  let extra='';
+  if(sec.n==='HOUSEHOLD SERVICES'&&otherSpecify){
+    extra=`<div class="ts-other">Other (specify): ${escapePrint(otherSpecify)}</div>`;
+  }
+  return `<div class="ts-svcsec"><h3>${escapePrint(sec.n)}</h3>
+    <table class="ts-svc"><thead><tr><th class="svc">Service</th>${head}</tr></thead><tbody>${rows}</tbody></table>${extra}</div>`;
+}
+
 function buildMoTimesheetHTML(r){
   const days=r.days||{};
   let hdrAide=hasSigInk(r.aideSig)?r.aideSig:'';
   let hdrClient=hasSigInk(r.clientSig)?r.clientSig:'';
-  let regular=0, travel=0, otherSpecify='';
+  let regular=0, otherSpecify='';
   const dayRows=PRINT_DAYS.map(i=>{
     const d=dayEntry(days,i);
     const aideSig=resolveDayInk(i,'aide',r)||d.aideSig||'';
@@ -2515,10 +2580,8 @@ function buildMoTimesheetHTML(r){
     if(d.otherSpecify)otherSpecify=d.otherSpecify;
     const hrsVal=d.hrs||d.hours||'';
     const hrs=hrsToDecimal(hrsVal);
-    const tr=Number(d.travelHrs||d.travelHours||0)||0;
     const worked=isWorkedDay(d);
     if(worked)regular+=hrs;
-    travel+=tr;
     const aideImg=hasSigInk(aideSig)?`<img src="${aideSig}" alt="HHA signature">`:'';
     const clientImg=hasSigInk(clientSig)?`<img src="${clientSig}" alt="Client signature">`:'';
     return `<tr>
@@ -2531,25 +2594,10 @@ function buildMoTimesheetHTML(r){
       <td>${clientImg}</td>
     </tr>`;
   }).join('');
-  const recTravel=Number(r.travelHrs||r.travelHours||0)||0;
-  if(recTravel&&!travel)travel=recTravel;
   const totalWeekly=(r.totalHrs&&r.totalHrs!=='0:00'&&r.totalHrs!=='—')?r.totalHrs:formatHrsDisplay(regular);
-  const svcHtml=PAPER_SERVICES.map(sec=>{
-    const head=PAPER_DAY_LETTERS.map((L,i)=>`<th title="${DAYS[i]}">${L}</th>`).join('');
-    const rows=sec.items.map(label=>{
-      const marks=PRINT_DAYS.map(i=>{
-        const d=dayEntry(days,i);
-        return `<td class="mark">${dayHasPaperService(d,label)?'✓':''}</td>`;
-      }).join('');
-      return `<tr><td class="svc">${escapePrint(label)}</td>${marks}</tr>`;
-    }).join('');
-    let extra='';
-    if(sec.n==='HOUSEHOLD SERVICES'&&otherSpecify){
-      extra=`<div class="ts-other">Other (specify): ${escapePrint(otherSpecify)}</div>`;
-    }
-    return `<div class="ts-svcsec"><h3>${escapePrint(sec.n)}</h3>
-      <table class="ts-svc"><thead><tr><th>Service</th>${head}</tr></thead><tbody>${rows}</tbody></table>${extra}</div>`;
-  }).join('');
+  const byName=n=>PAPER_SERVICES.find(s=>s.n===n);
+  const leftHtml=PAPER_SVC_LEFT.map(n=>buildPaperSvcSection(byName(n),days,otherSpecify)).join('');
+  const rightHtml=PAPER_SVC_RIGHT.map(n=>buildPaperSvcSection(byName(n),days,otherSpecify)).join('');
   const aideHdr=hasSigInk(hdrAide)?`<img src="${hdrAide}" alt="Caregiver signature">`:'<div class="sigline"></div>';
   const clientHdr=hasSigInk(hdrClient)?`<img src="${hdrClient}" alt="Client signature">`:'<div class="sigline"></div>';
   const notes=String(r.notes||'').trim();
@@ -2590,11 +2638,13 @@ function buildMoTimesheetHTML(r){
     </table>
     <div class="ts-totals">
       <div>Total Weekly Hours: <span>${escapePrint(totalWeekly)}</span></div>
-      ${travel?`<div>Total Travel Hours: <span>${formatHrsDec(travel)}</span></div>`:''}
     </div>
     <div class="ts-notice">Notify EverCare Home Agency at ${escapePrint(AGENCY.phone)} of any significant change in condition — hospitalization, falls, hours change, etc.</div>
     <p class="ts-sandata">Don't forget to clock in and out on Sandata — make sure your Sandata times match this timesheet.</p>
-    ${svcHtml}
+    <div class="ts-svccols">
+      <div class="ts-svccol">${leftHtml}</div>
+      <div class="ts-svccol">${rightHtml}</div>
+    </div>
     <div class="ts-comments"><div class="lbl">Comments</div>${escapePrint(notes||' ')}</div>
     <div class="ts-legal">
       Timesheets due by <strong>5:00 PM every Monday</strong>, no exceptions. Full legal signatures only — no scratch-outs or white-out; correct errors with a single line-through, initialed.<br>
@@ -2657,12 +2707,20 @@ function openTimesheetPrint(r){
 
 function printTimesheetSheet(){
   const overlay=document.getElementById('tsPrintOverlay');
-  if(!overlay||!overlay.classList.contains('show'))return;
+  const sheet=document.getElementById('tsPrintSheet');
+  if(!overlay||!overlay.classList.contains('show')||!sheet)return;
   unlockBodyForPrint();
+  const parent=sheet.parentNode;
+  const next=sheet.nextSibling;
+  document.body.appendChild(sheet);
   let finished=false;
   const done=()=>{
     if(finished)return;
     finished=true;
+    if(parent){
+      if(next)parent.insertBefore(sheet,next);
+      else parent.appendChild(sheet);
+    }
     restoreBodyAfterPrint();
     window.removeEventListener('afterprint',done);
   };
@@ -2679,13 +2737,74 @@ function printTS(){
   openTimesheetPrint(currentRec);
 }
 
+function sampleSigPng(label){
+  const c=document.createElement('canvas');
+  c.width=220;c.height=48;
+  const ctx=c.getContext('2d');
+  ctx.strokeStyle='#1a2744';
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(8,30);
+  ctx.quadraticCurveTo(50,8,90,28);
+  ctx.quadraticCurveTo(130,46,210,18);
+  ctx.stroke();
+  ctx.font='italic 13px "Times New Roman",serif';
+  ctx.fillStyle='#1a2744';
+  ctx.fillText(label||'',12,44);
+  return c.toDataURL('image/png');
+}
+function buildPrintSampleRecord(){
+  const aide=sampleSigPng('A. Hassaman');
+  const client=sampleSigPng('R. Coleman');
+  const days={};
+  const rows=[
+    {i:0,date:'2026-09-13',tin:'08:00',tout:'12:00',hrs:'4:00',svcs:['Bed Bath','Shampoo hair','Assist w/dressing','Make Bed','Assist w/ambulation','Meal set up']},
+    {i:1,date:'2026-09-14',tin:'08:00',tout:'14:00',hrs:'6:00',svcs:['Shower','Oral care','Change Linen','Laundry','Turn & position','Assist w/feeding']},
+    {i:2,date:'2026-09-15',tin:'',tout:'',hrs:'',svcs:[]},
+    {i:3,date:'2026-09-16',tin:'09:00',tout:'13:00',hrs:'4:00',svcs:['Skin Care','Nail Care','Light housekeeping','Dishes','Medication Reminder (Verbal)','Encourage Fluids']},
+    {i:4,date:'2026-09-17',tin:'08:00',tout:'12:00',hrs:'4:00',svcs:['Assist w/chair bath','Pericare','Bathroom (Toilet, Tub, Sink)','Assist w/BSC','Range of Motion']},
+    {i:5,date:'2026-09-18',tin:'',tout:'',hrs:'',svcs:[]},
+    {i:6,date:'2026-09-19',tin:'',tout:'',hrs:'',svcs:[]}
+  ];
+  rows.forEach(row=>{
+    const worked=!!row.tin;
+    days[row.i]={
+      date:row.date,tin:row.tin,tout:row.tout,hrs:row.hrs||'—',
+      svcs:row.svcs,aideSig:worked?aide:'',clientSig:worked?client:''
+    };
+  });
+  return {
+    id:'print-sample',
+    clientName:'Ruth Coleman',
+    empName:'Aminila Hassaman',
+    weekStart:'2026-09-13',
+    svcType:'Personal Care',
+    totalHrs:'18:00',
+    notes:'Client requested extra laundry Thursday.',
+    aideSig:aide,
+    clientSig:client,
+    days
+  };
+}
+function renderAdminPrintSample(){
+  const r=buildPrintSampleRecord();
+  currentRec=r;
+  openTimesheetPrint(r);
+  return r;
+}
+document.addEventListener('DOMContentLoaded',function(){
+  if(/[?&]printSample=1(?:&|$)/.test(location.search||'')){
+    renderAdminPrintSample();
+  }
+});
+
 async function downloadTSPDF(){
   if(!currentRec)return;
   if(!requireTimesheetSignatures(currentRec))return;
   const r=currentRec;
   showTempMsg('Generating PDF, please wait...','var(--teal)');
   const container=document.createElement('div');
-  container.style.cssText='position:fixed;left:-9999px;top:0;width:850px;background:white;padding:24px;';
+  container.style.cssText='position:fixed;left:-9999px;top:0;width:8.5in;background:white;padding:0.28in 0.32in;';
   container.innerHTML=buildMoTimesheetHTML(r);
   document.body.appendChild(container);
   try{
