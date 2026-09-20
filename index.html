@@ -1387,63 +1387,141 @@ const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturda
 const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Mo paper form
 const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
 const SIG_REQUIRED_MSG='Client and HHA signatures are required';
-function formatDistanceMiles(distanceFt){
-  const ft=Number(distanceFt);
-  if(!isFinite(ft))return 'unknown distance';
-  const mi=ft/5280;
+const FT_PER_MI=5280;
+function resolveDistanceMiles(d){
+  if(d==null||d==='')return NaN;
+  if(typeof d==='object'){
+    if(d.distanceMi!=null&&d.distanceMi!==''){
+      const mi=Number(d.distanceMi);
+      if(isFinite(mi))return mi;
+    }
+    if(d.distanceFt!=null&&d.distanceFt!==''){
+      const ft=Number(d.distanceFt);
+      if(isFinite(ft))return ft/FT_PER_MI;
+    }
+    return NaN;
+  }
+  const n=Number(d);
+  return isFinite(n)?n/FT_PER_MI:NaN;
+}
+function formatDistanceMiles(d){
+  const mi=resolveDistanceMiles(d);
+  if(!isFinite(mi))return 'unknown distance';
   return mi.toFixed(2)+' mi';
 }
-function hasSigInk(sig){
-  return !!(sig&&String(sig).length>100);
+function dayHasDistance(d){
+  return !!(d&&((d.distanceMi!=null&&d.distanceMi!=='')||(d.distanceFt!=null&&d.distanceFt!=='')));
 }
-function resolveDayInk(i,role){
-  const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
-  const pad=adminSigPads[padId];
-  if(pad&&pad.hasData){
-    const c=document.getElementById(padId);
-    if(c)return c.toDataURL();
+let _tsBlankPngMax=0;
+function tsBlankPngMax(){
+  if(_tsBlankPngMax)return _tsBlankPngMax;
+  let max=400;
+  try{
+    if(typeof document!=='undefined'){
+      [[1,1],[200,60],[280,60],[300,150],[400,150]].forEach(([w,h])=>{
+        const c=document.createElement('canvas');
+        c.width=w;c.height=h;
+        const n=c.toDataURL('image/png').length;
+        if(n>max)max=n;
+        const ctx=c.getContext('2d');
+        if(ctx){
+          ctx.fillStyle='#ffffff';
+          ctx.fillRect(0,0,w,h);
+          const wlen=c.toDataURL('image/png').length;
+          if(wlen>max)max=wlen;
+        }
+      });
+    }
+  }catch(e){}
+  _tsBlankPngMax=max;
+  return _tsBlankPngMax;
+}
+function hasSigInk(sig){
+  if(!sig)return false;
+  const s=String(sig);
+  if(s.indexOf('data:image')!==0)return false;
+  // Blank canvas toDataURL is often >100 chars; require ink well above an empty pad.
+  return s.length>tsBlankPngMax()+800;
+}
+function canvasHasInk(c){
+  if(!c)return false;
+  try{
+    const img=c.getContext('2d').getImageData(0,0,c.width||1,c.height||1).data;
+    let ink=0;
+    for(let i=3;i<img.length;i+=4){
+      if(img[i]>15){ink++;if(ink>16)return true;}
+    }
+  }catch(e){
+    try{return hasSigInk(c.toDataURL('image/png'));}catch(e2){return false;}
   }
-  const d=((currentRec&&currentRec.days)||{})[i]||{};
+  return false;
+}
+function dayEntry(days,i){
+  if(!days)return {};
+  return days[i]||days[String(i)]||{};
+}
+function resolveDayInk(i,role,rec){
+  const r=rec||currentRec;
+  if(r===currentRec&&typeof document!=='undefined'){
+    const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
+    const pad=typeof adminSigPads!=='undefined'?adminSigPads[padId]:null;
+    if(pad&&pad.hasData){
+      const c=document.getElementById(padId);
+      if(c&&canvasHasInk(c)){try{return c.toDataURL();}catch(e){}}
+    }
+  }
+  const d=dayEntry((r&&r.days)||{},i);
   return role==='aide'?(d.aideSig||''):(d.clientSig||'');
 }
 function isWorkedDay(d){
-  return !!(d&&(d.tin||d.tout||(d.hrs&&d.hrs!=='—')));
+  return !!(d&&(d.tin||d.tout||d.in||d.out||(d.hrs&&d.hrs!=='—')||(d.hours&&d.hours!=='—')));
+}
+function dayHasInk(rec,i,role){
+  const r=rec||currentRec;
+  if(r===currentRec&&typeof document!=='undefined'){
+    const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
+    if(canvasHasInk(document.getElementById(padId)))return true;
+  }
+  const d=dayEntry((r&&r.days)||{},i);
+  return hasSigInk(role==='aide'?d.aideSig:d.clientSig);
 }
 function timesheetInkStatus(rec){
   const r=rec||currentRec;
   const days=(r&&r.days)||{};
   let aide=false,client=false,worked=0,missing=0;
   DAYS.forEach((_,i)=>{
-    const d=days[i]||{};
+    const d=dayEntry(days,i);
     if(!isWorkedDay(d))return;
     worked++;
-    const aInk=hasSigInk(resolveDayInk(i,'aide')||d.aideSig);
-    const cInk=hasSigInk(resolveDayInk(i,'client')||d.clientSig);
+    const aInk=dayHasInk(r,i,'aide');
+    const cInk=dayHasInk(r,i,'client');
     if(aInk)aide=true;
     if(cInk)client=true;
     if(!aInk||!cInk)missing++;
   });
-  // Ace lock: aideSig + clientSig PNG ink on each worked day
+  // Ace lock: aideSig + clientSig PNG ink on each worked day. Zero worked days cannot print.
   return {aide,client,worked,missing,ok:worked>0&&missing===0&&aide&&client};
 }
-function requireTimesheetSignatures(){
-  const st=timesheetInkStatus();
+function requireTimesheetSignatures(rec){
+  const st=timesheetInkStatus(rec);
   if(st.ok)return true;
   showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');
-  const tbl=document.querySelector('#detailBody .hours-tbl');
-  if(tbl)tbl.scrollIntoView({behavior:'smooth',block:'center'});
+  if(typeof document!=='undefined'){
+    const tbl=document.querySelector('#detailBody .hours-tbl');
+    if(tbl)tbl.scrollIntoView({behavior:'smooth',block:'center'});
+  }
   return false;
 }
 function collectTimesheetSignatures(){
   if(!currentRec)return;
-  if(!requireTimesheetSignatures())return;
+  if(!requireTimesheetSignatures(currentRec))return;
   showTempMsg('Client and HHA signatures are on file. Ready to print.','var(--success)');
 }
 function gpsDistanceUi(d){
   if(!d)return '';
-  if(d.distanceFt!=null&&d.distanceFt!==''){
+  if(dayHasDistance(d)){
     const col=d.verified===true?'var(--success)':'var(--danger)';
-    return '<span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d.distanceFt)+' from client</span>';
+    return '<span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d)+' from client</span>';
   }
   if(d.verified===true)return '<span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
   return '';
@@ -1496,7 +1574,7 @@ const ACT=['Dangle side of bed','Turn & position','Assist w/transfer','Range of 
 const HH=['Make Bed','Change Linen','Light housekeeping'];
 const NUT=['Meal set up','Assist w/feeding'];
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
-let allRecords=[],currentRec=null,adminSigPads={};
+var allRecords=[],currentRec=null,adminSigPads={};
 let allBackupRecords=[],currentBackupRec=null;
 
 const GAS_HEADERS={'Content-Type':'text/plain;charset=utf-8'};
@@ -1844,7 +1922,9 @@ async function renderTimesheets(){
 
 function openTimesheetPdf(id){
   const r=allRecords.find(x=>String(x.id)===String(id));
-  const url=(r&&(r.pdfLink||'')).trim();
+  if(!r){showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');return;}
+  if(!requireTimesheetSignatures(r))return;
+  const url=(r.pdfLink||'').trim();
   if(!url){alert('No archived PDF yet for this timesheet.');return;}
   window.open(url,'_blank','noopener');
 }
@@ -1977,15 +2057,15 @@ function viewBackup(id){
     if(!d)return;
     const tin=d.tin||d.in||'—';
     const tout=d.tout||d.out||'—';
-    const aideSigHTML=d.aideSig&&d.aideSig.length>100?`<img src="${d.aideSig}" class="sig-mini">`:'—';
-    const clientSigHTML=d.clientSig&&d.clientSig.length>100?`<img src="${d.clientSig}" class="sig-mini">`:'—';
+    const aideSigHTML=hasSigInk(d.aideSig)?`<img src="${d.aideSig}" class="sig-mini">`:'—';
+    const clientSigHTML=hasSigInk(d.clientSig)?`<img src="${d.clientSig}" class="sig-mini">`:'—';
     dayRows+=`<tr>
       <td><strong>${day}</strong></td>
       <td>${d.date||'—'}</td>
       <td>${tin}</td>
       <td>${tout}</td>
       <td><strong>${d.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${d.location?`📍 ${d.location}${gpsDistanceUi(d)}`:'—'}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${(d.location||dayHasDistance(d))?`${d.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}`:'—'}</td>
       <td>${aideSigHTML}</td>
       <td>${clientSigHTML}</td>
       <td style="font-size:0.7rem;max-width:160px">${(d.svcs||[]).join(', ')||'—'}</td>
@@ -2051,17 +2131,18 @@ function buildDetailBody(){
   let dayRows='';
   adminSigPads={};
   DAYS.forEach((day,i)=>{
-    const d=days[i];
+    const d=days[i]||days[String(i)];
     if(!d&&!Object.keys(days).length)return;
-    const aideSigHTML=d?.aideSig&&d.aideSig.length>100?`<img src="${d.aideSig}" class="sig-mini"><br>`:''
-    const clientSigHTML=d?.clientSig&&d.clientSig.length>100?`<img src="${d.clientSig}" class="sig-mini"><br>`:''
+    const aideSigHTML=hasSigInk(d?.aideSig)?`<img src="${d.aideSig}" class="sig-mini"><br>`:''
+    const clientSigHTML=hasSigInk(d?.clientSig)?`<img src="${d.clientSig}" class="sig-mini"><br>`:''
+    const locCell=(d&&(d.location||dayHasDistance(d)||(d.lat&&d.lng)))?`${d.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}${d.lat&&d.lng?`<br><button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—';
     dayRows+=`<tr>
       <td><strong>${day}</strong></td>
       <td>${d?.date||'—'}</td>
       <td><input class="edit-f" id="ei_in_${i}" value="${d?.tin||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td><input class="edit-f" id="ei_out_${i}" value="${d?.tout||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td id="ei_hrs_${i}"><strong>${d?.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${d?.location?`📍 ${d.location}${gpsDistanceUi(d)}<br>${d.lat&&d.lng?`<button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—'}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${locCell}</td>
       <td>
         ${aideSigHTML}
         <canvas class="sig-canvas" id="asig_aide_${i}" height="60" title="Draw new aide signature"></canvas>
@@ -2152,15 +2233,17 @@ async function showLocationMap(dayIndex){
 
   const aideLat=parseFloat(d.lat), aideLng=parseFloat(d.lng);
 
-  // Status banner
+  // Status banner — miles primary (distanceMi, else distanceFt/5280)
   const banner=document.getElementById('mapStatusBanner');
+  const hasDist=dayHasDistance(d);
+  const distLabel=hasDist?formatDistanceMiles(d):'';
   if(d.verified===true){
     banner.style.background='#e8f8f0';banner.style.color='var(--success)';
-    const vMi=(d.distanceFt!=null&&d.distanceFt!=='')?' ('+formatDistanceMiles(d.distanceFt)+')':'';
+    const vMi=hasDist?' ('+distLabel+')':'';
     banner.textContent='✅ Verified — Aide was at the client\'s home when this day was saved.'+vMi;
   }else if(d.verified===false){
     banner.style.background='#fde8e8';banner.style.color='var(--danger)';
-    banner.textContent='❌ Not Verified — Aide was approximately '+formatDistanceMiles(d.distanceFt)+' from the client\'s registered address.';
+    banner.textContent='❌ Not Verified — Aide was approximately '+distLabel+' from the client\'s registered address.';
   }else{
     banner.style.background='#f5f8fc';banner.style.color='var(--muted)';
     banner.textContent='⚠️ No client address on file to compare against — showing aide\'s location only.';
@@ -2389,13 +2472,13 @@ function openTimesheetPrint(r){
 
 function printTS(){
   if(!currentRec)return;
-  if(!requireTimesheetSignatures())return;
+  if(!requireTimesheetSignatures(currentRec))return;
   openTimesheetPrint(currentRec);
 }
 
 async function downloadTSPDF(){
   if(!currentRec)return;
-  if(!requireTimesheetSignatures())return;
+  if(!requireTimesheetSignatures(currentRec))return;
   const r=currentRec;
   showTempMsg('Generating PDF, please wait...','var(--teal)');
   const container=document.createElement('div');
