@@ -1889,6 +1889,7 @@ function warmUpSheets(){
 
 document.addEventListener('DOMContentLoaded',function(){
   if(document.getElementById('loginScreen')?.classList.contains('active'))warmUpSheets();
+  if(typeof nciBindDateMask==='function')nciBindDateMask();
 });
 
 async function apiPost(payload){
@@ -4726,8 +4727,51 @@ var nciLastCompletePdf=null;
 
 function todayEasternMDY(){return toEasternMDY(new Date());}
 
-function nciIsMDYInput(el){
-  return !!(el&&el.tagName==='INPUT'&&el.getAttribute('data-date')==='mdy');
+// Known NCI date fields — tagged in HTML, but binding is delegated (not ID-list-only).
+const NCI_MDY_IDS=[
+  'nci_a_socDate','nci_a_clientSignatureDate','nci_a_agencySignatureDate',
+  'nci_p_dateOfBirth','nci_p_socDate','nci_p_nursePocSignatureDate',
+  'nci_p_clientFamilySignatureDate','nci_p_pcaSignatureDate',
+  'nci_c_patientSignatureDate','nci_r_patientGuardianSignatureDate','nci_r_witnessSignatureDate',
+  'nci_m_clientRepSignatureDate','nci_m_agencyRepSignatureDate','nci_m_proxyAgencyRepSignDate'
+];
+function nciDateLabelText(el){
+  if(!el)return '';
+  if(el.id){
+    try{
+      const byFor=document.querySelector('label[for="'+el.id+'"]');
+      if(byFor)return byFor.textContent||'';
+    }catch(err){}
+  }
+  const field=el.closest?el.closest('.field,label'):null;
+  if(field){
+    if(field.tagName==='LABEL')return field.textContent||'';
+    const lab=field.querySelector('label');
+    if(lab)return lab.textContent||'';
+  }
+  const prev=el.previousElementSibling;
+  if(prev&&prev.tagName==='LABEL')return prev.textContent||'';
+  return '';
+}
+function nciLooksLikeDateInput(el){
+  if(!el||el.tagName!=='INPUT')return false;
+  const type=String(el.type||'text').toLowerCase();
+  if(type==='checkbox'||type==='radio'||type==='hidden'||type==='button'||type==='submit'||type==='file'||type==='password')return false;
+  if((el.getAttribute('data-date')||'')==='mdy')return true;
+  if(/MM\s*\/\s*DD\s*\/\s*YYYY/i.test(el.getAttribute('placeholder')||''))return true;
+  if(/date|dob|soc|birth/i.test((el.id||'')+' '+(el.name||'')))return true;
+  if(/date|dob|birth|\bsoc\b/i.test(nciDateLabelText(el)))return true;
+  return false;
+}
+function nciIsMDYInput(el){return nciLooksLikeDateInput(el);}
+function nciTagMDYInput(el){
+  if(!el||el.tagName!=='INPUT')return;
+  el.setAttribute('data-date','mdy');
+  el.setAttribute('inputmode','numeric');
+  el.setAttribute('maxlength','10');
+  if(!el.getAttribute('autocomplete'))el.setAttribute('autocomplete','off');
+  if(!el.getAttribute('pattern'))el.setAttribute('pattern','[0-9]{2}/[0-9]{2}/[0-9]{4}');
+  if(!el.getAttribute('placeholder'))el.setAttribute('placeholder','MM/DD/YYYY');
 }
 function nciMDYDigits(s){return String(s||'').replace(/\D/g,'').slice(0,8);}
 function formatMDYDigits(digits,addTrailing){
@@ -4766,9 +4810,17 @@ function maskMDYInput(el,e){
   }
   try{el.setSelectionRange(pos,pos);}catch(err){}
 }
+function nciApplyMDYMask(el,e){
+  if(!nciLooksLikeDateInput(el))return;
+  nciTagMDYInput(el);
+  maskMDYInput(el,e);
+  if(el._nciMdyT)clearTimeout(el._nciMdyT);
+  el._nciMdyT=setTimeout(function(){maskMDYInput(el,e);},0);
+}
 function nciMDYOnKeydown(e){
   const el=e.target;
-  if(!nciIsMDYInput(el))return;
+  if(!nciLooksLikeDateInput(el))return;
+  nciTagMDYInput(el);
   if(el.selectionStart!==el.selectionEnd)return;
   const start=el.selectionStart||0;
   if(e.key==='Backspace'&&start>0&&el.value.charAt(start-1)==='/'){
@@ -4778,16 +4830,14 @@ function nciMDYOnKeydown(e){
   }
 }
 function nciPrepareMDYInputs(root){
+  if(!root)root=nciEl('newClientIntakeModal');
   if(!root)return;
+  NCI_MDY_IDS.forEach(function(id){
+    const el=document.getElementById(id);
+    if(el)nciTagMDYInput(el);
+  });
   root.querySelectorAll('input').forEach(function(el){
-    const ph=el.getAttribute('placeholder')||'';
-    if(el.getAttribute('data-date')==='mdy'||ph==='MM/DD/YYYY'){
-      el.setAttribute('data-date','mdy');
-      el.setAttribute('inputmode','numeric');
-      el.setAttribute('maxlength','10');
-      if(!el.getAttribute('autocomplete'))el.setAttribute('autocomplete','off');
-      if(!el.getAttribute('pattern'))el.setAttribute('pattern','[0-9]{2}/[0-9]{2}/[0-9]{4}');
-    }
+    if(nciLooksLikeDateInput(el))nciTagMDYInput(el);
   });
 }
 function nciBindDateMask(){
@@ -4797,10 +4847,24 @@ function nciBindDateMask(){
   if(modal.getAttribute('data-mdy-bound')==='1')return;
   modal.setAttribute('data-mdy-bound','1');
   modal.addEventListener('keydown',function(e){
-    if(nciIsMDYInput(e.target))nciMDYOnKeydown(e);
+    if(nciLooksLikeDateInput(e.target))nciMDYOnKeydown(e);
   },true);
   modal.addEventListener('input',function(e){
-    if(nciIsMDYInput(e.target))maskMDYInput(e.target,e);
+    nciApplyMDYMask(e.target,e);
+  },true);
+  modal.addEventListener('blur',function(e){
+    nciApplyMDYMask(e.target,e);
+  },true);
+  modal.addEventListener('focusout',function(e){
+    nciApplyMDYMask(e.target,e);
+  },true);
+  modal.addEventListener('paste',function(e){
+    const el=e.target;
+    if(!nciLooksLikeDateInput(el))return;
+    setTimeout(function(){nciApplyMDYMask(el,{inputType:'insertFromPaste'});},0);
+  },true);
+  modal.addEventListener('focusin',function(e){
+    if(nciLooksLikeDateInput(e.target))nciTagMDYInput(e.target);
   },true);
 }
 
@@ -5081,6 +5145,7 @@ function nciRenderSteps(){
   const back=nciEl('nciBackBtn');const next=nciEl('nciNextBtn');
   if(back)back.disabled=nciState.step<=1;
   if(next)next.style.display=nciState.step>=5?'none':'inline-flex';
+  nciPrepareMDYInputs(nciEl('newClientIntakeModal'));
 }
 
 function nciJump(step){
@@ -5090,7 +5155,11 @@ function nciJump(step){
   nciRenderSteps();
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
-  setTimeout(()=>nciInitPageSigs(nciState.step),80);
+  nciPrepareMDYInputs(nciEl('newClientIntakeModal'));
+  setTimeout(function(){
+    nciPrepareMDYInputs(nciEl('newClientIntakeModal'));
+    nciInitPageSigs(nciState.step);
+  },80);
 }
 function nciGo(delta){nciJump(nciState.step+delta);}
 
@@ -5593,6 +5662,7 @@ function applyNewClientIntake(data){
   if(mClientInk)nciPaintSig('nci_admit_clientRepSig',mClientInk);
   if(mAgencyInk)nciPaintSig('nci_admit_agencyRepSig',mAgencyInk);
   if(mProxyInk)nciPaintSig('nci_admit_proxyAgencySig',mProxyInk);
+  nciPrepareMDYInputs(nciEl('newClientIntakeModal'));
 }
 
 async function saveNewClientIntake(status){
@@ -6349,7 +6419,7 @@ async function loadNewClientIntakeDrafts(){
 }
 
 
-window.addEventListener('load',()=>{renderBroadcastPreview();});
+window.addEventListener('load',()=>{renderBroadcastPreview();if(typeof nciBindDateMask==='function')nciBindDateMask();});
 </script>
 </body>
 </html>
