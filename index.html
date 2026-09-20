@@ -263,7 +263,7 @@ textarea{resize:vertical;min-height:80px;}
 .ts-mo .ts-sigbox img{height:36px;max-width:100%;}
 .ts-mo .ts-sigline{border-bottom:1px solid #111;height:36px;margin-bottom:6px;}
 .ts-mo .ts-sigmeta{font-size:10px;}
-.ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
+.ts-gps-mi{display:inline;margin-left:6px;font-size:0.65rem;font-weight:700;white-space:nowrap;}
 @media(max-width:700px){
   .ts-print-sheet{padding:14px 10px;width:100%;}
   .ts-mo .ts-sigs{grid-template-columns:1fr;}
@@ -1362,8 +1362,26 @@ const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturda
 const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Mo paper form
 const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
 const SIG_REQUIRED_MSG='Client and HHA signatures are required';
+function numOrNaN(v){
+  if(v==null||v==='')return NaN;
+  if(typeof v==='number')return v;
+  const m=String(v).match(/-?\d+(?:\.\d+)?/);
+  return m?Number(m[0]):NaN;
+}
+// Prefer Ace distanceMi (already miles); else distanceFt/5280. Accepts a day object or feet number.
+function resolveDistanceFt(d){
+  if(d==null||d==='')return NaN;
+  if(typeof d==='object'){
+    const mi=numOrNaN(d.distanceMi??d.distance_mi??d.DistanceMi);
+    if(isFinite(mi))return mi*5280;
+    const ft=numOrNaN(d.distanceFt??d.distance_ft??d.DistanceFt);
+    if(isFinite(ft))return ft;
+    return NaN;
+  }
+  return numOrNaN(d);
+}
 function formatDistanceMiles(distanceFt){
-  const ft=Number(distanceFt);
+  const ft=resolveDistanceFt(distanceFt);
   if(!isFinite(ft))return 'unknown distance';
   const mi=ft/5280;
   return mi.toFixed(2)+' mi';
@@ -1416,11 +1434,11 @@ function collectTimesheetSignatures(){
 }
 function gpsDistanceUi(d){
   if(!d)return '';
-  if(d.distanceFt!=null&&d.distanceFt!==''){
+  if(isFinite(resolveDistanceFt(d))){
     const col=d.verified===true?'var(--success)':'var(--danger)';
-    return '<span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d.distanceFt)+' from client</span>';
+    return ' <span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d)+' from client</span>';
   }
-  if(d.verified===true)return '<span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
+  if(d.verified===true)return ' <span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
   return '';
 }
 function serviceCodeFor(rec,day){
@@ -2036,7 +2054,7 @@ function buildDetailBody(){
       <td><input class="edit-f" id="ei_in_${i}" value="${d?.tin||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td><input class="edit-f" id="ei_out_${i}" value="${d?.tout||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td id="ei_hrs_${i}"><strong>${d?.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${d?.location?`📍 ${d.location}${gpsDistanceUi(d)}<br>${d.lat&&d.lng?`<button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—'}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${d?.location?`📍 ${d.location}<br>${d.lat&&d.lng?`<button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}${gpsDistanceUi(d)}`:'—'}</td>
       <td>
         ${aideSigHTML}
         <canvas class="sig-canvas" id="asig_aide_${i}" height="60" title="Draw new aide signature"></canvas>
@@ -2131,11 +2149,11 @@ async function showLocationMap(dayIndex){
   const banner=document.getElementById('mapStatusBanner');
   if(d.verified===true){
     banner.style.background='#e8f8f0';banner.style.color='var(--success)';
-    const vMi=(d.distanceFt!=null&&d.distanceFt!=='')?' ('+formatDistanceMiles(d.distanceFt)+')':'';
+    const vMi=isFinite(resolveDistanceFt(d))?' ('+formatDistanceMiles(d)+')':'';
     banner.textContent='✅ Verified — Aide was at the client\'s home when this day was saved.'+vMi;
   }else if(d.verified===false){
     banner.style.background='#fde8e8';banner.style.color='var(--danger)';
-    banner.textContent='❌ Not Verified — Aide was approximately '+formatDistanceMiles(d.distanceFt)+' from the client\'s registered address.';
+    banner.textContent='❌ Not Verified — Aide was approximately '+formatDistanceMiles(d)+' from the client\'s registered address.';
   }else{
     banner.style.background='#f5f8fc';banner.style.color='var(--muted)';
     banner.textContent='⚠️ No client address on file to compare against — showing aide\'s location only.';
