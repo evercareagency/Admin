@@ -1381,16 +1381,25 @@ function resolveDayInk(i,role){
   const d=((currentRec&&currentRec.days)||{})[i]||{};
   return role==='aide'?(d.aideSig||''):(d.clientSig||'');
 }
+function isWorkedDay(d){
+  return !!(d&&(d.tin||d.tout||(d.hrs&&d.hrs!=='—')));
+}
 function timesheetInkStatus(rec){
   const r=rec||currentRec;
-  let aide=false,client=false;
+  const days=(r&&r.days)||{};
+  let aide=false,client=false,worked=0,missing=0;
   DAYS.forEach((_,i)=>{
-    if(hasSigInk(resolveDayInk(i,'aide')))aide=true;
-    else if(r&&r.days&&hasSigInk((r.days[i]||{}).aideSig))aide=true;
-    if(hasSigInk(resolveDayInk(i,'client')))client=true;
-    else if(r&&r.days&&hasSigInk((r.days[i]||{}).clientSig))client=true;
+    const d=days[i]||{};
+    if(!isWorkedDay(d))return;
+    worked++;
+    const aInk=hasSigInk(resolveDayInk(i,'aide')||d.aideSig);
+    const cInk=hasSigInk(resolveDayInk(i,'client')||d.clientSig);
+    if(aInk)aide=true;
+    if(cInk)client=true;
+    if(!aInk||!cInk)missing++;
   });
-  return {aide,client,ok:aide&&client};
+  // Ace lock: aideSig + clientSig PNG ink on each worked day
+  return {aide,client,worked,missing,ok:worked>0&&missing===0&&aide&&client};
 }
 function requireTimesheetSignatures(){
   const st=timesheetInkStatus();
