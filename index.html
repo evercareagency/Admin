@@ -1385,29 +1385,7 @@ const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Mo paper form
 const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
-const SIG_REQUIRED_MSG='Client and HHA signatures are required.';
-let _tsBlankPngMax=0;
-function tsBlankPngMax(){
-  if(_tsBlankPngMax)return _tsBlankPngMax;
-  let max=400;
-  try{
-    [[1,1],[200,60],[280,60],[300,150],[400,150]].forEach(([w,h])=>{
-      const c=document.createElement('canvas');
-      c.width=w;c.height=h;
-      const n=c.toDataURL('image/png').length;
-      if(n>max)max=n;
-      const ctx=c.getContext('2d');
-      if(ctx){
-        ctx.fillStyle='#ffffff';
-        ctx.fillRect(0,0,w,h);
-        const wlen=c.toDataURL('image/png').length;
-        if(wlen>max)max=wlen;
-      }
-    });
-  }catch(e){}
-  _tsBlankPngMax=max;
-  return _tsBlankPngMax;
-}
+const SIG_REQUIRED_MSG='Client and HHA signatures are required';
 function formatDistanceMiles(distanceFt){
   const ft=Number(distanceFt);
   if(!isFinite(ft))return 'unknown distance';
@@ -1415,75 +1393,40 @@ function formatDistanceMiles(distanceFt){
   return mi.toFixed(2)+' mi';
 }
 function hasSigInk(sig){
-  if(!sig)return false;
-  const s=String(sig);
-  if(s.indexOf('data:image')!==0)return false;
-  // Blank canvas toDataURL is often >100 chars; require real ink well above an empty pad.
-  return s.length>tsBlankPngMax()+800;
+  return !!(sig&&String(sig).length>100);
 }
-function dayEntry(days,i){
-  if(!days)return {};
-  return days[i]||days[String(i)]||{};
-}
-function adminPadHasInk(padId){
-  const pad=typeof adminSigPads!=='undefined'?adminSigPads[padId]:null;
-  if(!pad||!pad.hasData)return false;
-  const c=document.getElementById(padId);
-  if(!c)return false;
-  try{
-    const img=c.getContext('2d').getImageData(0,0,c.width||1,c.height||1).data;
-    let ink=0;
-    for(let i=3;i<img.length;i+=4){
-      if(img[i]>15){ink++;if(ink>16)return true;}
-    }
-  }catch(e){
-    try{return hasSigInk(c.toDataURL('image/png'));}catch(e2){return false;}
+function resolveDayInk(i,role){
+  const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
+  const pad=adminSigPads[padId];
+  if(pad&&pad.hasData){
+    const c=document.getElementById(padId);
+    if(c)return c.toDataURL();
   }
-  return false;
-}
-function resolveDayInk(i,role,rec){
-  const r=rec||currentRec;
-  if(r===currentRec){
-    const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
-    if(adminPadHasInk(padId)){
-      const c=document.getElementById(padId);
-      if(c){try{return c.toDataURL();}catch(e){}}
-    }
-  }
-  const d=dayEntry((r&&r.days)||{},i);
+  const d=((currentRec&&currentRec.days)||{})[i]||{};
   return role==='aide'?(d.aideSig||''):(d.clientSig||'');
 }
 function isWorkedDay(d){
-  return !!(d&&(d.tin||d.tout||d.in||d.out||(d.hrs&&d.hrs!=='—')||(d.hours&&d.hours!=='—')));
-}
-function dayHasInk(rec,i,role){
-  const r=rec||currentRec;
-  if(r===currentRec){
-    const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
-    if(adminPadHasInk(padId))return true;
-  }
-  const d=dayEntry((r&&r.days)||{},i);
-  return hasSigInk(role==='aide'?d.aideSig:d.clientSig);
+  return !!(d&&(d.tin||d.tout||(d.hrs&&d.hrs!=='—')));
 }
 function timesheetInkStatus(rec){
   const r=rec||currentRec;
   const days=(r&&r.days)||{};
   let aide=false,client=false,worked=0,missing=0;
   DAYS.forEach((_,i)=>{
-    const d=dayEntry(days,i);
+    const d=days[i]||{};
     if(!isWorkedDay(d))return;
     worked++;
-    const aInk=dayHasInk(r,i,'aide');
-    const cInk=dayHasInk(r,i,'client');
+    const aInk=hasSigInk(resolveDayInk(i,'aide')||d.aideSig);
+    const cInk=hasSigInk(resolveDayInk(i,'client')||d.clientSig);
     if(aInk)aide=true;
     if(cInk)client=true;
     if(!aInk||!cInk)missing++;
   });
-  // Ace lock: aideSig + clientSig PNG ink on each worked day. Zero worked days cannot print.
+  // Ace lock: aideSig + clientSig PNG ink on each worked day
   return {aide,client,worked,missing,ok:worked>0&&missing===0&&aide&&client};
 }
-function requireTimesheetSignatures(rec){
-  const st=timesheetInkStatus(rec);
+function requireTimesheetSignatures(){
+  const st=timesheetInkStatus();
   if(st.ok)return true;
   showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');
   const tbl=document.querySelector('#detailBody .hours-tbl');
@@ -1492,7 +1435,7 @@ function requireTimesheetSignatures(rec){
 }
 function collectTimesheetSignatures(){
   if(!currentRec)return;
-  if(!requireTimesheetSignatures(currentRec))return;
+  if(!requireTimesheetSignatures())return;
   showTempMsg('Client and HHA signatures are on file. Ready to print.','var(--success)');
 }
 function gpsDistanceUi(d){
@@ -1900,9 +1843,7 @@ async function renderTimesheets(){
 
 function openTimesheetPdf(id){
   const r=allRecords.find(x=>String(x.id)===String(id));
-  if(!r){showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');return;}
-  if(!requireTimesheetSignatures(r))return;
-  const url=(r.pdfLink||'').trim();
+  const url=(r&&(r.pdfLink||'')).trim();
   if(!url){alert('No archived PDF yet for this timesheet.');return;}
   window.open(url,'_blank','noopener');
 }
@@ -2035,8 +1976,8 @@ function viewBackup(id){
     if(!d)return;
     const tin=d.tin||d.in||'—';
     const tout=d.tout||d.out||'—';
-    const aideSigHTML=hasSigInk(d.aideSig)?`<img src="${d.aideSig}" class="sig-mini">`:'—';
-    const clientSigHTML=hasSigInk(d.clientSig)?`<img src="${d.clientSig}" class="sig-mini">`:'—';
+    const aideSigHTML=d.aideSig&&d.aideSig.length>100?`<img src="${d.aideSig}" class="sig-mini">`:'—';
+    const clientSigHTML=d.clientSig&&d.clientSig.length>100?`<img src="${d.clientSig}" class="sig-mini">`:'—';
     dayRows+=`<tr>
       <td><strong>${day}</strong></td>
       <td>${d.date||'—'}</td>
@@ -2111,17 +2052,15 @@ function buildDetailBody(){
   DAYS.forEach((day,i)=>{
     const d=days[i];
     if(!d&&!Object.keys(days).length)return;
-    const aideSigHTML=hasSigInk(d?.aideSig)?`<img src="${d.aideSig}" class="sig-mini"><br>`:''
-    const clientSigHTML=hasSigInk(d?.clientSig)?`<img src="${d.clientSig}" class="sig-mini"><br>`:''
-    const hasMiles=d&&d.distanceFt!=null&&d.distanceFt!=='';
-    const locCell=(d?.location||hasMiles)?`${d?.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}${d?.lat&&d?.lng?`<br><button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—';
+    const aideSigHTML=d?.aideSig&&d.aideSig.length>100?`<img src="${d.aideSig}" class="sig-mini"><br>`:''
+    const clientSigHTML=d?.clientSig&&d.clientSig.length>100?`<img src="${d.clientSig}" class="sig-mini"><br>`:''
     dayRows+=`<tr>
       <td><strong>${day}</strong></td>
       <td>${d?.date||'—'}</td>
       <td><input class="edit-f" id="ei_in_${i}" value="${d?.tin||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td><input class="edit-f" id="ei_out_${i}" value="${d?.tout||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td id="ei_hrs_${i}"><strong>${d?.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${locCell}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${d?.location?`📍 ${d.location}${gpsDistanceUi(d)}<br>${d.lat&&d.lng?`<button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—'}</td>
       <td>
         ${aideSigHTML}
         <canvas class="sig-canvas" id="asig_aide_${i}" height="60" title="Draw new aide signature"></canvas>
@@ -2482,13 +2421,13 @@ function openTimesheetPrint(r){
 
 function printTS(){
   if(!currentRec)return;
-  if(!requireTimesheetSignatures(currentRec))return;
+  if(!requireTimesheetSignatures())return;
   openTimesheetPrint(currentRec);
 }
 
 async function downloadTSPDF(){
   if(!currentRec)return;
-  if(!requireTimesheetSignatures(currentRec))return;
+  if(!requireTimesheetSignatures())return;
   const r=currentRec;
   showTempMsg('Generating PDF, please wait...','var(--teal)');
   const container=document.createElement('div');
