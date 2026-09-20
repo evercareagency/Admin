@@ -202,6 +202,7 @@ textarea{resize:vertical;min-height:80px;}
 .nci-radio input{width:18px;height:18px;accent-color:var(--teal);}
 .nci-draft-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .nci-draft-row:last-child{border-bottom:none;}
+.nci-pdf-pending{font-size:0.72rem;color:var(--muted);font-weight:600;}
 @media(max-width:700px){
   #newClientIntakeModal .modal.nci-modal{padding:12px 12px 0;max-width:100vw;width:100%;overflow-x:hidden;}
   .nci-head,#nciHead{flex-wrap:wrap;}
@@ -671,13 +672,35 @@ else setupEverCarePWA();
         <div class="page-hdr">
           <div><h1>Clients</h1><p>Manage client addresses and assign aides for location verification</p></div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
+            <button class="btn btn-ghost" onclick="renderClients(true);loadCompletedNewClientIntakes();">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
         </div>
         <div class="card">
           <div class="search-bar"><input type="text" id="clientSearch" placeholder="&#128269; Search clients..." oninput="paintClients()"></div>
           <div id="clientsContainer"></div>
+        </div>
+        <div class="card" id="nciCompletedAdminCard">
+          <div class="card-title"><span class="ico">📄</span> Completed intakes</div>
+          <p class="nci-hint" style="margin-bottom:10px">Nurses’ completed Open-new-client packets. View opens the archived PDF when Ace has a link; otherwise the row stays PDF pending.</p>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="nciCompletedAdminTable">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Opened</th>
+                  <th>Completed</th>
+                  <th>Status</th>
+                  <th>Nurse</th>
+                  <th>PDF</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="nciCompletedAdminBody">
+                <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading completed intakes…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -848,10 +871,12 @@ Call (216) 377-5991 with any questions.</textarea>
         <div><h2>EverCare</h2><p>Nurse Portal</p></div>
       </div>
       <div style="padding:8px 18px;background:rgba(255,255,255,0.06);font-size:0.7rem;color:rgba(255,255,255,0.7);border-bottom:1px solid rgba(255,255,255,0.1)">&#128100; Logged in as: <strong id="nurseSidebarRoleName">Nurse</strong></div>
-      <div class="nav-item active" id="nav_nurse_compliance"><span class="ni">&#9989;</span> Compliance</div>
+      <div class="nav-item active" id="nav_nurse_compliance" onclick="showNurseTab('compliance')"><span class="ni">&#9989;</span> Compliance</div>
+      <div class="nav-item" id="nav_nurse_completes" onclick="showNurseTab('completes')"><span class="ni">📄</span> Completed intakes</div>
       <div class="sidebar-bottom"><button onclick="adminLogout()">&#8592; Sign Out</button></div>
     </div>
     <div class="main-content">
+      <div id="nurseTabCompliance">
       <div class="page-hdr">
         <div>
           <h1>Supervisory Compliance</h1>
@@ -892,6 +917,41 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="card-title"><span class="ico">📝</span> Intake drafts</div>
         <p class="nci-hint" style="margin-bottom:8px">Resume a saved draft from Sheets when Ace’s list_new_client_intakes is live.</p>
         <div id="nciDraftsList"></div>
+      </div>
+      </div>
+      <div id="nurseTabCompletes" style="display:none">
+        <div class="page-hdr">
+          <div>
+            <h1>Completed intakes</h1>
+            <p>Finished Open-new-client packets — open the PDF when Ace has archived it</p>
+          </div>
+          <div class="nurse-actions">
+            <button type="button" class="btn btn-navy" onclick="openNewClientIntake()">Open new client — on-site intake visit</button>
+            <button type="button" class="btn btn-teal" onclick="loadCompletedNewClientIntakes()">&#128260; Refresh</button>
+          </div>
+        </div>
+        <div class="card" id="nciCompletedNurseCard">
+          <div class="card-title"><span class="ico">📄</span> Completed intakes</div>
+          <p class="nci-hint" style="margin-bottom:10px">Client, dates, and status from Ace <code>list_new_client_intakes</code> with status Complete. View opens <code>pdfLink</code> when present; otherwise PDF pending.</p>
+          <div style="overflow-x:auto">
+            <table class="data-table" id="nciCompletedNurseTable">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Opened</th>
+                  <th>Completed</th>
+                  <th>Status</th>
+                  <th>Nurse</th>
+                  <th>PDF</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="nciCompletedNurseBody">
+                <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading completed intakes…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1866,14 +1926,17 @@ function unlockBodyScroll(){
 function openModal(id){document.getElementById(id).classList.add('show');lockBodyScroll();}
 function closeModal(id){document.getElementById(id).classList.remove('show');if(!document.querySelector('.modal-bg.show'))unlockBodyScroll();}
 function showTab(tab){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('#adminScreen .tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#adminScreen .nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`tab_${tab}`).classList.add('active');
   document.getElementById(`nav_${tab}`).classList.add('active');
   if(tab==='aides')renderAides();
   if(tab==='backups')renderBackupRequests();
   if(tab==='broadcast')renderBroadcastPreview();
-  if(tab==='clients')renderClients();
+  if(tab==='clients'){
+    renderClients();
+    loadCompletedNewClientIntakes();
+  }
   if(tab==='inservices')renderInservices();
   if(tab==='activity')renderActivityLog();
   if(tab==='settings'){
@@ -1968,12 +2031,14 @@ async function mgrLogin(){
         if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
         // Paint Nurse home first — do not await compliance before unlocking Sign In
         showScreen('nurseScreen');
+        if(typeof showNurseTab==='function')showNurseTab('compliance');
         if(btn){btn.disabled=false;btn.textContent='Sign In →';}
         window._mgrLoginInFlight=false;
         requestAnimationFrame(function(){
           setTimeout(function(){
             loadNurseCompliance(true);
             loadNewClientIntakeDrafts();
+            loadCompletedNewClientIntakes();
             apiGetCached('get_clients').then(d=>{ if(d&&d.success) allClients=d.data||[]; }).catch(()=>{});
             apiGetCached('get_users').then(d=>{ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(u=>u.username); }).catch(()=>{});
             logActivity('Logged in (Nurse)');
@@ -1990,6 +2055,7 @@ async function mgrLogin(){
           setTimeout(function(){
             renderTimesheets();
             renderBroadcastPreview();
+            loadCompletedNewClientIntakes();
             logActivity('Logged in');
             Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
           }, 0);
@@ -4417,7 +4483,8 @@ async function viewSupervisoryVisitPdf(rowIndex){
 //     proxyAgencyRepSignatureData, proxyAgencyRepSignDate
 // *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
-// Archive: archive_new_client_intake_pdf. No CallOutcome on intake.
+// Archive: archive_new_client_intake_pdf (still stub — pdfLink may be empty).
+// List completes: list_new_client_intakes { status: "Complete" }. No CallOutcome on intake.
 
 const NCI_STEPS=[
   {n:1,label:'In person'},
@@ -5300,6 +5367,7 @@ async function saveNewClientIntake(status){
       closeNewClientIntake(true);
       showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       loadNewClientIntakeDrafts();
+      loadCompletedNewClientIntakes();
     }else{
       showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
       loadNewClientIntakeDrafts();
@@ -5380,6 +5448,142 @@ async function resumeNewClientIntake(intakeId){
     nciFail('Backend pending or unreachable. Stub action: get_new_client_intake.');
     setTimeout(()=>nciInitPageSigs(1),80);
   }
+}
+
+function showNurseTab(tab){
+  const compliance=document.getElementById('nurseTabCompliance');
+  const completes=document.getElementById('nurseTabCompletes');
+  const navC=document.getElementById('nav_nurse_compliance');
+  const navI=document.getElementById('nav_nurse_completes');
+  if(compliance)compliance.style.display=tab==='completes'?'none':'';
+  if(completes)completes.style.display=tab==='completes'?'':'none';
+  if(navC)navC.classList.toggle('active',tab!=='completes');
+  if(navI)navI.classList.toggle('active',tab==='completes');
+  if(tab==='completes')loadCompletedNewClientIntakes();
+}
+
+let nciCompletedRows=[];
+
+function nciIntakeRowsFromList(data){
+  if(!data)return [];
+  const raw=data.data||data.intakes||data.rows||data.records||[];
+  return Array.isArray(raw)?raw:(raw&&typeof raw==='object'&&!Array.isArray(raw)?[raw]:[]);
+}
+
+function nciIntakeIdOf(r){
+  if(!r)return '';
+  const v=r.intakeId!=null&&r.intakeId!==''?r.intakeId:(r.IntakeId!=null&&r.IntakeId!==''?r.IntakeId:(r.id!=null&&r.id!==''?r.id:''));
+  return v==null?'':String(v);
+}
+
+function pickIntakePdfLink(obj){
+  if(!obj)return '';
+  const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
+  const v=obj.pdfLink||obj.pdfUrl||obj.PdfLink||obj.PDFLink||obj.pdf_link||obj.PdfUrl||obj.PDFUrl||obj.archiveUrl||obj.archiveLink
+    ||(nested&&(nested.pdfLink||nested.pdfUrl||nested.PdfLink||nested.PDFLink||nested.pdf_link||nested.pdfUrl))||'';
+  return String(v||'').trim();
+}
+
+function nciIntakeOpened(r){
+  if(!r)return '';
+  return r.openedAt||r.openedDate||r.dateOpened||r.createdAt||r.created||r.startedAt||r.opened||r.socDate
+    ||(r.assessment&&(r.assessment.socDate||r.assessment.assessmentDate))||'';
+}
+
+function nciIntakeCompletedAt(r){
+  if(!r)return '';
+  return r.completedAt||r.completedDate||r.dateCompleted||r.completed||r.updatedAt||r.savedAt||'';
+}
+
+function nciIntakeClientName(r){
+  if(!r)return 'Untitled';
+  return r.clientName||(r.assessment&&r.assessment.clientName)||r.name||'Untitled';
+}
+
+function nciCompletedTableHtml(rows){
+  if(!rows.length){
+    return '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">No completed intakes yet.</td></tr>';
+  }
+  return rows.map(r=>{
+    const id=nciIntakeIdOf(r);
+    const name=escapeHtml(nciIntakeClientName(r));
+    const st=escapeHtml(r.status||'Complete');
+    const opened=escapeHtml(toEasternMDY(nciIntakeOpened(r))||'—');
+    const done=escapeHtml(toEasternMDY(nciIntakeCompletedAt(r))||'—');
+    const nurse=escapeHtml(r.nurseName||r.NurseName||r.supervisorName||'—');
+    const pdf=pickIntakePdfLink(r);
+    const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
+    return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${opened}</td>
+      <td>${done}</td>
+      <td><span class="badge badge-ok">${st}</span></td>
+      <td>${nurse}</td>
+      <td>${pdfCell}</td>
+      <td><button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${escapeAttr(id)}')">📄 View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function paintCompletedNewClientIntakes(){
+  const html=nciCompletedTableHtml(nciCompletedRows);
+  const nurseBody=document.getElementById('nciCompletedNurseBody');
+  const adminBody=document.getElementById('nciCompletedAdminBody');
+  if(nurseBody)nurseBody.innerHTML=html;
+  if(adminBody)adminBody.innerHTML=html;
+}
+
+async function loadCompletedNewClientIntakes(){
+  const nurseBody=document.getElementById('nciCompletedNurseBody');
+  const adminBody=document.getElementById('nciCompletedAdminBody');
+  const loading='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading completed intakes…</td></tr>';
+  if(nurseBody)nurseBody.innerHTML=loading;
+  if(adminBody)adminBody.innerHTML=loading;
+  try{
+    // Same Complete list for Nurse, Admin, and Scheduler — no Admin-only gate.
+    const data=await apiPost({action:'list_new_client_intakes',status:'Complete'});
+    let rows=[];
+    if(data&&data.success){
+      rows=nciIntakeRowsFromList(data);
+    }
+    nciCompletedRows=rows.filter(function(r){
+      const st=String((r&&r.status)||'Complete').toLowerCase();
+      return !r||!r.status||st==='complete'||st==='completed';
+    }).map(function(r){
+      const copy=Object.assign({},r);
+      copy.pdfLink=pickIntakePdfLink(r);
+      copy.intakeId=nciIntakeIdOf(r);
+      return copy;
+    });
+    paintCompletedNewClientIntakes();
+  }catch(e){
+    nciCompletedRows=[];
+    paintCompletedNewClientIntakes();
+  }
+}
+
+async function viewCompletedIntakePdf(intakeId){
+  const id=String(intakeId||'');
+  const row=nciCompletedRows.find(function(r){return nciIntakeIdOf(r)===id;})||{};
+  let url=pickIntakePdfLink(row);
+  if(url){
+    window.open(url,'_blank','noopener');
+    return;
+  }
+  // archive_new_client_intake_pdf is still a stub — try once; never invent a URL.
+  if(id){
+    try{
+      const data=await apiPost({action:'archive_new_client_intake_pdf',intakeId:id});
+      url=pickIntakePdfLink(data);
+      if(url){
+        row.pdfLink=url;
+        paintCompletedNewClientIntakes();
+        window.open(url,'_blank','noopener');
+        return;
+      }
+    }catch(e){}
+  }
+  showTempMsg('PDF not ready yet','var(--warn)');
 }
 
 async function loadNewClientIntakeDrafts(){
