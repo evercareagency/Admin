@@ -1552,7 +1552,7 @@ const ACT=['Dangle side of bed','Turn & position','Assist w/transfer','Range of 
 const HH=['Make Bed','Change Linen','Light housekeeping'];
 const NUT=['Meal set up','Assist w/feeding'];
 const store={get:k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
-let allRecords=[],currentRec=null,adminSigPads={};
+var allRecords=[],currentRec=null,adminSigPads={};
 let allBackupRecords=[],currentBackupRec=null;
 
 const GAS_HEADERS={'Content-Type':'text/plain;charset=utf-8'};
