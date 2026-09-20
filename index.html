@@ -269,37 +269,99 @@ body.ts-print-open{overflow:hidden;}
 .ts-mo{width:100%;color:#111;}
 .ts-mo .ts-agency{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:10px;}
 .ts-mo .ts-agency h1{font-size:18px;letter-spacing:0.4px;margin:0 0 2px;text-transform:uppercase;}
-.ts-mo .ts-agency .sub{font-size:12px;margin:0;}
-.ts-mo .ts-agency .addr{font-size:11px;margin:2px 0 0;}
-.ts-mo .ts-title{text-align:center;font-size:15px;font-weight:700;text-transform:uppercase;margin:8px 0 10px;text-decoration:underline;}
+.ts-mo .ts-agency .addr{font-size:11px;margin:2px 0 0;line-height:1.45;}
+.ts-mo .ts-title{text-align:center;font-size:15px;font-weight:700;text-transform:uppercase;margin:8px 0 4px;text-decoration:underline;}
+.ts-mo .ts-week{text-align:center;font-size:12px;margin:0 0 10px;}
 .ts-mo .ts-hdr{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px;}
-.ts-mo .ts-hdr td{border:1px solid #111;padding:6px 8px;vertical-align:top;}
+.ts-mo .ts-hdr td{border:1px solid #111;padding:6px 8px;vertical-align:top;width:50%;}
 .ts-mo .ts-hdr .lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;}
 .ts-mo .ts-grid{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;}
-.ts-mo .ts-grid th,.ts-mo .ts-grid td{border:1px solid #111;padding:5px 4px;text-align:center;}
-.ts-mo .ts-grid th{background:#111;color:#fff;font-weight:700;font-size:10px;}
-.ts-mo .ts-grid td.rowlbl{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;}
-.ts-mo .ts-totals{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;margin:8px 0 12px;font-weight:700;}
+.ts-mo .ts-grid th,.ts-mo .ts-grid td{border:1px solid #111;padding:6px 5px;text-align:center;height:26px;}
+.ts-mo .ts-grid th{background:#111;color:#fff;font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-grid td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;}
+.ts-mo .ts-totals{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;margin:8px 0 12px;font-weight:700;}
 .ts-mo .ts-totals span{border-bottom:1px solid #111;min-width:90px;display:inline-block;text-align:center;}
-.ts-mo .ts-cert{font-size:10.5px;line-height:1.45;border:1px solid #111;padding:8px 10px;margin-bottom:14px;}
-.ts-mo .ts-sigs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
-.ts-mo .ts-sigbox{border:1px solid #111;padding:8px 10px;min-height:78px;}
-.ts-mo .ts-sigbox .slbl{font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
-.ts-mo .ts-sigbox img{height:36px;max-width:100%;}
-.ts-mo .ts-sigline{border-bottom:1px solid #111;height:36px;margin-bottom:6px;}
+.ts-mo .ts-cert{font-size:10.5px;line-height:1.45;border:1px solid #111;padding:8px 10px;margin-bottom:16px;}
+.ts-mo .ts-sigrow{display:flex;gap:16px;align-items:flex-end;margin-top:12px;}
+.ts-mo .ts-sigfield{flex:1;min-width:0;}
+.ts-mo .ts-sigdate{width:140px;flex-shrink:0;}
+.ts-mo .ts-sigrow .slbl{font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.ts-mo .ts-sigrow img{height:36px;max-width:100%;display:block;}
+.ts-mo .ts-sigline{border-bottom:1px solid #111;min-height:36px;margin-bottom:4px;display:flex;align-items:flex-end;}
 .ts-mo .ts-sigmeta{font-size:10px;}
 .ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
 @media(max-width:700px){
   .ts-print-sheet{padding:14px 10px;width:100%;}
-  .ts-mo .ts-sigs{grid-template-columns:1fr;}
+  .ts-mo .ts-sigrow{flex-wrap:wrap;}
+  .ts-mo .ts-sigdate{width:100%;}
   .ts-mo .ts-grid{font-size:9px;}
 }
+/* iOS Safari Print Options: only the sheet may print. Do not hide a parent of #tsPrintSheet.
+   Screen rules use position:fixed !important + body overflow:hidden — those blank iOS preview. */
 @media print{
-  .screen,.sidebar,.modal-bg,#pwaBanner,.ts-print-toolbar{display:none !important;}
-  #tsPrintOverlay.ts-print-overlay,.ts-print-overlay.show{display:block !important;position:static;background:white;overflow:visible;}
-  .ts-print-wrap{padding:0;}
-  .ts-print-sheet{box-shadow:none;width:100%;max-width:none;padding:0;}
-  @page{size:letter;margin:0.4in;}
+  html,body,body.ts-print-open,html.ts-printing,html.ts-printing body{
+    background:#fff !important;
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+    position:static !important;
+    width:auto !important;
+    max-width:none !important;
+    top:auto !important;
+    left:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+  body > *:not(#tsPrintOverlay){display:none !important;}
+  .no-print,.ts-print-toolbar,#tsPrintToolbar,.sidebar,.modal-bg,#pwaBanner,.screen{
+    display:none !important;
+    visibility:hidden !important;
+  }
+  #tsPrintOverlay,
+  #tsPrintOverlay.ts-print-overlay,
+  #tsPrintOverlay.ts-print-overlay.show,
+  #tsPrintOverlay.show,
+  #tsPrintOverlay[hidden],
+  #tsPrintOverlay.show[hidden]{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    position:static !important;
+    inset:auto !important;
+    top:auto !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    width:100% !important;
+    overflow:visible !important;
+    background:#fff !important;
+    box-shadow:none !important;
+    z-index:auto !important;
+    pointer-events:none !important;
+  }
+  #tsPrintOverlay .ts-print-wrap{
+    display:block !important;
+    visibility:visible !important;
+    padding:0 !important;
+    overflow:visible !important;
+    height:auto !important;
+  }
+  #tsPrintSheet,.ts-print-sheet,.ts-mo,.ts-mo *{
+    visibility:visible !important;
+  }
+  #tsPrintSheet,.ts-print-sheet{
+    box-shadow:none !important;
+    width:100% !important;
+    max-width:none !important;
+    padding:0 !important;
+    position:static !important;
+    overflow:visible !important;
+    background:#fff !important;
+  }
+  @page{size:letter;margin:0.5in;}
 }
 
 /* Inservice assign: Assign to all + Choose aides */
@@ -1359,7 +1421,7 @@ Call (216) 377-5991 with any questions.</textarea>
     <div class="ts-print-actions">
       <button type="button" id="tsPrintBackBtn" class="btn btn-ghost" onclick="closeTimesheetPrint()">← Back to portal</button>
       <button type="button" id="tsPrintCloseBtn" class="btn btn-ghost" onclick="closeTimesheetPrint()">✕ Close</button>
-      <button type="button" id="tsPrintDoBtn" class="btn btn-teal" onclick="window.print()">🖨️ Print This Timesheet</button>
+      <button type="button" id="tsPrintDoBtn" class="btn btn-teal" onclick="printTimesheetSheet()">🖨️ Print This Timesheet</button>
     </div>
   </div>
   <div class="ts-print-wrap">
@@ -1384,7 +1446,13 @@ Call (216) 377-5991 with any questions.</textarea>
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
 const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Mo paper form
+const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Timesheet Signature Verification
+const AGENCY={
+  name:'EverCare Home Agency',
+  address:'5510 Pearl Rd Ste 200',
+  cityLine:'Cleveland, OH 44129',
+  phone:'(216) 377-5991'
+};
 const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
 const SIG_REQUIRED_MSG='Client and HHA signatures are required';
 const FT_PER_MI=5280;
@@ -1573,6 +1641,22 @@ function hrsToDecimal(hrs){
 function formatHrsDec(n){
   const v=Number(n)||0;
   return v.toFixed(2);
+}
+function escapePrint(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+function resolvePatientId(r){
+  if(!r)return '';
+  const direct=r.clientId||r.client_id||r.patientId||r.patient_id||r.medicaidId||'';
+  if(direct)return String(direct);
+  const name=String(r.clientName||r.client_name||'').trim().toLowerCase();
+  if(!name||typeof allClients==='undefined')return '';
+  const c=(allClients||[]).find(x=>String(x.name||x.clientName||'').trim().toLowerCase()===name);
+  return (c&&(c.id||c.clientId||c.medicaidId||c.patientId))||'';
+}
+function resolveEmployeeId(r){
+  if(!r)return '';
+  return String(r.empId||r.employeeId||r.emp_id||r.aideId||r.username||'');
 }
 const PC=['Bed Bath','Assist w/chair bath','Tub Bath','Shower','Shower w/chair','Shampoo hair','Hair care/Comb','Oral care','Skin Care','Pericare','Nail Care','Shave','Assist w/dressing','Med. Reminders'];
 const ELIM=['Assist w/bed pan/urinal','Assist w/BSC','Incontinence Care','Empty drainage bag','Record bowel movement','Catheter Care'];
@@ -1912,6 +1996,7 @@ async function renderTimesheets(){
     if(data.success&&data.data){
       allRecords=data.data.filter(r=>r.submitted).map(r=>({
         id:r.id,submitted:r.submitted,empName:r.empName||r.emp_name||'',username:r.username||'',
+        clientId:r.clientId||r.client_id||r.patientId||'',empId:r.empId||r.employeeId||r.emp_id||'',
         clientName:r.clientName||r.client_name||'',svcType:r.svcType||r.svc_type||'',
         weekStart:r.weekStart||r.week_start||'',
         pdfLink:r.PdfLink||r.pdfLink||r.pdf_link||r.PDFLink||'',
@@ -2365,64 +2450,77 @@ function deleteRec(){
 function buildMoTimesheetHTML(r){
   const days=r.days||{};
   const initials=patientInitials(r.clientName);
-  let topAide='', topClient='';
+  let topAide='', topClient='', sigDate='';
   let regular=0, travel=0;
-  const col={};
-  PRINT_DAYS.forEach(i=>{
-    const d=days[i]||{};
-    const aideSig=resolveDayInk(i,'aide')||d.aideSig||'';
-    const clientSig=resolveDayInk(i,'client')||d.clientSig||'';
+  const rows=PRINT_DAYS.map(i=>{
+    const d=dayEntry(days,i);
+    const aideSig=resolveDayInk(i,'aide',r)||d.aideSig||'';
+    const clientSig=resolveDayInk(i,'client',r)||d.clientSig||'';
     if(!topAide&&hasSigInk(aideSig))topAide=aideSig;
     if(!topClient&&hasSigInk(clientSig))topClient=clientSig;
-    const hrs=hrsToDecimal(d.hrs);
+    const hrs=hrsToDecimal(d.hrs||d.hours);
     const tr=Number(d.travelHrs||d.travelHours||0)||0;
-    if(d.tin||d.tout||d.hrs)regular+=hrs;
+    const worked=!!(d.tin||d.tout||d.in||d.out||(d.hrs&&d.hrs!=='—')||(d.hours&&d.hours!=='—'));
+    if(worked)regular+=hrs;
     travel+=tr;
-    col[i]={
+    if(worked&&!sigDate)sigDate=toMDYPrint(d.date)||'';
+    return {
+      day:DAYS[i],
       date:toMDYPrint(d.date)||'',
-      code:(d.tin||d.tout||d.hrs)?serviceCodeFor(r,d):'',
-      tin:to12hrPrint(d.tin)||'',
-      tout:to12hrPrint(d.tout)||'',
-      hrs:(d.hrs&&d.hrs!=='—')?formatHrsDec(hrs):'',
+      code:worked?serviceCodeFor(r,d):'',
+      tin:to12hrPrint(d.tin||d.in)||'',
+      tout:to12hrPrint(d.tout||d.out)||'',
+      hrs:worked?formatHrsDec(hrs):'',
       init:hasSigInk(clientSig)?initials:''
     };
   });
   const recTravel=Number(r.travelHrs||r.travelHours||0)||0;
   if(recTravel&&!travel)travel=recTravel;
-  const th=key=>PRINT_DAYS.map(i=>`<td>${col[i][key]||''}</td>`).join('');
-  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  if(!sigDate)sigDate=toMDYPrint(r.weekStart)||'';
+  const esc=escapePrint;
+  const patientId=resolvePatientId(r);
+  const employeeId=resolveEmployeeId(r);
+  const dayRows=rows.map(row=>`<tr>
+      <td class="day">${esc(row.day)}</td>
+      <td>${esc(row.date)}</td>
+      <td>${esc(row.code)}</td>
+      <td>${esc(row.tin)}</td>
+      <td>${esc(row.tout)}</td>
+      <td>${esc(row.hrs)}</td>
+      <td>${esc(row.init)}</td>
+    </tr>`).join('');
+  const aideImg=topAide?`<img src="${topAide}" alt="Employee signature">`:'';
+  const clientImg=topClient?`<img src="${topClient}" alt="Patient signature">`:'';
   return `<div class="ts-mo">
     <div class="ts-agency">
-      <h1>EverCare Home Agency</h1>
-      <p class="sub">Home Health / Personal Care Timesheet</p>
-      <p class="addr">5510 Pearl Rd Ste 200 &nbsp; Cleveland, OH 44129 &nbsp; (216) 377-5991</p>
+      <h1>${esc(AGENCY.name)}</h1>
+      <p class="addr">${esc(AGENCY.address)} &nbsp; ${esc(AGENCY.cityLine)}<br>${esc(AGENCY.phone)}</p>
     </div>
-    <div class="ts-title">Weekly Service Time Record</div>
+    <div class="ts-title">Timesheet Signature Verification</div>
+    <p class="ts-week">${esc(formatWeekLabel(r.weekStart))}</p>
     <table class="ts-hdr">
       <tr>
-        <td style="width:50%"><div class="lbl">Agency</div>EverCare Home Agency</td>
-        <td><div class="lbl">Week of</div>${esc(formatWeekLabel(r.weekStart))}</td>
+        <td><div class="lbl">Patient Name</div>${esc(r.clientName||'—')}</td>
+        <td><div class="lbl">Patient ID</div>${esc(patientId||'—')}</td>
       </tr>
       <tr>
-        <td><div class="lbl">Patient / Client</div>${esc(r.clientName||'—')}</td>
-        <td><div class="lbl">Employee / HHA</div>${esc(r.empName||'—')}</td>
-      </tr>
-      <tr>
-        <td><div class="lbl">Service type</div>${esc(r.svcType||'—')}</td>
-        <td><div class="lbl">Total hours</div>${esc(r.totalHrs||'—')}</td>
+        <td><div class="lbl">Employee Name</div>${esc(r.empName||'—')}</td>
+        <td><div class="lbl">Employee ID</div>${esc(employeeId||'—')}</td>
       </tr>
     </table>
     <table class="ts-grid">
-      <thead><tr><th></th>${dayNames.map(n=>`<th>${n}</th>`).join('')}</tr></thead>
-      <tbody>
-        <tr><td class="rowlbl">Date</td>${th('date')}</tr>
-        <tr><td class="rowlbl">Service Code</td>${th('code')}</tr>
-        <tr><td class="rowlbl">Time In</td>${th('tin')}</tr>
-        <tr><td class="rowlbl">Time Out</td>${th('tout')}</tr>
-        <tr><td class="rowlbl">Total Hours</td>${th('hrs')}</tr>
-        <tr><td class="rowlbl">Patient Initial</td>${th('init')}</tr>
-      </tbody>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Date</th>
+          <th>Service Code</th>
+          <th>Time In</th>
+          <th>Time Out</th>
+          <th>Total Hours</th>
+          <th>Patient Initial</th>
+        </tr>
+      </thead>
+      <tbody>${dayRows}</tbody>
     </table>
     <div class="ts-totals">
       <div>Total Regular Hours: <span>${formatHrsDec(regular)}</span></div>
@@ -2432,18 +2530,28 @@ function buildMoTimesheetHTML(r){
       <strong>CERTIFICATION.</strong> I certify that the hours and services on this timesheet are true and correct.
       The employee provided the listed services to the patient named above. The patient (or authorized representative)
       confirms the work was performed satisfactorily. Unsigned timesheets will not be accepted. Do not pay the employee directly.
-      False statements may result in termination and/or prosecution. Notify the office at (216) 377-5991 of hospitalization, falls, hour changes, or cancellations. Timesheets are due by 5:00 PM every Monday.
+      False statements may result in termination and/or prosecution. Notify the office at ${esc(AGENCY.phone)} of hospitalization, falls, hour changes, or cancellations. Timesheets are due by 5:00 PM every Monday.
     </div>
-    <div class="ts-sigs">
-      <div class="ts-sigbox">
-        <div class="slbl">Employee / HHA Signature</div>
-        ${topAide?`<img src="${topAide}" alt="Employee signature">`:'<div class="ts-sigline"></div>'}
+    <div class="ts-sigrow">
+      <div class="ts-sigfield">
+        <div class="slbl">Employee Signature</div>
+        <div class="ts-sigline">${aideImg}</div>
         <div class="ts-sigmeta">${esc(r.empName||'')}</div>
       </div>
-      <div class="ts-sigbox">
-        <div class="slbl">Patient / Client Signature</div>
-        ${topClient?`<img src="${topClient}" alt="Patient signature">`:'<div class="ts-sigline"></div>'}
+      <div class="ts-sigdate">
+        <div class="slbl">Date</div>
+        <div class="ts-sigline">${esc(sigDate)}</div>
+      </div>
+    </div>
+    <div class="ts-sigrow">
+      <div class="ts-sigfield">
+        <div class="slbl">Patient / Representative Signature</div>
+        <div class="ts-sigline">${clientImg}</div>
         <div class="ts-sigmeta">${esc(r.clientName||'')}</div>
+      </div>
+      <div class="ts-sigdate">
+        <div class="slbl">Date</div>
+        <div class="ts-sigline">${esc(sigDate)}</div>
       </div>
     </div>
   </div>`;
@@ -2455,7 +2563,9 @@ function closeTimesheetPrint(){
   el.classList.remove('show');
   el.setAttribute('hidden','');
   el.hidden=true;
+  document.documentElement.classList.remove('ts-printing');
   document.body.classList.remove('ts-print-open');
+  if(document.querySelector('.modal-bg.show')&&typeof lockBodyScroll==='function')lockBodyScroll();
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){
@@ -2463,6 +2573,28 @@ document.addEventListener('keydown',function(e){
     if(el&&el.classList.contains('show'))closeTimesheetPrint();
   }
 });
+
+function unlockBodyForPrint(){
+  document.documentElement.classList.add('ts-printing');
+  document.body.classList.remove('ts-print-open');
+  document.body.style.overflow='visible';
+  document.body.style.position='static';
+  document.body.style.width='';
+  document.body.style.top='';
+}
+function restoreBodyAfterPrint(){
+  document.documentElement.classList.remove('ts-printing');
+  const overlay=document.getElementById('tsPrintOverlay');
+  if(overlay&&overlay.classList.contains('show')){
+    document.body.classList.add('ts-print-open');
+    document.body.style.overflow='hidden';
+    document.body.style.position='';
+    document.body.style.width='';
+    document.body.style.top='';
+  }else if(document.querySelector('.modal-bg.show')&&typeof lockBodyScroll==='function'){
+    lockBodyScroll();
+  }
+}
 
 function openTimesheetPrint(r){
   const sheet=document.getElementById('tsPrintSheet');
@@ -2474,6 +2606,24 @@ function openTimesheetPrint(r){
   overlay.hidden=false;
   overlay.scrollTop=0;
   document.body.classList.add('ts-print-open');
+}
+
+function printTimesheetSheet(){
+  const overlay=document.getElementById('tsPrintOverlay');
+  if(!overlay||!overlay.classList.contains('show'))return;
+  unlockBodyForPrint();
+  let finished=false;
+  const done=()=>{
+    if(finished)return;
+    finished=true;
+    restoreBodyAfterPrint();
+    window.removeEventListener('afterprint',done);
+  };
+  window.addEventListener('afterprint',done);
+  setTimeout(function(){
+    window.print();
+    setTimeout(done,2000);
+  },50);
 }
 
 function printTS(){
