@@ -1526,6 +1526,12 @@ function gpsDistanceUi(d){
   if(d.verified===true)return '<span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
   return '';
 }
+function gpsStatusLabel(d){
+  const mi=dayHasDistance(d)?formatDistanceMiles(d)+' from client':'';
+  if(d&&d.verified===true)return mi?'✓ Verified — '+mi:'✓ Verified';
+  if(d&&d.verified===false)return mi?'✗ Off Location — '+mi:'✗ Off Location';
+  return mi?'View Map — '+mi:'View Map';
+}
 function serviceCodeFor(rec,day){
   const t=String((rec&&rec.svcType)||'').toLowerCase();
   if(/home\s*mak|homemak|household|hm\b/.test(t))return 'HM';
@@ -2135,7 +2141,7 @@ function buildDetailBody(){
     if(!d&&!Object.keys(days).length)return;
     const aideSigHTML=hasSigInk(d?.aideSig)?`<img src="${d.aideSig}" class="sig-mini"><br>`:''
     const clientSigHTML=hasSigInk(d?.clientSig)?`<img src="${d.clientSig}" class="sig-mini"><br>`:''
-    const locCell=(d&&(d.location||dayHasDistance(d)||(d.lat&&d.lng)))?`${d.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}${d.lat&&d.lng?`<br><button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—';
+    const locCell=(d&&(d.location||dayHasDistance(d)||(d.lat&&d.lng)))?`${d.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}${d.lat&&d.lng?`<br><button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${gpsStatusLabel(d)}</button>`:''}`:'—';
     dayRows+=`<tr>
       <td><strong>${day}</strong></td>
       <td>${d?.date||'—'}</td>
