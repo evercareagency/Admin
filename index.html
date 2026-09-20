@@ -4643,7 +4643,9 @@ async function viewSupervisoryVisitPdf(rowIndex){
 //     proxyAgencyRepSignatureData, proxyAgencyRepSignDate
 // *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
-// Archive: archive_new_client_intake_pdf (optional fallback). Complete save auto-rearchives.
+// Archive: archive_new_client_intake_pdf { intakeId }. Complete save returns fast
+// (pdfPending and/or empty pdfLink). After UI success, POST archive then refresh pdfLink.
+// pdfError is a toast only — status stays Complete.
 // List Complete rows (Ace locked): intakeId, clientId, clientName, socDate, status,
 //   nurseUsername/nurseName, pdfLink, pdfFileId, createdAt, updatedAt, completedAt.
 // completedAt (fallback submittedAt) → Completed column. Edit: save_new_client_intake Complete.
@@ -5626,21 +5628,22 @@ async function saveNewClientIntake(status){
     nciDirty=false;
     nciCaptureClean();
     if(status==='Complete'){
-      const pdf=pickIntakePdfLink(data);
-      const pdfErr=nciStr((data&&data.pdfError)||(data.data&&data.data.pdfError));
-      const pdfFileId=nciStr((data&&data.pdfFileId)||(data.data&&data.data.pdfFileId));
+      const meta=nciPickPdfMeta(data);
       const wasCompleteEdit=nciWizardMode==='complete';
-      nciLastCompletePdf={intakeId:nciState.intakeId,pdfLink:pdf,pdfFileId:pdfFileId};
-      nciRememberCompletePdf(nciState.intakeId,pdf,pdfFileId);
+      nciLastCompletePdf={intakeId:nciState.intakeId,pdfLink:meta.pdfLink,pdfFileId:meta.pdfFileId};
+      nciRememberCompletePdf(nciState.intakeId,meta.pdfLink,meta.pdfFileId);
       closeNewClientIntake(true);
-      if(wasCompleteEdit){
-        if(pdfErr||!pdf)showTempMsg('Saved — PDF refresh pending','var(--warn)');
-        else showTempMsg('Saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
+      loadNewClientIntakeDrafts();
+      loadCompletedNewClientIntakes();
+      // pdfPending / empty pdfLink is success — never fail or roll back Complete.
+      if(nciPdfNeedsFollowup(meta)){
+        showTempMsg('Saved — PDF generating','var(--success)');
+        nciEnsureCompletePdf(nciState.intakeId,meta.pdfError);
+      }else if(wasCompleteEdit){
+        showTempMsg('Saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       }else{
         showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       }
-      loadNewClientIntakeDrafts();
-      loadCompletedNewClientIntakes();
     }else{
       showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
       loadNewClientIntakeDrafts();
@@ -5655,15 +5658,120 @@ async function saveNewClientIntake(status){
   }
 }
 
+function nciSleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+function nciIsPdfPending(obj){
+  if(!obj||typeof obj!=='object')return false;
+  const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
+  const v=obj.pdfPending!=null?obj.pdfPending:(nested&&nested.pdfPending);
+  if(v===true||v===1)return true;
+  const s=String(v==null?'':v).trim().toLowerCase();
+  return s==='true'||s==='1'||s==='yes';
+}
+function nciPickPdfMeta(obj){
+  if(!obj||typeof obj!=='object')return {intakeId:'',pdfLink:'',pdfFileId:'',pdfError:'',pdfPending:false};
+  const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
+  const take=function(key){
+    if(obj[key]!=null&&obj[key]!=='')return obj[key];
+    if(nested&&nested[key]!=null&&nested[key]!=='')return nested[key];
+    return '';
+  };
+  return {
+    intakeId:nciStr(take('intakeId')),
+    pdfLink:pickIntakePdfLink(obj),
+    pdfFileId:nciStr(take('pdfFileId')),
+    pdfError:nciStr(take('pdfError')),
+    pdfPending:nciIsPdfPending(obj)
+  };
+}
+function nciPdfNeedsFollowup(meta){
+  if(!meta)return true;
+  return !!(meta.pdfPending||!meta.pdfLink);
+}
+
 async function archiveNewClientIntakePdf(intakeId){
-  // Ace PDF archive — action locked: archive_new_client_intake_pdf. Failures are ignored.
-  try{
-    await apiPost({action:'archive_new_client_intake_pdf',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
-  }catch(e){}
+  // Ace PDF archive — action locked: archive_new_client_intake_pdf { intakeId }.
+  return apiPost({action:'archive_new_client_intake_pdf',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
 }
 
 async function getNewClientIntake(intakeId){
   return apiPost({action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
+}
+
+function nciApplyCompletePdf(intakeId,pdfLink,pdfFileId){
+  const id=String(intakeId||'');
+  const link=String(pdfLink||'').trim();
+  if(!id||!link)return;
+  nciLastCompletePdf={intakeId:id,pdfLink:link,pdfFileId:pdfFileId||''};
+  nciRememberCompletePdf(id,link,pdfFileId||'');
+}
+
+async function nciPollCompletePdfLink(intakeId,budgetMs){
+  const id=String(intakeId||'');
+  const deadline=Date.now()+(budgetMs||15000);
+  while(Date.now()<deadline){
+    try{
+      const got=await getNewClientIntake(id);
+      const meta=nciPickPdfMeta(got);
+      if(meta.pdfLink){
+        nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
+        return meta;
+      }
+    }catch(e){}
+    try{
+      await loadCompletedNewClientIntakes();
+      const row=(nciCompletedRows||[]).find(function(r){return nciIntakeIdOf(r)===id;})||null;
+      const link=pickIntakePdfLink(row);
+      if(link){
+        nciApplyCompletePdf(id,link,row&&row.pdfFileId);
+        return {intakeId:id,pdfLink:link,pdfFileId:nciStr(row&&row.pdfFileId),pdfError:'',pdfPending:false};
+      }
+    }catch(e){}
+    const left=deadline-Date.now();
+    if(left<=0)break;
+    await nciSleep(Math.min(2000,left));
+  }
+  return null;
+}
+
+async function nciEnsureCompletePdf(intakeId,priorPdfError){
+  const id=String(intakeId||'');
+  if(!id)return;
+  let pdfError=nciStr(priorPdfError);
+  let ready=false;
+  const markReady=function(meta){
+    if(!meta||!meta.pdfLink)return false;
+    nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
+    if(!ready){
+      ready=true;
+      showTempMsg('PDF ready','var(--success)');
+      loadCompletedNewClientIntakes();
+    }
+    return true;
+  };
+  try{
+    const archiveP=archiveNewClientIntakePdf(id).then(function(archived){
+      const meta=nciPickPdfMeta(archived);
+      if(meta.pdfError)pdfError=meta.pdfError;
+      else if(archived&&archived.success===false)pdfError=pdfError||nciStr(archived.error||archived.message);
+      markReady(meta);
+      return meta;
+    }).catch(function(err){
+      pdfError=pdfError||nciStr((err&&err.message)||'');
+      return null;
+    });
+    const pollP=nciPollCompletePdfLink(id,15000).then(function(meta){
+      markReady(meta);
+      return meta;
+    }).catch(function(){return null;});
+    await Promise.race([
+      archiveP.then(function(m){return (m&&m.pdfLink)?m:pollP;}),
+      pollP,
+      nciSleep(15000)
+    ]);
+    if(!ready)showTempMsg(pdfError||'PDF not ready yet','var(--warn)');
+  }catch(e){
+    if(!ready)showTempMsg(pdfError||nciStr((e&&e.message)||'')||'PDF not ready yet','var(--warn)');
+  }
 }
 
 async function resumeNewClientIntake(intakeId,opts){
@@ -5801,6 +5909,13 @@ function nciRememberCompletePdf(intakeId,pdfLink,pdfFileId){
       if(pdfFileId)r.pdfFileId=pdfFileId;
     }
   });
+  if(pdfLink||pdfFileId){
+    nciLastCompletePdf={
+      intakeId:id,
+      pdfLink:pdfLink||(nciLastCompletePdf&&nciLastCompletePdf.pdfLink)||'',
+      pdfFileId:pdfFileId||(nciLastCompletePdf&&nciLastCompletePdf.pdfFileId)||''
+    };
+  }
   paintCompletedNewClientIntakes();
 }
 
