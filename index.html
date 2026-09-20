@@ -267,34 +267,42 @@ body.ts-print-open{overflow:hidden;}
 .ts-print-wrap{flex:1;padding:18px 12px 40px;display:flex;justify-content:center;}
 .ts-print-sheet{background:white;width:8.5in;max-width:100%;padding:0.45in 0.5in;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;}
 .ts-mo{width:100%;color:#111;}
-.ts-mo .ts-agency{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:10px;}
-.ts-mo .ts-agency h1{font-size:18px;letter-spacing:0.4px;margin:0 0 2px;text-transform:uppercase;}
+.ts-mo .ts-agency{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:8px;}
+.ts-mo .ts-agency h1{font-size:18px;letter-spacing:0.6px;margin:0 0 2px;text-transform:uppercase;}
 .ts-mo .ts-agency .addr{font-size:11px;margin:2px 0 0;line-height:1.45;}
-.ts-mo .ts-title{text-align:center;font-size:15px;font-weight:700;text-transform:uppercase;margin:8px 0 4px;text-decoration:underline;}
+.ts-mo .ts-title{text-align:center;font-size:16px;font-weight:700;text-transform:uppercase;margin:8px 0 2px;letter-spacing:0.8px;}
 .ts-mo .ts-week{text-align:center;font-size:12px;margin:0 0 10px;}
-.ts-mo .ts-hdr{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px;}
-.ts-mo .ts-hdr td{border:1px solid #111;padding:6px 8px;vertical-align:top;width:50%;}
-.ts-mo .ts-hdr .lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;}
-.ts-mo .ts-grid{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;}
-.ts-mo .ts-grid th,.ts-mo .ts-grid td{border:1px solid #111;padding:6px 5px;text-align:center;height:26px;}
-.ts-mo .ts-grid th{background:#111;color:#fff;font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.ts-mo .ts-grid td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;}
-.ts-mo .ts-totals{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;margin:8px 0 12px;font-weight:700;}
+.ts-mo .ts-names{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.ts-mo .ts-namebox{border:1px solid #111;padding:6px 8px;min-height:72px;}
+.ts-mo .ts-namebox .lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;}
+.ts-mo .ts-namebox .val{font-size:13px;font-weight:700;margin:2px 0 4px;}
+.ts-mo .ts-namebox img{height:34px;max-width:100%;display:block;}
+.ts-mo .ts-namebox .sigline{border-bottom:1px solid #111;min-height:34px;}
+.ts-mo .ts-days{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:8px;}
+.ts-mo .ts-days th,.ts-mo .ts-days td{border:1px solid #111;padding:5px 4px;text-align:center;height:28px;vertical-align:middle;}
+.ts-mo .ts-days th{background:#111;color:#fff;font-weight:700;font-size:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-days td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;}
+.ts-mo .ts-days img{height:22px;max-width:72px;}
+.ts-mo .ts-totals{display:flex;gap:28px;flex-wrap:wrap;font-size:12px;margin:6px 0 10px;font-weight:700;}
 .ts-mo .ts-totals span{border-bottom:1px solid #111;min-width:90px;display:inline-block;text-align:center;}
-.ts-mo .ts-cert{font-size:10.5px;line-height:1.45;border:1px solid #111;padding:8px 10px;margin-bottom:16px;}
-.ts-mo .ts-sigrow{display:flex;gap:16px;align-items:flex-end;margin-top:12px;}
-.ts-mo .ts-sigfield{flex:1;min-width:0;}
-.ts-mo .ts-sigdate{width:140px;flex-shrink:0;}
-.ts-mo .ts-sigrow .slbl{font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
-.ts-mo .ts-sigrow img{height:36px;max-width:100%;display:block;}
-.ts-mo .ts-sigline{border-bottom:1px solid #111;min-height:36px;margin-bottom:4px;display:flex;align-items:flex-end;}
-.ts-mo .ts-sigmeta{font-size:10px;}
+.ts-mo .ts-notice{font-size:10px;font-weight:700;text-align:center;border:1px solid #111;padding:7px 8px;margin:8px 0;line-height:1.4;text-transform:uppercase;}
+.ts-mo .ts-sandata{font-size:10.5px;text-align:center;margin:0 0 12px;line-height:1.4;}
+.ts-mo .ts-svcsec{margin-bottom:8px;}
+.ts-mo .ts-svcsec h3{font-size:11px;margin:0 0 3px;letter-spacing:0.4px;}
+.ts-mo .ts-svc{width:100%;border-collapse:collapse;font-size:8.5px;}
+.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:2px 3px;}
+.ts-mo .ts-svc th{background:#111;color:#fff;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-svc td.svc{text-align:left;white-space:nowrap;}
+.ts-mo .ts-svc td.mark{text-align:center;width:22px;font-weight:700;}
+.ts-mo .ts-other{font-size:10px;margin:2px 0 8px;}
+.ts-mo .ts-comments{border:1px solid #111;min-height:52px;padding:6px 8px;font-size:11px;margin:8px 0;}
+.ts-mo .ts-comments .lbl{font-size:9px;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.ts-mo .ts-legal{font-size:9.5px;line-height:1.45;text-align:center;margin-top:10px;border-top:1px solid #111;padding-top:8px;}
 .ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
 @media(max-width:700px){
   .ts-print-sheet{padding:14px 10px;width:100%;}
-  .ts-mo .ts-sigrow{flex-wrap:wrap;}
-  .ts-mo .ts-sigdate{width:100%;}
-  .ts-mo .ts-grid{font-size:9px;}
+  .ts-mo .ts-names{grid-template-columns:1fr;}
+  .ts-mo .ts-days,.ts-mo .ts-svc{font-size:8px;}
 }
 /* iOS Safari Print Options: only the sheet may print. Do not hide a parent of #tsPrintSheet.
    Screen rules use position:fixed !important + body overflow:hidden — those blank iOS preview. */
@@ -1446,13 +1454,22 @@ Call (216) 377-5991 with any questions.</textarea>
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
 const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Timesheet Signature Verification
+const PRINT_DAYS=[0,1,2,3,4,5,6]; // Sun–Sat Caregiver Timesheet paper
+const PAPER_DAY_LETTERS=['S','M','T','W','T','F','S'];
 const AGENCY={
   name:'EverCare Home Agency',
   address:'5510 Pearl Rd Ste 200',
   cityLine:'Cleveland, OH 44129',
   phone:'(216) 377-5991'
 };
+const PAPER_SERVICES=[
+  {n:'PERSONAL CARE',items:['Assist W/Bath-Bed/Tub/Shower','Hair Care/Shampoo','Shave','Skin Care','Nail Care/Foot Care','Oral Care/Denture Care','Assist W/Dressing']},
+  {n:'ELIMINATION',items:['Bedpan/Urinal/Bedside Commode/Foley','Cath. Care','Incontinence/Perineal Care','Empty Drainage Bag','Empty Colostomy Bag']},
+  {n:'HOUSEHOLD SERVICES',items:['Make Bed/Change Linen','Tidy Work Area/Trash Removal','Clear Pathways','Laundry','Sweep/Wet Mop','Dusting/Vacuum','Dishes','Refrigerator','Bathroom (Toilet, Tub, Sink)','Grocery Shopping','Other (specify)']},
+  {n:'MOBILITY',items:['Dangle','Transfer Chair/Commode/Bed','Assist W/Ambulation','Walker/Wheelchair/Crutches','Bedbound','Turn & Position','Encourage Deep Breathing']},
+  {n:'TREATMENTS',items:['Medication Reminder (Verbal)','Prescription Pick Up']},
+  {n:'NUTRITION',items:['Diet','Meal Prep. (B/L/D)','Assist W/ Feeding','Encourage Fluids']}
+];
 const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
 const SIG_REQUIRED_MSG='Client and HHA signatures are required';
 const FT_PER_MI=5280;
@@ -1657,6 +1674,27 @@ function resolvePatientId(r){
 function resolveEmployeeId(r){
   if(!r)return '';
   return String(r.empId||r.employeeId||r.emp_id||r.aideId||r.username||'');
+}
+function paperSvcKey(s){
+  return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+}
+function dayHasPaperService(d,label){
+  const svcs=(d&&d.svcs)||[];
+  if(!svcs.length)return false;
+  const t=paperSvcKey(label);
+  if(!t)return false;
+  return svcs.some(s=>{
+    const x=paperSvcKey(s);
+    return x===t||(x.length>4&&t.indexOf(x)!==-1)||(t.length>4&&x.indexOf(t)!==-1);
+  });
+}
+function formatHrsDisplay(hrs){
+  if(hrs==null||hrs===''||hrs==='—')return '';
+  if(/^\d+:\d{2}$/.test(String(hrs)))return String(hrs);
+  const n=typeof hrs==='number'?hrs:hrsToDecimal(hrs);
+  if(!n)return '';
+  const h=Math.floor(n),m=Math.round((n-h)*60);
+  return h+':'+String(m).padStart(2,'0');
 }
 const PC=['Bed Bath','Assist w/chair bath','Tub Bath','Shower','Shower w/chair','Shampoo hair','Hair care/Comb','Oral care','Skin Care','Pericare','Nail Care','Shave','Assist w/dressing','Med. Reminders'];
 const ELIM=['Assist w/bed pan/urinal','Assist w/BSC','Incontinence Care','Empty drainage bag','Record bowel movement','Catheter Care'];
@@ -2449,110 +2487,103 @@ function deleteRec(){
 
 function buildMoTimesheetHTML(r){
   const days=r.days||{};
-  const initials=patientInitials(r.clientName);
-  let topAide='', topClient='', sigDate='';
-  let regular=0, travel=0;
-  const rows=PRINT_DAYS.map(i=>{
+  let hdrAide=hasSigInk(r.aideSig)?r.aideSig:'';
+  let hdrClient=hasSigInk(r.clientSig)?r.clientSig:'';
+  let regular=0, travel=0, otherSpecify='';
+  const dayRows=PRINT_DAYS.map(i=>{
     const d=dayEntry(days,i);
     const aideSig=resolveDayInk(i,'aide',r)||d.aideSig||'';
     const clientSig=resolveDayInk(i,'client',r)||d.clientSig||'';
-    if(!topAide&&hasSigInk(aideSig))topAide=aideSig;
-    if(!topClient&&hasSigInk(clientSig))topClient=clientSig;
-    const hrs=hrsToDecimal(d.hrs||d.hours);
+    if(!hdrAide&&hasSigInk(aideSig))hdrAide=aideSig;
+    if(!hdrClient&&hasSigInk(clientSig))hdrClient=clientSig;
+    if(d.otherSpecify)otherSpecify=d.otherSpecify;
+    const hrsVal=d.hrs||d.hours||'';
+    const hrs=hrsToDecimal(hrsVal);
     const tr=Number(d.travelHrs||d.travelHours||0)||0;
-    const worked=!!(d.tin||d.tout||d.in||d.out||(d.hrs&&d.hrs!=='—')||(d.hours&&d.hours!=='—'));
+    const worked=isWorkedDay(d);
     if(worked)regular+=hrs;
     travel+=tr;
-    if(worked&&!sigDate)sigDate=toMDYPrint(d.date)||'';
-    return {
-      day:DAYS[i],
-      date:toMDYPrint(d.date)||'',
-      code:worked?serviceCodeFor(r,d):'',
-      tin:to12hrPrint(d.tin||d.in)||'',
-      tout:to12hrPrint(d.tout||d.out)||'',
-      hrs:worked?formatHrsDec(hrs):'',
-      init:hasSigInk(clientSig)?initials:''
-    };
-  });
+    const aideImg=hasSigInk(aideSig)?`<img src="${aideSig}" alt="HHA signature">`:'';
+    const clientImg=hasSigInk(clientSig)?`<img src="${clientSig}" alt="Client signature">`:'';
+    return `<tr>
+      <td class="day">${escapePrint(DAYS[i])}</td>
+      <td>${escapePrint(toMDYPrint(d.date)||'')}</td>
+      <td>${escapePrint(to12hrPrint(d.tin||d.in)||'')}</td>
+      <td>${escapePrint(to12hrPrint(d.tout||d.out)||'')}</td>
+      <td>${escapePrint(worked?formatHrsDisplay(hrsVal):'')}</td>
+      <td>${aideImg}</td>
+      <td>${clientImg}</td>
+    </tr>`;
+  }).join('');
   const recTravel=Number(r.travelHrs||r.travelHours||0)||0;
   if(recTravel&&!travel)travel=recTravel;
-  if(!sigDate)sigDate=toMDYPrint(r.weekStart)||'';
-  const esc=escapePrint;
-  const patientId=resolvePatientId(r);
-  const employeeId=resolveEmployeeId(r);
-  const dayRows=rows.map(row=>`<tr>
-      <td class="day">${esc(row.day)}</td>
-      <td>${esc(row.date)}</td>
-      <td>${esc(row.code)}</td>
-      <td>${esc(row.tin)}</td>
-      <td>${esc(row.tout)}</td>
-      <td>${esc(row.hrs)}</td>
-      <td>${esc(row.init)}</td>
-    </tr>`).join('');
-  const aideImg=topAide?`<img src="${topAide}" alt="Employee signature">`:'';
-  const clientImg=topClient?`<img src="${topClient}" alt="Patient signature">`:'';
+  const totalWeekly=(r.totalHrs&&r.totalHrs!=='0:00'&&r.totalHrs!=='—')?r.totalHrs:formatHrsDisplay(regular);
+  const svcHtml=PAPER_SERVICES.map(sec=>{
+    const head=PAPER_DAY_LETTERS.map((L,i)=>`<th title="${DAYS[i]}">${L}</th>`).join('');
+    const rows=sec.items.map(label=>{
+      const marks=PRINT_DAYS.map(i=>{
+        const d=dayEntry(days,i);
+        return `<td class="mark">${dayHasPaperService(d,label)?'✓':''}</td>`;
+      }).join('');
+      return `<tr><td class="svc">${escapePrint(label)}</td>${marks}</tr>`;
+    }).join('');
+    let extra='';
+    if(sec.n==='HOUSEHOLD SERVICES'&&otherSpecify){
+      extra=`<div class="ts-other">Other (specify): ${escapePrint(otherSpecify)}</div>`;
+    }
+    return `<div class="ts-svcsec"><h3>${escapePrint(sec.n)}</h3>
+      <table class="ts-svc"><thead><tr><th>Service</th>${head}</tr></thead><tbody>${rows}</tbody></table>${extra}</div>`;
+  }).join('');
+  const aideHdr=hasSigInk(hdrAide)?`<img src="${hdrAide}" alt="Caregiver signature">`:'<div class="sigline"></div>';
+  const clientHdr=hasSigInk(hdrClient)?`<img src="${hdrClient}" alt="Client signature">`:'<div class="sigline"></div>';
+  const notes=String(r.notes||'').trim();
   return `<div class="ts-mo">
     <div class="ts-agency">
-      <h1>${esc(AGENCY.name)}</h1>
-      <p class="addr">${esc(AGENCY.address)} &nbsp; ${esc(AGENCY.cityLine)}<br>${esc(AGENCY.phone)}</p>
+      <h1>${escapePrint(AGENCY.name)}</h1>
+      <p class="addr">${escapePrint(AGENCY.address)} &nbsp; ${escapePrint(AGENCY.cityLine)}<br>${escapePrint(AGENCY.phone)}</p>
     </div>
-    <div class="ts-title">Timesheet Signature Verification</div>
-    <p class="ts-week">${esc(formatWeekLabel(r.weekStart))}</p>
-    <table class="ts-hdr">
-      <tr>
-        <td><div class="lbl">Patient Name</div>${esc(r.clientName||'—')}</td>
-        <td><div class="lbl">Patient ID</div>${esc(patientId||'—')}</td>
-      </tr>
-      <tr>
-        <td><div class="lbl">Employee Name</div>${esc(r.empName||'—')}</td>
-        <td><div class="lbl">Employee ID</div>${esc(employeeId||'—')}</td>
-      </tr>
-    </table>
-    <table class="ts-grid">
+    <div class="ts-title">Caregiver Timesheet</div>
+    <p class="ts-week">${escapePrint(formatWeekLabel(r.weekStart))}</p>
+    <div class="ts-names">
+      <div class="ts-namebox">
+        <div class="lbl">Client Name</div>
+        <div class="val">${escapePrint(r.clientName||'—')}</div>
+        <div class="lbl">Client Signature</div>
+        ${clientHdr}
+      </div>
+      <div class="ts-namebox">
+        <div class="lbl">Caregiver / HHA Name</div>
+        <div class="val">${escapePrint(r.empName||'—')}</div>
+        <div class="lbl">Caregiver / HHA Signature</div>
+        ${aideHdr}
+      </div>
+    </div>
+    <table class="ts-days">
       <thead>
         <tr>
           <th>Day</th>
           <th>Date</th>
-          <th>Service Code</th>
           <th>Time In</th>
           <th>Time Out</th>
-          <th>Total Hours</th>
-          <th>Patient Initial</th>
+          <th>Hrs</th>
+          <th>HHA Signature</th>
+          <th>Client Signature</th>
         </tr>
       </thead>
       <tbody>${dayRows}</tbody>
     </table>
     <div class="ts-totals">
-      <div>Total Regular Hours: <span>${formatHrsDec(regular)}</span></div>
+      <div>Total Weekly Hours: <span>${escapePrint(totalWeekly)}</span></div>
       <div>Total Travel Hours: <span>${formatHrsDec(travel)}</span></div>
     </div>
-    <div class="ts-cert">
-      <strong>CERTIFICATION.</strong> I certify that the hours and services on this timesheet are true and correct.
-      The employee provided the listed services to the patient named above. The patient (or authorized representative)
-      confirms the work was performed satisfactorily. Unsigned timesheets will not be accepted. Do not pay the employee directly.
-      False statements may result in termination and/or prosecution. Notify the office at ${esc(AGENCY.phone)} of hospitalization, falls, hour changes, or cancellations. Timesheets are due by 5:00 PM every Monday.
-    </div>
-    <div class="ts-sigrow">
-      <div class="ts-sigfield">
-        <div class="slbl">Employee Signature</div>
-        <div class="ts-sigline">${aideImg}</div>
-        <div class="ts-sigmeta">${esc(r.empName||'')}</div>
-      </div>
-      <div class="ts-sigdate">
-        <div class="slbl">Date</div>
-        <div class="ts-sigline">${esc(sigDate)}</div>
-      </div>
-    </div>
-    <div class="ts-sigrow">
-      <div class="ts-sigfield">
-        <div class="slbl">Patient / Representative Signature</div>
-        <div class="ts-sigline">${clientImg}</div>
-        <div class="ts-sigmeta">${esc(r.clientName||'')}</div>
-      </div>
-      <div class="ts-sigdate">
-        <div class="slbl">Date</div>
-        <div class="ts-sigline">${esc(sigDate)}</div>
-      </div>
+    <div class="ts-notice">Notify EverCare Home Agency at ${escapePrint(AGENCY.phone)} of any significant change in condition — hospitalization, falls, hours change, etc.</div>
+    <p class="ts-sandata">Don't forget to clock in and out on Sandata — make sure your Sandata times match this timesheet.</p>
+    ${svcHtml}
+    <div class="ts-comments"><div class="lbl">Comments</div>${escapePrint(notes||' ')}</div>
+    <div class="ts-legal">
+      Timesheets due by <strong>5:00 PM every Monday</strong>, no exceptions. Full legal signatures only — no scratch-outs or white-out; correct errors with a single line-through, initialed.<br>
+      This is a legal document: signing confirms the hours and services above are accurate.<br>
+      <strong>${escapePrint(AGENCY.address)}, ${escapePrint(AGENCY.cityLine)}</strong> &nbsp;|&nbsp; ${escapePrint(AGENCY.phone)}
     </div>
   </div>`;
 }
