@@ -5619,26 +5619,25 @@ function nciIntakeRowsFromList(data){
 }
 
 function nciIntakeIdOf(r){
-  if(!r)return '';
-  const v=r.intakeId!=null&&r.intakeId!==''?r.intakeId:(r.IntakeId!=null&&r.IntakeId!==''?r.IntakeId:(r.id!=null&&r.id!==''?r.id:''));
-  return v==null?'':String(v);
+  if(!r||r.intakeId==null||r.intakeId==='')return '';
+  return String(r.intakeId);
 }
 
 function pickIntakePdfLink(obj){
   if(!obj)return '';
   const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
-  const v=obj.pdfLink||obj.PdfLink||(nested&&(nested.pdfLink||nested.PdfLink))||'';
+  const v=obj.pdfLink||(nested&&nested.pdfLink)||'';
   return String(v||'').trim();
 }
 
 function nciIntakeOpened(r){
   if(!r)return '';
-  return r.createdAt||r.socDate||'';
+  return r.createdAt||'';
 }
 
 function nciIntakeCompletedAt(r){
   if(!r)return '';
-  return r.submittedAt||r.updatedAt||'';
+  return r.submittedAt||'';
 }
 
 function nciIntakeClientName(r){
@@ -5710,20 +5709,22 @@ async function loadCompletedNewClientIntakes(){
       rows=nciIntakeRowsFromList(data);
     }
     nciCompletedRows=rows.filter(function(r){
-      const st=String((r&&r.status)||'Complete').toLowerCase();
-      return !r||!r.status||st==='complete'||st==='completed';
+      const st=String((r&&r.status)||'Complete');
+      return st==='Complete';
     }).map(function(r){
-      const copy=Object.assign({},r);
-      copy.pdfLink=pickIntakePdfLink(r);
-      copy.intakeId=nciIntakeIdOf(r);
-      copy.clientName=r.clientName||'';
-      copy.nurseName=r.nurseName||'';
-      copy.socDate=r.socDate||'';
-      copy.createdAt=r.createdAt||'';
-      copy.updatedAt=r.updatedAt||'';
-      copy.submittedAt=r.submittedAt||'';
-      copy.pdfFileId=r.pdfFileId||'';
-      return copy;
+      return {
+        intakeId:r.intakeId!=null&&r.intakeId!==''?String(r.intakeId):'',
+        clientId:r.clientId!=null&&r.clientId!==''?String(r.clientId):'',
+        clientName:r.clientName||'',
+        socDate:r.socDate||'',
+        status:r.status||'Complete',
+        nurseName:r.nurseName||'',
+        pdfLink:r.pdfLink||'',
+        pdfFileId:r.pdfFileId||'',
+        createdAt:r.createdAt||'',
+        updatedAt:r.updatedAt||'',
+        submittedAt:r.submittedAt||''
+      };
     });
     if(nciLastCompletePdf&&nciLastCompletePdf.intakeId){
       nciRememberCompletePdf(nciLastCompletePdf.intakeId,nciLastCompletePdf.pdfLink,nciLastCompletePdf.pdfFileId);
