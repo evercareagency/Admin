@@ -203,6 +203,8 @@ textarea{resize:vertical;min-height:80px;}
 .nci-draft-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .nci-draft-row:last-child{border-bottom:none;}
 .nci-pdf-pending{font-size:0.72rem;color:var(--muted);font-weight:600;}
+.nci-complete-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.nci-complete-actions .btn:disabled{cursor:not-allowed;opacity:0.55;}
 @media(max-width:700px){
   #newClientIntakeModal .modal.nci-modal{padding:12px 12px 0;max-width:100vw;width:100%;overflow-x:hidden;}
   .nci-head,#nciHead{flex-wrap:wrap;}
@@ -682,7 +684,7 @@ else setupEverCarePWA();
         </div>
         <div class="card" id="nciCompletedAdminCard">
           <div class="card-title"><span class="ico">📄</span> Completed intakes</div>
-          <p class="nci-hint" style="margin-bottom:10px">Nurses’ completed Open-new-client packets. View opens the archived PDF when Ace has a link; otherwise the row stays PDF pending.</p>
+          <p class="nci-hint" style="margin-bottom:10px">Nurses’ completed Open-new-client packets. View opens pdfLink when Ace has it. Edit reopens the same 5-page wizard and saves as Complete.</p>
           <div style="overflow-x:auto">
             <table class="data-table" id="nciCompletedAdminTable">
               <thead>
@@ -932,7 +934,7 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
         <div class="card" id="nciCompletedNurseCard">
           <div class="card-title"><span class="ico">📄</span> Completed intakes</div>
-          <p class="nci-hint" style="margin-bottom:10px">Client, dates, and status from Ace <code>list_new_client_intakes</code> with status Complete. View opens <code>pdfLink</code> when present; otherwise PDF pending.</p>
+          <p class="nci-hint" style="margin-bottom:10px">Complete packets from Ace. View opens <code>pdfLink</code> when present; Edit reopens the wizard and saves as Complete.</p>
           <div style="overflow-x:auto">
             <table class="data-table" id="nciCompletedNurseTable">
               <thead>
@@ -4483,8 +4485,10 @@ async function viewSupervisoryVisitPdf(rowIndex){
 //     proxyAgencyRepSignatureData, proxyAgencyRepSignDate
 // *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
-// Archive: archive_new_client_intake_pdf (still stub — pdfLink may be empty).
-// List completes: list_new_client_intakes { status: "Complete" }. No CallOutcome on intake.
+// Archive: archive_new_client_intake_pdf (optional fallback). Complete save auto-rearchives.
+// List Complete rows (Ace locked): intakeId, clientId, clientName, socDate, status,
+//   nurseName, pdfLink, pdfFileId, createdAt, updatedAt, submittedAt.
+// submittedAt → Completed column. Edit Complete: save_new_client_intake status Complete.
 
 const NCI_STEPS=[
   {n:1,label:'In person'},
@@ -4550,13 +4554,15 @@ function nciAceOnly(obj,keys){
   return out;
 }
 
-let nciState={intakeId:'',clientId:'',step:1};
+let nciState={intakeId:'',clientId:'',step:1,nurseName:''};
 let nciSigStore={};
 let nciResumePayload=null;
 var nciDirty=false;
 var nciSaving=false;
 var nciDirtyBound=false;
 var nciOpenSnapshot='';
+var nciWizardMode='new'; // new | draft | complete
+var nciLastCompletePdf=null;
 
 function todayEasternMDY(){return toEasternMDY(new Date());}
 
@@ -4698,6 +4704,8 @@ function nciForceIntakeId(data){
     :(inner&&inner.clientId!=null&&inner.clientId!=='')?inner.clientId
     :nciState.clientId;
   nciState.clientId=(cid==null||cid==='')?'':String(cid);
+  const nurse=(data&&data.nurseName)||(inner&&inner.nurseName)||nciState.nurseName||'';
+  if(nurse)nciState.nurseName=String(nurse);
 }
 function nciEchoStatus(data){
   if(!data||typeof data!=='object')return '';
@@ -4853,8 +4861,20 @@ function nciBuildGrids(){
   nciBuildScores('nciAdlGrid',NCI_ADLS);
 }
 
+function nciApplyWizardChrome(){
+  const title=nciEl('nciTitle');
+  const draft=nciEl('nciDraftBtn');
+  const complete=nciEl('nciCompleteBtn');
+  if(title)title.textContent=nciWizardMode==='complete'?'Edit completed intake':'Open new client';
+  if(draft)draft.style.display=nciWizardMode==='complete'?'none':'';
+  if(complete){
+    complete.textContent=nciWizardMode==='complete'?'Save changes':'Mark Complete';
+    complete.onclick=function(){saveNewClientIntake('Complete');};
+  }
+}
+
 function resetNewClientIntake(){
-  nciState={intakeId:'',clientId:'',step:1};
+  nciState={intakeId:'',clientId:'',step:1,nurseName:''};
   nciSigStore={};
   nciResumePayload=null;
   const modal=nciEl('newClientIntakeModal');
@@ -4946,15 +4966,21 @@ function nciSetSaving(on,status){
   const d=nciEl('nciDraftBtn');
   const c=nciEl('nciCompleteBtn');
   if(d){d.disabled=!!on;d.textContent=(on&&status==='Draft')?'Saving…':'Save Draft';}
-  if(c){c.disabled=!!on;c.textContent=(on&&status==='Complete')?'Completing…':'Mark Complete';}
+  if(c){
+    c.disabled=!!on;
+    if(nciWizardMode==='complete')c.textContent=on?'Saving…':'Save changes';
+    else c.textContent=(on&&status==='Complete')?'Completing…':'Mark Complete';
+  }
 }
 
 function openNewClientIntake(){
+  nciWizardMode='new';
   nciEnsureShell();
   nciHideDiscard();
   nciBindDirty();
   nciBuildGrids();
   resetNewClientIntake();
+  nciApplyWizardChrome();
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
@@ -5133,7 +5159,7 @@ function collectNewClientIntake(status){
     action:'save_new_client_intake',
     intakeId:intakeId,
     status:status,
-    nurseName:currentNurseName||'Nurse',
+    nurseName:nciState.nurseName||currentNurseName||'Nurse',
     clientName:clientName,
     socDate:socDate,
     assessment:nciAceOnly(assessment,ACE_ASSESSMENT_KEYS),
@@ -5340,7 +5366,7 @@ async function saveNewClientIntake(status){
     if(status==='Complete'){
       const miss=validateNewClientIntake(payload)||[];
       if(miss.length){
-        nciFail('Mark Complete needs: '+miss.join('; ')+'.');
+        nciFail((nciWizardMode==='complete'?'Save changes needs: ':'Mark Complete needs: ')+miss.join('; ')+'.');
         return;
       }
     }
@@ -5363,9 +5389,19 @@ async function saveNewClientIntake(status){
     nciDirty=false;
     nciCaptureClean();
     if(status==='Complete'){
-      archiveNewClientIntakePdf(nciState.intakeId);
+      const pdf=pickIntakePdfLink(data);
+      const pdfErr=nciStr((data&&data.pdfError)||(data.data&&data.data.pdfError));
+      const pdfFileId=nciStr((data&&data.pdfFileId)||(data.data&&data.data.pdfFileId));
+      const wasCompleteEdit=nciWizardMode==='complete';
+      nciLastCompletePdf={intakeId:nciState.intakeId,pdfLink:pdf,pdfFileId:pdfFileId};
+      nciRememberCompletePdf(nciState.intakeId,pdf,pdfFileId);
       closeNewClientIntake(true);
-      showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
+      if(wasCompleteEdit){
+        if(pdfErr||!pdf)showTempMsg('Saved — PDF refresh pending','var(--warn)');
+        else showTempMsg('Saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
+      }else{
+        showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
+      }
       loadNewClientIntakeDrafts();
       loadCompletedNewClientIntakes();
     }else{
@@ -5393,13 +5429,20 @@ async function getNewClientIntake(intakeId){
   return apiPost({action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
 }
 
-async function resumeNewClientIntake(intakeId){
+async function resumeNewClientIntake(intakeId,opts){
+  opts=opts||{};
+  const completeEdit=opts.completeEdit===true;
+  nciWizardMode=completeEdit?'complete':'draft';
   nciEnsureShell();
   nciHideDiscard();
   nciBindDirty();
   nciBuildGrids();
+  const keepNurse=nciState.nurseName||'';
   resetNewClientIntake();
   nciState.intakeId=(intakeId==null||intakeId==='')?'':String(intakeId);
+  if(opts.nurseName)nciState.nurseName=String(opts.nurseName);
+  else if(keepNurse)nciState.nurseName=keepNurse;
+  nciApplyWizardChrome();
   nciPrefillDates();
   nciRenderSteps();
   openModal('newClientIntakeModal');
@@ -5432,22 +5475,30 @@ async function resumeNewClientIntake(intakeId){
         const aDob=nciVal('nci_p_dateOfBirth');
         const aPhone=nciVal('nci_p_phone');
         if(!name){
-          nciFail('Resume opened but client name was empty — Ace fields may not have restored. Save Draft again after filling the name.');
+          nciFail((completeEdit?'Edit':'Resume')+' opened but client name was empty — Ace fields may not have restored.');
         }else if((hadDob&&!aDob)||(hadPhone&&!aPhone)){
-          nciFail('Resume opened but Activity Plan DOB/phone stayed blank even though Ace activityPlan had the value(s). Save Draft again after filling date of birth and phone.');
+          nciFail((completeEdit?'Edit':'Resume')+' opened but Activity Plan DOB/phone stayed blank even though Ace activityPlan had the value(s).');
         }else{
-          showTempMsg('Draft resumed.','var(--teal)');
+          showTempMsg(completeEdit?'Intake opened for edit.':'Draft resumed.','var(--teal)');
         }
         nciCaptureClean();
       },100);
     }else{
-      nciFail((data&&data.error)||'Backend pending — get_new_client_intake could not load this draft.');
+      nciFail((data&&data.error)||'Backend pending — get_new_client_intake could not load this intake.');
       setTimeout(()=>nciInitPageSigs(1),80);
     }
   }catch(e){
     nciFail('Backend pending or unreachable. Stub action: get_new_client_intake.');
     setTimeout(()=>nciInitPageSigs(1),80);
   }
+}
+
+async function editCompletedIntake(intakeId){
+  const id=String(intakeId||'');
+  const row=nciCompletedRows.find(function(r){return nciIntakeIdOf(r)===id;})||{};
+  nciWizardMode='complete';
+  nciState.nurseName=row.nurseName||currentNurseName||nciState.nurseName||'';
+  return resumeNewClientIntake(id,{completeEdit:true,nurseName:nciState.nurseName});
 }
 
 function showNurseTab(tab){
@@ -5479,25 +5530,35 @@ function nciIntakeIdOf(r){
 function pickIntakePdfLink(obj){
   if(!obj)return '';
   const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
-  const v=obj.pdfLink||obj.pdfUrl||obj.PdfLink||obj.PDFLink||obj.pdf_link||obj.PdfUrl||obj.PDFUrl||obj.archiveUrl||obj.archiveLink
-    ||(nested&&(nested.pdfLink||nested.pdfUrl||nested.PdfLink||nested.PDFLink||nested.pdf_link||nested.pdfUrl))||'';
+  const v=obj.pdfLink||obj.PdfLink||(nested&&(nested.pdfLink||nested.PdfLink))||'';
   return String(v||'').trim();
 }
 
 function nciIntakeOpened(r){
   if(!r)return '';
-  return r.openedAt||r.openedDate||r.dateOpened||r.createdAt||r.created||r.startedAt||r.opened||r.socDate
-    ||(r.assessment&&(r.assessment.socDate||r.assessment.assessmentDate))||'';
+  return r.createdAt||r.socDate||'';
 }
 
 function nciIntakeCompletedAt(r){
   if(!r)return '';
-  return r.completedAt||r.completedDate||r.dateCompleted||r.completed||r.updatedAt||r.savedAt||'';
+  return r.submittedAt||r.updatedAt||'';
 }
 
 function nciIntakeClientName(r){
   if(!r)return 'Untitled';
-  return r.clientName||(r.assessment&&r.assessment.clientName)||r.name||'Untitled';
+  return r.clientName||'Untitled';
+}
+
+function nciRememberCompletePdf(intakeId,pdfLink,pdfFileId){
+  const id=String(intakeId||'');
+  if(!id)return;
+  nciCompletedRows.forEach(function(r){
+    if(nciIntakeIdOf(r)===id){
+      if(pdfLink)r.pdfLink=pdfLink;
+      if(pdfFileId)r.pdfFileId=pdfFileId;
+    }
+  });
+  paintCompletedNewClientIntakes();
 }
 
 function nciCompletedTableHtml(rows){
@@ -5510,9 +5571,11 @@ function nciCompletedTableHtml(rows){
     const st=escapeHtml(r.status||'Complete');
     const opened=escapeHtml(toEasternMDY(nciIntakeOpened(r))||'—');
     const done=escapeHtml(toEasternMDY(nciIntakeCompletedAt(r))||'—');
-    const nurse=escapeHtml(r.nurseName||r.NurseName||r.supervisorName||'—');
+    const nurse=escapeHtml(r.nurseName||'—');
     const pdf=pickIntakePdfLink(r);
     const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
+    const viewDis=pdf?'':' disabled';
+    const safe=escapeAttr(id);
     return `<tr>
       <td><strong>${name}</strong></td>
       <td>${opened}</td>
@@ -5520,7 +5583,10 @@ function nciCompletedTableHtml(rows){
       <td><span class="badge badge-ok">${st}</span></td>
       <td>${nurse}</td>
       <td>${pdfCell}</td>
-      <td><button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${escapeAttr(id)}')">📄 View</button></td>
+      <td><div class="nci-complete-actions">
+        <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${safe}')"${viewDis}>📄 View</button>
+        <button type="button" class="btn btn-sm btn-navy" onclick="editCompletedIntake('${safe}')">Edit</button>
+      </div></td>
     </tr>`;
   }).join('');
 }
@@ -5553,9 +5619,20 @@ async function loadCompletedNewClientIntakes(){
       const copy=Object.assign({},r);
       copy.pdfLink=pickIntakePdfLink(r);
       copy.intakeId=nciIntakeIdOf(r);
+      copy.clientName=r.clientName||'';
+      copy.nurseName=r.nurseName||'';
+      copy.socDate=r.socDate||'';
+      copy.createdAt=r.createdAt||'';
+      copy.updatedAt=r.updatedAt||'';
+      copy.submittedAt=r.submittedAt||'';
+      copy.pdfFileId=r.pdfFileId||'';
       return copy;
     });
-    paintCompletedNewClientIntakes();
+    if(nciLastCompletePdf&&nciLastCompletePdf.intakeId){
+      nciRememberCompletePdf(nciLastCompletePdf.intakeId,nciLastCompletePdf.pdfLink,nciLastCompletePdf.pdfFileId);
+    }else{
+      paintCompletedNewClientIntakes();
+    }
   }catch(e){
     nciCompletedRows=[];
     paintCompletedNewClientIntakes();
@@ -5569,19 +5646,6 @@ async function viewCompletedIntakePdf(intakeId){
   if(url){
     window.open(url,'_blank','noopener');
     return;
-  }
-  // archive_new_client_intake_pdf is still a stub — try once; never invent a URL.
-  if(id){
-    try{
-      const data=await apiPost({action:'archive_new_client_intake_pdf',intakeId:id});
-      url=pickIntakePdfLink(data);
-      if(url){
-        row.pdfLink=url;
-        paintCompletedNewClientIntakes();
-        window.open(url,'_blank','noopener');
-        return;
-      }
-    }catch(e){}
   }
   showTempMsg('PDF not ready yet','var(--warn)');
 }
