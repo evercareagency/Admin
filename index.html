@@ -5,13 +5,14 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;max-width:100%;overflow-x:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);max-width:100%;overflow-x:hidden;}
 .screen{display:none;min-height:100vh;min-height:100dvh;}
 .screen.active{display:block;}
 #loginScreen.active{display:flex;align-items:center;justify-content:center;background:var(--navy);min-height:100vh;min-height:100dvh;padding:20px;}
@@ -163,7 +164,8 @@ textarea{resize:vertical;min-height:80px;}
 .nci-close{flex-shrink:0;min-height:44px;min-width:44px;}
 .nci-x{min-width:44px;min-height:44px;width:44px;height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;font-size:1.45rem;line-height:1;cursor:pointer;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:600;padding:0;}
 .nci-sub{font-size:0.78rem;color:var(--muted);margin-top:4px;}
-.nci-body,#nciBody{flex:1 1 0% !important;min-height:0 !important;overflow-x:hidden;overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
+.nci-body,#nciBody{flex:1 1 0% !important;min-height:0 !important;overflow-x:hidden;overflow-y:auto !important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;max-width:100%;}
+#newClientIntakeModal input,#newClientIntakeModal select,#newClientIntakeModal textarea{touch-action:manipulation;max-width:100%;}
 .nci-steps{display:flex;gap:6px;margin:0 0 16px;flex-wrap:wrap;}
 .nci-dot{flex:1;min-width:56px;min-height:44px;border:1.5px solid var(--border);background:white;border-radius:8px;cursor:pointer;font-size:0.66rem;font-weight:700;color:var(--muted);padding:6px 4px;text-align:center;}
 .nci-dot strong{display:block;font-size:0.85rem;color:var(--navy);}
@@ -200,9 +202,79 @@ textarea{resize:vertical;min-height:80px;}
 .nci-radio input{width:18px;height:18px;accent-color:var(--teal);}
 .nci-draft-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .nci-draft-row:last-child{border-bottom:none;}
-@media(max-width:700px){#newClientIntakeModal .modal.nci-modal{padding:12px 12px 0;}.nci-dot{min-width:calc(20% - 6px);}.nci-checks{grid-template-columns:1fr;}}
+@media(max-width:700px){
+  #newClientIntakeModal .modal.nci-modal{padding:12px 12px 0;max-width:100vw;width:100%;overflow-x:hidden;}
+  .nci-head,#nciHead{flex-wrap:wrap;}
+  .nci-dot{min-width:calc(20% - 6px);}
+  .nci-checks{grid-template-columns:1fr;}
+  #nciBody,.nci-body,#nciBody .nci-page{max-width:100%;overflow-x:hidden;}
+  #newClientIntakeModal input[type="text"],
+  #newClientIntakeModal input[type="password"],
+  #newClientIntakeModal input[type="date"],
+  #newClientIntakeModal input[type="time"],
+  #newClientIntakeModal input[type="tel"],
+  #newClientIntakeModal input[type="email"],
+  #newClientIntakeModal input[type="number"],
+  #newClientIntakeModal select,
+  #newClientIntakeModal textarea{font-size:16px !important;}
+}
 @media(min-width:701px){
   #newClientIntakeModal .modal.nci-modal{border-radius:12px;}
+}
+@media(max-width:768px){
+  input[type="text"],input[type="password"],input[type="date"],input[type="time"],input[type="tel"],input[type="email"],input[type="number"],select,textarea,.edit-f,.search-bar input{
+    font-size:16px !important;
+  }
+  #newClientIntakeModal,#newClientIntakeModal .modal.nci-modal{
+    width:100%;
+    max-width:100vw;
+    overflow-x:hidden;
+  }
+}
+
+/* Admin timesheet print preview (in-portal so Back/Close always works) */
+.ts-print-overlay{display:none;position:fixed;inset:0;z-index:10050;background:#d8dde6;flex-direction:column;overflow:auto;-webkit-overflow-scrolling:touch;}
+.ts-print-overlay.show{display:flex !important;}
+.ts-print-toolbar{flex-shrink:0;position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top,0px));background:var(--navy);color:white;}
+.ts-print-toolbar h2{font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;margin:0;}
+.ts-print-toolbar .ts-print-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.ts-print-toolbar .btn{min-height:44px;}
+.ts-print-wrap{flex:1;padding:18px 12px 40px;display:flex;justify-content:center;}
+.ts-print-sheet{background:white;width:8.5in;max-width:100%;padding:0.45in 0.5in;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;}
+.ts-mo{width:100%;color:#111;}
+.ts-mo .ts-agency{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:10px;}
+.ts-mo .ts-agency h1{font-size:18px;letter-spacing:0.4px;margin:0 0 2px;text-transform:uppercase;}
+.ts-mo .ts-agency .sub{font-size:12px;margin:0;}
+.ts-mo .ts-agency .addr{font-size:11px;margin:2px 0 0;}
+.ts-mo .ts-title{text-align:center;font-size:15px;font-weight:700;text-transform:uppercase;margin:8px 0 10px;text-decoration:underline;}
+.ts-mo .ts-hdr{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px;}
+.ts-mo .ts-hdr td{border:1px solid #111;padding:6px 8px;vertical-align:top;}
+.ts-mo .ts-hdr .lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.4px;font-weight:700;}
+.ts-mo .ts-grid{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;}
+.ts-mo .ts-grid th,.ts-mo .ts-grid td{border:1px solid #111;padding:5px 4px;text-align:center;}
+.ts-mo .ts-grid th{background:#111;color:#fff;font-weight:700;font-size:10px;}
+.ts-mo .ts-grid td.rowlbl{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;}
+.ts-mo .ts-totals{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;margin:8px 0 12px;font-weight:700;}
+.ts-mo .ts-totals span{border-bottom:1px solid #111;min-width:90px;display:inline-block;text-align:center;}
+.ts-mo .ts-cert{font-size:10.5px;line-height:1.45;border:1px solid #111;padding:8px 10px;margin-bottom:14px;}
+.ts-mo .ts-sigs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+.ts-mo .ts-sigbox{border:1px solid #111;padding:8px 10px;min-height:78px;}
+.ts-mo .ts-sigbox .slbl{font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:4px;}
+.ts-mo .ts-sigbox img{height:36px;max-width:100%;}
+.ts-mo .ts-sigline{border-bottom:1px solid #111;height:36px;margin-bottom:6px;}
+.ts-mo .ts-sigmeta{font-size:10px;}
+.ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
+@media(max-width:700px){
+  .ts-print-sheet{padding:14px 10px;width:100%;}
+  .ts-mo .ts-sigs{grid-template-columns:1fr;}
+  .ts-mo .ts-grid{font-size:9px;}
+}
+@media print{
+  .screen,.sidebar,.modal-bg,#pwaBanner,.ts-print-toolbar{display:none !important;}
+  #tsPrintOverlay.ts-print-overlay,.ts-print-overlay.show{display:block !important;position:static;background:white;overflow:visible;}
+  .ts-print-wrap{padding:0;}
+  .ts-print-sheet{box-shadow:none;width:100%;max-width:none;padding:0;}
+  @page{size:letter;margin:0.4in;}
 }
 
 /* Inservice assign: Assign to all + Choose aides */
@@ -1234,7 +1306,8 @@ Call (216) 377-5991 with any questions.</textarea>
       <div style="display:flex;gap:7px;flex-wrap:wrap">
         <button class="mbtn mbtn-warn" onclick="showCorrectionPanel()">⚠️ Request Correction</button>
         <button class="mbtn" style="background:var(--success);color:white" onclick="saveEdits()">💾 Save Edits</button>
-        <button class="mbtn mbtn-confirm" onclick="printTS()">🖨️ Print PDF</button>
+        <button class="mbtn" style="background:#6b3fa0;color:white" onclick="collectTimesheetSignatures()">✍️ Collect Signature</button>
+        <button class="mbtn mbtn-confirm" onclick="printTS()">🖨️ Print timesheet</button>
         <button class="mbtn" style="background:var(--navy);color:white" onclick="downloadTSPDF()">⬇️ Save as PDF File</button>
         <button class="mbtn mbtn-danger" onclick="deleteRec()">🗑️ Delete</button>
         <button class="mbtn mbtn-cancel" onclick="closeModal('detailModal')">✕ Close</button>
@@ -1255,6 +1328,20 @@ Call (216) 377-5991 with any questions.</textarea>
 </div>
 
 
+<div id="tsPrintOverlay" class="ts-print-overlay" hidden>
+  <div class="ts-print-toolbar no-print">
+    <h2>Timesheet print view</h2>
+    <div class="ts-print-actions">
+      <button type="button" class="btn btn-ghost" onclick="closeTimesheetPrint()">← Back to portal</button>
+      <button type="button" class="btn btn-ghost" onclick="closeTimesheetPrint()">✕ Close</button>
+      <button type="button" class="btn btn-teal" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+  <div class="ts-print-wrap">
+    <div id="tsPrintSheet" class="ts-print-sheet"></div>
+  </div>
+</div>
+
 <div class="modal-bg" id="backupDetailModal">
   <div class="modal">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
@@ -1272,6 +1359,103 @@ Call (216) 377-5991 with any questions.</textarea>
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
 const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const PRINT_DAYS=[1,2,3,4,5,6,0]; // Mon–Sun for Mo paper form
+const GPS_VERIFY_FT=500; // internal verification threshold (~0.09 mi); UI always shows miles
+const SIG_REQUIRED_MSG='Client and HHA signatures are required';
+function formatDistanceMiles(distanceFt){
+  const ft=Number(distanceFt);
+  if(!isFinite(ft))return 'unknown distance';
+  const mi=ft/5280;
+  return mi.toFixed(2)+' mi';
+}
+function hasSigInk(sig){
+  return !!(sig&&String(sig).length>100);
+}
+function resolveDayInk(i,role){
+  const padId=role==='aide'?`asig_aide_${i}`:`asig_client_${i}`;
+  const pad=adminSigPads[padId];
+  if(pad&&pad.hasData){
+    const c=document.getElementById(padId);
+    if(c)return c.toDataURL();
+  }
+  const d=((currentRec&&currentRec.days)||{})[i]||{};
+  return role==='aide'?(d.aideSig||''):(d.clientSig||'');
+}
+function timesheetInkStatus(rec){
+  const r=rec||currentRec;
+  let aide=false,client=false;
+  DAYS.forEach((_,i)=>{
+    if(hasSigInk(resolveDayInk(i,'aide')))aide=true;
+    else if(r&&r.days&&hasSigInk((r.days[i]||{}).aideSig))aide=true;
+    if(hasSigInk(resolveDayInk(i,'client')))client=true;
+    else if(r&&r.days&&hasSigInk((r.days[i]||{}).clientSig))client=true;
+  });
+  return {aide,client,ok:aide&&client};
+}
+function requireTimesheetSignatures(){
+  const st=timesheetInkStatus();
+  if(st.ok)return true;
+  showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');
+  const tbl=document.querySelector('#detailBody .hours-tbl');
+  if(tbl)tbl.scrollIntoView({behavior:'smooth',block:'center'});
+  return false;
+}
+function collectTimesheetSignatures(){
+  if(!currentRec)return;
+  if(!requireTimesheetSignatures())return;
+  showTempMsg('Client and HHA signatures are on file. Ready to print.','var(--success)');
+}
+function gpsDistanceUi(d){
+  if(!d)return '';
+  if(d.distanceFt!=null&&d.distanceFt!==''){
+    const col=d.verified===true?'var(--success)':'var(--danger)';
+    return '<span class="ts-gps-mi" style="color:'+col+'">'+formatDistanceMiles(d.distanceFt)+' from client</span>';
+  }
+  if(d.verified===true)return '<span class="ts-gps-mi" style="color:var(--success)">At client address</span>';
+  return '';
+}
+function serviceCodeFor(rec,day){
+  const t=String((rec&&rec.svcType)||'').toLowerCase();
+  if(/home\s*mak|homemak|household|hm\b/.test(t))return 'HM';
+  if(/personal|hha|pc\b/.test(t))return 'PC';
+  if(day&&day.svcs&&day.svcs.length){
+    const s=day.svcs[0];
+    if(typeof HH!=='undefined'&&HH.includes(s))return 'HM';
+    if(typeof NUT!=='undefined'&&NUT.includes(s))return 'HM';
+    return 'PC';
+  }
+  return (rec&&rec.svcType)||'PC';
+}
+function patientInitials(name){
+  const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length)return '';
+  return parts.map(p=>p[0].toUpperCase()).join('');
+}
+function to12hrPrint(t){
+  if(!t)return'';
+  const[h,m]=String(t).split(':').map(Number);
+  if(isNaN(h))return t;
+  const period=h>=12?'PM':'AM';
+  let h12=h%12;if(h12===0)h12=12;
+  return `${h12}:${String(m||0).padStart(2,'0')} ${period}`;
+}
+function toMDYPrint(d){
+  if(!d)return'';
+  const parts=String(d).split('-');
+  if(parts.length!==3)return d;
+  const[yyyy,mm,dd]=parts;
+  return `${mm}/${dd}/${String(yyyy).slice(-2)}`;
+}
+function hrsToDecimal(hrs){
+  if(!hrs||hrs==='—')return 0;
+  const[h,m]=String(hrs).split(':').map(Number);
+  if(isNaN(h))return 0;
+  return h+((m||0)/60);
+}
+function formatHrsDec(n){
+  const v=Number(n)||0;
+  return v.toFixed(2);
+}
 const PC=['Bed Bath','Assist w/chair bath','Tub Bath','Shower','Shower w/chair','Shampoo hair','Hair care/Comb','Oral care','Skin Care','Pericare','Nail Care','Shave','Assist w/dressing','Med. Reminders'];
 const ELIM=['Assist w/bed pan/urinal','Assist w/BSC','Incontinence Care','Empty drainage bag','Record bowel movement','Catheter Care'];
 const ACT=['Dangle side of bed','Turn & position','Assist w/transfer','Range of Motion','Assist w/ambulation','Equipment care'];
@@ -1767,7 +1951,7 @@ function viewBackup(id){
       <td>${tin}</td>
       <td>${tout}</td>
       <td><strong>${d.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${d.location?`📍 ${d.location}`:'—'}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${d.location?`📍 ${d.location}${gpsDistanceUi(d)}`:'—'}</td>
       <td>${aideSigHTML}</td>
       <td>${clientSigHTML}</td>
       <td style="font-size:0.7rem;max-width:160px">${(d.svcs||[]).join(', ')||'—'}</td>
@@ -1843,7 +2027,7 @@ function buildDetailBody(){
       <td><input class="edit-f" id="ei_in_${i}" value="${d?.tin||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td><input class="edit-f" id="ei_out_${i}" value="${d?.tout||''}" style="width:80px" oninput="recalcHrs(${i})"></td>
       <td id="ei_hrs_${i}"><strong>${d?.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${d?.location?`📍 ${d.location}<br>${d.lat&&d.lng?`<button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—'}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${d?.location?`📍 ${d.location}${gpsDistanceUi(d)}<br>${d.lat&&d.lng?`<button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${d.verified===true?'✓ Verified':d.verified===false?'✗ Off Location':'View Map'}</button>`:''}`:'—'}</td>
       <td>
         ${aideSigHTML}
         <canvas class="sig-canvas" id="asig_aide_${i}" height="60" title="Draw new aide signature"></canvas>
@@ -1938,10 +2122,11 @@ async function showLocationMap(dayIndex){
   const banner=document.getElementById('mapStatusBanner');
   if(d.verified===true){
     banner.style.background='#e8f8f0';banner.style.color='var(--success)';
-    banner.textContent='✅ Verified — Aide was at the client\'s home when this day was saved.';
+    const vMi=(d.distanceFt!=null&&d.distanceFt!=='')?' ('+formatDistanceMiles(d.distanceFt)+')':'';
+    banner.textContent='✅ Verified — Aide was at the client\'s home when this day was saved.'+vMi;
   }else if(d.verified===false){
     banner.style.background='#fde8e8';banner.style.color='var(--danger)';
-    banner.textContent='❌ Not Verified — Aide was approximately '+(d.distanceFt||'?')+' feet from the client\'s registered address.';
+    banner.textContent='❌ Not Verified — Aide was approximately '+formatDistanceMiles(d.distanceFt)+' from the client\'s registered address.';
   }else{
     banner.style.background='#f5f8fc';banner.style.color='var(--muted)';
     banner.textContent='⚠️ No client address on file to compare against — showing aide\'s location only.';
@@ -2054,197 +2239,131 @@ function deleteRec(){
   quickDelete(currentRec.id);closeModal('detailModal');currentRec=null;
 }
 
+function buildMoTimesheetHTML(r){
+  const days=r.days||{};
+  const initials=patientInitials(r.clientName);
+  let topAide='', topClient='';
+  let regular=0, travel=0;
+  const col={};
+  PRINT_DAYS.forEach(i=>{
+    const d=days[i]||{};
+    const aideSig=resolveDayInk(i,'aide')||d.aideSig||'';
+    const clientSig=resolveDayInk(i,'client')||d.clientSig||'';
+    if(!topAide&&hasSigInk(aideSig))topAide=aideSig;
+    if(!topClient&&hasSigInk(clientSig))topClient=clientSig;
+    const hrs=hrsToDecimal(d.hrs);
+    const tr=Number(d.travelHrs||d.travelHours||0)||0;
+    if(d.tin||d.tout||d.hrs)regular+=hrs;
+    travel+=tr;
+    col[i]={
+      date:toMDYPrint(d.date)||'',
+      code:(d.tin||d.tout||d.hrs)?serviceCodeFor(r,d):'',
+      tin:to12hrPrint(d.tin)||'',
+      tout:to12hrPrint(d.tout)||'',
+      hrs:(d.hrs&&d.hrs!=='—')?formatHrsDec(hrs):'',
+      init:hasSigInk(clientSig)?initials:''
+    };
+  });
+  const recTravel=Number(r.travelHrs||r.travelHours||0)||0;
+  if(recTravel&&!travel)travel=recTravel;
+  const th=key=>PRINT_DAYS.map(i=>`<td>${col[i][key]||''}</td>`).join('');
+  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  return `<div class="ts-mo">
+    <div class="ts-agency">
+      <h1>EverCare Home Agency</h1>
+      <p class="sub">Home Health / Personal Care Timesheet</p>
+      <p class="addr">5510 Pearl Rd Ste 200 &nbsp; Cleveland, OH 44129 &nbsp; (216) 377-5991</p>
+    </div>
+    <div class="ts-title">Weekly Service Time Record</div>
+    <table class="ts-hdr">
+      <tr>
+        <td style="width:50%"><div class="lbl">Agency</div>EverCare Home Agency</td>
+        <td><div class="lbl">Week of</div>${esc(formatWeekLabel(r.weekStart))}</td>
+      </tr>
+      <tr>
+        <td><div class="lbl">Patient / Client</div>${esc(r.clientName||'—')}</td>
+        <td><div class="lbl">Employee / HHA</div>${esc(r.empName||'—')}</td>
+      </tr>
+      <tr>
+        <td><div class="lbl">Service type</div>${esc(r.svcType||'—')}</td>
+        <td><div class="lbl">Total hours</div>${esc(r.totalHrs||'—')}</td>
+      </tr>
+    </table>
+    <table class="ts-grid">
+      <thead><tr><th></th>${dayNames.map(n=>`<th>${n}</th>`).join('')}</tr></thead>
+      <tbody>
+        <tr><td class="rowlbl">Date</td>${th('date')}</tr>
+        <tr><td class="rowlbl">Service Code</td>${th('code')}</tr>
+        <tr><td class="rowlbl">Time In</td>${th('tin')}</tr>
+        <tr><td class="rowlbl">Time Out</td>${th('tout')}</tr>
+        <tr><td class="rowlbl">Total Hours</td>${th('hrs')}</tr>
+        <tr><td class="rowlbl">Patient Initial</td>${th('init')}</tr>
+      </tbody>
+    </table>
+    <div class="ts-totals">
+      <div>Total Regular Hours: <span>${formatHrsDec(regular)}</span></div>
+      <div>Total Travel Hours: <span>${formatHrsDec(travel)}</span></div>
+    </div>
+    <div class="ts-cert">
+      <strong>CERTIFICATION.</strong> I certify that the hours and services on this timesheet are true and correct.
+      The employee provided the listed services to the patient named above. The patient (or authorized representative)
+      confirms the work was performed satisfactorily. Unsigned timesheets will not be accepted. Do not pay the employee directly.
+      False statements may result in termination and/or prosecution. Notify the office at (216) 377-5991 of hospitalization, falls, hour changes, or cancellations. Timesheets are due by 5:00 PM every Monday.
+    </div>
+    <div class="ts-sigs">
+      <div class="ts-sigbox">
+        <div class="slbl">Employee / HHA Signature</div>
+        ${topAide?`<img src="${topAide}" alt="Employee signature">`:'<div class="ts-sigline"></div>'}
+        <div class="ts-sigmeta">${esc(r.empName||'')}</div>
+      </div>
+      <div class="ts-sigbox">
+        <div class="slbl">Patient / Client Signature</div>
+        ${topClient?`<img src="${topClient}" alt="Patient signature">`:'<div class="ts-sigline"></div>'}
+        <div class="ts-sigmeta">${esc(r.clientName||'')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeTimesheetPrint(){
+  const el=document.getElementById('tsPrintOverlay');
+  if(!el)return;
+  el.classList.remove('show');
+  el.hidden=true;
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    const el=document.getElementById('tsPrintOverlay');
+    if(el&&el.classList.contains('show'))closeTimesheetPrint();
+  }
+});
+
+function openTimesheetPrint(r){
+  const sheet=document.getElementById('tsPrintSheet');
+  const overlay=document.getElementById('tsPrintOverlay');
+  if(!sheet||!overlay)return;
+  sheet.innerHTML=buildMoTimesheetHTML(r);
+  overlay.hidden=false;
+  overlay.classList.add('show');
+  overlay.scrollTop=0;
+}
+
 function printTS(){
   if(!currentRec)return;
-  const r=currentRec,days=r.days||{};
-
-  // Helper: convert 24hr "HH:MM" to 12hr "H:MM AM/PM"
-  const to12hr=(t)=>{
-    if(!t)return'';
-    const[h,m]=t.split(':').map(Number);
-    if(isNaN(h))return t;
-    const period=h>=12?'PM':'AM';
-    let h12=h%12;if(h12===0)h12=12;
-    return `${h12}:${String(m).padStart(2,'0')} ${period}`;
-  };
-
-  // Helper: convert YYYY-MM-DD to MM/DD/YY
-  const toMDY=(d)=>{
-    if(!d)return'';
-    const parts=d.split('-');
-    if(parts.length!==3)return d;
-    const[yyyy,mm,dd]=parts;
-    return `${mm}/${dd}/${yyyy.slice(2)}`;
-  };
-
-  // Helper: convert "H:MM" duration to "Hh MMm" format (not a clock time, no AM/PM)
-  const toDuration=(hrs)=>{
-    if(!hrs||hrs==='—')return '0h 00m';
-    const[h,m]=hrs.split(':').map(Number);
-    return `${h}h ${String(m||0).padStart(2,'0')}m`;
-  };
-
-  let dayRows='';
-  let topAideSig='', topClientSig='';
-  DAYS.forEach((day,i)=>{
-    const d=days[i];
-    // Check if admin drew new signature
-    const aidePad=adminSigPads[`asig_aide_${i}`],clientPad=adminSigPads[`asig_client_${i}`];
-    const aideSig=aidePad?.hasData?document.getElementById(`asig_aide_${i}`)?.toDataURL():(d?.aideSig||'');
-    const clientSig=clientPad?.hasData?document.getElementById(`asig_client_${i}`)?.toDataURL():(d?.clientSig||'');
-    // Grab first available signatures for the top summary section
-    if(!topAideSig&&aideSig&&aideSig.length>100)topAideSig=aideSig;
-    if(!topClientSig&&clientSig&&clientSig.length>100)topClientSig=clientSig;
-    dayRows+=`<tr>
-      <td>${day}</td><td>${toMDY(d?.date)||''}</td>
-      <td>${to12hr(d?.tin)||''}</td><td>${to12hr(d?.tout)||''}</td><td>${d?.hrs||''}</td>
-      <td>${aideSig&&aideSig.length>100?`<img src="${aideSig}" style="height:30px">`:''}</td>
-      <td>${clientSig&&clientSig.length>100?`<img src="${clientSig}" style="height:30px">`:''}</td>
-      <td>${toMDY(d?.date)||''}</td>
-    </tr>`;
-  });
-  const svcTbl=(title,items)=>`<tr><td colspan="8" style="background:#000000;color:white;font-weight:bold;padding:1.5px 4px;font-size:7.5px">${title}</td></tr>${items.map(s=>`<tr><td>${s}</td>${DAYS.map((_,i)=>`<td style="text-align:center">${days[i]?.svcs?.includes(s)?'✓':''}</td>`).join('')}</tr>`).join('')}`;
-  const w=window.open('','_blank','width=1050,height=780');
-  w.document.write(`<!DOCTYPE html><html><head><title>EverCare Timesheet — ${r.empName}</title>
-  <style>
-    @page{size:letter;margin:0.35in;}
-    *{box-sizing:border-box;}
-    body{font-family:Arial,sans-serif;font-size:8.5px;padding:0;max-width:100%;margin:0;line-height:1.2;}
-    h2{text-align:center;font-size:13px;margin:0 0 2px;text-decoration:underline;}
-    h3{text-align:center;font-size:10px;margin:1px 0;}
-    hr{margin:3px 0;border:none;border-top:1px solid #333;}
-    table{width:100%;border-collapse:collapse;margin-bottom:4px;font-size:8px;}
-    th{border:1px solid #333;padding:2px 3px;background:#555;color:white;text-align:left;font-size:7.5px;}
-    td{border:1px solid #aaa;padding:1.5px 3px;}
-    .info{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-bottom:4px;font-size:9px;}
-    .sig-img{height:24px;vertical-align:middle;}
-    .sig-line{display:inline-block;border-bottom:1px solid #333;min-width:130px;height:20px;}
-    .footer-txt{text-align:center;margin-top:6px;font-size:8px;border-top:1px solid #aaa;padding-top:4px;}
-    .notice-txt{font-size:7.5px;margin:2px 0;}
-    img{max-height:22px !important;}
-    @media print{.no-print{display:none;}}
-  </style>
-</head><body>
-
-  <h2>PERSONAL CARE / HOME MAKING (circle one)</h2>
-  <h3>EverCare Home Agency</h3>
-  <h3>Timesheet</h3>
-  <hr>
-  <div class="info">
-    <span><b>Client's name:</b> ${r.clientName||'—'}</span>
-    <span><b>Client's Signature:</b> ${topClientSig?`<img src="${topClientSig}" class="sig-img">`:'<span class="sig-line"></span>'}</span>
-  </div>
-  <div class="info">
-    <span><b>Employee's name:</b> ${r.empName||'—'}</span>
-    <span><b>Employee's Signature:</b> ${topAideSig?`<img src="${topAideSig}" class="sig-img">`:'<span class="sig-line"></span>'}</span>
-    <span><b>Total hours worked:</b> ${toDuration(r.totalHrs)}</span>
-  </div>
-  <table>
-    <thead><tr><th>Day</th><th>Date</th><th>Time-In</th><th>Time-Out</th><th>Hours</th><th>HHA Signature</th><th>Client Signature</th><th>Date</th></tr></thead>
-    <tbody>${dayRows}</tbody>
-  </table>
-  <div class="notice-txt">☐ Notify office at (216) 377-5991 if there are any changes ex: hospitalization, falls, hours change, cancellations etc</div>
-  <div class="notice-txt">☐ Timesheets are due by 5:00pm each and every Monday. There Are No Exceptions!!</div>
-  <div class="notice-txt">☐ Note: Your supervisor indicates approval of the hours that have been documented. You will not be paid for unauthorized hours/shifts. If you have any questions or concerns, please contact the office as soon as possible.</div>
-  <table>
-    <thead><tr><th style="min-width:140px">Service</th><th>Sun</th><th>M</th><th>T</th><th>W</th><th>TH</th><th>F</th><th>Sa</th></tr></thead>
-    <tbody>
-      ${svcTbl('PERSONAL CARE',PC)}
-      ${svcTbl('ELIMINATION',ELIM)}
-      ${svcTbl('ACTIVITY',ACT)}
-      ${svcTbl('HOUSEHOLD TASK',HH)}
-      ${svcTbl('NUTRITION',NUT)}
-    </tbody>
-  </table>
-  <p style="text-align:center;font-style:italic;font-size:8px;margin:3px 0">BY SIGNING THIS FORM, YOU ACKNOWLEDGE THAT ALL MARKED SERVICES HAS BEEN RENDERED.</p>
-  <div class="footer-txt">5510 Pearl Rd Ste 200 Cleveland, OH 44129</div>
-  <br><button class="no-print" onclick="window.print()" style="padding:9px 22px;background:#2a7f7f;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px">🖨️ Print This Timesheet</button>
-  </body></html>`);
-  w.document.close();
+  if(!requireTimesheetSignatures())return;
+  openTimesheetPrint(currentRec);
 }
 
 async function downloadTSPDF(){
   if(!currentRec)return;
-  const r=currentRec,days=r.days||{};
+  if(!requireTimesheetSignatures())return;
+  const r=currentRec;
   showTempMsg('Generating PDF, please wait...','var(--teal)');
-
-  const to12hr=(t)=>{if(!t)return'';const[h,m]=t.split(':').map(Number);if(isNaN(h))return t;const period=h>=12?'PM':'AM';let h12=h%12;if(h12===0)h12=12;return `${h12}:${String(m).padStart(2,'0')} ${period}`;};
-  const toMDY=(d)=>{if(!d)return'';const parts=d.split('-');if(parts.length!==3)return d;const[yyyy,mm,dd]=parts;return `${mm}/${dd}/${yyyy.slice(2)}`;};
-  const toDuration=(hrs)=>{if(!hrs||hrs==='—')return '0h 00m';const[h,m]=hrs.split(':').map(Number);return `${h}h ${String(m||0).padStart(2,'0')}m`;};
-
-  let dayRows='';
-  let topAideSig='', topClientSig='';
-  DAYS.forEach((day,i)=>{
-    const d=days[i];
-    const aideSig=d?.aideSig||'', clientSig=d?.clientSig||'';
-    if(!topAideSig&&aideSig&&aideSig.length>100)topAideSig=aideSig;
-    if(!topClientSig&&clientSig&&clientSig.length>100)topClientSig=clientSig;
-    dayRows+=`<tr>
-      <td>${day}</td><td>${toMDY(d?.date)||''}</td>
-      <td>${to12hr(d?.tin)||''}</td><td>${to12hr(d?.tout)||''}</td><td>${d?.hrs||''}</td>
-      <td>${aideSig&&aideSig.length>100?`<img src="${aideSig}" style="height:30px">`:''}</td>
-      <td>${clientSig&&clientSig.length>100?`<img src="${clientSig}" style="height:30px">`:''}</td>
-      <td>${toMDY(d?.date)||''}</td>
-    </tr>`;
-  });
-  const svcTbl=(title,items)=>`<tr><td colspan="8" style="background:#000000;color:white;font-weight:bold;padding:1.5px 4px;font-size:7.5px">${title}</td></tr>${items.map(s=>`<tr><td>${s}</td>${DAYS.map((_,i)=>`<td style="text-align:center">${days[i]?.svcs?.includes(s)?'✓':''}</td>`).join('')}</tr>`).join('')}`;
-
   const container=document.createElement('div');
-  container.style.cssText='position:fixed;left:-9999px;top:0;width:850px;background:white;font-family:Arial,sans-serif;font-size:11px;padding:20px;';
-  container.innerHTML=`
-    <h2 style="text-align:center;font-size:16px;margin:0 0 2px;text-decoration:underline">PERSONAL CARE / HOME MAKING (circle one)</h2>
-    <h3 style="text-align:center;font-size:13px;margin:2px 0">EverCare Home Agency</h3>
-    <h3 style="text-align:center;font-size:13px;margin:2px 0 8px">Timesheet</h3>
-    <hr style="margin:6px 0;border:none;border-top:1px solid #333">
-    <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:6px;font-size:11px">
-      <span><b>Client's name:</b> ${r.clientName||'—'}</span>
-      <span><b>Client's Signature:</b> ${topClientSig?`<img src="${topClientSig}" style="height:28px;vertical-align:middle">`:'<span style="display:inline-block;border-bottom:1px solid #333;min-width:150px;height:22px"></span>'}</span>
-    </div>
-    <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:8px;font-size:11px">
-      <span><b>Employee's name:</b> ${r.empName||'—'}</span>
-      <span><b>Employee's Signature:</b> ${topAideSig?`<img src="${topAideSig}" style="height:28px;vertical-align:middle">`:'<span style="display:inline-block;border-bottom:1px solid #333;min-width:150px;height:22px"></span>'}</span>
-      <span><b>Total hours worked:</b> ${toDuration(r.totalHrs)}</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;margin-bottom:6px;font-size:10px">
-      <thead><tr>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Day</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Date</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Time-In</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Time-Out</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Hours</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">HHA Signature</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Client Signature</th>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left">Date</th>
-      </tr></thead>
-      <tbody style="font-size:10px">${dayRows.replace(/<td>/g,'<td style="border:1px solid #aaa;padding:3px 4px">')}</tbody>
-    </table>
-    <div style="font-size:9.5px;margin:3px 0">☐ Notify office at (216) 377-5991 if there are any changes ex: hospitalization, falls, hours change, cancellations etc</div>
-    <div style="font-size:9.5px;margin:3px 0"><b>☐ Timesheets are due by 5:00pm each and every Monday. There Are No Exceptions!!</b></div>
-    <div style="font-size:9.5px;margin:3px 0 8px">☐ Note: Your supervisor indicates approval of the hours that have been documented. You will not be paid for unauthorized hours/shifts. If you have any questions or concerns, please contact the office as soon as possible.</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9px">
-      <thead><tr>
-        <th style="border:1px solid #333;padding:3px 4px;background:#555;color:white;text-align:left;min-width:140px">Service</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">Sun</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">M</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">T</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">W</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">TH</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">F</th>
-        <th style="border:1px solid #333;padding:3px;background:#555;color:white">Sa</th>
-      </tr></thead>
-      <tbody>
-        ${svcTbl('PERSONAL CARE',PC).replace(/<td>/g,'<td style="border:1px solid #aaa;padding:3px 4px">')}
-        ${svcTbl('ELIMINATION',ELIM).replace(/<td>/g,'<td style="border:1px solid #aaa;padding:3px 4px">')}
-        ${svcTbl('ACTIVITY',ACT).replace(/<td>/g,'<td style="border:1px solid #aaa;padding:3px 4px">')}
-        ${svcTbl('HOUSEHOLD TASK',HH).replace(/<td>/g,'<td style="border:1px solid #aaa;padding:3px 4px">')}
-        ${svcTbl('NUTRITION',NUT).replace(/<td>/g,'<td style="border:1px solid #aaa;padding:3px 4px">')}
-      </tbody>
-    </table>
-    <p style="text-align:center;font-style:italic;font-size:9px;margin:8px 0">BY SIGNING THIS FORM, YOU ACKNOWLEDGE THAT ALL MARKED SERVICES HAS BEEN RENDERED.</p>
-    <div style="text-align:center;margin-top:10px;font-size:9px;border-top:1px solid #aaa;padding-top:6px">5510 Pearl Rd Ste 200 Cleveland, OH 44129</div>
-  `;
+  container.style.cssText='position:fixed;left:-9999px;top:0;width:850px;background:white;padding:24px;';
+  container.innerHTML=buildMoTimesheetHTML(r);
   document.body.appendChild(container);
-
   try{
     const canvas=await html2canvas(container,{scale:2,useCORS:true});
     const imgData=canvas.toDataURL('image/png');
