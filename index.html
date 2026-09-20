@@ -394,7 +394,15 @@ body.ts-print-open{overflow:hidden;}
     background:#fff !important;
     color:#111 !important;
   }
-  @page{size:letter;margin:0.22in;}
+  @page{size:letter;margin:0;}
+  html.ts-printing body > #tsPrintSheet,
+  #tsPrintSheet,.ts-print-sheet{
+    width:8.5in !important;
+    height:11in !important;
+    max-height:11in !important;
+    padding:0.18in 0.20in 0.14in !important;
+    overflow:hidden !important;
+  }
 }
 
 /* Inservice assign: Assign to all + Choose aides */
