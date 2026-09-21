@@ -47,10 +47,9 @@ assert.ok(printBlock.includes('max-height:10.5in !important'), 'print sheet max-
 assert.ok(printBlock.includes('width:8.1in !important'), 'print sheet width fits Letter minus 0.2in margins');
 assert.ok(printBlock.includes('#nciToast'), 'toast chrome hidden in print');
 assert.ok(printBlock.includes('.no-print'), 'no-print chrome hidden');
-assert.ok(html.includes('Headers & Footers'), 'iOS Headers & Footers helper');
+assert.ok(html.includes('Headers &amp; Footers'), 'iOS Headers & Footers helper');
 assert.ok(html.includes('github.io URL'), 'helper names the Safari github.io URL');
 assert.ok(html.includes('id="tsPrintIosTip"'), 'helper sits near Print in the overlay toolbar');
-assert.ok(/showTempMsg\('Tip: iOS Print Options/.test(html), 'short toast notes Safari headers');
 assert.ok(html.includes('v=ts1pg721'), 'Pages cache-bust for one-page print CSS');
 assert.ok(!printBlock.includes('height:11in !important'), 'print sheet must not be a full 11in plus @page margin (that is page 2)');
 

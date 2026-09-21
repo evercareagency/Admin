@@ -2931,9 +2931,6 @@ function openTimesheetPrint(r){
   overlay.hidden=false;
   overlay.scrollTop=0;
   document.body.classList.add('ts-print-open');
-  if(typeof showTempMsg==='function'){
-    showTempMsg('Tip: iOS Print Options → turn off Headers & Footers if a github.io URL appears (Safari-controlled).','var(--navy)',7000);
-  }
 }
 
 async function printTimesheetSheet(){
