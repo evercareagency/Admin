@@ -301,20 +301,20 @@ body.ts-print-open{overflow:hidden;}
 .ts-mo .ts-days .totalval{font-size:9.5px;}
 .ts-mo .ts-notice{font-size:7.5px;font-weight:700;text-align:center;border-top:1px solid #111;border-bottom:1px solid #111;padding:5px 3px;margin:6px 0 3px;line-height:1.3;text-transform:uppercase;}
 .ts-mo .ts-sandata{font-size:8.5px;text-align:center;margin:0 0 7px;line-height:1.3;}
-.ts-mo .ts-svccols{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin:0;}
+.ts-mo .ts-svccols{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch;flex:1;min-height:0;margin:0;}
 .ts-mo .ts-svccol{min-width:0;display:flex;flex-direction:column;}
 .ts-mo .ts-svcsec{margin-bottom:6px;}
 .ts-mo .ts-svc{width:100%;border-collapse:collapse;font-size:7.5px;table-layout:fixed;}
-.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:1px 3px;height:14px;line-height:1.15;vertical-align:middle;}
+.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:1px 3px;height:16px;line-height:1.15;vertical-align:middle;}
 .ts-mo .ts-svc th{background:#111;color:#fff;font-weight:700;font-size:7.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
 .ts-mo .ts-svc th.cat,.ts-mo .ts-svc td.svc{text-align:left;overflow:hidden;}
 .ts-mo .ts-svc td.mark,.ts-mo .ts-svc th.d{text-align:center;width:15px;font-weight:700;padding:0;}
 .ts-mo .ts-other{font-size:7.5px;margin:0 0 2px;}
-.ts-mo .ts-comments{border:none;padding:6px 0 0;font-size:8.5px;display:flex;flex-direction:column;}
+.ts-mo .ts-comments{border:none;flex:1;min-height:54px;padding:6px 0 0;font-size:8.5px;display:flex;flex-direction:column;}
 .ts-mo .ts-comments .lbl{font-size:8.5px;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:0.4px;}
-.ts-mo .ts-comment-line{border-bottom:1px solid #111;height:16px;}
-.ts-mo .ts-comment-line:first-of-type{height:18px;}
-.ts-mo .ts-legal{font-size:7.5px;line-height:1.35;text-align:center;margin-top:auto;border-top:1px solid #111;padding-top:5px;flex-shrink:0;}
+.ts-mo .ts-comment-line{border-bottom:1px solid #111;min-height:16px;flex:1;}
+.ts-mo .ts-comment-line:first-of-type{min-height:18px;}
+.ts-mo .ts-legal{font-size:7.5px;line-height:1.35;text-align:center;margin-top:6px;border-top:1px solid #111;padding-top:5px;flex-shrink:0;}
 .ts-mo .ts-legal .addr{display:block;margin-top:4px;font-weight:700;letter-spacing:0.5px;}
 .ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
 @media(max-width:700px){
@@ -422,7 +422,9 @@ body.ts-print-open{overflow:hidden;}
     flex-direction:column !important;
   }
   .ts-mo{height:100% !important;display:flex !important;flex-direction:column !important;}
-  .ts-mo .ts-svccols{display:grid !important;grid-template-columns:1fr 1fr !important;}
+  .ts-mo .ts-svccols{display:grid !important;grid-template-columns:1fr 1fr !important;align-items:stretch !important;flex:1 !important;min-height:0 !important;}
+  .ts-mo .ts-comments{flex:1 !important;}
+  .ts-mo .ts-legal{margin-top:6px !important;}
 }
 
 /* Inservice assign: Assign to all + Choose aides */
