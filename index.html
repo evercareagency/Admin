@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
 <!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
+<!-- inservice view-results hotfix 2026-09-21 paint-from-update / cache-on-unknown-get -->
 <meta name="admin-build" content="2026-09-21-cert-c2-ribbon-laurel">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -3534,6 +3535,7 @@ let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
 let isComplianceRows=[];
 let isResultsState={rowIndex:-1,row:null,questions:[],editing:false};
+let isResultDetailById={};
 
 function getIsAssignMode(){
   const el=document.querySelector('input[name="isAssignMode"]:checked');
@@ -3936,7 +3938,7 @@ function isPendingActionsHtml(i){
 function renderISComplianceTable(rows){
   const tbody=document.getElementById('isComplianceBody');
   const empty=document.getElementById('isComplianceEmpty');
-  isComplianceRows=rows||[];
+  isComplianceRows=(rows||[]).map(mergeCachedISResultRow);
   if(!tbody)return;
   if(!isComplianceRows.length){
     if(empty)empty.style.display='block';
@@ -4154,6 +4156,87 @@ function applyISResultScore(row,data){
   next.isCompleted=true;
   return fillISScore(next,INSERVICES.find(t=>t.id==next.topicId),parseISAnswers(next));
 }
+function isISGetShape(data){
+  if(!data||typeof data!=='object')return false;
+  const payload=isResultPayload(data);
+  if(parseISResultItems(payload)||parseISResultItems(data))return true;
+  const scoreKeys=['scoreCorrect','ScoreCorrect','scoreTotal','ScoreTotal','scorePct','ScorePct','scorePercent'];
+  for(let i=0;i<scoreKeys.length;i++){
+    if(payload[scoreKeys[i]]!=null&&payload[scoreKeys[i]]!=='')return true;
+    if(data[scoreKeys[i]]!=null&&data[scoreKeys[i]]!=='')return true;
+  }
+  return false;
+}
+function formatISAceActionError(data,action,fallback){
+  const why=String((data&&(data.error||data.message))||fallback||'Request failed.').trim();
+  const act=String(action||'').trim();
+  if(!why)return act?('Ace '+act+' failed.'):'Ace request failed.';
+  if(/^unknown action$/i.test(why)||(typeof nciLooksLikeUnknownAction==='function'&&nciLooksLikeUnknownAction(why)&&(!act||why.toLowerCase().indexOf(act.toLowerCase())<0))){
+    return act?('Ace '+act+' failed: '+why):why;
+  }
+  return why;
+}
+function rememberISResultDetail(id,detail){
+  if(!id||!detail)return;
+  const key=String(id);
+  const prev=isResultDetailById[key]||{};
+  isResultDetailById[key]={
+    questions:(detail.questions&&detail.questions.length)?detail.questions:(prev.questions||[]),
+    row:detail.row||prev.row||null,
+    payload:detail.payload||prev.payload||null
+  };
+}
+function cachedISResultDetail(id){
+  if(!id)return null;
+  return isResultDetailById[String(id)]||null;
+}
+function mergeCachedISResultRow(row){
+  if(!row)return row;
+  const cached=cachedISResultDetail(isResultIdOf(row));
+  if(!cached)return row;
+  let next=Object.assign({},row);
+  if(cached.row){
+    if(cached.row.answers!=null)next.answers=cached.row.answers;
+    ['scoreCorrect','ScoreCorrect','scoreTotal','ScoreTotal','scorePct','ScorePct','scorePercent','GradedDetail','gradedDetail'].forEach(function(k){
+      if(cached.row[k]!=null&&cached.row[k]!=='')next[k]=cached.row[k];
+    });
+  }
+  if(cached.payload)next=applyISResultScore(next,cached.payload);
+  next.isCompleted=true;
+  return next;
+}
+function regradeISQuestionsFromAnswers(questions,answers){
+  return (questions||[]).map(function(q,i){
+    const sel=answers[i];
+    const label=(q.options&&q.options[sel]!=null)?q.options[sel]:q.aideAnswer;
+    const next=Object.assign({},q,{selected:sel,aideAnswer:label});
+    next.isCorrect=Number(next.selected)===Number(next.correct)||String(next.aideAnswer||'')===String(next.correctAnswer||'');
+    return next;
+  });
+}
+function fallbackISQuestions(row){
+  const id=isResultIdOf(row);
+  const cached=cachedISResultDetail(id);
+  if(cached&&cached.questions&&cached.questions.length)return cached.questions.slice();
+  if(cached&&cached.payload){
+    const fromCache=normalizeISResultQuestions(cached.payload,Object.assign({},row,cached.row||{}));
+    if(fromCache.length)return fromCache;
+  }
+  return buildLocalISQuestions(row);
+}
+function adoptISResultPayload(row,data){
+  const next=applyISResultScore(row,data);
+  let questions=normalizeISResultQuestions(data,next);
+  if(!questions.length)questions=fallbackISQuestions(next);
+  isResultsState.row=next;
+  isResultsState.questions=questions;
+  const id=isResultIdOf(next);
+  rememberISResultDetail(id,{questions:questions,row:next,payload:data});
+  if(isResultsState.rowIndex>=0&&isComplianceRows[isResultsState.rowIndex]){
+    isComplianceRows[isResultsState.rowIndex]=mergeCachedISResultRow(Object.assign({},isComplianceRows[isResultsState.rowIndex],next));
+  }
+  return questions;
+}
 function setISResultsEditMode(on){
   isResultsState.editing=!!on;
   const edit=document.getElementById('isResultsEditBtn');
@@ -4218,24 +4301,33 @@ function closeISResults(){
 async function viewISResults(rowIndex){
   const row=isComplianceRows[rowIndex];
   if(!row)return;
-  isResultsState={rowIndex:rowIndex,row:row,questions:[],editing:false};
+  const cached=cachedISResultDetail(isResultIdOf(row));
+  const seeded=cached&&cached.row?Object.assign({},row,cached.row):row;
+  isResultsState={rowIndex:rowIndex,row:seeded,questions:(cached&&cached.questions)||[],editing:false};
   setISResultsEditMode(false);
   const note=document.getElementById('isResultsNote');
   if(note){note.hidden=true;note.textContent='';delete note.dataset.liveErr;}
   const body=document.getElementById('isResultsBody');
   if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">Loading results...</p>';
   const banner=document.getElementById('isResultsBanner');
-  if(banner)banner.textContent=formatISScoreBanner(row);
+  if(banner)banner.textContent=formatISScoreBanner(seeded);
   const meta=document.getElementById('isResultsMeta');
   if(meta){
-    meta.innerHTML='<div><span class="lbl">Aide</span> '+escapeHtml(row.empName||row.username||'—')+'</div>'
-      +'<div><span class="lbl">Topic</span> '+escapeHtml(row.topicTitle||row.topicShort||'—')+'</div>'
-      +'<div><span class="lbl">Completed</span> '+escapeHtml(formatISCompletedDate(certDateFromRecord(row)))+'</div>';
+    meta.innerHTML='<div><span class="lbl">Aide</span> '+escapeHtml(seeded.empName||seeded.username||'—')+'</div>'
+      +'<div><span class="lbl">Topic</span> '+escapeHtml(seeded.topicTitle||seeded.topicShort||'—')+'</div>'
+      +'<div><span class="lbl">Completed</span> '+escapeHtml(formatISCompletedDate(certDateFromRecord(seeded)))+'</div>';
   }
   openModal('isResultsModal');
-  const resultId=isResultIdOf(row);
+  const resultId=isResultIdOf(seeded);
   if(!resultId){
-    if(note){note.hidden=false;note.dataset.liveErr='1';note.textContent='Ace result id missing — cannot load get_inservice_result.';}
+    const qs=fallbackISQuestions(seeded);
+    const why='Ace result id missing — cannot load get_inservice_result.';
+    if(note){note.hidden=false;note.dataset.liveErr='1';note.textContent=why;}
+    if(qs.length){
+      isResultsState.questions=qs;
+      paintISResults();
+      return;
+    }
     if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">No Ace result id on this row.</p>';
     return;
   }
@@ -4245,15 +4337,23 @@ async function viewISResults(rowIndex){
   }catch(e){
     data={success:false,error:(e&&e.message)||'Error'};
   }
-  if(!(data&&data.success)){
-    const why=(data&&(data.error||data.message))||'Could not load results.';
-    if(note){note.hidden=false;note.dataset.liveErr='1';note.textContent=String(why);}
-    if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">'+escapeHtml(String(why))+'</p>';
+  if(data&&data.success){
+    if(note){note.hidden=true;note.textContent='';delete note.dataset.liveErr;}
+    adoptISResultPayload(seeded,data);
+    paintISResults();
     return;
   }
-  isResultsState.row=applyISResultScore(row,data);
-  isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
-  paintISResults();
+  const why=formatISAceActionError(data,'get_inservice_result','Could not load results.');
+  if(note){note.hidden=false;note.dataset.liveErr='1';note.textContent=why;}
+  const qs=fallbackISQuestions(seeded);
+  if(qs.length){
+    isResultsState.questions=qs;
+    if(cached&&cached.payload)isResultsState.row=applyISResultScore(seeded,cached.payload);
+    rememberISResultDetail(resultId,{questions:qs,row:isResultsState.row,payload:cached&&cached.payload});
+    paintISResults();
+    return;
+  }
+  if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">'+escapeHtml(why)+'</p>';
 }
 function startISResultsEdit(){
   if(!isResultsState.row)return;
@@ -4291,19 +4391,32 @@ async function saveISResultsEdit(){
   }
   if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save answers';}
   if(!(data&&data.success)){
-    const why=(data&&(data.error||data.message))||'Save failed.';
-    showTempMsg(String(why),'var(--danger)');
+    showTempMsg(formatISAceActionError(data,'admin_update_inservice_answers','Save failed.'),'var(--danger)');
     return;
   }
-  let refreshed=null;
-  try{
-    refreshed=await apiPost({action:'get_inservice_result',id:resultId});
-  }catch(e){
-    refreshed=null;
+  let live=data;
+  if(!isISGetShape(data)){
+    let refreshed=null;
+    try{
+      refreshed=await apiPost({action:'get_inservice_result',id:resultId});
+    }catch(e){
+      refreshed=null;
+    }
+    if(refreshed&&refreshed.success)live=refreshed;
   }
-  const live=(refreshed&&refreshed.success)?refreshed:data;
-  isResultsState.row=applyISResultScore(row,live);
-  isResultsState.questions=normalizeISResultQuestions(live,isResultsState.row);
+  const next=applyISResultScore(row,live);
+  next.answers=answers;
+  let questions=normalizeISResultQuestions(live,next);
+  if(!questions.length)questions=regradeISQuestionsFromAnswers(isResultsState.questions,answers);
+  if(!questions.length)questions=buildLocalISQuestions(next);
+  isResultsState.row=next;
+  isResultsState.questions=questions;
+  rememberISResultDetail(resultId,{questions:questions,row:next,payload:live});
+  if(isResultsState.rowIndex>=0&&isComplianceRows[isResultsState.rowIndex]){
+    isComplianceRows[isResultsState.rowIndex]=mergeCachedISResultRow(Object.assign({},isComplianceRows[isResultsState.rowIndex],next));
+  }
+  const note=document.getElementById('isResultsNote');
+  if(note){note.hidden=true;note.textContent='';delete note.dataset.liveErr;}
   setISResultsEditMode(false);
   paintISResults();
   showTempMsg('Answers updated. Score refreshed.','var(--success)');
