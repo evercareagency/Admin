@@ -11,7 +11,8 @@
 <!-- inservice view-results hotfix 2026-09-21 paint-from-update / cache-on-unknown-get -->
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
-<meta name="admin-build" content="2026-09-21-ace-lock-aide">
+<!-- add aide collision toast 2026-09-21 v=collisione6ed -->
+<meta name="admin-build" content="2026-09-21-add-aide-collision">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -1558,6 +1559,7 @@ Call (216) 377-5991 with any questions.</textarea>
       <div class="search-bar" style="margin-bottom:8px"><input type="text" id="addAideClientSearch" placeholder="Search clients..." oninput="renderAddAideClientList()" autocomplete="off"></div>
       <div id="addAideClientList" class="is-aide-list" role="group" aria-label="Clients"></div>
     </div>
+    <div id="addAideErr" class="nci-err" role="alert"></div>
     <div class="modal-btns">
       <button type="button" class="mbtn mbtn-cancel" onclick="closeModal('addAideModal')">Cancel</button>
       <button type="button" class="mbtn mbtn-confirm" id="createAideBtn" onclick="submitCreateAide()">Create aide</button>
@@ -2578,10 +2580,14 @@ function formatAideAssignedClients(u){
 function aceActionError(data,err,action){
   const raw=(data&&(data.error||data.message))||(err&&err.message)||'Request failed.';
   const text=String(raw);
+  if(looksLikeUsernameTaken(text))return text;
   if(typeof nciLooksLikeUnknownAction==='function'&&nciLooksLikeUnknownAction(text)){
     return 'Unknown action: '+(action||'')+(data&&data.error?(' — '+data.error):'');
   }
   return text;
+}
+function looksLikeUsernameTaken(text){
+  return /already taken|username taken|user(name)? (already )?exists|duplicate (user|username)/i.test(String(text||''));
 }
 async function postAideAction(primary,alias,payload){
   let data=null;
@@ -2592,6 +2598,7 @@ async function postAideAction(primary,alias,payload){
   }
   if(data&&data.success)return {data:data,err:null,action:primary};
   const why=(data&&(data.error||data.message))||'';
+  if(looksLikeUsernameTaken(why))return {data:data,err:null,action:primary};
   if(alias&&typeof nciLooksLikeUnknownAction==='function'&&nciLooksLikeUnknownAction(why)){
     try{
       data=await apiPost(Object.assign({action:alias},payload));
@@ -2606,7 +2613,39 @@ async function postAideAction(primary,alias,payload){
 let addAideUsernameDirty=false;
 let addAideSelectedClients=new Set();
 let addAideClientRoster=[];
+let loadedAidesList=[];
 let _aideTempPwdOnce='';
+function collectLoadedAideUsernames(){
+  const set={};
+  function addUser(u){
+    const un=String((u&&u.username)||'').trim().toLowerCase();
+    if(un)set[un]=true;
+  }
+  function addList(list){
+    if(!list||!list.length)return;
+    for(let i=0;i<list.length;i++)addUser(list[i]);
+  }
+  addList(loadedAidesList);
+  if(typeof allAidesForAssign!=='undefined')addList(allAidesForAssign);
+  const cached=typeof cacheGet==='function'?cacheGet('get_users'):null;
+  if(cached&&cached.data)addList(cached.data);
+  return set;
+}
+function aideUsernameAlreadyTaken(username){
+  const un=String(username||'').trim().toLowerCase();
+  if(!un)return false;
+  return !!collectLoadedAideUsernames()[un];
+}
+function clearAddAideError(){
+  const el=document.getElementById('addAideErr');
+  if(el){el.textContent='';el.style.display='none';}
+}
+function showAddAideError(msg){
+  const text=String(msg||'Request failed.');
+  const el=document.getElementById('addAideErr');
+  if(el){el.textContent=text;el.style.display='block';}
+  showTempMsg(text,'#b91c1c');
+}
 
 async function renderAides(force){
   const container=document.getElementById('aidesContainer');
@@ -2623,6 +2662,8 @@ async function renderAides(force){
     const data=await apiGetCached('get_users',null,force===true);
     if(data&&data.success&&data.data&&data.data.length){
       const aides=data.data.filter(function(u){return u&&u.username;});
+      loadedAidesList=aides;
+      if(typeof allAidesForAssign!=='undefined')allAidesForAssign=aides.slice();
       if(!aides.length){
         container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
         return;
@@ -2647,6 +2688,7 @@ async function renderAides(force){
       return;
     }
   }catch(e){}
+  loadedAidesList=[];
   container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
 }
 
@@ -2658,6 +2700,7 @@ function onAddAideNameInput(){
 }
 function onAddAideUsernameInput(){
   addAideUsernameDirty=true;
+  clearAddAideError();
 }
 function onAddAideClientToggle(cb){
   if(!cb)return;
@@ -2713,6 +2756,7 @@ function showAddAideModal(){
   if(nameEl)nameEl.value='';
   if(userEl)userEl.value='';
   if(searchEl)searchEl.value='';
+  clearAddAideError();
   renderAddAideClientList();
   loadClientsForAddAide();
   openModal('addAideModal');
@@ -2755,8 +2799,13 @@ async function submitCreateAide(){
   const fullName=(nameEl&&nameEl.value||'').trim();
   const username=(userEl&&userEl.value||'').trim().toLowerCase().replace(/\s+/g,'');
   if(userEl)userEl.value=username;
-  if(!fullName){showTempMsg('Enter the aide\'s full name.','var(--danger)');return;}
-  if(!username){showTempMsg('Enter a username.','var(--danger)');return;}
+  clearAddAideError();
+  if(!fullName){showAddAideError('Enter the aide\'s full name.');return;}
+  if(!username){showAddAideError('Enter a username.');return;}
+  if(aideUsernameAlreadyTaken(username)){
+    showAddAideError('Username already taken');
+    return;
+  }
   const clientIds=Array.from(addAideSelectedClients);
   const tempPassword=generateTempPassword();
   if(btn){btn.disabled=true;btn.textContent='Creating...';}
@@ -2775,9 +2824,9 @@ async function submitCreateAide(){
       renderAides(true);
       return;
     }
-    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'admin_create_aide'),'var(--danger)');
+    showAddAideError(aceActionError(data,res&&res.err,res&&res.action||'admin_create_aide'));
   }catch(e){
-    showTempMsg(aceActionError(null,e,'admin_create_aide'),'var(--danger)');
+    showAddAideError(aceActionError(null,e,'admin_create_aide'));
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Create aide';}
   }
