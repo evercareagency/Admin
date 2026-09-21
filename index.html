@@ -457,9 +457,12 @@ body.ts-print-open{overflow:hidden;}
 .is-clear-hint{font-size:0.76rem;color:var(--muted);margin-top:8px;line-height:1.45;}
 .is-compliance-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 .is-compliance-score{font-weight:700;color:var(--navy);white-space:nowrap;}
-.is-results-modal{max-width:720px;}
-.is-results-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.is-results-modal{max-width:720px;max-height:min(92vh,920px);display:flex;flex-direction:column;overflow:hidden;padding-bottom:12px;}
+.is-results-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;flex-shrink:0;}
 .is-results-head h3{margin:0;padding-right:8px;}
+#isResultsBanner,#isResultsMeta,#isResultsNote{flex-shrink:0;}
+#isResultsBody{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#isResultsModal button[hidden]{display:none !important;}
 .is-result-banner{background:var(--teal-light);border:1.5px solid var(--teal);border-radius:10px;padding:14px 16px;margin-bottom:12px;text-align:center;font-size:1.15rem;font-weight:700;color:var(--teal-dark);}
 .is-result-meta{font-size:0.84rem;color:var(--navy);margin-bottom:14px;line-height:1.5;}
 .is-result-meta .lbl{color:var(--muted);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;}
@@ -476,7 +479,7 @@ body.ts-print-open{overflow:hidden;}
 .is-result-qa .ans .right{color:var(--success);font-weight:600;}
 .is-result-edit-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;margin:6px 0 0 30px;min-height:40px;cursor:pointer;font-size:0.82rem;}
 .is-result-edit-opt input{accent-color:var(--teal);width:18px;height:18px;}
-.is-results-foot{justify-content:space-between;}
+.is-results-foot{justify-content:space-between;flex-shrink:0;margin-top:10px;padding-top:12px;border-top:1px solid var(--border);}
 </style>
 
 <!-- PWA -->
@@ -4136,9 +4139,12 @@ function setISResultsEditMode(on){
   const edit=document.getElementById('isResultsEditBtn');
   const save=document.getElementById('isResultsSaveEdit');
   const cancel=document.getElementById('isResultsCancelEdit');
-  if(edit)edit.hidden=!!on;
-  if(save)save.hidden=!on;
-  if(cancel)cancel.hidden=!on;
+  [edit,save,cancel].forEach(function(el){
+    if(!el)return;
+    const hide=el===edit?!!on:!on;
+    el.hidden=hide;
+    el.style.display=hide?'none':'';
+  });
 }
 function paintISResults(){
   const banner=document.getElementById('isResultsBanner');

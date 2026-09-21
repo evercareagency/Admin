@@ -59,6 +59,8 @@ assert.ok(deleteRes, 'deleteISResult missing');
 assert.ok(printHook, 'printISCert missing');
 assert.ok(viewRes, 'viewISResults missing');
 assert.ok(startEdit, 'startISResultsEdit missing');
+assert.ok(html.includes('#isResultsModal button[hidden]{display:none !important;}'), 'hidden footer buttons must beat .btn display');
+assert.ok(extractFn(html, 'function setISResultsEditMode(on)').includes("el.style.display=hide?'none':''"), 'edit mode toggles display');
 assert.ok(saveEdit, 'saveISResultsEdit missing');
 assert.ok(formatDate, 'formatISCompletedDate missing');
 assert.ok(formatScore, 'formatISScoreColumn missing');
