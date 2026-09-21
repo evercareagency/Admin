@@ -58,8 +58,12 @@ assert.ok(/listsP=Promise\.all/.test(loadFn),
 
 assert.ok(fetchFn.includes("action:'list_nurse_alerts'"),
   'fetch must use Ace list_nurse_alerts');
+assert.ok(fetchFn.includes("['items','alerts','data','rows']"),
+  'list_nurse_alerts must read Ace items[].id first');
 assert.ok(fetchFn.includes('username'),
   'list_nurse_alerts must send {username}');
+assert.ok(/markNurseAlertsRead\(ids\)\.then/.test(loadFn),
+  'after mark, must re-fetch list_nurse_alerts to sync badge');
 assert.ok(markFn.includes("action:'mark_nurse_alerts_read'"),
   'mark must use Ace mark_nurse_alerts_read');
 assert.ok(/username,ids:list/.test(markFn),
@@ -107,8 +111,15 @@ async function runRole(role){
   function portalUsername(){
     return String(currentAdminUsername||currentNurseName||currentAdminRole||'').trim();
   }
-  function nurseListRows(data){
-    return (data && data.alerts) || [];
+  function nurseListRows(data,keys){
+    if(!data)return [];
+    if(Array.isArray(data))return data;
+    const names=keys||['items','alerts','data','rows'];
+    for(let i=0;i<names.length;i++){
+      const v=data[names[i]];
+      if(Array.isArray(v))return v;
+    }
+    return [];
   }
   function mapNurseAlertRow(a){
     return {
@@ -139,11 +150,16 @@ async function runRole(role){
     setNurseAlertBadge(0);
     paintAdminNurseAlerts([]);
   }
+  let listed = 0;
   async function apiPost(payload){
     events.push({t:'api',action:payload.action,payload});
     if(payload.action==='list_nurse_alerts'){
       assert.strictEqual(payload.username, currentAdminUsername);
-      return {success:true,alerts:[
+      listed++;
+      if(listed>1){
+        return {success:true,items:[]};
+      }
+      return {success:true,items:[
         {id:'n1',type:'intake',refId:'10',clientName:'Cara',nurseUsername:'rn',createdAt:'2026-09-21'},
         {id:'n2',type:'visit',refId:'11',clientName:'Dee',nurseUsername:'rn',createdAt:'2026-09-21'}
       ]};
@@ -164,7 +180,7 @@ async function runRole(role){
     if(!username)return [];
     const data=await apiPost({action:'list_nurse_alerts',username});
     if(!(data&&data.success))return [];
-    return nurseListRows(data,['alerts','data','items','rows']).map(mapNurseAlertRow).filter(a=>a.id);
+    return nurseListRows(data,['items','alerts','data','rows']).map(mapNurseAlertRow).filter(a=>a.id);
   }
   async function markNurseAlertsRead(ids){
     const username=portalUsername();
@@ -201,7 +217,11 @@ async function runRole(role){
     const ids=alerts.map(a=>a.id).filter(Boolean);
     adminNurseAlerts=[];
     if(ids.length){
-      void markNurseAlertsRead(ids);
+      void markNurseAlertsRead(ids).then(async()=>{
+        const leftover=await fetchUnreadNurseAlerts();
+        adminNurseAlerts=[];
+        setNurseAlertBadge(leftover.length);
+      });
     }
     await listsP;
     await loadNurseActivityFeed();
@@ -223,6 +243,13 @@ async function runRole(role){
   const markCall = events.find(e=>e.action==='mark_nurse_alerts_read');
   assert.ok(markCall, role+': mark posted');
   assert.deepStrictEqual(Object.keys(markCall.payload).sort(), ['action','ids','username']);
+
+  await new Promise(r=>setTimeout(r, 120));
+  assert.ok(markFinished, role+': mark eventually finishes');
+  assert.ok(events.filter(e=>e.action==='list_nurse_alerts').length>=2,
+    role+': must re-fetch list_nurse_alerts after mark');
+  assert.strictEqual(badge.textContent, '0', role+': re-fetch empty list keeps badge 0');
+  assert.ok(!/Unread/.test(list.innerHTML), role+': re-fetch must not resurrect Unread');
 
   return {events, markFinished};
 }
