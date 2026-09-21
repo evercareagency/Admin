@@ -18,7 +18,19 @@ assert.ok(!html.includes('buildPaperSvcSection'), 'table service builder must be
 assert.ok(!html.includes('Travel Hours'), 'must not invent Travel Hours');
 assert.ok(html.includes('function buildPrintHtml('), 'buildPrintHtml required');
 assert.ok(html.includes('class="ts-blank"'), 'blank paper img required');
-assert.ok(html.includes("TS_BLANK_SRC='assets/blank-letter.png'"), 'Pages-served blank path');
+assert.ok(/TS_BLANK_SRC='assets\/blank-letter\.png\?v='/.test(html), 'Pages-served blank path with cache bust');
+assert.ok(html.includes("TS_BLANK_VER='a713ovl'"), 'blank asset version');
+assert.ok(/background-image:\s*(?:var\(--ts-blank-url\)|url\(['"]assets\/blank-letter\.png\?v=)/.test(html), 'sheet CSS background-image backup');
+assert.ok(html.includes("background-image:url('assets/blank-letter.png?v=a713ovl')"), 'print CSS keeps versioned blank');
+assert.ok(!/#tsPrintSheet,\.ts-print-sheet\{[^}]*background:#fff !important/.test(html.replace(/\n/g,'')), 'print sheet CSS must not wipe background-image');
+assert.ok(html.includes('data-print-mode="paper-overlay"'), 'sheet marks paper-overlay mode');
+assert.ok(html.includes('applyPrintSheetPaper'), 'open/print apply paper CSS + data attr');
+assert.ok(/async function printTimesheetSheet\(/.test(html), 'printTimesheetSheet stays async');
+assert.ok(/async function waitForBlankPaper\(/.test(html), 'decode wait helper');
+assert.ok(html.includes('img.decode') || html.includes('img.decode==='), 'await image decode');
+assert.ok(html.includes('naturalWidth>0'), 'blank must decode with naturalWidth>0');
+assert.ok(!html.includes('PAPER_SVC_LEFT'), 'legacy HTML left-column builder removed');
+assert.ok(!html.includes('PAPER_SERVICES'), 'legacy HTML service table map removed');
 assert.ok(html.includes('nameX:110'), 'Ace FORM nameX');
 assert.ok(html.includes('dayY0:172.5'), 'Ace FORM dayY0');
 assert.ok(html.includes('commentsY:610'), 'Ace FORM commentsY');
@@ -66,6 +78,7 @@ const consts = [
   extractConst(html, 'SVC_TREATMENTS'),
   extractConst(html, 'SVC_NUTRITION'),
   extractConst(html, 'TS_FORM_PT'),
+  extractConst(html, 'TS_BLANK_VER'),
   extractConst(html, 'TS_BLANK_SRC'),
   extractConst(html, 'TS_SVC_OVERLAY')
 ].join('\n');
@@ -122,8 +135,9 @@ const rec = {
 
 const out = buildPrintHtml(rec);
 assert.ok(out.startsWith('<img class="ts-blank"'), 'sheet starts with blank paper img');
-assert.ok(out.includes('src="assets/blank-letter.png"'), 'blank src is Pages asset');
+assert.ok(out.includes('src="assets/blank-letter.png?v=a713ovl"'), 'blank src is versioned Pages asset');
 assert.ok(!/<table/i.test(out), 'overlay must not rebuild tables');
+assert.ok(!out.includes('<table'), 'buildPrintHtml never emits table');
 assert.ok(out.includes('Ruth Coleman'), 'client name fill');
 assert.ok(out.includes('Aminila Hassaman'), 'caregiver name fill');
 assert.ok(out.includes('09/13/26'), 'day date fill');
