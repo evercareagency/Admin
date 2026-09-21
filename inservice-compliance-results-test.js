@@ -47,6 +47,7 @@ const isNum = extractFn(html, 'function isNumOrNull(v)');
 const ansOk = extractFn(html, 'function isISAnswerCorrect(q,aideAns)');
 const firstField = extractFn(html, 'function firstISField(obj,keys)');
 const resultIdOf = extractFn(html, 'function isResultIdOf(c)');
+const parseJsonArr = extractFn(html, 'function parseISJsonArray(raw)');
 const printCert = extractFn(html, 'function printCert(r)');
 
 assert.ok(clearAssignment, 'clearAssignment missing');
@@ -104,10 +105,12 @@ assert.ok(loadIS.includes('isISCompletedRecord'), 'after clear, completed rows s
 assert.ok(loadIS.includes('Completed results stay here after Clear Assignment'), 'empty copy does not imply wipe');
 
 assert.ok(viewRes.includes("action:'get_inservice_result'"), 'View Results fetches get_inservice_result');
-assert.ok(viewRes.includes('id:resultId'), 'View Results sends Ace LOCK { id }');
-assert.ok(viewRes.includes('nciLooksLikeUnknownAction'), 'View Results stubs unknown Ace action');
+assert.ok(viewRes.includes('id:resultId'), 'View Results sends Ace v42 { id }');
+assert.ok(!viewRes.includes('Unknown action: get_inservice_result'), 'must not fake unknown-action stub');
+assert.ok(!html.includes('not deployed yet'), 'must not show Ace-not-deployed stub copy');
 assert.ok(saveEdit.includes("action:'admin_update_inservice_answers'"), 'save posts admin update');
-assert.ok(saveEdit.includes('id:resultId,answers:answers'), 'save sends Ace LOCK { id, answers:[selIdx] }');
+assert.ok(saveEdit.includes('id:resultId,answers:answers'), 'save sends Ace v42 { id, answers:[selIdx] }');
+assert.ok(saveEdit.includes("action:'get_inservice_result'"), 'save refreshes View Results from get_inservice_result');
 assert.ok(saveEdit.includes('loadISCompliance(true)'), 'save refreshes score/list');
 assert.ok(deleteRes.includes("postArchiveAction('delete_inservice_result','archive_inservice_result',{id:id})"), 'delete/archive LOCK { id }');
 assert.ok(loadIS.includes('includeArchived')===false || /no includeArchived/.test(html), 'get_inservices skips archived');
@@ -129,9 +132,9 @@ const sandbox = {
   console
 };
 vm.createContext(sandbox);
-assert.ok(topicIdOf && isNum && ansOk && fillScore && hydrate && certDate && firstField && resultIdOf, 'score/date helpers missing');
+assert.ok(topicIdOf && isNum && ansOk && fillScore && hydrate && certDate && firstField && resultIdOf && parseJsonArr, 'score/date helpers missing');
 vm.runInContext(
-  [isNum, firstField, resultIdOf, parseAns, completedRec, topicIdOf, ansOk, fillScore, hydrate, certDate, formatDate, formatScore, formatBanner].join('\n'),
+  [isNum, firstField, resultIdOf, parseJsonArr, parseAns, completedRec, topicIdOf, ansOk, fillScore, hydrate, certDate, formatDate, formatScore, formatBanner].join('\n'),
   sandbox
 );
 
