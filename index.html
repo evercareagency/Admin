@@ -278,18 +278,18 @@ textarea{resize:vertical;min-height:80px;}
 .ts-print-toolbar .btn{min-height:44px;min-width:44px;display:inline-flex !important;visibility:visible !important;}
 #tsPrintBackBtn,#tsPrintCloseBtn{background:#fff !important;color:#1a2744 !important;border:2px solid #fff !important;}
 body.ts-print-open{overflow:hidden;}
-.ts-print-wrap{flex:1;padding:8px 6px 20px;display:flex;justify-content:center;}
+.ts-print-wrap{flex:1;padding:8px 6px 20px;display:flex;justify-content:center;align-items:flex-start;}
 /* US Letter lock — 612×792pt / 8.5×11in. Blank paper + FORM-map fills only. */
-.ts-print-sheet{position:relative;background:#fff;width:8.5in;height:11in;max-width:100%;padding:0;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;overflow:hidden;aspect-ratio:8.5/11;}
+.ts-print-sheet{position:relative;background:#fff;width:8.5in;height:11in;max-width:100%;padding:0;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;overflow:hidden;aspect-ratio:8.5/11;container-type:inline-size;container-name:ts;flex:none;align-self:flex-start;}
 .ts-blank{display:block;width:100%;height:100%;object-fit:fill;object-position:center;border:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;position:absolute;inset:0;z-index:0;}
 .ts-fill{position:absolute;z-index:1;color:#111;font-family:'Times New Roman',Times,serif;font-weight:700;line-height:1;white-space:nowrap;pointer-events:none;transform:translate(0,-50%);}
 .ts-fill-c{transform:translate(-50%,-50%);text-align:center;}
-.ts-fill-name{font-size:10pt;max-width:30%;overflow:hidden;text-overflow:ellipsis;}
-.ts-fill-day{font-size:7.5pt;}
-.ts-fill-total{font-size:8.5pt;}
-.ts-fill-mark{font-size:8pt;}
-.ts-fill-other{font-size:7pt;max-width:10%;overflow:hidden;text-overflow:ellipsis;}
-.ts-fill-notes{font-size:8pt;font-weight:400;white-space:normal;max-width:46%;line-height:1.3;transform:none;}
+.ts-fill-name{font-size:10pt;font-size:1.634cqw;max-width:30%;overflow:hidden;text-overflow:ellipsis;}
+.ts-fill-day{font-size:7.5pt;font-size:1.225cqw;}
+.ts-fill-total{font-size:8.5pt;font-size:1.389cqw;}
+.ts-fill-mark{font-size:8pt;font-size:1.307cqw;}
+.ts-fill-other{font-size:7pt;font-size:1.144cqw;max-width:10%;overflow:hidden;text-overflow:ellipsis;}
+.ts-fill-notes{font-size:8pt;font-size:1.307cqw;font-weight:400;white-space:normal;max-width:46%;line-height:1.3;transform:none;}
 .ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
 @media(max-width:700px){
   .ts-print-sheet{width:100%;height:auto;min-height:0;aspect-ratio:8.5/11;padding:0;}
