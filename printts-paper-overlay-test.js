@@ -39,6 +39,19 @@ assert.ok(/async function downloadTSPDF\(\)\{[\s\S]*requireTimesheetSignatures/.
 assert.ok(html.includes('sheet.innerHTML=buildPrintHtml(r)'), 'openTimesheetPrint uses overlay HTML');
 assert.ok(html.includes('@media print'), 'print stylesheet stays');
 assert.ok(/#tsPrintToolbar[\s\S]*display:none !important/.test(html), 'toolbar hidden in print');
+const printBlock = html.slice(html.indexOf('@media print{'), html.indexOf('/* Inservice assign'));
+assert.ok(printBlock.includes('@page{size:letter portrait;margin:0.2in;}'), '@page uses 0.2in (≤0.25in) so Safari is less likely to apply 0.5in defaults');
+assert.ok(!/@page\{[^}]*margin:\s*0;/.test(printBlock), 'do not use @page margin:0 (Safari treats it as default 0.5in)');
+assert.ok(printBlock.includes('height:10.5in !important'), 'print sheet is slightly scaled under 11in');
+assert.ok(printBlock.includes('max-height:10.5in !important'), 'print sheet max-height keeps address on page 1');
+assert.ok(printBlock.includes('width:8.1in !important'), 'print sheet width fits Letter minus 0.2in margins');
+assert.ok(printBlock.includes('#nciToast'), 'toast chrome hidden in print');
+assert.ok(printBlock.includes('.no-print'), 'no-print chrome hidden');
+assert.ok(html.includes('Headers &amp; Footers'), 'iOS Headers & Footers helper');
+assert.ok(html.includes('github.io URL'), 'helper names the Safari github.io URL');
+assert.ok(html.includes('id="tsPrintIosTip"'), 'helper sits near Print in the overlay toolbar');
+assert.ok(html.includes('v=ts1pg721'), 'Pages cache-bust for one-page print CSS');
+assert.ok(!printBlock.includes('height:11in !important'), 'print sheet must not be a full 11in plus @page margin (that is page 2)');
 
 function extractFn(src, sig){
   const start = src.indexOf(sig);
