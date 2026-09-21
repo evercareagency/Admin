@@ -6,23 +6,35 @@ const path = require('path');
 const assert = require('assert');
 
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
-const saveFn = html.match(/async function saveNewClientIntake\(status\)\{[\s\S]*?\n\}/);
-const ensureFn = html.match(/async function nciEnsureCompletePdf\(intakeId,priorPdfError\)\{[\s\S]*?\n\}/);
+function extractFn(src, sig){
+  const start = src.indexOf(sig);
+  if(start < 0)return '';
+  let i = src.indexOf('{', start);
+  let depth = 0;
+  for(; i < src.length; i++){
+    if(src[i] === '{')depth++;
+    else if(src[i] === '}'){
+      depth--;
+      if(depth === 0)return src.slice(start, i + 1);
+    }
+  }
+  return '';
+}
+const save = extractFn(html, 'async function saveNewClientIntake(status)');
+const ensure = extractFn(html, 'async function nciEnsureCompletePdf(intakeId,priorPdfError)');
 
-assert.ok(saveFn, 'saveNewClientIntake not found');
-assert.ok(ensureFn, 'nciEnsureCompletePdf not found');
-
-const save = saveFn[0];
-const ensure = ensureFn[0];
+assert.ok(save, 'saveNewClientIntake not found');
+assert.ok(ensure, 'nciEnsureCompletePdf not found');
 
 assert.ok(save.includes("showTempMsg('Saved — PDF generating','var(--success)',0)"),
   'Complete followup must show exact sticky toast Saved — PDF generating');
 
-const toastAt = save.indexOf("showTempMsg('Saved — PDF generating'");
-const closeAt = save.indexOf('closeNewClientIntake(true)');
-const draftsAt = save.indexOf('loadNewClientIntakeDrafts()');
-const listAt = save.indexOf('loadCompletedNewClientIntakes()');
-assert.ok(toastAt > 0 && closeAt > toastAt, 'generating toast must appear before closeNewClientIntake');
+const follow = save.slice(save.indexOf('pdfPending / empty pdfLink'));
+const toastAt = follow.indexOf("showTempMsg('Saved — PDF generating'");
+const closeAt = follow.indexOf('closeNewClientIntake(true)');
+const draftsAt = follow.indexOf('loadNewClientIntakeDrafts()');
+const listAt = follow.indexOf('loadCompletedNewClientIntakes()');
+assert.ok(toastAt >= 0 && closeAt > toastAt, 'generating toast must appear before closeNewClientIntake');
 assert.ok(draftsAt > toastAt && listAt > toastAt, 'generating toast must appear before list reload');
 assert.ok(!/await\s+nciEnsureCompletePdf/.test(save), 'save must not await nciEnsureCompletePdf');
 assert.ok(!/await\s+archiveNewClientIntakePdf/.test(save), 'save must not await archive');
@@ -37,25 +49,8 @@ assert.ok(/const NCI_PDF_INTERIM_WARN_MS=8000/.test(html), 'interim warn must be
 const toasts = [];
 const calls = {archive: 0, get: 0};
 
-function el(id) {
-  return {
-    id,
-    style: {cssText: '', display: 'none'},
-    textContent: '',
-    setAttribute: function(){},
-    parentNode: global.document.body
-  };
-}
-const toastEl = el('nciToast');
-global.document = {
-  body: {appendChild: function(){}},
-  getElementById: function(id){ return id === 'nciToast' ? toastEl : null; },
-  createElement: function(){ return toastEl; }
-};
-
 function showTempMsg(msg, color, holdMs) {
   toasts.push({msg, color, holdMs, at: Date.now()});
-  toastEl.textContent = msg;
 }
 function nciStr(v){ return v == null ? '' : String(v).trim(); }
 function nciSleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
@@ -112,7 +107,7 @@ async function nciPollCompletePdfLink(){
   return null;
 }
 
-eval(ensure.replace('async function nciEnsureCompletePdf', 'async function nciEnsureCompletePdf'));
+const nciEnsureCompletePdf = eval('(' + ensure + ')');
 
 async function run(){
   const t0 = Date.now();
@@ -147,8 +142,61 @@ async function run(){
   assert.ok(readyMsgs.includes('PDF ready'), 'fast pdfLink still toasts PDF ready');
   assert.ok(!readyMsgs.includes('PDF not ready yet'), 'ready path must not show interim warn');
 
+  const saveOrder = await runSaveOrder();
+
   console.log('nci-pdf-generating-toast-test: ok');
-  console.log(JSON.stringify({early, mid, late, readyMsgs, calls}, null, 2));
+  console.log(JSON.stringify({early, mid, late, readyMsgs, calls, saveOrder}, null, 2));
+}
+
+async function runSaveOrder(){
+  const events = [];
+  let nciSaving = false;
+  const nciState = {intakeId:''};
+  const nciWizardMode = 'new';
+  let nciDirty = true;
+  let nciLastCompletePdf = null;
+  function nciShowErr(){}
+  function nciSetSaving(){}
+  function collectNewClientIntake(){ return {action:'save_new_client_intake',status:'Complete'}; }
+  function validateNewClientIntake(){ return []; }
+  async function apiPost(){
+    await nciSleep(5);
+    return {success:true,intakeId:'77',status:'Complete',pdfPending:true,pdfLink:''};
+  }
+  function nciForceIntakeId(data){ nciState.intakeId = String(data.intakeId||''); }
+  function nciSaveFailWhy(){ return 'Save failed.'; }
+  function nciEchoStatus(){ return 'Complete'; }
+  function nciArchiveIntakeId(data){ return String((data&&data.intakeId)||''); }
+  function nciCaptureClean(){}
+  function nciPickPdfMeta(){ return {intakeId:'77',pdfLink:'',pdfFileId:'',pdfError:'',pdfPending:true}; }
+  function nciPdfNeedsFollowup(){ return true; }
+  function nciRememberCompletePdf(){ events.push('remember'); }
+  function nciLooksLikeUnknownAction(){ return false; }
+  function nciFail(msg){ events.push('fail:'+msg); }
+  function nciEnsureCompletePdf(id){
+    events.push('ensure:'+id);
+    return new Promise(function(resolve){ setTimeout(resolve, 400); });
+  }
+  function closeNewClientIntake(){ events.push('close'); }
+  function loadNewClientIntakeDrafts(){ events.push('drafts'); }
+  function loadCompletedNewClientIntakes(){ events.push('list'); }
+  function showTempMsg(msg){ events.push('toast:'+msg); }
+  const saveNewClientIntake = eval('('+save+')');
+
+  const saveStarted = Date.now();
+  await saveNewClientIntake('Complete');
+  const saveMs = Date.now() - saveStarted;
+  assert.ok(saveMs < 200, 'Complete save must not await archive/ensure hang, took '+saveMs+'ms');
+  const toastI = events.indexOf('toast:Saved — PDF generating');
+  const closeI = events.indexOf('close');
+  const listI = events.indexOf('list');
+  const ensureI = events.findIndex(function(e){ return String(e).indexOf('ensure:')===0; });
+  assert.ok(toastI >= 0, 'Complete pdfPending must toast Saved — PDF generating');
+  assert.ok(closeI > toastI, 'toast must fire before close');
+  assert.ok(listI > toastI, 'toast must fire before list reload');
+  assert.ok(ensureI > toastI, 'ensure starts after generating toast');
+  assert.ok(events.includes('ensure:77'), 'ensure must be started');
+  return {events, saveMs};
 }
 
 run().catch(function(err){
