@@ -602,11 +602,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 else setupEverCarePWA();
 </script>
 </head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <body><div id="pwaBanner" style="display:none;background:var(--navy);color:white;padding:12px 14px;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:200">
   <p style="font-size:0.82rem;line-height:1.35;flex:1">📱 Add EverCare to your <strong>Home Screen</strong> for one-tap login.</p>
   <button id="pwaBannerInstallBtn" onclick="installPWA()" style="background:var(--teal);border:none;color:white;padding:8px 14px;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Install</button>
@@ -676,7 +676,7 @@ else setupEverCarePWA();
         <div class="page-hdr">
           <div><h1>Timesheets</h1><p>All submitted caregiver timesheets</p></div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="exportAllToExcel()">📥 Export All to Excel</button>
+            <button class="btn btn-ghost" id="exportAllPdfsBtn" onclick="exportAllAsPDFs()">📄 Export all as PDFs</button>
             <button class="btn btn-teal" onclick="renderTimesheets()">🔄 Refresh</button>
           </div>
         </div>
@@ -3002,11 +3002,26 @@ document.addEventListener('DOMContentLoaded',function(){
   }
 });
 
-async function downloadTSPDF(){
-  if(!currentRec)return;
-  if(!requireTimesheetSignatures(currentRec))return;
-  const r=currentRec;
-  showTempMsg('Generating PDF, please wait...','var(--teal)');
+const TS_PDF_ROW_MS=25000;
+function withTimeout(p,ms,msg){
+  return new Promise(function(resolve,reject){
+    const t=setTimeout(function(){reject(new Error(msg||'Timed out'));},ms);
+    Promise.resolve(p).then(function(v){clearTimeout(t);resolve(v);},function(e){clearTimeout(t);reject(e);});
+  });
+}
+function downloadBlob(blob,filename){
+  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url);},2000);
+}
+
+// Shared PrintTS Letter overlay → jsPDF (same path as printTS / ?printSample=1).
+async function renderTimesheetPdfDoc(r){
   const container=document.createElement('div');
   container.className='ts-print-sheet';
   container.setAttribute('data-print-mode','paper-overlay');
@@ -3024,6 +3039,23 @@ async function downloadTSPDF(){
     const pageWidth=pdf.internal.pageSize.getWidth();
     const pageHeight=pdf.internal.pageSize.getHeight();
     pdf.addImage(imgData,'PNG',0,0,pageWidth,pageHeight);
+    return pdf;
+  }finally{
+    if(container.parentNode)container.parentNode.removeChild(container);
+  }
+}
+async function renderTimesheetPdfBlob(r){
+  const pdf=await renderTimesheetPdfDoc(r);
+  return pdf.output('blob');
+}
+
+async function downloadTSPDF(){
+  if(!currentRec)return;
+  if(!requireTimesheetSignatures(currentRec))return;
+  const r=currentRec;
+  showTempMsg('Generating PDF, please wait...','var(--teal)');
+  try{
+    const pdf=await renderTimesheetPdfDoc(r);
     const safeClient=(r.clientName||'client').replace(/[^a-z0-9]/gi,'_');
     const safeEmp=(r.empName||'aide').replace(/[^a-z0-9]/gi,'_');
     pdf.save(`EverCare_Timesheet_${safeEmp}_${safeClient}_${r.weekStart||''}.pdf`);
@@ -3031,8 +3063,6 @@ async function downloadTSPDF(){
   }catch(e){
     console.error(e);
     showTempMsg('Error generating PDF. Try Print instead.','var(--danger)');
-  }finally{
-    document.body.removeChild(container);
   }
 }
 function sendBroadcast(){const msg=document.getElementById('broadcastMsg').value.trim();if(!msg){alert('Please enter a message.');return;}localStorage.setItem('broadcast_msg',msg);renderBroadcastPreview();showTempMsg('✅ Alert sent!','var(--success)');}
@@ -4826,51 +4856,153 @@ async function deleteClient(id){
   }
 }
 
-// ─── EXPORT TO EXCEL ─────────────────────────────────────
-async function exportAllToExcel(){
-  showTempMsg('Preparing export...','var(--teal)');
+// ─── EXPORT ALL AS PDFs (client-side ZIP of PrintTS overlays) ─
+// Uses in-memory Timesheets list (get_all cache). No Drive, no Apps Script
+// archive, no Sheets "generate PDF". Device download only.
+function parseTimesheetDays(days){
+  if(!days)return {};
+  if(typeof days==='string'){
+    try{days=JSON.parse(days);}catch(e){return {};}
+  }
+  return (days&&typeof days==='object')?days:{};
+}
+function timesheetHasOverlayFields(r){
+  if(!r||typeof r!=='object')return false;
+  const days=parseTimesheetDays(r.days);
+  const hasDay=Object.keys(days).some(function(k){
+    const d=days[k];
+    return !!(d&&(d.date||d.tin||d.tout||d.in||d.out||(d.hrs&&d.hrs!=='—')||(d.hours&&d.hours!=='—')||(d.svcs&&d.svcs.length)||d.aideSig||d.clientSig));
+  });
+  const hasName=!!String(r.empName||r.emp_name||r.clientName||r.client_name||'').trim();
+  const hasWeek=!!String(r.weekStart||r.week_start||'').trim();
+  return hasDay||(hasName&&hasWeek);
+}
+function getExportableTimesheets(){
+  let recs=(typeof allRecords!=='undefined'&&Array.isArray(allRecords)&&allRecords.length)?allRecords.slice():[];
+  if(!recs.length){
+    try{
+      const stored=(typeof store!=='undefined'&&store.get)?(store.get('admin_records')||[]):[];
+      recs=stored.filter(function(r){return r&&r.submitted;});
+    }catch(e){recs=[];}
+  }
+  return recs;
+}
+async function hydrateTimesheetForOverlay(r){
+  if(!r)return null;
+  const copy=Object.assign({},r);
+  copy.days=parseTimesheetDays(r.days);
+  if(timesheetHasOverlayFields(copy))return copy;
+  const id=r.id;
+  const pools=[];
+  if(typeof allRecords!=='undefined'&&Array.isArray(allRecords))pools.push(allRecords);
   try{
-    const data=await apiPost({action:'get_all'});
-    if(!data.success||!data.data||!data.data.length){
+    const stored=(typeof store!=='undefined'&&store.get)?store.get('admin_records'):null;
+    if(Array.isArray(stored))pools.push(stored);
+  }catch(e){}
+  for(let p=0;p<pools.length;p++){
+    const hit=pools[p].find(function(x){return String(x.id)===String(id);});
+    if(!hit)continue;
+    const merged=Object.assign({},hit,copy);
+    merged.days=parseTimesheetDays(hit.days||copy.days);
+    if(timesheetHasOverlayFields(merged))return merged;
+  }
+  return null;
+}
+function weekStartMMDDYYYY(weekStart){
+  const s=String(weekStart||'').trim();
+  const plain=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(plain)return plain[2]+plain[3]+plain[1];
+  const md=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(md)return String(md[1]).padStart(2,'0')+String(md[2]).padStart(2,'0')+md[3];
+  const d=new Date(s);
+  if(!isNaN(d.getTime())){
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const dd=String(d.getDate()).padStart(2,'0');
+    return mm+dd+String(d.getFullYear());
+  }
+  return '00000000';
+}
+function sanitizePdfNamePart(s){
+  return String(s||'').replace(/[^a-z0-9]+/gi,'_').replace(/^_+|_+$/g,'').replace(/_+/g,'_')||'X';
+}
+function timesheetZipPdfName(r){
+  const name=String((r&&(r.empName||r.emp_name||r.username))||'Aide').trim();
+  const parts=name.split(/\s+/).filter(Boolean);
+  const first=parts.length>1?parts[0]:'';
+  const last=parts.length?parts[parts.length-1]:'Aide';
+  const week=weekStartMMDDYYYY(r&&(r.weekStart||r.week_start));
+  const base=first
+    ? sanitizePdfNamePart(last)+'_'+sanitizePdfNamePart(first)+'_WeekOf_'+week
+    : sanitizePdfNamePart(last)+'_WeekOf_'+week;
+  return base+'.pdf';
+}
+function uniqueZipName(name,used){
+  if(!used[name]){used[name]=1;return name;}
+  const m=String(name).match(/^(.*)(\.pdf)$/i);
+  const stem=m?m[1]:name;
+  const ext=m?m[2]:'';
+  let n=used[name];
+  let next;
+  do{
+    n++;
+    next=stem+'_'+n+ext;
+  }while(used[next]);
+  used[name]=n;
+  used[next]=1;
+  return next;
+}
+
+async function exportAllAsPDFs(){
+  const btn=document.getElementById('exportAllPdfsBtn');
+  const orig=btn?btn.textContent:'📄 Export all as PDFs';
+  if(btn){btn.disabled=true;}
+  try{
+    const records=getExportableTimesheets();
+    if(!records.length){
       showTempMsg('No timesheets to export yet.','var(--warn)');
       return;
     }
-    const records=data.data;
-
-    // Sheet 1: Summary
-    const summaryRows=[['Submitted','Employee','Client','Week Starting','Total Hours','Status','Notes']];
-    records.forEach(r=>{
-      summaryRows.push([r.submitted,r.empName,r.clientName,formatWeekLabel(r.weekStart),r.totalHrs,r.status,r.notes||'']);
-    });
-
-    // Sheet 2: Daily Details
-    const dailyRows=[['Employee','Client','Week Starting','Day','Date','Time In','Time Out','Hours','Location','Verified','Services']];
-    records.forEach(r=>{
-      const days=r.days||{};
-      Object.keys(days).forEach(i=>{
-        const d=days[i];
-        if(d&&d.tin){
-          dailyRows.push([
-            r.empName, r.clientName, formatWeekLabel(r.weekStart), DAYS[i]||i, d.date||'',
-            d.tin||'', d.tout||'', d.hrs||'', d.location||'',
-            d.verified===true?'Yes':d.verified===false?'No':'N/A',
-            (d.svcs||[]).join(', ')
-          ]);
-        }
-      });
-    });
-
-    const wb=XLSX.utils.book_new();
-    const ws1=XLSX.utils.aoa_to_sheet(summaryRows);
-    const ws2=XLSX.utils.aoa_to_sheet(dailyRows);
-    XLSX.utils.book_append_sheet(wb,ws1,'Summary');
-    XLSX.utils.book_append_sheet(wb,ws2,'Daily Details');
-
+    if(typeof JSZip==='undefined'){
+      showTempMsg('ZIP library failed to load. Refresh and try again.','var(--danger)');
+      return;
+    }
+    const zip=new JSZip();
+    const usedNames={};
+    let ok=0,err=0;
+    const total=records.length;
+    for(let i=0;i<total;i++){
+      const label='Exporting '+(i+1)+'/'+total+'…';
+      if(btn)btn.textContent=label;
+      showTempMsg(label,'var(--teal)',0);
+      await new Promise(function(r){setTimeout(r,0);});
+      try{
+        const rec=await hydrateTimesheetForOverlay(records[i]);
+        if(!rec){err++;continue;}
+        const blob=await withTimeout(renderTimesheetPdfBlob(rec),TS_PDF_ROW_MS,'PDF timed out');
+        zip.file(uniqueZipName(timesheetZipPdfName(rec),usedNames),blob);
+        ok++;
+      }catch(rowErr){
+        console.error(rowErr);
+        err++;
+      }
+    }
+    if(!ok){
+      showTempMsg('Could not generate any PDFs.','var(--danger)');
+      return;
+    }
+    if(btn)btn.textContent='Packing ZIP…';
+    showTempMsg('Packing ZIP…','var(--teal)',0);
+    const zipBlob=await zip.generateAsync({type:'blob'});
     const dateStr=new Date().toISOString().split('T')[0];
-    XLSX.writeFile(wb,`EverCare_Timesheets_Backup_${dateStr}.xlsx`);
-    showTempMsg('✅ Excel file downloaded!','var(--success)');
+    downloadBlob(zipBlob,'EverCare_Timesheets_PDFs_'+dateStr+'.zip');
+    let msg='Downloaded '+ok+' PDFs';
+    if(err)msg+=' ('+err+' skipped)';
+    showTempMsg(msg,err?'var(--warn)':'var(--success)');
   }catch(e){
-    showTempMsg('Error exporting. Try again.','var(--danger)');
+    console.error(e);
+    showTempMsg('Error exporting PDFs. Try again.','var(--danger)');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=orig;}
   }
 }
 
