@@ -69,11 +69,17 @@ assert.ok(create, 'submitCreateAide missing');
 assert.ok(reset, 'resetAideTempPassword missing');
 assert.ok(render, 'renderAides missing');
 
-assert.ok(create.includes("action:'create_aide'"), 'create must POST create_aide');
-assert.ok(create.includes('fullName') && create.includes('username') && create.includes('tempPassword') && create.includes('clientIds'),
-  'create_aide payload must include fullName, username, tempPassword, clientIds');
-assert.ok(!/email/.test(create), 'create_aide must not send email');
-assert.ok(reset.includes("action:'reset_aide_temp_password'"), 'reset must POST reset_aide_temp_password');
+assert.ok(create.includes("'admin_create_aide'") && create.includes("'create_aide'"),
+  'create must POST admin_create_aide with create_aide alias');
+assert.ok(create.includes('name:') && create.includes('username') && create.includes('tempPassword') && create.includes('clientIds'),
+  'admin_create_aide payload must include name, username, tempPassword, clientIds');
+assert.ok(!/\bemail\b/.test(create), 'admin_create_aide must not send email');
+assert.ok(reset.includes("'reset_temp_password'") && reset.includes("'reset_aide_temp_password'"),
+  'reset must POST reset_temp_password with alias');
+assert.ok(reset.includes('tempPassword'), 'reset_temp_password must send Ghost-generated tempPassword');
+const postAide = extractFn(html, 'async function postAideAction(primary,alias,payload)');
+assert.ok(postAide, 'postAideAction helper missing');
+assert.ok(postAide.includes('nciLooksLikeUnknownAction'), 'alias retry only on Unknown action');
 assert.ok(showOnce.includes('_aideTempPwdOnce'), 'one-time password must be stashed only in memory');
 assert.ok(closeOnce.includes("_aideTempPwdOnce=''") || closeOnce.includes('_aideTempPwdOnce=""'),
   'closing the modal must discard the temp password');
@@ -119,9 +125,10 @@ assert.deepStrictEqual(helpers.aideAssignedClientValues({clients: 'c1,c2'}), ['c
 assert.deepStrictEqual(helpers.aideAssignedClientValues({clientIds: ['c9']}), ['c9']);
 assert.strictEqual(helpers.formatAideAssignedClients({assignedClients: ['c1']}), 'Rivera, Ana');
 
-assert.ok(/Unknown action: create_aide/.test(helpers.aceActionError({error: 'Unknown action'}, null, 'create_aide')),
+assert.ok(/Unknown action: admin_create_aide/.test(helpers.aceActionError({error: 'Unknown action'}, null, 'admin_create_aide')),
   'Unknown action must surface as a clear toast string');
-assert.ok(helpers.aceActionError({error: 'Username taken'}, null, 'create_aide') === 'Username taken',
+assert.ok(helpers.aceActionError({error: 'Username taken'}, null, 'admin_create_aide') === 'Username taken',
   'Ace collision error is shown as-is');
+assert.strictEqual(helpers.formatAideAssignedClients({assignedClients:[{id:'c1',name:'Rivera, Ana'}]}), 'Rivera, Ana');
 
 console.log('admin-add-aide-test: ok');

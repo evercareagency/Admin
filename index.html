@@ -10,7 +10,8 @@
 <!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
 <!-- inservice view-results hotfix 2026-09-21 paint-from-update / cache-on-unknown-get -->
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
-<meta name="admin-build" content="2026-09-21-add-aide-temp-pwd">
+<!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
+<meta name="admin-build" content="2026-09-21-ace-lock-aide">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -2582,6 +2583,25 @@ function aceActionError(data,err,action){
   }
   return text;
 }
+async function postAideAction(primary,alias,payload){
+  let data=null;
+  try{
+    data=await apiPost(Object.assign({action:primary},payload));
+  }catch(e){
+    return {data:null,err:e,action:primary};
+  }
+  if(data&&data.success)return {data:data,err:null,action:primary};
+  const why=(data&&(data.error||data.message))||'';
+  if(alias&&typeof nciLooksLikeUnknownAction==='function'&&nciLooksLikeUnknownAction(why)){
+    try{
+      data=await apiPost(Object.assign({action:alias},payload));
+      return {data:data,err:null,action:alias};
+    }catch(e){
+      return {data:null,err:e,action:alias};
+    }
+  }
+  return {data:data,err:null,action:primary};
+}
 
 let addAideUsernameDirty=false;
 let addAideSelectedClients=new Set();
@@ -2740,9 +2760,10 @@ async function submitCreateAide(){
   const clientIds=Array.from(addAideSelectedClients);
   const tempPassword=generateTempPassword();
   if(btn){btn.disabled=true;btn.textContent='Creating...';}
-  let data=null;
   try{
-    data=await apiPost({action:'create_aide',fullName:fullName,username:username,tempPassword:tempPassword,clientIds:clientIds});
+    const payload={username:username,name:fullName,fullName:fullName,tempPassword:tempPassword,clientIds:clientIds};
+    const res=await postAideAction('admin_create_aide','create_aide',payload);
+    const data=res&&res.data;
     if(data&&data.success){
       cacheInvalidate('get_users');
       closeModal('addAideModal');
@@ -2754,9 +2775,9 @@ async function submitCreateAide(){
       renderAides(true);
       return;
     }
-    showTempMsg(aceActionError(data,null,'create_aide'),'var(--danger)');
+    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'admin_create_aide'),'var(--danger)');
   }catch(e){
-    showTempMsg(aceActionError(null,e,'create_aide'),'var(--danger)');
+    showTempMsg(aceActionError(null,e,'admin_create_aide'),'var(--danger)');
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Create aide';}
   }
@@ -2774,26 +2795,22 @@ function confirmResetAideTempPassword(username){
 async function resetAideTempPassword(username){
   const un=String(username||'').trim().toLowerCase();
   if(!un)return;
+  const tempPassword=generateTempPassword();
   try{
-    const data=await apiPost({action:'reset_aide_temp_password',username:un});
+    const res=await postAideAction('reset_temp_password','reset_aide_temp_password',{username:un,tempPassword:tempPassword});
+    const data=res&&res.data;
     if(data&&data.success){
       cacheInvalidate('get_users');
-      const pwd=data.tempPassword;
-      if(!pwd){
-        showTempMsg('Password reset for @'+un+', but Ace did not return the temp password. Try again.','var(--warn)');
-        logActivity('Reset temp password for @'+un);
-        renderAides(true);
-        return;
-      }
+      const pwd=data.tempPassword||tempPassword;
       showTempMsg('New temp password for @'+un+'. Copy it now — it will not be shown again.','var(--success)');
       showAideTempPasswordOnce(un,pwd,'New temporary password');
       logActivity('Reset temp password for @'+un);
       renderAides(true);
       return;
     }
-    showTempMsg(aceActionError(data,null,'reset_aide_temp_password'),'var(--danger)');
+    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'reset_temp_password'),'var(--danger)');
   }catch(e){
-    showTempMsg(aceActionError(null,e,'reset_aide_temp_password'),'var(--danger)');
+    showTempMsg(aceActionError(null,e,'reset_temp_password'),'var(--danger)');
   }
 }
 
