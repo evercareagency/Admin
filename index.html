@@ -3530,7 +3530,7 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
 let isComplianceRows=[];
-let isResultsState={rowIndex:-1,row:null,questions:[],editing:false,stubbed:false};
+let isResultsState={rowIndex:-1,row:null,questions:[],editing:false};
 
 function getIsAssignMode(){
   const el=document.querySelector('input[name="isAssignMode"]:checked');
@@ -3758,17 +3758,33 @@ function isNumOrNull(v){
   const n=Number(v);
   return isNaN(n)?null:n;
 }
+function parseISJsonArray(raw){
+  if(raw==null||raw==='')return null;
+  if(typeof raw==='string'){
+    const s=raw.trim();
+    if(!s)return null;
+    try{raw=JSON.parse(s);}catch(e){return null;}
+  }
+  return Array.isArray(raw)?raw:null;
+}
 function parseISAnswers(c){
   if(!c)return [];
   let raw=c.answers;
   if(raw==null&&c.topicId!=null)raw=c['answers_'+c.topicId];
   if(raw==null&&c.topic_id!=null)raw=c['answers_'+c.topic_id];
-  if(typeof raw==='string'){
-    const s=raw.trim();
-    if(!s)return [];
-    try{raw=JSON.parse(s);}catch(e){return [];}
-  }
-  return Array.isArray(raw)?raw:[];
+  const fromAns=parseISJsonArray(raw);
+  if(fromAns)return fromAns;
+  const graded=parseISJsonArray(c.GradedDetail!=null?c.GradedDetail:c.gradedDetail);
+  if(graded&&graded.length&&(typeof graded[0]==='number'||typeof graded[0]==='string'))return graded;
+  return [];
+}
+function parseISResultItems(payload){
+  if(!payload)return null;
+  const direct=parseISJsonArray(payload.items)||parseISJsonArray(payload.questions);
+  if(direct)return direct;
+  const graded=parseISJsonArray(payload.GradedDetail!=null?payload.GradedDetail:payload.gradedDetail);
+  if(graded&&graded.length&&typeof graded[0]==='object')return graded;
+  return null;
 }
 function isTopicIdOfCompletion(c){
   if(!c)return null;
@@ -4079,16 +4095,14 @@ function buildLocalISQuestions(row){
 function normalizeISResultQuestions(data,row){
   const payload=isResultPayload(data);
   const answers=Array.isArray(payload.answers)?payload.answers:(Array.isArray(row&&row.answers)?parseISAnswers(row):[]);
-  let raw=payload.items||payload.questions;
-  if(!Array.isArray(raw)&&data&&Array.isArray(data.items))raw=data.items;
-  if(!Array.isArray(raw)&&data&&Array.isArray(data.questions))raw=data.questions;
+  let raw=parseISResultItems(payload)||parseISResultItems(data);
   const topic=INSERVICES.find(t=>t.id==(payload.topicId!=null?payload.topicId:(row&&row.topicId)));
   if(!Array.isArray(raw)){
     if(topic&&answers.length){
       const seeded=Object.assign({},row,{answers:answers,topicId:topic.id});
       return buildLocalISQuestions(seeded);
     }
-    return buildLocalISQuestions(row);
+    return [];
   }
   return raw.map(function(q,i){
     const idx=q.index!=null?q.index:(q.qIndex!=null?q.qIndex:i);
@@ -4127,6 +4141,9 @@ function applyISResultScore(row,data){
   if(payload.topicId!=null)next.topicId=payload.topicId;
   if(payload.topicTitle)next.topicTitle=payload.topicTitle;
   if(payload.answers)next.answers=payload.answers;
+  if(payload.signature)next.signature=payload.signature;
+  if(payload.GradedDetail!=null)next.GradedDetail=payload.GradedDetail;
+  if(payload.gradedDetail!=null)next.gradedDetail=payload.gradedDetail;
   ['scoreCorrect','ScoreCorrect','scoreTotal','ScoreTotal','scorePct','ScorePct','scorePercent','completed','completedAt','CompletedAt'].forEach(function(k){
     if(payload[k]!=null&&payload[k]!=='')next[k]=payload[k];
     else if(data&&data[k]!=null&&data[k]!=='')next[k]=data[k];
@@ -4158,14 +4175,9 @@ function paintISResults(){
       +'<div><span class="lbl">Topic</span> '+escapeHtml(row.topicTitle||row.topicShort||'—')+'</div>'
       +'<div><span class="lbl">Completed</span> '+escapeHtml(formatISCompletedDate(certDateFromRecord(row)))+'</div>';
   }
-  if(note){
-    if(isResultsState.stubbed){
-      note.hidden=false;
-      note.textContent='Ace get_inservice_result is not deployed yet — showing local topic questions.';
-    }else{
-      note.hidden=true;
-      note.textContent='';
-    }
+  if(note&&!note.dataset.liveErr){
+    note.hidden=true;
+    note.textContent='';
   }
   if(!body)return;
   const qs=isResultsState.questions||[];
@@ -4194,15 +4206,19 @@ function paintISResults(){
   }).join('');
 }
 function closeISResults(){
-  isResultsState={rowIndex:-1,row:null,questions:[],editing:false,stubbed:false};
+  isResultsState={rowIndex:-1,row:null,questions:[],editing:false};
   setISResultsEditMode(false);
+  const note=document.getElementById('isResultsNote');
+  if(note){note.hidden=true;note.textContent='';delete note.dataset.liveErr;}
   closeModal('isResultsModal');
 }
 async function viewISResults(rowIndex){
   const row=isComplianceRows[rowIndex];
   if(!row)return;
-  isResultsState={rowIndex:rowIndex,row:row,questions:[],editing:false,stubbed:false};
+  isResultsState={rowIndex:rowIndex,row:row,questions:[],editing:false};
   setISResultsEditMode(false);
+  const note=document.getElementById('isResultsNote');
+  if(note){note.hidden=true;note.textContent='';delete note.dataset.liveErr;}
   const body=document.getElementById('isResultsBody');
   if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">Loading results...</p>';
   const banner=document.getElementById('isResultsBanner');
@@ -4214,44 +4230,34 @@ async function viewISResults(rowIndex){
       +'<div><span class="lbl">Completed</span> '+escapeHtml(formatISCompletedDate(certDateFromRecord(row)))+'</div>';
   }
   openModal('isResultsModal');
-  let data=null;
   const resultId=isResultIdOf(row);
+  if(!resultId){
+    if(note){note.hidden=false;note.dataset.liveErr='1';note.textContent='Ace result id missing — cannot load get_inservice_result.';}
+    if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">No Ace result id on this row.</p>';
+    return;
+  }
+  let data=null;
   try{
-    if(resultId)data=await apiPost({action:'get_inservice_result',id:resultId});
-    else data={success:false,error:'Unknown action: get_inservice_result'};
+    data=await apiPost({action:'get_inservice_result',id:resultId});
   }catch(e){
     data={success:false,error:(e&&e.message)||'Error'};
   }
-  const why=(data&&(data.error||data.message))||'';
-  const unknown=!(data&&data.success)&&nciLooksLikeUnknownAction(why);
-  const payload=isResultPayload(data);
-  const hasQs=!!(payload&&(Array.isArray(payload.items)||Array.isArray(payload.questions)||Array.isArray(payload.answers)));
-  if(data&&data.success&&hasQs){
-    isResultsState.stubbed=false;
-    isResultsState.row=applyISResultScore(row,data);
-    isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
-  }else{
-    isResultsState.stubbed=unknown||!hasQs;
-    isResultsState.questions=buildLocalISQuestions(row);
-    if(isResultsState.questions.length){
-      let ok=0;
-      isResultsState.questions.forEach(function(q){if(q.isCorrect)ok++;});
-      if(isResultsState.row.scoreCorrect==null||isResultsState.row.scoreTotal==null){
-        isResultsState.row.scoreCorrect=ok;
-        isResultsState.row.scoreTotal=isResultsState.questions.length;
-        isResultsState.row.scorePercent=isResultsState.row.scoreTotal?Math.round(ok/isResultsState.row.scoreTotal*100):0;
-      }
-    }
-    if(data&&data.success===false&&!unknown&&why){
-      const note=document.getElementById('isResultsNote');
-      if(note){note.hidden=false;note.textContent=String(why);}
-    }
+  if(!(data&&data.success)){
+    const why=(data&&(data.error||data.message))||'Could not load results.';
+    if(note){note.hidden=false;note.dataset.liveErr='1';note.textContent=String(why);}
+    if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">'+escapeHtml(String(why))+'</p>';
+    return;
   }
+  isResultsState.row=applyISResultScore(row,data);
+  isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
   paintISResults();
 }
 function startISResultsEdit(){
   if(!isResultsState.row)return;
-  if(!isResultsState.questions.length)isResultsState.questions=buildLocalISQuestions(isResultsState.row);
+  if(!isResultsState.questions.length){
+    showTempMsg('No Ace question items to edit yet.','var(--danger)');
+    return;
+  }
   setISResultsEditMode(true);
   paintISResults();
 }
@@ -4283,33 +4289,18 @@ async function saveISResultsEdit(){
   if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save answers';}
   if(!(data&&data.success)){
     const why=(data&&(data.error||data.message))||'Save failed.';
-    if(nciLooksLikeUnknownAction(why)){
-      showTempMsg(data&&data.error?String(data.error):('Unknown action: admin_update_inservice_answers'),'var(--danger)');
-    }else{
-      showTempMsg(String(why),'var(--danger)');
-    }
+    showTempMsg(String(why),'var(--danger)');
     return;
   }
-  isResultsState.row=applyISResultScore(row,data);
-  isResultsState.row.answers=answers;
-  if((data.items||data.questions)||(data.data&&(data.data.items||data.data.questions))){
-    isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
-  }else{
-    isResultsState.questions=isResultsState.questions.map(function(q,i){
-      const sel=answers[i];
-      const label=(q.options&&q.options[sel]!=null)?q.options[sel]:q.aideAnswer;
-      const next=Object.assign({},q,{selected:sel,aideAnswer:label});
-      next.isCorrect=Number(next.selected)===Number(next.correct)||String(next.aideAnswer||'')===String(next.correctAnswer||'');
-      return next;
-    });
-    let ok=0;
-    isResultsState.questions.forEach(function(q){if(q.isCorrect)ok++;});
-    isResultsState.row.scoreCorrect=ok;
-    isResultsState.row.scoreTotal=isResultsState.questions.length;
-    isResultsState.row.scorePct=isResultsState.row.scoreTotal?Math.round(ok/isResultsState.row.scoreTotal*100):0;
-    isResultsState.row.scorePercent=isResultsState.row.scorePct;
+  let refreshed=null;
+  try{
+    refreshed=await apiPost({action:'get_inservice_result',id:resultId});
+  }catch(e){
+    refreshed=null;
   }
-  isResultsState.stubbed=false;
+  const live=(refreshed&&refreshed.success)?refreshed:data;
+  isResultsState.row=applyISResultScore(row,live);
+  isResultsState.questions=normalizeISResultQuestions(live,isResultsState.row);
   setISResultsEditMode(false);
   paintISResults();
   showTempMsg('Answers updated. Score refreshed.','var(--success)');
