@@ -454,6 +454,29 @@ body.ts-print-open{overflow:hidden;}
   .is-assign-mode{flex:1 1 100%;}
   .is-aide-count{margin-left:0;width:100%;}
 }
+.is-clear-hint{font-size:0.76rem;color:var(--muted);margin-top:8px;line-height:1.45;}
+.is-compliance-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.is-compliance-score{font-weight:700;color:var(--navy);white-space:nowrap;}
+.is-results-modal{max-width:720px;}
+.is-results-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.is-results-head h3{margin:0;padding-right:8px;}
+.is-result-banner{background:var(--teal-light);border:1.5px solid var(--teal);border-radius:10px;padding:14px 16px;margin-bottom:12px;text-align:center;font-size:1.15rem;font-weight:700;color:var(--teal-dark);}
+.is-result-meta{font-size:0.84rem;color:var(--navy);margin-bottom:14px;line-height:1.5;}
+.is-result-meta .lbl{color:var(--muted);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;}
+.is-result-note{font-size:0.76rem;color:var(--muted);margin:-6px 0 12px;line-height:1.4;}
+.is-result-qa{border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;background:white;}
+.is-result-qa.ok{border-color:#9ad8b4;background:#f3fbf6;}
+.is-result-qa.bad{border-color:#f0b4ae;background:#fdeeee;}
+.is-result-qa .q{font-weight:600;color:var(--navy);font-size:0.86rem;margin-bottom:8px;display:flex;gap:8px;align-items:flex-start;}
+.is-result-qa .mark{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;}
+.is-result-qa.ok .mark{background:var(--success);color:white;}
+.is-result-qa.bad .mark{background:var(--danger);color:white;}
+.is-result-qa .ans{font-size:0.8rem;color:var(--text);line-height:1.45;margin-left:30px;}
+.is-result-qa .ans .wrong{color:var(--danger);font-weight:600;}
+.is-result-qa .ans .right{color:var(--success);font-weight:600;}
+.is-result-edit-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;margin:6px 0 0 30px;min-height:40px;cursor:pointer;font-size:0.82rem;}
+.is-result-edit-opt input{accent-color:var(--teal);width:18px;height:18px;}
+.is-results-foot{justify-content:space-between;}
 </style>
 
 <!-- PWA -->
@@ -834,6 +857,7 @@ else setupEverCarePWA();
             </div>
           </div>
           <div id="currentAssignment" style="margin-top:12px;font-size:0.8rem;color:var(--muted)"></div>
+          <p id="isClearHint" class="is-clear-hint">Clear Assignment removes the current topic from aides only. Completed quizzes, scores, and certificates stay on this dashboard.</p>
         </div>
 
         <!-- COMPLIANCE DASHBOARD -->
@@ -841,7 +865,7 @@ else setupEverCarePWA();
           <div class="card-title"><span class="ico">&#9989;</span> Compliance Dashboard</div>
           <div style="overflow-x:auto">
             <table class="data-table" id="isComplianceTable">
-              <thead><tr><th>Aide Name</th><th>Topic</th><th>Status</th><th>Completed</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Aide Name</th><th>Topic</th><th>Status</th><th>Completed</th><th>Score</th><th>Actions</th></tr></thead>
               <tbody id="isComplianceBody"></tbody>
             </table>
           </div>
@@ -1607,6 +1631,32 @@ Call (216) 377-5991 with any questions.</textarea>
     <div class="nci-discard-actions">
       <button type="button" class="btn btn-ghost nci-discard-btn" id="nciDiscardCancelBtn" onclick="nciCancelDiscard()">Cancel</button>
       <button type="button" class="btn btn-danger nci-discard-btn" id="nciDiscardGoBtn" onclick="nciConfirmDiscard()">Discard</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="isResultsModal">
+  <div class="modal is-results-modal">
+    <div class="is-results-head">
+      <div>
+        <h3 id="isResultsTitle">View Results</h3>
+        <p class="nci-sub" id="isResultsSub">Aide quiz answers for this topic</p>
+      </div>
+      <button type="button" class="nci-x" onclick="closeISResults()" aria-label="Close">&#215;</button>
+    </div>
+    <div id="isResultsBanner" class="is-result-banner">Score: —</div>
+    <div id="isResultsMeta" class="is-result-meta"></div>
+    <div id="isResultsNote" class="is-result-note" hidden></div>
+    <div id="isResultsBody"></div>
+    <div class="modal-btns is-results-foot">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-ghost" id="isResultsCancelEdit" hidden onclick="cancelISResultsEdit()">Cancel</button>
+        <button type="button" class="btn btn-teal" id="isResultsSaveEdit" hidden onclick="saveISResultsEdit()">Save answers</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn btn-navy" id="isResultsEditBtn" onclick="startISResultsEdit()">Edit answers (Admin)</button>
+        <button type="button" class="btn btn-ghost" onclick="closeISResults()">Close</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3476,6 +3526,8 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 // ─── INSERVICE ADMIN ────────────────────────────────────
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
+let isComplianceRows=[];
+let isResultsState={rowIndex:-1,row:null,questions:[],editing:false,stubbed:false};
 
 function getIsAssignMode(){
   const el=document.querySelector('input[name="isAssignMode"]:checked');
@@ -3685,20 +3737,203 @@ async function assignTopic(){
 async function clearAssignment(){
   showTempMsg('Clearing assignment...','var(--teal)');
   try{
-    await apiPost({action:'clear_assigned_topic'});
+    const data=await apiPost({action:'clear_assigned_topic'});
     cacheInvalidate('get_assigned_topic');
-    showTempMsg('Assignment cleared.','var(--teal)');
+    if(data&&data.success===false){
+      showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
+      return;
+    }
+    showTempMsg('Assignment cleared. Completion records are kept.','var(--teal)');
     renderInservices(true);
   }catch(e){
     showTempMsg('Error clearing assignment.','var(--danger)');
   }
 }
 
+function isNumOrNull(v){
+  if(v==null||v==='')return null;
+  const n=Number(v);
+  return isNaN(n)?null:n;
+}
+function parseISAnswers(c){
+  if(!c)return [];
+  let raw=c.answers;
+  if(raw==null&&c.topicId!=null)raw=c['answers_'+c.topicId];
+  if(raw==null&&c.topic_id!=null)raw=c['answers_'+c.topic_id];
+  if(typeof raw==='string'){
+    const s=raw.trim();
+    if(!s)return [];
+    try{raw=JSON.parse(s);}catch(e){return [];}
+  }
+  return Array.isArray(raw)?raw:[];
+}
+function isTopicIdOfCompletion(c){
+  if(!c)return null;
+  if(c.topicId!=null&&c.topicId!=='')return c.topicId;
+  if(c.topic_id!=null&&c.topic_id!=='')return c.topic_id;
+  if(c.inserviceId!=null&&c.inserviceId!=='')return c.inserviceId;
+  return null;
+}
+function findISCompletion(completions,username,topicId){
+  return (completions||[]).find(c=>String(c.username||'').toLowerCase()===String(username||'').toLowerCase()&&String(isTopicIdOfCompletion(c))===String(topicId));
+}
+function isISCompletedRecord(c){
+  if(!c)return false;
+  const st=String(c.status||'').toLowerCase();
+  if(st==='completed'||st==='complete')return true;
+  if(c.completed!=null&&String(c.completed).trim()!==''&&String(c.completed)!=='—')return true;
+  if(c.completedAt!=null&&String(c.completedAt).trim()!=='')return true;
+  if(c.completed_at!=null&&String(c.completed_at).trim()!=='')return true;
+  if(c.scoreCorrect!=null||c.scorePercent!=null||c.scoreTotal!=null)return true;
+  return parseISAnswers(c).length>0;
+}
+function isISAnswerCorrect(q,aideAns){
+  if(!q||aideAns==null||aideAns==='')return false;
+  const correctIdx=q.answer;
+  const correctText=q.correctAnswer!=null?q.correctAnswer:(Array.isArray(q.options)?q.options[correctIdx]:'');
+  if(typeof aideAns==='number'||(/^\d+$/.test(String(aideAns).trim())&&Array.isArray(q.options)&&Number(aideAns)>=0&&Number(aideAns)<q.options.length)){
+    return Number(aideAns)===Number(correctIdx);
+  }
+  return String(aideAns).trim()===String(correctText==null?'':correctText).trim();
+}
+function fillISScore(row,topic,answers){
+  if(!row)return row;
+  row.scoreCorrect=isNumOrNull(row.scoreCorrect!=null?row.scoreCorrect:(row.correct!=null?row.correct:row.score_correct));
+  row.scoreTotal=isNumOrNull(row.scoreTotal!=null?row.scoreTotal:(row.total!=null?row.total:row.score_total));
+  row.scorePercent=isNumOrNull(row.scorePercent!=null?row.scorePercent:(row.percent!=null?row.percent:row.score_percent));
+  if((row.scoreCorrect==null||row.scoreTotal==null)&&topic&&topic.questions&&answers&&answers.length){
+    let ok=0;
+    topic.questions.forEach(function(q,i){if(isISAnswerCorrect(q,answers[i]))ok++;});
+    row.scoreCorrect=ok;
+    row.scoreTotal=topic.questions.length;
+    row.scorePercent=row.scoreTotal?Math.round(ok/row.scoreTotal*100):0;
+  }else if(row.scoreCorrect!=null&&row.scoreTotal&&row.scorePercent==null){
+    row.scorePercent=Math.round(row.scoreCorrect/row.scoreTotal*100);
+  }
+  return row;
+}
+function hydrateISComplianceRow(c,aide,topic){
+  const src=c&&typeof c==='object'?c:{};
+  const topicId=isTopicIdOfCompletion(src)!=null?isTopicIdOfCompletion(src):(topic&&topic.id);
+  const topicObj=topic||INSERVICES.find(t=>t.id==topicId)||{};
+  const answers=parseISAnswers(src);
+  const row=Object.assign({},src,{
+    username:(aide&&aide.username)||src.username||'',
+    empName:(aide&&aide.name)||src.empName||src.emp_name||src.name||src.username||'',
+    topicId:topicId,
+    topicTitle:src.topicTitle||src.topic_title||topicObj.title||'',
+    topicShort:topicObj.shortTitle||src.topicTitle||src.topic_title||'',
+    isCompleted:isISCompletedRecord(src)
+  });
+  return fillISScore(row,topicObj,answers);
+}
+function formatISCompletedDate(val){
+  if(val==null||val==='')return '—';
+  if(val instanceof Date){
+    if(isNaN(val.getTime()))return '—';
+    return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(val);
+  }
+  const s=String(val).trim();
+  if(!s||s==='—'||/^null$/i.test(s)||/^undefined$/i.test(s))return '—';
+  const named=s.match(/\b([A-Za-z]{3,9}) (\d{1,2}), (\d{4})\b/);
+  if(named&&!/\d{4}-\d{2}-\d{2}T/.test(s)&&!/Z$/i.test(s)){
+    const d=new Date(named[1]+' '+named[2]+', '+named[3]);
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric'}).format(d);
+    return named[0];
+  }
+  const mdy=s.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/);
+  if(mdy&&!/\d{4}-\d{2}-\d{2}T/.test(s)&&!/Z$/i.test(s)){
+    const d=new Date(Number(mdy[3]),Number(mdy[1])-1,Number(mdy[2]));
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric'}).format(d);
+  }
+  const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso){
+    const d=new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3]));
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric'}).format(d);
+  }
+  const n=Number(s);
+  if(s!==''&&!isNaN(n)&&n>20000&&n<80000){
+    const d=new Date(Date.UTC(1899,11,30)+Math.round(n)*86400000);
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'}).format(d);
+  }
+  const parsed=new Date(s);
+  if(!isNaN(parsed.getTime())){
+    return new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'America/New_York'}).format(parsed);
+  }
+  if(/\d{4}-\d{2}-\d{2}T/.test(s)||/Z$/i.test(s))return '—';
+  return s;
+}
+function formatISScoreColumn(row){
+  if(!row||!row.isCompleted)return '—';
+  const sc=row.scoreCorrect,tot=row.scoreTotal,pct=row.scorePercent;
+  if(sc!=null&&tot){
+    const p=pct!=null?Math.round(Number(pct)):Math.round(sc/tot*100);
+    return sc+'/'+tot+' · '+p+'%';
+  }
+  if(pct!=null&&pct!=='')return Math.round(Number(pct))+'%';
+  return '—';
+}
+function formatISScoreBanner(row){
+  if(!row)return 'Score: —';
+  const sc=row.scoreCorrect,tot=row.scoreTotal,pct=row.scorePercent;
+  if(sc!=null&&tot){
+    const p=pct!=null?Math.round(Number(pct)):Math.round(sc/tot*100);
+    return 'Score: '+sc+'/'+tot+' ('+p+'%)';
+  }
+  if(pct!=null&&pct!=='')return 'Score: '+Math.round(Number(pct))+'%';
+  return 'Score: —';
+}
+function isCompletedActionsHtml(i){
+  return '<div class="actions is-compliance-actions">'
+    +'<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewISResults('+i+')">View Results</button>'
+    +'<button type="button" class="btn btn-sm btn-view" onclick="printISCert('+i+')">Print Cert</button>'
+    +'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISResult('+i+')">Delete</button>'
+    +'</div>';
+}
+function isPendingActionsHtml(i){
+  return '<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>';
+}
+function renderISComplianceTable(rows){
+  const tbody=document.getElementById('isComplianceBody');
+  const empty=document.getElementById('isComplianceEmpty');
+  isComplianceRows=rows||[];
+  if(!tbody)return;
+  if(!isComplianceRows.length){
+    if(empty)empty.style.display='block';
+    tbody.innerHTML='';
+    return;
+  }
+  if(empty)empty.style.display='none';
+  tbody.innerHTML=isComplianceRows.map(function(row,i){
+    const completion=row;
+    const name=escapeHtml(row.empName||row.username||'');
+    const topic=escapeHtml(row.topicShort||row.topicTitle||'');
+    if(row.isCompleted){
+      return '<tr>'
+        +'<td><strong>'+name+'</strong></td>'
+        +'<td style="font-size:0.78rem">'+topic+'</td>'
+        +'<td><span class="badge badge-ok">✅ Completed</span></td>'
+        +'<td style="font-size:0.75rem">'+escapeHtml(formatISCompletedDate(formatCertDate(certDateFromRecord(completion))))+'</td>'
+        +'<td class="is-compliance-score">'+escapeHtml(formatISScoreColumn(row))+'</td>'
+        +'<td>'+isCompletedActionsHtml(i)+'</td>'
+        +'</tr>';
+    }
+    return '<tr>'
+      +'<td><strong>'+name+'</strong></td>'
+      +'<td style="font-size:0.78rem">'+topic+'</td>'
+      +'<td><span class="badge badge-fix">❌ Not Completed</span></td>'
+      +'<td style="font-size:0.75rem">—</td>'
+      +'<td class="is-compliance-score">—</td>'
+      +'<td>'+isPendingActionsHtml(i)+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
 async function loadISCompliance(force){
   const tbody=document.getElementById('isComplianceBody');
   const empty=document.getElementById('isComplianceEmpty');
   if(!tbody)return;
-  tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
+  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
 
   try{
     const [assignData, usersData, isData]=await Promise.all([
@@ -3708,60 +3943,307 @@ async function loadISCompliance(force){
     ]);
     const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
-
     const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
+    const completions=(isData&&isData.success&&Array.isArray(isData.data))?isData.data:[];
 
-    const completions=(isData&&isData.success&&isData.data)?isData.data:[];
-
-    if(!aides.length){
-      empty.style.display='block';
-      tbody.innerHTML='';
-      return;
-    }
-
-    empty.style.display='none';
-
-    if(!assignedTopic){
-      tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--muted)">No topic currently assigned. Assign one above to see compliance status.</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML=aides.map(a=>{
-      const completion=completions.find(c=>c.username===a.username&&c.topicId==assignedTopic.id);
-      if(completion){
-        return `<tr>
-          <td><strong>${a.name}</strong></td>
-          <td style="font-size:0.78rem">${assignedTopic.shortTitle}</td>
-          <td><span class="badge badge-ok">✅ Completed</span></td>
-          <td style="font-size:0.75rem">${escapeHtml(formatCertDate(certDateFromRecord(completion)))}</td>
-          <td><button class="btn btn-sm btn-view" onclick="printCert(${JSON.stringify(completion).replace(/"/g,'&quot;')})">Print Cert</button></td>
-        </tr>`;
-      } else {
-        return `<tr>
-          <td><strong>${a.name}</strong></td>
-          <td style="font-size:0.78rem">${assignedTopic.shortTitle}</td>
-          <td><span class="badge badge-fix">❌ Not Completed</span></td>
-          <td style="font-size:0.75rem">—</td>
-          <td><button class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('${a.username}','${a.name}')">📢 Send Reminder</button></td>
-        </tr>`;
+    if(assignedTopic){
+      const seen={};
+      const rows=aides.map(function(a){
+        seen[String(a.username||'').toLowerCase()]=1;
+        const completion=findISCompletion(completions,a.username,assignedTopic.id);
+        return hydrateISComplianceRow(completion||{},a,assignedTopic);
+      });
+      completions.forEach(function(c){
+        if(String(isTopicIdOfCompletion(c))!==String(assignedTopic.id))return;
+        const key=String(c.username||'').toLowerCase();
+        if(seen[key]||!isISCompletedRecord(c))return;
+        seen[key]=1;
+        rows.push(hydrateISComplianceRow(c,null,assignedTopic));
+      });
+      if(!rows.length){
+        if(empty)empty.style.display='block';
+        isComplianceRows=[];
+        tbody.innerHTML='';
+        return;
       }
-    }).join('');
+      renderISComplianceTable(rows);
+      return;
+    }
+
+    const hist=completions.filter(isISCompletedRecord).map(function(c){
+      const aide=aides.find(a=>String(a.username||'').toLowerCase()===String(c.username||'').toLowerCase());
+      return hydrateISComplianceRow(c,aide,null);
+    });
+    if(hist.length){
+      renderISComplianceTable(hist);
+      return;
+    }
+    isComplianceRows=[];
+    if(empty)empty.style.display='none';
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">No topic currently assigned. Completed results stay here after Clear Assignment.</td></tr>';
   }catch(e){
-    empty.style.display='block';
+    if(empty)empty.style.display='block';
     tbody.innerHTML='';
+    isComplianceRows=[];
   }
 }
 
-async function sendISReminder(username,name){
+async function sendISReminder(rowIndexOrUsername,name){
   try{
+    let username=rowIndexOrUsername,label=name;
+    if(typeof rowIndexOrUsername==='number'){
+      const row=isComplianceRows[rowIndexOrUsername]||{};
+      username=row.username;
+      label=row.empName||row.username;
+    }
     const assignData=await apiGetCached('get_assigned_topic');
     const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
     if(!assignedTopicId){showTempMsg('No topic currently assigned.','var(--danger)');return;}
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_is_reminder',username,topicId:assignedTopicId})});
-    showTempMsg(`📢 Reminder sent to ${name}!`,'var(--success)');
+    showTempMsg('📢 Reminder sent to '+(label||username)+'!','var(--success)');
   }catch(e){
     showTempMsg('Error sending reminder. Try again.','var(--danger)');
   }
+}
+
+function printISCert(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row)return;
+  printCert(row);
+}
+
+function confirmDeleteISResult(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row||!row.username||row.topicId==null||row.topicId==='')return;
+  showSharedConfirm('Are you sure?',function(){deleteISResult(rowIndex);},'Yes, delete');
+}
+
+async function deleteISResult(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row)return;
+  const res=await postArchiveAction('delete_inservice_result',null,{username:row.username,topicId:row.topicId});
+  if(toastArchiveResult(res,'Inservice result deleted.')){
+    await loadISCompliance(true);
+  }
+}
+
+function buildLocalISQuestions(row){
+  const topic=INSERVICES.find(t=>t.id==row.topicId);
+  const answers=parseISAnswers(row);
+  if(!topic||!topic.questions)return [];
+  return topic.questions.map(function(q,i){
+    const aide=answers[i];
+    const aideText=(typeof aide==='number'||(/^\d+$/.test(String(aide||'').trim())&&q.options&&q.options[Number(aide)]))?(q.options[Number(aide)]||''):(aide==null?'':String(aide));
+    const correctText=Array.isArray(q.options)?q.options[q.answer]:'';
+    return {
+      qIndex:i,
+      question:q.q,
+      options:q.options||[],
+      aideAnswer:aideText,
+      correctAnswer:correctText,
+      isCorrect:isISAnswerCorrect(q,aide)
+    };
+  });
+}
+function normalizeISResultQuestions(data,row){
+  const payload=data&&(data.data&&!Array.isArray(data.data)?data.data:data.result)||data||{};
+  let raw=payload.questions||payload.items||(Array.isArray(data&&data.data)?null:null);
+  if(!Array.isArray(raw)&&data&&Array.isArray(data.questions))raw=data.questions;
+  if(!Array.isArray(raw))return buildLocalISQuestions(row);
+  return raw.map(function(q,i){
+    const topic=INSERVICES.find(t=>t.id==(row&&row.topicId));
+    const local=topic&&topic.questions&&topic.questions[q.qIndex!=null?q.qIndex:i];
+    const options=q.options||(local&&local.options)||[];
+    const correctAnswer=q.correctAnswer!=null?q.correctAnswer:(local?local.options[local.answer]:'');
+    const aideAnswer=q.aideAnswer!=null?q.aideAnswer:(q.answer!=null?q.answer:'');
+    const isCorrect=typeof q.isCorrect==='boolean'?q.isCorrect:isISAnswerCorrect(local||{options:options,answer:options.indexOf(correctAnswer),correctAnswer:correctAnswer},aideAnswer);
+    return {
+      qIndex:q.qIndex!=null?q.qIndex:i,
+      question:q.question||q.q||(local&&local.q)||('Question '+(i+1)),
+      options:options,
+      aideAnswer:typeof aideAnswer==='number'&&options[aideAnswer]!=null?options[aideAnswer]:aideAnswer,
+      correctAnswer:typeof correctAnswer==='number'&&options[correctAnswer]!=null?options[correctAnswer]:correctAnswer,
+      isCorrect:isCorrect
+    };
+  });
+}
+function applyISResultScore(row,data){
+  const payload=data&&(data.data&&!Array.isArray(data.data)?data.data:data.result)||data||{};
+  const next=Object.assign({},row);
+  ['scoreCorrect','scoreTotal','scorePercent','completed','completedAt'].forEach(function(k){
+    if(payload[k]!=null&&payload[k]!=='')next[k]=payload[k];
+    else if(data&&data[k]!=null&&data[k]!=='')next[k]=data[k];
+  });
+  next.isCompleted=true;
+  return fillISScore(next,INSERVICES.find(t=>t.id==next.topicId),parseISAnswers(next));
+}
+function setISResultsEditMode(on){
+  isResultsState.editing=!!on;
+  const edit=document.getElementById('isResultsEditBtn');
+  const save=document.getElementById('isResultsSaveEdit');
+  const cancel=document.getElementById('isResultsCancelEdit');
+  if(edit)edit.hidden=!!on;
+  if(save)save.hidden=!on;
+  if(cancel)cancel.hidden=!on;
+}
+function paintISResults(){
+  const banner=document.getElementById('isResultsBanner');
+  const meta=document.getElementById('isResultsMeta');
+  const note=document.getElementById('isResultsNote');
+  const body=document.getElementById('isResultsBody');
+  const row=isResultsState.row||{};
+  if(banner)banner.textContent=formatISScoreBanner(row);
+  if(meta){
+    meta.innerHTML='<div><span class="lbl">Aide</span> '+escapeHtml(row.empName||row.username||'—')+'</div>'
+      +'<div><span class="lbl">Topic</span> '+escapeHtml(row.topicTitle||row.topicShort||'—')+'</div>'
+      +'<div><span class="lbl">Completed</span> '+escapeHtml(formatISCompletedDate(certDateFromRecord(row)))+'</div>';
+  }
+  if(note){
+    if(isResultsState.stubbed){
+      note.hidden=false;
+      note.textContent='Ace get_inservice_result is not deployed yet — showing local topic questions.';
+    }else{
+      note.hidden=true;
+      note.textContent='';
+    }
+  }
+  if(!body)return;
+  const qs=isResultsState.questions||[];
+  if(!qs.length){
+    body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">No question results available yet.</p>';
+    return;
+  }
+  if(isResultsState.editing){
+    body.innerHTML=qs.map(function(q,i){
+      const opts=(q.options&&q.options.length)?q.options:[q.aideAnswer,q.correctAnswer].filter(function(v,idx,arr){return v&&arr.indexOf(v)===idx;});
+      const picks=opts.map(function(opt){
+        const checked=String(opt)===String(q.aideAnswer)?' checked':'';
+        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+escapeAttr(opt)+'"'+checked+'>'+escapeHtml(opt)+'</label>';
+      }).join('');
+      return '<div class="is-result-qa"><div class="q">'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</div>'+picks+'</div>';
+    }).join('');
+    return;
+  }
+  body.innerHTML=qs.map(function(q,i){
+    const ok=!!q.isCorrect;
+    const mark=ok?'✓':'✕';
+    const cls=ok?'ok':'bad';
+    let ans='<div class="ans">Aide answer: <span class="'+(ok?'right':'wrong')+'">'+escapeHtml(q.aideAnswer||'—')+'</span></div>';
+    if(!ok)ans+='<div class="ans">Correct answer: <span class="right">'+escapeHtml(q.correctAnswer||'—')+'</span></div>';
+    return '<div class="is-result-qa '+cls+'"><div class="q"><span class="mark">'+mark+'</span><span>'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</span></div>'+ans+'</div>';
+  }).join('');
+}
+function closeISResults(){
+  isResultsState={rowIndex:-1,row:null,questions:[],editing:false,stubbed:false};
+  setISResultsEditMode(false);
+  closeModal('isResultsModal');
+}
+async function viewISResults(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row)return;
+  isResultsState={rowIndex:rowIndex,row:row,questions:[],editing:false,stubbed:false};
+  setISResultsEditMode(false);
+  const body=document.getElementById('isResultsBody');
+  if(body)body.innerHTML='<p style="color:var(--muted);font-size:0.84rem">Loading results...</p>';
+  const banner=document.getElementById('isResultsBanner');
+  if(banner)banner.textContent=formatISScoreBanner(row);
+  const meta=document.getElementById('isResultsMeta');
+  if(meta){
+    meta.innerHTML='<div><span class="lbl">Aide</span> '+escapeHtml(row.empName||row.username||'—')+'</div>'
+      +'<div><span class="lbl">Topic</span> '+escapeHtml(row.topicTitle||row.topicShort||'—')+'</div>'
+      +'<div><span class="lbl">Completed</span> '+escapeHtml(formatISCompletedDate(certDateFromRecord(row)))+'</div>';
+  }
+  openModal('isResultsModal');
+  let data=null;
+  try{
+    data=await apiPost({action:'get_inservice_result',username:row.username,topicId:row.topicId});
+  }catch(e){
+    data={success:false,error:(e&&e.message)||'Error'};
+  }
+  const why=(data&&(data.error||data.message))||'';
+  const unknown=!(data&&data.success)&&nciLooksLikeUnknownAction(why);
+  const hasQs=data&&(Array.isArray(data.questions)||(data.data&&(Array.isArray(data.data.questions)||Array.isArray(data.data.items)))||(data.result&&Array.isArray(data.result.questions)));
+  if(data&&data.success&&hasQs){
+    isResultsState.stubbed=false;
+    isResultsState.row=applyISResultScore(row,data);
+    isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
+  }else{
+    isResultsState.stubbed=unknown||!hasQs;
+    isResultsState.questions=buildLocalISQuestions(row);
+    if(isResultsState.questions.length){
+      let ok=0;
+      isResultsState.questions.forEach(function(q){if(q.isCorrect)ok++;});
+      if(isResultsState.row.scoreCorrect==null||isResultsState.row.scoreTotal==null){
+        isResultsState.row.scoreCorrect=ok;
+        isResultsState.row.scoreTotal=isResultsState.questions.length;
+        isResultsState.row.scorePercent=isResultsState.row.scoreTotal?Math.round(ok/isResultsState.row.scoreTotal*100):0;
+      }
+    }
+    if(data&&data.success===false&&!unknown&&why){
+      const note=document.getElementById('isResultsNote');
+      if(note){note.hidden=false;note.textContent=String(why);}
+    }
+  }
+  paintISResults();
+}
+function startISResultsEdit(){
+  if(!isResultsState.row)return;
+  if(!isResultsState.questions.length)isResultsState.questions=buildLocalISQuestions(isResultsState.row);
+  setISResultsEditMode(true);
+  paintISResults();
+}
+function cancelISResultsEdit(){
+  setISResultsEditMode(false);
+  paintISResults();
+}
+async function saveISResultsEdit(){
+  const row=isResultsState.row;
+  if(!row)return;
+  const answers=(isResultsState.questions||[]).map(function(q,i){
+    const sel=document.querySelector('input[name="isEditQ'+i+'"]:checked');
+    return {qIndex:q.qIndex!=null?q.qIndex:i,aideAnswer:sel?sel.value:''};
+  });
+  const saveBtn=document.getElementById('isResultsSaveEdit');
+  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving…';}
+  let data=null;
+  try{
+    data=await apiPost({action:'admin_update_inservice_answers',username:row.username,topicId:row.topicId,answers:answers});
+  }catch(e){
+    data={success:false,error:(e&&e.message)||'Save failed.'};
+  }
+  if(saveBtn){saveBtn.disabled=false;saveBtn.textContent='Save answers';}
+  if(!(data&&data.success)){
+    const why=(data&&(data.error||data.message))||'Save failed.';
+    if(nciLooksLikeUnknownAction(why)){
+      showTempMsg(data&&data.error?String(data.error):('Unknown action: admin_update_inservice_answers'),'var(--danger)');
+    }else{
+      showTempMsg(String(why),'var(--danger)');
+    }
+    return;
+  }
+  answers.forEach(function(a,i){
+    if(isResultsState.questions[i])isResultsState.questions[i].aideAnswer=a.aideAnswer;
+  });
+  isResultsState.row=applyISResultScore(row,data);
+  if(data.questions||(data.data&&data.data.questions)){
+    isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
+  }else{
+    isResultsState.questions=isResultsState.questions.map(function(q,i){
+      const next=Object.assign({},q,{aideAnswer:answers[i]?answers[i].aideAnswer:q.aideAnswer});
+      next.isCorrect=String(next.aideAnswer||'')===String(next.correctAnswer||'');
+      return next;
+    });
+    let ok=0;
+    isResultsState.questions.forEach(function(q){if(q.isCorrect)ok++;});
+    isResultsState.row.scoreCorrect=ok;
+    isResultsState.row.scoreTotal=isResultsState.questions.length;
+    isResultsState.row.scorePercent=isResultsState.row.scoreTotal?Math.round(ok/isResultsState.row.scoreTotal*100):0;
+  }
+  isResultsState.stubbed=false;
+  setISResultsEditMode(false);
+  paintISResults();
+  showTempMsg('Answers updated. Score refreshed.','var(--success)');
+  loadISCompliance(true);
 }
 
 function formatCertDate(val){
