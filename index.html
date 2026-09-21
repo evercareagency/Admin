@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- paper-overlay hotfix 2026-09-21 v=a713ovl force Pages index.html refresh -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -280,7 +281,18 @@ textarea{resize:vertical;min-height:80px;}
 body.ts-print-open{overflow:hidden;}
 .ts-print-wrap{flex:1;padding:8px 6px 20px;display:flex;justify-content:center;align-items:flex-start;}
 /* US Letter lock — 612×792pt / 8.5×11in. Blank paper + FORM-map fills only. */
-.ts-print-sheet{position:relative;background:#fff;width:8.5in;height:11in;max-width:100%;padding:0;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;overflow:hidden;aspect-ratio:8.5/11;container-type:inline-size;container-name:ts;flex:none;align-self:flex-start;}
+:root{--ts-blank-url:url('assets/blank-letter.png?v=a713ovl');}
+#tsPrintSheet,.ts-print-sheet{
+  position:relative;
+  background-color:#fff;
+  background-image:var(--ts-blank-url);
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  background-position:center;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+  width:8.5in;height:11in;max-width:100%;padding:0;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;overflow:hidden;aspect-ratio:8.5/11;container-type:inline-size;container-name:ts;flex:none;align-self:flex-start;
+}
 .ts-blank{display:block;width:100%;height:100%;object-fit:fill;object-position:center;border:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;position:absolute;inset:0;z-index:0;}
 .ts-fill{position:absolute;z-index:1;color:#111;font-family:'Times New Roman',Times,serif;font-weight:700;line-height:1;white-space:nowrap;pointer-events:none;transform:translate(0,-50%);}
 .ts-fill-c{transform:translate(-50%,-50%);text-align:center;}
@@ -380,7 +392,13 @@ body.ts-print-open{overflow:hidden;}
     margin:0 !important;
     position:relative !important;
     overflow:hidden !important;
-    background:#fff !important;
+    background-color:#fff !important;
+    background-image:url('assets/blank-letter.png?v=a713ovl') !important;
+    background-size:100% 100% !important;
+    background-repeat:no-repeat !important;
+    background-position:center !important;
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
     color:#111 !important;
   }
   @page{size:letter;margin:0;}
@@ -1573,7 +1591,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
   </div>
   <div class="ts-print-wrap">
-    <div id="tsPrintSheet" class="ts-print-sheet"></div>
+    <div id="tsPrintSheet" class="ts-print-sheet" data-print-mode="paper-overlay"></div>
   </div>
 </div>
 
@@ -1595,30 +1613,19 @@ const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7re
 const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const PRINT_DAYS=[0,1,2,3,4,5,6]; // Sun–Sat Caregiver Timesheet paper
-const PAPER_DAY_LETTERS=['S','M','T','W','T','F','S'];
 const AGENCY={
   name:'EverCare Home Agency',
   address:'5510 Pearl Rd Ste 200',
   cityLine:'Cleveland, OH 44129',
   phone:'(216) 377-5991'
 };
-/* Exact Ace / TimesheetArchive.gs PAPER_SERVICES SVC_* labels. */
+/* Exact Ace / TimesheetArchive.gs SVC_* labels. */
 const SVC_PERSONAL_CARE=['Assist W/Bath-Bed/Tub/Shower','Hair Care/Shampoo','Shave','Skin Care','Nail Care/Foot Care','Oral Care/Denture Care','Assist W/Dressing'];
 const SVC_ELIMINATION=['Bedpan/Urinal/Bedside Commode/Foley','Cath. Care','Incontinence/Perineal Care','Empty Drainage Bag','Empty Colostomy Bag'];
 const SVC_HOUSEHOLD=['Make Bed/Change Linen','Tidy Work Area/Trash Removal','Clear Pathways','Laundry','Sweep/Wet Mop','Dusting/Vacuum','Dishes','Refrigerator','Bathroom (Toilet, Tub, Sink)','Grocery Shopping','Other (specify)'];
 const SVC_MOBILITY=['Dangle','Transfer Chair/Commode/Bed','Assist W/Ambulation','Walker/Wheelchair/Crutches','Bedbound','Turn & Position','Encourage Deep Breathing'];
 const SVC_TREATMENTS=['Medication Reminder (Verbal)','Prescription Pick Up'];
 const SVC_NUTRITION=['Diet','Meal Prep. (B/L/D)','Assist W/ Feeding','Encourage Fluids'];
-const PAPER_SERVICES=[
-  {n:'PERSONAL CARE',items:SVC_PERSONAL_CARE},
-  {n:'HOUSEHOLD SERVICES',items:SVC_HOUSEHOLD},
-  {n:'ELIMINATION',items:SVC_ELIMINATION},
-  {n:'MOBILITY',items:SVC_MOBILITY},
-  {n:'TREATMENTS',items:SVC_TREATMENTS},
-  {n:'NUTRITION',items:SVC_NUTRITION}
-];
-const PAPER_SVC_LEFT=['PERSONAL CARE','HOUSEHOLD SERVICES'];
-const PAPER_SVC_RIGHT=['ELIMINATION','MOBILITY','TREATMENTS','NUTRITION'];
 /* Ace TimesheetArchive FORM map — PDF pts, letter 612×792, yTop from top. */
 const TS_FORM_PT={
   sheetW:612,sheetH:792,
@@ -1638,7 +1645,8 @@ const TS_FORM_PT={
   yTreat:[606.18,619.59],
   yNutrition:[673.38,686.79,700.18,713.59]
 };
-const TS_BLANK_SRC='assets/blank-letter.png';
+const TS_BLANK_VER='a713ovl';
+const TS_BLANK_SRC='assets/blank-letter.png?v='+TS_BLANK_VER;
 const TS_SVC_OVERLAY=[
   {items:SVC_PERSONAL_CARE,ys:'yPersonal',xs:'dayXL'},
   {items:SVC_ELIMINATION,ys:'yElim',xs:'dayXR'},
@@ -2693,17 +2701,40 @@ function daySigMark(r,i,role){
   const d=dayEntry((r&&r.days)||{},i);
   return hasSigInk(role==='aide'?(d.aideSig||''):(d.clientSig||''));
 }
+function applyPrintSheetPaper(sheet){
+  if(!sheet)return;
+  sheet.setAttribute('data-print-mode','paper-overlay');
+  sheet.style.backgroundColor='#fff';
+  sheet.style.backgroundImage="url('"+TS_BLANK_SRC+"')";
+  sheet.style.backgroundSize='100% 100%';
+  sheet.style.backgroundRepeat='no-repeat';
+  sheet.style.backgroundPosition='center';
+  sheet.style.webkitPrintColorAdjust='exact';
+  sheet.style.printColorAdjust='exact';
+}
 function waitForSheetImages(root){
   const imgs=root?root.querySelectorAll('img'):[];
   if(!imgs.length)return Promise.resolve();
   return Promise.all(Array.prototype.map.call(imgs,img=>{
-    if(img.complete&&img.naturalWidth)return Promise.resolve();
+    if(img.complete&&img.naturalWidth>0)return Promise.resolve();
     return new Promise(res=>{
       const done=()=>res();
       img.addEventListener('load',done,{once:true});
       img.addEventListener('error',done,{once:true});
     });
   }));
+}
+async function waitForBlankPaper(root){
+  const img=root&&root.querySelector('img.ts-blank');
+  if(!img)return;
+  const deadline=Date.now()+8000;
+  while(Date.now()<deadline){
+    try{
+      if(typeof img.decode==='function')await img.decode();
+    }catch(e){}
+    if(img.naturalWidth>0)return;
+    await new Promise(r=>setTimeout(r,40));
+  }
 }
 
 function buildPrintHtml(r){
@@ -2752,7 +2783,9 @@ function buildPrintHtml(r){
   if(otherSpecify)fills.push(tsFill(otherSpecify,F.otherSpecifyX,F.otherSpecifyY,'ts-fill-other'));
   const notes=String((r&&(r.notes||r.comments))||'').trim();
   if(notes)fills.push(tsFill(notes,F.commentsX,F.commentsY,'ts-fill-notes'));
-  return `<img class="ts-blank" src="${TS_BLANK_SRC}" alt="" width="1275" height="1650" decoding="sync" loading="eager">${fills.join('')}`;
+  const html=`<img class="ts-blank" src="${TS_BLANK_SRC}" alt="" width="1275" height="1650" decoding="sync" loading="eager">${fills.join('')}`;
+  if(/<table\b/i.test(html))return html.replace(/<table\b[\s\S]*?<\/table>/gi,'');
+  return html;
 }
 
 function closeTimesheetPrint(){
@@ -2799,6 +2832,7 @@ function openTimesheetPrint(r){
   const overlay=document.getElementById('tsPrintOverlay');
   if(!sheet||!overlay)return;
   sheet.innerHTML=buildPrintHtml(r);
+  applyPrintSheetPaper(sheet);
   overlay.classList.add('show');
   overlay.removeAttribute('hidden');
   overlay.hidden=false;
@@ -2810,7 +2844,11 @@ async function printTimesheetSheet(){
   const overlay=document.getElementById('tsPrintOverlay');
   const sheet=document.getElementById('tsPrintSheet');
   if(!overlay||!overlay.classList.contains('show')||!sheet)return;
-  await waitForSheetImages(sheet);
+  applyPrintSheetPaper(sheet);
+  await waitForBlankPaper(sheet);
+  if(!(sheet.querySelector('img.ts-blank')&&sheet.querySelector('img.ts-blank').naturalWidth>0)){
+    await waitForSheetImages(sheet);
+  }
   unlockBodyForPrint();
   const parent=sheet.parentNode;
   const next=sheet.nextSibling;
@@ -2907,10 +2945,13 @@ async function downloadTSPDF(){
   showTempMsg('Generating PDF, please wait...','var(--teal)');
   const container=document.createElement('div');
   container.className='ts-print-sheet';
-  container.style.cssText='position:fixed;left:-9999px;top:0;width:8.5in;height:11in;padding:0;overflow:hidden;background:#fff;box-shadow:none;';
+  container.setAttribute('data-print-mode','paper-overlay');
+  container.style.cssText='position:fixed;left:-9999px;top:0;width:8.5in;height:11in;padding:0;overflow:hidden;background-color:#fff;box-shadow:none;';
   container.innerHTML=buildPrintHtml(r);
+  applyPrintSheetPaper(container);
   document.body.appendChild(container);
   try{
+    await waitForBlankPaper(container);
     await waitForSheetImages(container);
     const canvas=await html2canvas(container,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
     const imgData=canvas.toDataURL('image/png');
