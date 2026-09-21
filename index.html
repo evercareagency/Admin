@@ -8,7 +8,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
 <!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
-<meta name="admin-build" content="2026-09-21-cert-c2-ribbon-laurel">
+<!-- PrintTS one-page Letter 2026-09-21 v=ts1pg721 force Pages index.html refresh -->
+<meta name="admin-build" content="2026-09-21-printts-one-page">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -277,6 +278,8 @@ textarea{resize:vertical;min-height:80px;}
   z-index:6;
 }
 .ts-print-toolbar h2{font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;margin:0;color:#fff;}
+.ts-print-toolbar-copy{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
+.ts-print-ios-tip{margin:0;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:500;line-height:1.35;color:rgba(255,255,255,0.82);max-width:42rem;}
 .ts-print-toolbar .ts-print-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .ts-print-toolbar .btn{min-height:44px;min-width:44px;display:inline-flex !important;visibility:visible !important;}
 #tsPrintBackBtn,#tsPrintCloseBtn{background:#fff !important;color:#1a2744 !important;border:2px solid #fff !important;}
@@ -309,13 +312,18 @@ body.ts-print-open{overflow:hidden;}
   .ts-print-sheet{width:100%;height:auto;min-height:0;aspect-ratio:8.5/11;padding:0;}
 }
 /* iOS Safari Print Options: show ONLY the form sheet. Overlay is static.
-   Screen rules use position:fixed + body overflow:hidden — those blank iOS preview. */
+   Screen rules use position:fixed + body overflow:hidden — those blank iOS preview.
+   One Letter page: @page ≤0.25in + sheet sized to the content box so the agency
+   address on the blank stays on page 1 (Safari chrome is less likely to push it). */
 @media print{
+  /* 0.2in (not 0): Safari often treats margin:0 as “use 0.5in default”. */
+  @page{size:letter portrait;margin:0.2in;}
   html,body,body.ts-print-open,html.ts-printing,html.ts-printing body{
     background:#fff !important;
     height:auto !important;
     min-height:0 !important;
-    overflow:visible !important;
+    max-height:none !important;
+    overflow:hidden !important;
     position:static !important;
     width:auto !important;
     max-width:none !important;
@@ -327,7 +335,8 @@ body.ts-print-open{overflow:hidden;}
   }
   /* Hide every body child except the print sheet (reparented) or its overlay host. */
   body > *:not(#tsPrintSheet):not(#tsPrintOverlay){display:none !important;visibility:hidden !important;}
-  .no-print,.ts-print-toolbar,#tsPrintToolbar,.sidebar,.modal-bg,#pwaBanner,.screen,
+  .no-print,.ts-print-toolbar,#tsPrintToolbar,.ts-print-ios-tip,.ts-print-toolbar-copy,
+  .sidebar,.modal-bg,#pwaBanner,.screen,#nciToast,#nciDiscardConfirm,
   #tsPrintOverlay .no-print,
   #tsPrintOverlay .ts-print-toolbar,
   #tsPrintOverlay.show .ts-print-toolbar,
@@ -337,7 +346,8 @@ body.ts-print-open{overflow:hidden;}
   #tsPrintOverlay.show #tsPrintCloseBtn,
   #tsPrintOverlay.show #tsPrintDoBtn,
   #tsPrintOverlay.show .ts-print-actions,
-  #tsPrintOverlay.show .ts-print-toolbar h2{
+  #tsPrintOverlay.show .ts-print-toolbar h2,
+  #tsPrintOverlay.show .ts-print-ios-tip{
     display:none !important;
     visibility:hidden !important;
     height:0 !important;
@@ -346,6 +356,16 @@ body.ts-print-open{overflow:hidden;}
     padding:0 !important;
     margin:0 !important;
     border:0 !important;
+  }
+  /* Reparented print: empty overlay must not occupy a second page. */
+  html.ts-printing body > #tsPrintOverlay{
+    display:none !important;
+    visibility:hidden !important;
+    height:0 !important;
+    max-height:0 !important;
+    overflow:hidden !important;
+    padding:0 !important;
+    margin:0 !important;
   }
   #tsPrintOverlay,
   #tsPrintOverlay.ts-print-overlay,
@@ -366,17 +386,30 @@ body.ts-print-open{overflow:hidden;}
     min-height:0 !important;
     max-height:none !important;
     width:100% !important;
-    overflow:visible !important;
+    overflow:hidden !important;
     background:#fff !important;
     box-shadow:none !important;
     z-index:auto !important;
     pointer-events:none !important;
+    padding:0 !important;
+    margin:0 !important;
+  }
+  html.ts-printing body > #tsPrintOverlay,
+  html.ts-printing body > #tsPrintOverlay.ts-print-overlay,
+  html.ts-printing body > #tsPrintOverlay.ts-print-overlay.show,
+  html.ts-printing body > #tsPrintOverlay.show{
+    display:none !important;
+    visibility:hidden !important;
+    height:0 !important;
+    max-height:0 !important;
+    overflow:hidden !important;
   }
   #tsPrintOverlay .ts-print-wrap{
     display:block !important;
     visibility:visible !important;
     padding:0 !important;
-    overflow:visible !important;
+    margin:0 !important;
+    overflow:hidden !important;
     height:auto !important;
   }
   html.ts-printing body > #tsPrintSheet,
@@ -387,11 +420,14 @@ body.ts-print-open{overflow:hidden;}
   #tsPrintSheet,.ts-print-sheet{
     display:block !important;
     box-shadow:none !important;
-    width:8.5in !important;
-    max-width:none !important;
+    /* 8.1×10.5 = Letter minus 0.2in margins, slight scale so address stays on page 1. */
+    width:8.1in !important;
+    height:10.5in !important;
+    max-width:8.1in !important;
+    max-height:10.5in !important;
     min-height:0 !important;
     padding:0 !important;
-    margin:0 !important;
+    margin:0 auto !important;
     position:relative !important;
     overflow:hidden !important;
     background-color:#fff !important;
@@ -402,16 +438,10 @@ body.ts-print-open{overflow:hidden;}
     -webkit-print-color-adjust:exact !important;
     print-color-adjust:exact !important;
     color:#111 !important;
-  }
-  @page{size:letter;margin:0;}
-  html.ts-printing body > #tsPrintSheet,
-  #tsPrintSheet,.ts-print-sheet{
-    width:8.5in !important;
-    height:11in !important;
-    max-height:11in !important;
-    padding:0 !important;
-    overflow:hidden !important;
-    display:block !important;
+    page-break-after:avoid !important;
+    page-break-inside:avoid !important;
+    break-after:avoid !important;
+    break-inside:avoid !important;
     aspect-ratio:8.5/11 !important;
   }
   .ts-blank{
@@ -1605,7 +1635,10 @@ Call (216) 377-5991 with any questions.</textarea>
 
 <div id="tsPrintOverlay" class="ts-print-overlay" hidden>
   <div class="ts-print-toolbar no-print" id="tsPrintToolbar">
-    <h2>Timesheet print view</h2>
+    <div class="ts-print-toolbar-copy">
+      <h2>Timesheet print view</h2>
+      <p class="ts-print-ios-tip no-print" id="tsPrintIosTip">iOS Print Options → turn off Headers &amp; Footers if a github.io URL appears (Safari adds it; we cannot fully hide it).</p>
+    </div>
     <div class="ts-print-actions">
       <button type="button" id="tsPrintBackBtn" class="btn btn-ghost" onclick="closeTimesheetPrint()">← Back to portal</button>
       <button type="button" id="tsPrintCloseBtn" class="btn btn-ghost" onclick="closeTimesheetPrint()">✕ Close</button>
@@ -2898,6 +2931,9 @@ function openTimesheetPrint(r){
   overlay.hidden=false;
   overlay.scrollTop=0;
   document.body.classList.add('ts-print-open');
+  if(typeof showTempMsg==='function'){
+    showTempMsg('Tip: iOS Print Options → turn off Headers & Footers if a github.io URL appears (Safari-controlled).','var(--navy)',7000);
+  }
 }
 
 async function printTimesheetSheet(){

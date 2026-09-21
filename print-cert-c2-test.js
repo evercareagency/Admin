@@ -24,7 +24,7 @@ function extractFn(src, sig){
 }
 
 assert.ok(html.includes('v=c2rib7212'), 'Pages cache-bust comment for C2 cert');
-assert.ok(html.includes('admin-build" content="2026-09-21-cert-c2-ribbon-laurel"'), 'admin-build meta for hard-refresh');
+assert.ok(html.includes('admin-build" content="2026-09-21-printts-one-page"') || html.includes('admin-build" content="2026-09-21-cert-c2-ribbon-laurel"'), 'admin-build meta for hard-refresh');
 assert.ok(html.includes('function formatCertDate('), 'formatCertDate required');
 assert.ok(html.includes('function certDateFromRecord('), 'certDateFromRecord required');
 assert.ok(html.includes('function buildCertHtml('), 'buildCertHtml required');
