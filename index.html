@@ -204,6 +204,7 @@ textarea{resize:vertical;min-height:80px;}
 .nci-foot .btn{min-height:44px;}
 .nci-discard{display:none;position:absolute;inset:0;z-index:40;align-items:center;justify-content:center;padding:20px;background:rgba(26,39,68,0.45);}
 .nci-discard.show{display:flex !important;}
+.nci-discard-page{position:fixed;z-index:2000;}
 .nci-discard-card{background:white;border-radius:12px;padding:20px 18px;max-width:340px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,0.28);text-align:center;}
 .nci-discard-card p{font-size:0.95rem;font-weight:600;color:var(--navy);margin:0 0 16px;line-height:1.4;}
 .nci-discard-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
@@ -1498,15 +1499,6 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
   </div>
-  <div id="nciDiscardConfirm" class="nci-discard" hidden>
-    <div class="nci-discard-card" role="dialog" aria-modal="true" aria-labelledby="nciDiscardTitle">
-      <p id="nciDiscardTitle">Discard unsaved changes?</p>
-      <div class="nci-discard-actions">
-        <button type="button" class="btn btn-ghost nci-discard-btn" id="nciDiscardCancelBtn" onclick="nciCancelDiscard()">Cancel</button>
-        <button type="button" class="btn btn-danger nci-discard-btn" id="nciDiscardGoBtn" onclick="nciConfirmDiscard()">Discard</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 
@@ -1605,6 +1597,16 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <div id="backupDetailBody"></div>
+  </div>
+</div>
+
+<div id="nciDiscardConfirm" class="nci-discard nci-discard-page" hidden>
+  <div class="nci-discard-card" role="dialog" aria-modal="true" aria-labelledby="nciDiscardTitle">
+    <p id="nciDiscardTitle">Discard unsaved changes?</p>
+    <div class="nci-discard-actions">
+      <button type="button" class="btn btn-ghost nci-discard-btn" id="nciDiscardCancelBtn" onclick="nciCancelDiscard()">Cancel</button>
+      <button type="button" class="btn btn-danger nci-discard-btn" id="nciDiscardGoBtn" onclick="nciConfirmDiscard()">Discard</button>
+    </div>
   </div>
 </div>
 
@@ -4064,6 +4066,7 @@ async function exportAllToExcel(){
 // ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
 // LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
 // list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);
+// archive_client { clientId } (alias delete_client) — inactive/Archived, not hard-delete;
 // reuse get_clients. AdminUsers = Role|Password only.
 
 const SC_PERSONAL_CARE=['Bathing','MealPrep','Exercises','Grooming','Housekeeping','TurnReposition','Shaving','Laundry','VitalSigns','HairCare','ErrandsShopping','CatheterCare','OralHygiene','Ambulation','Appointments','SkinCare','PersonalCare'];
@@ -4170,7 +4173,7 @@ function hydrateNurseComplianceRow(r,extra){
   const status=scField(r,'Status','status')||deriveNurseStatus(visits,countingCalls);
   const daysLeft=Number(r.daysLeftInWindow??scField(r,'DaysLeftInWindow','daysLeftInWindow')??r.daysLeft??scField(r,'DaysInWindow','daysInWindow')??60)||60;
   const row=Object.assign({
-    clientId:scField(r,'ClientId','clientId')||'',
+    clientId:scField(r,'ClientId','clientId')||r.id||'',
     clientName:scField(r,'ClientName','clientName')||'—',
     assignedAides:r.assignedAides||r.AssignedAides||[],
     visits,countingCalls,status,
@@ -4281,9 +4284,39 @@ function renderNurseComplianceTable(rows){
         <button class="btn btn-sm btn-teal" onclick="openSupervisoryContactForm('Visit',${i})">Log Visit</button>
         <button class="btn btn-sm btn-navy" onclick="openSupervisoryContactForm('PhoneCall',${i})">Log Phone Call</button>
         <button class="btn btn-sm" id="scViewPdfBtn${i}" style="background:#e8f5e9;color:#2e7d32" onclick="viewSupervisoryVisitPdf(${i})">📄 View PDF</button>
+        <button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteComplianceClient(${i})">Delete</button>
       </div></td>
     </tr>`;
   }).join('');
+}
+
+function clientIdOfComplianceRow(r){
+  if(!r)return '';
+  const id=r.clientId||r.ClientId||r.id||'';
+  return id==null?'':String(id);
+}
+function confirmDeleteComplianceClient(rowIndex){
+  const row=nurseComplianceRows[rowIndex];
+  const clientId=clientIdOfComplianceRow(row);
+  if(!clientId){
+    showTempMsg('No clientId for this row.','var(--danger)');
+    return;
+  }
+  showSharedConfirm('Are you sure?',function(){archiveComplianceClient(clientId);},'Yes, delete');
+}
+async function archiveComplianceClient(clientId){
+  const id=String(clientId||'');
+  if(!id){
+    showTempMsg('No clientId for this row.','var(--danger)');
+    return false;
+  }
+  const res=await postArchiveAction('archive_client','delete_client',{clientId:id});
+  if(toastArchiveResult(res,'Client deleted.')){
+    cacheInvalidate('get_supervisory_compliance');
+    await loadNurseCompliance(true);
+    return true;
+  }
+  return false;
 }
 
 function buildScPersonalCareGrid(){
@@ -4681,7 +4714,8 @@ async function viewSupervisoryVisitPdf(rowIndex){
 //     proxyAgencyRepSignatureData, proxyAgencyRepSignDate
 // *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
-// Archive: archive_new_client_intake_pdf { intakeId }. Complete save returns fast
+// Soft-delete: archive_new_client_intake { intakeId } (alias delete_new_client_intake) — Status=Archived.
+// Archive PDF: archive_new_client_intake_pdf { intakeId }. Complete save returns fast
 // (pdfPending and/or empty pdfLink). Toast "Saved — PDF generating" BEFORE close/reload
 // (sticky). Do not await archive. Interim "PDF not ready yet" only after ~8s if still
 // pending. "PDF ready" when pdfLink lands. After UI success, POST archive then refresh pdfLink.
@@ -5293,28 +5327,77 @@ function nciEnsureShell(){
   if(body.parentElement!==shell)shell.insertBefore(body,head.nextSibling);
   if(foot.parentElement!==shell || body.contains(foot))shell.appendChild(foot);
 }
-function nciHideDiscard(){
+let _sharedConfirmOnYes=null;
+function hideSharedConfirm(){
   const el=nciEl('nciDiscardConfirm');
   if(!el)return;
   el.classList.remove('show');
   el.hidden=true;
   el.style.display='none';
+  _sharedConfirmOnYes=null;
 }
-function nciShowDiscard(){
+function showSharedConfirm(title,onConfirm,confirmLabel){
   const el=nciEl('nciDiscardConfirm');
+  const t=nciEl('nciDiscardTitle');
+  const go=nciEl('nciDiscardGoBtn');
   if(!el)return;
+  if(t)t.textContent=title||'Are you sure?';
+  if(go)go.textContent=confirmLabel||'Yes, delete';
+  _sharedConfirmOnYes=typeof onConfirm==='function'?onConfirm:null;
   el.hidden=false;
   el.classList.add('show');
   el.style.display='flex';
 }
+function nciHideDiscard(){
+  hideSharedConfirm();
+}
+function nciShowDiscard(){
+  showSharedConfirm('Discard unsaved changes?',function(){closeNewClientIntake(true);},'Discard');
+}
 function nciCancelDiscard(){
-  nciHideDiscard();
+  hideSharedConfirm();
 }
 function nciConfirmDiscard(){
-  closeNewClientIntake(true);
+  const fn=_sharedConfirmOnYes;
+  hideSharedConfirm();
+  if(fn)fn();
 }
 function nciLooksLikeUnknownAction(text){
   return /unknown action|not implemented|stub action/i.test(String(text||''));
+}
+async function postArchiveAction(primary,alias,payload){
+  let data=null;
+  try{
+    data=await apiPost(Object.assign({action:primary},payload));
+  }catch(e){
+    return {data:null,err:e,action:primary};
+  }
+  if(data&&data.success)return {data:data,err:null,action:primary};
+  const why=(data&&(data.error||data.message))||'';
+  if(alias&&nciLooksLikeUnknownAction(why)){
+    try{
+      data=await apiPost(Object.assign({action:alias},payload));
+      return {data:data,err:null,action:alias};
+    }catch(e){
+      return {data:null,err:e,action:alias};
+    }
+  }
+  return {data:data,err:null,action:primary};
+}
+function toastArchiveResult(res,okMsg){
+  const data=res&&res.data;
+  const err=res&&res.err;
+  if(data&&data.success){
+    showTempMsg(okMsg||'Deleted.','var(--success)');
+    return true;
+  }
+  const raw=(data&&data.error)||(err&&err.message)||'Delete failed.';
+  if(nciLooksLikeUnknownAction(raw)){
+    showTempMsg('Unknown action: '+((res&&res.action)||'')+(data&&data.error?' — '+data.error:''),'var(--danger)');
+  }else{
+    showTempMsg(String(raw),'var(--danger)');
+  }
+  return false;
 }
 function nciSaveFailWhy(data,status,err){
   const bits=[];
@@ -6155,9 +6238,32 @@ function nciCompletedTableHtml(rows){
       <td><div class="nci-complete-actions">
         <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${safe}')"${viewDis}${pdf?'':' title="PDF pending"'}>📄 View</button>
         <button type="button" class="btn btn-sm btn-navy" onclick="editCompletedIntake('${safe}')">Edit</button>
+        <button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteCompletedIntake('${safe}')">Delete</button>
       </div></td>
     </tr>`;
   }).join('');
+}
+
+function confirmDeleteCompletedIntake(intakeId){
+  const id=String(intakeId||'');
+  if(!id){
+    showTempMsg('No intakeId for this row.','var(--danger)');
+    return;
+  }
+  showSharedConfirm('Are you sure?',function(){archiveCompletedIntake(id);},'Yes, delete');
+}
+async function archiveCompletedIntake(intakeId){
+  const id=String(intakeId||'');
+  if(!id){
+    showTempMsg('No intakeId for this row.','var(--danger)');
+    return false;
+  }
+  const res=await postArchiveAction('archive_new_client_intake','delete_new_client_intake',{intakeId:id});
+  if(toastArchiveResult(res,'Intake deleted.')){
+    await refreshCompletedNewClientIntakes();
+    return true;
+  }
+  return false;
 }
 
 function paintCompletedNewClientIntakes(){
