@@ -7,7 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- paper-overlay hotfix 2026-09-21 v=a713ovl force Pages index.html refresh -->
+<!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
+<meta name="admin-build" content="2026-09-21-cert-c2-ribbon-laurel">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -2939,6 +2940,9 @@ document.addEventListener('DOMContentLoaded',function(){
   if(/[?&]printSample=1(?:&|$)/.test(location.search||'')){
     renderAdminPrintSample();
   }
+  if(/[?&]certSample=1(?:&|$)/.test(location.search||'')){
+    renderAdminCertSample();
+  }
 });
 
 async function downloadTSPDF(){
@@ -3729,7 +3733,7 @@ async function loadISCompliance(force){
           <td><strong>${a.name}</strong></td>
           <td style="font-size:0.78rem">${assignedTopic.shortTitle}</td>
           <td><span class="badge badge-ok">✅ Completed</span></td>
-          <td style="font-size:0.75rem">${completion.completed}</td>
+          <td style="font-size:0.75rem">${escapeHtml(formatCertDate(certDateFromRecord(completion)))}</td>
           <td><button class="btn btn-sm btn-view" onclick="printCert(${JSON.stringify(completion).replace(/"/g,'&quot;')})">Print Cert</button></td>
         </tr>`;
       } else {
@@ -3760,87 +3764,235 @@ async function sendISReminder(username,name){
   }
 }
 
-function printCert(r){
-  const is=INSERVICES.find(i=>i.id==r.topicId)||{title:r.topicTitle};
-  const sigHTML=r.signature&&r.signature.length>100?'<img src="'+r.signature+'" style="height:40px">':'';
-  const w=window.open('','_blank','width=800,height:650');
-  w.document.write(`<!DOCTYPE html><html><head><title>EverCare Certificate</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:Arial,sans-serif;padding:40px;}
-    .cert{border:3px solid #2a7f7f;border-radius:8px;padding:40px;max-width:700px;margin:0 auto;position:relative;overflow:hidden;}
-    .side-l{position:absolute;left:0;top:0;bottom:0;width:16px;background:#2a7f7f;}
-    .side-r{position:absolute;right:0;top:0;bottom:0;width:16px;background:#2a7f7f;}
-    .inner{margin:0 24px;}
-    .top-bar{height:5px;background:#2a7f7f;border-radius:3px;margin-bottom:28px;}
-    .corner{position:absolute;width:36px;height:36px;border-color:#9a9a9a;border-style:solid;}
-    .tl{top:20px;left:24px;border-width:2px 0 0 2px;}
-    .tr{top:20px;right:24px;border-width:2px 2px 0 0;}
-    .bl{bottom:20px;left:24px;border-width:0 0 2px 2px;}
-    .br{bottom:20px;right:24px;border-width:0 2px 2px 0;}
-    .agency{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2a7f7f;text-align:center;margin-bottom:5px;}
-    h1{font-size:22px;text-align:center;color:#1a2744;margin-bottom:4px;}
-    .sub{font-size:12px;text-align:center;color:#6b7a90;margin-bottom:20px;}
-    .divider{display:flex;align-items:center;gap:10px;margin:14px 0;}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:#dce4ef;}
-    .diamond{width:8px;height:8px;background:#2a7f7f;transform:rotate(45deg);}
-    .certifies{font-size:13px;text-align:center;color:#6b7a90;margin-bottom:8px;}
-    .name{font-size:22px;text-align:center;color:#1a2744;border-bottom:1px solid #dce4ef;padding-bottom:6px;margin-bottom:14px;}
-    .has-completed{font-size:13px;text-align:center;color:#6b7a90;margin-bottom:8px;}
-    .topic-box{background:#e8f4f4;border:1px solid #2a7f7f;border-radius:6px;padding:10px 20px;text-align:center;margin-bottom:10px;}
-    .topic-name{font-size:16px;font-weight:bold;color:#1e6060;}
-    .date-pill{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0;}
-    .date-dot{width:6px;height:6px;background:#2a7f7f;border-radius:50%;}
-    .date-text{font-size:13px;color:#6b7a90;}
-    .sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin:20px 0 14px;}
-    .sig-box{text-align:center;}
-    .sig-line{height:50px;border-bottom:1px solid #1a2744;margin-bottom:7px;display:flex;align-items:flex-end;justify-content:center;}
-    .sig-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#6b7a90;}
-    .sig-name{font-size:11px;color:#6b7a90;margin-top:3px;}
-    .date-under{width:80px;border-bottom:0.5px solid #1a2744;margin:6px auto 3px;}
-    .date-lbl{font-size:10px;color:#9a9a9a;}
-    .footer{text-align:center;font-size:11px;color:#9a9a9a;border-top:0.5px solid #dce4ef;padding-top:10px;}
-    .bot-bar{height:4px;background:#2a7f7f;border-radius:3px;margin-top:20px;}
-    @media print{.no-print{display:none;}}
-  </style>
-</head><body>
+function formatCertDate(val){
+  if(val==null||val==='')return '—';
+  if(val instanceof Date){
+    if(isNaN(val.getTime()))return '—';
+    return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}).format(val);
+  }
+  const s=String(val).trim();
+  if(!s||s==='—'||/^null$/i.test(s)||/^undefined$/i.test(s))return '—';
+  if(!/\d{4}-\d{2}-\d{2}T/.test(s)&&!/Z$/i.test(s)){
+    const named=s.match(/[A-Za-z]+ \d{1,2}, \d{4}/);
+    if(named)return named[0];
+  }
+  const mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\b/);
+  if(mdy){
+    const d=new Date(Number(mdy[3]),Number(mdy[1])-1,Number(mdy[2]));
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(d);
+  }
+  const iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso){
+    const d=new Date(Number(iso[1]),Number(iso[2])-1,Number(iso[3]));
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'}).format(d);
+  }
+  const n=Number(s);
+  if(s!==''&&!isNaN(n)&&n>20000&&n<80000){
+    const d=new Date(Date.UTC(1899,11,30)+Math.round(n)*86400000);
+    if(!isNaN(d.getTime()))return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}).format(d);
+  }
+  const parsed=new Date(s);
+  if(!isNaN(parsed.getTime())){
+    return new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'America/New_York'}).format(parsed);
+  }
+  if(/\d{4}-\d{2}-\d{2}T/.test(s)||/Z$/i.test(s))return '—';
+  return s;
+}
 
-  <div class="cert">
-    <div class="side-l"></div><div class="side-r"></div>
-    <div class="corner tl"></div><div class="corner tr"></div>
-    <div class="corner bl"></div><div class="corner br"></div>
-    <div class="inner">
-      <div class="top-bar"></div>
-      <div class="agency">EverCare Home Agency</div>
-      <h1>Certificate of Inservice Completion</h1>
-      <div class="sub">Personal Care / Home Making</div>
-      <div class="divider"><div class="diamond"></div></div>
-      <div class="certifies">This certifies that</div>
-      <div class="name">${r.empName}</div>
-      <div class="has-completed">has successfully completed the inservice training for</div>
-      <div class="topic-box"><div class="topic-name">${r.topicTitle}</div></div>
-      <div style="font-size:11px;text-align:center;color:#9a9a9a">EverCare Home Agency &mdash; HHA Inservice Training</div>
-      <div class="date-pill"><div class="date-dot"></div><div class="date-text">Date of Completion: <strong style="color:#1a2744">${r.completed}</strong></div></div>
-      <div class="divider"><div class="diamond" style="background:#9a9a9a"></div></div>
-      <div class="sig-grid">
-        <div class="sig-box">
-          <div class="sig-line">${sigHTML}</div>
-          <div class="sig-label">Employee Signature</div>
-          <div class="sig-name">${r.empName}</div>
-        </div>
-        <div class="sig-box">
-          <div class="sig-line"></div>
-          <div class="sig-label">RN / Supervisor Signature</div>
-          <div class="date-under"></div>
-          <div class="date-lbl">Date</div>
-        </div>
-      </div>
-      <div class="footer">5510 Pearl Rd Ste 200, Cleveland, OH 44129 &nbsp;|&nbsp; (216) 377-5991 &nbsp;|&nbsp; EverCare Home Agency</div>
-      <div class="bot-bar"></div>
-    </div>
-  </div>
-  <br><button class="no-print" onclick="window.print()" style="padding:9px 22px;background:#2a7f7f;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px">Print Certificate</button>
-  </body></html>`);
+function certDateFromRecord(r){
+  if(!r||typeof r!=='object')return '';
+  const keys=['completed','completedAt','completed_at','completedOn','dateCompleted','completionDate','completedDate','date'];
+  for(let i=0;i<keys.length;i++){
+    const v=r[keys[i]];
+    if(v!=null&&String(v).trim()!=='')return v;
+  }
+  return '';
+}
+
+function certLaurelSvg(){
+  const leaf=function(x,y,rot,fill,scale){
+    const s=scale||1;
+    return '<path d="M0,-11 C7.2,-6 7.4,4 0,12.5 C-7.4,4 -7.2,-6 0,-11 Z" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate('+rot.toFixed(1)+') scale('+s.toFixed(2)+')" fill="'+fill+'"/>';
+  };
+  const cx=100,cy=100;
+  let out='';
+  const rows=[{r:81,n:19,s:1.05},{r:69,n:17,s:0.9}];
+  rows.forEach(function(row){
+    for(let side=-1;side<=1;side+=2){
+      for(let i=0;i<row.n;i++){
+        const t=i/(row.n-1);
+        const deg=side<0?(100+t*165):(80-t*165);
+        const rad=deg*Math.PI/180;
+        const x=cx+Math.cos(rad)*row.r;
+        const y=cy+Math.sin(rad)*row.r;
+        const rot=deg+(i%2?10:-8);
+        out+=leaf(x,y,rot,i%2?'#174f4f':'#2a7f7f',row.s);
+      }
+    }
+  });
+  return '<svg class="seal" viewBox="0 0 200 200" aria-hidden="true">'+out+
+    '<path d="M88 176 C94 168 106 168 112 176 C106 172 94 172 88 176 Z" fill="#174f4f"/>'+
+    '<circle cx="100" cy="100" r="34" fill="#f6ebd0" stroke="#174f4f" stroke-width="2"/>'+
+    '<circle cx="100" cy="100" r="28" fill="none" stroke="#2a7f7f" stroke-width="1.1"/>'+
+    '<text x="100" y="97" text-anchor="middle" fill="#174f4f" font-family="Cinzel,Playfair Display,Times New Roman,serif" font-size="16" font-weight="700" letter-spacing="1.2">EC</text>'+
+    '<text x="100" y="112" text-anchor="middle" fill="#174f4f" font-family="Cinzel,Times New Roman,serif" font-size="6.4" letter-spacing="1.5">HOME AGENCY</text></svg>';
+}
+
+function certRibbonHtml(){
+  return '<div class="ribbon" role="img" aria-label="Personal Care / Home Making">'+
+    '<span class="rib-tail rib-tail-l"></span>'+
+    '<span class="rib-fold rib-fold-l"></span>'+
+    '<span class="rib-band">Personal Care / Home Making</span>'+
+    '<span class="rib-fold rib-fold-r"></span>'+
+    '<span class="rib-tail rib-tail-r"></span>'+
+    '</div>';
+}
+
+function certCornerSvg(pos){
+  return '<svg class="flourish '+pos+'" viewBox="0 0 90 90" aria-hidden="true">'+
+    '<path d="M10 80 C10 28 28 10 80 10" fill="none" stroke="#1e6868" stroke-width="2.1"/>'+
+    '<path d="M22 80 C22 40 40 22 80 22" fill="none" stroke="#2a7f7f" stroke-width="1.15"/>'+
+    '<path d="M14 46 C4 46 5 28 18 31 C26 33 20 48 12 44" fill="#1e6868"/>'+
+    '<path d="M46 14 C46 4 64 5 61 18 C59 26 44 20 48 12" fill="#1e6868"/>'+
+    '<circle cx="16" cy="16" r="2.3" fill="#2a7f7f"/>'+
+    '</svg>';
+}
+
+function buildCertSampleRecord(){
+  return {
+    empName:'Aminila Hassaman',
+    topicTitle:'Infection Control & Hand Hygiene',
+    topicId:'sample',
+    completed:'2026-08-02T01:42:29.000Z',
+    signature:typeof sampleSigPng==='function'?sampleSigPng('A. Hassaman'):''
+  };
+}
+
+function renderAdminCertSample(){
+  const html=buildCertHtml(buildCertSampleRecord());
+  document.open();
+  document.write(html);
+  document.close();
+}
+
+function buildCertHtml(r){
+  r=r||{};
+  const topicSrc=r.topicTitle||r.title||r.topic||((typeof INSERVICES!=='undefined'&&INSERVICES.find)?((INSERVICES.find(function(i){return i.id==r.topicId;})||{}).title):'')||'Inservice Training';
+  const nameSrc=r.empName||r.emp_name||r.name||r.aideName||'—';
+  const name=escapeHtml(nameSrc);
+  const topic=escapeHtml(topicSrc);
+  const when=escapeHtml(formatCertDate(certDateFromRecord(r)));
+  const sigSrc=r.signature||r.sig||'';
+  const sigHTML=sigSrc&&String(sigSrc).length>100?'<img src="'+String(sigSrc).replace(/"/g,'')+'" alt="">':'';
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>EverCare Certificate</title>'+
+    '<meta name="admin-build" content="2026-09-21-cert-c2-ribbon-laurel">'+
+    '<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">'+
+    '<style>'+
+    '*{box-sizing:border-box;margin:0;padding:0;}'+
+    'html,body{background:#d8dde6;}'+
+    'body{font-family:"Cormorant Garamond",Georgia,serif;color:#1a2744;}'+
+    '.cert-toolbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;background:#1a2744;color:#fff;}'+
+    '.cert-toolbar h2{font-family:"DM Sans",Arial,sans-serif;font-size:0.95rem;font-weight:700;margin:0;}'+
+    '.cert-actions{display:flex;gap:8px;flex-wrap:wrap;}'+
+    '.cert-toolbar .cbtn{min-height:44px;padding:8px 14px;border-radius:8px;font-family:"DM Sans",Arial,sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;}'+
+    '.cbtn-ghost{background:#fff;color:#1a2744;border:1.5px solid #dce4ef;}'+
+    '.cbtn-print{background:#2a7f7f;color:#fff;}'+
+    '.cert-wrap{padding:10px 8px 22px;display:flex;justify-content:center;}'+
+    '.cert{position:relative;width:min(8.5in,calc(100vw - 16px));aspect-ratio:8.5/11;background:'+
+      'radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.42),transparent 52%),'+
+      'radial-gradient(ellipse at 82% 88%,rgba(176,138,70,.09),transparent 46%),'+
+      'linear-gradient(180deg,#f8efd8 0%,#f3e4c4 48%,#efe0b8 100%);'+
+      'box-shadow:0 8px 28px rgba(26,39,68,.18);overflow:hidden;}'+
+    '.frame{position:absolute;inset:10px;border:7px solid #1e6868;}'+
+    '.frame-in{position:absolute;inset:20px;border:2px solid #2a7f7f;}'+
+    '.frame-thin{position:absolute;inset:26px;border:1px solid rgba(30,104,104,.55);}'+
+    '.flourish{position:absolute;width:74px;height:74px;}'+
+    '.flourish.tl{top:28px;left:28px;}'+
+    '.flourish.tr{top:28px;right:28px;transform:scaleX(-1);}'+
+    '.flourish.bl{bottom:28px;left:28px;transform:scaleY(-1);}'+
+    '.flourish.br{bottom:28px;right:28px;transform:scale(-1);}'+
+    '.inner{position:absolute;inset:40px 46px 36px;display:flex;flex-direction:column;align-items:center;text-align:center;}'+
+    '.head{width:100%;display:flex;flex-direction:column;align-items:center;}'+
+    '.body{width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}'+
+    '.agency{font-family:Cinzel,"Playfair Display",Times New Roman,serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#174f4f;font-weight:700;margin-top:4px;}'+
+    '.rule{width:46%;height:1px;background:linear-gradient(90deg,transparent,#1e6868,transparent);margin:10px 0 8px;}'+
+    'h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(22px,3.6vw,36px);font-weight:700;color:#1a2744;line-height:1.15;margin:2px 0 12px;}'+
+    '.ribbon{position:relative;display:flex;align-items:flex-start;justify-content:center;width:90%;max-width:660px;height:58px;margin:4px 0 8px;}'+
+    '.rib-band{flex:1;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#3a9696 0%,#2a7f7f 46%,#1e6868 100%);color:#f8efd8;font-family:Cinzel,"Playfair Display",Times New Roman,serif;font-size:clamp(11px,1.65vw,15px);font-weight:700;letter-spacing:1.1px;padding:0 8px;white-space:nowrap;box-shadow:0 2px 0 #123838;z-index:2;}'+
+    '.rib-fold{width:14px;height:40px;background:#145252;z-index:1;}'+
+    '.rib-fold-l{clip-path:polygon(100% 0,0 12px,100% 100%);}'+
+    '.rib-fold-r{clip-path:polygon(0 0,100% 12px,0 100%);}'+
+    '.rib-tail{width:clamp(36px,6.2vw,48px);height:50px;background:#143f3f;margin-top:8px;}'+
+    '.rib-tail-l{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,68% 52%);margin-right:-2px;}'+
+    '.rib-tail-r{clip-path:polygon(0 0,100% 0,32% 52%,100% 100%,0 100%);margin-left:-2px;}'+
+    '.seal{width:min(176px,30%);height:auto;margin:0 0 2px;}'+
+    '.certifies,.has-completed{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:clamp(15px,2vw,20px);color:#3d4a5c;}'+
+    '.name{font-family:"Playfair Display",Georgia,serif;font-size:clamp(24px,3.4vw,36px);font-weight:700;color:#1a2744;border-bottom:1.5px solid #1e6868;padding:2px 18px 6px;margin:8px 0 10px;min-width:58%;}'+
+    '.topic{font-family:"Playfair Display",Georgia,serif;font-size:clamp(16px,2.3vw,22px);font-weight:600;color:#174f4f;margin:8px 0 10px;max-width:90%;}'+
+    '.when{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(14px,1.8vw,18px);color:#1a2744;margin:4px 0 8px;}'+
+    '.when strong{font-family:"Playfair Display",serif;font-weight:600;}'+
+    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;width:92%;margin-top:10px;padding-top:4px;}'+
+    '.sig-box{text-align:center;}'+
+    '.sig-line{min-height:46px;border-bottom:1px solid #1a2744;margin-bottom:6px;display:flex;align-items:flex-end;justify-content:center;}'+
+    '.sig-line img{height:40px;max-width:100%;}'+
+    '.sig-label{font-family:Cinzel,serif;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:#3d4a5c;}'+
+    '.sig-name{font-size:12px;color:#5a6576;margin-top:3px;}'+
+    '@page{size:letter portrait;margin:0.22in;}'+
+    '@media print{'+
+      'html,body{background:#f3e4c4 !important;width:100%;height:100%;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      '.no-print,.cert-toolbar{display:none !important;}'+
+      '.cert-wrap{padding:0;margin:0;width:100%;height:100%;}'+
+      '.cert{width:100% !important;height:100% !important;max-width:none;aspect-ratio:auto;box-shadow:none;}'+
+    '}'+
+    '</style></head><body>'+
+    '<div class="cert-toolbar no-print">'+
+      '<h2>Certificate print view</h2>'+
+      '<div class="cert-actions">'+
+        '<button type="button" class="cbtn cbtn-ghost no-print" onclick="certLeave()">← Back</button>'+
+        '<button type="button" class="cbtn cbtn-ghost no-print" onclick="certLeave()">✕ Close</button>'+
+        '<button type="button" class="cbtn cbtn-print no-print" onclick="window.print()">Print Certificate</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="cert-wrap">'+
+      '<div class="cert" data-cert-style="c2-ribbon-laurel">'+
+        '<div class="frame"></div><div class="frame-in"></div><div class="frame-thin"></div>'+
+        certCornerSvg('tl')+certCornerSvg('tr')+certCornerSvg('bl')+certCornerSvg('br')+
+        '<div class="inner">'+
+          '<div class="head">'+
+            '<div class="agency">EVERCARE HOME AGENCY</div>'+
+            '<div class="rule"></div>'+
+            '<h1>Certificate of Inservice Completion</h1>'+
+            certRibbonHtml()+
+            certLaurelSvg()+
+          '</div>'+
+          '<div class="body">'+
+            '<div class="certifies">This certifies that</div>'+
+            '<div class="name">'+name+'</div>'+
+            '<div class="has-completed">has successfully completed</div>'+
+            '<div class="topic">'+topic+'</div>'+
+            '<div class="when">Date of Completion: <strong>'+when+'</strong></div>'+
+          '</div>'+
+          '<div class="sig-grid">'+
+            '<div class="sig-box"><div class="sig-line">'+sigHTML+'</div><div class="sig-label">Employee Signature</div><div class="sig-name">'+name+'</div></div>'+
+            '<div class="sig-box"><div class="sig-line"></div><div class="sig-label">RN / Supervisor Signature</div></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<script>function certLeave(){try{window.close();}catch(e){}setTimeout(function(){if(!window.closed){if(history.length>1)history.back();else location.replace("index.html");}},80);}<\/script>'+
+    '</body></html>';
+}
+
+function printCert(r){
+  const html=buildCertHtml(r);
+  const w=window.open('','_blank','width=980,height=1200,scrollbars=yes');
+  if(!w){
+    document.open();
+    document.write(html);
+    document.close();
+    return;
+  }
+  w.document.write(html);
   w.document.close();
 }
 
