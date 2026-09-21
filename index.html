@@ -4224,7 +4224,8 @@ async function exportAllToExcel(){
 // list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);
 // Ace LOCK (edit/delete): get_supervisory_contact { contactId } hydrate;
 //   save_supervisory_contact + contactId = update (omit contactId on create);
-//   archive_supervisory_contact { contactId } soft-delete that contact only;
+//   archive_supervisory_contact { contactId } soft-delete that contact only
+//     (alias delete_supervisory_contact); NEVER archive_client for visit Delete;
 //   archive_supervisory_visit_pdf { contactId } after successful edit unless pdfLink returned.
 // Stub toast if a Version is not live yet (unknown action). No Correction send-back.
 // Ace FINAL LOCK: archive_client { clientId } — client archive only, never visit delete.
@@ -4549,7 +4550,12 @@ async function archiveSupervisoryContact(contactId){
     showTempMsg('No contactId for this row.','var(--danger)');
     return false;
   }
-  const res=await postArchiveAction('archive_supervisory_contact','',{contactId:id});
+  const res=await postArchiveAction('archive_supervisory_contact','delete_supervisory_contact',{contactId:id});
+  const why=((res&&res.data&&(res.data.error||res.data.message))||(res&&res.err&&res.err.message)||'');
+  if(!(res&&res.data&&res.data.success)&&scLooksLikeMissingAce(why,res&&res.data)){
+    showTempMsg('Ace Version not live yet — stub action: archive_supervisory_contact','var(--warn)');
+    return false;
+  }
   if(toastArchiveResult(res,'Contact deleted.')){
     forgetNurseContactId(id);
     cacheInvalidate('get_supervisory_compliance');
@@ -4727,6 +4733,14 @@ function paintNurseSig(id,dataUrl){
 function scEditingContactId(){
   const el=document.getElementById('sc_contactId');
   return el?String(el.value||'').trim():'';
+}
+
+function scLooksLikeMissingAce(text,data){
+  const why=String(text||'');
+  if(typeof nciLooksLikeUnknownAction==='function'&&nciLooksLikeUnknownAction(why))return true;
+  const status=data&&(data.httpStatus||data.status||data.code);
+  if(Number(status)===404)return true;
+  return /not found|\b404\b/i.test(why);
 }
 
 function scSigPng(id){
@@ -4936,13 +4950,13 @@ async function fetchSupervisoryContact(contactId){
       }
     }
     const why=(data&&(data.error||data.message))||'';
-    if(nciLooksLikeUnknownAction(why)){
-      showTempMsg(data&&data.error?String(data.error):('Unknown action: get_supervisory_contact'),'var(--warn)');
+    if(scLooksLikeMissingAce(why,data)){
+      showTempMsg('Ace Version not live yet — stub action: get_supervisory_contact','var(--warn)');
     }
   }catch(e){
     const msg=(e&&e.message)||'';
-    if(nciLooksLikeUnknownAction(msg)){
-      showTempMsg('Unknown action: get_supervisory_contact','var(--warn)');
+    if(scLooksLikeMissingAce(msg,null)){
+      showTempMsg('Ace Version not live yet — stub action: get_supervisory_contact','var(--warn)');
     }
   }
   return resolveSupervisoryContactFromList(id);
@@ -5044,21 +5058,25 @@ async function saveSupervisoryContact(){
       }
       const savedId=pickContactId(data)||editingId||'';
       let savedPdf=pickVisitPdfLink(data);
-      if(editingId&&!savedPdf){
+      const pdfPending=!!(data&&(data.pdfPending||data.pdf_pending));
+      if(data&&data.pdfFileId&&i>=0&&nurseComplianceRows[i])nurseComplianceRows[i].pdfFileId=data.pdfFileId;
+      // Visit update may return pdfLink/pdfFileId (sync). If pdfPending or empty pdfLink, re-archive.
+      if(editingId&&isVisit&&(!savedPdf||pdfPending)){
         try{
           const pdfRes=await apiPost({action:'archive_supervisory_visit_pdf',contactId:String(editingId)});
           if(pdfRes&&pdfRes.success){
             savedPdf=pickVisitPdfLink(pdfRes)||savedPdf;
+            if(pdfRes.pdfFileId&&i>=0&&nurseComplianceRows[i])nurseComplianceRows[i].pdfFileId=pdfRes.pdfFileId;
           }else{
             const why=(pdfRes&&(pdfRes.error||pdfRes.message))||'';
-            if(nciLooksLikeUnknownAction(why)){
-              showTempMsg(pdfRes&&pdfRes.error?String(pdfRes.error):('Unknown action: archive_supervisory_visit_pdf'),'var(--warn)');
+            if(scLooksLikeMissingAce(why,pdfRes)){
+              showTempMsg('Ace Version not live yet — stub action: archive_supervisory_visit_pdf','var(--warn)');
             }
           }
         }catch(e){
           const msg=(e&&e.message)||'';
-          if(nciLooksLikeUnknownAction(msg)){
-            showTempMsg('Unknown action: archive_supervisory_visit_pdf','var(--warn)');
+          if(scLooksLikeMissingAce(msg,null)){
+            showTempMsg('Ace Version not live yet — stub action: archive_supervisory_visit_pdf','var(--warn)');
           }
         }
       }
@@ -5078,8 +5096,8 @@ async function saveSupervisoryContact(){
       else loadNurseCompliance(true);
     }else{
       const why=(data&&(data.error||data.message))||'';
-      err.textContent=nciLooksLikeUnknownAction(why)
-        ?(data&&data.error?String(data.error):'Unknown action: save_supervisory_contact')
+      err.textContent=scLooksLikeMissingAce(why,data)
+        ?'Ace Version not live yet — stub action: save_supervisory_contact'
         :((data&&data.error)||'Save failed — Sheets did not store this contact. Form data was not saved.');
       err.style.display='block';
     }
@@ -7049,7 +7067,8 @@ async function viewCompletedIntakePdf(intakeId){
 //    View PDF: pdfLink, else archive_supervisory_visit_pdf { contactId }
 //    Edit: get_supervisory_contact { contactId } (or list row) then
 //      save_supervisory_contact + contactId; re-archive PDF unless pdfLink returned.
-//    Delete: archive_supervisory_contact { contactId } — NOT archive_client.
+//    Delete: archive_supervisory_contact { contactId } (alias delete_supervisory_contact)
+//      — NEVER archive_client for visit Delete.
 //    Admin and Scheduler have the same actions — no Admin-only gate.
 // C) list_nurse_alerts { username } unread only; mark_nurse_alerts_read { username, ids }
 // Optional: list_nurse_activity { limit?:50 } for the Recent nurse activity feed.

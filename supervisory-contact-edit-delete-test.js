@@ -102,8 +102,8 @@ assert.ok(saveFn.includes('payload.contactId=editingId'),
   'save with contactId is the update path');
 assert.ok(saveFn.includes("action:'archive_supervisory_visit_pdf'"),
   'after successful edit, re-archive visit PDF');
-assert.ok(saveFn.includes('editingId&&!savedPdf'),
-  'skip re-archive when Ace already returned pdfLink');
+assert.ok(saveFn.includes('editingId&&isVisit&&(!savedPdf||pdfPending)'),
+  'visit update re-archives PDF when pdfPending or empty pdfLink');
 assert.ok(saveFn.includes('toEasternMDY'),
   'saved dates stay MM/DD/YYYY');
 assert.ok(saveFn.includes("currentAdminRole==='Admin'||currentAdminRole==='Scheduler'"),
@@ -113,15 +113,15 @@ assert.ok(fetchCt.includes("action:'get_supervisory_contact'"),
   'hydrate fetches get_supervisory_contact { contactId }');
 assert.ok(fetchCt.includes('resolveSupervisoryContactFromList'),
   'falls back to list row when get is incomplete or stub');
-assert.ok(fetchCt.includes('Unknown action: get_supervisory_contact'),
+assert.ok(fetchCt.includes('stub action: get_supervisory_contact'),
   'stub toast if get_supervisory_contact Version is not live');
 
 assert.ok(confirmVisit.includes("showSharedConfirm('Are you sure?'"),
   'visit delete uses in-DOM Are you sure?');
 assert.ok(confirmVisit.includes('archiveSupervisoryContact(id)'),
   'Yes, delete archives the contact');
-assert.ok(archiveVisit.includes("postArchiveAction('archive_supervisory_contact'"),
-  'visit delete posts archive_supervisory_contact { contactId }');
+assert.ok(archiveVisit.includes("postArchiveAction('archive_supervisory_contact','delete_supervisory_contact',{contactId:id})"),
+  'visit delete posts archive_supervisory_contact { contactId }; alias delete_supervisory_contact');
 assert.ok(archiveVisit.includes('{contactId:id}'),
   'archive_supervisory_contact payload is { contactId }');
 assert.ok(!archiveVisit.includes('archive_client'),
@@ -344,6 +344,7 @@ assert.ok(els.adminSupervisoryBody.innerHTML.includes('09/21/2026'),
 
   globalThis.currentAdminRole = 'Nurse';
   globalThis.nurseComplianceRows = [row];
+  eval('globalThis.scLooksLikeMissingAce = '+extractFn(html, 'function scLooksLikeMissingAce(text,data)'));
   eval('globalThis.forgetNurseContactId = '+extractFn(html, 'function forgetNurseContactId(contactId)'));
   eval('globalThis.archiveSupervisoryContact = '+archiveVisit);
   eval('globalThis.confirmDeleteSupervisoryContact = '+confirmVisit);
@@ -372,8 +373,11 @@ assert.ok(els.adminSupervisoryBody.innerHTML.includes('09/21/2026'),
   loadAdminSupervisoryContacts.calls = 0;
   ok = await archiveSupervisoryContact('P3');
   assert.strictEqual(ok, false);
-  assert.deepStrictEqual(posts, [{action:'archive_supervisory_contact',contactId:'P3'}]);
-  assert.ok(/Unknown action/.test(toasts[0].msg), 'stub toast if archive_supervisory_contact is not live');
+  assert.strictEqual(posts[0].action, 'archive_supervisory_contact');
+  assert.strictEqual(posts[0].contactId, 'P3');
+  assert.strictEqual(posts[1].action, 'delete_supervisory_contact');
+  assert.strictEqual(posts[1].contactId, 'P3');
+  assert.ok(/stub action: archive_supervisory_contact/.test(toasts[0].msg), 'stub toast if archive_supervisory_contact is not live');
   assert.strictEqual(loadAdminSupervisoryContacts.calls, 0, 'failed archive does not refresh');
 
   // save update path + PDF re-archive unless pdfLink
@@ -478,6 +482,17 @@ assert.ok(els.adminSupervisoryBody.innerHTML.includes('09/21/2026'),
   await saveSupervisoryContact();
   assert.ok(!posts.some(p=>p.action==='archive_supervisory_visit_pdf'),
     'skip PDF re-archive when Ace returned pdfLink');
+
+  posts.length = 0;
+  apiImpl = async function(payload){
+    posts.push(payload);
+    if(payload.action==='save_supervisory_contact')return {success:true,contactId:'V9',pdfPending:true};
+    if(payload.action==='archive_supervisory_visit_pdf')return {success:true,pdfLink:'https://example.com/later.pdf',pdfFileId:'F9'};
+    return {success:false,error:'nope'};
+  };
+  await saveSupervisoryContact();
+  assert.ok(posts.some(p=>p.action==='archive_supervisory_visit_pdf'),
+    'visit update with pdfPending must re-archive PDF');
 
   console.log('supervisory-contact-edit-delete-test: ok');
 })().catch(function(e){
