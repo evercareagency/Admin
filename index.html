@@ -9,7 +9,8 @@
 <title>EverCare — Admin Portal</title>
 <!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
 <!-- inservice view-results hotfix 2026-09-21 paint-from-update / cache-on-unknown-get -->
-<meta name="admin-build" content="2026-09-21-cert-c2-ribbon-laurel">
+<!-- add aide + temp password 2026-09-21 v=addaideb63d -->
+<meta name="admin-build" content="2026-09-21-add-aide-temp-pwd">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -122,6 +123,10 @@ textarea{resize:vertical;min-height:80px;}
 .aide-card{background:white;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .aide-card h4{font-weight:600;color:var(--navy);font-size:0.88rem;}
 .aide-card p{font-size:0.73rem;color:var(--muted);margin-top:2px;}
+.temp-pwd-card{background:#fff8f0;border:1.5px solid var(--warn);border-radius:10px;padding:16px;margin:8px 0 14px;}
+.temp-pwd-card .pwd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:1.15rem;font-weight:700;color:var(--navy);letter-spacing:0.04em;word-break:break-all;margin:8px 0 0;}
+.temp-pwd-card .hint{font-size:0.76rem;color:var(--warn);font-weight:600;margin-top:8px;}
+.page-hdr .page-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .loc-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;}
 .loc-green{background:var(--success);}.loc-red{background:var(--danger);}.loc-grey{background:#aaa;}
 .broadcast-active{background:#c0392b;color:white;padding:11px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:14px;}
@@ -716,7 +721,13 @@ else setupEverCarePWA();
       </div>
 
       <div class="tab-panel" id="tab_aides">
-        <div class="page-hdr"><div><h1>Aides</h1><p>All registered caregivers and their location status</p></div><button class="btn btn-teal" onclick="renderAides(true)">🔄 Refresh</button></div>
+        <div class="page-hdr">
+          <div><h1>Aides</h1><p>Registered caregivers — username, assigned clients, and temp-password status</p></div>
+          <div class="page-actions">
+            <button class="btn btn-ghost" onclick="renderAides(true)">🔄 Refresh</button>
+            <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Add aide</button>
+          </div>
+        </div>
         <div id="aidesContainer"><p style="color:var(--muted)">Loading...</p></div>
       </div>
 
@@ -1532,6 +1543,43 @@ Call (216) 377-5991 with any questions.</textarea>
   </div>
 </div>
 
+
+<!-- ADD AIDE MODAL -->
+<div class="modal-bg" id="addAideModal">
+  <div class="modal" style="max-width:560px">
+    <h3>Add aide</h3>
+    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5">Username is filled from the name (first initial + last name). You can edit it before creating. No email here — the aide adds email when they change the temp password.</p>
+    <div class="field"><label>Full name</label><input type="text" id="addAideFullName" placeholder="Jane Doe" autocomplete="off" oninput="onAddAideNameInput()"></div>
+    <div class="field"><label>Username</label><input type="text" id="addAideUsername" placeholder="jdoe" autocomplete="off" oninput="onAddAideUsernameInput()"></div>
+    <div class="card" style="background:var(--off);margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:10px"><span class="ico">🏠</span> Assign clients</div>
+      <p style="font-size:0.76rem;color:var(--muted);margin-bottom:10px">Check every client this aide works with (or may cover).</p>
+      <div class="search-bar" style="margin-bottom:8px"><input type="text" id="addAideClientSearch" placeholder="Search clients..." oninput="renderAddAideClientList()" autocomplete="off"></div>
+      <div id="addAideClientList" class="is-aide-list" role="group" aria-label="Clients"></div>
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="mbtn mbtn-cancel" onclick="closeModal('addAideModal')">Cancel</button>
+      <button type="button" class="mbtn mbtn-confirm" id="createAideBtn" onclick="submitCreateAide()">Create aide</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONE-TIME TEMP PASSWORD -->
+<div class="modal-bg" id="aideTempPwdModal">
+  <div class="modal" style="max-width:440px;margin-top:72px">
+    <h3 id="aideTempPwdTitle">Temporary password</h3>
+    <p id="aideTempPwdSub" style="font-size:0.8rem;color:var(--muted);margin-bottom:12px;line-height:1.5">Copy this now. It will not be shown again.</p>
+    <div class="temp-pwd-card">
+      <div class="lbl" style="font-size:0.65rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px" id="aideTempPwdUser"></div>
+      <div class="pwd" id="aideTempPwdValue"></div>
+      <p class="hint">Give this to the aide in person or by text. Do not email it from this screen.</p>
+    </div>
+    <div class="modal-btns">
+      <button type="button" class="mbtn mbtn-confirm" onclick="copyAideTempPassword()">Copy</button>
+      <button type="button" class="mbtn mbtn-cancel" onclick="closeAideTempPasswordModal()">Done</button>
+    </div>
+  </div>
+</div>
 
 <!-- ADD/EDIT CLIENT MODAL -->
 <div class="modal-bg" id="clientModal">
@@ -2483,29 +2531,270 @@ function viewBackup(id){
   openModal('backupDetailModal');
 }
 
+function suggestAideUsername(fullName){
+  const parts=String(fullName||'').trim().toLowerCase().split(/\s+/).filter(Boolean).map(function(p){return p.replace(/[^a-z0-9]/g,'');}).filter(Boolean);
+  if(!parts.length)return '';
+  if(parts.length===1)return parts[0];
+  return String(parts[0].charAt(0)||'')+String(parts[parts.length-1]||'');
+}
+function generateTempPassword(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+  const buf=new Uint8Array(10);
+  if(typeof crypto!=='undefined'&&crypto.getRandomValues)crypto.getRandomValues(buf);
+  else for(let i=0;i<buf.length;i++)buf[i]=Math.floor(Math.random()*256);
+  let s='Ec';
+  for(let i=0;i<buf.length;i++)s+=chars[buf[i]%chars.length];
+  return s;
+}
+function aideTruth(v){
+  if(v===true||v===1)return true;
+  const s=String(v==null?'':v).trim().toLowerCase();
+  return s==='true'||s==='1'||s==='yes'||s==='y';
+}
+function aideOnTempPassword(u){
+  if(!u)return false;
+  return aideTruth(u.mustChangePassword)||aideTruth(u.onTempPassword)||aideTruth(u.tempPasswordActive)||aideTruth(u.needsPasswordChange);
+}
+function aideAssignedClientValues(u){
+  if(!u)return [];
+  const raw=u.assignedClients!=null?u.assignedClients:(u.clients!=null?u.clients:(u.clientIds!=null?u.clientIds:(u.AssignedClients!=null?u.AssignedClients:u.ClientIds)));
+  if(Array.isArray(raw))return raw;
+  if(raw==null||raw==='')return [];
+  return String(raw).split(/[,;]/).map(function(s){return s.trim();}).filter(Boolean);
+}
+function resolveClientLabel(item){
+  if(item==null||item==='')return '';
+  if(typeof item==='object')return String(item.name||item.clientName||item.id||item.clientId||'').trim();
+  const id=String(item);
+  const list=typeof allClients!=='undefined'&&allClients?allClients:[];
+  const match=list.find(function(c){return String(c.id)===id||String(c.clientId)===id;});
+  return match?String(match.name||id):id;
+}
+function formatAideAssignedClients(u){
+  const labels=aideAssignedClientValues(u).map(resolveClientLabel).filter(Boolean);
+  return labels.length?labels.join(', '):'—';
+}
+function aceActionError(data,err,action){
+  const raw=(data&&(data.error||data.message))||(err&&err.message)||'Request failed.';
+  const text=String(raw);
+  if(typeof nciLooksLikeUnknownAction==='function'&&nciLooksLikeUnknownAction(text)){
+    return 'Unknown action: '+(action||'')+(data&&data.error?(' — '+data.error):'');
+  }
+  return text;
+}
+
+let addAideUsernameDirty=false;
+let addAideSelectedClients=new Set();
+let addAideClientRoster=[];
+let _aideTempPwdOnce='';
+
 async function renderAides(force){
   const container=document.getElementById('aidesContainer');
+  if(!container)return;
   if(force===true||!cacheGet('get_users')){
     container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
   }
   try{
+    if(force===true||!allClients.length){
+      apiGetCached('get_clients',null,force===true).then(function(d){
+        if(d&&d.success&&d.data)allClients=d.data;
+      }).catch(function(){});
+    }
     const data=await apiGetCached('get_users',null,force===true);
-    if(data.success&&data.data&&data.data.length){
-      const aides=data.data.filter(u=>u.username);
-      const tsCount=username=>allRecords.filter(r=>r.username===username).length;
-      container.innerHTML=`<div class="card"><div class="card-title"><span class="ico">👥</span> ${aides.length} Registered Aides</div>`+
-        aides.map(u=>{
-          const ls=u.locationStatus||'unknown';
-          const dot=ls==='granted'?'loc-green':ls==='denied'?'loc-red':'loc-grey';
-          const label=ls==='granted'?'Location Enabled':ls==='denied'?'Location Denied — Contact Aide':'Location Unknown';
-          return`<div class="aide-card">
-            <div><h4>${u.name}</h4><p>@${u.username} · ${u.email||''} · Joined ${formatDateTimeLabel(u.joined)}</p><p style="margin-top:3px"><span class="loc-dot ${dot}"></span>${label}${u.lastSeen?` · Last seen ${formatDateTimeLabel(u.lastSeen)}`:''}</p></div>
-            <div style="font-size:0.75rem;color:var(--muted)">${tsCount(u.username)} timesheet${tsCount(u.username)!==1?'s':''}</div>
-          </div>`;}).join('')+`</div>`;
+    if(data&&data.success&&data.data&&data.data.length){
+      const aides=data.data.filter(function(u){return u&&u.username;});
+      if(!aides.length){
+        container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
+        return;
+      }
+      const rows=aides.map(function(u){
+        const un=String(u.username||'');
+        const onTemp=aideOnTempPassword(u);
+        const status=onTemp
+          ?'<span class="badge badge-warn">Still on temp password</span>'
+          :'<span class="badge badge-ok">Active</span>';
+        return '<tr>'
+          +'<td>'+escapeHtml(u.name||u.fullName||'—')+'</td>'
+          +'<td>@'+escapeHtml(un)+'</td>'
+          +'<td>'+escapeHtml(formatAideAssignedClients(u))+'</td>'
+          +'<td>'+status+'</td>'
+          +'<td class="actions"><button type="button" class="btn btn-sm btn-ghost" onclick="confirmResetAideTempPassword(\''+escapeAttr(un)+'\')">Reset temp password</button></td>'
+          +'</tr>';
+      }).join('');
+      container.innerHTML='<div class="card"><div class="card-title"><span class="ico">👥</span> '+aides.length+' Registered Aides</div>'
+        +'<div class="table-wrap" style="overflow-x:auto"><table class="data-table" id="aidesTable"><thead><tr><th>Name</th><th>Username</th><th>Assigned clients</th><th>Status</th><th>Actions</th></tr></thead><tbody>'
+        +rows+'</tbody></table></div></div>';
       return;
     }
   }catch(e){}
-  container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet.</p></div>';
+  container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
+}
+
+function onAddAideNameInput(){
+  if(addAideUsernameDirty)return;
+  const nameEl=document.getElementById('addAideFullName');
+  const userEl=document.getElementById('addAideUsername');
+  if(nameEl&&userEl)userEl.value=suggestAideUsername(nameEl.value);
+}
+function onAddAideUsernameInput(){
+  addAideUsernameDirty=true;
+}
+function onAddAideClientToggle(cb){
+  if(!cb)return;
+  if(cb.checked)addAideSelectedClients.add(cb.value);
+  else addAideSelectedClients.delete(cb.value);
+}
+function renderAddAideClientList(){
+  const list=document.getElementById('addAideClientList');
+  if(!list)return;
+  const q=(document.getElementById('addAideClientSearch')?.value||'').trim().toLowerCase();
+  const rows=addAideClientRoster.filter(function(c){
+    if(!q)return true;
+    return String(c.name||'').toLowerCase().indexOf(q)>=0||String(c.id||'').toLowerCase().indexOf(q)>=0;
+  });
+  if(!addAideClientRoster.length){
+    list.innerHTML='<p class="empty">No clients on file yet. Add clients first, or create the aide now and assign later.</p>';
+    return;
+  }
+  if(!rows.length){
+    list.innerHTML='<p class="empty">No clients match that search.</p>';
+    return;
+  }
+  list.innerHTML=rows.map(function(c){
+    const id=String(c.id||c.clientId||'');
+    const checked=addAideSelectedClients.has(id)?'checked':'';
+    return '<label class="is-aide-row"><input type="checkbox" class="add-aide-client-cb" value="'+escapeAttr(id)+'" '+checked+' onchange="onAddAideClientToggle(this)"><span><span class="nm">'+escapeHtml(c.name||id)+'</span></span></label>';
+  }).join('');
+}
+async function loadClientsForAddAide(force){
+  const list=document.getElementById('addAideClientList');
+  if(list&&!addAideClientRoster.length)list.innerHTML='<p class="empty">Loading clients...</p>';
+  try{
+    const data=await apiGetCached('get_clients',null,force===true);
+    if(data&&data.success&&data.data){
+      allClients=data.data;
+      addAideClientRoster=data.data.slice();
+      renderAddAideClientList();
+      return;
+    }
+    const err=(data&&(data.error||data.message))||'Could not load clients.';
+    if(list)list.innerHTML='<p class="empty err">'+escapeHtml(aceActionError(data,null,'get_clients'))+'</p>';
+    if(err){/* keep toast-free on open */}
+  }catch(e){
+    if(list)list.innerHTML='<p class="empty err">Error loading clients.</p>';
+  }
+}
+function showAddAideModal(){
+  addAideUsernameDirty=false;
+  addAideSelectedClients=new Set();
+  const nameEl=document.getElementById('addAideFullName');
+  const userEl=document.getElementById('addAideUsername');
+  const searchEl=document.getElementById('addAideClientSearch');
+  if(nameEl)nameEl.value='';
+  if(userEl)userEl.value='';
+  if(searchEl)searchEl.value='';
+  renderAddAideClientList();
+  loadClientsForAddAide();
+  openModal('addAideModal');
+  if(nameEl)setTimeout(function(){nameEl.focus();},50);
+}
+function showAideTempPasswordOnce(username,tempPassword,title){
+  _aideTempPwdOnce=String(tempPassword||'');
+  const userEl=document.getElementById('aideTempPwdUser');
+  const valEl=document.getElementById('aideTempPwdValue');
+  const titleEl=document.getElementById('aideTempPwdTitle');
+  if(titleEl)titleEl.textContent=title||'Temporary password';
+  if(userEl)userEl.textContent=username?('@'+username):'Aide';
+  if(valEl)valEl.textContent=_aideTempPwdOnce||'—';
+  openModal('aideTempPwdModal');
+}
+function closeAideTempPasswordModal(){
+  _aideTempPwdOnce='';
+  const valEl=document.getElementById('aideTempPwdValue');
+  if(valEl)valEl.textContent='';
+  closeModal('aideTempPwdModal');
+}
+function copyAideTempPassword(){
+  const val=_aideTempPwdOnce||(document.getElementById('aideTempPwdValue')?.textContent||'');
+  if(!val){showTempMsg('Nothing to copy.','var(--warn)');return;}
+  const done=function(){showTempMsg('Temporary password copied.','var(--success)');};
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(val).then(done).catch(function(){
+        const ta=document.createElement('textarea');ta.value=val;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();done();
+      });
+      return;
+    }
+  }catch(e){}
+  const ta=document.createElement('textarea');ta.value=val;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();done();
+}
+async function submitCreateAide(){
+  const nameEl=document.getElementById('addAideFullName');
+  const userEl=document.getElementById('addAideUsername');
+  const btn=document.getElementById('createAideBtn');
+  const fullName=(nameEl&&nameEl.value||'').trim();
+  const username=(userEl&&userEl.value||'').trim().toLowerCase().replace(/\s+/g,'');
+  if(userEl)userEl.value=username;
+  if(!fullName){showTempMsg('Enter the aide\'s full name.','var(--danger)');return;}
+  if(!username){showTempMsg('Enter a username.','var(--danger)');return;}
+  const clientIds=Array.from(addAideSelectedClients);
+  const tempPassword=generateTempPassword();
+  if(btn){btn.disabled=true;btn.textContent='Creating...';}
+  let data=null;
+  try{
+    data=await apiPost({action:'create_aide',fullName:fullName,username:username,tempPassword:tempPassword,clientIds:clientIds});
+    if(data&&data.success){
+      cacheInvalidate('get_users');
+      closeModal('addAideModal');
+      const shownUser=data.username||username;
+      const shownPwd=data.tempPassword||tempPassword;
+      showTempMsg('Aide @'+shownUser+' created. Copy the temp password now — it will not be shown again.','var(--success)');
+      showAideTempPasswordOnce(shownUser,shownPwd,'Temporary password');
+      logActivity('Created aide @'+shownUser);
+      renderAides(true);
+      return;
+    }
+    showTempMsg(aceActionError(data,null,'create_aide'),'var(--danger)');
+  }catch(e){
+    showTempMsg(aceActionError(null,e,'create_aide'),'var(--danger)');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Create aide';}
+  }
+}
+function confirmResetAideTempPassword(username){
+  const un=String(username||'');
+  if(!un)return;
+  const go=function(){resetAideTempPassword(un);};
+  if(typeof showSharedConfirm==='function'){
+    showSharedConfirm('Reset temp password for @'+un+'? They will need this new password on next login.',go,'Reset password');
+    return;
+  }
+  if(confirm('Reset temp password for @'+un+'?'))go();
+}
+async function resetAideTempPassword(username){
+  const un=String(username||'').trim().toLowerCase();
+  if(!un)return;
+  try{
+    const data=await apiPost({action:'reset_aide_temp_password',username:un});
+    if(data&&data.success){
+      cacheInvalidate('get_users');
+      const pwd=data.tempPassword;
+      if(!pwd){
+        showTempMsg('Password reset for @'+un+', but Ace did not return the temp password. Try again.','var(--warn)');
+        logActivity('Reset temp password for @'+un);
+        renderAides(true);
+        return;
+      }
+      showTempMsg('New temp password for @'+un+'. Copy it now — it will not be shown again.','var(--success)');
+      showAideTempPasswordOnce(un,pwd,'New temporary password');
+      logActivity('Reset temp password for @'+un);
+      renderAides(true);
+      return;
+    }
+    showTempMsg(aceActionError(data,null,'reset_aide_temp_password'),'var(--danger)');
+  }catch(e){
+    showTempMsg(aceActionError(null,e,'reset_aide_temp_password'),'var(--danger)');
+  }
 }
 
 function viewRec(id){
