@@ -279,45 +279,47 @@ textarea{resize:vertical;min-height:80px;}
 #tsPrintBackBtn,#tsPrintCloseBtn{background:#fff !important;color:#1a2744 !important;border:2px solid #fff !important;}
 body.ts-print-open{overflow:hidden;}
 .ts-print-wrap{flex:1;padding:8px 6px 20px;display:flex;justify-content:center;}
-.ts-print-sheet{background:#fff;width:8.5in;height:11in;max-width:100%;padding:0.20in 0.22in 0.16in;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;overflow:hidden;}
-.ts-mo{width:100%;color:#111;line-height:1.08;page-break-inside:avoid;break-inside:avoid;}
-.ts-mo .ts-agency{text-align:center;border-bottom:1.25px solid #111;padding-bottom:2px;margin-bottom:3px;}
-.ts-mo .ts-agency h1{font-size:12px;letter-spacing:0.4px;margin:0;text-transform:uppercase;}
-.ts-mo .ts-agency .addr{font-size:7.5px;margin:1px 0 0;line-height:1.2;}
-.ts-mo .ts-title{text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;margin:2px 0 0;letter-spacing:0.6px;}
-.ts-mo .ts-week{text-align:center;font-size:8px;margin:0 0 3px;}
-.ts-mo .ts-meta{width:100%;border-collapse:collapse;margin-bottom:3px;font-size:8px;}
-.ts-mo .ts-meta td{border:1px solid #111;padding:2px 4px;vertical-align:middle;height:28px;}
-.ts-mo .ts-meta .lbl{font-size:6.5px;text-transform:uppercase;letter-spacing:0.25px;font-weight:700;display:block;}
-.ts-mo .ts-meta .val{font-size:9.5px;font-weight:700;}
-.ts-mo .ts-meta img{height:18px;max-width:100%;display:block;}
-.ts-mo .ts-meta .sigline{border-bottom:1px solid #111;min-height:16px;}
-.ts-mo .ts-days{width:100%;border-collapse:collapse;font-size:7.5px;margin-bottom:3px;}
-.ts-mo .ts-days th,.ts-mo .ts-days td{border:1px solid #111;padding:1px 2px;text-align:center;height:14px;vertical-align:middle;}
-.ts-mo .ts-days th{background:#111;color:#fff;font-weight:700;font-size:7px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.ts-mo .ts-days td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;padding-left:3px;}
-.ts-mo .ts-days img{height:12px;max-width:48px;}
-.ts-mo .ts-totals{font-size:8px;margin:1px 0 3px;font-weight:700;}
-.ts-mo .ts-totals span{border-bottom:1px solid #111;min-width:56px;display:inline-block;text-align:center;}
-.ts-mo .ts-notice{font-size:7px;font-weight:700;text-align:center;border:1px solid #111;padding:2px 3px;margin:2px 0;line-height:1.2;text-transform:uppercase;}
-.ts-mo .ts-sandata{font-size:7.5px;text-align:center;margin:0 0 3px;line-height:1.2;}
-.ts-mo .ts-svccols{display:grid;grid-template-columns:1fr 1fr;gap:4px;align-items:start;margin:0 0 2px;}
-.ts-mo .ts-svccol{min-width:0;}
-.ts-mo .ts-svcsec{margin-bottom:2px;}
-.ts-mo .ts-svc{width:100%;border-collapse:collapse;font-size:6.4px;table-layout:fixed;}
-.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:0 2px;height:10px;line-height:1;vertical-align:middle;}
-.ts-mo .ts-svc th{background:#111;color:#fff;font-weight:700;font-size:6.2px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-.ts-mo .ts-svc th.cat,.ts-mo .ts-svc td.svc{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ts-mo .ts-svc td.mark,.ts-mo .ts-svc th.d{text-align:center;width:13px;font-weight:700;padding:0;}
-.ts-mo .ts-other{font-size:6.5px;margin:0 0 1px;}
-.ts-mo .ts-comments{border:1px solid #111;min-height:22px;padding:2px 4px;font-size:7.5px;margin:2px 0;}
-.ts-mo .ts-comments .lbl{font-size:6.5px;font-weight:700;text-transform:uppercase;margin-bottom:0;}
-.ts-mo .ts-legal{font-size:6.5px;line-height:1.2;text-align:center;margin-top:3px;border-top:1px solid #111;padding-top:2px;}
+/* US Letter lock — 612×792pt / 8.5×11in. Paper TARGET: header, hours, two-col checklist, comments left. */
+.ts-print-sheet{background:#fff;width:8.5in;height:11in;max-width:100%;padding:0.20in 0.26in 0.16in;box-shadow:0 8px 28px rgba(0,0,0,0.18);color:#111;font-family:'Times New Roman',Times,serif;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;}
+.ts-mo{width:100%;height:100%;display:flex;flex-direction:column;color:#111;line-height:1.15;page-break-inside:avoid;break-inside:avoid;page-break-after:avoid;break-after:avoid;}
+.ts-mo .ts-agency{text-align:center;margin:0;}
+.ts-mo .ts-agency h1{font-size:22px;letter-spacing:0.15px;margin:0;font-weight:700;text-transform:none;}
+.ts-mo .ts-title{text-align:center;font-size:12px;font-weight:700;text-transform:uppercase;margin:2px 0 8px;letter-spacing:2.2px;}
+.ts-mo .ts-meta{width:100%;border-collapse:collapse;margin-bottom:7px;font-size:8px;}
+.ts-mo .ts-meta td{border:1px solid #111;padding:4px 6px;vertical-align:middle;height:38px;width:50%;}
+.ts-mo .ts-meta .lbl{font-size:7.5px;text-transform:uppercase;letter-spacing:0.3px;font-weight:700;display:block;}
+.ts-mo .ts-meta .val{font-size:11px;font-weight:700;}
+.ts-mo .ts-meta img{height:22px;max-width:100%;display:block;}
+.ts-mo .ts-meta .sigline{border-bottom:1px solid #111;min-height:20px;}
+.ts-mo .ts-days{width:100%;border-collapse:collapse;font-size:8.5px;margin:0;}
+.ts-mo .ts-days th,.ts-mo .ts-days td{border:1px solid #111;padding:2px 3px;text-align:center;height:19px;vertical-align:middle;}
+.ts-mo .ts-days th{background:#111;color:#fff;font-weight:700;font-size:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-days td.day{text-align:left;font-weight:700;white-space:nowrap;background:#f3f3f3;padding-left:5px;}
+.ts-mo .ts-days img{height:14px;max-width:60px;}
+.ts-mo .ts-days tfoot td{background:#fff;font-weight:700;height:20px;}
+.ts-mo .ts-days .totallbl{text-align:right;padding-right:8px;}
+.ts-mo .ts-days .totalval{font-size:9.5px;}
+.ts-mo .ts-notice{font-size:7.5px;font-weight:700;text-align:center;border-top:1px solid #111;border-bottom:1px solid #111;padding:5px 3px;margin:6px 0 3px;line-height:1.3;text-transform:uppercase;}
+.ts-mo .ts-sandata{font-size:8.5px;text-align:center;margin:0 0 7px;line-height:1.3;}
+.ts-mo .ts-svccols{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start;margin:0;}
+.ts-mo .ts-svccol{min-width:0;display:flex;flex-direction:column;}
+.ts-mo .ts-svcsec{margin-bottom:6px;}
+.ts-mo .ts-svc{width:100%;border-collapse:collapse;font-size:7.5px;table-layout:fixed;}
+.ts-mo .ts-svc th,.ts-mo .ts-svc td{border:1px solid #111;padding:1px 3px;height:14px;line-height:1.15;vertical-align:middle;}
+.ts-mo .ts-svc th{background:#111;color:#fff;font-weight:700;font-size:7.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.ts-mo .ts-svc th.cat,.ts-mo .ts-svc td.svc{text-align:left;overflow:hidden;}
+.ts-mo .ts-svc td.mark,.ts-mo .ts-svc th.d{text-align:center;width:15px;font-weight:700;padding:0;}
+.ts-mo .ts-other{font-size:7.5px;margin:0 0 2px;}
+.ts-mo .ts-comments{border:none;padding:6px 0 0;font-size:8.5px;display:flex;flex-direction:column;}
+.ts-mo .ts-comments .lbl{font-size:8.5px;font-weight:700;text-transform:uppercase;margin-bottom:4px;letter-spacing:0.4px;}
+.ts-mo .ts-comment-line{border-bottom:1px solid #111;height:16px;}
+.ts-mo .ts-comment-line:first-of-type{height:18px;}
+.ts-mo .ts-legal{font-size:7.5px;line-height:1.35;text-align:center;margin-top:auto;border-top:1px solid #111;padding-top:5px;flex-shrink:0;}
+.ts-mo .ts-legal .addr{display:block;margin-top:4px;font-weight:700;letter-spacing:0.5px;}
 .ts-gps-mi{display:block;margin-top:3px;font-size:0.65rem;font-weight:700;}
 @media(max-width:700px){
-  .ts-print-sheet{padding:8px 6px;width:100%;height:auto;min-height:0;overflow:auto;}
-  .ts-mo .ts-svccols{grid-template-columns:1fr;}
-  .ts-mo .ts-days,.ts-mo .ts-svc{font-size:7px;}
+  .ts-print-sheet{padding:8px 6px;width:100%;height:auto;min-height:11in;overflow:auto;}
+  .ts-mo .ts-days,.ts-mo .ts-svc{font-size:7.5px;}
 }
 /* iOS Safari Print Options: show ONLY the form sheet. Overlay is static.
    Screen rules use position:fixed + body overflow:hidden — those blank iOS preview. */
@@ -414,9 +416,13 @@ body.ts-print-open{overflow:hidden;}
     width:8.5in !important;
     height:11in !important;
     max-height:11in !important;
-    padding:0.18in 0.20in 0.14in !important;
+    padding:0.20in 0.26in 0.16in !important;
     overflow:hidden !important;
+    display:flex !important;
+    flex-direction:column !important;
   }
+  .ts-mo{height:100% !important;display:flex !important;flex-direction:column !important;}
+  .ts-mo .ts-svccols{display:grid !important;grid-template-columns:1fr 1fr !important;}
 }
 
 /* Inservice assign: Assign to all + Choose aides */
@@ -2678,6 +2684,16 @@ function buildPaperSvcSection(sec,days,otherSpecify){
     <table class="ts-svc"><thead><tr><th class="cat">${escapePrint(sec.n)}</th>${head}</tr></thead><tbody>${rows}</tbody></table>${extra}</div>`;
 }
 
+function buildPaperComments(notes){
+  const text=String(notes||'').trim();
+  return `<div class="ts-comments">
+    <div class="lbl">Comments</div>
+    <div class="ts-comment-line">${escapePrint(text)}</div>
+    <div class="ts-comment-line"></div>
+    <div class="ts-comment-line"></div>
+  </div>`;
+}
+
 function buildMoTimesheetHTML(r){
   const days=r.days||{};
   let hdrAide=hasSigInk(r.aideSig)?r.aideSig:'';
@@ -2716,10 +2732,8 @@ function buildMoTimesheetHTML(r){
   return `<div class="ts-mo">
     <div class="ts-agency">
       <h1>${escapePrint(AGENCY.name)}</h1>
-      <p class="addr">${escapePrint(AGENCY.address)} &nbsp; ${escapePrint(AGENCY.cityLine)}<br>${escapePrint(AGENCY.phone)}</p>
     </div>
     <div class="ts-title">Caregiver Timesheet</div>
-    <p class="ts-week">${escapePrint(formatWeekLabel(r.weekStart))}</p>
     <table class="ts-meta">
       <tr>
         <td><span class="lbl">Client Name</span><div class="val">${escapePrint(r.clientName||'—')}</div></td>
@@ -2743,21 +2757,24 @@ function buildMoTimesheetHTML(r){
         </tr>
       </thead>
       <tbody>${dayRows}</tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="totallbl">Total Weekly Hours</td>
+          <td class="totalval">${escapePrint(totalWeekly)}</td>
+          <td colspan="2"></td>
+        </tr>
+      </tfoot>
     </table>
-    <div class="ts-totals">
-      <div>Total Weekly Hours: <span>${escapePrint(totalWeekly)}</span></div>
-    </div>
     <div class="ts-notice">Notify EverCare Home Agency at ${escapePrint(AGENCY.phone)} of any significant change in condition — hospitalization, falls, hours change, etc.</div>
     <p class="ts-sandata">Don't forget to clock in and out on Sandata — make sure your Sandata times match this timesheet.</p>
     <div class="ts-svccols">
-      <div class="ts-svccol">${leftHtml}</div>
+      <div class="ts-svccol">${leftHtml}${buildPaperComments(notes)}</div>
       <div class="ts-svccol">${rightHtml}</div>
     </div>
-    <div class="ts-comments"><div class="lbl">Comments</div>${escapePrint(notes||' ')}</div>
     <div class="ts-legal">
       Timesheets due by <strong>5:00 PM every Monday</strong>, no exceptions. Full legal signatures only — no scratch-outs or white-out; correct errors with a single line-through, initialed.<br>
       This is a legal document: signing confirms the hours and services above are accurate.<br>
-      <strong>${escapePrint(AGENCY.address)}, ${escapePrint(AGENCY.cityLine)}</strong> &nbsp;|&nbsp; ${escapePrint(AGENCY.phone)}
+      <span class="addr">${escapePrint(AGENCY.address)}, ${escapePrint(AGENCY.cityLine)}</span>
     </div>
   </div>`;
 }
