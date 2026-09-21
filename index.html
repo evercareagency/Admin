@@ -1008,7 +1008,7 @@ Call (216) 377-5991 with any questions.</textarea>
           </div>
           <div class="nurse-actions">
             <button type="button" class="btn btn-navy" onclick="openNewClientIntake()">Open new client — on-site intake visit</button>
-            <button type="button" class="btn btn-teal" onclick="loadCompletedNewClientIntakes()">&#128260; Refresh</button>
+            <button type="button" class="btn btn-teal" onclick="refreshCompletedNewClientIntakes()">&#128260; Refresh</button>
           </div>
         </div>
         <div class="card" id="nciCompletedNurseCard">
@@ -2993,7 +2993,7 @@ async function adminResetCaregiverPwd(){
   }catch(e){err.textContent='Error. Try again.';err.style.display='block';}
 }
 
-function showTempMsg(msg,color){
+function showTempMsg(msg,color,holdMs){
   let el=document.getElementById('nciToast');
   if(!el){el=document.createElement('div');el.id='nciToast';}
   if(el.parentNode!==document.body)document.body.appendChild(el);
@@ -3002,7 +3002,9 @@ function showTempMsg(msg,color){
   el.textContent=msg;
   el.setAttribute('role','status');
   clearTimeout(showTempMsg._t);
-  showTempMsg._t=setTimeout(function(){el.style.display='none';},5000);
+  showTempMsg._t=null;
+  const ms=holdMs==null?5000:Number(holdMs);
+  if(ms>0)showTempMsg._t=setTimeout(function(){el.style.display='none';},ms);
 }
 
 const INSERVICES = [
@@ -4662,8 +4664,14 @@ async function viewSupervisoryVisitPdf(rowIndex){
 // *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
 // Archive: archive_new_client_intake_pdf { intakeId }. Complete save returns fast
-// (pdfPending and/or empty pdfLink). After UI success, POST archive then refresh pdfLink.
-// pdfError is a toast only — status stays Complete.
+// (pdfPending and/or empty pdfLink). Toast "Saved — PDF generating" BEFORE close/reload
+// (sticky). Do not await archive. Interim "PDF not ready yet" only after ~8s if still
+// pending. "PDF ready" when pdfLink lands. After UI success, POST archive then refresh pdfLink.
+// Ace Complete success is TOP-LEVEL ONLY: success, intakeId, clientId, status, created,
+//   updatedAt, pdfLink, pdfFileId, pdfPending?, pdfError?
+// intakeId is always a string at top-level — archive uses data.intakeId, not data.data.intakeId.
+// pdfPending is response-only (not a sheet column). UI clears pending when pdfLink is truthy.
+// pdfError / nciPdfArchive_ missing is a toast only — status stays Complete.
 // List Complete rows (Ace locked): intakeId, clientId, clientName, socDate, status,
 //   nurseUsername/nurseName, pdfLink, pdfFileId, createdAt, updatedAt, completedAt.
 // completedAt (fallback submittedAt) → Completed column. Edit: save_new_client_intake Complete.
@@ -5011,13 +5019,31 @@ function nciPage(root,outer,key){
   };
   return nciMergePages([from(outer),from(root)]);
 }
+function nciPickIntakeId(obj){
+  // Ace Complete success: top-level intakeId (string). Broaden only if that slot is blank.
+  if(!obj||typeof obj!=='object')return '';
+  const nested=nciInnerData(obj);
+  const cands=[
+    obj.intakeId,
+    obj.IntakeId,
+    obj.id,
+    nested&&nested.intakeId,
+    nested&&nested.id
+  ];
+  for(let i=0;i<cands.length;i++){
+    const s=nciStr(cands[i]);
+    if(s)return s;
+  }
+  return '';
+}
+function nciArchiveIntakeId(data){
+  // Archive payload uses data.intakeId — not data.data.intakeId.
+  const top=nciStr(data&&data.intakeId);
+  return top||nciPickIntakeId(data);
+}
 function nciForceIntakeId(data){
   const inner=nciInnerData(data);
-  const raw=(data&&data.intakeId!=null&&data.intakeId!=='')?data.intakeId
-    :(inner&&inner.intakeId!=null&&inner.intakeId!=='')?inner.intakeId
-    :(data&&data.id!=null&&data.id!=='')?data.id
-    :(inner&&inner.id!=null&&inner.id!=='')?inner.id
-    :nciState.intakeId;
+  const raw=nciArchiveIntakeId(data)||nciState.intakeId;
   nciState.intakeId=(raw==null||raw==='')?'':String(raw);
   const cid=(data&&data.clientId!=null&&data.clientId!=='')?data.clientId
     :(inner&&inner.clientId!=null&&inner.clientId!=='')?inner.clientId
@@ -5710,8 +5736,8 @@ async function saveNewClientIntake(status){
         return;
       }
     }
-    // Ace list returns numeric ids — always persist as string so Complete never posts blank.
-    nciState.intakeId=String(data.intakeId||(data.data&&data.data.intakeId)||nciState.intakeId||'');
+    // Ace Complete success: top-level intakeId string. Archive uses data.intakeId, not data.data.intakeId.
+    nciState.intakeId=nciArchiveIntakeId(data)||nciState.intakeId||'';
     nciDirty=false;
     nciCaptureClean();
     if(status==='Complete'){
@@ -5719,18 +5745,36 @@ async function saveNewClientIntake(status){
       const wasCompleteEdit=nciWizardMode==='complete';
       nciLastCompletePdf={intakeId:nciState.intakeId,pdfLink:meta.pdfLink,pdfFileId:meta.pdfFileId};
       nciRememberCompletePdf(nciState.intakeId,meta.pdfLink,meta.pdfFileId);
-      closeNewClientIntake(true);
-      loadNewClientIntakeDrafts();
-      loadCompletedNewClientIntakes();
+      if(!nciState.intakeId){
+        const keys=(data&&typeof data==='object')?Object.keys(data):[];
+        const nested=nciInnerData(data);
+        console.error('save_new_client_intake Complete missing intakeId',{
+          keys:keys,
+          dataKeys:nested?Object.keys(nested):[],
+          intakeId:data&&data.intakeId,
+          IntakeId:data&&data.IntakeId,
+          id:data&&data.id,
+          nestedIntakeId:nested&&nested.intakeId
+        });
+        showTempMsg('Saved Complete but missing intakeId — PDF cannot start','var(--danger)');
+        closeNewClientIntake(true);
+        loadNewClientIntakeDrafts();
+        loadCompletedNewClientIntakes();
+        return;
+      }
       // pdfPending / empty pdfLink is success — never fail or roll back Complete.
+      // Toast BEFORE close/reload so the generating message is not wiped.
       if(nciPdfNeedsFollowup(meta)){
-        showTempMsg('Saved — PDF generating','var(--success)');
+        showTempMsg('Saved — PDF generating','var(--success)',0);
         nciEnsureCompletePdf(nciState.intakeId,meta.pdfError);
       }else if(wasCompleteEdit){
         showTempMsg('Saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       }else{
         showTempMsg('Intake saved as Complete'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       }
+      closeNewClientIntake(true);
+      loadNewClientIntakeDrafts();
+      loadCompletedNewClientIntakes();
     }else{
       showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
       loadNewClientIntakeDrafts();
@@ -5762,17 +5806,19 @@ function nciPickPdfMeta(obj){
     if(nested&&nested[key]!=null&&nested[key]!=='')return nested[key];
     return '';
   };
+  const pdfLink=pickIntakePdfLink(obj);
   return {
-    intakeId:nciStr(take('intakeId')),
-    pdfLink:pickIntakePdfLink(obj),
+    intakeId:nciArchiveIntakeId(obj)||nciStr(take('intakeId')),
+    pdfLink:pdfLink,
     pdfFileId:nciStr(take('pdfFileId')),
     pdfError:nciStr(take('pdfError')),
-    pdfPending:nciIsPdfPending(obj)
+    pdfPending:pdfLink?false:nciIsPdfPending(obj)
   };
 }
 function nciPdfNeedsFollowup(meta){
   if(!meta)return true;
-  return !!(meta.pdfPending||!meta.pdfLink);
+  if(nciStr(meta.pdfLink))return false;
+  return true;
 }
 
 async function archiveNewClientIntakePdf(intakeId){
@@ -5792,9 +5838,50 @@ function nciApplyCompletePdf(intakeId,pdfLink,pdfFileId){
   nciRememberCompletePdf(id,link,pdfFileId||'');
 }
 
+const NCI_PDF_POLL_MS=60000;
+const NCI_ARCHIVE_RETRY_MS=3000;
+const NCI_PDF_INTERIM_WARN_MS=8000;
+
+function nciLogArchiveShape(archived){
+  const meta=nciPickPdfMeta(archived&&typeof archived==='object'?archived:{});
+  const err=nciStr(archived&&(archived.pdfError||archived.error||archived.message));
+  console.warn('archive_new_client_intake_pdf',{
+    action:(archived&&archived.action)||'archive_new_client_intake_pdf',
+    success:archived?archived.success:undefined,
+    pdfLink:meta.pdfLink||'',
+    pdfError:meta.pdfError||err||'',
+    pdfPending:!!(archived&&nciIsPdfPending(archived))
+  });
+}
+function nciArchiveHardError(archived,err){
+  if(err)return nciStr(err.message)||'PDF archive failed';
+  const meta=nciPickPdfMeta(archived&&typeof archived==='object'?archived:{});
+  if(meta.pdfError)return meta.pdfError;
+  if(archived&&archived.success===false){
+    return nciStr(archived.error||archived.message)||'PDF archive failed';
+  }
+  return '';
+}
+async function nciCallArchivePdf(intakeId){
+  try{
+    const archived=await archiveNewClientIntakePdf(intakeId);
+    nciLogArchiveShape(archived);
+    return {archived:archived,meta:nciPickPdfMeta(archived),err:null};
+  }catch(err){
+    nciLogArchiveShape({
+      action:'archive_new_client_intake_pdf',
+      success:false,
+      pdfLink:'',
+      pdfError:nciStr(err&&err.message),
+      pdfPending:false
+    });
+    return {archived:null,meta:null,err:err};
+  }
+}
+
 async function nciPollCompletePdfLink(intakeId,budgetMs){
   const id=String(intakeId||'');
-  const deadline=Date.now()+(budgetMs||15000);
+  const deadline=Date.now()+(budgetMs||NCI_PDF_POLL_MS);
   while(Date.now()<deadline){
     try{
       const got=await getNewClientIntake(id);
@@ -5821,10 +5908,16 @@ async function nciPollCompletePdfLink(intakeId,budgetMs){
 }
 
 async function nciEnsureCompletePdf(intakeId,priorPdfError){
-  const id=String(intakeId||'');
-  if(!id)return;
+  const id=nciStr(intakeId);
+  if(!id){
+    console.error('nciEnsureCompletePdf missing intakeId');
+    showTempMsg('Saved Complete but missing intakeId — PDF cannot start','var(--danger)');
+    return;
+  }
   let pdfError=nciStr(priorPdfError);
   let ready=false;
+  let warned=false;
+  const started=Date.now();
   const markReady=function(meta){
     if(!meta||!meta.pdfLink)return false;
     nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
@@ -5835,29 +5928,43 @@ async function nciEnsureCompletePdf(intakeId,priorPdfError){
     }
     return true;
   };
+  const applyArchive=function(result){
+    result=result||{};
+    const hard=nciArchiveHardError(result.archived,result.err);
+    if(hard)pdfError=hard;
+    if(result.meta)markReady(result.meta);
+    return hard;
+  };
+  const warnIfPending=function(){
+    if(ready||warned)return;
+    const wait=NCI_PDF_INTERIM_WARN_MS-(Date.now()-started);
+    if(wait>0){
+      nciSleep(wait).then(warnIfPending);
+      return;
+    }
+    warned=true;
+    showTempMsg(pdfError||'PDF not ready yet','var(--warn)');
+  };
   try{
-    const archiveP=archiveNewClientIntakePdf(id).then(function(archived){
-      const meta=nciPickPdfMeta(archived);
-      if(meta.pdfError)pdfError=meta.pdfError;
-      else if(archived&&archived.success===false)pdfError=pdfError||nciStr(archived.error||archived.message);
-      markReady(meta);
-      return meta;
-    }).catch(function(err){
-      pdfError=pdfError||nciStr((err&&err.message)||'');
-      return null;
-    });
-    const pollP=nciPollCompletePdfLink(id,15000).then(function(meta){
+    // Do not await archive — Complete hang must stay fast.
+    const archiveP=nciCallArchivePdf(id).then(applyArchive);
+    const pollP=nciPollCompletePdfLink(id,NCI_PDF_POLL_MS).then(function(meta){
       markReady(meta);
       return meta;
     }).catch(function(){return null;});
-    await Promise.race([
-      archiveP.then(function(m){return (m&&m.pdfLink)?m:pollP;}),
-      pollP,
-      nciSleep(15000)
-    ]);
-    if(!ready)showTempMsg(pdfError||'PDF not ready yet','var(--warn)');
+    archiveP.then(function(firstHard){
+      if(ready||firstHard)return null;
+      return nciSleep(NCI_ARCHIVE_RETRY_MS).then(function(){
+        if(ready)return null;
+        return nciCallArchivePdf(id).then(applyArchive);
+      });
+    }).catch(function(){return null;});
+    nciSleep(NCI_PDF_INTERIM_WARN_MS).then(warnIfPending);
+    await pollP;
+    if(!ready)warnIfPending();
   }catch(e){
-    if(!ready)showTempMsg(pdfError||nciStr((e&&e.message)||'')||'PDF not ready yet','var(--warn)');
+    pdfError=pdfError||nciStr((e&&e.message)||'');
+    if(!ready)warnIfPending();
   }
 }
 
@@ -5961,8 +6068,7 @@ function nciIntakeRowsFromList(data){
 }
 
 function nciIntakeIdOf(r){
-  if(!r||r.intakeId==null||r.intakeId==='')return '';
-  return String(r.intakeId);
+  return nciPickIntakeId(r);
 }
 
 function pickIntakePdfLink(obj){
@@ -6044,6 +6150,32 @@ function paintCompletedNewClientIntakes(){
   if(adminBody)adminBody.innerHTML=html;
 }
 
+async function nciRecheckPendingCompletePdfs(){
+  const pending=(nciCompletedRows||[]).filter(function(r){
+    return nciIntakeIdOf(r)&&!pickIntakePdfLink(r);
+  });
+  if(!pending.length)return 0;
+  let found=0;
+  for(let i=0;i<pending.length;i++){
+    const id=nciIntakeIdOf(pending[i]);
+    try{
+      const got=await getNewClientIntake(id);
+      const meta=nciPickPdfMeta(got);
+      if(meta.pdfLink){
+        nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
+        found++;
+      }
+    }catch(e){}
+  }
+  if(found)paintCompletedNewClientIntakes();
+  return found;
+}
+
+async function refreshCompletedNewClientIntakes(){
+  await loadCompletedNewClientIntakes();
+  await nciRecheckPendingCompletePdfs();
+}
+
 async function loadCompletedNewClientIntakes(){
   const nurseBody=document.getElementById('nciCompletedNurseBody');
   const adminBody=document.getElementById('nciCompletedAdminBody');
@@ -6062,14 +6194,14 @@ async function loadCompletedNewClientIntakes(){
       return st==='Complete';
     }).map(function(r){
       return {
-        intakeId:r.intakeId!=null&&r.intakeId!==''?String(r.intakeId):'',
+        intakeId:nciPickIntakeId(r),
         clientId:r.clientId!=null&&r.clientId!==''?String(r.clientId):'',
         clientName:r.clientName||'',
         socDate:r.socDate||'',
         status:r.status||'Complete',
         nurseName:r.nurseName||r.nurseUsername||'',
         nurseUsername:r.nurseUsername||'',
-        pdfLink:r.pdfLink||'',
+        pdfLink:pickIntakePdfLink(r),
         pdfFileId:r.pdfFileId||'',
         createdAt:r.createdAt||'',
         updatedAt:r.updatedAt||'',
@@ -6402,7 +6534,7 @@ async function loadAdminNurseSection(){
     setNurseAlertBadge(0);
   }
   await Promise.all([
-    loadCompletedNewClientIntakes(),
+    refreshCompletedNewClientIntakes(),
     loadAdminSupervisoryContacts()
   ]);
   await loadNurseActivityFeed();
