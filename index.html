@@ -3784,7 +3784,7 @@ function isISCompletedRecord(c){
   if(c.completed!=null&&String(c.completed).trim()!==''&&String(c.completed)!=='—')return true;
   if(c.completedAt!=null&&String(c.completedAt).trim()!=='')return true;
   if(c.completed_at!=null&&String(c.completed_at).trim()!=='')return true;
-  if(c.scoreCorrect!=null||c.scorePercent!=null||c.scoreTotal!=null)return true;
+  if(c.scoreCorrect!=null||c.ScoreCorrect!=null||c.scorePct!=null||c.ScorePct!=null||c.scorePercent!=null||c.scoreTotal!=null||c.ScoreTotal!=null)return true;
   return parseISAnswers(c).length>0;
 }
 function isISAnswerCorrect(q,aideAns){
@@ -3798,19 +3798,34 @@ function isISAnswerCorrect(q,aideAns){
 }
 function fillISScore(row,topic,answers){
   if(!row)return row;
-  row.scoreCorrect=isNumOrNull(row.scoreCorrect!=null?row.scoreCorrect:(row.correct!=null?row.correct:row.score_correct));
-  row.scoreTotal=isNumOrNull(row.scoreTotal!=null?row.scoreTotal:(row.total!=null?row.total:row.score_total));
-  row.scorePercent=isNumOrNull(row.scorePercent!=null?row.scorePercent:(row.percent!=null?row.percent:row.score_percent));
+  row.scoreCorrect=isNumOrNull(firstISField(row,['scoreCorrect','ScoreCorrect','correct','score_correct']));
+  row.scoreTotal=isNumOrNull(firstISField(row,['scoreTotal','ScoreTotal','total','score_total']));
+  row.scorePct=isNumOrNull(firstISField(row,['scorePct','ScorePct','scorePercent','percent','score_percent']));
+  row.scorePercent=row.scorePct;
   if((row.scoreCorrect==null||row.scoreTotal==null)&&topic&&topic.questions&&answers&&answers.length){
     let ok=0;
     topic.questions.forEach(function(q,i){if(isISAnswerCorrect(q,answers[i]))ok++;});
     row.scoreCorrect=ok;
     row.scoreTotal=topic.questions.length;
-    row.scorePercent=row.scoreTotal?Math.round(ok/row.scoreTotal*100):0;
-  }else if(row.scoreCorrect!=null&&row.scoreTotal&&row.scorePercent==null){
-    row.scorePercent=Math.round(row.scoreCorrect/row.scoreTotal*100);
+    row.scorePct=row.scoreTotal?Math.round(ok/row.scoreTotal*100):0;
+    row.scorePercent=row.scorePct;
+  }else if(row.scoreCorrect!=null&&row.scoreTotal&&row.scorePct==null){
+    row.scorePct=Math.round(row.scoreCorrect/row.scoreTotal*100);
+    row.scorePercent=row.scorePct;
   }
   return row;
+}
+function firstISField(obj,keys){
+  if(!obj)return null;
+  for(let i=0;i<keys.length;i++){
+    if(obj[keys[i]]!=null&&obj[keys[i]]!=='')return obj[keys[i]];
+  }
+  return null;
+}
+function isResultIdOf(c){
+  if(!c)return '';
+  const id=firstISField(c,['id','Id','resultId','inserviceResultId']);
+  return id==null?'':String(id);
 }
 function hydrateISComplianceRow(c,aide,topic){
   const src=c&&typeof c==='object'?c:{};
@@ -3818,11 +3833,14 @@ function hydrateISComplianceRow(c,aide,topic){
   const topicObj=topic||INSERVICES.find(t=>t.id==topicId)||{};
   const answers=parseISAnswers(src);
   const row=Object.assign({},src,{
+    id:isResultIdOf(src),
     username:(aide&&aide.username)||src.username||'',
     empName:(aide&&aide.name)||src.empName||src.emp_name||src.name||src.username||'',
     topicId:topicId,
     topicTitle:src.topicTitle||src.topic_title||topicObj.title||'',
     topicShort:topicObj.shortTitle||src.topicTitle||src.topic_title||'',
+    completedAt:firstISField(src,['completedAt','CompletedAt','completed_at','completed']),
+    status:firstISField(src,['status','Status'])||'',
     isCompleted:isISCompletedRecord(src)
   });
   return fillISScore(row,topicObj,answers);
@@ -3865,7 +3883,7 @@ function formatISCompletedDate(val){
 }
 function formatISScoreColumn(row){
   if(!row||!row.isCompleted)return '—';
-  const sc=row.scoreCorrect,tot=row.scoreTotal,pct=row.scorePercent;
+  const sc=row.scoreCorrect,tot=row.scoreTotal,pct=row.scorePct!=null?row.scorePct:row.scorePercent;
   if(sc!=null&&tot){
     const p=pct!=null?Math.round(Number(pct)):Math.round(sc/tot*100);
     return sc+'/'+tot+' · '+p+'%';
@@ -3875,7 +3893,7 @@ function formatISScoreColumn(row){
 }
 function formatISScoreBanner(row){
   if(!row)return 'Score: —';
-  const sc=row.scoreCorrect,tot=row.scoreTotal,pct=row.scorePercent;
+  const sc=row.scoreCorrect,tot=row.scoreTotal,pct=row.scorePct!=null?row.scorePct:row.scorePercent;
   if(sc!=null&&tot){
     const p=pct!=null?Math.round(Number(pct)):Math.round(sc/tot*100);
     return 'Score: '+sc+'/'+tot+' ('+p+'%)';
@@ -3939,12 +3957,14 @@ async function loadISCompliance(force){
     const [assignData, usersData, isData]=await Promise.all([
       apiGetCached('get_assigned_topic',null,force===true),
       apiGetCached('get_users',null,force===true),
-      apiPost({action:'get_inservices'})
+      apiPost({action:'get_inservices'}) // no includeArchived — Ace skips Status=Archived
     ]);
     const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
     const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
-    const completions=(isData&&isData.success&&Array.isArray(isData.data))?isData.data:[];
+    const completions=((isData&&isData.success&&Array.isArray(isData.data))?isData.data:[]).filter(function(c){
+      return String(c&&(c.status||c.Status)||'').toLowerCase()!=='archived';
+    });
 
     if(assignedTopic){
       const seen={};
@@ -4014,15 +4034,20 @@ function printISCert(rowIndex){
 
 function confirmDeleteISResult(rowIndex){
   const row=isComplianceRows[rowIndex];
-  if(!row||!row.username||row.topicId==null||row.topicId==='')return;
+  const id=isResultIdOf(row);
+  if(!row||!id){
+    showTempMsg('Cannot delete — Ace result id missing.','var(--danger)');
+    return;
+  }
   showSharedConfirm('Are you sure?',function(){deleteISResult(rowIndex);},'Yes, delete');
 }
 
 async function deleteISResult(rowIndex){
   const row=isComplianceRows[rowIndex];
-  if(!row)return;
-  const res=await postArchiveAction('delete_inservice_result',null,{username:row.username,topicId:row.topicId});
-  if(toastArchiveResult(res,'Inservice result deleted.')){
+  const id=isResultIdOf(row);
+  if(!row||!id)return;
+  const res=await postArchiveAction('delete_inservice_result','archive_inservice_result',{id:id});
+  if(toastArchiveResult(res,'Inservice result archived.')){
     await loadISCompliance(true);
   }
 }
@@ -4037,6 +4062,9 @@ function buildLocalISQuestions(row){
     const correctText=Array.isArray(q.options)?q.options[q.answer]:'';
     return {
       qIndex:i,
+      index:i,
+      selected:typeof aide==='number'?aide:(/^\d+$/.test(String(aide||'').trim())?Number(aide):-1),
+      correct:q.answer,
       question:q.q,
       options:q.options||[],
       aideAnswer:aideText,
@@ -4046,31 +4074,57 @@ function buildLocalISQuestions(row){
   });
 }
 function normalizeISResultQuestions(data,row){
-  const payload=data&&(data.data&&!Array.isArray(data.data)?data.data:data.result)||data||{};
-  let raw=payload.questions||payload.items||(Array.isArray(data&&data.data)?null:null);
+  const payload=isResultPayload(data);
+  const answers=Array.isArray(payload.answers)?payload.answers:(Array.isArray(row&&row.answers)?parseISAnswers(row):[]);
+  let raw=payload.items||payload.questions;
+  if(!Array.isArray(raw)&&data&&Array.isArray(data.items))raw=data.items;
   if(!Array.isArray(raw)&&data&&Array.isArray(data.questions))raw=data.questions;
-  if(!Array.isArray(raw))return buildLocalISQuestions(row);
+  const topic=INSERVICES.find(t=>t.id==(payload.topicId!=null?payload.topicId:(row&&row.topicId)));
+  if(!Array.isArray(raw)){
+    if(topic&&answers.length){
+      const seeded=Object.assign({},row,{answers:answers,topicId:topic.id});
+      return buildLocalISQuestions(seeded);
+    }
+    return buildLocalISQuestions(row);
+  }
   return raw.map(function(q,i){
-    const topic=INSERVICES.find(t=>t.id==(row&&row.topicId));
-    const local=topic&&topic.questions&&topic.questions[q.qIndex!=null?q.qIndex:i];
+    const idx=q.index!=null?q.index:(q.qIndex!=null?q.qIndex:i);
+    const local=topic&&topic.questions&&topic.questions[idx];
     const options=q.options||(local&&local.options)||[];
-    const correctAnswer=q.correctAnswer!=null?q.correctAnswer:(local?local.options[local.answer]:'');
-    const aideAnswer=q.aideAnswer!=null?q.aideAnswer:(q.answer!=null?q.answer:'');
-    const isCorrect=typeof q.isCorrect==='boolean'?q.isCorrect:isISAnswerCorrect(local||{options:options,answer:options.indexOf(correctAnswer),correctAnswer:correctAnswer},aideAnswer);
+    const selected=q.selected!=null?q.selected:(answers[idx]!=null?answers[idx]:q.aideAnswer);
+    const correct=q.correct!=null?q.correct:(local?local.answer:q.correctAnswer);
+    const aideAnswer=q.selectedLabel||q.aideAnswer||(typeof selected==='number'&&options[selected]!=null?options[selected]:selected);
+    const correctAnswer=q.correctLabel||q.correctAnswer||(typeof correct==='number'&&options[correct]!=null?options[correct]:correct);
+    const isCorrect=typeof q.isCorrect==='boolean'?q.isCorrect:isISAnswerCorrect(local||{options:options,answer:correct,correctAnswer:correctAnswer},selected);
     return {
-      qIndex:q.qIndex!=null?q.qIndex:i,
-      question:q.question||q.q||(local&&local.q)||('Question '+(i+1)),
+      qIndex:idx,
+      index:idx,
+      selected:typeof selected==='number'?selected:(options.indexOf(String(aideAnswer))),
+      correct:typeof correct==='number'?correct:(options.indexOf(String(correctAnswer))),
+      question:q.prompt||q.question||q.q||(local&&local.q)||('Question '+(idx+1)),
       options:options,
-      aideAnswer:typeof aideAnswer==='number'&&options[aideAnswer]!=null?options[aideAnswer]:aideAnswer,
-      correctAnswer:typeof correctAnswer==='number'&&options[correctAnswer]!=null?options[correctAnswer]:correctAnswer,
+      aideAnswer:aideAnswer==null?'':String(aideAnswer),
+      correctAnswer:correctAnswer==null?'':String(correctAnswer),
       isCorrect:isCorrect
     };
   });
 }
+function isResultPayload(data){
+  if(!data)return {};
+  if(data.data&&!Array.isArray(data.data))return data.data;
+  if(data.result&&typeof data.result==='object')return data.result;
+  return data;
+}
 function applyISResultScore(row,data){
-  const payload=data&&(data.data&&!Array.isArray(data.data)?data.data:data.result)||data||{};
+  const payload=isResultPayload(data);
   const next=Object.assign({},row);
-  ['scoreCorrect','scoreTotal','scorePercent','completed','completedAt'].forEach(function(k){
+  if(payload.id!=null)next.id=payload.id;
+  if(payload.username)next.username=payload.username;
+  if(payload.empName)next.empName=payload.empName;
+  if(payload.topicId!=null)next.topicId=payload.topicId;
+  if(payload.topicTitle)next.topicTitle=payload.topicTitle;
+  if(payload.answers)next.answers=payload.answers;
+  ['scoreCorrect','ScoreCorrect','scoreTotal','ScoreTotal','scorePct','ScorePct','scorePercent','completed','completedAt','CompletedAt'].forEach(function(k){
     if(payload[k]!=null&&payload[k]!=='')next[k]=payload[k];
     else if(data&&data[k]!=null&&data[k]!=='')next[k]=data[k];
   });
@@ -4116,9 +4170,9 @@ function paintISResults(){
   if(isResultsState.editing){
     body.innerHTML=qs.map(function(q,i){
       const opts=(q.options&&q.options.length)?q.options:[q.aideAnswer,q.correctAnswer].filter(function(v,idx,arr){return v&&arr.indexOf(v)===idx;});
-      const picks=opts.map(function(opt){
-        const checked=String(opt)===String(q.aideAnswer)?' checked':'';
-        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+escapeAttr(opt)+'"'+checked+'>'+escapeHtml(opt)+'</label>';
+      const picks=opts.map(function(opt,oi){
+        const checked=(q.selected===oi||String(opt)===String(q.aideAnswer))?' checked':'';
+        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+oi+'"'+checked+'>'+escapeHtml(opt)+'</label>';
       }).join('');
       return '<div class="is-result-qa"><div class="q">'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</div>'+picks+'</div>';
     }).join('');
@@ -4155,14 +4209,17 @@ async function viewISResults(rowIndex){
   }
   openModal('isResultsModal');
   let data=null;
+  const resultId=isResultIdOf(row);
   try{
-    data=await apiPost({action:'get_inservice_result',username:row.username,topicId:row.topicId});
+    if(resultId)data=await apiPost({action:'get_inservice_result',id:resultId});
+    else data={success:false,error:'Unknown action: get_inservice_result'};
   }catch(e){
     data={success:false,error:(e&&e.message)||'Error'};
   }
   const why=(data&&(data.error||data.message))||'';
   const unknown=!(data&&data.success)&&nciLooksLikeUnknownAction(why);
-  const hasQs=data&&(Array.isArray(data.questions)||(data.data&&(Array.isArray(data.data.questions)||Array.isArray(data.data.items)))||(data.result&&Array.isArray(data.result.questions)));
+  const payload=isResultPayload(data);
+  const hasQs=!!(payload&&(Array.isArray(payload.items)||Array.isArray(payload.questions)||Array.isArray(payload.answers)));
   if(data&&data.success&&hasQs){
     isResultsState.stubbed=false;
     isResultsState.row=applyISResultScore(row,data);
@@ -4199,15 +4256,21 @@ function cancelISResultsEdit(){
 async function saveISResultsEdit(){
   const row=isResultsState.row;
   if(!row)return;
+  const resultId=isResultIdOf(row);
   const answers=(isResultsState.questions||[]).map(function(q,i){
     const sel=document.querySelector('input[name="isEditQ'+i+'"]:checked');
-    return {qIndex:q.qIndex!=null?q.qIndex:i,aideAnswer:sel?sel.value:''};
+    const idx=sel&&sel.value!==''?Number(sel.value):(q.selected!=null?Number(q.selected):-1);
+    return idx;
   });
+  if(!resultId){
+    showTempMsg('Cannot save — Ace result id missing.','var(--danger)');
+    return;
+  }
   const saveBtn=document.getElementById('isResultsSaveEdit');
   if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Saving…';}
   let data=null;
   try{
-    data=await apiPost({action:'admin_update_inservice_answers',username:row.username,topicId:row.topicId,answers:answers});
+    data=await apiPost({action:'admin_update_inservice_answers',id:resultId,answers:answers});
   }catch(e){
     data={success:false,error:(e&&e.message)||'Save failed.'};
   }
@@ -4221,23 +4284,24 @@ async function saveISResultsEdit(){
     }
     return;
   }
-  answers.forEach(function(a,i){
-    if(isResultsState.questions[i])isResultsState.questions[i].aideAnswer=a.aideAnswer;
-  });
   isResultsState.row=applyISResultScore(row,data);
-  if(data.questions||(data.data&&data.data.questions)){
+  isResultsState.row.answers=answers;
+  if((data.items||data.questions)||(data.data&&(data.data.items||data.data.questions))){
     isResultsState.questions=normalizeISResultQuestions(data,isResultsState.row);
   }else{
     isResultsState.questions=isResultsState.questions.map(function(q,i){
-      const next=Object.assign({},q,{aideAnswer:answers[i]?answers[i].aideAnswer:q.aideAnswer});
-      next.isCorrect=String(next.aideAnswer||'')===String(next.correctAnswer||'');
+      const sel=answers[i];
+      const label=(q.options&&q.options[sel]!=null)?q.options[sel]:q.aideAnswer;
+      const next=Object.assign({},q,{selected:sel,aideAnswer:label});
+      next.isCorrect=Number(next.selected)===Number(next.correct)||String(next.aideAnswer||'')===String(next.correctAnswer||'');
       return next;
     });
     let ok=0;
     isResultsState.questions.forEach(function(q){if(q.isCorrect)ok++;});
     isResultsState.row.scoreCorrect=ok;
     isResultsState.row.scoreTotal=isResultsState.questions.length;
-    isResultsState.row.scorePercent=isResultsState.row.scoreTotal?Math.round(ok/isResultsState.row.scoreTotal*100):0;
+    isResultsState.row.scorePct=isResultsState.row.scoreTotal?Math.round(ok/isResultsState.row.scoreTotal*100):0;
+    isResultsState.row.scorePercent=isResultsState.row.scorePct;
   }
   isResultsState.stubbed=false;
   setISResultsEditMode(false);

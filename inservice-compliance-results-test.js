@@ -45,6 +45,8 @@ const certDate = extractFn(html, 'function certDateFromRecord(r)');
 const topicIdOf = extractFn(html, 'function isTopicIdOfCompletion(c)');
 const isNum = extractFn(html, 'function isNumOrNull(v)');
 const ansOk = extractFn(html, 'function isISAnswerCorrect(q,aideAns)');
+const firstField = extractFn(html, 'function firstISField(obj,keys)');
+const resultIdOf = extractFn(html, 'function isResultIdOf(c)');
 const printCert = extractFn(html, 'function printCert(r)');
 
 assert.ok(clearAssignment, 'clearAssignment missing');
@@ -100,10 +102,14 @@ assert.ok(loadIS.includes('isISCompletedRecord'), 'after clear, completed rows s
 assert.ok(loadIS.includes('Completed results stay here after Clear Assignment'), 'empty copy does not imply wipe');
 
 assert.ok(viewRes.includes("action:'get_inservice_result'"), 'View Results fetches get_inservice_result');
+assert.ok(viewRes.includes('id:resultId'), 'View Results sends Ace LOCK { id }');
 assert.ok(viewRes.includes('nciLooksLikeUnknownAction'), 'View Results stubs unknown Ace action');
 assert.ok(saveEdit.includes("action:'admin_update_inservice_answers'"), 'save posts admin update');
+assert.ok(saveEdit.includes('id:resultId,answers:answers'), 'save sends Ace LOCK { id, answers:[selIdx] }');
 assert.ok(saveEdit.includes('loadISCompliance(true)'), 'save refreshes score/list');
-assert.ok(deleteRes.includes("postArchiveAction('delete_inservice_result'"), 'delete posts delete_inservice_result');
+assert.ok(deleteRes.includes("postArchiveAction('delete_inservice_result','archive_inservice_result',{id:id})"), 'delete/archive LOCK { id }');
+assert.ok(loadIS.includes('includeArchived')===false || /no includeArchived/.test(html), 'get_inservices skips archived');
+assert.ok(!/includeArchived\s*:/.test(loadIS), 'must not pass includeArchived');
 
 assert.ok(html.includes('v=c2rib7212'), 'C2 cache-bust comment stays');
 assert.ok(html.includes('function printCert('), 'C2 printCert stays');
@@ -121,9 +127,9 @@ const sandbox = {
   console
 };
 vm.createContext(sandbox);
-assert.ok(topicIdOf && isNum && ansOk && fillScore && hydrate && certDate, 'score/date helpers missing');
+assert.ok(topicIdOf && isNum && ansOk && fillScore && hydrate && certDate && firstField && resultIdOf, 'score/date helpers missing');
 vm.runInContext(
-  [isNum, parseAns, completedRec, topicIdOf, ansOk, fillScore, hydrate, certDate, formatDate, formatScore, formatBanner].join('\n'),
+  [isNum, firstField, resultIdOf, parseAns, completedRec, topicIdOf, ansOk, fillScore, hydrate, certDate, formatDate, formatScore, formatBanner].join('\n'),
   sandbox
 );
 
@@ -135,10 +141,10 @@ assert.strictEqual(sandbox.formatISCompletedDate('08/02/2026'), 'Aug 2, 2026');
 assert.strictEqual(sandbox.formatISCompletedDate('August 2, 2026'), 'Aug 2, 2026');
 
 const completed = sandbox.hydrateISComplianceRow({
-  username:'aide1', empName:'Asha Aide', topicId:1,
-  completed:'2026-08-02T01:42:29.000Z',
-  scoreCorrect:9, scoreTotal:10, scorePercent:90,
-  answers:JSON.stringify([1,2,1,3,1,1,1,1,1,0])
+  id:'is-asha-1', username:'aide1', empName:'Asha Aide', topicId:1,
+  completedAt:'2026-08-02T01:42:29.000Z',
+  scoreCorrect:9, scoreTotal:10, scorePct:90, Status:'Active',
+  answers:[1,2,1,3,1,1,1,1,1,0]
 }, {username:'aide1', name:'Asha Aide'}, {id:1, title:'Diabetes', shortTitle:'Diabetes Complications', questions:new Array(10).fill({q:'q',options:['a','b'],answer:0})});
 assert.strictEqual(completed.isCompleted, true);
 assert.strictEqual(sandbox.formatISScoreColumn(completed), '9/10 · 90%');
