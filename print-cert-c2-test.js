@@ -48,7 +48,7 @@ assert.ok(html.includes('@page{size:letter portrait;margin:0.22in;}'), 'US Lette
 assert.ok(html.includes('@media print{'), 'print stylesheet');
 assert.ok(/\.no-print,\.cert-toolbar\{display:none !important;\}/.test(html), 'print hides chrome');
 assert.ok(html.includes('certLaurelSvg'), 'laurel seal helper');
-assert.ok(html.includes('certRibbonSvg'), 'ribbon helper');
+assert.ok(html.includes('certRibbonHtml'), 'ribbon helper');
 assert.ok(!/graduation|mortar\s*board|cap-icon/i.test(html.slice(html.indexOf('function certLaurelSvg'), html.indexOf('function printCert'))), 'seal must not use a graduation cap');
 const certFnSrc = html.slice(html.indexOf('function formatCertDate'), html.indexOf('function printCert(r)') + 800);
 assert.ok(!certFnSrc.includes('5510 Pearl'), 'no street address on cert (or leftover footer)');
@@ -68,7 +68,7 @@ const sandbox = { INSERVICES: [] };
 vm.createContext(sandbox);
 vm.runInContext(escapeHtml + '\n' + formatCertDate + '\n' + certDateFromRecord + '\n' +
   extractFn(html, 'function certLaurelSvg()') + '\n' +
-  extractFn(html, 'function certRibbonSvg()') + '\n' +
+  extractFn(html, 'function certRibbonHtml()') + '\n' +
   extractFn(html, 'function certCornerSvg(pos)') + '\n' +
   buildCertHtml, sandbox);
 
@@ -100,6 +100,7 @@ assert.ok(!cert.includes('2026-08-02T01:42:29.000Z'), 'built cert strips ISO');
 assert.ok(!cert.includes('5510 Pearl'), 'built cert has no address');
 assert.ok(!cert.includes('377-5991'), 'built cert has no phone');
 assert.ok(cert.includes('Personal Care / Home Making'), 'built cert ribbon');
+assert.ok(cert.includes('rib-tail'), 'built cert swallowtail ribbon');
 assert.ok(cert.includes('class="seal"'), 'built cert laurel seal');
 assert.ok(cert.includes('← Back'), 'built cert Back');
 assert.ok(cert.includes('✕ Close'), 'built cert Close');

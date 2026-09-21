@@ -3810,37 +3810,42 @@ function certDateFromRecord(r){
 }
 
 function certLaurelSvg(){
-  const leaf=function(cx,cy,rot,fill){
-    return '<ellipse cx="'+cx+'" cy="'+cy+'" rx="6.4" ry="15.8" transform="rotate('+rot+' '+cx+' '+cy+')" fill="'+fill+'"/>';
+  const leaf=function(x,y,rot,fill,scale){
+    const s=scale||1;
+    return '<path d="M0,-11 C7.2,-6 7.4,4 0,12.5 C-7.4,4 -7.2,-6 0,-11 Z" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate('+rot.toFixed(1)+') scale('+s.toFixed(2)+')" fill="'+fill+'"/>';
   };
-  const side=function(sign){
-    let out='';
-    for(let i=0;i<16;i++){
-      const t=i/15;
-      const ang=(-208+t*158)*Math.PI/180;
-      const r=74+(i%2?3.2:0);
-      const x=(100+sign*Math.cos(ang)*r).toFixed(1);
-      const y=(106+Math.sin(ang)*r).toFixed(1);
-      const rot=(sign>0?(t*158-118):(208-t*158)).toFixed(1);
-      out+=leaf(x,y,rot,i%2?'#174f4f':'#2a7f7f');
+  const cx=100,cy=100;
+  let out='';
+  const rows=[{r:81,n:19,s:1.05},{r:69,n:17,s:0.9}];
+  rows.forEach(function(row){
+    for(let side=-1;side<=1;side+=2){
+      for(let i=0;i<row.n;i++){
+        const t=i/(row.n-1);
+        const deg=side<0?(100+t*165):(80-t*165);
+        const rad=deg*Math.PI/180;
+        const x=cx+Math.cos(rad)*row.r;
+        const y=cy+Math.sin(rad)*row.r;
+        const rot=deg+(i%2?10:-8);
+        out+=leaf(x,y,rot,i%2?'#174f4f':'#2a7f7f',row.s);
+      }
     }
-    return out;
-  };
-  return '<svg class="seal" viewBox="0 0 200 200" aria-hidden="true">'+side(-1)+side(1)+
-    '<circle cx="100" cy="106" r="40" fill="none" stroke="#174f4f" stroke-width="2.2"/>'+
-    '<circle cx="100" cy="106" r="33" fill="none" stroke="#2a7f7f" stroke-width="1.1"/>'+
-    '<text x="100" y="102" text-anchor="middle" fill="#174f4f" font-family="Cinzel,Playfair Display,serif" font-size="16" font-weight="700" letter-spacing="1.2">EC</text>'+
-    '<text x="100" y="118" text-anchor="middle" fill="#174f4f" font-family="Cinzel,serif" font-size="6.5" letter-spacing="1.6">HOME AGENCY</text></svg>';
+  });
+  return '<svg class="seal" viewBox="0 0 200 200" aria-hidden="true">'+out+
+    '<path d="M88 176 C94 168 106 168 112 176 C106 172 94 172 88 176 Z" fill="#174f4f"/>'+
+    '<circle cx="100" cy="100" r="34" fill="#f6ebd0" stroke="#174f4f" stroke-width="2"/>'+
+    '<circle cx="100" cy="100" r="28" fill="none" stroke="#2a7f7f" stroke-width="1.1"/>'+
+    '<text x="100" y="97" text-anchor="middle" fill="#174f4f" font-family="Cinzel,Playfair Display,Times New Roman,serif" font-size="16" font-weight="700" letter-spacing="1.2">EC</text>'+
+    '<text x="100" y="112" text-anchor="middle" fill="#174f4f" font-family="Cinzel,Times New Roman,serif" font-size="6.4" letter-spacing="1.5">HOME AGENCY</text></svg>';
 }
 
-function certRibbonSvg(){
-  return '<svg class="ribbon-svg" viewBox="0 0 760 108" aria-hidden="true">'+
-    '<path d="M6 16 L86 16 L68 54 L86 92 L6 92 L38 54 Z" fill="#143f3f"/>'+
-    '<path d="M754 16 L674 16 L692 54 L674 92 L754 92 L722 54 Z" fill="#143f3f"/>'+
-    '<path d="M78 12 H682 L660 54 L682 96 H78 L100 54 Z" fill="#2a7f7f"/>'+
-    '<path d="M78 12 H682 L672 30 H88 Z" fill="#3c9a9a"/>'+
-    '<path d="M100 54 L78 96 H682 L660 54 Z" fill="#1e6868"/>'+
-    '</svg>';
+function certRibbonHtml(){
+  return '<div class="ribbon" role="img" aria-label="Personal Care / Home Making">'+
+    '<span class="rib-tail rib-tail-l"></span>'+
+    '<span class="rib-fold rib-fold-l"></span>'+
+    '<span class="rib-band">Personal Care / Home Making</span>'+
+    '<span class="rib-fold rib-fold-r"></span>'+
+    '<span class="rib-tail rib-tail-r"></span>'+
+    '</div>';
 }
 
 function certCornerSvg(pos){
@@ -3906,20 +3911,27 @@ function buildCertHtml(r){
     '.flourish.tr{top:28px;right:28px;transform:scaleX(-1);}'+
     '.flourish.bl{bottom:28px;left:28px;transform:scaleY(-1);}'+
     '.flourish.br{bottom:28px;right:28px;transform:scale(-1);}'+
-    '.inner{position:absolute;inset:42px 48px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;}'+
-    '.agency{font-family:Cinzel,"Playfair Display",serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#174f4f;font-weight:700;margin-top:6px;}'+
+    '.inner{position:absolute;inset:40px 46px 36px;display:flex;flex-direction:column;align-items:center;text-align:center;}'+
+    '.head{width:100%;display:flex;flex-direction:column;align-items:center;}'+
+    '.body{width:100%;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}'+
+    '.agency{font-family:Cinzel,"Playfair Display",Times New Roman,serif;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#174f4f;font-weight:700;margin-top:4px;}'+
     '.rule{width:46%;height:1px;background:linear-gradient(90deg,transparent,#1e6868,transparent);margin:10px 0 8px;}'+
-    'h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(22px,3.6vw,38px);font-weight:700;color:#1a2744;line-height:1.15;margin:2px 0 4px;}'+
-    '.ribbon-wrap{position:relative;width:86%;max-width:620px;margin:6px 0 0;}'+
-    '.ribbon-svg{width:100%;height:auto;display:block;}'+
-    '.ribbon-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Cinzel,"Playfair Display",serif;font-size:clamp(11px,1.7vw,16px);font-weight:700;letter-spacing:1.2px;color:#f8efd8;text-shadow:0 1px 0 rgba(0,0,0,.18);padding:0 11%;}'+
-    '.seal{width:min(168px,28%);height:auto;margin:-2px 0 4px;}'+
+    'h1{font-family:"Playfair Display",Georgia,serif;font-size:clamp(22px,3.6vw,36px);font-weight:700;color:#1a2744;line-height:1.15;margin:2px 0 12px;}'+
+    '.ribbon{position:relative;display:flex;align-items:flex-start;justify-content:center;width:90%;max-width:660px;height:58px;margin:4px 0 8px;}'+
+    '.rib-band{flex:1;height:40px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#3a9696 0%,#2a7f7f 46%,#1e6868 100%);color:#f8efd8;font-family:Cinzel,"Playfair Display",Times New Roman,serif;font-size:clamp(11px,1.65vw,15px);font-weight:700;letter-spacing:1.1px;padding:0 8px;white-space:nowrap;box-shadow:0 2px 0 #123838;z-index:2;}'+
+    '.rib-fold{width:14px;height:40px;background:#145252;z-index:1;}'+
+    '.rib-fold-l{clip-path:polygon(100% 0,0 12px,100% 100%);}'+
+    '.rib-fold-r{clip-path:polygon(0 0,100% 12px,0 100%);}'+
+    '.rib-tail{width:clamp(36px,6.2vw,48px);height:50px;background:#143f3f;margin-top:8px;}'+
+    '.rib-tail-l{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,68% 52%);margin-right:-2px;}'+
+    '.rib-tail-r{clip-path:polygon(0 0,100% 0,32% 52%,100% 100%,0 100%);margin-left:-2px;}'+
+    '.seal{width:min(176px,30%);height:auto;margin:0 0 2px;}'+
     '.certifies,.has-completed{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:clamp(15px,2vw,20px);color:#3d4a5c;}'+
     '.name{font-family:"Playfair Display",Georgia,serif;font-size:clamp(24px,3.4vw,36px);font-weight:700;color:#1a2744;border-bottom:1.5px solid #1e6868;padding:2px 18px 6px;margin:8px 0 10px;min-width:58%;}'+
     '.topic{font-family:"Playfair Display",Georgia,serif;font-size:clamp(16px,2.3vw,22px);font-weight:600;color:#174f4f;margin:8px 0 10px;max-width:90%;}'+
     '.when{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(14px,1.8vw,18px);color:#1a2744;margin:4px 0 8px;}'+
     '.when strong{font-family:"Playfair Display",serif;font-weight:600;}'+
-    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;width:92%;margin-top:auto;padding-top:8px;}'+
+    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;width:92%;margin-top:10px;padding-top:4px;}'+
     '.sig-box{text-align:center;}'+
     '.sig-line{min-height:46px;border-bottom:1px solid #1a2744;margin-bottom:6px;display:flex;align-items:flex-end;justify-content:center;}'+
     '.sig-line img{height:40px;max-width:100%;}'+
@@ -3946,16 +3958,20 @@ function buildCertHtml(r){
         '<div class="frame"></div><div class="frame-in"></div><div class="frame-thin"></div>'+
         certCornerSvg('tl')+certCornerSvg('tr')+certCornerSvg('bl')+certCornerSvg('br')+
         '<div class="inner">'+
-          '<div class="agency">EVERCARE HOME AGENCY</div>'+
-          '<div class="rule"></div>'+
-          '<h1>Certificate of Inservice Completion</h1>'+
-          '<div class="ribbon-wrap">'+certRibbonSvg()+'<div class="ribbon-label">Personal Care / Home Making</div></div>'+
-          certLaurelSvg()+
-          '<div class="certifies">This certifies that</div>'+
-          '<div class="name">'+name+'</div>'+
-          '<div class="has-completed">has successfully completed</div>'+
-          '<div class="topic">'+topic+'</div>'+
-          '<div class="when">Date of Completion: <strong>'+when+'</strong></div>'+
+          '<div class="head">'+
+            '<div class="agency">EVERCARE HOME AGENCY</div>'+
+            '<div class="rule"></div>'+
+            '<h1>Certificate of Inservice Completion</h1>'+
+            certRibbonHtml()+
+            certLaurelSvg()+
+          '</div>'+
+          '<div class="body">'+
+            '<div class="certifies">This certifies that</div>'+
+            '<div class="name">'+name+'</div>'+
+            '<div class="has-completed">has successfully completed</div>'+
+            '<div class="topic">'+topic+'</div>'+
+            '<div class="when">Date of Completion: <strong>'+when+'</strong></div>'+
+          '</div>'+
           '<div class="sig-grid">'+
             '<div class="sig-box"><div class="sig-line">'+sigHTML+'</div><div class="sig-label">Employee Signature</div><div class="sig-name">'+name+'</div></div>'+
             '<div class="sig-box"><div class="sig-line"></div><div class="sig-label">RN / Supervisor Signature</div></div>'+
