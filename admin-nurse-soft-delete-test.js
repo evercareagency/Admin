@@ -29,7 +29,7 @@ const showConfirm = extractFn(html, 'function showSharedConfirm(title,onConfirm,
 const hideConfirm = extractFn(html, 'function hideSharedConfirm()');
 const nciShow = extractFn(html, 'function nciShowDiscard()');
 const nciGo = extractFn(html, 'function nciConfirmDiscard()');
-const postArchive = extractFn(html, 'async function postArchiveAction(primary,alias,payload)');
+const postArchive = extractFn(html, 'async function postArchiveAction(primary,alias,payload,aliasExtra)');
 const toastRes = extractFn(html, 'function toastArchiveResult(res,okMsg)');
 const confirmClient = extractFn(html, 'function confirmDeleteComplianceClient(rowIndex)');
 const archiveClient = extractFn(html, 'async function archiveComplianceClient(clientId)');
@@ -81,8 +81,8 @@ assert.ok(html.includes('id="nciDiscardConfirm"') && html.includes('nci-discard-
 assert.ok(html.includes('class="nci-discard nci-discard-page"'),
   'page confirm uses nci-discard card pattern');
 
-assert.ok(archiveClient.includes("postArchiveAction('archive_client','delete_client',{clientId:id})"),
-  'compliance delete posts archive_client { clientId } with delete_client alias');
+assert.ok(archiveClient.includes("postArchiveAction('archive_client','delete_client',{clientId:id},{id:id})"),
+  'compliance delete posts archive_client { clientId }; alias delete_client { clientId } or { id }');
 assert.ok(archiveIntake.includes("postArchiveAction('archive_new_client_intake','delete_new_client_intake',{intakeId:id})"),
   'intake delete posts archive_new_client_intake { intakeId } with delete alias');
 assert.ok(archiveClient.includes('loadNurseCompliance(true)'),
@@ -108,6 +108,10 @@ assert.ok(!/confirmDeleteComplianceClient|archiveComplianceClient|archive_client
 
 assert.ok(completedHtml.includes("nciIntakeIdOf(r)"),
   'completed Delete uses nciIntakeIdOf');
+assert.ok(html.includes("{action:'get_supervisory_compliance'}"),
+  'compliance refresh must not pass includeInactive');
+assert.ok(html.includes("action:'list_new_client_intakes',status:'Complete'"),
+  'completed list stays status Complete so Ace excludes Archived');
 
 // Runtime: shared confirm + archive fallback + toasts
 const els = {};
@@ -184,10 +188,12 @@ eval('globalThis.toastArchiveResult = '+toastRes);
     if(payload.action==='delete_client')return {success:true};
     return {success:false,error:'nope'};
   };
-  res = await postArchiveAction('archive_client','delete_client',{clientId:'C2'});
+  res = await postArchiveAction('archive_client','delete_client',{clientId:'C2'},{id:'C2'});
   assert.strictEqual(posts[0].action, 'archive_client');
+  assert.deepStrictEqual(posts[0], {action:'archive_client',clientId:'C2'});
   assert.strictEqual(posts[1].action, 'delete_client');
   assert.strictEqual(posts[1].clientId, 'C2');
+  assert.strictEqual(posts[1].id, 'C2');
   assert.ok(toastArchiveResult(res,'Client deleted.'));
 
   posts.length = 0;
@@ -201,7 +207,7 @@ eval('globalThis.toastArchiveResult = '+toastRes);
   assert.strictEqual(posts[1].action, 'delete_new_client_intake');
   assert.strictEqual(posts[0].intakeId, 'I9');
   assert.strictEqual(toastArchiveResult(res,'Intake deleted.'), false);
-  assert.ok(/Unknown action/.test(toasts[0].msg), 'unknown toast is clear: '+toasts[0].msg);
+  assert.strictEqual(toasts[0].msg, 'Unknown action');
   assert.strictEqual(toasts[0].color, 'var(--danger)');
 
   posts.length = 0;

@@ -4066,7 +4066,10 @@ async function exportAllToExcel(){
 // ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
 // LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
 // list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);
-// archive_client { clientId } (alias delete_client) — inactive/Archived, not hard-delete;
+// Ace FINAL LOCK: archive_client { clientId }
+//   alias delete_client { clientId } or { id } — not hard-delete.
+//   Success { success:true, clientId, active:false }. Fail { success:false, error }.
+//   Lists/compliance skip inactive unless includeInactive:true.
 // reuse get_clients. AdminUsers = Role|Password only.
 
 const SC_PERSONAL_CARE=['Bathing','MealPrep','Exercises','Grooming','Housekeeping','TurnReposition','Shaving','Laundry','VitalSigns','HairCare','ErrandsShopping','CatheterCare','OralHygiene','Ambulation','Appointments','SkinCare','PersonalCare'];
@@ -4212,7 +4215,7 @@ async function loadNurseCompliance(force){
   if(empty)empty.style.display='none';
   try{
     // TODO: Sheets live — action name locked: get_supervisory_compliance
-    const data=await apiPost({action:'get_supervisory_compliance'});
+    const data=await apiPost({action:'get_supervisory_compliance'}); // no includeInactive — skip archived
     let rows=[];
     if(data&&data.success&&Array.isArray(data.data)){
       rows=data.data.map(r=>hydrateNurseComplianceRow(r));
@@ -4310,7 +4313,7 @@ async function archiveComplianceClient(clientId){
     showTempMsg('No clientId for this row.','var(--danger)');
     return false;
   }
-  const res=await postArchiveAction('archive_client','delete_client',{clientId:id});
+  const res=await postArchiveAction('archive_client','delete_client',{clientId:id},{id:id});
   if(toastArchiveResult(res,'Client deleted.')){
     cacheInvalidate('get_supervisory_compliance');
     await loadNurseCompliance(true);
@@ -4714,7 +4717,10 @@ async function viewSupervisoryVisitPdf(rowIndex){
 //     proxyAgencyRepSignatureData, proxyAgencyRepSignDate
 // *SignatureData = PNG data URLs only. dates = MM/DD/YYYY America/New_York.
 // Resume: get flat OR data:{…}. Page1 phone/DOB/address from activityPlan.
-// Soft-delete: archive_new_client_intake { intakeId } (alias delete_new_client_intake) — Status=Archived.
+// Ace FINAL LOCK: archive_new_client_intake { intakeId }
+//   alias delete_new_client_intake { intakeId } — Status=Archived, not hard-delete.
+//   Success { success:true, intakeId, status:"Archived" }. Fail { success:false, error }.
+//   list_new_client_intakes {status:"Complete"} already excludes Archived.
 // Archive PDF: archive_new_client_intake_pdf { intakeId }. Complete save returns fast
 // (pdfPending and/or empty pdfLink). Toast "Saved — PDF generating" BEFORE close/reload
 // (sticky). Do not await archive. Interim "PDF not ready yet" only after ~8s if still
@@ -5365,7 +5371,7 @@ function nciConfirmDiscard(){
 function nciLooksLikeUnknownAction(text){
   return /unknown action|not implemented|stub action/i.test(String(text||''));
 }
-async function postArchiveAction(primary,alias,payload){
+async function postArchiveAction(primary,alias,payload,aliasExtra){
   let data=null;
   try{
     data=await apiPost(Object.assign({action:primary},payload));
@@ -5376,7 +5382,7 @@ async function postArchiveAction(primary,alias,payload){
   const why=(data&&(data.error||data.message))||'';
   if(alias&&nciLooksLikeUnknownAction(why)){
     try{
-      data=await apiPost(Object.assign({action:alias},payload));
+      data=await apiPost(Object.assign({action:alias},payload,aliasExtra||{}));
       return {data:data,err:null,action:alias};
     }catch(e){
       return {data:null,err:e,action:alias};
@@ -5391,9 +5397,10 @@ function toastArchiveResult(res,okMsg){
     showTempMsg(okMsg||'Deleted.','var(--success)');
     return true;
   }
-  const raw=(data&&data.error)||(err&&err.message)||'Delete failed.';
+  const aceErr=data&&data.error;
+  const raw=aceErr||(err&&err.message)||'Delete failed.';
   if(nciLooksLikeUnknownAction(raw)){
-    showTempMsg('Unknown action: '+((res&&res.action)||'')+(data&&data.error?' — '+data.error:''),'var(--danger)');
+    showTempMsg(aceErr?String(aceErr):('Unknown action: '+((res&&res.action)||'')),'var(--danger)');
   }else{
     showTempMsg(String(raw),'var(--danger)');
   }
