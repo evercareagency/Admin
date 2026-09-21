@@ -35,6 +35,9 @@ const confirmClient = extractFn(html, 'function confirmDeleteComplianceClient(ro
 const archiveClient = extractFn(html, 'async function archiveComplianceClient(clientId)');
 const confirmIntake = extractFn(html, 'function confirmDeleteCompletedIntake(intakeId)');
 const archiveIntake = extractFn(html, 'async function archiveCompletedIntake(intakeId)');
+const draftsHtml = extractFn(html, 'function nciDraftsListHtml(rows)');
+const confirmDraft = extractFn(html, 'function confirmDeleteDraftIntake(intakeId)');
+const archiveDraft = extractFn(html, 'async function archiveDraftIntake(intakeId)');
 const clientIdOf = extractFn(html, 'function clientIdOfComplianceRow(r)');
 const unknownFn = extractFn(html, 'function nciLooksLikeUnknownAction(text)');
 const paintAdmin = extractFn(html, 'function paintAdminSupervisoryContacts()');
@@ -52,6 +55,9 @@ assert.ok(confirmClient, 'confirmDeleteComplianceClient missing');
 assert.ok(archiveClient, 'archiveComplianceClient missing');
 assert.ok(confirmIntake, 'confirmDeleteCompletedIntake missing');
 assert.ok(archiveIntake, 'archiveCompletedIntake missing');
+assert.ok(draftsHtml, 'nciDraftsListHtml missing');
+assert.ok(confirmDraft, 'confirmDeleteDraftIntake missing');
+assert.ok(archiveDraft, 'archiveDraftIntake missing');
 assert.ok(clientIdOf, 'clientIdOfComplianceRow missing');
 
 assert.ok(renderCompliance.includes('confirmDeleteComplianceClient'),
@@ -64,10 +70,14 @@ assert.ok(completedHtml.indexOf('viewCompletedIntakePdf') < completedHtml.indexO
   'Delete must sit after View');
 assert.ok(completedHtml.indexOf('editCompletedIntake') < completedHtml.indexOf('confirmDeleteCompletedIntake'),
   'Delete must sit after Edit');
+assert.ok(draftsHtml.includes('confirmDeleteDraftIntake'),
+  'draft intakes must include Delete next to Resume');
+assert.ok(draftsHtml.indexOf('resumeNewClientIntake') < draftsHtml.indexOf('confirmDeleteDraftIntake'),
+  'Delete must sit after Resume');
 
-assert.ok(!/window\.confirm/.test(confirmClient+confirmIntake+archiveClient+archiveIntake+showConfirm),
+assert.ok(!/window\.confirm/.test(confirmClient+confirmIntake+confirmDraft+archiveClient+archiveIntake+archiveDraft+showConfirm),
   'must not use window.confirm');
-assert.ok(!/\bconfirm\(/.test(confirmClient+confirmIntake+archiveClient+archiveIntake+showConfirm),
+assert.ok(!/\bconfirm\(/.test(confirmClient+confirmIntake+confirmDraft+archiveClient+archiveIntake+archiveDraft+showConfirm),
   'must not use confirm()');
 
 assert.ok(showConfirm.includes("title||'Are you sure?'"),
@@ -85,11 +95,19 @@ assert.ok(archiveClient.includes("postArchiveAction('archive_client','delete_cli
   'compliance delete posts archive_client { clientId }; alias delete_client { clientId } or { id }');
 assert.ok(archiveIntake.includes("postArchiveAction('archive_new_client_intake','delete_new_client_intake',{intakeId:id})"),
   'intake delete posts archive_new_client_intake { intakeId } with delete alias');
+assert.ok(archiveDraft.includes("postArchiveAction('archive_new_client_intake','delete_new_client_intake',{intakeId:id})"),
+  'draft delete posts archive_new_client_intake { intakeId } with delete alias');
+assert.ok(confirmDraft.includes("showSharedConfirm('Are you sure?'"),
+  'draft delete uses shared Are you sure? card');
+assert.ok(confirmDraft.includes("archiveDraftIntake(id)"),
+  'draft confirm Yes calls archiveDraftIntake');
 assert.ok(archiveClient.includes('loadNurseCompliance(true)'),
   'client archive success refreshes compliance list');
 assert.ok(archiveIntake.includes('refreshCompletedNewClientIntakes()'),
   'intake archive success refreshes completed list');
-assert.ok(!/hard.?delete|delete_client',id/.test(archiveClient+archiveIntake+postArchive),
+assert.ok(archiveDraft.includes('loadNewClientIntakeDrafts()'),
+  'draft archive success refreshes drafts list');
+assert.ok(!/hard.?delete|delete_client',id/.test(archiveClient+archiveIntake+archiveDraft+postArchive),
   'must not invent hard-delete or old delete_client {id} payload');
 assert.ok(toastRes.includes('data.error'),
   'fail toast uses data.error');
@@ -108,6 +126,10 @@ assert.ok(!/confirmDeleteComplianceClient|archiveComplianceClient|archive_client
 
 assert.ok(completedHtml.includes("nciIntakeIdOf(r)"),
   'completed Delete uses nciIntakeIdOf');
+assert.ok(draftsHtml.includes("nciIntakeIdOf(r)"),
+  'draft Delete uses nciIntakeIdOf');
+assert.ok(html.includes("action:'list_new_client_intakes',nurseName:currentNurseName||'',status:'Draft'"),
+  'drafts list stays status Draft so Ace excludes Archived');
 assert.ok(html.includes("{action:'get_supervisory_compliance'}"),
   'compliance refresh must not pass includeInactive');
 assert.ok(html.includes("action:'list_new_client_intakes',status:'Complete'"),
@@ -236,6 +258,45 @@ eval('globalThis.toastArchiveResult = '+toastRes);
   }
   function nciIntakeIdOf(r){ return nciPickIntakeId(r); }
   assert.strictEqual(nciIntakeIdOf({intakeId:'N1'}),'N1');
+
+  let draftsRefresh = 0;
+  async function loadNewClientIntakeDrafts(){ draftsRefresh++; }
+  eval('globalThis.archiveDraftIntake = '+archiveDraft);
+  eval('globalThis.confirmDeleteDraftIntake = '+confirmDraft);
+
+  posts.length = 0;
+  toasts.length = 0;
+  draftsRefresh = 0;
+  apiImpl = async function(payload){
+    posts.push(payload);
+    return {success:true,intakeId:payload.intakeId,status:'Archived'};
+  };
+  let draftOk = await archiveDraftIntake('D1');
+  assert.strictEqual(draftOk, true);
+  assert.deepStrictEqual(posts, [{action:'archive_new_client_intake',intakeId:'D1'}]);
+  assert.strictEqual(toasts[0].msg, 'Intake deleted.');
+  assert.strictEqual(draftsRefresh, 1, 'success refreshes drafts so the row disappears');
+
+  posts.length = 0;
+  toasts.length = 0;
+  draftsRefresh = 0;
+  apiImpl = async function(payload){
+    posts.push(payload);
+    return {success:false,error:'Client already archived'};
+  };
+  draftOk = await archiveDraftIntake('D2');
+  assert.strictEqual(draftOk, false);
+  assert.strictEqual(posts.length, 1, 'draft fail does not invent extra fields or alias unless Unknown action');
+  assert.strictEqual(draftsRefresh, 0, 'failed archive leaves the draft');
+  assert.strictEqual(toasts[0].msg, 'Client already archived');
+
+  confirmDeleteDraftIntake('D3');
+  assert.strictEqual(els.nciDiscardConfirm.hidden, false, 'draft Delete shows Are you sure?');
+  assert.strictEqual(els.nciDiscardTitle.textContent, 'Are you sure?');
+  assert.strictEqual(els.nciDiscardGoBtn.textContent, 'Yes, delete');
+  hideSharedConfirm();
+  assert.strictEqual(els.nciDiscardConfirm.hidden, true, 'Cancel leaves the draft');
+  assert.strictEqual(_sharedConfirmOnYes, null, 'Cancel does not archive');
 
   console.log('admin-nurse-soft-delete-test: ok');
 })().catch(function(e){

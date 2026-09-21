@@ -4720,7 +4720,7 @@ async function viewSupervisoryVisitPdf(rowIndex){
 // Ace FINAL LOCK: archive_new_client_intake { intakeId }
 //   alias delete_new_client_intake { intakeId } — Status=Archived, not hard-delete.
 //   Success { success:true, intakeId, status:"Archived" }. Fail { success:false, error }.
-//   list_new_client_intakes {status:"Complete"} already excludes Archived.
+//   list_new_client_intakes {status:"Complete"|"Draft"} already excludes Archived.
 // Archive PDF: archive_new_client_intake_pdf { intakeId }. Complete save returns fast
 // (pdfPending and/or empty pdfLink). Toast "Saved — PDF generating" BEFORE close/reload
 // (sticky). Do not await archive. Interim "PDF not ready yet" only after ~8s if still
@@ -6272,6 +6272,27 @@ async function archiveCompletedIntake(intakeId){
   }
   return false;
 }
+function confirmDeleteDraftIntake(intakeId){
+  const id=String(intakeId||'');
+  if(!id){
+    showTempMsg('No intakeId for this row.','var(--danger)');
+    return;
+  }
+  showSharedConfirm('Are you sure?',function(){archiveDraftIntake(id);},'Yes, delete');
+}
+async function archiveDraftIntake(intakeId){
+  const id=String(intakeId||'');
+  if(!id){
+    showTempMsg('No intakeId for this row.','var(--danger)');
+    return false;
+  }
+  const res=await postArchiveAction('archive_new_client_intake','delete_new_client_intake',{intakeId:id});
+  if(toastArchiveResult(res,'Intake deleted.')){
+    await loadNewClientIntakeDrafts();
+    return true;
+  }
+  return false;
+}
 
 function paintCompletedNewClientIntakes(){
   const html=nciCompletedTableHtml(nciCompletedRows);
@@ -6680,6 +6701,23 @@ async function loadAdminNurseSection(){
   await loadNurseActivityFeed();
 }
 
+function nciDraftsListHtml(rows){
+  return (rows||[]).map(r=>{
+    const id=nciIntakeIdOf(r);
+    const name=escapeHtml(r.clientName||(r.assessment&&r.assessment.clientName)||'Untitled');
+    const st=escapeHtml(r.status||'Draft');
+    const when=escapeHtml(toEasternMDY(r.updatedAt||r.savedAt||r.socDate||r.assessmentDate||(r.assessment&&(r.assessment.socDate||r.assessment.assessmentDate))||'')||'');
+    const safe=escapeAttr(id);
+    return `<div class="nci-draft-row">
+      <div><strong>${name}</strong><div style="font-size:0.72rem;color:var(--muted)">${st}${when?' · '+when:''}</div></div>
+      <div class="nci-complete-actions">
+        <button type="button" class="btn btn-sm btn-navy" onclick="resumeNewClientIntake('${safe}')">Resume</button>
+        <button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteDraftIntake('${safe}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadNewClientIntakeDrafts(){
   const card=nciEl('nciDraftsCard');
   const list=nciEl('nciDraftsList');
@@ -6692,16 +6730,7 @@ async function loadNewClientIntakeDrafts(){
     }
     if(!rows.length){card.style.display='none';list.innerHTML='';return;}
     card.style.display='block';
-    list.innerHTML=rows.map(r=>{
-      const id=String(r.intakeId!=null&&r.intakeId!==''?r.intakeId:(r.id!=null&&r.id!==''?r.id:''));
-      const name=escapeHtml(r.clientName||(r.assessment&&r.assessment.clientName)||'Untitled');
-      const st=escapeHtml(r.status||'Draft');
-      const when=escapeHtml(toEasternMDY(r.updatedAt||r.savedAt||r.socDate||r.assessmentDate||(r.assessment&&(r.assessment.socDate||r.assessment.assessmentDate))||'')||'');
-      return `<div class="nci-draft-row">
-        <div><strong>${name}</strong><div style="font-size:0.72rem;color:var(--muted)">${st}${when?' · '+when:''}</div></div>
-        <button type="button" class="btn btn-sm btn-navy" onclick="resumeNewClientIntake('${escapeAttr(id)}')">Resume</button>
-      </div>`;
-    }).join('');
+    list.innerHTML=nciDraftsListHtml(rows);
   }catch(e){
     card.style.display='none';
   }
