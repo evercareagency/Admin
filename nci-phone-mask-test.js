@@ -37,7 +37,8 @@ PHONE_IDS.forEach(function(id){
   assert.ok(tag, id+' input missing');
   assert.ok(/data-phone="us"/.test(tag), id+' must have data-phone="us"');
   assert.ok(/inputmode="tel"/.test(tag), id+' must have inputmode="tel"');
-  assert.ok(/maxlength="14"/.test(tag), id+' must cap formatted US phone (~14)');
+  const max = parseInt((tag.match(/maxlength="(\d+)"/)||[])[1]||'0',10);
+  assert.ok(max>=14&&max<=20, id+' must allow formatted US phone (~14) plus +1 paste');
   assert.ok(/placeholder="\(123\) 456-7890"/.test(tag), id+' must use (123) 456-7890 placeholder');
 });
 
@@ -96,5 +97,8 @@ assert.strictEqual(helpers.formatUSPhoneDisplay('2163775991'), '(216) 377-5991')
 assert.strictEqual(helpers.formatUSPhoneDisplay('(123) 333-1234'), '(123) 333-1234');
 assert.strictEqual(helpers.formatUSPhoneDisplay('+12163775991'), '(216) 377-5991');
 assert.strictEqual(helpers.formatUSPhoneDisplay(''), '');
+assert.strictEqual(helpers.formatUSPhoneDisplay('+1 (216) 377-5991'), '(216) 377-5991');
+assert.strictEqual(helpers.formatUSPhoneDisplay('+1 216-377-5991'), '(216) 377-5991');
+assert.strictEqual(helpers.nciPhoneDigits('+1216'), '216');
 
 console.log('nci-phone-mask-test: ok');

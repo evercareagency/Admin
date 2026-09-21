@@ -1200,7 +1200,7 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
         <div id="nciCaregiverDetailWrap" class="det-grid" style="grid-template-columns:1fr 1fr;display:none;margin-top:10px">
           <div class="field"><label>Caregiver name</label><input type="text" id="nci_a_caregiverName"></div>
-          <div class="field"><label>Caregiver phone</label><input type="text" id="nci_a_caregiverPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="14" autocomplete="tel"></div>
+          <div class="field"><label>Caregiver phone</label><input type="text" id="nci_a_caregiverPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="18" autocomplete="tel"></div>
         </div>
       </div>
       <div class="nurse-form-section">
@@ -1279,7 +1279,7 @@ Call (216) 377-5991 with any questions.</textarea>
           <div class="field"><label>Date of birth</label><input type="text" id="nci_p_dateOfBirth" placeholder="MM/DD/YYYY" inputmode="numeric" data-date="mdy" maxlength="10" autocomplete="off" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"></div>
           <div class="field"><label>MR#</label><input type="text" id="nci_p_mrNumber" placeholder="Type medical record number"></div>
           <div class="field"><label>SOC Date</label><input type="text" id="nci_p_socDate" placeholder="MM/DD/YYYY" inputmode="numeric" data-date="mdy" maxlength="10" autocomplete="off" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"></div>
-          <div class="field"><label>Phone</label><input type="text" id="nci_p_phone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="14" autocomplete="tel"></div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_p_phone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="18" autocomplete="tel"></div>
         </div>
         <div class="field"><label>Male / Female</label>
           <div class="nci-radios">
@@ -1301,7 +1301,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="det-grid" style="grid-template-columns:1fr 1fr">
           <div class="field"><label>Name</label><input type="text" id="nci_p_emergencyName"></div>
           <div class="field"><label>Relationship</label><input type="text" id="nci_p_emergencyRelationship"></div>
-          <div class="field"><label>Phone</label><input type="text" id="nci_p_emergencyPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="14" autocomplete="tel"></div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_p_emergencyPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="18" autocomplete="tel"></div>
         </div>
       </div>
       <div class="nurse-form-section">
@@ -1337,7 +1337,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="field"><label>Special requests</label><textarea id="nci_p_specialRequests"></textarea></div>
         <div class="det-grid" style="grid-template-columns:1fr 1fr">
           <div class="field"><label>Supervisor name</label><input type="text" id="nci_p_supervisorName"></div>
-          <div class="field"><label>Supervisor phone</label><input type="text" id="nci_p_supervisorPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="14" autocomplete="tel"></div>
+          <div class="field"><label>Supervisor phone</label><input type="text" id="nci_p_supervisorPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="18" autocomplete="tel"></div>
         </div>
         <p class="nci-legend">Supervisory visits every 57–60 days.</p>
       </div>
@@ -1393,7 +1393,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="det-grid" style="grid-template-columns:1fr 1fr">
           <div class="field"><label>Name</label><input type="text" id="nci_c_emergencyName"></div>
           <div class="field"><label>Relationship</label><input type="text" id="nci_c_emergencyRelationship"></div>
-          <div class="field"><label>Phone</label><input type="text" id="nci_c_emergencyPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="14" autocomplete="tel"></div>
+          <div class="field"><label>Phone</label><input type="text" id="nci_c_emergencyPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="18" autocomplete="tel"></div>
         </div>
       </div>
     </div>
@@ -1476,7 +1476,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <label class="nci-check"><input type="checkbox" id="nci_m_proxyInfoProvided"> Information provided</label>
         <div class="det-grid" style="grid-template-columns:1fr 1fr;margin-top:10px">
           <div class="field"><label>Health agent name</label><input type="text" id="nci_m_healthAgentName"></div>
-          <div class="field"><label>Health agent phone</label><input type="text" id="nci_m_healthAgentPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="14" autocomplete="tel"></div>
+          <div class="field"><label>Health agent phone</label><input type="text" id="nci_m_healthAgentPhone" placeholder="(123) 456-7890" inputmode="tel" data-phone="us" maxlength="18" autocomplete="tel"></div>
         </div>
         <h4 style="margin-top:14px">Agency signature (proxy)</h4>
         <canvas class="sig-canvas" id="nci_admit_proxyAgencySig" height="60"></canvas>
@@ -4972,12 +4972,14 @@ function nciTagPhoneInput(el){
   if(!el||el.tagName!=='INPUT')return;
   el.setAttribute('data-phone','us');
   el.setAttribute('inputmode','tel');
-  el.setAttribute('maxlength','14');
+  el.setAttribute('maxlength','18');
   if(!el.getAttribute('placeholder'))el.setAttribute('placeholder','(123) 456-7890');
 }
 function nciPhoneDigits(s){
-  let d=String(s||'').replace(/\D/g,'');
-  if(d.charAt(0)==='1'&&d.length>=11)d=d.slice(1);
+  const raw=String(s||'');
+  let d=raw.replace(/\D/g,'');
+  if(/^\s*\+1/.test(raw)&&d.charAt(0)==='1')d=d.slice(1);
+  else if(d.charAt(0)==='1'&&d.length>=11)d=d.slice(1);
   return d.slice(0,10);
 }
 function formatPhoneDigits(digits,addTrailing){
@@ -5001,6 +5003,12 @@ function maskPhoneInput(el,e){
   const inputType=(e&&e.inputType)||'';
   const isDelete=inputType.indexOf('delete')===0;
   const digits=nciPhoneDigits(raw);
+  if(!digits&&/^\s*\+/.test(raw)){
+    const keep=/^\s*\+1/.test(raw)?'+1':'+';
+    if(el.value!==keep)el.value=keep;
+    try{el.setSelectionRange(keep.length,keep.length);}catch(err){}
+    return;
+  }
   const next=formatPhoneDigits(digits,!isDelete);
   if(next!==el.value)el.value=next;
   let seen=0,pos=next.length;
@@ -5078,7 +5086,15 @@ function nciBindPhoneMaskOn(root){
   root.addEventListener('paste',function(e){
     const el=e.target;
     if(!nciLooksLikePhoneInput(el))return;
-    setTimeout(function(){nciApplyPhoneMask(el,{inputType:'insertFromPaste'});},0);
+    const clip=e.clipboardData||window.clipboardData;
+    const text=clip&&clip.getData?String(clip.getData('text')||''):'';
+    if(text){
+      e.preventDefault();
+      el.value=text;
+      nciApplyPhoneMask(el,{inputType:'insertFromPaste'});
+    }else{
+      setTimeout(function(){nciApplyPhoneMask(el,{inputType:'insertFromPaste'});},0);
+    }
   },true);
   root.addEventListener('focusin',function(e){
     if(nciLooksLikePhoneInput(e.target))nciTagPhoneInput(e.target);
