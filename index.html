@@ -6336,45 +6336,45 @@ function focusNurseAlertItem(type,refId){
   void refId;
 }
 
-async function refreshNurseAlertBadge(){
+function mapNurseAlertRow(a){
+  // Ace v35 list_nurse_alerts rows expose `id` (unread only).
+  return {
+    id:a&&a.id!=null?String(a.id):'',
+    type:a&&a.type?String(a.type):'',
+    refId:a&&a.refId!=null?String(a.refId):'',
+    clientName:(a&&a.clientName)||'',
+    nurseUsername:(a&&a.nurseUsername)||'',
+    createdAt:(a&&a.createdAt)||''
+  };
+}
+
+function clearAdminNurseAlertsUi(){
+  adminNurseAlerts=[];
+  setNurseAlertBadge(0);
+  paintAdminNurseAlerts([]);
+}
+
+async function fetchUnreadNurseAlerts(){
   // Admin + Scheduler only. Nurse role has its own UI.
-  if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler'){
-    setNurseAlertBadge(0);
-    return [];
-  }
+  if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler')return [];
   const username=portalUsername();
-  if(!username){
-    setNurseAlertBadge(0);
-    paintAdminNurseAlerts([]);
-    return [];
-  }
+  if(!username)return [];
   try{
     const data=await apiPost({action:'list_nurse_alerts',username});
-    if(!(data&&data.success)){
-      adminNurseAlerts=[];
-      setNurseAlertBadge(0);
-      paintAdminNurseAlerts([]);
-      return [];
-    }
-    const rows=nurseListRows(data,['alerts','data','items','rows']).map(a=>({
-      id:a&&a.id!=null?String(a.id):'',
-      type:a&&a.type?String(a.type):'',
-      refId:a&&a.refId!=null?String(a.refId):'',
-      clientName:(a&&a.clientName)||'',
-      nurseUsername:(a&&a.nurseUsername)||'',
-      createdAt:(a&&a.createdAt)||''
-    })).filter(a=>a.id);
-    adminNurseAlerts=rows;
-    setNurseAlertBadge(rows.length);
-    paintAdminNurseAlerts(rows);
-    return rows;
+    if(!(data&&data.success))return [];
+    return nurseListRows(data,['items','alerts','data','rows']).map(mapNurseAlertRow).filter(a=>a.id);
   }catch(e){
     // Ace unread Version not live yet — keep badge hidden / 0.
-    adminNurseAlerts=[];
-    setNurseAlertBadge(0);
-    paintAdminNurseAlerts([]);
     return [];
   }
+}
+
+async function refreshNurseAlertBadge(){
+  const rows=await fetchUnreadNurseAlerts();
+  adminNurseAlerts=rows;
+  setNurseAlertBadge(rows.length);
+  paintAdminNurseAlerts(rows);
+  return rows;
 }
 
 async function markNurseAlertsRead(ids){
@@ -6382,6 +6382,7 @@ async function markNurseAlertsRead(ids){
   const list=(ids||[]).map(String).filter(Boolean);
   if(!username||!list.length)return;
   try{
+    // Ace lock: mark_nurse_alerts_read { username, ids[] }
     await apiPost({action:'mark_nurse_alerts_read',username,ids:list});
   }catch(e){}
 }
@@ -6531,16 +6532,24 @@ async function loadNurseActivityFeed(){
 
 async function loadAdminNurseSection(){
   if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler')return;
-  const alerts=await refreshNurseAlertBadge();
-  const ids=alerts.map(a=>a.id).filter(Boolean);
-  if(ids.length){
-    await markNurseAlertsRead(ids);
-    setNurseAlertBadge(0);
-  }
-  await Promise.all([
+  // Optimistic: drop login-painted Unread + badge on first tick. Do not wait on mark (or fetch)
+  // before Completes / Supervisory. adminNurseAlerts=[] so activity cannot resurrect Unread.
+  clearAdminNurseAlertsUi();
+  const listsP=Promise.all([
     refreshCompletedNewClientIntakes(),
     loadAdminSupervisoryContacts()
   ]);
+  const alerts=await fetchUnreadNurseAlerts();
+  const ids=alerts.map(a=>a.id).filter(Boolean);
+  adminNurseAlerts=[];
+  if(ids.length){
+    void markNurseAlertsRead(ids).then(async()=>{
+      const leftover=await fetchUnreadNurseAlerts();
+      adminNurseAlerts=[];
+      setNurseAlertBadge(leftover.length);
+    });
+  }
+  await listsP;
   await loadNurseActivityFeed();
 }
 
