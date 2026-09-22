@@ -31,6 +31,12 @@ assert.ok(/\.catch\(/.test(warm), 'warm ping must soft-fail');
 assert.ok(!/await\s+fetch/.test(warm), 'warm ping must not block on /exec');
 assert.ok(/function warmUpSheets\(\)\{[\s\S]*?\}\s*warmUpSheets\(\);/.test(html), 'warm ping must run when the script opens');
 assert.ok(!/loginScreen'\)\?\.classList\.contains\('active'\)\)warmUpSheets/.test(html), 'warm ping must not wait for the login screen check');
+const loginAt = html.indexOf('id="loginScreen"');
+const earlyPing = html.indexOf("body:JSON.stringify({action:'ping'})");
+assert.ok(loginAt > 0 && earlyPing > 0 && earlyPing < loginAt, 'warm ping must be sent before the login screen markup is parsed');
+assert.ok(html.indexOf("method:'GET'", earlyPing) > earlyPing && html.indexOf("method:'GET'", earlyPing) < loginAt, 'GET wake must run with the early ping');
+const execUrls = html.match(/https:\/\/script\.google\.com\/macros\/s\/[^'"]+\/exec/g) || [];
+assert.strictEqual(new Set(execUrls).size, 1, 'early ping and SHEETS_URL must share one /exec URL');
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(login, 'mgrLogin missing');
@@ -176,3 +182,88 @@ assert.ok(filled.loginAt, 'missing loginAt is backfilled instead of forcing logo
 assert.strictEqual(vm.runInContext('isAdminSessionExpired(readAdminSession())', sandbox), false);
 
 console.log('admin-login-feel-test: ok');
+
+async function runBrowser(){
+  if(process.env.SKIP_BROWSER==='1')return;
+  const http=require('http');
+  let puppeteer;
+  try{puppeteer=require('puppeteer-core');}
+  catch(e){
+    try{puppeteer=require('/tmp/probe/node_modules/puppeteer-core');}
+    catch(e2){
+      console.log('admin-login-feel browser skipped (no puppeteer-core)');
+      return;
+    }
+  }
+  const chrome=process.env.CHROME_PATH||'/usr/bin/google-chrome';
+  const root=path.join(__dirname);
+  const server=http.createServer((req,res)=>{
+    const urlPath=decodeURIComponent((req.url||'/').split('?')[0]);
+    const file=path.normalize(path.join(root, urlPath==='/'?'index.html':urlPath));
+    if(!file.startsWith(root)){res.writeHead(403);res.end();return;}
+    fs.readFile(file,(err,buf)=>{
+      if(err){res.writeHead(404);res.end('missing');return;}
+      res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
+      res.end(buf);
+    });
+  });
+  await new Promise(r=>server.listen(0,'127.0.0.1',r));
+  const port=server.address().port;
+  const browser=await puppeteer.launch({
+    executablePath:chrome,
+    headless:'new',
+    args:['--no-sandbox','--disable-dev-shm-usage']
+  });
+  try{
+    for(const vp of [
+      {name:'desktop',width:1280,height:800,isMobile:false},
+      {name:'phone',width:390,height:844,isMobile:true,hasTouch:true,deviceScaleFactor:2}
+    ]){
+      const page=await browser.newPage();
+      await page.setViewport(vp);
+      const hits=[];
+      await page.setRequestInterception(true);
+      page.on('request',req=>{
+        const u=req.url();
+        if(/fonts\.googleapis|fonts\.gstatic|cdnjs\.cloudflare|gstatic\.com/.test(u)){req.abort();return;}
+        if(!/script\.google\.com/.test(u)){req.continue();return;}
+        let action='';
+        try{action=JSON.parse(req.postData()||'{}').action||'';}catch(e){}
+        hits.push({method:req.method(),action,url:u});
+        req.respond({
+          status:200,
+          contentType:'application/json',
+          headers:{'Access-Control-Allow-Origin':'*'},
+          body:JSON.stringify({success:true,ok:true})
+        });
+      });
+      await page.goto('http://127.0.0.1:'+port+'/index.html?v=warm',{waitUntil:'domcontentloaded',timeout:20000});
+      await page.waitForFunction(()=>window._sheetsWarmUpStarted===true,{timeout:5000});
+      const deadline=Date.now()+4000;
+      while(!hits.some(h=>h.action==='ping'||h.method==='GET')&&Date.now()<deadline){
+        await new Promise(r=>setTimeout(r,40));
+      }
+      const state=await page.evaluate(()=>({
+        login:!!document.getElementById('loginScreen')?.classList.contains('active'),
+        admin:!!document.getElementById('adminScreen')?.classList.contains('active'),
+        warm:window._sheetsWarmUpStarted===true
+      }));
+      assert.ok(state.login, vp.name+' login screen must stay up before Sign In');
+      assert.ok(!state.admin, vp.name+' must not open home before Sign In');
+      assert.ok(state.warm, vp.name+' warm flag must be set');
+      assert.ok(hits.some(h=>h.action==='ping'), vp.name+' must POST {action:ping} before Sign In');
+      assert.ok(hits.some(h=>h.method==='GET'&&/\/exec/.test(h.url)), vp.name+' must GET /exec before Sign In');
+      assert.ok(hits.every(h=>/\/exec/.test(h.url)), vp.name+' warm traffic must be /exec');
+      console.log('admin-login-feel browser', vp.name, hits.map(h=>h.method+(h.action?':'+h.action:'')).join(','));
+      await page.close();
+    }
+  }finally{
+    await browser.close();
+    await new Promise(r=>server.close(r));
+  }
+}
+
+runBrowser().catch(function(err){
+  console.error(err);
+  process.exit(1);
+});

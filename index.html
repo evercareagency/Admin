@@ -7,12 +7,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- login warm /exec before paint 2026-09-22 v=warmexecf932 -->
 <!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
 <!-- inservice view-results hotfix 2026-09-21 paint-from-update / cache-on-unknown-get -->
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-21-add-aide-collision">
+<meta name="admin-build" content="2026-09-22-login-warm-exec">
+<script>
+/* Wake Ace /exec before the login screen is parsed. Soft-fail — never block Sign In.
+   POST ping first (Caregiver), then GET wake. Same once-per-load flag as warmUpSheets. */
+(function(){
+  if(window._sheetsWarmUpStarted)return;
+  window._sheetsWarmUpStarted=true;
+  var url='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
+  try{
+    fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(function(){});
+  }catch(e){}
+  try{
+    fetch(url,{method:'GET',mode:'cors',cache:'no-store'}).catch(function(){});
+  }catch(e){}
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
@@ -2010,16 +2026,16 @@ const _memCache={};
 const _inflight={};
 
 
-/** Wake Ace /exec as soon as the app opens, before the first Sign In.
- *  GET plus lightweight action ping. Soft-fail — never blocks login or invents schema. */
+/** Wake Ace /exec as soon as the app script runs. Head script already pings before login markup.
+ *  POST ping, then GET wake. Soft-fail — never blocks login or invents schema. */
 function warmUpSheets(){
   if(window._sheetsWarmUpStarted)return;
   window._sheetsWarmUpStarted=true;
   try{
-    fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'}).catch(function(){});
+    fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(function(){});
   }catch(e){}
   try{
-    fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(function(){});
+    fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'}).catch(function(){});
   }catch(e){}
 }
 warmUpSheets();
