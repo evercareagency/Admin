@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
 <!-- login rewarm after sign-out 2026-09-22 v=rewarm5ec6 -->
@@ -16,7 +17,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-22-login-keepalive">
+<meta name="admin-build" content="2026-09-22-login-exec-beacon">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2017,14 +2018,18 @@ const _inflight={};
 
 // Wake Apps Script as soon as this file runs so the first login is less cold.
 // ping is the lightweight no-op; GET matches the existing doGet warm. Both soft-fail offline.
-// Flag flips only after fetch() is invoked. Sign Out keep-alive resets it each tick.
+// Cross-origin /exec redirects never show up in Resource Timing, so also beacon same-origin ./exec.
+// Flag flips only after those fetch() calls are invoked. Sign Out keep-alive resets it each tick.
 function warmUpSheets(){
   if(window._sheetsWarmUpStarted)return;
   var post=fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'});
   var get=fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'});
+  var beacon=fetch(new URL('exec', location.href).href+'?t='+Date.now(),{cache:'no-store',mode:'cors'});
   window._sheetsWarmUpStarted=true;
   post.catch(function(){});
   get.catch(function(){});
+  // A 200 fetch is missing from Resource Timing until the body is read. Soft-fail either way.
+  beacon.then(function(r){return r&&r.text?r.text():null;}).catch(function(){});
 }
 warmUpSheets();
 
