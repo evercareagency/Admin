@@ -2010,20 +2010,23 @@ const _memCache={};
 const _inflight={};
 
 
-/** Wake Apps Script before Sign In (cold start). Prefer GET; fallback POST ping.
- *  Requires Sheets doGet→OK or action ping — hold push until Mo OK + Sheets live. */
+/** Wake Ace /exec as soon as the app opens, before the first Sign In.
+ *  GET plus lightweight action ping. Soft-fail — never blocks login or invents schema. */
 function warmUpSheets(){
   if(window._sheetsWarmUpStarted)return;
   window._sheetsWarmUpStarted=true;
-  // GET first (doGet). Ignore failures — warm-up is best-effort.
-  fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'}).catch(()=>{});
-  // POST ping also (if Sheets adds it). text/plain CORS preserved.
-  fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(()=>{});
+  try{
+    fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'}).catch(function(){});
+  }catch(e){}
+  try{
+    fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(function(){});
+  }catch(e){}
 }
+warmUpSheets();
 
 
 document.addEventListener('DOMContentLoaded',function(){
-  if(document.getElementById('loginScreen')?.classList.contains('active'))warmUpSheets();
+  warmUpSheets();
   if(typeof nciBindDateMask==='function')nciBindDateMask();
   if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();
 });
@@ -2239,9 +2242,135 @@ function togglePasswordVisibility(id,btn){
   if(btn)btn.textContent=show?'Hide':'Show';
 }
 
+// Stay signed in across opens. Clock starts at loginAt only (no idle timer).
+// 8h matches Caregiver CG_SESSION_MS. Password is never stored.
+const ADMIN_SESSION_KEY='admin_session';
+const ADMIN_SESSION_MS=8*60*60*1000;
+function isPortalRole(role){
+  return role==='Admin'||role==='Scheduler'||role==='Nurse';
+}
+function parseAdminLoginAt(sess){
+  if(!sess||sess.loginAt==null||sess.loginAt==='')return null;
+  const n=typeof sess.loginAt==='number'?sess.loginAt:Date.parse(sess.loginAt);
+  return Number.isFinite(n)?n:null;
+}
+function isAdminSessionExpired(sess){
+  const at=parseAdminLoginAt(sess);
+  if(at==null)return false;
+  return (Date.now()-at)>ADMIN_SESSION_MS;
+}
+function clearAdminSession(){
+  try{localStorage.removeItem(ADMIN_SESSION_KEY);}catch(e){}
+}
+function readAdminSession(){
+  const sess=store.get(ADMIN_SESSION_KEY);
+  if(!sess||typeof sess!=='object')return null;
+  return sess;
+}
+function writeAdminSession(sess){
+  store.set(ADMIN_SESSION_KEY,sess);
+  return sess;
+}
+function backfillAdminSessionLoginAt(sess){
+  if(!sess||!isPortalRole(sess.role))return sess;
+  if(parseAdminLoginAt(sess)!=null)return sess;
+  sess.loginAt=Date.now();
+  writeAdminSession(sess);
+  return sess;
+}
+function applyAdminSession(sess){
+  currentAdminRole=sess.role;
+  currentAdminUsername=sess.username||sess.role||'';
+  currentNurseName=sess.role==='Nurse'?(sess.name||'Nurse'):null;
+  return sess;
+}
+function startAdminSession(data){
+  if(!data||!isPortalRole(data.role))return null;
+  const role=data.role;
+  const sess={
+    role:role,
+    username:String(data.username||data.nurseUsername||data.name||data.displayName||role),
+    name:String(data.name||data.supervisorName||data.displayName||(role==='Nurse'?'Nurse':'')),
+    loginAt:Date.now()
+  };
+  writeAdminSession(sess);
+  return applyAdminSession(sess);
+}
+function restoreAdminSession(){
+  let sess=readAdminSession();
+  if(!sess||!isPortalRole(sess.role)){
+    if(sess)clearAdminSession();
+    return null;
+  }
+  sess=backfillAdminSessionLoginAt(sess);
+  if(isAdminSessionExpired(sess)){
+    clearAdminSession();
+    currentAdminRole=null;
+    currentAdminUsername=null;
+    currentNurseName=null;
+    return null;
+  }
+  writeAdminSession(sess);
+  return applyAdminSession(sess);
+}
+function openPortalHome(sess, opts){
+  if(!sess||!isPortalRole(sess.role))return;
+  const role=sess.role;
+  const fresh=!!(opts&&opts.freshLogin);
+  // Nurse stays on the nurse home. Admin and Scheduler share the admin home.
+  if(role==='Nurse'){
+    currentNurseName=sess.name||currentNurseName||'Nurse';
+    const nRole=document.getElementById('nurseSidebarRoleName');
+    if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
+    showScreen('nurseScreen');
+    if(typeof showNurseTab==='function')showNurseTab('compliance');
+  }else{
+    currentNurseName=null;
+    const roleLabel=document.getElementById('currentRoleLabel');
+    if(roleLabel)roleLabel.textContent='Logged in as: '+role;
+    const side=document.getElementById('sidebarRoleName');
+    if(side)side.textContent=role;
+    showScreen('adminScreen');
+  }
+  const btn=document.getElementById('mgrLoginBtn');
+  if(btn){btn.disabled=false;btn.textContent='Sign In →';}
+  window._mgrLoginInFlight=false;
+  const run=function(){
+    if(role==='Nurse'){
+      loadNurseCompliance(true);
+      loadNewClientIntakeDrafts();
+      loadCompletedNewClientIntakes();
+      apiGetCached('get_clients').then(function(d){ if(d&&d.success) allClients=d.data||[]; }).catch(function(){});
+      apiGetCached('get_users').then(function(d){ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(function(u){return u.username;}); }).catch(function(){});
+      if(fresh)logActivity('Logged in (Nurse)');
+      return;
+    }
+    renderTimesheets();
+    renderBroadcastPreview();
+    refreshNurseAlertBadge();
+    loadCompletedNewClientIntakes();
+    if(fresh)logActivity('Logged in');
+    Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(function(){});
+  };
+  if(typeof requestAnimationFrame==='function')requestAnimationFrame(function(){setTimeout(run,0);});
+  else setTimeout(run,0);
+}
+function enforceAdminSessionTimeout(){
+  const sess=readAdminSession();
+  if(!sess||!sess.role)return;
+  if(isAdminSessionExpired(sess))adminLogout();
+}
+function bootAdminPortal(){
+  warmUpSheets();
+  if(/[?&](?:printSample|certSample)=1(?:&|$)/.test(location.search||''))return;
+  const sess=restoreAdminSession();
+  if(sess)openPortalHome(sess,{freshLogin:false});
+}
+
 async function mgrLogin(){
   if(window._mgrLoginInFlight)return;
   window._mgrLoginInFlight=true;
+  warmUpSheets();
   const pwd=document.getElementById('mgr_pass').value;
   const btn=document.getElementById('mgrLoginBtn')||document.querySelector('#loginScreen .login-box button.btn-navy');
   const errEl=document.getElementById('mgrErr');
@@ -2250,52 +2379,15 @@ async function mgrLogin(){
   try{
     const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_login',password:pwd})});
     const data=await res.json();
-    if(data.success&&data.role){
-      currentAdminRole=data.role;
-      currentAdminUsername=data.username||data.nurseUsername||data.name||data.displayName||data.role||'';
-      document.getElementById('mgr_pass').value='';
-      // Nurse: limited home only — no full Admin tools
-      if(data.role==='Nurse'){
-        currentNurseName=data.name||data.supervisorName||data.displayName||'Nurse';
-        const nRole=document.getElementById('nurseSidebarRoleName');
-        if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
-        // Paint Nurse home first — do not await compliance before unlocking Sign In
-        showScreen('nurseScreen');
-        if(typeof showNurseTab==='function')showNurseTab('compliance');
-        if(btn){btn.disabled=false;btn.textContent='Sign In →';}
-        window._mgrLoginInFlight=false;
-        requestAnimationFrame(function(){
-          setTimeout(function(){
-            loadNurseCompliance(true);
-            loadNewClientIntakeDrafts();
-            loadCompletedNewClientIntakes();
-            apiGetCached('get_clients').then(d=>{ if(d&&d.success) allClients=d.data||[]; }).catch(()=>{});
-            apiGetCached('get_users').then(d=>{ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(u=>u.username); }).catch(()=>{});
-            logActivity('Logged in (Nurse)');
-          }, 0);
-        });
-      }else{
-        currentNurseName=null;
-        document.getElementById('currentRoleLabel').textContent='Logged in as: '+data.role;
-        document.getElementById('sidebarRoleName').textContent=data.role;
-        showScreen('adminScreen');
-        if(btn){btn.disabled=false;btn.textContent='Sign In →';}
-        window._mgrLoginInFlight=false;
-        requestAnimationFrame(function(){
-          setTimeout(function(){
-            renderTimesheets();
-            renderBroadcastPreview();
-            refreshNurseAlertBadge();
-            loadCompletedNewClientIntakes();
-            logActivity('Logged in');
-            Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(()=>{});
-          }, 0);
-        });
-      }
-    }else{
-      errEl.textContent='Incorrect password.';
-      errEl.style.display='block';
+    if(data.success&&isPortalRole(data.role)){
+      const passEl=document.getElementById('mgr_pass');
+      if(passEl)passEl.value='';
+      const sess=startAdminSession(data);
+      openPortalHome(sess,{freshLogin:true});
+      return;
     }
+    errEl.textContent='Incorrect password.';
+    errEl.style.display='block';
   }catch(e){
     errEl.textContent='Connection error. Please try again.';
     errEl.style.display='block';
@@ -2337,7 +2429,7 @@ async function renderActivityLog(){
   }
 }
 
-function adminLogout(){logActivity('Logged out');currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
+function adminLogout(){logActivity('Logged out');clearAdminSession();currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
@@ -8564,6 +8656,11 @@ async function loadNewClientIntakeDrafts(){
 }
 
 
+bootAdminPortal();
+window.addEventListener('pageshow',function(){enforceAdminSessionTimeout();});
+document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='visible')enforceAdminSessionTimeout();
+});
 window.addEventListener('load',()=>{renderBroadcastPreview();if(typeof nciBindDateMask==='function')nciBindDateMask();if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();});
 </script>
 </body>
