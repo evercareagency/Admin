@@ -2028,7 +2028,8 @@ function warmUpSheets(){
   window._sheetsWarmUpStarted=true;
   post.catch(function(){});
   get.catch(function(){});
-  beacon.catch(function(){});
+  // A 200 fetch is missing from Resource Timing until the body is read. Soft-fail either way.
+  beacon.then(function(r){return r&&r.text?r.text():null;}).catch(function(){});
 }
 warmUpSheets();
 

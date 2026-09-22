@@ -37,6 +37,7 @@ const fetchAt = warm.indexOf('fetch(SHEETS_URL');
 const beaconAt = warm.indexOf("fetch(new URL('exec', location.href).href+'?t='+Date.now(),{cache:'no-store',mode:'cors'})");
 const flagAt = warm.indexOf('_sheetsWarmUpStarted=true');
 assert.ok(fetchAt > 0 && beaconAt > fetchAt && flagAt > beaconAt, 'flag is set only after Ace warm and the same-origin /exec beacon are invoked');
+assert.ok(/beacon\.then\(function\(r\)\{return r&&r\.text\?r\.text\(\):null;\}\)\.catch\(function\(\)\{\}\)/.test(warm), 'beacon reads the body so a 200 /exec is visible in Resource Timing');
 assert.strictEqual(fs.readFileSync(path.join(__dirname, 'exec'), 'utf8').trim(), '{}', 'pages root must serve a static ./exec file');
 assert.ok(/function warmUpSheets\(\)\{[\s\S]*?\}\s*warmUpSheets\(\);/.test(html), 'warm ping must run when the script opens');
 assert.ok(/DOMContentLoaded[\s\S]{0,240}warmUpSheets\(\)/.test(html), 'warm ping must also run on DOMContentLoaded');
