@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
 <!-- login rewarm after sign-out 2026-09-22 v=rewarm5ec6 -->
 <!-- login warm /exec before paint 2026-09-22 v=warmexecf932 -->
@@ -15,7 +16,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-22-warm-midbody-exec">
+<meta name="admin-build" content="2026-09-22-login-keepalive">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2016,16 +2017,14 @@ const _inflight={};
 
 // Wake Apps Script as soon as this file runs so the first login is less cold.
 // ping is the lightweight no-op; GET matches the existing doGet warm. Both soft-fail offline.
-// Once per load. Sign Out resets the flag and calls warmUpSheets() once — no interval.
+// Flag flips only after fetch() is invoked. Sign Out keep-alive resets it each tick.
 function warmUpSheets(){
   if(window._sheetsWarmUpStarted)return;
+  var post=fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'});
+  var get=fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'});
   window._sheetsWarmUpStarted=true;
-  try{
-    fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(function(){});
-  }catch(e){}
-  try{
-    fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'}).catch(function(){});
-  }catch(e){}
+  post.catch(function(){});
+  get.catch(function(){});
 }
 warmUpSheets();
 
@@ -2136,7 +2135,23 @@ function formatDateTimeLabel(val){
 
 
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen'){window._sheetsWarmUpStarted=false;window._sheetsWarmUpAt=0;warmUpSheets();}}
+function stopLoginWarmKeepAlive(){
+  if(window._loginWarmTimer){clearInterval(window._loginWarmTimer);window._loginWarmTimer=null;}
+}
+function startLoginWarmKeepAlive(){
+  window._sheetsWarmUpStarted=false;
+  window._sheetsWarmUpAt=0;
+  warmUpSheets();
+  if(window._loginWarmTimer)return;
+  window._loginWarmTimer=setInterval(function(){
+    var el=document.getElementById('loginScreen');
+    if(!el||!el.classList.contains('active')){stopLoginWarmKeepAlive();return;}
+    window._sheetsWarmUpStarted=false;
+    window._sheetsWarmUpAt=0;
+    warmUpSheets();
+  },1100);
+}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
