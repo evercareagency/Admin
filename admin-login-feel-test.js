@@ -29,19 +29,29 @@ assert.ok(/action:'ping'/.test(warm), 'warm ping must post action ping');
 assert.ok(/method:'GET'/.test(warm), 'warm ping must also GET /exec');
 assert.ok(/\.catch\(/.test(warm), 'warm ping must soft-fail');
 assert.ok(!/await\s+fetch/.test(warm), 'warm ping must not block on /exec');
-assert.ok(!/if\(window\._sheetsWarmUpStarted\)return/.test(warm), 'warm must not skip on a once-per-load flag');
-assert.ok(/_sheetsWarmUpAt/.test(warm) && /<2000/.test(warm), 'repeat warms debounce to about 2s');
+assert.ok(/if\(window\._sheetsWarmUpStarted\)return/.test(warm), 'warm fires once until the login screen resets the flag');
+assert.ok(!/_sheetsWarmUpAt/.test(warm), 'warm must not debounce on a timestamp');
+assert.ok(!/<2000/.test(warm), 'warm must not use a 2s debounce');
+assert.ok(/SHEETS_URL/.test(warm), 'warm must fetch SHEETS_URL');
 assert.ok(/function warmUpSheets\(\)\{[\s\S]*?\}\s*warmUpSheets\(\);/.test(html), 'warm ping must run when the script opens');
+assert.ok(/DOMContentLoaded[\s\S]{0,240}warmUpSheets\(\)/.test(html), 'warm ping must also run on DOMContentLoaded');
 assert.ok(!/loginScreen'\)\?\.classList\.contains\('active'\)\)warmUpSheets/.test(html), 'warm ping must not wait for the login screen check');
-const loginAt = html.indexOf('id="loginScreen"');
-const earlyPing = html.indexOf("body:JSON.stringify({action:'ping'})");
-assert.ok(loginAt > 0 && earlyPing > 0 && earlyPing < loginAt, 'warm ping must be sent before the login screen markup is parsed');
-assert.ok(html.indexOf("method:'GET'", earlyPing) > earlyPing && html.indexOf("method:'GET'", earlyPing) < loginAt, 'GET wake must run with the early ping');
+assert.ok(!/setInterval\s*\(/.test(html), 'login must not keep-alive ping on an interval');
+const headEnd = html.indexOf('</head>');
+assert.ok(headEnd > 0, 'head must close');
+const head = html.slice(0, headEnd);
+assert.ok(/setResourceTimingBufferSize\(500\)/.test(head), 'head must raise the Resource Timing buffer to 500');
+assert.ok(!/action:'ping'/.test(head), 'head must not POST the warm ping');
+assert.ok(!/Wake Ace/.test(head), 'head Wake Ace IIFE must be gone');
+const sheetsAt = html.indexOf("const SHEETS_URL=");
+const warmAt = html.indexOf('function warmUpSheets()');
+assert.ok(sheetsAt > headEnd && warmAt > sheetsAt, 'warmUpSheets stays in the main app script after SHEETS_URL');
 const execUrls = html.match(/https:\/\/script\.google\.com\/macros\/s\/[^'"]+\/exec/g) || [];
-assert.strictEqual(new Set(execUrls).size, 1, 'early ping and SHEETS_URL must share one /exec URL');
+assert.strictEqual(new Set(execUrls).size, 1, 'SHEETS_URL is the only /exec URL');
 const showScreenFn = extractFn(html, 'function showScreen(id)');
-assert.ok(showScreenFn.includes("_sheetsWarmUpAt=0") && showScreenFn.includes('warmUpSheets()'),
-  'showing the login screen must clear the debounce and warm again');
+assert.ok(showScreenFn.includes('_sheetsWarmUpStarted=false') && showScreenFn.includes('warmUpSheets()'),
+  'showing the login screen must reset the once-flag and warm once');
+assert.ok(showScreenFn.includes('_sheetsWarmUpAt=0'), 'showing the login screen clears a leftover warm timestamp');
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(login, 'mgrLogin missing');
@@ -188,7 +198,7 @@ assert.strictEqual(vm.runInContext('isAdminSessionExpired(readAdminSession())', 
 
 console.log('admin-login-feel-test: ok');
 
-// Sign-out must warm even when the head script already set the once-per-load flag.
+// Sign-out resets the once-flag and warms once. A live flag must not spam.
 (function rewarmAfterSignOut(){
   const calls = [];
   const sheetsUrl = (html.match(/const SHEETS_URL='([^']+)'/) || [])[1];
@@ -223,14 +233,7 @@ console.log('admin-login-feel-test: ok');
   vm.createContext(box);
   vm.runInContext(warm + '\n' + showScreenFn, box);
   vm.runInContext('warmUpSheets()', box);
-  assert.strictEqual(calls.length, 0, 'a warm inside 2s of the head ping must not spam');
-  box.window._sheetsWarmUpAt = Date.now() - 5000;
-  vm.runInContext('warmUpSheets()', box);
-  assert.ok(calls.some(function(c){return c.method === 'POST' && /"action":"ping"/.test(c.body);}),
-    'a stale once-per-load flag must not block a later warm');
-  calls.length = 0;
-  box.window._sheetsWarmUpStarted = true;
-  box.window._sheetsWarmUpAt = Date.now();
+  assert.strictEqual(calls.length, 0, 'once-flag must skip a repeat warm');
   vm.runInContext("showScreen('loginScreen')", box);
   assert.ok(screens.loginScreen.classList.contains('active'), 'sign-out shows the login screen');
   assert.ok(!screens.adminScreen.classList.contains('active'), 'sign-out leaves the admin home');
@@ -240,7 +243,11 @@ console.log('admin-login-feel-test: ok');
   assert.ok(/"action":"ping"/.test(post[0].body), 'sign-out POST body is {action:ping}');
   assert.strictEqual(get.length, 1, 'sign-out fires one GET wake');
   assert.ok(calls.every(function(c){return c.url === sheetsUrl;}), 'sign-out warm uses SHEETS_URL');
+  assert.strictEqual(box.window._sheetsWarmUpStarted, true, 'sign-out warm sets the flag again');
+  assert.strictEqual(box.window._sheetsWarmUpAt, 0, 'sign-out clears a leftover timestamp');
   calls.length = 0;
+  vm.runInContext('warmUpSheets()', box);
+  assert.strictEqual(calls.length, 0, 'sign-out must warm once, not on a timer');
   vm.runInContext("showScreen('adminScreen')", box);
   assert.strictEqual(calls.length, 0, 'leaving the login screen must not warm');
   console.log('admin-login-feel rewarm-after-signout: ok');
@@ -306,8 +313,22 @@ async function runBrowser(){
         if(holdSheets)held.push(respond);
         else respond();
       });
+      const navAt=Date.now();
       await page.goto('http://127.0.0.1:'+port+'/index.html?v=warm',{waitUntil:'domcontentloaded',timeout:20000});
-      await page.waitForFunction(()=>window._sheetsWarmUpStarted===true,{timeout:5000});
+      const budget=Math.max(50, 1500-(Date.now()-navAt));
+      const freshTiming=await page.waitForFunction(()=>{
+        return window._sheetsWarmUpStarted===true &&
+          performance.getEntriesByType('resource').some(function(e){return /\/exec/.test(e.name);});
+      },{timeout:budget}).then(function(){return true;}).catch(function(){return false;});
+      const freshExec=await page.evaluate(function(){
+        return {
+          flag:window._sheetsWarmUpStarted===true,
+          exec:performance.getEntriesByType('resource').filter(function(e){return /\/exec/.test(e.name);}).length,
+          buf:typeof performance.setResourceTimingBufferSize==='function'
+        };
+      });
+      assert.ok(freshTiming, vp.name+' fresh open: _sheetsWarmUpStarted and /exec Resource Timing within 1.5s (timings not cleared); exec='+freshExec.exec+' flag='+freshExec.flag+' budget='+budget);
+      assert.ok(freshExec.flag && freshExec.exec>=1, vp.name+' fresh Resource Timing must keep /exec');
       const deadline=Date.now()+4000;
       while(!hits.some(h=>h.action==='ping'||h.method==='GET')&&Date.now()<deadline){
         await new Promise(r=>setTimeout(r,40));
@@ -324,6 +345,8 @@ async function runBrowser(){
       assert.ok(hits.some(h=>h.method==='GET'&&/\/exec/.test(h.url)), vp.name+' must GET /exec before Sign In');
       assert.ok(hits.every(h=>/\/exec/.test(h.url)), vp.name+' warm traffic must be /exec');
       const freshCount=hits.length;
+      await new Promise(function(r){setTimeout(r,1100);});
+      assert.strictEqual(hits.length, freshCount, vp.name+' must not spam /exec on a 1s interval');
       // Probe: sign out → clear Resource Timing → a new /exec within 1.5s.
       // Hold the sign-out response so it is still in flight when timing is cleared.
       holdSheets=true;
