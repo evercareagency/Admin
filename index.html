@@ -7,18 +7,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- login rewarm after sign-out 2026-09-22 v=rewarm5ec6 -->
 <!-- login warm /exec before paint 2026-09-22 v=warmexecf932 -->
 <!-- inservice cert C2 ribbon+laurel 2026-09-21 v=c2rib7212 force Pages index.html refresh -->
 <!-- inservice view-results hotfix 2026-09-21 paint-from-update / cache-on-unknown-get -->
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-22-login-warm-exec">
+<meta name="admin-build" content="2026-09-22-login-rewarm-signout">
 <script>
 /* Wake Ace /exec before the login screen is parsed. Soft-fail — never block Sign In.
-   POST ping first (Caregiver), then GET wake. Same once-per-load flag as warmUpSheets. */
+   POST ping first (Caregiver), then GET wake.
+   Timestamp debounce only — Sign Out calls warmUpSheets again. Do not use a forever flag. */
 (function(){
-  if(window._sheetsWarmUpStarted)return;
+  if(window._sheetsWarmUpAt&&(Date.now()-window._sheetsWarmUpAt)<2000)return;
+  window._sheetsWarmUpAt=Date.now();
   window._sheetsWarmUpStarted=true;
   var url='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
   try{
@@ -2026,10 +2029,14 @@ const _memCache={};
 const _inflight={};
 
 
-/** Wake Ace /exec as soon as the app script runs. Head script already pings before login markup.
- *  POST ping, then GET wake. Soft-fail — never blocks login or invents schema. */
+/** Wake Ace /exec. POST ping, then GET. Soft-fail — never blocks Sign In.
+ *  At most one burst per ~2s so the head ping is not repeated on boot.
+ *  A forever once-per-load flag must not skip Sign Out: showScreen('loginScreen')
+ *  clears the timestamp so the login screen always warms again. */
 function warmUpSheets(){
-  if(window._sheetsWarmUpStarted)return;
+  var now=Date.now();
+  if(window._sheetsWarmUpAt&&(now-window._sheetsWarmUpAt)<2000)return;
+  window._sheetsWarmUpAt=now;
   window._sheetsWarmUpStarted=true;
   try{
     fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'}).catch(function(){});
@@ -2147,7 +2154,7 @@ function formatDateTimeLabel(val){
 
 
 
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')warmUpSheets();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen'){window._sheetsWarmUpAt=0;warmUpSheets();}}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
