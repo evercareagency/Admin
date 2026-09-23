@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- sb dual-verify soft-fail 2026-09-23 v=sbdual flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -17,7 +18,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-22-login-exec-beacon">
+<meta name="admin-build" content="2026-09-23-sb-dual-admin">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1726,6 +1727,8 @@ Call (216) 377-5991 with any questions.</textarea>
 
 <script>
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
+const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplYWxrcHR3Z2lmbmtia3VhdnZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMDExMTAsImV4cCI6MjEwNTc3NzExMH0.b-3Pdb_oVR3L6JM0yd_aQcqtQH8exGV7OPwdtx0b3Xg';
 const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const PRINT_DAYS=[0,1,2,3,4,5,6]; // Sun–Sat Caregiver Timesheet paper
@@ -2392,6 +2395,60 @@ function bootAdminPortal(){
   if(sess)openPortalHome(sess,{freshLogin:false});
 }
 
+function evercareSbEnabled(){
+  try{
+    var search=(typeof location!=='undefined'&&location&&location.search)||'';
+    if(/(?:^|[?&])sb=1(?:&|$)/.test(search))return true;
+    if(typeof localStorage!=='undefined'&&localStorage.getItem('evercare_sb')==='1')return true;
+  }catch(e){}
+  return false;
+}
+function roleAccountSbEmail(role){
+  var key=String(role||'').trim().toLowerCase();
+  if(key==='admin')return 'admin@roles.evercare.local';
+  if(key==='scheduler')return 'scheduler@roles.evercare.local';
+  if(key==='nurse')return 'nurse@roles.evercare.local';
+  return '';
+}
+// Soft dual-verify for Admin / Scheduler / Nurse only. Sheets stays source of truth.
+// Flag off (default) returns before any Supabase request. Failures never block Sign In.
+function softSbDualVerify(role,password){
+  try{
+    if(!evercareSbEnabled())return;
+    var email=roleAccountSbEmail(role);
+    if(!email){
+      window.__sbDual={ok:false,error:'role has no supabase email'};
+      return;
+    }
+    window.__sbDual={ok:false,email:email};
+    fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+SUPABASE_ANON_KEY,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({email:email,password:password})
+    }).then(function(res){
+      return res.text().then(function(raw){
+        var data=null;
+        try{data=raw?JSON.parse(raw):null;}catch(e){}
+        if(res.ok&&data&&data.access_token){
+          window.__sbDual={ok:true,email:email};
+        }else{
+          var msg=(data&&(data.error_description||data.msg||data.message||data.error))||('HTTP '+res.status);
+          if(msg&&typeof msg==='object')msg=msg.message||JSON.stringify(msg);
+          window.__sbDual={ok:false,error:String(msg),email:email};
+        }
+      });
+    }).catch(function(err){
+      window.__sbDual={ok:false,error:String(err&&err.message||err||'supabase'),email:email};
+    });
+  }catch(err){
+    try{window.__sbDual={ok:false,error:String(err&&err.message||err||'supabase')};}catch(e2){}
+  }
+}
+
 async function mgrLogin(){
   if(window._mgrLoginInFlight)return;
   window._mgrLoginInFlight=true;
@@ -2405,6 +2462,7 @@ async function mgrLogin(){
     const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_login',password:pwd})});
     const data=await res.json();
     if(data.success&&isPortalRole(data.role)){
+      try{softSbDualVerify(data.role,pwd);}catch(sbErr){}
       const passEl=document.getElementById('mgr_pass');
       if(passEl)passEl.value='';
       const sess=startAdminSession(data);
