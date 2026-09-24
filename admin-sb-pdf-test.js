@@ -26,8 +26,11 @@ function extractFn(src, sig){
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-make">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-size">'), 'admin-build meta');
 assert.ok(html.includes('v=sbpdfmake9c24'), 'make/refresh marker is greppable');
+assert.ok(html.includes('v=sbpdfsize25'), 'size marker is greppable');
+assert.ok(html.includes('var SB_PDF_MAX_BYTES=25*1024*1024'), 'client upload guard is 25 MiB');
+assert.ok(html.includes("canvas.toDataURL('image/jpeg', TS_PDF_JPEG_QUALITY)"), 'overlay PDF is JPEG, not an uncompressed PNG');
 assert.ok(html.includes('client-overlay no-edge'), 'client overlay marker, not an Edge render');
 assert.ok(html.includes('GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1'), 'write contract is named in the tip');
 assert.ok(!html.includes('/functions/v1'), 'no Edge Function');
@@ -100,7 +103,7 @@ function harness(opts){
     SB_PDF_BUCKET: 'evercare-pdfs',
     SB_PDF_SIGN_SECONDS: 120,
     SB_PDF_MIN_BYTES: 1024,
-    SB_PDF_MAX_BYTES: 10485760,
+    SB_PDF_MAX_BYTES: 25 * 1024 * 1024,
     EVERCARE_ORG_ID: '4f97f4d3-6635-4544-904c-6b06aa02d40b',
     Uint8Array: Uint8Array,
     location: {search: opts.search || ''},
@@ -364,7 +367,16 @@ function runUpload(){
 }
 
 Promise.resolve().then(function(){
-  return direct.box.sbResolveTimesheetPdf({id: 'ts-1', pdfStoragePath: storagePath, pdfLink: driveLink});
+  const underGuard = pdfBytes(11 * 1024 * 1024);
+  const overGuard = pdfBytes(25 * 1024 * 1024 + 1);
+  return direct.box.sbPdfPayloadInfo(underGuard).then(function(under){
+    assert.strictEqual(under.ok, true, '11 MiB PDF stays under the 25 MiB guard');
+    assert.strictEqual(under.size, 11 * 1024 * 1024);
+    return direct.box.sbPdfPayloadInfo(overGuard);
+  }).then(function(over){
+    assert.strictEqual(over.ok, false, 'bytes over 25 MiB still fail soft');
+    return direct.box.sbResolveTimesheetPdf({id: 'ts-1', pdfStoragePath: storagePath, pdfLink: driveLink});
+  });
 }).then(function(opened){
   assert.strictEqual(opened.mode, 'storage');
   assert.strictEqual(opened.url, urlConst + '/storage/v1' + signedPath);
