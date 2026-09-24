@@ -30,6 +30,9 @@ const completedActs = extractFn(html, 'function isCompletedActionsHtml(i)');
 const pendingActs = extractFn(html, 'function isPendingActionsHtml(i)');
 const confirmDel = extractFn(html, 'function confirmDeleteISResult(rowIndex)');
 const deleteRes = extractFn(html, 'async function deleteISResult(rowIndex)');
+const confirmAssign = extractFn(html, 'function confirmDeleteISAssignment(rowIndex)');
+const deleteAssign = extractFn(html, 'async function deleteISAssignment(rowIndex)');
+const onAssign = extractFn(html, 'function isAideOnCurrentISAssignment(assignView, username)');
 const printHook = extractFn(html, 'function printISCert(rowIndex)');
 const viewRes = extractFn(html, 'async function viewISResults(rowIndex)');
 const startEdit = extractFn(html, 'function startISResultsEdit()');
@@ -65,6 +68,9 @@ assert.ok(completedActs, 'isCompletedActionsHtml missing');
 assert.ok(pendingActs, 'isPendingActionsHtml missing');
 assert.ok(confirmDel, 'confirmDeleteISResult missing');
 assert.ok(deleteRes, 'deleteISResult missing');
+assert.ok(confirmAssign, 'confirmDeleteISAssignment missing');
+assert.ok(deleteAssign, 'deleteISAssignment missing');
+assert.ok(onAssign, 'isAideOnCurrentISAssignment missing');
 assert.ok(printHook, 'printISCert missing');
 assert.ok(viewRes, 'viewISResults missing');
 assert.ok(startEdit, 'startISResultsEdit missing');
@@ -100,16 +106,22 @@ assert.ok(completedActs.indexOf('View Cert') < completedActs.indexOf('Print Cert
 assert.ok(completedActs.indexOf('Print Cert') < completedActs.indexOf('Delete'), 'Print Cert before Delete');
 assert.ok(completedActs.includes('isOfficeCertStaff'), 'certs are office staff only');
 assert.ok(pendingActs.includes('Send Reminder'), 'not completed keeps Send Reminder');
+assert.ok(pendingActs.includes('Delete'), 'not completed includes Delete');
+assert.ok(pendingActs.includes('confirmDeleteISAssignment'), 'not completed Delete confirms the assignment');
+assert.ok(!pendingActs.includes('confirmDeleteISResult'), 'not completed Delete does not archive a result');
+assert.ok(pendingActs.indexOf('Send Reminder') < pendingActs.indexOf('Delete'), 'Send Reminder before Delete');
 assert.ok(!pendingActs.includes('View Results'), 'not completed has no View Results');
 assert.ok(!pendingActs.includes('View Cert'), 'not completed has no View Cert');
 assert.ok(!pendingActs.includes('Print Cert'), 'not completed has no Print Cert');
-assert.ok(!pendingActs.includes('Delete'), 'not completed has no Delete');
 
 assert.ok(printHook.includes('printCert(row)'), 'Print Cert calls existing printCert');
 assert.ok(confirmDel.includes("showSharedConfirm('Are you sure?'"), 'delete uses in-DOM Are you sure?');
 assert.ok(confirmDel.includes('Yes, delete'), 'delete confirm label');
-assert.ok(!/window\.confirm/.test(confirmDel+deleteRes+renderTable+completedActs), 'no window.confirm');
-assert.ok(!/\bconfirm\(/.test(confirmDel+deleteRes), 'no confirm()');
+assert.ok(confirmAssign.includes("showSharedConfirm('Are you sure?'"), 'assignment delete uses Are you sure?');
+assert.ok(confirmAssign.includes('Yes, delete'), 'assignment delete confirm label');
+assert.ok(confirmAssign.includes('deleteISAssignment'), 'assignment confirm calls deleteISAssignment');
+assert.ok(!/window\.confirm/.test(confirmDel+deleteRes+confirmAssign+deleteAssign+renderTable+completedActs+pendingActs), 'no window.confirm');
+assert.ok(!/\bconfirm\(/.test(confirmDel+deleteRes+confirmAssign+deleteAssign), 'no confirm()');
 
 assert.ok(clearAssignment.includes("action:'clear_assigned_topic'"), 'clear posts clear_assigned_topic only');
 assert.ok(!/delete_inservice_result/.test(clearAssignment), 'clear must not delete results');
@@ -132,6 +144,16 @@ assert.ok(saveEdit.includes('rememberISResultDetail'), 'save caches painted resu
 assert.ok(saveEdit.includes('loadISCompliance(true)'), 'save refreshes score/list');
 assert.ok(getShape && aceErr && remember && cached && fallbackQs && adopt && regrade && mergeRow, 'hotfix helpers missing');
 assert.ok(deleteRes.includes("postArchiveAction('delete_inservice_result','archive_inservice_result',{id:id})"), 'delete/archive LOCK { id }');
+assert.ok(deleteAssign.includes("action:'unassign_inservice_aide'"), 'not completed delete unassigns that aide');
+assert.ok(deleteAssign.includes('topicId:String(topicId)'), 'unassign sends topic id');
+assert.ok(deleteAssign.includes('username:username'), 'unassign sends username');
+assert.ok(!/inservice_results|delete_inservice_result|archive_inservice_result/.test(deleteAssign), 'assignment delete must not touch results');
+assert.ok(!/clear_assigned_topic/.test(deleteAssign), 'one aide delete must not clear the whole topic');
+assert.ok(loadIS.includes('isAideOnCurrentISAssignment'), 'not completed rows follow the assignment list');
+assert.ok(loadIS.includes('!isISCompletedRecord(completion)&&!isAideOnCurrentISAssignment'), 'completed rows stay when that aide is off the list');
+assert.ok(html.includes('v=isdel1'), 'isdel1 marker');
+assert.ok(html.includes('2026-09-24-is-delete'), 'is-delete build marker');
+assert.ok(html.includes('v=pdf1p'), 'pdf1p marker stays');
 assert.ok(loadIS.includes('includeArchived')===false || /no includeArchived/.test(html), 'get_inservices skips archived');
 assert.ok(!/includeArchived\s*:/.test(loadIS), 'must not pass includeArchived');
 
@@ -257,6 +279,24 @@ assert.strictEqual(sandbox.formatISCompletedDate(sandbox.certDateFromRecord(comp
 const pending = sandbox.hydrateISComplianceRow({}, {username:'aide2', name:'Pat Pending'}, {id:1, title:'Diabetes', shortTitle:'Diabetes Complications'});
 assert.strictEqual(pending.isCompleted, false);
 assert.strictEqual(sandbox.formatISScoreColumn(pending), '—');
+
+vm.runInContext([pendingActs, onAssign, confirmAssign].join('\n'), sandbox);
+sandbox.isComplianceRows=[pending];
+sandbox.showSharedConfirm=function(title, fn, label){sandbox._confirm={title:title,label:label,fn:fn};};
+const pendingHtml=sandbox.isPendingActionsHtml(0);
+assert.ok(pendingHtml.includes('Send Reminder'), 'pending html has Send Reminder');
+assert.ok(pendingHtml.includes('Delete'), 'pending html has Delete');
+assert.ok(pendingHtml.indexOf('Send Reminder')<pendingHtml.indexOf('Delete'), 'pending html order');
+assert.ok(pendingHtml.includes('confirmDeleteISAssignment(0)'), 'pending Delete is wired');
+assert.ok(!pendingHtml.includes('View Results')&&!pendingHtml.includes('Print Cert'), 'pending html has no cert actions');
+sandbox.confirmDeleteISAssignment(0);
+assert.strictEqual(sandbox._confirm.title, 'Are you sure?');
+assert.strictEqual(sandbox._confirm.label, 'Yes, delete');
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:true, aideUsernames:null}, 'aide2'), true);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:false, aideUsernames:['Aide2']}, 'aide2'), true);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:false, aideUsernames:['Aide2']}, 'other'), false);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:false, aideUsernames:[]}, 'aide2'), false);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({success:true, topicId:1}, 'aide2'), true);
 
 assert.strictEqual(
   sandbox.formatISAceActionError({success:false,error:'Unknown action'},'get_inservice_result','Could not load results.'),

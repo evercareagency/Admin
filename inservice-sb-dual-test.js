@@ -92,6 +92,10 @@ const names = [
   'async function sbAssignSelectedAides(topicId,aideUsernames)',
   'async function sbClearAssignedTopicRow(topicId)',
   'async function sbClearAssignedTopic(topicId)',
+  'function sbAideNameKey(v)',
+  'function sbWithoutAideUsername(list, username)',
+  'async function sbActiveAideUsernames()',
+  'async function sbUnassignInserviceAide(topicId, username)',
   'async function sbInserviceDispatch(payload)',
   'async function apiPost(payload)'
 ];
@@ -490,6 +494,99 @@ function sessionWindow(){
   const sbUiB = uiBox('?sb=1', '2');
   await sbUiB.box.clearAssignment();
   assert.strictEqual(sbUiB.posts[0].topicId, '2');
+
+  const dropSrc = extractFn(html, 'async function sbUnassignInserviceAide(topicId, username)');
+  const rosterSrc = extractFn(html, 'async function sbActiveAideUsernames()');
+  assert.ok(dropSrc && !/inservice_results/.test(dropSrc), 'unassign must not name results');
+  assert.ok(!/sbRestMutate\(\s*'DELETE'/.test(dropSrc+rosterSrc), 'unassign does not hard-delete');
+  assert.ok(dropSrc.includes('sbUpsertTopicAssignment(topicId, next.names)'), 'unassign upserts the remaining usernames');
+  assert.ok(extractFn(html, 'function sbInserviceAction(action)').includes("action==='unassign_inservice_aide'"), 'action is routed');
+
+  const dropRows = [
+    {org_id:ORG, topic_id:'1', aide_usernames:null},
+    {org_id:ORG, topic_id:'2', aide_usernames:['keepme']}
+  ];
+  const aideRoster = [{username:'Aide1'},{username:'aide2'},{username:'DoneAide'}];
+  function dropTopic(u){
+    const m = decodeURIComponent(String(u)).match(/(?:^|[?&])topic_id=eq\.([^&]+)/);
+    return m ? m[1] : null;
+  }
+  const drop = harness({
+    search:'?sb=1',
+    storage:{evercare_sb:'1'},
+    window:sessionWindow(),
+    route: function(u, init){
+      if(u.indexOf('/rest/v1/aides')>=0){
+        return {ok:true, status:200, raw: JSON.stringify(aideRoster)};
+      }
+      if(u.indexOf('inservice_topic_assignment')>=0){
+        const topic = dropTopic(u);
+        if(init.method==='GET'){
+          const rows = dropRows.filter(function(r){return !topic || String(r.topic_id)===topic;});
+          return {ok:true, status:200, raw: JSON.stringify(rows)};
+        }
+        if(init.method==='POST'){
+          const body = JSON.parse(init.body);
+          const idx = dropRows.findIndex(function(r){return String(r.topic_id)===String(body.topic_id);});
+          if(idx>=0)dropRows[idx]=body;
+          else dropRows.push(body);
+          return {ok:true, status:201, raw: JSON.stringify([body])};
+        }
+        if(init.method==='DELETE' || init.method==='PATCH'){
+          return {ok:false, status:500, raw: JSON.stringify({message:'assignment delete or patch is not used'})};
+        }
+      }
+      if(u.indexOf('inservice_results')>=0){
+        return {ok:false, status:500, raw: JSON.stringify({message:'results must not be touched'})};
+      }
+      return {ok:false, status:500, raw: JSON.stringify({message:'unexpected '+init.method+' '+u})};
+    }
+  });
+
+  const removedAll = await drop.box.apiPost({action:'unassign_inservice_aide', topicId:'1', username:'AIDE2'});
+  assert.strictEqual(removedAll.success, true);
+  assert.strictEqual(removedAll.assignAll, false);
+  assert.deepStrictEqual(removedAll.aideUsernames, ['Aide1','DoneAide']);
+  const allPost = drop.calls.filter(function(c){return c.init.method==='POST';}).pop();
+  assert.deepStrictEqual(JSON.parse(allPost.init.body), {org_id:ORG, topic_id:'1', aide_usernames:['Aide1','DoneAide']});
+  assert.ok(decodeURIComponent(allPost.url).indexOf('on_conflict=org_id,topic_id')>=0);
+  const aideGet = drop.calls.filter(function(c){return c.url.indexOf('/rest/v1/aides')>=0;}).pop();
+  assert.ok(aideGet, 'assign-all removal reads the active roster');
+  assert.ok(decodeURIComponent(aideGet.url).indexOf('is_active=eq.true')>=0);
+  assert.ok(decodeURIComponent(aideGet.url).indexOf('org_id=eq.'+ORG)>=0);
+  assert.ok(decodeURIComponent(aideGet.url).indexOf('select=username')>=0);
+  assert.ok(!drop.calls.some(function(c){return c.init.method==='DELETE'||c.init.method==='PATCH'||c.url.indexOf('inservice_results')>=0;}));
+  assert.deepStrictEqual(dropRows.find(function(r){return r.topic_id==='2';}).aide_usernames, ['keepme']);
+
+  drop.calls.length = 0;
+  dropRows[0] = {org_id:ORG, topic_id:'1', aide_usernames:['Aide1','aide2']};
+  const fromList = await drop.box.apiPost({action:'unassign_inservice_aide', topicId:'1', username:'Aide1'});
+  assert.strictEqual(fromList.success, true);
+  assert.deepStrictEqual(fromList.aideUsernames, ['aide2']);
+  assert.ok(!drop.calls.some(function(c){return c.url.indexOf('/rest/v1/aides')>=0;}), 'explicit list does not reload aides');
+  assert.ok(!drop.calls.some(function(c){return c.init.method==='DELETE'||c.url.indexOf('inservice_results')>=0;}));
+  assert.deepStrictEqual(dropRows.find(function(r){return r.topic_id==='2';}).aide_usernames, ['keepme']);
+
+  drop.calls.length = 0;
+  const last = await drop.box.apiPost({action:'unassign_inservice_aide', topicId:'1', username:'aide2'});
+  assert.strictEqual(last.success, true);
+  assert.deepStrictEqual(last.aideUsernames, []);
+  assert.ok(dropRows.some(function(r){return String(r.topic_id)==='1';}), 'empty list keeps the assignment row');
+  assert.ok(!drop.calls.some(function(c){return c.init.method==='DELETE';}), 'last aide is not a hard delete');
+  assert.deepStrictEqual(JSON.parse(drop.calls.filter(function(c){return c.init.method==='POST';}).pop().init.body).aide_usernames, []);
+
+  drop.calls.length = 0;
+  const already = await drop.box.apiPost({action:'unassign_inservice_aide', topicId:'1', username:'Aide1'});
+  assert.strictEqual(already.success, true);
+  assert.deepStrictEqual(already.aideUsernames, []);
+  assert.strictEqual(drop.calls.length, 1, 'already absent does not write');
+  assert.strictEqual(drop.calls[0].init.method, 'GET');
+
+  drop.calls.length = 0;
+  const missingTopic = await drop.box.apiPost({action:'unassign_inservice_aide', username:'aide2'});
+  assert.strictEqual(missingTopic.success, false);
+  assert.ok(/topic id missing/i.test(missingTopic.error));
+  assert.strictEqual(drop.calls.length, 0);
 
   console.log('inservice-sb-dual-test: ok');
 })().catch(function(err){
