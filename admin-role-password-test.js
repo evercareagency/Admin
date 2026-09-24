@@ -26,7 +26,8 @@ function extractFn(src, sig){
 const MARKER = '<!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->';
 assert.ok(html.includes(MARKER), 'tip marker missing');
 assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-warmoff1">'), 'warmoff1 advances admin-build after adminpw1');
+assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
+assert.ok(html.includes('content="2026-09-24-nursespd1"'), 'admin-build moves to nursespd1');
 assert.ok(!/resetPasswordForEmail/.test(html), 'role passwords must not use recovery email');
 
 const resetSelect = html.slice(html.indexOf('id="adminResetRole"'), html.indexOf('id="adminRecoveryCode"'));

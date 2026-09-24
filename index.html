@@ -28,7 +28,8 @@
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
-<meta name="admin-build" content="2026-09-24-warmoff1">
+<!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. Open View/PDF/edit that needs ink: get_new_client_intake includeSignatures:true (alias includeSigs:true). List, Completes prefetch, and home loads do not send that flag. -->
+<meta name="admin-build" content="2026-09-24-nursespd1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2475,6 +2476,8 @@ function openPortalHome(sess, opts){
     if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
     showScreen('nurseScreen');
     if(typeof showNurseTab==='function')showNurseTab('compliance');
+    // nursespd1: start the one Completes list now so it overlaps compliance (same single-flight).
+    loadCompletedNewClientIntakes();
   }else{
     currentNurseName=null;
     const roleLabel=document.getElementById('currentRoleLabel');
@@ -2490,7 +2493,7 @@ function openPortalHome(sess, opts){
     if(role==='Nurse'){
       loadNurseCompliance(true);
       loadNewClientIntakeDrafts();
-      loadCompletedNewClientIntakes();
+      loadCompletedNewClientIntakes(); // nursespd1: join the prefetch, do not start a second list
       apiGetCached('get_clients').then(function(d){ if(d&&d.success) allClients=d.data||[]; }).catch(function(){});
       apiGetCached('get_users').then(function(d){ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(function(u){return u.username;}); }).catch(function(){});
       if(fresh)logActivity('Logged in (Nurse)');
@@ -10340,6 +10343,7 @@ async function saveNewClientIntake(status){
         showTempMsg('Saved Complete but missing intakeId — PDF cannot start','var(--danger)');
         closeNewClientIntake(true);
         loadNewClientIntakeDrafts();
+        nciInvalidateCompleteListCache();
         loadCompletedNewClientIntakes();
         return;
       }
@@ -10355,6 +10359,7 @@ async function saveNewClientIntake(status){
       }
       closeNewClientIntake(true);
       loadNewClientIntakeDrafts();
+      nciInvalidateCompleteListCache();
       loadCompletedNewClientIntakes();
     }else{
       showTempMsg('Draft saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--teal)');
@@ -10407,8 +10412,15 @@ async function archiveNewClientIntakePdf(intakeId){
   return apiPost({action:'archive_new_client_intake_pdf',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
 }
 
-async function getNewClientIntake(intakeId){
-  return apiPost({action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
+async function getNewClientIntake(intakeId, opts){
+  // Ace omits *SignatureData unless the open asks for ink. List/prefetch/home never pass opts.
+  opts=opts||{};
+  const payload={action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)};
+  if(opts.includeSignatures||opts.includeSigs){
+    payload.includeSignatures=true;
+    payload.includeSigs=true;
+  }
+  return apiPost(payload);
 }
 
 function nciApplyCompletePdf(intakeId,pdfLink,pdfFileId){
@@ -10473,6 +10485,7 @@ async function nciPollCompletePdfLink(intakeId,budgetMs){
       }
     }catch(e){}
     try{
+      nciInvalidateCompleteListCache();
       await loadCompletedNewClientIntakes();
       const row=(nciCompletedRows||[]).find(function(r){return nciIntakeIdOf(r)===id;})||null;
       const link=pickIntakePdfLink(row);
@@ -10571,7 +10584,7 @@ async function resumeNewClientIntake(intakeId,opts){
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
   try{
-    const data=await getNewClientIntake(nciState.intakeId);
+    const data=await getNewClientIntake(nciState.intakeId,{includeSignatures:true,includeSigs:true});
     if(data&&data.success){
       nciResumePayload=data;
       applyNewClientIntake(data);
@@ -10691,6 +10704,7 @@ function nciRememberCompletePdf(intakeId,pdfLink,pdfFileId){
     };
   }
   paintCompletedNewClientIntakes();
+  nciTouchCompleteListCache();
 }
 
 function nciCompletedTableHtml(rows){
@@ -10706,7 +10720,6 @@ function nciCompletedTableHtml(rows){
     const nurse=escapeHtml(r.nurseName||r.nurseUsername||'—');
     const pdf=pickIntakePdfLink(r);
     const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
-    const viewDis=pdf?'':' disabled';
     const safe=escapeAttr(id);
     return `<tr>
       <td><strong>${name}</strong></td>
@@ -10716,7 +10729,7 @@ function nciCompletedTableHtml(rows){
       <td>${nurse}</td>
       <td>${pdfCell}</td>
       <td><div class="nci-complete-actions">
-        <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${safe}')"${viewDis}${pdf?'':' title="PDF pending"'}>📄 View</button>
+        <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${safe}')"${pdf?'':' title="PDF pending — load intake with signatures"'}>📄 View</button>
         <button type="button" class="btn btn-sm btn-navy" onclick="editCompletedIntake('${safe}')">Edit</button>
         <button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteCompletedIntake('${safe}')">Delete</button>
       </div></td>
@@ -10797,52 +10810,204 @@ async function nciRecheckPendingCompletePdfs(){
 }
 
 async function refreshCompletedNewClientIntakes(){
+  nciInvalidateCompleteListCache();
   await loadCompletedNewClientIntakes();
   await nciRecheckPendingCompletePdfs();
 }
 
-async function loadCompletedNewClientIntakes(){
-  const nurseBody=document.getElementById('nciCompletedNurseBody');
-  const adminBody=document.getElementById('nciCompletedAdminBody');
-  const loading='<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading completed intakes…</td></tr>';
-  if(nurseBody)nurseBody.innerHTML=loading;
-  if(adminBody)adminBody.innerHTML=loading;
+// nursespd1 — one Complete list in flight, ~5min sessionStorage, 2s still-loading + Retry.
+const NCI_COMPLETE_LIST_TTL_MS=5*60*1000;
+const NCI_COMPLETE_LIST_SLOW_MS=2000;
+const NCI_COMPLETE_LIST_CACHE_KEY='ec_nci_completes_nursespd1';
+let nciCompleteListInflight=null;
+let nciCompleteListEpoch=0;
+let nciCompleteSoftFor=0;
+let nciCompleteListFetchedThisPage=false;
+let nciCompleteListSlowTimer=null;
+let nciCompleteListWaitGen=0;
+
+function nciCompleteListCacheGet(){
   try{
-    // Same Complete list for Nurse, Admin, and Scheduler — no Admin-only gate.
-    const data=await apiPost({action:'list_new_client_intakes',status:'Complete'});
-    let rows=[];
-    if(data&&data.success){
-      rows=nciIntakeRowsFromList(data);
-    }
-    nciCompletedRows=rows.filter(function(r){
-      const st=String((r&&r.status)||'Complete');
-      return st==='Complete';
-    }).map(function(r){
-      return {
-        intakeId:nciPickIntakeId(r),
-        clientId:r.clientId!=null&&r.clientId!==''?String(r.clientId):'',
-        clientName:r.clientName||'',
-        socDate:r.socDate||'',
-        status:r.status||'Complete',
-        nurseName:r.nurseName||r.nurseUsername||'',
-        nurseUsername:r.nurseUsername||'',
-        pdfLink:pickIntakePdfLink(r),
-        pdfFileId:r.pdfFileId||'',
-        createdAt:r.createdAt||'',
-        updatedAt:r.updatedAt||'',
-        completedAt:r.completedAt||'',
-        submittedAt:r.submittedAt||''
-      };
-    });
-    if(nciLastCompletePdf&&nciLastCompletePdf.intakeId){
-      nciRememberCompletePdf(nciLastCompletePdf.intakeId,nciLastCompletePdf.pdfLink,nciLastCompletePdf.pdfFileId);
-    }else{
-      paintCompletedNewClientIntakes();
-    }
-  }catch(e){
-    nciCompletedRows=[];
+    if(typeof sessionStorage==='undefined'||!sessionStorage)return null;
+    const raw=sessionStorage.getItem(NCI_COMPLETE_LIST_CACHE_KEY);
+    if(!raw)return null;
+    const rec=JSON.parse(raw);
+    if(!rec||!Array.isArray(rec.rows))return null;
+    const t=Number(rec.t)||0;
+    if(!t||(Date.now()-t)>=NCI_COMPLETE_LIST_TTL_MS)return null;
+    return {t:t,rows:rec.rows};
+  }catch(e){return null;}
+}
+function nciCompleteListCacheSet(rows){
+  try{
+    if(typeof sessionStorage==='undefined'||!sessionStorage)return;
+    sessionStorage.setItem(NCI_COMPLETE_LIST_CACHE_KEY,JSON.stringify({t:Date.now(),rows:rows||[]}));
+  }catch(e){}
+}
+function nciInvalidateCompleteListCache(){
+  nciCompleteListEpoch++;
+  nciCompleteSoftFor=0;
+  try{
+    if(typeof sessionStorage!=='undefined'&&sessionStorage)sessionStorage.removeItem(NCI_COMPLETE_LIST_CACHE_KEY);
+  }catch(e){}
+}
+function nciTouchCompleteListCache(){
+  try{
+    if(typeof sessionStorage==='undefined'||!sessionStorage)return;
+    const raw=sessionStorage.getItem(NCI_COMPLETE_LIST_CACHE_KEY);
+    if(!raw)return;
+    const rec=JSON.parse(raw);
+    if(!rec||!Array.isArray(rec.rows))return;
+    const t=Number(rec.t)||0;
+    if(!t||(Date.now()-t)>=NCI_COMPLETE_LIST_TTL_MS)return;
+    rec.rows=nciCompletedRows||[];
+    sessionStorage.setItem(NCI_COMPLETE_LIST_CACHE_KEY,JSON.stringify(rec));
+  }catch(e){}
+}
+function nciMapCompleteIntakeRows(data){
+  let rows=[];
+  if(data&&data.success)rows=nciIntakeRowsFromList(data);
+  return rows.filter(function(r){
+    const st=String((r&&r.status)||'Complete');
+    return st==='Complete';
+  }).map(function(r){
+    return {
+      intakeId:nciPickIntakeId(r),
+      clientId:r.clientId!=null&&r.clientId!==''?String(r.clientId):'',
+      clientName:r.clientName||'',
+      socDate:r.socDate||'',
+      status:r.status||'Complete',
+      nurseName:r.nurseName||r.nurseUsername||'',
+      nurseUsername:r.nurseUsername||'',
+      pdfLink:pickIntakePdfLink(r),
+      pdfFileId:r.pdfFileId||'',
+      createdAt:r.createdAt||'',
+      updatedAt:r.updatedAt||'',
+      completedAt:r.completedAt||'',
+      submittedAt:r.submittedAt||''
+    };
+  });
+}
+function nciApplyCompletedRows(rows){
+  nciCompletedRows=rows||[];
+  if(nciLastCompletePdf&&nciLastCompletePdf.intakeId){
+    nciRememberCompletePdf(nciLastCompletePdf.intakeId,nciLastCompletePdf.pdfLink,nciLastCompletePdf.pdfFileId);
+  }else{
     paintCompletedNewClientIntakes();
   }
+}
+function nciCompleteListPendingHtml(slow){
+  if(slow){
+    return '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Still loading from Sheets… <button type="button" class="btn btn-sm btn-teal" onclick="retryCompletedNewClientIntakes()">Retry</button></td></tr>';
+  }
+  return '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted)">Loading completed intakes…</td></tr>';
+}
+function nciPaintCompleteListPending(slow){
+  const html=nciCompleteListPendingHtml(!!slow);
+  const nurseBody=document.getElementById('nciCompletedNurseBody');
+  const adminBody=document.getElementById('nciCompletedAdminBody');
+  if(nurseBody)nurseBody.innerHTML=html;
+  if(adminBody)adminBody.innerHTML=html;
+}
+function nciClearCompleteListSlowTimer(){
+  nciCompleteListWaitGen++;
+  if(nciCompleteListSlowTimer){
+    clearTimeout(nciCompleteListSlowTimer);
+    nciCompleteListSlowTimer=null;
+  }
+}
+function nciArmCompleteListSlowUi(){
+  const gen=++nciCompleteListWaitGen;
+  if(nciCompleteListSlowTimer){
+    clearTimeout(nciCompleteListSlowTimer);
+    nciCompleteListSlowTimer=null;
+  }
+  const started=(nciCompleteListInflight&&nciCompleteListInflight.startedAt)||Date.now();
+  const elapsed=Date.now()-started;
+  if(elapsed>=NCI_COMPLETE_LIST_SLOW_MS){
+    nciPaintCompleteListPending(true);
+    return;
+  }
+  nciPaintCompleteListPending(false);
+  nciCompleteListSlowTimer=setTimeout(function(){
+    nciCompleteListSlowTimer=null;
+    if(gen!==nciCompleteListWaitGen)return;
+    if(!nciCompleteListInflight)return;
+    if(nciCompletedRows&&nciCompletedRows.length)return;
+    nciPaintCompleteListPending(true);
+  },NCI_COMPLETE_LIST_SLOW_MS-elapsed);
+}
+function nciFetchCompleteList(){
+  // Ignore duplicate callers — never two list_new_client_intakes Complete posts at once.
+  if(nciCompleteListInflight)return nciCompleteListInflight;
+  nciCompleteListFetchedThisPage=true;
+  const epoch=nciCompleteListEpoch;
+  const startedAt=Date.now();
+  const flight=(async function(){
+    try{
+      // Same Complete list for Nurse, Admin, and Scheduler — no Admin-only gate.
+      const data=await apiPost({action:'list_new_client_intakes',status:'Complete'});
+      const rows=nciMapCompleteIntakeRows(data);
+      if(epoch===nciCompleteListEpoch&&data&&data.success)nciCompleteListCacheSet(rows);
+      return {rows:rows,epoch:epoch};
+    }finally{
+      if(nciCompleteListInflight===flight)nciCompleteListInflight=null;
+    }
+  })();
+  flight.epoch=epoch;
+  flight.startedAt=startedAt;
+  nciCompleteListInflight=flight;
+  return flight;
+}
+function nciScheduleCompleteListSoftRefresh(stamp){
+  if(nciCompleteListInflight){
+    void nciCompleteListInflight.then(function(res){
+      if(res&&Array.isArray(res.rows)&&res.epoch===nciCompleteListEpoch)nciApplyCompletedRows(res.rows);
+    }).catch(function(){});
+    return;
+  }
+  // This page already asked Sheets (prefetch or Completes open). Do not fire again.
+  if(nciCompleteListFetchedThisPage)return;
+  if(nciCompleteSoftFor===stamp)return;
+  nciCompleteSoftFor=stamp;
+  void nciFetchCompleteList().then(function(res){
+    if(res&&Array.isArray(res.rows)&&res.epoch===nciCompleteListEpoch)nciApplyCompletedRows(res.rows);
+  }).catch(function(){});
+}
+async function loadCompletedNewClientIntakes(){
+  const cached=nciCompleteListCacheGet();
+  if(cached){
+    nciClearCompleteListSlowTimer();
+    nciApplyCompletedRows(cached.rows);
+    nciScheduleCompleteListSoftRefresh(cached.t);
+    return;
+  }
+  const pending=nciFetchCompleteList();
+  if(!(nciCompletedRows&&nciCompletedRows.length))nciArmCompleteListSlowUi();
+  try{
+    let res=await pending;
+    if(res&&res.epoch!==nciCompleteListEpoch){
+      res=await nciFetchCompleteList();
+    }
+    nciClearCompleteListSlowTimer();
+    nciApplyCompletedRows((res&&res.rows)||[]);
+  }catch(e){
+    nciClearCompleteListSlowTimer();
+    if(!(nciCompletedRows&&nciCompletedRows.length)){
+      nciCompletedRows=[];
+      paintCompletedNewClientIntakes();
+    }
+  }
+}
+function retryCompletedNewClientIntakes(){
+  // Still in flight: ignore the duplicate. Do not start a second Sheets list.
+  if(nciCompleteListInflight){
+    if(!(nciCompletedRows&&nciCompletedRows.length))nciArmCompleteListSlowUi();
+    return nciCompleteListInflight;
+  }
+  nciInvalidateCompleteListCache();
+  nciCompletedRows=[];
+  return loadCompletedNewClientIntakes();
 }
 
 async function viewCompletedIntakePdf(intakeId){
@@ -10853,6 +11018,16 @@ async function viewCompletedIntakePdf(intakeId){
     window.open(url,'_blank','noopener');
     return;
   }
+  // View/PDF has no stored link yet. Load this intake with ink (not the Completes list).
+  try{
+    const got=await getNewClientIntake(id,{includeSignatures:true,includeSigs:true});
+    const meta=nciPickPdfMeta(got);
+    if(meta.pdfLink){
+      nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
+      window.open(meta.pdfLink,'_blank','noopener');
+      return;
+    }
+  }catch(e){}
   showTempMsg('PDF not ready yet','var(--warn)');
 }
 

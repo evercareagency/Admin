@@ -154,7 +154,7 @@ assert.ok(onAssign.includes('aide_usernames null = all aides'), 'null assignment
 assert.ok(loadIS.includes('isAideOnCurrentISAssignment'), 'not completed rows follow the assignment list');
 assert.ok(loadIS.includes('!isISCompletedRecord(completion)&&!isAideOnCurrentISAssignment'), 'completed rows stay when that aide is off the list');
 assert.ok(html.includes('v=isdel1'), 'isdel1 marker');
-assert.ok(html.includes('2026-09-24-is-delete'), 'is-delete build marker');
+assert.ok(html.includes('2026-09-24-nursespd1'), 'current admin-build marker');
 assert.ok(html.includes('v=pdf1p'), 'pdf1p marker stays');
 assert.ok(loadIS.includes('includeArchived')===false || /no includeArchived/.test(html), 'get_inservices skips archived');
 assert.ok(!/includeArchived\s*:/.test(loadIS), 'must not pass includeArchived');
