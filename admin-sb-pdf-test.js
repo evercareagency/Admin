@@ -26,7 +26,7 @@ function extractFn(src, sig){
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-supervisory">'), 'admin-build meta');
 
 const opener = extractFn(html, 'function openTimesheetPdf(id)');
 const flagOffTail = opener.slice(opener.lastIndexOf('if(!requireTimesheetSignatures(r))return;'));

@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- sb auth lists+pdf 2026-09-24 v=sbpdf flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -18,7 +18,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-sb-pdf">
+<meta name="admin-build" content="2026-09-24-sb-supervisory">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2053,9 +2053,13 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 async function apiPost(payload){
-  // Flag on: aides, clients, and payroll timesheets are Supabase. Every other action stays on Sheets.
+  // Flag on: aides, clients, payroll timesheets, and supervisory contacts are Supabase.
+  // Every other action stays on Sheets. Flag off never reaches these branches.
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
     return sbApiList(payload);
+  }
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)){
+    return sbApiSupervisory(payload);
   }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
@@ -2925,6 +2929,330 @@ async function sbResolveTimesheetPdf(row){
     return {mode:'missing'};
   }catch(err){
     return {mode:'error',error:String(err&&err.message||err||'supabase')};
+  }
+}
+
+function sbIsSupervisoryAction(action){
+  return action==='list_supervisory_contacts'
+    ||action==='get_supervisory_contact'
+    ||action==='save_supervisory_contact'
+    ||action==='archive_supervisory_contact'
+    ||action==='delete_supervisory_contact'
+    ||action==='archive_supervisory_visit_pdf';
+}
+function sbUuid(v){
+  var s=String(v||'').trim().toLowerCase();
+  var parts=s.split('-');
+  if(parts.length!==5)return false;
+  if(parts[0].length!==8||parts[1].length!==4||parts[2].length!==4||parts[3].length!==4||parts[4].length!==12)return false;
+  if(parts[2].charAt(0)!=='1'&&parts[2].charAt(0)!=='2'&&parts[2].charAt(0)!=='3'&&parts[2].charAt(0)!=='4'&&parts[2].charAt(0)!=='5'&&parts[2].charAt(0)!=='6'&&parts[2].charAt(0)!=='7'&&parts[2].charAt(0)!=='8')return false;
+  var variant=parts[3].charAt(0);
+  if(variant!=='8'&&variant!=='9'&&variant!=='a'&&variant!=='b')return false;
+  return /^[0-9a-f-]+$/.test(s);
+}
+function sbScTextDate(val){
+  if(val==null||String(val).trim()==='')return null;
+  var s=String(val).trim();
+  var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return iso[1]+'-'+iso[2]+'-'+iso[3];
+  var mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(mdy){
+    var month=mdy[1].length===1?'0'+mdy[1]:mdy[1];
+    var day=mdy[2].length===1?'0'+mdy[2]:mdy[2];
+    return mdy[3]+'-'+month+'-'+day;
+  }
+  return s;
+}
+function sbScContactMs(raw){
+  var s=String(raw||'').trim();
+  if(!s)return 0;
+  var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return Date.UTC(+iso[1],+iso[2]-1,+iso[3]);
+  var mdy=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(mdy)return Date.UTC(+mdy[3],+mdy[1]-1,+mdy[2]);
+  var t=Date.parse(s);
+  return isNaN(t)?0:t;
+}
+function sbScYes(v){
+  return v===true||v==='Yes'||v==='yes'||v==='true';
+}
+function sbFirstRow(data){
+  if(Array.isArray(data))return data[0]||null;
+  if(data&&typeof data==='object')return data;
+  return null;
+}
+function sbMapSupervisoryContact(row){
+  var payload=(row&&row.payload&&typeof row.payload==='object'&&!Array.isArray(row.payload))?row.payload:{};
+  var contact={};
+  Object.keys(payload).forEach(function(k){
+    contact[k]=payload[k];
+    if(/^[A-Z]/.test(k)){
+      var camel=k.charAt(0).toLowerCase()+k.slice(1);
+      if(contact[camel]==null||contact[camel]==='')contact[camel]=payload[k];
+    }
+  });
+  var id=row&&row.id?String(row.id):'';
+  var legacy=row&&row.legacy_id?String(row.legacy_id):'';
+  contact.id=id;
+  contact.contactId=id||legacy;
+  contact.legacyId=legacy;
+  contact.ContactId=legacy||id;
+  contact.clientId=row&&row.client_id||'';
+  contact.ClientId=contact.clientId;
+  contact.clientName=row&&row.client_name||'';
+  contact.ClientName=contact.clientName;
+  contact.aideId=row&&row.aide_id||'';
+  contact.aideName=row&&row.aide_name||'';
+  contact.AideName=contact.aideName;
+  contact.supervisorName=row&&row.supervisor_name||'';
+  contact.SupervisorName=contact.supervisorName;
+  contact.contactDate=row&&row.contact_date||'';
+  contact.ContactDate=contact.contactDate;
+  contact.contactType=row&&row.contact_type||'';
+  contact.ContactType=contact.contactType;
+  contact.aidePresent=(row&&row.aide_present)||contact.aidePresent||'';
+  contact.AidePresent=contact.aidePresent;
+  if(row&&row.form_complete===true)contact.formComplete='Yes';
+  else if(row&&row.form_complete===false)contact.formComplete='No';
+  contact.status=(row&&row.status)||'Active';
+  contact.Status=contact.status;
+  contact.isActive=!(row&&row.is_active===false)&&contact.status!=='Archived';
+  contact.clientSignatureCaptured=(row&&row.client_signature_captured)?'Yes':'No';
+  contact.supervisorSignatureCaptured=(row&&row.supervisor_signature_captured)?'Yes':'No';
+  contact.clientSignatureDate=(row&&row.client_signature_date)||contact.clientSignatureDate||'';
+  contact.ClientSignatureDate=contact.clientSignatureDate;
+  contact.supervisorSignatureDate=(row&&row.supervisor_signature_date)||contact.supervisorSignatureDate||'';
+  contact.SupervisorSignatureDate=contact.supervisorSignatureDate;
+  contact.pdfLink=row&&row.pdf_link||'';
+  contact.pdf_link=contact.pdfLink;
+  contact.pdfStoragePath=row&&row.pdf_storage_path||'';
+  contact.pdf_storage_path=contact.pdfStoragePath;
+  contact.createdAt=row&&row.created_at||'';
+  contact.CreatedAt=contact.createdAt;
+  contact.updatedAt=row&&row.updated_at||'';
+  contact.UpdatedAt=contact.updatedAt;
+  return contact;
+}
+var SB_SC_PAYLOAD_KEYS=['ClientLivesWith','FunctionalLimitations','PleasedWithAide','AideAppearance','AideAttitudeCommunication','ClientAppearance','HomeObservations','WashesHands','FollowsPOC','DocumentsCare','NotifiesOffice','Accountability','ReportsAsScheduled','WorksAssignedHours','Bathing','MealPrep','Exercises','Grooming','Housekeeping','TurnReposition','Shaving','Laundry','VitalSigns','HairCare','ErrandsShopping','CatheterCare','OralHygiene','Ambulation','Appointments','SkinCare','PersonalCare','SpokeWith','CallConnected','CallOutcome','TopicsCovered','ClientComments','SupervisorComments','ClientSignatureData','SupervisorSignatureData'];
+function sbScPayloadFromSave(payload){
+  var out={};
+  SB_SC_PAYLOAD_KEYS.forEach(function(key){
+    var camel=key.charAt(0).toLowerCase()+key.slice(1);
+    var v=payload&&payload[key];
+    if(v==null||v==='')v=payload&&payload[camel];
+    if(v!=null&&v!=='')out[key]=v;
+  });
+  return out;
+}
+function sbScSaveBody(payload, orgId, isCreate){
+  var body={
+    contact_date:sbScTextDate(payload.contactDate||payload.ContactDate),
+    contact_type:String(payload.contactType||payload.ContactType||'Visit'),
+    client_name:payload.clientName||payload.ClientName||'',
+    aide_name:payload.aideName||payload.AideName||'',
+    supervisor_name:payload.supervisorName||payload.SupervisorName||'',
+    aide_present:payload.aidePresent||payload.AidePresent||'',
+    form_complete:!(payload.formComplete==='No'||payload.formComplete===false||payload.form_complete===false),
+    client_signature_captured:sbScYes(payload.clientSignatureCaptured!=null?payload.clientSignatureCaptured:payload.client_signature_captured),
+    supervisor_signature_captured:sbScYes(payload.supervisorSignatureCaptured!=null?payload.supervisorSignatureCaptured:payload.supervisor_signature_captured),
+    client_signature_date:sbScTextDate(payload.clientSignatureDate||payload.ClientSignatureDate),
+    supervisor_signature_date:sbScTextDate(payload.supervisorSignatureDate||payload.SupervisorSignatureDate),
+    client_id:sbUuid(payload.clientId||payload.ClientId)?String(payload.clientId||payload.ClientId):null,
+    aide_id:sbUuid(payload.aideId||payload.AideId)?String(payload.aideId||payload.AideId):null,
+    payload:sbScPayloadFromSave(payload)
+  };
+  if(isCreate){
+    body.org_id=orgId;
+    body.status='Active';
+    var legacy=payload.legacyId||payload.legacy_id||'';
+    if(legacy)body.legacy_id=String(legacy);
+  }
+  return body;
+}
+function sbScKeepRow(row, payload){
+  if(!row)return false;
+  var includeArchived=!!(payload&&(payload.includeArchived||payload.include_archived));
+  if(!includeArchived&&String(row.status||'Active')!=='Active')return false;
+  if(payload&&payload.contactType&&String(row.contact_type||'')!==String(payload.contactType))return false;
+  if(payload&&payload.contactId){
+    var want=String(payload.contactId);
+    if(String(row.id||'')!==want&&String(row.legacy_id||'')!==want)return false;
+  }
+  var wantId=payload&&payload.clientId?String(payload.clientId):'';
+  var wantName=payload&&payload.clientName?String(payload.clientName).trim().toLowerCase():'';
+  if(wantId||wantName){
+    var idOk=!!(wantId&&String(row.client_id||'')===wantId);
+    var nameOk=!!(wantName&&String(row.client_name||'').trim().toLowerCase()===wantName);
+    if(wantId&&wantName){
+      if(!idOk&&!nameOk)return false;
+    }else if(wantId&&!idOk)return false;
+    else if(wantName&&!nameOk)return false;
+  }
+  if(payload&&payload.sinceDays){
+    var days=Number(payload.sinceDays);
+    var ms=sbScContactMs(row.contact_date||row.updated_at||row.created_at);
+    if(isFinite(days)&&days>0&&ms&&ms<Date.now()-days*24*60*60*1000)return false;
+  }
+  return true;
+}
+async function sbRestWrite(method, table, pairs, body, refreshed){
+  if(String(method||'').toUpperCase()==='DELETE'){
+    return {ok:false,error:'Archive only — hard delete is not allowed'};
+  }
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,error:'Not signed in',status:401};
+  var qs=sbFilterQuery(pairs);
+  var url=SUPABASE_URL+'/rest/v1/'+table+(qs?('?'+qs):'');
+  var res;
+  try{
+    res=await fetch(url,{
+      method:method,
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        Accept:'application/json',
+        'Content-Type':'application/json',
+        Prefer:'return=representation'
+      },
+      body:JSON.stringify(body||{})
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbRestWrite(method, table, pairs, body, true);
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
+  return {ok:true,data:data,status:res.status};
+}
+function sbSupervisoryIdFilter(contactId){
+  var id=String(contactId||'');
+  if(sbUuid(id))return ['id','eq.'+id];
+  return ['legacy_id','eq.'+id];
+}
+function sbSupervisoryPdfPath(path){
+  var clean=sbPdfObjectPath(path);
+  var prefix=SB_PDF_BUCKET+'/';
+  if(clean.indexOf(prefix)===0)clean=clean.slice(prefix.length);
+  return clean;
+}
+async function sbSupervisoryList(payload){
+  var pairs=[
+    ['select','*'],
+    ['order','contact_date.desc']
+  ];
+  if(!(payload&&(payload.includeArchived||payload.include_archived)))pairs.splice(1,0,['status','eq.Active']);
+  if(payload&&payload.contactType)pairs.push(['contact_type','eq.'+payload.contactType]);
+  if(payload&&payload.contactId)pairs.push(sbSupervisoryIdFilter(payload.contactId));
+  if(payload&&payload.clientId&&sbUuid(payload.clientId))pairs.push(['client_id','eq.'+payload.clientId]);
+  var listed=await sbRestGet('supervisory_contacts', pairs);
+  if(!listed.ok)return {success:false,error:listed.error||'supervisory_contacts',httpStatus:listed.status||0};
+  var rows=Array.isArray(listed.data)?listed.data:[];
+  var kept=rows.filter(function(row){return sbScKeepRow(row, payload||{});});
+  var mapped=kept.map(sbMapSupervisoryContact);
+  return {success:true,data:mapped,contacts:mapped};
+}
+async function sbSupervisoryGet(payload){
+  var id=String((payload&&(payload.contactId||payload.id))||'');
+  if(!id)return {success:false,error:'No contactId for this row.'};
+  var got=await sbRestGet('supervisory_contacts',[
+    ['select','*'],
+    sbSupervisoryIdFilter(id)
+  ]);
+  if(!got.ok)return {success:false,error:got.error||'supervisory_contacts',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {success:false,error:'No matching supervisory contact'};
+  var mapped=sbMapSupervisoryContact(row);
+  return {success:true,contact:mapped,data:mapped};
+}
+async function sbSupervisorySave(payload){
+  var sess=readSbSession();
+  var orgId=sess&&sess.profile&&sess.profile.org_id;
+  if(!orgId)return {success:false,error:'missing org'};
+  var editing=String((payload&&payload.contactId)||'').trim();
+  var isCreate=!editing;
+  var body=sbScSaveBody(payload||{}, orgId, isCreate);
+  var wrote;
+  if(isCreate){
+    wrote=await sbRestWrite('POST','supervisory_contacts',[], body);
+  }else{
+    wrote=await sbRestWrite('PATCH','supervisory_contacts',[sbSupervisoryIdFilter(editing)], body);
+  }
+  if(!wrote.ok)return {success:false,error:wrote.error||'Save failed',httpStatus:wrote.status||0};
+  var row=sbFirstRow(wrote.data);
+  if(!row)return {success:false,error:'No matching supervisory contact'};
+  var mapped=sbMapSupervisoryContact(row);
+  var clientInk=String((payload&&(payload.clientSignatureData||payload.ClientSignatureData))||'');
+  var supervisorInk=String((payload&&(payload.supervisorSignatureData||payload.SupervisorSignatureData))||'');
+  return {
+    success:true,
+    contactId:row.legacy_id||row.id,
+    id:row.id,
+    status:row.status||'Active',
+    updatedAt:row.updated_at||'',
+    contact:mapped,
+    data:mapped,
+    clientSignatureDataLen:clientInk.length,
+    supervisorSignatureDataLen:supervisorInk.length,
+    pdfLink:row.pdf_link||'',
+    pdfStoragePath:row.pdf_storage_path||''
+  };
+}
+async function sbSupervisoryArchive(payload){
+  var id=String((payload&&(payload.contactId||payload.id))||'').trim();
+  if(!id)return {success:false,error:'No contactId for this row.'};
+  var wrote=await sbRestWrite('PATCH','supervisory_contacts',[
+    sbSupervisoryIdFilter(id),
+    ['select','id,legacy_id,status,updated_at,is_active']
+  ], {status:'Archived'});
+  if(!wrote.ok)return {success:false,error:wrote.error||'Archive failed',httpStatus:wrote.status||0};
+  var row=sbFirstRow(wrote.data);
+  if(!row)return {success:false,error:'No matching supervisory contact'};
+  return {
+    success:true,
+    contactId:row.legacy_id||row.id,
+    id:row.id,
+    status:row.status||'Archived',
+    updatedAt:row.updated_at||'',
+    isActive:row.is_active===true
+  };
+}
+async function sbSupervisoryPdf(payload){
+  var loaded=await sbSupervisoryGet(payload||{});
+  if(!loaded.success)return loaded;
+  var row=loaded.contact||{};
+  var path=sbSupervisoryPdfPath(row.pdfStoragePath||'');
+  if(path){
+    var signed=await sbSignPdfUrl(path);
+    if(!signed.ok)return {success:false,error:signed.error||'Could not open visit PDF.',httpStatus:signed.status||0};
+    return {success:true,pdfLink:signed.url,pdfStoragePath:path,contactId:row.legacyId||row.contactId};
+  }
+  if(String(row.contactType||'')==='PhoneCall')return {success:false,error:'Phone calls do not include a PDF.'};
+  var link=String(row.pdfLink||'').trim();
+  if(link)return {success:true,pdfLink:link,contactId:row.legacyId||row.contactId};
+  return {success:false,error:'PDF not ready yet'};
+}
+async function sbApiSupervisory(payload){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
+  var action=payload&&payload.action;
+  if(!sbIsSupervisoryAction(action))return {success:false,error:'not a supervisory action'};
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
+  try{
+    if(action==='list_supervisory_contacts')return sbSupervisoryList(payload);
+    if(action==='get_supervisory_contact')return sbSupervisoryGet(payload);
+    if(action==='save_supervisory_contact')return sbSupervisorySave(payload);
+    if(action==='archive_supervisory_visit_pdf')return sbSupervisoryPdf(payload);
+    return sbSupervisoryArchive(payload);
+  }catch(err){
+    return {success:false,error:String(err&&err.message||err||'supabase')};
   }
 }
 
@@ -6066,6 +6394,8 @@ async function exportAllAsPDFs(){
 
 
 // ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
+// Flag on (?sb=1 or evercare_sb=1): list/get/save/archive use Supabase supervisory_contacts.
+// Archive sets status=Archived only. Flag off keeps the Ace /exec actions below.
 // LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
 // list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);
 // Ace LOCK (edit/delete): get_supervisory_contact { contactId } hydrate;
@@ -6966,6 +7296,26 @@ function openVisitPdfUrl(url){
   return true;
 }
 
+function scPdfStoragePath(row){
+  if(!row)return '';
+  return String(row.pdfStoragePath||row.pdf_storage_path||row.PdfStoragePath||'').trim();
+}
+
+// Flag on: a stored file wins over the legacy Drive link. Flag off returns false immediately.
+async function openStoredSupervisoryPdf(row, contactId){
+  if(typeof evercareSbEnabled!=='function'||!evercareSbEnabled())return false;
+  if(!scPdfStoragePath(row))return false;
+  const id=String(contactId||pickContactId(row)||'');
+  if(!id)return false;
+  const data=await apiPost({action:'archive_supervisory_visit_pdf',contactId:id});
+  const url=(data&&data.success)?pickVisitPdfLink(data):'';
+  if(url){openVisitPdfUrl(url);return true;}
+  const legacy=pickVisitPdfLink(row);
+  if(legacy){openVisitPdfUrl(legacy);return true;}
+  showTempMsg((data&&(data.error||data.message))||'Could not open visit PDF.','var(--danger)');
+  return true;
+}
+
 function setViewPdfButtonWorking(rowIndex,working){
   const btn=document.getElementById('scViewPdfBtn'+rowIndex);
   if(!btn)return;
@@ -6991,6 +7341,16 @@ async function resolveLatestVisitContact(row){
 async function viewSupervisoryVisitPdf(rowIndex){
   const row=nurseComplianceRows[rowIndex];
   if(!row){showTempMsg('No client row.','var(--danger)');return;}
+  if(scPdfStoragePath(row)&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    const earlyBtn=document.getElementById('scViewPdfBtn'+rowIndex);
+    if(earlyBtn&&earlyBtn.disabled)return;
+    setViewPdfButtonWorking(rowIndex,true);
+    try{
+      if(await openStoredSupervisoryPdf(row, row.lastVisitContactId||row.lastContactId||''))return;
+    }finally{
+      setViewPdfButtonWorking(rowIndex,false);
+    }
+  }
   const existing=pickVisitPdfLink(row);
   if(existing){openVisitPdfUrl(existing);return;}
 
@@ -9076,7 +9436,8 @@ function paintAdminSupervisoryContacts(){
     const name=escapeHtml(scField(r,'ClientName','clientName')||'—');
     const date=escapeHtml(toEasternMDY(scField(r,'ContactDate','contactDate')||scField(r,'CreatedAt','createdAt')||'')||'—');
     const nurse=escapeHtml(scField(r,'SupervisorName','supervisorName')||'—');
-    const pdf=pickVisitPdfLink(r);
+    const storedPdf=String((r&&(r.pdfStoragePath||r.pdf_storage_path))||'').trim();
+    const pdf=pickVisitPdfLink(r)||storedPdf;
     const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
     return `<tr>
       <td><strong>${name}</strong></td>
@@ -9113,6 +9474,7 @@ async function viewAdminSupervisoryPdf(contactId){
   const id=String(contactId||'');
   if(!id){showTempMsg('No contactId for this row.','var(--danger)');return;}
   const row=adminSupervisoryRows.find(r=>pickContactId(r)===id)||{};
+  if(await openStoredSupervisoryPdf(row,id))return;
   const existing=pickVisitPdfLink(row);
   if(existing){openVisitPdfUrl(existing);return;}
   try{
