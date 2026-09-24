@@ -29,7 +29,7 @@ assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
 assert.ok(html.includes('v=nursespd1'), 'nursespd1 marker stays');
 assert.ok(html.includes('<!-- admin schedule 2026-09-24 v=sched1'), 'schedule marker ships beside adminpw1');
-assert.ok(html.includes('content="2026-09-24-nursespd2"'), 'admin-build advances to nursespd2; password code stays');
+assert.ok(html.includes('content="2026-09-24-sched1m"'), 'admin-build advances to sched1m; password code stays');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(!/resetPasswordForEmail/.test(html), 'role passwords must not use recovery email');
 
