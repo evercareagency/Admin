@@ -37,7 +37,7 @@ assert.ok(!html.includes('function sbRememberAdminJwt'), 'no parallel token stor
 
 const clearSrc = extractFn(html, 'async function sbClearAssignedTopic(topicId)');
 const clearRowSrc = extractFn(html, 'async function sbClearAssignedTopicRow(topicId)');
-const upsertSrc = extractFn(html, 'async function sbUpsertAssignment(topicId,aideUsernames)');
+const upsertSrc = extractFn(html, 'async function sbUpsertTopicAssignment(topicId,aideUsernames)');
 const archiveSrc = extractFn(html, 'async function sbArchiveInserviceResult(id)');
 assert.ok(clearSrc && !/inservice_results/.test(clearSrc), 'clear assignment helper must not touch results');
 assert.ok(clearRowSrc && !/inservice_results/.test(clearRowSrc), 'clear row helper must not touch results');
@@ -49,6 +49,8 @@ assert.ok(!/DELETE/.test(clearSrc), 'delete vs null stays inside sbClearAssigned
 assert.ok(clearRowSrc.includes("sbRestMutate('DELETE','inservice_topic_assignment'"), 'clear deletes the assignment row');
 assert.ok(upsertSrc.includes("['on_conflict','org_id,topic_id']"), 'upsert conflicts on org_id,topic_id');
 assert.ok(!upsertSrc.includes("['on_conflict','org_id']"), 'upsert must not use the legacy org-only conflict target');
+assert.ok(!/[\s{]id\s*:/.test(upsertSrc), 'topic upsert must not send the uuid id column');
+assert.strictEqual((html.match(/async function sbUpsertAssignment\(/g) || []).length, 1, 'client assignment upsert is the only function with this name');
 assert.ok(!/v:\s*2|topics:\s*\{/.test(html), 'v2 aide_usernames encoding must be gone');
 
 const sheetsClear = extractFn(html, 'async function clearAssignment()');
@@ -85,7 +87,7 @@ const names = [
   'function sbMapAssignment(row)',
   'async function sbFetchAssignmentRows(topicId)',
   'async function sbGetAssignedTopic(topicId)',
-  'async function sbUpsertAssignment(topicId,aideUsernames)',
+  'async function sbUpsertTopicAssignment(topicId,aideUsernames)',
   'async function sbSetAssignedTopic(topicId)',
   'async function sbAssignSelectedAides(topicId,aideUsernames)',
   'async function sbClearAssignedTopicRow(topicId)',
@@ -307,6 +309,7 @@ function sessionWindow(){
   assert.deepStrictEqual(JSON.parse(setCall.init.body), {org_id:ORG, topic_id:'1', aide_usernames:null});
   assert.ok(setCall.init.headers.Prefer.indexOf('resolution=merge-duplicates')>=0);
   assert.ok(!Object.prototype.hasOwnProperty.call(JSON.parse(setCall.init.body), 'updated_at'));
+  assert.ok(!Object.prototype.hasOwnProperty.call(JSON.parse(setCall.init.body), 'id'), 'assign all must not send uuid id');
   assert.ok(assign.calls.every(function(c){return c.url.indexOf('inservice_results')<0;}), 'assign all does not touch results');
 
   assign.calls.length = 0;
@@ -314,7 +317,8 @@ function sessionWindow(){
   assert.strictEqual(selected.assignAll, false);
   assert.strictEqual(JSON.stringify(selected.aideUsernames), JSON.stringify(['aide2']));
   const selBody = JSON.parse(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().init.body);
-  assert.deepStrictEqual(selBody.aide_usernames, ['aide2']);
+  assert.deepStrictEqual(selBody, {org_id:ORG, topic_id:'1', aide_usernames:['aide2']});
+  assert.ok(!Object.prototype.hasOwnProperty.call(selBody, 'id'), 'selected assign must not send uuid id');
   const selGet = assign.calls.filter(function(c){return c.init.method==='GET' && c.url.indexOf('inservice_topic_assignment')>=0;}).pop();
   assert.ok(selGet, 'selected assign reads that topic row first');
   assert.ok(assignmentQuery(selGet.url).indexOf('topic_id=eq.1')>=0);
@@ -437,6 +441,18 @@ function sessionWindow(){
   const alias = await assign.box.apiPost({action:'archive_inservice_result', id:row.id});
   assert.strictEqual(alias.success, true);
   assert.deepStrictEqual(JSON.parse(assign.calls.filter(function(c){return c.init.method==='PATCH';}).pop().init.body), {status:'Archived'});
+
+  assign.calls.length = 0;
+  assignmentRows.length = 0;
+  vm.runInContext(extractFn(html, 'async function sbUpsertAssignment(aideId, clientId)'), assign.box);
+  const probeAssign = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'1', aideUsernames:['qa_probe']});
+  assert.strictEqual(probeAssign.success, true);
+  assert.deepStrictEqual(probeAssign.aideUsernames, ['qa_probe']);
+  const probePost = assign.calls.filter(function(c){return c.init.method==='POST';}).pop();
+  assert.ok(assignmentQuery(probePost.url).indexOf('/rest/v1/inservice_topic_assignment?on_conflict=org_id,topic_id')>=0);
+  assert.ok(probePost.url.indexOf('/rest/v1/assignments?')<0, 'topic assign must not post the client assignments table');
+  assert.deepStrictEqual(JSON.parse(probePost.init.body), {org_id:ORG, topic_id:'1', aide_usernames:['qa_probe']});
+  assert.ok(!Object.prototype.hasOwnProperty.call(JSON.parse(probePost.init.body), 'id'));
 
   const uiNames = [
     'function evercareSbEnabled()',

@@ -62,8 +62,12 @@ assert.ok(commitTs.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-T
 assert.ok(commitTs.includes("apiPost({action:'delete',id:id})"), 'flag-on timesheet delete posts action delete');
 assert.ok(commitTs.includes('data.success===true&&data.is_active===false'), 'timesheet success requires is_active false');
 assert.ok(commitTs.indexOf('evercareSbEnabled()') < commitTs.indexOf('fetch(SHEETS_URL'), 'sheets delete stays on the flag-off branch');
-assert.ok(quickDelete.includes("showSharedConfirm('Delete this timesheet permanently?'"), 'timesheet delete uses in-app confirm');
-assert.ok(deleteRecSrc.includes("showSharedConfirm('Delete timesheet for '"), 'detail delete uses in-app confirm');
+assert.ok(quickDelete.includes("showSharedConfirm('Archive this timesheet?'"), 'trash confirms archive, not permanent delete');
+assert.ok(quickDelete.includes("'Yes, archive'"), 'trash confirm button is Yes, archive');
+assert.ok(!/permanently|Yes, delete/.test(quickDelete), 'default trash path is not a permanent delete');
+assert.ok(deleteRecSrc.includes("showSharedConfirm('Archive timesheet for '"), 'detail archive uses in-app confirm');
+assert.ok(deleteRecSrc.includes("'Yes, archive'"), 'detail confirm button is Yes, archive');
+assert.ok(!/permanently|Yes, delete/.test(deleteRecSrc), 'detail path is not a permanent delete');
 assert.ok(!deleteRecSrc.includes('quickDelete('), 'detail delete must not open a second confirm');
 assert.ok(deleteClientSrc.includes("showSharedConfirm('Delete this client? This cannot be undone.'"), 'client delete uses in-app confirm');
 assert.ok(commitClientSrc.includes('data.success===true&&data.is_active===false'), 'client success requires is_active false');

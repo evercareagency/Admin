@@ -26,7 +26,7 @@ function extractFn(src, sig){
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut-hotfix">'), 'admin-build meta');
 assert.ok(html.includes('v=sbpdfmake9c24'), 'make/refresh marker is greppable');
 assert.ok(html.includes('v=sbpdfsize25'), 'size marker is greppable');
 assert.ok(html.includes('var SB_PDF_MAX_BYTES=25*1024*1024'), 'client upload guard is 25 MiB');
