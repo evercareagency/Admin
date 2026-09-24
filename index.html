@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse feature data ALWAYS /exec. Broadcast Alert is not Supabase (local broadcast_msg). Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
+<!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, nurse alerts, and nurse client writes stay /exec. Broadcast Alert is not Supabase (local broadcast_msg). Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
 <!-- sb archive §3.3/§4.3 2026-09-24 v=sbcut1b PATCH is_active=false select id,is_active single() default trash is Archive, not hard DELETE -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
@@ -16,7 +16,7 @@
 <!-- inservice sb dual 2026-09-24 v=sbcut1b topic assignment upsert omits uuid id; topic_id stays text -->
 <!-- timesheet pdf 1 page + desk + cert lock 2026-09-24 v=pdf1p admin-build 2026-09-24-pdf-1page-actions Letter overlay scaled inside the page so the agency line stays on page 1. Archive PATCH is_active=false only. Delete PATCH is_active=false + deleted_at. Restore archive is_active=true where deleted_at is null. Restore trash is_active=true + deleted_at null. No hard DELETE. Office cert track Personal Care / Home Making on cream; signatures on the same cream. -->
 <!-- inservice compliance delete 2026-09-24 v=isdel1 admin-build 2026-09-24-is-delete Delete is POST /rest/v1/rpc/admin_unassign_inservice_aide {p_topic_id,p_username,p_archive_active_result}. Not Completed sends false. Completed sends true so the row does not flip back to Not Completed. Not Completed rows follow aide_usernames: null = all aides, else only those usernames. -->
-<!-- login sheets warm off 2026-09-24 v=warmoff1 admin-build 2026-09-24-warmoff1 When evercareSbEnabled (portal_data_backend=supabase), Admin/Scheduler login does not fire blocking Sheets /exec warmkeep. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps warmkeep. Nurse feature data stays on /exec; list_new_client_intakes is unchanged. -->
+<!-- login sheets warm off 2026-09-24 v=warmoff1 admin-build 2026-09-24-warmoff1 When evercareSbEnabled (portal_data_backend=supabase), Admin/Scheduler login does not fire blocking Sheets /exec warmkeep. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps warmkeep. -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -30,7 +30,8 @@
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
 <!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. Open View/PDF/edit that needs ink: get_new_client_intake includeSignatures:true (alias includeSigs:true). List, Completes prefetch, and home loads do not send that flag. -->
 <!-- admin schedule 2026-09-24 v=sched1 week grid clients × Mon–Sun. Usual pattern once; cell edits are exceptions for that date. Live Ace: list_schedule_week(p_week_start), upsert_schedule_pattern, upsert_schedule_exception (call_off|cover|hours_override|aide_override|clear), delete_schedule_pattern. Office access_token via sbRestRpc. No localStorage stub. No Sheets /exec. No Sandata/EVV chips. -->
-<meta name="admin-build" content="2026-09-24-sched1">
+<!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Broadcast stays local. Compliance, nurse alerts, and nurse client writes stay /exec. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
+<meta name="admin-build" content="2026-09-24-nursenb1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1213,7 +1214,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
       <div class="card" id="nciDraftsCard" style="display:none">
         <div class="card-title"><span class="ico">📝</span> Intake drafts</div>
-        <p class="nci-hint" style="margin-bottom:8px">Resume a saved draft from Sheets when Ace’s list_new_client_intakes is live.</p>
+        <p class="nci-hint" style="margin-bottom:8px">Resume a saved draft from the office list.</p>
         <div id="nciDraftsList"></div>
       </div>
       </div>
@@ -2225,10 +2226,18 @@ async function apiPost(payload){
   // and inservice compliance/results are Supabase by default. Admin writes too.
   // Those returns happen before the /exec post — no Sheets dual-write on the Supabase path.
   // Emergency rollback (?sheets=1 or evercare_sheets=1) makes evercareSbEnabled() false.
-  // Nurse portal (currentAdminRole Nurse) always stays on Sheets /exec, including supervisory contacts.
-  // Broadcast Alert does not use apiPost. Nurse alerts, intakes, and get_supervisory_compliance are not Supabase routers.
+  // v=nursenb1: intakes (every role) and Nurse supervisory list/save/archive use Ace when the cut is on.
+  // Nurse client writes, get_supervisory_compliance, and nurse alerts stay on Sheets /exec.
+  // Broadcast Alert does not use apiPost.
+  var sbOn=typeof evercareSbEnabled==='function'&&evercareSbEnabled();
+  if(sbOn&&payload&&typeof sbIsNurseIntakeAction==='function'&&sbIsNurseIntakeAction(payload.action)){
+    return sbNurseIntakeDispatch(payload);
+  }
   var nurseSheets=false;
   try{nurseSheets=(typeof currentAdminRole!=='undefined'&&currentAdminRole==='Nurse');}catch(eNurse){nurseSheets=false;}
+  if(nurseSheets&&sbOn&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)&&typeof sbNurseSupervisoryDispatch==='function'){
+    return sbNurseSupervisoryDispatch(payload);
+  }
   if(!nurseSheets){
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
     return sbApiList(payload);
@@ -5009,6 +5018,236 @@ function sbUsernameIn(list, name){
 async function sbRestRpc(fnName, body){
   return sbRestMutate('POST','rpc/'+fnName,[],body||{},'return=representation');
 }
+// v=nursenb1 — Ace CALLABLE office JWT. Rollback never enters here.
+function sbIsNurseIntakeAction(action){
+  return action==='list_new_client_intakes'
+    ||action==='get_new_client_intake'
+    ||action==='save_new_client_intake'
+    ||action==='archive_new_client_intake'
+    ||action==='delete_new_client_intake';
+}
+function sbAsJsonObject(v){
+  if(typeof v==='string'){
+    try{v=JSON.parse(v);}catch(e){return null;}
+  }
+  if(v&&typeof v==='object'&&!Array.isArray(v))return v;
+  return null;
+}
+function sbRpcNode(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(Array.isArray(node)&&node.length===1){
+    var one=sbAsJsonObject(node[0]);
+    if(one&&(one.success!=null||one.ok!=null||one.intakes!=null||one.rows!=null||one.contacts!=null||one.packet!=null||(one.data!=null&&(Array.isArray(one.data)||sbAsJsonObject(one.data)))))return one;
+  }
+  return node;
+}
+function sbRpcError(node){
+  if(!node||typeof node!=='object'||Array.isArray(node))return '';
+  if(node.ok===false||node.success===false)return String(node.error||node.message||'Request failed.');
+  return '';
+}
+function sbIntakePick(row){
+  var args=arguments;
+  var src=args[0]||{};
+  for(var i=1;i<args.length;i++){
+    var v=src[args[i]];
+    if(v!=null&&v!=='')return v;
+  }
+  return '';
+}
+function sbMapIntakeRow(row){
+  var src=sbAsJsonObject(row)||{};
+  var packet=sbAsJsonObject(src.packet)||sbAsJsonObject(src.p_packet)||sbAsJsonObject(src.payload)||{};
+  var merged=Object.assign({}, packet, src);
+  var id=String(sbIntakePick(merged,'intakeId','intake_id','id')||'');
+  var out=Object.assign({}, merged);
+  out.intakeId=id;
+  out.IntakeId=id;
+  if(id)out.id=id;
+  out.clientId=String(sbIntakePick(merged,'clientId','client_id')||'');
+  out.clientName=String(sbIntakePick(merged,'clientName','client_name')||'');
+  out.socDate=String(sbIntakePick(merged,'socDate','soc_date')||'');
+  out.status=String(sbIntakePick(merged,'status')||'');
+  out.nurseName=String(sbIntakePick(merged,'nurseName','nurse_name')||'');
+  out.nurseUsername=String(sbIntakePick(merged,'nurseUsername','nurse_username')||'');
+  out.pdfLink=String(sbIntakePick(merged,'pdfLink','pdf_link','PdfLink')||'');
+  out.pdfFileId=String(sbIntakePick(merged,'pdfFileId','pdf_file_id')||'');
+  out.pdfStoragePath=String(sbIntakePick(merged,'pdfStoragePath','pdf_storage_path')||'');
+  out.createdAt=String(sbIntakePick(merged,'createdAt','created_at')||'');
+  out.updatedAt=String(sbIntakePick(merged,'updatedAt','updated_at')||'');
+  out.completedAt=String(sbIntakePick(merged,'completedAt','completed_at')||'');
+  out.submittedAt=String(sbIntakePick(merged,'submittedAt','submitted_at')||'');
+  if(merged.activity_plan&&!out.activityPlan)out.activityPlan=merged.activity_plan;
+  out.success=true;
+  return out;
+}
+function sbIntakeListRows(node){
+  if(Array.isArray(node))return node;
+  var obj=sbAsJsonObject(node);
+  if(!obj)return [];
+  var keys=['data','intakes','rows','records','items'];
+  for(var i=0;i<keys.length;i++){
+    if(Array.isArray(obj[keys[i]]))return obj[keys[i]];
+  }
+  if(obj.intakeId!=null||obj.intake_id!=null)return [obj];
+  return [];
+}
+function sbIntakePacket(payload){
+  var packet={};
+  var src=payload||{};
+  Object.keys(src).forEach(function(k){
+    if(k==='action')return;
+    packet[k]=src[k];
+  });
+  if(packet.intakeId==null||String(packet.intakeId).trim()==='')packet.intakeId=null;
+  else packet.intakeId=String(packet.intakeId);
+  if(packet.clientId==null||String(packet.clientId).trim()==='')delete packet.clientId;
+  else packet.clientId=String(packet.clientId);
+  return packet;
+}
+function sbIntakeOk(node, fallback){
+  var err=sbRpcError(node);
+  if(err)return {success:false,error:err};
+  var row=node;
+  if(Array.isArray(node))row=node[0]||null;
+  else if(node&&Array.isArray(node.data))row=node.data[0]||node;
+  else if(node&&node.data&&typeof node.data==='object')row=Object.assign({}, node, node.data);
+  var mapped=sbMapIntakeRow(row||{});
+  var fb=fallback||{};
+  if(!mapped.intakeId&&fb.intakeId)mapped.intakeId=String(fb.intakeId);
+  if(!mapped.status&&fb.status)mapped.status=String(fb.status);
+  if(!mapped.clientName&&fb.clientName)mapped.clientName=String(fb.clientName);
+  if(!mapped.nurseName&&fb.nurseName)mapped.nurseName=String(fb.nurseName);
+  mapped.success=true;
+  mapped.ok=true;
+  mapped.data=Object.assign({}, mapped);
+  return mapped;
+}
+async function sbNurseIntakeDispatch(payload){
+  var action=payload&&payload.action;
+  var sess=typeof readSbSession==='function'?readSbSession():null;
+  if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
+  try{
+    if(action==='list_new_client_intakes'){
+      var listBody={};
+      var status=payload.status||payload.p_status;
+      var nurse=payload.nurseName||payload.p_nurse_name;
+      var client=payload.clientName||payload.p_client_name;
+      if(status)listBody.p_status=String(status);
+      if(nurse)listBody.p_nurse_name=String(nurse);
+      if(client)listBody.p_client_name=String(client);
+      var listed=await sbRestRpc('list_new_client_intakes', listBody);
+      if(!listed||listed.ok!==true)return {success:false,error:(listed&&listed.error)||'Could not list intakes.',httpStatus:listed&&listed.status||0};
+      var listNode=sbRpcNode(listed.data);
+      var listErr=sbRpcError(listNode);
+      if(listErr)return {success:false,error:listErr,httpStatus:listed.status||0};
+      var rows=sbIntakeListRows(listNode).map(sbMapIntakeRow);
+      return {success:true,ok:true,data:rows,intakes:rows};
+    }
+    if(action==='get_new_client_intake'){
+      var intakeId=String((payload.intakeId||payload.p_intake_id||payload.id)||'');
+      if(!intakeId)return {success:false,error:'No intakeId for this row.'};
+      var include=!!(payload.includeSignatures||payload.includeSigs||payload.p_include_signatures);
+      var got=await sbRestRpc('get_new_client_intake', {p_intake_id:intakeId, p_include_signatures:include});
+      if(!got||got.ok!==true)return {success:false,error:(got&&got.error)||'Could not load this intake.',httpStatus:got&&got.status||0};
+      return sbIntakeOk(sbRpcNode(got.data), {intakeId:intakeId});
+    }
+    if(action==='save_new_client_intake'){
+      var packet=sbIntakePacket(payload);
+      var saved=await sbRestRpc('save_new_client_intake', {p_packet:packet});
+      if(!saved||saved.ok!==true)return {success:false,error:(saved&&saved.error)||'Save failed.',httpStatus:saved&&saved.status||0};
+      return sbIntakeOk(sbRpcNode(saved.data), packet);
+    }
+    var archiveId=String((payload.intakeId||payload.p_intake_id||payload.id)||'');
+    if(!archiveId)return {success:false,error:'No intakeId for this row.'};
+    var archived=await sbRestRpc('archive_new_client_intake', {p_intake_id:archiveId});
+    if(!archived||archived.ok!==true)return {success:false,error:(archived&&archived.error)||'Archive failed.',httpStatus:archived&&archived.status||0};
+    var archivedNode=sbRpcNode(archived.data);
+    var archivedErr=sbRpcError(archivedNode);
+    if(archivedErr)return {success:false,error:archivedErr,httpStatus:archived.status||0};
+    var archivedRow=sbIntakeOk(archivedNode, {intakeId:archiveId, status:'Archived'});
+    if(!archivedRow.status)archivedRow.status='Archived';
+    return archivedRow;
+  }catch(err){
+    return {success:false,error:String(err&&err.message||err||'supabase')};
+  }
+}
+function sbSupervisoryRpcRows(node){
+  var rows=[];
+  if(Array.isArray(node))rows=node;
+  else if(node&&typeof node==='object'){
+    var keys=['data','contacts','rows','records','items'];
+    for(var i=0;i<keys.length;i++){
+      if(Array.isArray(node[keys[i]])){rows=node[keys[i]];break;}
+    }
+  }
+  return rows.map(function(row){
+    if(!row||typeof row!=='object')return row;
+    if(row.contact_type!=null||row.client_name!=null||row.contact_date!=null||row.pdf_storage_path!=null||row.legacy_id!=null){
+      return sbMapSupervisoryContact(row);
+    }
+    if(!row.contactId&&(row.id||row.contact_id))row.contactId=String(row.id||row.contact_id);
+    return row;
+  });
+}
+async function sbListSupervisoryContactsRpc(payload){
+  var body={
+    p_include_archived:!!(payload&&(payload.includeArchived||payload.include_archived))
+  };
+  if(payload&&payload.clientName)body.p_client_name=String(payload.clientName);
+  if(payload&&payload.contactType)body.p_contact_type=String(payload.contactType);
+  var got=await sbRestRpc('list_supervisory_contacts_rpc', body);
+  if(!got||got.ok!==true)return {success:false,error:(got&&got.error)||'supervisory_contacts',httpStatus:got&&got.status||0};
+  var node=sbRpcNode(got.data);
+  var err=sbRpcError(node);
+  if(err)return {success:false,error:err,httpStatus:got.status||0};
+  var mapped=sbSupervisoryRpcRows(node);
+  if(payload&&payload.sinceDays){
+    var days=Number(payload.sinceDays);
+    if(isFinite(days)&&days>0){
+      var cutoff=Date.now()-days*24*60*60*1000;
+      mapped=mapped.filter(function(row){
+        var ms=sbScContactMs(row&&(row.contactDate||row.ContactDate||row.updatedAt||row.createdAt));
+        return !ms||ms>=cutoff;
+      });
+    }
+  }
+  return {success:true,data:mapped,contacts:mapped};
+}
+async function sbArchiveSupervisoryContactRpc(payload){
+  var id=String((payload&&(payload.contactId||payload.id||payload.p_contact_id))||'').trim();
+  if(!id)return {success:false,error:'No contactId for this row.'};
+  var got=await sbRestRpc('archive_supervisory_contact_rpc', {p_contact_id:id});
+  if(!got||got.ok!==true)return {success:false,error:(got&&got.error)||'Archive failed',httpStatus:got&&got.status||0};
+  var node=sbRpcNode(got.data);
+  var err=sbRpcError(node);
+  if(err)return {success:false,error:err,httpStatus:got.status||0};
+  var row=sbAsJsonObject(node)||(Array.isArray(node)?sbAsJsonObject(node[0]):null)||{};
+  return {
+    success:true,
+    contactId:String(row.contactId||row.contact_id||row.legacy_id||row.id||id),
+    id:String(row.id||row.contact_id||id),
+    status:String(row.status||row.Status||'Archived'),
+    updatedAt:String(row.updatedAt||row.updated_at||''),
+    isActive:false
+  };
+}
+async function sbNurseSupervisoryDispatch(payload){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
+  var action=payload&&payload.action;
+  var sess=typeof readSbSession==='function'?readSbSession():null;
+  if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
+  try{
+    if(action==='list_supervisory_contacts')return await sbListSupervisoryContactsRpc(payload);
+    if(action==='archive_supervisory_contact'||action==='delete_supervisory_contact')return await sbArchiveSupervisoryContactRpc(payload);
+    return await sbApiSupervisory(payload);
+  }catch(err){
+    return {success:false,error:String(err&&err.message||err||'supabase')};
+  }
+}
 // admin-role-password v=adminpw1 — Forgot uses anon + ECA2026. Settings uses the Admin access_token and omits the recovery code.
 function sbRolePasswordPayload(data){
   var row=data;
@@ -6920,7 +7159,7 @@ async function downloadTSPDF(){
   }
 }
 // sheets-cut-v1: Broadcast Alert ALWAYS stays off Supabase (not gated by evercareSbEnabled).
-// Aide portal reads local broadcast_msg. Nurse feature data ALWAYS stays on /exec.
+// Aide portal reads local broadcast_msg. Broadcast is not Supabase and not /exec.
 function sendBroadcast(){const msg=document.getElementById('broadcastMsg').value.trim();if(!msg){alert('Please enter a message.');return;}localStorage.setItem('broadcast_msg',msg);renderBroadcastPreview();showTempMsg('✅ Alert sent!','var(--success)');}
 function clearBroadcast(){localStorage.removeItem('broadcast_msg');document.getElementById('broadcastMsg').value='';renderBroadcastPreview();showTempMsg('Alert cleared.','var(--teal)');}
 function renderBroadcastPreview(){const msg=localStorage.getItem('broadcast_msg');const el=document.getElementById('broadcastPreview');if(msg){el.innerHTML=`<p style="font-size:0.75rem;color:var(--muted);margin-bottom:7px">Current active alert:</p><div class="broadcast-active">🚨 ${msg}</div>`;}else{el.innerHTML=`<p style="font-size:0.75rem;color:var(--muted)">No active alert.</p>`;}}
@@ -9033,7 +9272,7 @@ async function exportAllAsPDFs(){
 
 // ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
 // sbcut: office Admin/Scheduler list/get/save/archive use Supabase supervisory_contacts by default.
-// Nurse portal (currentAdminRole Nurse) stays Sheets /exec for these actions. Emergency rollback: ?sheets=1 or evercare_sheets=1.
+// v=nursenb1: Nurse list uses list_supervisory_contacts_rpc; Nurse archive uses archive_supervisory_contact_rpc; Nurse save/get/pdf use the same REST supervisory_contacts path. Emergency rollback: ?sheets=1 or evercare_sheets=1.
 // Archive sets status=Archived only. Sheets rollback keeps the Ace /exec actions below.
 // LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
 // list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);

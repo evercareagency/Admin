@@ -24,12 +24,14 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sched1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursenb1">'), 'admin-build meta');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
 assert.ok(html.includes('v=sbcut1b'), 'sbcut hotfix marker');
 assert.ok(html.includes('sheets=1'), 'sheets rollback query');
 assert.ok(html.includes('evercare_sheets'), 'sheets rollback storage key');
-assert.ok(html.includes("currentAdminRole==='Nurse'"), 'nurse portal stays on Sheets');
+assert.ok(html.includes("currentAdminRole==='Nurse'"), 'nurse client writes still detect the Nurse role');
+assert.ok(html.includes('v=nursenb1'), 'nursenb1 marker');
+assert.ok(html.includes("sbRestRpc('list_new_client_intakes'"), 'completes list uses the intake RPC');
 const sendBroadcast = extractFn(html, 'function sendBroadcast()');
 assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broadcast stays local');
 assert.ok(!/supabase|evercareSbEnabled|SHEETS_URL/.test(sendBroadcast), 'broadcast is not on the sbcut');
@@ -622,10 +624,13 @@ async function runBrowser(){
         assert.strictEqual(state.admin,false);
         assert.ok(state.nurseLabel.indexOf('Ada Nurse')>=0,state.nurseLabel);
         const nciBy=Date.now()+4000;
-        while(!on.hits.some(function(h){return h.action==='list_new_client_intakes';})&&Date.now()<nciBy){
+        while(!on.hits.some(function(h){return /\/rpc\/list_new_client_intakes/.test(h.url)&&/Complete/.test(h.post||'');})&&Date.now()<nciBy){
           await new Promise(function(r){setTimeout(r,40);});
         }
-        assert.ok(on.hits.some(function(h){return h.action==='list_new_client_intakes';}), vp.name+' nurse intakes stay on Sheets');
+        const completeHits=on.hits.filter(function(h){return /\/rpc\/list_new_client_intakes/.test(h.url)&&/Complete/.test(h.post||'');});
+        assert.ok(completeHits.length>=1, vp.name+' nurse Completes hit list_new_client_intakes');
+        assert.ok(completeHits.every(function(h){return h.url.indexOf('script.google.com')<0;}), vp.name+' Completes must not use /exec');
+        assert.ok(!on.hits.some(function(h){return h.action==='list_new_client_intakes'&&/script\.google\.com/.test(h.url);}), vp.name+' Completes list is not a Sheets action');
       }else{
         assert.strictEqual(state.admin,true);
         assert.strictEqual(state.nurse,false);
