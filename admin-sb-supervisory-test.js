@@ -24,7 +24,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sched1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursenb1">'), 'admin-build meta');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes(anonFile), 'anon key stays the embedded jwt');
@@ -70,7 +70,8 @@ const sigs = [
   'async function sbSupervisorySave(payload)',
   'async function sbSupervisoryArchive(payload)',
   'async function sbSupervisoryPdf(payload)',
-  'async function sbApiSupervisory(payload)'
+  'async function sbApiSupervisory(payload)',
+  'async function sbNurseSupervisoryDispatch(payload)'
 ];
 const fns = sigs.map(function(sig){
   const fn = extractFn(html, sig);
@@ -483,9 +484,10 @@ Promise.all([
   assert.strictEqual(deleted.error, 'Archive only — hard delete is not allowed');
   assert.strictEqual(hard.calls.length, 0, 'DELETE never hits the network');
 
-  assert.strictEqual(nurseStay.calls.length, 1, 'nurse supervisory save is one sheets call');
-  assert.strictEqual(nurseStay.calls[0].url, sheetsUrl, 'nurse portal supervisory stays on sheets');
-  assert.ok(!nurseStay.calls.some(function(c){return c.url.indexOf('supabase.co') >= 0;}), 'nurse portal must not call supabase');
+  assert.strictEqual(nurseStay.calls.length, 1, 'nurse supervisory save is one supabase call');
+  assert.strictEqual(nurseStay.calls[0].init.method, 'POST');
+  assert.ok(nurseStay.calls[0].url.indexOf('/rest/v1/supervisory_contacts') > 0, 'nurse save uses REST supervisory_contacts');
+  assert.ok(!nurseStay.calls.some(function(c){return c.url === sheetsUrl;}), 'nurse supervisory save must not call sheets');
   assert.ok(defaultOn.calls[0].url.indexOf('/rest/v1/supervisory_contacts') > 0, 'default office list is supabase without ?sb=1');
   assert.ok(!defaultOn.calls.some(function(c){return c.url === sheetsUrl;}), 'default office list must not dual-write sheets');
   assert.strictEqual(nurseAlerts.calls.length, 1);
