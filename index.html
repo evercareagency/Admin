@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- sb archive §3.3/§4.3 2026-09-24 PATCH is_active=false select id,is_active single() when ?sb=1 -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
@@ -3848,14 +3849,67 @@ async function sbAdminUpdateClient(payload){
   }
   return {success:true,id:row.id||id,clientId:row.id||id,data:sbMapClient(row)};
 }
+// §3.3 clients / §4.3 timesheets. Column is is_active.
+// .update({ is_active: false }).eq('id', id).select('id, is_active').single()
+function sbArchiveRepresentation(data){
+  if(Array.isArray(data)){
+    if(data.length!==1)return null;
+    return data[0]||null;
+  }
+  if(data&&typeof data==='object')return data;
+  return null;
+}
+async function sbRestPatchActive(table, id, refreshed){
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,error:'Not signed in',status:401};
+  var url=SUPABASE_URL+'/rest/v1/'+table+'?'+sbFilterQuery([
+    ['id','eq.'+id],
+    ['select','id,is_active']
+  ]);
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'PATCH',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        Accept:'application/vnd.pgrst.object+json',
+        'Content-Type':'application/json',
+        Prefer:'return=representation'
+      },
+      body:JSON.stringify({is_active:false})
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbRestPatchActive(table, id, true);
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status,data:data};
+  return {ok:true,data:data,status:res.status};
+}
+function sbConfirmedArchive(row, id){
+  if(!row||row.is_active!==false){
+    return {success:false,error:'Archive was not confirmed',is_active:row&&typeof row.is_active==='boolean'?row.is_active:null,representation:row||null};
+  }
+  return {success:true,id:row.id||id,is_active:false,representation:row};
+}
 async function sbAdminArchiveClient(payload){
   var id=String((payload&&(payload.clientId||payload.id))||'').trim();
   if(!id)return {success:false,error:'No clientId for this row.'};
-  var got=await sbRestMutate('PATCH','clients',[['id','eq.'+id]],{is_active:false},'return=representation');
-  if(!got.ok)return {success:false,error:got.error||'Could not archive client.',httpStatus:got.status||0};
-  var row=sbFirstRow(got.data);
-  if(!row)return {success:false,error:'Client not found.'};
-  return {success:true,clientId:row.id||id,id:row.id||id,active:false,is_active:false};
+  var got=await sbRestPatchActive('clients', id);
+  if(!got.ok)return {success:false,error:got.error||'Could not archive client.',httpStatus:got.status||0,is_active:null};
+  var confirmed=sbConfirmedArchive(sbArchiveRepresentation(got.data), id);
+  if(!confirmed.success)return confirmed;
+  confirmed.clientId=confirmed.id;
+  return confirmed;
 }
 async function sbAdminUpdateTimesheet(payload){
   var id=String((payload&&payload.id)||'').trim();
@@ -3899,13 +3953,11 @@ async function sbAdminSendCorrection(payload){
   return {success:true,id:row.id,status:row.status||'correction_requested',data:sbMapTimesheet(row)};
 }
 async function sbAdminSoftDeleteTimesheet(payload){
-  var id=String((payload&&payload.id)||'').trim();
+  var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
   if(!id)return {success:false,error:'Timesheet id missing.'};
-  var got=await sbRestMutate('PATCH','timesheets',[['id','eq.'+id]],{is_active:false},'return=representation');
-  if(!got.ok)return {success:false,error:got.error||'Could not delete timesheet.',httpStatus:got.status||0};
-  var row=sbFirstRow(got.data);
-  if(!row)return {success:false,error:'Timesheet not found.'};
-  return {success:true,id:row.id||id,is_active:false};
+  var got=await sbRestPatchActive('timesheets', id);
+  if(!got.ok)return {success:false,error:got.error||'Could not delete timesheet.',httpStatus:got.status||0,is_active:null};
+  return sbConfirmedArchive(sbArchiveRepresentation(got.data), id);
 }
 async function sbAdminWriteDispatch(payload){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
@@ -4807,31 +4859,43 @@ async function sendCorrectionRequest(){
 }
 
 function quickDelete(id){
-  if(!confirm('Delete this timesheet permanently?'))return;
+  showSharedConfirm('Delete this timesheet permanently?',function(){commitTimesheetDelete(id);},'Yes, delete');
+}
+
+function deleteRec(){
+  if(!currentRec)return;
+  const rec=currentRec;
+  showSharedConfirm('Delete timesheet for '+rec.empName+'?',function(){
+    logActivity('Deleted timesheet for '+rec.empName+' ('+(rec.clientName||'')+', week of '+(rec.weekStart||'')+')');
+    commitTimesheetDelete(rec.id);
+    closeModal('detailModal');
+    currentRec=null;
+  },'Yes, delete');
+}
+
+async function commitTimesheetDelete(id){
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
-    sbAdminWriteDispatch({action:'delete',id:id}).then(function(res){
-      if(!(res&&res.success)){
-        showTempMsg((res&&res.error)||'Could not delete timesheet.','var(--danger)');
+    try{
+      const data=await apiPost({action:'delete',id:id});
+      if(!(data&&data.success===true&&data.is_active===false)){
+        showTempMsg((data&&data.error)||'Error deleting timesheet.','var(--danger)');
         return;
       }
+      cacheInvalidate('get_all');
       allRecords=allRecords.filter(r=>String(r.id)!==String(id));
       store.set('admin_records',allRecords);
-      renderTimesheets();
       showTempMsg('🗑️ Deleted.','var(--danger)');
-    }).catch(function(){showTempMsg('Could not delete timesheet.','var(--danger)');});
-    return;
+      renderTimesheets();
+      return;
+    }catch(e){
+      showTempMsg('Error deleting timesheet.','var(--danger)');
+      return;
+    }
   }
   allRecords=allRecords.filter(r=>String(r.id)!==String(id));
   store.set('admin_records',allRecords);
   fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});
   renderTimesheets();showTempMsg('🗑️ Deleted.','var(--danger)');
-}
-
-function deleteRec(){
-  if(!currentRec)return;
-  if(!confirm(`Delete timesheet for ${currentRec.empName}?`))return;
-  logActivity('Deleted timesheet for '+currentRec.empName+' ('+(currentRec.clientName||'')+', week of '+(currentRec.weekStart||'')+')');
-  quickDelete(currentRec.id);closeModal('detailModal');currentRec=null;
 }
 
 function tsPctX(x){return (Number(x)/TS_FORM_PT.sheetW*100).toFixed(4)+'%';}
@@ -7009,16 +7073,21 @@ async function saveClient(){
   }
 }
 
-async function deleteClient(id){
-  if(!confirm('Delete this client? This cannot be undone.'))return;
+function deleteClient(id){
+  showSharedConfirm('Delete this client? This cannot be undone.',function(){commitDeleteClient(id);},'Delete');
+}
+async function commitDeleteClient(id){
   const client=allClients.find(c=>String(c.id)===String(id));
   try{
     const data=await apiPost({action:'delete_client',id});
-    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&!(data&&data.success)){
-      showTempMsg((data&&(data.error||data.message))||'Error deleting client.','var(--danger)');
-      return;
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+      if(!(data&&data.success===true&&data.is_active===false)){
+        showTempMsg((data&&(data.error||data.message))||'Error deleting client.','var(--danger)');
+        return;
+      }
     }
     cacheInvalidate('get_clients');
+    allClients=allClients.filter(c=>String(c.id)!==String(id));
     showTempMsg('Client deleted.','var(--danger)');
     logActivity('Deleted client: '+(client?.name||id));
     renderClients(true);
@@ -7471,6 +7540,7 @@ async function archiveComplianceClient(clientId){
   const res=await postArchiveAction('archive_client','delete_client',{clientId:id},{id:id});
   if(toastArchiveResult(res,'Client deleted.')){
     cacheInvalidate('get_supervisory_compliance');
+    cacheInvalidate('get_clients');
     await loadNurseCompliance(true);
     return true;
   }
