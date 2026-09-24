@@ -35,7 +35,7 @@ assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(!html.includes('evercare_sb_jwt'), 'inservice uses the auth session, not a second jwt key');
 assert.ok(!html.includes('function sbRememberAdminJwt'), 'no parallel token store');
 
-const clearSrc = extractFn(html, 'async function sbClearAssignedTopic()');
+const clearSrc = extractFn(html, 'async function sbClearAssignedTopic(topicId)');
 const upsertSrc = extractFn(html, 'async function sbUpsertAssignment(topicId,aideUsernames)');
 const archiveSrc = extractFn(html, 'async function sbArchiveInserviceResult(id)');
 assert.ok(clearSrc && !/inservice_results/.test(clearSrc), 'clear assignment helper must not touch results');
@@ -46,6 +46,9 @@ assert.ok(!/method:\s*'DELETE'/.test(archiveSrc+clearSrc+upsertSrc), 'no hard de
 const sheetsClear = extractFn(html, 'async function clearAssignment()');
 assert.ok(sheetsClear.includes("action:'clear_assigned_topic'"), 'flag-off clear still posts Sheets');
 assert.ok(!/inservice_results/.test(sheetsClear), 'Sheets clear function must not name results table');
+assert.ok(sheetsClear.includes('evercareSbEnabled()'), 'topic id is attached only when the sb flag is on');
+assert.ok(sheetsClear.includes('payload.topicId=String(sel.value)'), 'sb clear sends the selected topic id');
+assert.ok(extractFn(html, 'function sbAssignTopicQuery()').includes('isAssignTopicTouched'), 'refresh follows the topic the user selected');
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
 assert.ok(apiPost.indexOf('evercareSbEnabled()') < apiPost.indexOf('SHEETS_URL'), 'flag check precedes Sheets');
@@ -70,13 +73,19 @@ const names = [
   'async function sbUpdateInserviceAnswers(id,answers)',
   'function sbUsernameList(raw)',
   'function sbMergeAideUsernames(existing,incoming)',
+  'function sbParseAssignmentMap(row)',
+  'function sbParseAssignmentRows(rows)',
+  'function sbAssignmentWriteBody(map,focusTopicId)',
+  'function sbProjectAssignment(map,topicId,focusTopicId)',
   'function sbMapAssignment(row)',
   'async function sbFetchAssignmentRow()',
-  'async function sbGetAssignedTopic()',
+  'function sbAssignmentMapFromFetch(got)',
+  'async function sbPostAssignment(body)',
+  'async function sbGetAssignedTopic(topicId)',
   'async function sbUpsertAssignment(topicId,aideUsernames)',
   'async function sbSetAssignedTopic(topicId)',
   'async function sbAssignSelectedAides(topicId,aideUsernames)',
-  'async function sbClearAssignedTopic()',
+  'async function sbClearAssignedTopic(topicId)',
   'async function sbInserviceDispatch(payload)',
   'async function apiPost(payload)'
 ];
@@ -293,6 +302,58 @@ function sessionWindow(){
   assert.ok(!clearCalls.some(function(c){return c.init.method==='DELETE';}));
 
   assign.calls.length = 0;
+  assignment = {org_id:ORG, topic_id:'1', aide_usernames:['bbj']};
+  const topicB = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'2', aideUsernames:['bowlax19']});
+  assert.strictEqual(topicB.success, true);
+  assert.strictEqual(topicB.topicId, '2');
+  assert.strictEqual(JSON.stringify(topicB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(topicB.assignAll, false);
+  const multiBody = JSON.parse(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().init.body);
+  assert.strictEqual(multiBody.org_id, ORG);
+  assert.strictEqual(multiBody.topic_id, '2');
+  assert.strictEqual(multiBody.aide_usernames.v, 2);
+  assert.deepStrictEqual(multiBody.aide_usernames.topics['1'], {aides:['bbj']});
+  assert.deepStrictEqual(multiBody.aide_usernames.topics['2'], {aides:['bowlax19']});
+  assert.ok(assign.calls.every(function(c){return c.url.indexOf('inservice_results')<0&&c.init.method!=='DELETE';}), 'second topic assign does not delete or touch results');
+
+  assign.calls.length = 0;
+  const stillA = await assign.box.apiPost({action:'get_assigned_topic', topicId:'1'});
+  assert.strictEqual(stillA.topicId, '1');
+  assert.strictEqual(JSON.stringify(stillA.aideUsernames), JSON.stringify(['bbj']));
+  assert.strictEqual(stillA.assignAll, false);
+  const stillB = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
+  assert.strictEqual(JSON.stringify(stillB.aideUsernames), JSON.stringify(['bowlax19']));
+
+  assign.calls.length = 0;
+  const clearA = await assign.box.apiPost({action:'clear_assigned_topic', topicId:'1'});
+  assert.strictEqual(clearA.success, true);
+  assert.strictEqual(clearA.topicId, null);
+  const clearAPosts = assign.calls.filter(function(c){return c.init.method==='POST';});
+  assert.strictEqual(clearAPosts.length, 1);
+  assert.deepStrictEqual(JSON.parse(clearAPosts[0].init.body), {org_id:ORG, topic_id:'2', aide_usernames:['bowlax19']});
+  assert.ok(assign.calls.every(function(c){return c.url.indexOf('inservice_results')<0&&c.init.method!=='DELETE';}), 'scoped clear does not delete or touch results');
+  const afterClearA = await assign.box.apiPost({action:'get_assigned_topic', topicId:'1'});
+  assert.strictEqual(afterClearA.topicId, null);
+  assert.strictEqual(afterClearA.assignAll, false);
+  const keptB = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
+  assert.strictEqual(keptB.topicId, '2');
+  assert.strictEqual(JSON.stringify(keptB.aideUsernames), JSON.stringify(['bowlax19']));
+
+  assign.calls.length = 0;
+  const allOther = await assign.box.apiPost({action:'set_assigned_topic', topicId:'3'});
+  assert.strictEqual(allOther.assignAll, true);
+  assert.strictEqual(allOther.topicId, '3');
+  const allBody = JSON.parse(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().init.body);
+  assert.strictEqual(allBody.aide_usernames.v, 2);
+  assert.deepStrictEqual(allBody.aide_usernames.topics['2'], {aides:['bowlax19']});
+  assert.deepStrictEqual(allBody.aide_usernames.topics['3'], {aides:null});
+  const clearOther = await assign.box.apiPost({action:'clear_assigned_topic', topicId:'3'});
+  assert.strictEqual(clearOther.topicId, null);
+  assert.deepStrictEqual(assignment, {org_id:ORG, topic_id:'2', aide_usernames:['bowlax19']});
+  const afterOther = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
+  assert.strictEqual(JSON.stringify(afterOther.aideUsernames), JSON.stringify(['bowlax19']));
+
+  assign.calls.length = 0;
   const saved = await assign.box.apiPost({action:'admin_update_inservice_answers', id:row.id, answers:[0,0]});
   assert.strictEqual(saved.success, true);
   assert.strictEqual(saved.score_pct, 50);
@@ -322,6 +383,40 @@ function sessionWindow(){
   const alias = await assign.box.apiPost({action:'archive_inservice_result', id:row.id});
   assert.strictEqual(alias.success, true);
   assert.deepStrictEqual(JSON.parse(assign.calls.filter(function(c){return c.init.method==='PATCH';}).pop().init.body), {status:'Archived'});
+
+  const uiNames = [
+    'function evercareSbEnabled()',
+    'async function clearAssignment()',
+    'function isAssignSheetsFailMsg(data,err)'
+  ];
+  function uiBox(search, topicValue){
+    const posts = [];
+    const box = {
+      location: {search: search},
+      localStorage: {getItem: function(){return null;}},
+      document: {getElementById: function(id){
+        if(id==='assignTopicSel')return {value: topicValue};
+        return null;
+      }},
+      showTempMsg: function(){},
+      cacheInvalidate: function(){},
+      renderInservices: function(){},
+      apiPost: function(payload){posts.push(payload); return Promise.resolve({success:true, topicId:null});},
+      evercareSbEnabled: null
+    };
+    vm.createContext(box);
+    vm.runInContext(uiNames.map(function(sig){return extractFn(html, sig);}).join('\n'), box);
+    return {box:box, posts:posts};
+  }
+  const sheetsUi = uiBox('', '1');
+  await sheetsUi.box.clearAssignment();
+  assert.strictEqual(JSON.stringify(sheetsUi.posts[0]), JSON.stringify({action:'clear_assigned_topic'}), 'flag off clear has no topic id');
+  const sbUi = uiBox('?sb=1', '1');
+  await sbUi.box.clearAssignment();
+  assert.strictEqual(JSON.stringify(sbUi.posts[0]), JSON.stringify({action:'clear_assigned_topic', topicId:'1'}), 'flag on clear sends the selected topic only');
+  const sbUiB = uiBox('?sb=1', '2');
+  await sbUiB.box.clearAssignment();
+  assert.strictEqual(sbUiB.posts[0].topicId, '2');
 
   console.log('inservice-sb-dual-test: ok');
 })().catch(function(err){
