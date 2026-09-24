@@ -37,7 +37,10 @@ assert.ok(!html.includes('/functions/v1'), 'no Edge Function');
 assert.ok(!/\.rpc\(/.test(html), 'no RPC render');
 const byteFn = extractFn(html, 'async function sbTimesheetPdfBytes(rec)');
 assert.ok(byteFn, 'client byte helper');
-assert.ok(byteFn.indexOf('renderTimesheetPdfBlob') >= 0 && byteFn.indexOf('renderTimesheetPdfBlob') < byteFn.indexOf('sbSheetsTimesheetPdfBytes'), 'overlay runs before Sheets fallback');
+assert.ok(byteFn.indexOf('renderTimesheetPdfBlob') >= 0, 'overlay is the PDF byte source');
+assert.ok(!byteFn.includes('sbSheetsTimesheetPdfBytes') && !byteFn.includes('get_timesheet_pdf'), 'default PDF bytes do not call /exec');
+assert.ok(html.includes('Sunday Drive TimesheetArchive stays ON'), 'Drive archive dual stays on');
+assert.ok(html.includes('sheets-cut-v1'), 'ace cut contract marker');
 
 const opener = extractFn(html, 'function openTimesheetPdf(id)');
 const flagOffTail = opener.slice(opener.lastIndexOf('if(!requireTimesheetSignatures(r))return;'));
@@ -79,7 +82,6 @@ const fns = [
   'function sbWrapPdfBytes(bytes)',
   'function sbB64ToBytes(b64)',
   'function sbPdfBytesFromUnknown(bytes)',
-  'async function sbSheetsTimesheetPdfBytes(row)',
   'async function sbTimesheetPdfBytes(rec)',
   'async function sbEnsureTimesheetStoragePdf(row)',
   'function timesheetPdfAvailable(r)'
@@ -351,15 +353,11 @@ function runUpload(){
     blocked.box.renderTimesheetPdfBlob = function(){return Promise.reject(new Error('overlay blocked'));};
     const blockedRow = {id: tsId, pdfLink: driveLink, pdfStoragePath: ''};
     return blocked.box.sbEnsureTimesheetStoragePdf(blockedRow).then(function(fromSheets){
-      assert.strictEqual(fromSheets.ok, true, 'Sheets bytes still upload when the overlay is blocked');
-      assert.ok(fromSheets.url.indexOf('token=sheets') > 0, fromSheets.url);
-      const sheetsCall = blocked.calls[0];
-      assert.ok(sheetsCall.url.indexOf('/exec') > 0, sheetsCall.url);
-      assert.deepStrictEqual(bodyOf(sheetsCall), {action: 'get_timesheet_pdf', id: tsId, timesheetId: tsId});
-      assert.strictEqual(blocked.calls[1].init.method, 'POST');
-      assert.ok(blocked.calls[1].url.indexOf('/storage/v1/object/evercare-pdfs/') > 0);
-      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0;}));
-      assert.strictEqual(blockedRow.pdfLink, driveLink);
+      assert.strictEqual(fromSheets.ok, false, 'overlay miss is a soft fail');
+      assert.strictEqual(fromSheets.soft, true);
+      assert.strictEqual(blocked.calls.length, 0, 'default PDF miss must not call /exec');
+      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0 || c.url.indexOf('script.google.com') >= 0;}));
+      assert.strictEqual(blockedRow.pdfLink, driveLink, 'Drive pdf_link stays; TimesheetArchive is not disabled');
       console.log('admin-sb-pdf-test: ok');
       return runBrowser();
     });
