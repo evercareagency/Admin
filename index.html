@@ -10720,7 +10720,6 @@ function nciCompletedTableHtml(rows){
     const nurse=escapeHtml(r.nurseName||r.nurseUsername||'—');
     const pdf=pickIntakePdfLink(r);
     const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
-    const viewDis=pdf?'':' disabled';
     const safe=escapeAttr(id);
     return `<tr>
       <td><strong>${name}</strong></td>
@@ -10730,7 +10729,7 @@ function nciCompletedTableHtml(rows){
       <td>${nurse}</td>
       <td>${pdfCell}</td>
       <td><div class="nci-complete-actions">
-        <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${safe}')"${viewDis}${pdf?'':' title="PDF pending"'}>📄 View</button>
+        <button type="button" class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="viewCompletedIntakePdf('${safe}')"${pdf?'':' title="PDF pending — load intake with signatures"'}>📄 View</button>
         <button type="button" class="btn btn-sm btn-navy" onclick="editCompletedIntake('${safe}')">Edit</button>
         <button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteCompletedIntake('${safe}')">Delete</button>
       </div></td>
@@ -11019,6 +11018,16 @@ async function viewCompletedIntakePdf(intakeId){
     window.open(url,'_blank','noopener');
     return;
   }
+  // View/PDF has no stored link yet. Load this intake with ink (not the Completes list).
+  try{
+    const got=await getNewClientIntake(id,{includeSignatures:true,includeSigs:true});
+    const meta=nciPickPdfMeta(got);
+    if(meta.pdfLink){
+      nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
+      window.open(meta.pdfLink,'_blank','noopener');
+      return;
+    }
+  }catch(e){}
   showTempMsg('PDF not ready yet','var(--warn)');
 }
 

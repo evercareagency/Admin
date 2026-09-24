@@ -43,6 +43,8 @@ const recheckInk = extractFn(html, 'async function nciRecheckPendingCompletePdfs
 const listInk = extractFn(html, 'function nciFetchCompleteList()');
 assert.ok(getInk.includes('payload.includeSignatures=true') && getInk.includes('payload.includeSigs=true'), 'get sends both aliases together');
 assert.ok(resumeInk.includes('includeSignatures:true,includeSigs:true'), 'edit and resume ask for ink');
+const viewInk = extractFn(html, 'async function viewCompletedIntakePdf(intakeId)');
+assert.ok(viewInk.includes('includeSignatures:true,includeSigs:true'), 'View/PDF asks for ink when it loads the intake');
 assert.ok(pollInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(pollInk), 'PDF link poll stays trimmed');
 assert.ok(recheckInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(recheckInk), 'pending PDF recheck stays trimmed');
 assert.ok(!/includeSignatures|includeSigs/.test(listInk), 'Completes list does not ask for signatures');

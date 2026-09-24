@@ -72,7 +72,7 @@ assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()')
 assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
 assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-warmoff1">'), 'warmoff1 admin-build');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursespd1">'), 'nursespd1 admin-build after warmoff1');
 assert.ok(login.includes('openPortalHome('), 'login must open home after success');
 assert.ok(!/get_users|get_all|get_clients|get_assigned_topic/.test(login), 'mgrLogin must not fetch heavy lists');
 assert.ok(!/await\s+renderTimesheets|await\s+apiGetCached|await\s+loadNurseCompliance/.test(login), 'mgrLogin must not await list loads');
