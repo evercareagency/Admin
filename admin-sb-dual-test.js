@@ -24,17 +24,20 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursenb1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-bcast1">'), 'admin-build meta');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
 assert.ok(html.includes('v=sbcut1b'), 'sbcut hotfix marker');
 assert.ok(html.includes('sheets=1'), 'sheets rollback query');
 assert.ok(html.includes('evercare_sheets'), 'sheets rollback storage key');
 assert.ok(html.includes("currentAdminRole==='Nurse'"), 'nurse client writes still detect the Nurse role');
 assert.ok(html.includes('v=nursenb1'), 'nursenb1 marker');
+assert.ok(html.includes('v=bcast1'), 'bcast1 marker');
 assert.ok(html.includes("sbRestRpc('list_new_client_intakes'"), 'completes list uses the intake RPC');
-const sendBroadcast = extractFn(html, 'function sendBroadcast()');
-assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broadcast stays local');
-assert.ok(!/supabase|evercareSbEnabled|SHEETS_URL/.test(sendBroadcast), 'broadcast is not on the sbcut');
+const sendBroadcast = extractFn(html, 'async function sendBroadcast()') || extractFn(html, 'function sendBroadcast()');
+assert.ok(sendBroadcast.includes("sbRestRpc('send_broadcast'"), 'broadcast send uses Ace on cut ON');
+assert.ok(sendBroadcast.includes('evercareSbEnabled()'), 'broadcast gates on sb cut');
+assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broadcast rollback keeps localStorage');
+assert.ok(!/SHEETS_URL/.test(sendBroadcast), 'broadcast has no Sheets /exec');
 assert.ok(html.includes("const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';"), 'supabase url');
 assert.ok(!html.includes('lvaglmztnlnsrhlluayz'), 'abandoned project ref must not appear');
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');

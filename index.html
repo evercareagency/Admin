@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, nurse alerts, and nurse client writes stay /exec. Broadcast Alert is not Supabase (local broadcast_msg). Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
+<!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, nurse alerts, and nurse client writes stay /exec. Broadcast Alert is Ace RPCs as of v=bcast1 (get_active_broadcast / send_broadcast / clear_broadcast); rollback keeps local broadcast_msg — no Sheets /exec for Broadcast. Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
 <!-- sb archive §3.3/§4.3 2026-09-24 v=sbcut1b PATCH is_active=false select id,is_active single() default trash is Archive, not hard DELETE -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
@@ -30,8 +30,9 @@
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
 <!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. Open View/PDF/edit that needs ink: get_new_client_intake includeSignatures:true (alias includeSigs:true). List, Completes prefetch, and home loads do not send that flag. -->
 <!-- admin schedule 2026-09-24 v=sched1 week grid clients × Mon–Sun. Usual pattern once; cell edits are exceptions for that date. Live Ace: list_schedule_week(p_week_start), upsert_schedule_pattern, upsert_schedule_exception (call_off|cover|hours_override|aide_override|clear), delete_schedule_pattern. Office access_token via sbRestRpc. No localStorage stub. No Sheets /exec. No Sandata/EVV chips. -->
-<!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Broadcast stays local. Compliance, nurse alerts, and nurse client writes stay /exec. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
-<meta name="admin-build" content="2026-09-24-nursenb1">
+<!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Compliance, nurse alerts, and nurse client writes stay /exec. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
+<!-- admin broadcast 2026-09-24 v=bcast1 admin-build 2026-09-24-bcast1. Cut ON: tab open/load POST rpc/get_active_broadcast {}; Send POST rpc/send_broadcast {p_message}; Clear POST rpc/clear_broadcast {}. Office JWT via sbRestRpc. Preview from data.message (empty if data null). No localStorage broadcast_msg on cut-ON. Rollback ?sheets=1 or evercare_sheets=1 keeps local broadcast_msg exactly. No Sheets /exec for Broadcast. Write roles Ace-enforced admin+scheduler. -->
+<meta name="admin-build" content="2026-09-24-bcast1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -7158,11 +7159,115 @@ async function downloadTSPDF(){
     showTempMsg('Error generating PDF. Try Print instead.','var(--danger)');
   }
 }
-// sheets-cut-v1: Broadcast Alert ALWAYS stays off Supabase (not gated by evercareSbEnabled).
-// Aide portal reads local broadcast_msg. Broadcast is not Supabase and not /exec.
-function sendBroadcast(){const msg=document.getElementById('broadcastMsg').value.trim();if(!msg){alert('Please enter a message.');return;}localStorage.setItem('broadcast_msg',msg);renderBroadcastPreview();showTempMsg('✅ Alert sent!','var(--success)');}
-function clearBroadcast(){localStorage.removeItem('broadcast_msg');document.getElementById('broadcastMsg').value='';renderBroadcastPreview();showTempMsg('Alert cleared.','var(--teal)');}
-function renderBroadcastPreview(){const msg=localStorage.getItem('broadcast_msg');const el=document.getElementById('broadcastPreview');if(msg){el.innerHTML=`<p style="font-size:0.75rem;color:var(--muted);margin-bottom:7px">Current active alert:</p><div class="broadcast-active">🚨 ${msg}</div>`;}else{el.innerHTML=`<p style="font-size:0.75rem;color:var(--muted)">No active alert.</p>`;}}
+// admin broadcast v=bcast1 — Ace CALLABLE when evercareSbEnabled. Rollback keeps local broadcast_msg. No Sheets /exec.
+function bcastPaintPreview(msg){
+  var el=document.getElementById('broadcastPreview');
+  if(!el)return;
+  if(msg){el.innerHTML='<p style="font-size:0.75rem;color:var(--muted);margin-bottom:7px">Current active alert:</p><div class="broadcast-active">🚨 '+msg+'</div>';}
+  else{el.innerHTML='<p style="font-size:0.75rem;color:var(--muted)">No active alert.</p>';}
+}
+function bcastActiveFromRpc(got){
+  if(!got||got.ok!==true)return {ok:false,error:(got&&got.error)||'Could not load broadcast.',msg:''};
+  var node=got.data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){node=null;}
+  }
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  var payload=node;
+  if(node&&typeof node==='object'&&!Array.isArray(node)&&(Object.prototype.hasOwnProperty.call(node,'data')||node.ok!=null||node.success!=null)){
+    if(node.ok===false||node.success===false)return {ok:false,error:String(node.error||node.message||'Request failed.'),msg:''};
+    payload=node.data;
+  }
+  if(payload==null)return {ok:true,msg:''};
+  if(typeof payload==='object'&&!Array.isArray(payload)){
+    if(payload.message==null||payload.message==='')return {ok:true,msg:''};
+    return {ok:true,msg:String(payload.message)};
+  }
+  if(typeof payload==='string')return {ok:true,msg:payload};
+  return {ok:true,msg:''};
+}
+function renderBroadcastPreviewLocal(){
+  var msg=localStorage.getItem('broadcast_msg');
+  bcastPaintPreview(msg||'');
+}
+async function loadActiveBroadcast(){
+  if(!(typeof evercareSbEnabled==='function'&&evercareSbEnabled())){
+    renderBroadcastPreviewLocal();
+    return;
+  }
+  if(typeof sbRestRpc!=='function'){
+    bcastPaintPreview('');
+    return;
+  }
+  var got;
+  try{got=await sbRestRpc('get_active_broadcast',{});}
+  catch(e){got={ok:false,error:String(e&&e.message||e||'broadcast')};}
+  var parsed=bcastActiveFromRpc(got);
+  if(!parsed.ok){
+    bcastPaintPreview('');
+    if(typeof showTempMsg==='function')showTempMsg(parsed.error||'Could not load broadcast.','var(--danger)');
+    return;
+  }
+  bcastPaintPreview(parsed.msg||'');
+}
+async function sendBroadcast(){
+  var input=document.getElementById('broadcastMsg');
+  var msg=input&&input.value?String(input.value).trim():'';
+  if(!msg){alert('Please enter a message.');return;}
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    if(typeof sbRestRpc!=='function'){
+      showTempMsg('Could not send alert.','var(--danger)');
+      return;
+    }
+    var got;
+    try{got=await sbRestRpc('send_broadcast',{p_message:msg});}
+    catch(e){got={ok:false,error:String(e&&e.message||e||'broadcast')};}
+    var parsed=bcastActiveFromRpc(got);
+    if(!parsed.ok){
+      showTempMsg(parsed.error||'Could not send alert.','var(--danger)');
+      return;
+    }
+    bcastPaintPreview(parsed.msg||msg);
+    showTempMsg('✅ Alert sent!','var(--success)');
+    return;
+  }
+  localStorage.setItem('broadcast_msg',msg);
+  renderBroadcastPreviewLocal();
+  showTempMsg('✅ Alert sent!','var(--success)');
+}
+async function clearBroadcast(){
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    if(typeof sbRestRpc!=='function'){
+      showTempMsg('Could not clear alert.','var(--danger)');
+      return;
+    }
+    var got;
+    try{got=await sbRestRpc('clear_broadcast',{});}
+    catch(e){got={ok:false,error:String(e&&e.message||e||'broadcast')};}
+    var parsed=bcastActiveFromRpc(got);
+    if(!parsed.ok){
+      showTempMsg(parsed.error||'Could not clear alert.','var(--danger)');
+      return;
+    }
+    var cleared=document.getElementById('broadcastMsg');
+    if(cleared)cleared.value='';
+    bcastPaintPreview('');
+    showTempMsg('Alert cleared.','var(--teal)');
+    return;
+  }
+  localStorage.removeItem('broadcast_msg');
+  var localInput=document.getElementById('broadcastMsg');
+  if(localInput)localInput.value='';
+  renderBroadcastPreviewLocal();
+  showTempMsg('Alert cleared.','var(--teal)');
+}
+function renderBroadcastPreview(){
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    loadActiveBroadcast();
+    return;
+  }
+  renderBroadcastPreviewLocal();
+}
 
 // SETTINGS
 async function changeRolePassword(role){
