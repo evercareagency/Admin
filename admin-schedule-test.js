@@ -9,7 +9,7 @@ const vm = require('vm');
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
 assert.ok(html.includes('<!-- admin schedule 2026-09-24 v=sched1'), 'schedule tip marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursenb1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-bcast1">'), 'admin-build meta');
 assert.ok(html.includes('<!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->'), 'adminpw1 marker stays');
 assert.ok(html.includes('No patterns yet — Add usual pattern'), 'empty-state copy');
 

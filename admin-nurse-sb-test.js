@@ -24,7 +24,8 @@ function extractFn(src, sig){
 }
 
 assert.ok(html.includes('v=nursenb1'), 'nursenb1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursenb1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-bcast1">'), 'admin-build meta');
+assert.ok(html.includes('v=bcast1'), 'bcast1 marker');
 assert.ok(html.includes('v=nursespd1'), 'nursespd1 single-flight UX stays');
 assert.ok(html.includes('v=sched1'), 'schedule marker stays');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
@@ -39,9 +40,10 @@ const schedSrc = html.slice(schedStart, schedEnd);
 assert.ok(schedStart > 0 && schedEnd > schedStart, 'schedule block stays');
 assert.ok(!/list_new_client_intakes|save_new_client_intake|supervisory_contacts/.test(schedSrc), 'schedule block is unchanged by nurse cut');
 
-const sendBroadcast = extractFn(html, 'function sendBroadcast()');
-assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broadcast stays local');
-assert.ok(!/supabase|sbRestRpc|SHEETS_URL/.test(sendBroadcast), 'broadcast is not on the nurse cut');
+const sendBroadcast = extractFn(html, 'async function sendBroadcast()') || extractFn(html, 'function sendBroadcast()');
+assert.ok(sendBroadcast.includes("sbRestRpc('send_broadcast'"), 'broadcast send uses Ace on cut ON');
+assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broadcast rollback keeps localStorage');
+assert.ok(!/SHEETS_URL/.test(sendBroadcast), 'broadcast has no Sheets /exec');
 
 const urlConst = (html.match(/const SUPABASE_URL='([^']+)'/) || [])[1];
 const keyConst = (html.match(/const SUPABASE_ANON_KEY='([^']+)'/) || [])[1];
