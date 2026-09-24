@@ -24,7 +24,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-pdf-1page-actions">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-is-delete">'), 'admin-build meta');
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes(anonFile), 'anon key stays the embedded jwt');
 assert.ok(!html.includes(".delete('supervisory_contacts'"), 'no client hard delete of supervisory_contacts');

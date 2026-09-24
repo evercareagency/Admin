@@ -14,7 +14,8 @@
 <!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 client-overlay no-edge GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 superseded by v=sbcut1b -->
 <!-- timesheet pdf size 2026-09-24 v=sbpdfsize25 jpeg overlay guard 25MiB superseded by v=sbcut1b -->
 <!-- inservice sb dual 2026-09-24 v=sbcut1b topic assignment upsert omits uuid id; topic_id stays text -->
-<!-- timesheet pdf 1 page + desk + cert lock 2026-09-24 v=pdf1p Letter overlay scaled inside the page so the agency line stays on page 1. Archive PATCH is_active=false only. Delete PATCH is_active=false + deleted_at. Restore archive is_active=true where deleted_at is null. Restore trash is_active=true + deleted_at null. No hard DELETE. Office cert track Personal Care / Home Making on cream; signatures on the same cream. -->
+<!-- timesheet pdf 1 page + desk + cert lock 2026-09-24 v=pdf1p admin-build 2026-09-24-pdf-1page-actions Letter overlay scaled inside the page so the agency line stays on page 1. Archive PATCH is_active=false only. Delete PATCH is_active=false + deleted_at. Restore archive is_active=true where deleted_at is null. Restore trash is_active=true + deleted_at null. No hard DELETE. Office cert track Personal Care / Home Making on cream; signatures on the same cream. -->
+<!-- inservice compliance delete 2026-09-24 v=isdel1 Delete is POST /rest/v1/rpc/admin_unassign_inservice_aide {p_topic_id,p_username,p_archive_active_result}. Not Completed sends false. Completed sends true so the row does not flip back to Not Completed. Not Completed rows follow aide_usernames: null = all aides, else only those usernames. -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -25,7 +26,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-pdf-1page-actions">
+<meta name="admin-build" content="2026-09-24-is-delete">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -3845,6 +3846,29 @@ async function sbClearAssignedTopic(topicId){
   if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
   return sbClearAssignedTopicRow(topicId);
 }
+// Ace CALLABLE. Office JWT + anon apikey via sbRestMutate. No assignment upsert and no results PATCH.
+async function sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult){
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
+  var name=String(username||'').trim();
+  if(!name)return {success:false,error:'Aide username missing.'};
+  var got=await sbRestMutate('POST','rpc/admin_unassign_inservice_aide',[],{
+    p_topic_id:String(topicId),
+    p_username:name,
+    p_archive_active_result:archiveActiveResult===true
+  },'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not remove this assignment.',httpStatus:got.status||0};
+  var row=got.data;
+  if(Array.isArray(row))row=row[0]||null;
+  if(row&&typeof row==='object'){
+    if(row.ok===false||row.success===false){
+      return {success:false,error:row.error||row.message||'Could not remove this assignment.'};
+    }
+    if(row.results_hard_deleted===true){
+      return {success:false,error:'Could not remove this assignment.',results_hard_deleted:true};
+    }
+  }
+  return {success:true,results_hard_deleted:false};
+}
 async function sbInserviceDispatch(payload){
   var action=payload&&payload.action;
   try{
@@ -6734,7 +6758,22 @@ function isCompletedActionsHtml(i){
     +'</div>';
 }
 function isPendingActionsHtml(i){
-  return '<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>';
+  return '<div class="actions is-compliance-actions">'
+    +'<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>'
+    +'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISAssignment('+i+')">Delete</button>'
+    +'</div>';
+}
+function isAideOnCurrentISAssignment(assignView, username){
+  // aide_usernames null = all aides; an array = only those usernames.
+  if(!assignView||assignView.success===false)return true;
+  const names=assignView.aideUsernames;
+  if(!Array.isArray(names))return true;
+  const key=String(username||'').trim().toLowerCase();
+  if(!key)return false;
+  for(let i=0;i<names.length;i++){
+    if(String(names[i]||'').trim().toLowerCase()===key)return true;
+  }
+  return false;
 }
 function renderISComplianceTable(rows){
   const tbody=document.getElementById('isComplianceBody');
@@ -6806,8 +6845,10 @@ async function loadISCompliance(force){
       const rows=aides.map(function(a){
         seen[String(a.username||'').toLowerCase()]=1;
         const completion=findISCompletion(completions,a.username,assignedTopic.id);
+        // Not Completed follows assignment scope. Completed results still render.
+        if(!isISCompletedRecord(completion)&&!isAideOnCurrentISAssignment(assignView,a.username))return null;
         return hydrateISComplianceRow(completion||{},a,assignedTopic);
-      });
+      }).filter(Boolean);
       completions.forEach(function(c){
         if(String(isTopicIdOfCompletion(c))!==String(assignedTopic.id))return;
         const key=String(c.username||'').toLowerCase();
@@ -6873,11 +6914,17 @@ function printISCert(rowIndex){
   printCert(row);
 }
 
+function isComplianceDeleteTopicId(row){
+  if(!row)return '';
+  if(row.topicId!=null&&String(row.topicId).trim()!=='')return String(row.topicId);
+  if(row.topic_id!=null&&String(row.topic_id).trim()!=='')return String(row.topic_id);
+  return '';
+}
 function confirmDeleteISResult(rowIndex){
   const row=isComplianceRows[rowIndex];
-  const id=isResultIdOf(row);
-  if(!row||!id){
-    showTempMsg('Cannot delete — Ace result id missing.','var(--danger)');
+  if(!row||!row.isCompleted)return;
+  if(!String(row.username||'').trim()||!isComplianceDeleteTopicId(row)){
+    showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
     return;
   }
   showSharedConfirm('Are you sure?',function(){deleteISResult(rowIndex);},'Yes, delete');
@@ -6885,12 +6932,43 @@ function confirmDeleteISResult(rowIndex){
 
 async function deleteISResult(rowIndex){
   const row=isComplianceRows[rowIndex];
-  const id=isResultIdOf(row);
-  if(!row||!id)return;
-  const res=await postArchiveAction('delete_inservice_result','archive_inservice_result',{id:id});
-  if(toastArchiveResult(res,'Inservice result archived.')){
-    await loadISCompliance(true);
+  if(!row||!row.isCompleted)return;
+  return commitISComplianceDelete(rowIndex, true);
+}
+
+function confirmDeleteISAssignment(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row||row.isCompleted)return;
+  if(!String(row.username||'').trim()||!isComplianceDeleteTopicId(row)){
+    showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
+    return;
   }
+  showSharedConfirm('Are you sure?',function(){deleteISAssignment(rowIndex);},'Yes, delete');
+}
+
+async function deleteISAssignment(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row||row.isCompleted)return;
+  return commitISComplianceDelete(rowIndex, false);
+}
+
+async function commitISComplianceDelete(rowIndex, archiveActiveResult){
+  const row=isComplianceRows[rowIndex];
+  if(!row)return;
+  const username=String(row.username||'').trim();
+  const topicId=isComplianceDeleteTopicId(row);
+  if(!username||!topicId){
+    showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
+    return;
+  }
+  const data=await sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult===true);
+  if(data&&data.success){
+    cacheInvalidate('get_assigned_topic');
+    showTempMsg(archiveActiveResult===true?'Removed from this topic. This result was archived.':'Removed from this topic. Completed results are kept.','var(--success)');
+    await renderInservices(true);
+    return;
+  }
+  showTempMsg(String((data&&(data.error||data.message))||'Could not remove this assignment.'),'var(--danger)');
 }
 
 function buildLocalISQuestions(row){

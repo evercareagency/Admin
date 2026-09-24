@@ -30,6 +30,10 @@ const completedActs = extractFn(html, 'function isCompletedActionsHtml(i)');
 const pendingActs = extractFn(html, 'function isPendingActionsHtml(i)');
 const confirmDel = extractFn(html, 'function confirmDeleteISResult(rowIndex)');
 const deleteRes = extractFn(html, 'async function deleteISResult(rowIndex)');
+const confirmAssign = extractFn(html, 'function confirmDeleteISAssignment(rowIndex)');
+const deleteAssign = extractFn(html, 'async function deleteISAssignment(rowIndex)');
+const commitDel = extractFn(html, 'async function commitISComplianceDelete(rowIndex, archiveActiveResult)');
+const onAssign = extractFn(html, 'function isAideOnCurrentISAssignment(assignView, username)');
 const printHook = extractFn(html, 'function printISCert(rowIndex)');
 const viewRes = extractFn(html, 'async function viewISResults(rowIndex)');
 const startEdit = extractFn(html, 'function startISResultsEdit()');
@@ -65,6 +69,10 @@ assert.ok(completedActs, 'isCompletedActionsHtml missing');
 assert.ok(pendingActs, 'isPendingActionsHtml missing');
 assert.ok(confirmDel, 'confirmDeleteISResult missing');
 assert.ok(deleteRes, 'deleteISResult missing');
+assert.ok(confirmAssign, 'confirmDeleteISAssignment missing');
+assert.ok(deleteAssign, 'deleteISAssignment missing');
+assert.ok(commitDel, 'commitISComplianceDelete missing');
+assert.ok(onAssign, 'isAideOnCurrentISAssignment missing');
 assert.ok(printHook, 'printISCert missing');
 assert.ok(viewRes, 'viewISResults missing');
 assert.ok(startEdit, 'startISResultsEdit missing');
@@ -85,7 +93,7 @@ assert.ok(html.includes('id="isResultsBanner"'), 'score banner');
 assert.ok(html.includes('Clear Assignment removes the current topic from aides only'), 'Clear Assignment copy');
 assert.ok(html.includes('Completion records are kept.'), 'clear success keeps results');
 assert.ok(html.includes("action:'get_inservice_result'"), 'get_inservice_result wired');
-assert.ok(html.includes("postArchiveAction('delete_inservice_result'"), 'delete_inservice_result wired');
+assert.ok(html.includes("rpc/admin_unassign_inservice_aide"), 'compliance delete uses the Ace RPC');
 assert.ok(html.includes("action:'admin_update_inservice_answers'"), 'admin_update_inservice_answers wired');
 assert.ok(html.includes("action:'clear_assigned_topic'"), 'clear_assigned_topic unchanged');
 assert.ok(html.includes("action:'get_inservices'"), 'get_inservices still used');
@@ -100,16 +108,22 @@ assert.ok(completedActs.indexOf('View Cert') < completedActs.indexOf('Print Cert
 assert.ok(completedActs.indexOf('Print Cert') < completedActs.indexOf('Delete'), 'Print Cert before Delete');
 assert.ok(completedActs.includes('isOfficeCertStaff'), 'certs are office staff only');
 assert.ok(pendingActs.includes('Send Reminder'), 'not completed keeps Send Reminder');
+assert.ok(pendingActs.includes('Delete'), 'not completed includes Delete');
+assert.ok(pendingActs.includes('confirmDeleteISAssignment'), 'not completed Delete confirms the assignment');
+assert.ok(!pendingActs.includes('confirmDeleteISResult'), 'not completed Delete does not archive a result');
+assert.ok(pendingActs.indexOf('Send Reminder') < pendingActs.indexOf('Delete'), 'Send Reminder before Delete');
 assert.ok(!pendingActs.includes('View Results'), 'not completed has no View Results');
 assert.ok(!pendingActs.includes('View Cert'), 'not completed has no View Cert');
 assert.ok(!pendingActs.includes('Print Cert'), 'not completed has no Print Cert');
-assert.ok(!pendingActs.includes('Delete'), 'not completed has no Delete');
 
 assert.ok(printHook.includes('printCert(row)'), 'Print Cert calls existing printCert');
 assert.ok(confirmDel.includes("showSharedConfirm('Are you sure?'"), 'delete uses in-DOM Are you sure?');
 assert.ok(confirmDel.includes('Yes, delete'), 'delete confirm label');
-assert.ok(!/window\.confirm/.test(confirmDel+deleteRes+renderTable+completedActs), 'no window.confirm');
-assert.ok(!/\bconfirm\(/.test(confirmDel+deleteRes), 'no confirm()');
+assert.ok(confirmAssign.includes("showSharedConfirm('Are you sure?'"), 'assignment delete uses Are you sure?');
+assert.ok(confirmAssign.includes('Yes, delete'), 'assignment delete confirm label');
+assert.ok(confirmAssign.includes('deleteISAssignment'), 'assignment confirm calls deleteISAssignment');
+assert.ok(!/window\.confirm/.test(confirmDel+deleteRes+confirmAssign+deleteAssign+renderTable+completedActs+pendingActs), 'no window.confirm');
+assert.ok(!/\bconfirm\(/.test(confirmDel+deleteRes+confirmAssign+deleteAssign), 'no confirm()');
 
 assert.ok(clearAssignment.includes("action:'clear_assigned_topic'"), 'clear posts clear_assigned_topic only');
 assert.ok(!/delete_inservice_result/.test(clearAssignment), 'clear must not delete results');
@@ -131,7 +145,17 @@ assert.ok(saveEdit.includes("action:'get_inservice_result'"), 'save may refresh 
 assert.ok(saveEdit.includes('rememberISResultDetail'), 'save caches painted result for reopen');
 assert.ok(saveEdit.includes('loadISCompliance(true)'), 'save refreshes score/list');
 assert.ok(getShape && aceErr && remember && cached && fallbackQs && adopt && regrade && mergeRow, 'hotfix helpers missing');
-assert.ok(deleteRes.includes("postArchiveAction('delete_inservice_result','archive_inservice_result',{id:id})"), 'delete/archive LOCK { id }');
+assert.ok(deleteRes.includes('commitISComplianceDelete(rowIndex, true)'), 'completed delete archives via the RPC flag');
+assert.ok(deleteAssign.includes('commitISComplianceDelete(rowIndex, false)'), 'not completed delete does not archive');
+assert.ok(commitDel.includes('sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult===true)'), 'both deletes call the RPC helper');
+assert.ok(!/postArchiveAction|delete_inservice_result|archive_inservice_result|inservice_results|inservice_topic_assignment|apiPost\(/.test(deleteRes+deleteAssign+commitDel), 'dashboard delete has no second path');
+assert.ok(!/clear_assigned_topic/.test(deleteAssign+commitDel), 'one aide delete must not clear the whole topic');
+assert.ok(onAssign.includes('aide_usernames null = all aides'), 'null assignment means every aide');
+assert.ok(loadIS.includes('isAideOnCurrentISAssignment'), 'not completed rows follow the assignment list');
+assert.ok(loadIS.includes('!isISCompletedRecord(completion)&&!isAideOnCurrentISAssignment'), 'completed rows stay when that aide is off the list');
+assert.ok(html.includes('v=isdel1'), 'isdel1 marker');
+assert.ok(html.includes('2026-09-24-is-delete'), 'is-delete build marker');
+assert.ok(html.includes('v=pdf1p'), 'pdf1p marker stays');
 assert.ok(loadIS.includes('includeArchived')===false || /no includeArchived/.test(html), 'get_inservices skips archived');
 assert.ok(!/includeArchived\s*:/.test(loadIS), 'must not pass includeArchived');
 
@@ -258,6 +282,33 @@ const pending = sandbox.hydrateISComplianceRow({}, {username:'aide2', name:'Pat 
 assert.strictEqual(pending.isCompleted, false);
 assert.strictEqual(sandbox.formatISScoreColumn(pending), '—');
 
+vm.runInContext([pendingActs, onAssign, confirmAssign, extractFn(html, 'function isComplianceDeleteTopicId(row)')].join('\n'), sandbox);
+sandbox.isComplianceRows=[pending];
+sandbox.showSharedConfirm=function(title, fn, label){sandbox._confirm={title:title,label:label,fn:fn};};
+const pendingHtml=sandbox.isPendingActionsHtml(0);
+assert.ok(pendingHtml.includes('Send Reminder'), 'pending html has Send Reminder');
+assert.ok(pendingHtml.includes('Delete'), 'pending html has Delete');
+assert.ok(pendingHtml.indexOf('Send Reminder')<pendingHtml.indexOf('Delete'), 'pending html order');
+assert.ok(pendingHtml.includes('confirmDeleteISAssignment(0)'), 'pending Delete is wired');
+assert.ok(!pendingHtml.includes('View Results')&&!pendingHtml.includes('Print Cert'), 'pending html has no cert actions');
+sandbox.confirmDeleteISAssignment(0);
+assert.strictEqual(sandbox._confirm.title, 'Are you sure?');
+assert.strictEqual(sandbox._confirm.label, 'Yes, delete');
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:true, aideUsernames:null}, 'aide2'), true);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:true, aideUsernames:['Aide2']}, 'aide2'), true);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:true, aideUsernames:['Aide2']}, 'other'), false);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:false, aideUsernames:['Aide2']}, 'aide2'), true);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:false, aideUsernames:['Aide2']}, 'other'), false);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({assignAll:false, aideUsernames:[]}, 'aide2'), false);
+assert.strictEqual(sandbox.isAideOnCurrentISAssignment({success:true, topicId:1}, 'aide2'), true);
+
+vm.runInContext([
+  extractFn(html, 'function isComplianceDeleteTopicId(row)'),
+  deleteRes,
+  deleteAssign,
+  commitDel
+].join('\n'), sandbox);
+
 assert.strictEqual(
   sandbox.formatISAceActionError({success:false,error:'Unknown action'},'get_inservice_result','Could not load results.'),
   'Ace get_inservice_result failed: Unknown action'
@@ -267,6 +318,20 @@ assert.ok(sandbox.isISGetShape({success:true,scoreCorrect:9,scoreTotal:10,scoreP
 assert.ok(!sandbox.isISGetShape({success:true}), 'bare success is not get shape');
 
 (async function probeEditReopen(){
+  const rpcCalls=[];
+  sandbox.sbAdminUnassignInserviceAide=async function(topicId, username, archive){
+    rpcCalls.push({topicId:topicId, username:username, archive:archive});
+    return {success:true, results_hard_deleted:false};
+  };
+  sandbox.cacheInvalidate=function(){};
+  sandbox.renderInservices=async function(){};
+  sandbox.isComplianceRows=[{username:' patjunk ', topicId:1, isCompleted:false}];
+  await sandbox.deleteISAssignment(0);
+  assert.deepStrictEqual(rpcCalls, [{topicId:'1', username:'patjunk', archive:false}]);
+  sandbox.isComplianceRows=[{username:'asha', topicId:2, isCompleted:true, id:'result-asha'}];
+  await sandbox.deleteISResult(0);
+  assert.deepStrictEqual(rpcCalls[1], {topicId:'2', username:'asha', archive:true});
+
   const listRow=sandbox.hydrateISComplianceRow({
     id:'is-asha-1', username:'aide1', empName:'Asha Aide', topicId:1,
     completedAt:'2026-08-02T01:42:29.000Z',
