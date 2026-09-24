@@ -11,7 +11,10 @@ const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 assert.ok(html.includes('<!-- admin schedule 2026-09-24 v=sched1'), 'schedule tip marker');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sched1">'), 'admin-build meta');
 assert.ok(html.includes('<!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->'), 'adminpw1 marker stays');
-assert.ok(html.includes('No patterns yet — Add usual pattern'), 'empty-state copy');
+assert.ok(html.includes('Edit usual pattern'), 'pattern editor button');
+assert.ok(html.includes('Search clients'), 'client search');
+assert.ok(html.includes('id="nav_timesheets"') && html.includes('id="nav_aides"') && html.includes('id="nav_clients"') && html.includes('id="nav_nurse"'), 'desk nav stays');
+assert.ok(html.includes('.nav-item.active{background:rgba(42,127,127,0.3)'), 'active nav is teal');
 
 const nurseAt = html.indexOf('id="nav_nurse"');
 const schedAt = html.indexOf('id="nav_schedule"');
@@ -63,7 +66,7 @@ function makeEl(id){
   els[id]=el;
   return el;
 }
-['schedWeekLabel','schedSourceNote','schedNoClients','schedEmpty','schedScroll','schedHead','schedBody','schedPanel','schedPanelTitle','schedUsualFields','schedExceptionMeta','schedCalloffWrap','schedClearBtn','schedDeleteUsualBtn','schedSaveBtn','schedClientSel','schedWeekdaySel','schedAideSel','schedHours','schedCalloff','schedNote','schedWhen','schedUsualAide','schedFilterAll','schedFilterOpen','schedFilterCalloff','schedSearch'].forEach(makeEl);
+['schedWeekLabel','schedSourceNote','schedCount','schedNoClients','schedScroll','schedHead','schedBody','schedPanel','schedPanelTitle','schedUsualFields','schedExceptionMeta','schedCalloffWrap','schedClearBtn','schedDeleteUsualBtn','schedSaveBtn','schedClientSel','schedWeekdaySel','schedAideSel','schedHours','schedCalloff','schedNote','schedWhen','schedUsualAide','schedFilterAll','schedFilterOpen','schedFilterCalloff','schedSearch'].forEach(makeEl);
 
 const sandbox = {
   allClients:[],
@@ -112,6 +115,11 @@ assert.strictEqual(sandbox.schedWeekdayFromIso('2026-09-27'), 7);
 assert.strictEqual(sandbox.schedAddDays('2026-09-21', 7), '2026-09-28');
 assert.strictEqual(sandbox.schedFormatHours(4), '4h');
 assert.strictEqual(sandbox.schedFormatHours(4.5), '4.5h');
+assert.strictEqual(sandbox.schedClientLabel('Maria Rivera'), 'Rivera, Maria');
+assert.strictEqual(sandbox.schedClientLabel('Rivera, Maria'), 'Rivera, Maria');
+assert.strictEqual(sandbox.schedShortAide('Alice Smith'), 'A. Smith');
+assert.strictEqual(sandbox.schedShortAide('Smith, Alice'), 'A. Smith');
+assert.strictEqual(sandbox.schedRangeFrom({start_time:'08:00', end_time:'11:00'}), '8a\u201311a');
 
 sandbox.schedApplyWeek({
   week_start:'2026-09-24',
@@ -120,8 +128,9 @@ sandbox.schedApplyWeek({
 assert.strictEqual(sandbox.schedWeekStart, '2026-09-21', 'server week snaps to Monday');
 sandbox.schedPaint();
 assert.strictEqual(els.schedScroll.hidden, false, 'empty patterns still show the grid');
-assert.strictEqual(els.schedEmpty.hidden, false, 'add usual pattern stays available');
-assert.ok(els.schedBody.innerHTML.includes('Open'), 'empty day reads Open');
+assert.ok(els.schedBody.innerHTML.includes('is-empty'), 'no pattern is a white cell');
+assert.ok(!els.schedBody.innerHTML.includes('>Open<') && !els.schedBody.innerHTML.includes('Open '), 'blank day is not Open');
+assert.strictEqual(els.schedCount.textContent, '1 client • scroll');
 
 sandbox.schedApplyWeek({
   week_start:'2026-09-21',
@@ -131,21 +140,22 @@ sandbox.schedApplyWeek({
       client_id:'ada',
       client_name:'Ada Client',
       days:{
-        '1':{hours:4, aide_id:'a1', aide_username:'sara', aide_name:'Sara', source:'pattern', exception_kind:null, note:''},
+        '1':{hours:4, aide_id:'a1', aide_username:'sara', aide_name:'Alice Smith', source:'pattern', exception_kind:null, note:'', start_time:'08:00', end_time:'11:00'},
         '2':{hours:null, aide_id:null, aide_name:null, source:'empty', exception_kind:null, note:''},
-        '3':{hours:4, aide_id:'a1', aide_name:'Sara', source:'exception', exception_kind:'call_off', note:'sick'}
+        '3':{hours:4, aide_id:'a1', aide_name:'Alice Smith', source:'exception', exception_kind:'call_off', note:'sick'},
+        '4':{hours:2, aide_id:null, aide_name:null, source:'pattern', exception_kind:null, note:''}
       }
     },
     {
       client_id:'bea',
       client_name:'Bea Client',
       days:{
-        '2':{hours:3, aide_id:'a1', aide_name:'Sara', source:'exception', exception_kind:'cover', note:''}
+        '2':{hours:3, aide_id:'a1', aide_name:'Alice Smith', source:'exception', exception_kind:'cover', note:''}
       }
     }
   ]
 });
-assert.strictEqual(sandbox.schedUsual.length, 1);
+assert.strictEqual(sandbox.schedUsual.length, 2);
 assert.strictEqual(sandbox.schedExceptions.length, 2);
 assert.strictEqual(sandbox.schedExceptions[0].kind, 'call_off');
 assert.strictEqual(sandbox.schedExceptions[0].on_date, '2026-09-23');
@@ -164,21 +174,24 @@ const mon=allRows[0].cells[0];
 const tue=allRows[0].cells[1];
 const wed=allRows[0].cells[2];
 assert.strictEqual(mon.state, 'usual');
-assert.strictEqual(sandbox.schedCellText(mon), 'Sara 4h');
-assert.strictEqual(tue.state, 'open');
+assert.strictEqual(sandbox.schedCellText(mon), 'A. Smith 8a\u201311a');
+assert.strictEqual(tue.state, 'empty');
 assert.strictEqual(sandbox.schedCellText(tue), '');
 assert.strictEqual(wed.state, 'calloff');
-assert.strictEqual(sandbox.schedCellText(wed), 'Sara 4h');
+assert.strictEqual(sandbox.schedCellText(wed), 'Call-off 4h');
+assert.strictEqual(allRows[0].cells[3].state, 'open');
+assert.strictEqual(sandbox.schedCellText(allRows[0].cells[3]), 'Open 2h');
 assert.strictEqual(allRows[1].cells[1].state, 'exception', 'cover paints as an assigned exception');
-assert.strictEqual(sandbox.schedCellText(allRows[1].cells[1]), 'Sara 3h');
+assert.strictEqual(sandbox.schedCellText(allRows[1].cells[1]), 'A. Smith 3h');
 
 sandbox.schedFilterOpen=true;
 sandbox.schedFilterCalloff=false;
 const openRows=sandbox.schedBuildRows().filter(function(r){return !r.hide;});
-assert.ok(openRows.length===2, 'both clients have an open day');
+assert.strictEqual(openRows.length, 1, 'only Ada has an uncovered shift');
 assert.strictEqual(openRows[0].cells[0].shrunk, true, 'staffed Monday shrinks when Open is on');
-assert.strictEqual(openRows[0].cells[1].shrunk, false, 'open Tuesday stays');
+assert.strictEqual(openRows[0].cells[1].shrunk, true, 'blank Tuesday is not an Open shift');
 assert.strictEqual(openRows[0].cells[2].shrunk, true, 'call-off shrinks under the Open filter');
+assert.strictEqual(openRows[0].cells[3].shrunk, false, 'hours with no aide stays');
 
 sandbox.schedFilterOpen=false;
 sandbox.schedFilterCalloff=true;
@@ -192,24 +205,30 @@ sandbox.schedFilterOpen=true;
 sandbox.schedFilterCalloff=true;
 const both=sandbox.schedBuildRows();
 assert.strictEqual(both[0].hide, false);
-assert.strictEqual(both[1].hide, false, 'Bea stays because Tuesday is open');
+assert.strictEqual(both[1].hide, true, 'Bea has neither an open shift nor a call-off');
 assert.strictEqual(both[0].cells[0].shrunk, true);
-assert.strictEqual(both[0].cells[1].shrunk, false);
+assert.strictEqual(both[0].cells[1].shrunk, true);
 assert.strictEqual(both[0].cells[2].shrunk, false);
+assert.strictEqual(both[0].cells[3].shrunk, false);
 assert.strictEqual(both[1].cells[1].shrunk, true, 'reassigned cell shrinks when it is not a problem');
 
 sandbox.schedFilterOpen=false;
 sandbox.schedFilterCalloff=false;
 sandbox.schedLoadError='';
 sandbox.schedPaint();
-assert.ok(els.schedBody.innerHTML.includes('Sara 4h'), 'grid shows aide and hours');
+assert.ok(els.schedBody.innerHTML.includes('A. Smith 8a\u201311a'), 'assigned cell is short name plus range');
+assert.ok(els.schedBody.innerHTML.includes('Call-off 4h'), 'call-off cell shows hours');
+assert.ok(els.schedBody.innerHTML.includes('Open 2h'), 'open cell shows hours');
+assert.ok(els.schedBody.innerHTML.includes('is-empty'), 'blank day stays white');
 assert.ok(els.schedBody.innerHTML.includes('is-calloff'), 'call-off cell class');
 assert.ok(els.schedBody.innerHTML.includes('is-usual'), 'assigned usual cell');
+assert.ok(els.schedBody.innerHTML.includes('Client, Ada'), 'client row is Last, First');
+assert.ok(els.schedBody.innerHTML.includes('sched-num'), 'client rows are numbered');
 assert.ok(!/sandata|evv|present|no-show|contera/i.test(els.schedBody.innerHTML), 'grid has no EVV chips');
-assert.ok(els.schedBody.innerHTML.includes('>Open<')||els.schedBody.innerHTML.includes('sched-open">Open'), 'empty cell reads Open');
 assert.ok(els.schedHead.innerHTML.includes('Mon')&&els.schedHead.innerHTML.includes('Sun'), 'day headers');
-assert.strictEqual(els.schedWeekLabel.textContent, 'Sep 21 – Sep 27, 2026');
-assert.strictEqual(els.schedSourceNote.textContent, '', 'no stub status line');
+assert.strictEqual(els.schedWeekLabel.textContent, 'Sep 21\u201327');
+assert.strictEqual(els.schedCount.textContent, '2 clients • scroll');
+assert.strictEqual(els.schedSourceNote.textContent, '', 'no concept footer');
 
 sandbox.schedFilterCalloff=true;
 els.schedSearch.value='Bea';
@@ -217,7 +236,7 @@ sandbox.schedJumpClient();
 assert.strictEqual(sandbox.schedJumpId, 'bea');
 assert.strictEqual(sandbox.schedFilterCalloff, false, 'search reveals a filtered-out row');
 assert.ok(els.schedBody.innerHTML.includes('is-jump'), 'matching row is marked');
-assert.ok(els.schedBody.innerHTML.indexOf('Bea Client')>=0);
+assert.ok(els.schedBody.innerHTML.indexOf('Client, Bea')>=0);
 
 sandbox.schedOpenCell('ada','2026-09-21',1);
 assert.strictEqual(els.schedPanel.hidden, false);
