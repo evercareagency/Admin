@@ -26,7 +26,8 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-is-delete">
+<!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
+<meta name="admin-build" content="2026-09-24-adminpw1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -548,6 +549,7 @@ body.ts-print-open{overflow:hidden;}
       <select id="adminResetRole" style="width:100%;padding:9px 11px;border:1.5px solid #dce4ef;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.86rem;margin-top:4px">
         <option value="Admin">Admin</option>
         <option value="Scheduler">Scheduler</option>
+        <option value="Nurse">Nurse</option>
       </select>
     </div>
     <div style="text-align:left;margin-bottom:10px">
@@ -1015,6 +1017,10 @@ Call (216) 377-5991 with any questions.</textarea>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
             <div class="field"><label>New Scheduler Password</label><input type="password" id="adm_new_scheduler" placeholder="New Scheduler password"></div>
             <button class="btn btn-teal" style="align-self:end" onclick="changeRolePassword('Scheduler')">🔐 Update Scheduler Password</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div class="field"><label>New Nurse Password</label><input type="password" id="adm_new_nurse" placeholder="New Nurse password"></div>
+            <button class="btn btn-teal" style="align-self:end" onclick="changeRolePassword('Nurse')">🔐 Update Nurse Password</button>
           </div>
           <div style="color:var(--danger);font-size:0.75rem;margin-top:7px;display:none" id="adminPwdErr"></div>
           <div style="color:var(--success);font-size:0.75rem;margin-top:7px;display:none" id="adminPwdOk">✅ Password updated!</div>
@@ -2343,6 +2349,18 @@ async function doAdminReset(){
   if(code!=='ECA2026'){err.textContent='Invalid recovery code.';err.style.display='block';return;}
   if(!newpwd){err.textContent='Please enter a new password.';err.style.display='block';return;}
   try{
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+      if(String(newpwd).length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+      const set=await sbAdminSetRolePasswordAnon(role,newpwd,'ECA2026');
+      if(!set||set.ok!==true){
+        err.textContent=(set&&set.error)||'Error resetting password. Try again.';
+        err.style.display='block';
+        return;
+      }
+      document.getElementById('adminResetModal').style.display='none';
+      showTempMsg('Password reset successfully for '+role+'! Please log in.','#27ae60');
+      return;
+    }
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_forgot_password',role,newPassword:newpwd})});
     document.getElementById('adminResetModal').style.display='none';
     showTempMsg('Password reset successfully for '+role+'! Please log in.','#27ae60');
@@ -3934,6 +3952,64 @@ function sbUsernameIn(list, name){
 }
 async function sbRestRpc(fnName, body){
   return sbRestMutate('POST','rpc/'+fnName,[],body||{},'return=representation');
+}
+// admin-role-password v=adminpw1 — Forgot uses anon + ECA2026. Settings uses the Admin access_token and omits the recovery code.
+function sbRolePasswordPayload(data){
+  var row=data;
+  if(Array.isArray(row))row=row[0]||null;
+  if(typeof row==='string'){
+    try{row=JSON.parse(row);}catch(e){row=null;}
+  }
+  return row&&typeof row==='object'?row:null;
+}
+function sbRolePasswordAccepted(data){
+  var row=sbRolePasswordPayload(data);
+  if(!row||row.ok!==true||row.success!==true){
+    return {ok:false,error:(row&&(row.error||row.message))||'Password was not updated.'};
+  }
+  return {ok:true,role:row.role||'',email:row.email||''};
+}
+async function sbAdminSetRolePasswordAnon(role, newPassword, recoveryCode){
+  var res;
+  try{
+    res=await fetch(SUPABASE_URL+'/rest/v1/rpc/admin_set_role_password',{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+SUPABASE_ANON_KEY,
+        'Content-Type':'application/json',
+        Accept:'application/json',
+        Prefer:'return=representation'
+      },
+      body:JSON.stringify({
+        p_role:role,
+        p_new_password:newPassword,
+        p_recovery_code:recoveryCode
+      })
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
+  var accepted=sbRolePasswordAccepted(data);
+  if(!accepted.ok)return {ok:false,error:accepted.error||'Password was not updated.',status:res.status};
+  return accepted;
+}
+async function sbAdminSetRolePasswordSession(role, newPassword){
+  var got=await sbRestRpc('admin_set_role_password',{
+    p_role:role,
+    p_new_password:newPassword
+  });
+  if(!got||got.ok!==true)return {ok:false,error:(got&&got.error)||'Error updating password. Try again.',status:got&&got.status};
+  var accepted=sbRolePasswordAccepted(got.data);
+  if(!accepted.ok)return {ok:false,error:accepted.error||'Password was not updated.',status:got.status};
+  return accepted;
 }
 function sbMapAideAuth(data){
   var row=typeof sbFirstRow==='function'?sbFirstRow(data):data;
@@ -5799,14 +5875,30 @@ async function changeRolePassword(role){
     showTempMsg('Only Admin can change passwords.','var(--danger)');
     return;
   }
-  const inputId=role==='Admin'?'adm_new_admin':'adm_new_scheduler';
-  const newp=document.getElementById(inputId).value;
+  const inputId=role==='Admin'?'adm_new_admin':(role==='Scheduler'?'adm_new_scheduler':(role==='Nurse'?'adm_new_nurse':''));
+  const input=inputId?document.getElementById(inputId):null;
   const err=document.getElementById('adminPwdErr'),ok=document.getElementById('adminPwdOk');
   err.style.display='none';ok.style.display='none';
+  if(!input){err.textContent='Unknown role.';err.style.display='block';return;}
+  const newp=input.value;
   if(!newp){err.textContent='Enter a new password.';err.style.display='block';return;}
   try{
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+      if(String(newp).length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
+      const set=await sbAdminSetRolePasswordSession(role,newp);
+      if(!set||set.ok!==true){
+        err.textContent=(set&&set.error)||'Error updating password. Try again.';
+        err.style.display='block';
+        return;
+      }
+      input.value='';
+      ok.textContent='✅ '+role+' password updated!';
+      ok.style.display='block';
+      logActivity('Changed '+role+' password');
+      return;
+    }
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'change_admin_password',role,password:newp})});
-    document.getElementById(inputId).value='';
+    input.value='';
     ok.textContent='✅ '+role+' password updated!';
     ok.style.display='block';
     logActivity('Changed '+role+' password');
