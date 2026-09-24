@@ -26,7 +26,9 @@ function extractFn(src, sig){
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-supervisory">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-make">'), 'admin-build meta');
+assert.ok(html.includes('v=sbpdfmake9c24'), 'make/refresh marker is greppable');
+assert.ok(html.includes('GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1'), 'write contract is named in the tip');
 
 const opener = extractFn(html, 'function openTimesheetPdf(id)');
 const flagOffTail = opener.slice(opener.lastIndexOf('if(!requireTimesheetSignatures(r))return;'));
@@ -35,6 +37,11 @@ assert.ok(flagOffTail.includes("alert('No archived PDF yet for this timesheet.')
 assert.ok(flagOffTail.includes("window.open(url,'_blank','noopener')"), 'flag off still opens the legacy link');
 assert.ok(opener.indexOf('evercareSbEnabled()') < opener.indexOf('sbResolveTimesheetPdf(r)'), 'flag on resolves storage before the sheets open');
 assert.ok(opener.includes("res.mode==='storage'"), 'storage URL opens without the Drive link');
+const softPart = opener.slice(0, opener.lastIndexOf('if(!requireTimesheetSignatures(r))return;'));
+assert.ok(softPart.includes('sbEnsureTimesheetStoragePdf(r)'), 'missing path renders and uploads before open');
+assert.ok(softPart.includes('arguments[1]'), 'explicit refresh reuses the make path');
+assert.ok(!softPart.includes('window.open(legacy'), 'soft View does not open Drive');
+assert.ok(!softPart.includes("r.pdfLink"), 'soft View does not read the legacy link');
 
 const fns = [
   'function evercareSbEnabled()',
@@ -51,6 +58,14 @@ const fns = [
   'function sbAbsoluteSignedUrl(signed)',
   'async function sbSignPdfUrl(objectPath, refreshed)',
   'async function sbResolveTimesheetPdf(row)',
+  'function sbBytesToAscii(buf, n)',
+  'async function sbPdfPayloadInfo(pdfBytes)',
+  'function sbRememberTimesheetPdfPath(row, objectPath)',
+  'function sbUuid(v)',
+  'function sbOrgId()',
+  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed)',
+  'async function sbUploadTimesheetPdf(row, pdfBytes, refreshed)',
+  'async function sbEnsureTimesheetStoragePdf(row)',
   'function timesheetPdfAvailable(r)'
 ].map(function(sig){
   const fn = extractFn(html, sig);
@@ -71,6 +86,10 @@ function harness(opts){
     SB_SESSION_KEY: 'evercare_sb_session',
     SB_PDF_BUCKET: 'evercare-pdfs',
     SB_PDF_SIGN_SECONDS: 120,
+    SB_PDF_MIN_BYTES: 1024,
+    SB_PDF_MAX_BYTES: 10485760,
+    EVERCARE_ORG_ID: '4f97f4d3-6635-4544-904c-6b06aa02d40b',
+    Uint8Array: Uint8Array,
     location: {search: opts.search || ''},
     localStorage: {
       getItem: function(k){return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;},
@@ -112,6 +131,8 @@ const session = {
   profile: {id: 'admin-uid', org_id: 'org-1', role: 'admin'}
 };
 const storagePath = 'org-1/timesheet/ts-1.pdf';
+const tsId = '11111111-1111-4111-8111-111111111111';
+const madePath = 'org-1/timesheet/' + tsId + '.pdf';
 const driveLink = 'https://drive.google.com/file/d/abc/view';
 const signedPath = '/object/sign/evercare-pdfs/' + storagePath + '?token=tok123';
 
@@ -160,6 +181,143 @@ const attached = harness({
   session: session,
   responses: [{status: 200, raw: JSON.stringify([{entity_id: 'ts-9', object_path: storagePath, bucket: 'evercare-pdfs'}])}]
 });
+
+function pdfBytes(size, magic){
+  const text = magic == null ? '%PDF-1.4' : magic;
+  const u8 = new Uint8Array(size);
+  for(let i = 0; i < text.length && i < size; i++)u8[i] = text.charCodeAt(i);
+  return {
+    size: size,
+    u8: u8,
+    slice: function(_start, end){
+      const n = end == null ? size : end;
+      const part = u8.slice(0, n);
+      return {arrayBuffer: function(){return Promise.resolve(part.buffer);}};
+    }
+  };
+}
+
+function runUpload(){
+  const uploaded = harness({
+    search: '?sb=1',
+    session: session,
+    responses: [
+      {status: 200, raw: JSON.stringify({Key: madePath})},
+      {status: 204, raw: ''},
+      {status: 201, raw: ''},
+      {status: 200, raw: JSON.stringify({signedURL: '/object/sign/evercare-pdfs/' + madePath + '?token=made'})}
+    ]
+  });
+  const stub = harness({search: '?sb=1', session: session, responses: []});
+  const badMagic = harness({search: '?sb=1', session: session, responses: []});
+  const uploadFail = harness({
+    search: '?sb=1',
+    session: session,
+    responses: [{status: 500, raw: JSON.stringify({message: 'storage down'})}]
+  });
+  const patchFail = harness({
+    search: '?sb=1',
+    session: session,
+    responses: [
+      {status: 200, raw: JSON.stringify({Key: madePath})},
+      {status: 500, raw: JSON.stringify({message: 'patch denied'})}
+    ]
+  });
+  const flagOff = harness({search: '', session: session, responses: []});
+  const ensured = harness({
+    search: '?sb=1',
+    session: session,
+    responses: [
+      {status: 200, raw: JSON.stringify({Key: madePath})},
+      {status: 204, raw: ''},
+      {status: 201, raw: ''},
+      {status: 200, raw: JSON.stringify({signedURL: '/object/sign/evercare-pdfs/' + madePath + '?token=ensured'})}
+    ]
+  });
+  const blob = pdfBytes(2048);
+  ensured.box.renderTimesheetPdfBlob = function(rec){
+    ensured.rendered = rec;
+    return Promise.resolve(blob);
+  };
+  const row = {id: tsId, pdfStoragePath: '', pdf_storage_path: '', pdfLink: driveLink};
+  return uploaded.box.sbUploadTimesheetPdf(row, blob).then(function(up){
+    assert.strictEqual(up.ok, true);
+    assert.ok(up.url.indexOf('/object/sign/evercare-pdfs/' + madePath + '?token=made') > 0, up.url);
+    assert.ok(up.url.indexOf('drive.google.com') < 0);
+    assert.strictEqual(uploaded.calls.length, 4);
+    assert.strictEqual(uploaded.calls[0].init.method, 'POST');
+    assert.ok(uploaded.calls[0].url.indexOf('/storage/v1/object/evercare-pdfs/org-1/timesheet/' + tsId + '.pdf') > 0, uploaded.calls[0].url);
+    assert.ok(uploaded.calls[0].url.indexOf('%2F') < 0, 'path slashes stay');
+    assert.strictEqual(uploaded.calls[0].init.headers.Authorization, 'Bearer user-jwt');
+    assert.strictEqual(uploaded.calls[0].init.headers.apikey, keyConst);
+    assert.strictEqual(uploaded.calls[0].init.headers['Content-Type'], 'application/pdf');
+    assert.strictEqual(uploaded.calls[0].init.headers['x-upsert'], 'true');
+    assert.strictEqual(uploaded.calls[0].init.body, blob);
+    assert.strictEqual(uploaded.calls[1].init.method, 'PATCH');
+    assert.ok(uploaded.calls[1].url.indexOf('/rest/v1/timesheets?') > 0, uploaded.calls[1].url);
+    assert.ok(uploaded.calls[1].url.indexOf('id=eq.' + tsId) > 0, uploaded.calls[1].url);
+    assert.deepStrictEqual(bodyOf(uploaded.calls[1]), {pdf_storage_path: madePath});
+    assert.ok(!Object.prototype.hasOwnProperty.call(bodyOf(uploaded.calls[1]), 'pdf_link'));
+    assert.strictEqual(uploaded.calls[1].init.headers.Prefer, 'return=minimal');
+    assert.strictEqual(uploaded.calls[2].init.method, 'POST');
+    assert.ok(uploaded.calls[2].url.indexOf('/rest/v1/pdf_documents?') > 0, uploaded.calls[2].url);
+    assert.ok(uploaded.calls[2].url.indexOf('on_conflict=org_id') > 0, uploaded.calls[2].url);
+    assert.strictEqual(uploaded.calls[2].init.headers.Prefer, 'resolution=merge-duplicates,return=minimal');
+    const reg = bodyOf(uploaded.calls[2]);
+    assert.strictEqual(reg.org_id, 'org-1');
+    assert.strictEqual(reg.doc_kind, 'timesheet');
+    assert.strictEqual(reg.entity_id, tsId);
+    assert.strictEqual(reg.bucket, 'evercare-pdfs');
+    assert.strictEqual(reg.object_path, madePath);
+    assert.strictEqual(reg.content_type, 'application/pdf');
+    assert.strictEqual(reg.byte_size, 2048);
+    assert.strictEqual(reg.is_active, true);
+    assert.ok(!Object.prototype.hasOwnProperty.call(reg, 'pdf_link'));
+    assert.strictEqual(uploaded.calls[3].init.method, 'POST');
+    assert.ok(uploaded.calls[3].url.indexOf('/object/sign/evercare-pdfs/') > 0);
+    assert.strictEqual(row.pdfLink, driveLink, 'upload must not clear the legacy link');
+    assert.strictEqual(row.pdfStoragePath, madePath);
+    return stub.box.sbUploadTimesheetPdf({id: tsId, pdfLink: driveLink}, pdfBytes(40, '%PDF-'));
+  }).then(function(tiny){
+    assert.strictEqual(tiny.ok, false);
+    assert.strictEqual(tiny.soft, true);
+    assert.strictEqual(stub.calls.length, 0, 'stub PDF must not upload');
+    return badMagic.box.sbUploadTimesheetPdf({id: tsId}, pdfBytes(2048, 'hello'));
+  }).then(function(text){
+    assert.strictEqual(text.ok, false);
+    assert.strictEqual(badMagic.calls.length, 0, 'non-PDF bytes must not upload');
+    const kept = {id: tsId, pdfStoragePath: '', pdfLink: driveLink};
+    return uploadFail.box.sbUploadTimesheetPdf(kept, blob).then(function(failed){
+      assert.strictEqual(failed.ok, false);
+      assert.strictEqual(failed.soft, true);
+      assert.strictEqual(kept.pdfStoragePath, '');
+      assert.strictEqual(kept.pdfLink, driveLink);
+      assert.strictEqual(uploadFail.calls.length, 1, 'failed upload does not patch');
+      return patchFail.box.sbUploadTimesheetPdf(kept, blob);
+    });
+  }).then(function(unlinked){
+    assert.strictEqual(unlinked.ok, false);
+    assert.strictEqual(unlinked.soft, true);
+    assert.strictEqual(patchFail.calls.length, 2, 'patch failure stops before registry and sign');
+    assert.ok(!patchFail.calls.some(function(c){return c.url.indexOf('/pdf_documents') >= 0 || c.url.indexOf('/object/sign/') >= 0;}));
+    return flagOff.box.sbUploadTimesheetPdf({id: tsId, pdfLink: driveLink}, blob);
+  }).then(function(offUp){
+    assert.strictEqual(offUp.skipped, true);
+    assert.strictEqual(flagOff.calls.length, 0, 'flag off must not upload');
+    const live = {id: tsId, pdfLink: driveLink, pdfStoragePath: ''};
+    ensured.box.currentRec = live;
+    return ensured.box.sbEnsureTimesheetStoragePdf(live);
+  }).then(function(made){
+    assert.strictEqual(made.ok, true);
+    assert.strictEqual(ensured.rendered, ensured.box.currentRec);
+    assert.strictEqual(ensured.rendered.pdfLink, driveLink);
+    assert.strictEqual(ensured.box.currentRec.pdfStoragePath, madePath);
+    assert.strictEqual(ensured.box.currentRec.pdfLink, driveLink, 'make must not clear the legacy link');
+    assert.ok(made.url.indexOf('token=ensured') > 0, made.url);
+    console.log('admin-sb-pdf-test: ok');
+    return runBrowser();
+  });
+}
 
 Promise.resolve().then(function(){
   return direct.box.sbResolveTimesheetPdf({id: 'ts-1', pdfStoragePath: storagePath, pdfLink: driveLink});
@@ -224,8 +382,9 @@ Promise.resolve().then(function(){
   return attached.box.sbAttachPdfPaths(rows).then(function(){
     assert.strictEqual(rows[0].pdfStoragePath, storagePath);
     assert.ok(attached.calls[0].url.indexOf('entity_id=in.') > 0);
-    console.log('admin-sb-pdf-test: ok');
-    return runBrowser();
+    assert.strictEqual(direct.box.timesheetPdfAvailable({id: tsId, pdfStoragePath: '', pdfLink: ''}), true);
+    assert.strictEqual(off.box.timesheetPdfAvailable({id: tsId, pdfStoragePath: '', pdfLink: ''}), false);
+    return runUpload();
   });
 }).catch(function(err){
   console.error(err);
@@ -276,7 +435,9 @@ async function runBrowser(){
     pdf_link: driveLink,
     days: {'0': {tin: '08:00', tout: '16:00', hrs: '8:00'}}
   };
-  function install(page, hits){
+  function install(page, hits, opts){
+    opts = opts || {};
+    const sheet = opts.row || timesheetRow;
     return page.setRequestInterception(true).then(function(){
       page.on('request', function(req){
         const u = req.url();
@@ -287,8 +448,8 @@ async function runBrowser(){
         }
         const cors = {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'apikey, authorization, content-type, accept, prefer',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+          'Access-Control-Allow-Headers': 'apikey, authorization, content-type, accept, prefer, x-upsert',
+          'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS'
         };
         if(/supabase\.co|script\.google\.com/.test(u)){
           if(req.method() === 'OPTIONS'){req.respond({status: 204, headers: cors, body: ''});return;}
@@ -296,6 +457,7 @@ async function runBrowser(){
           try{parsed = JSON.parse(req.postData() || '{}');}catch(e){}
           hits.push({url: u, method: req.method(), action: parsed.action || '', body: parsed, headers: req.headers()});
           let raw = JSON.stringify({success: true, data: []});
+          let status = 200;
           if(/script\.google\.com/.test(u) && parsed.action === 'get_all'){
             raw = JSON.stringify({success: true, data: [{
               id: 'sheet-ts', submitted: true, empName: 'Sheet Aide', clientName: 'Sheet Client',
@@ -303,15 +465,29 @@ async function runBrowser(){
               days: {'0': {tin: '08:00', tout: '09:00', hrs: '1:00'}}
             }]});
           }else if(req.method() === 'GET' && /\/rest\/v1\/timesheets/.test(u)){
-            raw = JSON.stringify([timesheetRow]);
+            raw = JSON.stringify([sheet]);
+          }else if(req.method() === 'GET' && /\/rest\/v1\/pdf_documents/.test(u)){
+            raw = '[]';
           }else if(req.method() === 'GET' && /\/rest\/v1\/aides/.test(u)){
             raw = JSON.stringify([]);
           }else if(req.method() === 'GET' && /\/rest\/v1\/clients/.test(u)){
             raw = JSON.stringify([]);
           }else if(req.method() === 'POST' && /\/object\/sign\/evercare-pdfs\//.test(u)){
-            raw = JSON.stringify({signedURL: signedPath});
+            raw = JSON.stringify({signedURL: opts.signedPath || signedPath});
+          }else if(req.method() === 'POST' && /\/storage\/v1\/object\/evercare-pdfs\//.test(u)){
+            if(opts.failUpload){
+              req.respond({status: 500, contentType: 'application/json', headers: cors, body: JSON.stringify({message: 'storage down'})});
+              return;
+            }
+            raw = JSON.stringify({Key: 'uploaded'});
+          }else if(req.method() === 'PATCH' && /\/rest\/v1\/timesheets/.test(u)){
+            status = 204;
+            raw = '';
+          }else if(req.method() === 'POST' && /\/rest\/v1\/pdf_documents/.test(u)){
+            status = 201;
+            raw = '';
           }
-          req.respond({status: 200, contentType: 'application/json', headers: cors, body: raw});
+          req.respond({status: status, contentType: 'application/json', headers: cors, body: raw});
           return;
         }
         req.continue();
@@ -388,6 +564,113 @@ async function runBrowser(){
     assert.deepStrictEqual(offOpened, []);
     assert.ok(!offHits.some(function(h){return /supabase\.co\/storage/.test(h.url) || /\/rest\/v1\//.test(h.url);}), 'flag off View must stay on Sheets');
     console.log('admin-sb-pdf browser flag off: ok');
+
+    const missingRow = Object.assign({}, timesheetRow, {
+      id: tsId,
+      pdf_storage_path: '',
+      pdf_link: driveLink
+    });
+    const madeSigned = '/object/sign/evercare-pdfs/' + madePath + '?token=made123';
+    async function stubRender(page){
+      await page.evaluate(function(){
+        window.renderTimesheetPdfBlob = function(){
+          var bytes = new Uint8Array(2048);
+          bytes[0] = 37; bytes[1] = 80; bytes[2] = 68; bytes[3] = 70; bytes[4] = 45;
+          return Promise.resolve(new Blob([bytes], {type: 'application/pdf'}));
+        };
+      });
+    }
+    const makeCtx = await browser.createBrowserContext();
+    const makePage = await makeCtx.newPage();
+    await makePage.setViewport({width: 1280, height: 900});
+    await makePage.evaluateOnNewDocument(function(adminRaw, sbRaw){
+      localStorage.setItem('admin_session', adminRaw);
+      localStorage.setItem('evercare_sb_session', sbRaw);
+      window.__opened = [];
+      window.__alerts = [];
+      window.open = function(url){window.__opened.push(String(url)); return null;};
+      window.alert = function(msg){window.__alerts.push(String(msg));};
+    }, admin, sb);
+    const makeHits = [];
+    await install(makePage, makeHits, {row: missingRow, signedPath: madeSigned});
+    await makePage.goto('http://127.0.0.1:' + port + '/index.html?sb=1&v=sbpdfmake', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await makePage.waitForFunction(function(){
+      const btn = document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]');
+      return btn && btn.textContent.indexOf('View') >= 0;
+    }, {timeout: 8000});
+    await stubRender(makePage);
+    await makePage.evaluate(function(){
+      document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]').click();
+    });
+    await makePage.waitForFunction(function(){return window.__opened.length === 1;}, {timeout: 20000});
+    const madeOpen = await makePage.evaluate(function(){return window.__opened[0];});
+    assert.ok(madeOpen.indexOf('/storage/v1/object/sign/evercare-pdfs/' + madePath + '?token=made123') > 0, madeOpen);
+    assert.ok(madeOpen.indexOf('drive.google.com') < 0, madeOpen);
+    const uploadHit = makeHits.find(function(h){return h.method === 'POST' && /\/storage\/v1\/object\/evercare-pdfs\//.test(h.url) && !/\/object\/sign\//.test(h.url);});
+    assert.ok(uploadHit, 'View uploads the rendered PDF');
+    assert.strictEqual(uploadHit.headers.authorization, 'Bearer user-jwt');
+    assert.strictEqual(uploadHit.headers['x-upsert'], 'true');
+    assert.ok(uploadHit.url.indexOf(madePath) > 0, uploadHit.url);
+    const patchHit = makeHits.find(function(h){return h.method === 'PATCH' && /\/rest\/v1\/timesheets/.test(h.url);});
+    assert.ok(patchHit, 'View patches pdf_storage_path');
+    assert.deepStrictEqual(patchHit.body, {pdf_storage_path: madePath});
+    const regHit = makeHits.find(function(h){return h.method === 'POST' && /\/rest\/v1\/pdf_documents/.test(h.url);});
+    assert.ok(regHit, 'View upserts pdf_documents');
+    assert.strictEqual(regHit.body.object_path, madePath);
+    assert.strictEqual(regHit.body.byte_size, 2048);
+    const kept = await makePage.evaluate(function(){
+      var rec = allRecords[0];
+      return {pdfLink: rec.pdfLink, pdfStoragePath: rec.pdfStoragePath};
+    });
+    assert.strictEqual(kept.pdfLink, driveLink, 'Sheet pdf link stays during dual-run');
+    assert.strictEqual(kept.pdfStoragePath, madePath);
+    assert.ok(!makeHits.some(function(h){return /drive\.google\.com/.test(h.url);}), 'soft make must not call Drive');
+    const makeAlerts = await makePage.evaluate(function(){return window.__alerts.slice();});
+    assert.deepStrictEqual(makeAlerts, []);
+    await makePage.screenshot({path: '/opt/cursor/artifacts/sb_pdf_make.png'});
+    console.log('admin-sb-pdf browser make: ok');
+
+    const failCtx = await browser.createBrowserContext();
+    const failPage = await failCtx.newPage();
+    await failPage.setViewport({width: 1280, height: 900});
+    await failPage.evaluateOnNewDocument(function(adminRaw, sbRaw){
+      localStorage.setItem('admin_session', adminRaw);
+      localStorage.setItem('evercare_sb_session', sbRaw);
+      window.__opened = [];
+      window.__alerts = [];
+      window.open = function(url){window.__opened.push(String(url)); return null;};
+      window.alert = function(msg){window.__alerts.push(String(msg));};
+    }, admin, sb);
+    const failHits = [];
+    await install(failPage, failHits, {row: missingRow, failUpload: true});
+    await failPage.goto('http://127.0.0.1:' + port + '/index.html?sb=1&v=sbpdfmiss', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await failPage.waitForSelector('#tsBody button[onclick^="openTimesheetPdf"]', {timeout: 8000});
+    await stubRender(failPage);
+    await failPage.evaluate(function(){
+      document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]').click();
+    });
+    await failPage.waitForFunction(function(){
+      const el = document.getElementById('nciToast');
+      return el && el.style.display !== 'none' && el.textContent.indexOf('Could not save the PDF to Storage') >= 0;
+    }, {timeout: 20000});
+    const failOpened = await failPage.evaluate(function(){return window.__opened.slice();});
+    const failAlerts = await failPage.evaluate(function(){return window.__alerts.slice();});
+    assert.deepStrictEqual(failOpened, []);
+    assert.deepStrictEqual(failAlerts, []);
+    assert.ok(!failHits.some(function(h){return h.method === 'PATCH' && /\/timesheets/.test(h.url);}), 'failed upload leaves the path null');
+    await failPage.evaluate(function(){
+      document.querySelector('#tsBody button[onclick^="viewRec"]').click();
+    });
+    await failPage.waitForSelector('#detailTitle', {timeout: 8000});
+    const detailOpen = await failPage.$eval('#detailTitle', function(el){return el.textContent;});
+    assert.ok(detailOpen.indexOf('Jane Doe') >= 0, detailOpen);
+    const still = await failPage.evaluate(function(){
+      return {pdfLink: allRecords[0].pdfLink, pdfStoragePath: allRecords[0].pdfStoragePath || ''};
+    });
+    assert.strictEqual(still.pdfLink, driveLink);
+    assert.strictEqual(still.pdfStoragePath, '');
+    await failPage.screenshot({path: '/opt/cursor/artifacts/sb_pdf_upload_soft.png'});
+    console.log('admin-sb-pdf browser upload miss: ok');
   }finally{
     await browser.close();
     await new Promise(function(r){server.close(r);});

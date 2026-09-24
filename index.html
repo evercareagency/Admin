@@ -10,6 +10,7 @@
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- sb archive §3.3/§4.3 2026-09-24 PATCH is_active=false select id,is_active single() when ?sb=1 -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
@@ -21,7 +22,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-sb-supervisory">
+<meta name="admin-build" content="2026-09-24-sb-pdf-make">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2837,6 +2838,8 @@ async function sbApiList(payload){
 }
 var SB_PDF_BUCKET='evercare-pdfs';
 var SB_PDF_SIGN_SECONDS=120;
+var SB_PDF_MIN_BYTES=1024;
+var SB_PDF_MAX_BYTES=10485760;
 function sbPdfObjectPath(path){
   return String(path||'').trim().replace(/^\/+/,'');
 }
@@ -2957,6 +2960,118 @@ async function sbResolveTimesheetPdf(row){
   }catch(err){
     return {mode:'error',error:String(err&&err.message||err||'supabase')};
   }
+}
+function sbBytesToAscii(buf, n){
+  var bytes=null;
+  if(buf&&typeof buf.byteLength==='number'&&typeof buf[0]==='number')bytes=buf;
+  else if(buf)bytes=new Uint8Array(buf);
+  if(!bytes)return '';
+  var len=Math.min(n||5, bytes.length);
+  var s='';
+  for(var i=0;i<len;i++)s+=String.fromCharCode(bytes[i]);
+  return s;
+}
+async function sbPdfPayloadInfo(pdfBytes){
+  var size=0;
+  if(pdfBytes&&typeof pdfBytes.size==='number')size=pdfBytes.size;
+  else if(pdfBytes&&typeof pdfBytes.byteLength==='number')size=pdfBytes.byteLength;
+  var header='';
+  try{
+    if(pdfBytes&&typeof pdfBytes.slice==='function'){
+      var part=pdfBytes.slice(0,5);
+      var buf=null;
+      if(part&&typeof part.arrayBuffer==='function')buf=await part.arrayBuffer();
+      else if(typeof pdfBytes.arrayBuffer==='function')buf=await pdfBytes.arrayBuffer();
+      if(buf)header=sbBytesToAscii(buf,5);
+    }else if(pdfBytes&&typeof pdfBytes.byteLength==='number'){
+      header=sbBytesToAscii(pdfBytes,5);
+    }
+  }catch(e){header='';}
+  var ok=size>=SB_PDF_MIN_BYTES&&size<=SB_PDF_MAX_BYTES&&header.indexOf('%PDF')===0;
+  return {ok:ok,size:size};
+}
+function sbRememberTimesheetPdfPath(row, objectPath){
+  var id=row&&row.id;
+  var apply=function(rec){
+    if(!rec)return;
+    rec.pdfStoragePath=objectPath;
+    rec.pdf_storage_path=objectPath;
+  };
+  apply(row);
+  if(typeof currentRec!=='undefined'&&currentRec&&String(currentRec.id)===String(id))apply(currentRec);
+  if(typeof allRecords!=='undefined'&&Array.isArray(allRecords)){
+    for(var i=0;i<allRecords.length;i++){
+      if(allRecords[i]&&String(allRecords[i].id)===String(id))apply(allRecords[i]);
+    }
+  }
+}
+// Soft ?sb=1 Admin JWT upload. v=sbpdfmake9c24 GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1
+async function sbUploadTimesheetPdf(row, pdfBytes, refreshed){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {ok:false,skipped:true};
+  var timesheetId=String(row&&row.id||'').trim();
+  if(typeof sbUuid==='function'&&!sbUuid(timesheetId))return {ok:false,soft:true};
+  var orgId=typeof sbOrgId==='function'?sbOrgId():'';
+  if(!orgId)return {ok:false,soft:true};
+  var info=await sbPdfPayloadInfo(pdfBytes);
+  if(!info.ok)return {ok:false,soft:true};
+  var objectPath=orgId+'/timesheet/'+timesheetId+'.pdf';
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,soft:true,error:'Not signed in',status:401};
+  var encoded=objectPath.split('/').map(function(seg){return encodeURIComponent(seg);}).join('/');
+  var url=SUPABASE_URL+'/storage/v1/object/'+SB_PDF_BUCKET+'/'+encoded;
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        'Content-Type':'application/pdf',
+        'x-upsert':'true'
+      },
+      body:pdfBytes
+    });
+  }catch(err){
+    return {ok:false,soft:true,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbUploadTimesheetPdf(row, pdfBytes, true);
+  }
+  if(!res.ok)return {ok:false,soft:true,error:'upload',status:res.status};
+  var patched=await sbRestMutate('PATCH','timesheets',[
+    ['id','eq.'+timesheetId]
+  ], {pdf_storage_path:objectPath}, 'return=minimal');
+  if(!patched.ok)return {ok:false,soft:true,error:patched.error||'link',status:patched.status||0};
+  sbRememberTimesheetPdfPath(row, objectPath);
+  var registered=await sbRestMutate('POST','pdf_documents',[
+    ['on_conflict','org_id,bucket,object_path']
+  ], {
+    org_id:orgId,
+    doc_kind:'timesheet',
+    entity_id:timesheetId,
+    bucket:SB_PDF_BUCKET,
+    object_path:objectPath,
+    content_type:'application/pdf',
+    byte_size:info.size,
+    is_active:true
+  }, 'resolution=merge-duplicates,return=minimal');
+  var signed=await sbSignPdfUrl(objectPath);
+  if(!signed.ok||!signed.url)return {ok:false,soft:true,error:signed.error||'sign',path:objectPath,registry:!!registered.ok};
+  return {ok:true,url:signed.url,path:objectPath,registry:!!registered.ok};
+}
+async function sbEnsureTimesheetStoragePdf(row){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {ok:false,skipped:true};
+  var rec=row;
+  if(typeof currentRec!=='undefined'&&currentRec&&row&&String(currentRec.id)===String(row.id))rec=currentRec;
+  if(typeof renderTimesheetPdfBlob!=='function')return {ok:false,soft:true};
+  var blob;
+  try{
+    blob=await renderTimesheetPdfBlob(rec);
+  }catch(err){
+    return {ok:false,soft:true,error:String(err&&err.message||err||'pdf')};
+  }
+  return sbUploadTimesheetPdf(rec, blob);
 }
 
 function sbIsSupervisoryAction(action){
@@ -4092,7 +4207,10 @@ async function renderTimesheets(){
 
 
 function timesheetPdfAvailable(r){
-  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&String((r&&(r.pdfStoragePath||r.pdf_storage_path))||'').trim())return true;
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    if(String((r&&(r.pdfStoragePath||r.pdf_storage_path))||'').trim())return true;
+    if(String((r&&r.id)||'').trim())return true;
+  }
   return !!String((r&&r.pdfLink)||'').trim();
 }
 function timesheetPdfButton(r,detail){
@@ -4101,22 +4219,51 @@ function timesheetPdfButton(r,detail){
   }
   return '<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="openTimesheetPdf(\''+r.id+'\')">'+(detail?'📄 View PDF':'📄 View')+'</button>';
 }
+function sbTimesheetPdfSoftMiss(){
+  showTempMsg('Could not save the PDF to Storage. This timesheet is still here; the archive will catch up.','var(--warn)');
+}
 function openTimesheetPdf(id){
   const r=allRecords.find(x=>String(x.id)===String(id));
   if(!r){showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');return;}
+  var refresh=arguments.length>1&&!!arguments[1];
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbResolveTimesheetPdf==='function'){
+    if(openTimesheetPdf._busy)return;
+    var done=function(){openTimesheetPdf._busy=false;};
+    var make=function(){
+      openTimesheetPdf._busy=true;
+      showTempMsg('Preparing PDF…','var(--teal)',0);
+      var run=typeof sbEnsureTimesheetStoragePdf==='function'?sbEnsureTimesheetStoragePdf(r):Promise.resolve({ok:false,soft:true});
+      Promise.resolve(run).then(function(made){
+        done();
+        if(made&&made.url){
+          window.open(made.url,'_blank','noopener');
+          showTempMsg('PDF ready.','var(--success)',2500);
+          return;
+        }
+        sbTimesheetPdfSoftMiss();
+      },function(){
+        done();
+        sbTimesheetPdfSoftMiss();
+      });
+    };
+    if(refresh){make();return;}
+    openTimesheetPdf._busy=true;
     sbResolveTimesheetPdf(r).then(function(res){
-      if(res&&res.mode==='storage'&&res.url){window.open(res.url,'_blank','noopener');return;}
-      if(res&&res.mode==='legacy'){
-        if(!requireTimesheetSignatures(r))return;
-        const legacy=(r.pdfLink||'').trim();
-        if(!legacy){alert('No archived PDF yet for this timesheet.');return;}
-        window.open(legacy,'_blank','noopener');
+      if(res&&res.mode==='storage'&&res.url){
+        done();
+        window.open(res.url,'_blank','noopener');
         return;
       }
-      if(res&&res.mode==='error'){showTempMsg(res.error||'Could not open PDF.','var(--danger)');return;}
-      alert('No archived PDF yet for this timesheet.');
-    }).catch(function(){showTempMsg('Could not open PDF.','var(--danger)');});
+      if(res&&res.mode==='error'){
+        done();
+        showTempMsg(res.error||'Could not open PDF.','var(--danger)');
+        return;
+      }
+      make();
+    }).catch(function(){
+      done();
+      showTempMsg('Could not open PDF.','var(--danger)');
+    });
     return;
   }
   if(!requireTimesheetSignatures(r))return;
@@ -5210,7 +5357,18 @@ async function downloadTSPDF(){
     const safeClient=(r.clientName||'client').replace(/[^a-z0-9]/gi,'_');
     const safeEmp=(r.empName||'aide').replace(/[^a-z0-9]/gi,'_');
     pdf.save(`EverCare_Timesheet_${safeEmp}_${safeClient}_${r.weekStart||''}.pdf`);
-    showTempMsg('✅ PDF downloaded!','var(--success)');
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbUploadTimesheetPdf==='function'){
+      try{
+        const up=await sbUploadTimesheetPdf(r, pdf.output('blob'));
+        if(up&&up.ok)showTempMsg('✅ PDF downloaded!','var(--success)');
+        else showTempMsg('PDF downloaded. Storage copy will be picked up on the next archive.','var(--warn)');
+      }catch(upErr){
+        console.error(upErr);
+        showTempMsg('PDF downloaded. Storage copy will be picked up on the next archive.','var(--warn)');
+      }
+    }else{
+      showTempMsg('✅ PDF downloaded!','var(--success)');
+    }
   }catch(e){
     console.error(e);
     showTempMsg('Error generating PDF. Try Print instead.','var(--danger)');
