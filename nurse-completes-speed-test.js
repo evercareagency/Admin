@@ -34,9 +34,24 @@ assert.ok(/NCI_COMPLETE_LIST_TTL_MS=5\*60\*1000/.test(html), 'cache ttl ~5min');
 assert.ok(/NCI_COMPLETE_LIST_SLOW_MS=2000/.test(html), 'slow hint at ~2s');
 assert.ok(html.includes("action:'list_new_client_intakes',status:'Complete'"), 'Complete list action stays');
 assert.ok(html.includes("action:'list_new_client_intakes',nurseName:currentNurseName||'',status:'Draft'"), 'Draft list stays a separate call');
+assert.ok(html.includes('includeSignatures:true') && html.includes('includeSigs:true'), 'ink open sends both signature flags');
+
+const getInk = extractFn(html, 'async function getNewClientIntake(intakeId, opts)');
+const resumeInk = extractFn(html, 'async function resumeNewClientIntake(intakeId,opts)');
+const pollInk = extractFn(html, 'async function nciPollCompletePdfLink(intakeId,budgetMs)');
+const recheckInk = extractFn(html, 'async function nciRecheckPendingCompletePdfs()');
+const listInk = extractFn(html, 'function nciFetchCompleteList()');
+assert.ok(getInk.includes('payload.includeSignatures=true') && getInk.includes('payload.includeSigs=true'), 'get sends both aliases together');
+assert.ok(resumeInk.includes('includeSignatures:true,includeSigs:true'), 'edit and resume ask for ink');
+assert.ok(pollInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(pollInk), 'PDF link poll stays trimmed');
+assert.ok(recheckInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(recheckInk), 'pending PDF recheck stays trimmed');
+assert.ok(!/includeSignatures|includeSigs/.test(listInk), 'Completes list does not ask for signatures');
 assert.ok(html.includes('if(nciCompleteListInflight)return nciCompleteListInflight;'), 'single-flight guard');
 
 const home = extractFn(html, 'function openPortalHome(sess, opts)');
+assert.ok(!/includeSignatures|includeSigs/.test(home), 'home prefetch does not ask for signatures');
+const draftsInk = extractFn(html, 'async function loadNewClientIntakeDrafts()');
+assert.ok(draftsInk && !/includeSignatures|includeSigs/.test(draftsInk), 'draft list does not ask for signatures');
 assert.strictEqual(home.split('loadCompletedNewClientIntakes()').length - 1, 3,
   'Nurse prefetch, Nurse join, and Admin home each call the shared loader');
 const prefetchAt = home.indexOf('loadCompletedNewClientIntakes();');
@@ -140,6 +155,19 @@ const row = {intakeId: '9', status: 'Complete', clientName: 'Mo Client', nurseNa
 const ok = {success: true, data: [row]};
 
 async function run(){
+  const inkBox = {calls: [], apiPost: function(p){ inkBox.calls.push(p); return Promise.resolve({success:true}); }};
+  vm.createContext(inkBox);
+  vm.runInContext(getInk + '\nthis.getNewClientIntake=getNewClientIntake;', inkBox);
+  await inkBox.getNewClientIntake('9');
+  await inkBox.getNewClientIntake('9', {includeSignatures:true});
+  await inkBox.getNewClientIntake('9', {includeSigs:true});
+  assert.strictEqual(inkBox.calls[0].action, 'get_new_client_intake');
+  assert.strictEqual(inkBox.calls[0].includeSignatures, undefined, 'plain get omits includeSignatures');
+  assert.strictEqual(inkBox.calls[0].includeSigs, undefined, 'plain get omits includeSigs');
+  assert.strictEqual(inkBox.calls[1].includeSignatures, true);
+  assert.strictEqual(inkBox.calls[1].includeSigs, true);
+  assert.strictEqual(inkBox.calls[2].includeSignatures, true);
+  assert.strictEqual(inkBox.calls[2].includeSigs, true);
   const p1 = sandbox.loadCompletedNewClientIntakes();
   const p2 = sandbox.loadCompletedNewClientIntakes();
   const p3 = sandbox.loadCompletedNewClientIntakes();

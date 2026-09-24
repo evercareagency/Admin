@@ -28,7 +28,7 @@
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
-<!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. -->
+<!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. Open View/PDF/edit that needs ink: get_new_client_intake includeSignatures:true (alias includeSigs:true). List, Completes prefetch, and home loads do not send that flag. -->
 <meta name="admin-build" content="2026-09-24-nursespd1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -10412,8 +10412,15 @@ async function archiveNewClientIntakePdf(intakeId){
   return apiPost({action:'archive_new_client_intake_pdf',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
 }
 
-async function getNewClientIntake(intakeId){
-  return apiPost({action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
+async function getNewClientIntake(intakeId, opts){
+  // Ace omits *SignatureData unless the open asks for ink. List/prefetch/home never pass opts.
+  opts=opts||{};
+  const payload={action:'get_new_client_intake',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)};
+  if(opts.includeSignatures||opts.includeSigs){
+    payload.includeSignatures=true;
+    payload.includeSigs=true;
+  }
+  return apiPost(payload);
 }
 
 function nciApplyCompletePdf(intakeId,pdfLink,pdfFileId){
@@ -10577,7 +10584,7 @@ async function resumeNewClientIntake(intakeId,opts){
   const body=nciEl('nciBody');
   if(body)body.scrollTop=0;
   try{
-    const data=await getNewClientIntake(nciState.intakeId);
+    const data=await getNewClientIntake(nciState.intakeId,{includeSignatures:true,includeSigs:true});
     if(data&&data.success){
       nciResumePayload=data;
       applyNewClientIntake(data);
