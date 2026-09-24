@@ -67,7 +67,12 @@ assert.ok(showScreenFn.includes("id==='loginScreen')startLoginWarmKeepAlive()") 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(login, 'mgrLogin missing');
 assert.ok(login.indexOf('warmUpSheets()') >= 0 && login.indexOf('warmUpSheets()') < login.indexOf("action:'admin_login'"),
-  'warm ping must start before the login POST');
+  'sheets rollback warm ping must start before the login POST');
+assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()'), 'sb cut login does not warm before auth');
+assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
+assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
+assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-warmoff1">'), 'warmoff1 admin-build');
 assert.ok(login.includes('openPortalHome('), 'login must open home after success');
 assert.ok(!/get_users|get_all|get_clients|get_assigned_topic/.test(login), 'mgrLogin must not fetch heavy lists');
 assert.ok(!/await\s+renderTimesheets|await\s+apiGetCached|await\s+loadNurseCompliance/.test(login), 'mgrLogin must not await list loads');
@@ -207,6 +212,33 @@ const filled = vm.runInContext('restoreAdminSession()', sandbox);
 assert.ok(filled.loginAt, 'missing loginAt is backfilled instead of forcing logout');
 assert.strictEqual(vm.runInContext('isAdminSessionExpired(readAdminSession())', sandbox), false);
 
+function runWarm(enabled){
+  const calls = [];
+  const box = {
+    window: {},
+    SHEETS_URL: 'https://script.google.com/macros/s/x/exec',
+    fetch: function(url, opts){
+      calls.push({url: url, method: opts && opts.method, body: opts && opts.body});
+      return Promise.resolve({text: function(){return Promise.resolve('');}});
+    },
+    URL: URL,
+    location: {href: 'https://evercareagency.github.io/Admin/index.html'},
+    Date: Date,
+    JSON: JSON,
+    evercareSbEnabled: function(){return enabled;}
+  };
+  vm.createContext(box);
+  vm.runInContext(warm, box);
+  vm.runInContext('warmUpSheets()', box);
+  return {calls: calls, box: box};
+}
+const cutWarm = runWarm(true);
+assert.strictEqual(cutWarm.calls.length, 0, 'sb cut warmUpSheets does not fetch /exec');
+assert.notStrictEqual(cutWarm.box.window._sheetsWarmUpStarted, true, 'sb cut warm does not set the once-flag');
+const sheetsWarm = runWarm(false);
+assert.strictEqual(sheetsWarm.calls.length, 3, 'sheets rollback warm is POST, GET, and the beacon');
+assert.strictEqual(sheetsWarm.box.window._sheetsWarmUpStarted, true, 'sheets rollback warm sets the once-flag');
+
 console.log('admin-login-feel-test: ok');
 
 // Sign-out resets the once-flag, warms immediately, then keep-alive ticks fetch again.
@@ -286,6 +318,52 @@ console.log('admin-login-feel-test: ok');
   console.log('admin-login-feel rewarm-after-signout: ok');
 })();
 
+// Supabase cut: showing the login screen must not beacon Sheets /exec.
+(function noWarmOnSbCut(){
+  const calls = [];
+  const sheetsUrl = (html.match(/const SHEETS_URL='([^']+)'/) || [])[1];
+  const classList = function(on){
+    const set = {};
+    if(on)set.active = true;
+    return {
+      add: function(c){set[c] = true;},
+      remove: function(c){delete set[c];},
+      contains: function(c){return !!set[c];}
+    };
+  };
+  const screens = {
+    loginScreen: {classList: classList(false)},
+    adminScreen: {classList: classList(true)}
+  };
+  let tick = null;
+  const box = {
+    window: {},
+    SHEETS_URL: sheetsUrl,
+    Date: Date,
+    JSON: JSON,
+    evercareSbEnabled: function(){return true;},
+    setInterval: function(fn){tick = fn; return 7;},
+    clearInterval: function(){tick = null;},
+    location: {href: 'https://evercareagency.github.io/Admin/index.html'},
+    URL: URL,
+    fetch: function(url, opts){
+      calls.push({url: url, method: opts && opts.method});
+      return Promise.resolve({text: function(){return Promise.resolve('');}});
+    },
+    document: {
+      querySelectorAll: function(){return [screens.loginScreen, screens.adminScreen];},
+      getElementById: function(id){return screens[id];}
+    }
+  };
+  vm.createContext(box);
+  vm.runInContext(warm + '\n' + stopKeep + '\n' + startKeep + '\n' + showScreenFn, box);
+  vm.runInContext("showScreen('loginScreen')", box);
+  assert.strictEqual(calls.length, 0, 'sb cut sign-out must not warm Sheets /exec');
+  assert.strictEqual(tick, null, 'sb cut sign-out must not arm the keep-alive');
+  assert.notStrictEqual(box.window._sheetsWarmUpStarted, true);
+  console.log('admin-login-feel sb-cut-no-warm: ok');
+})();
+
 async function runBrowser(){
   if(process.env.SKIP_BROWSER==='1')return;
   const http=require('http');
@@ -341,7 +419,7 @@ async function runBrowser(){
         });
       });
       const navAt=Date.now();
-      await page.goto('http://127.0.0.1:'+port+'/index.html?v=warm',{waitUntil:'domcontentloaded',timeout:20000});
+      await page.goto('http://127.0.0.1:'+port+'/index.html?sheets=1&v=warm',{waitUntil:'domcontentloaded',timeout:20000});
       const budget=Math.max(50, 1500-(Date.now()-navAt));
       const freshTiming=await page.waitForFunction(()=>{
         return window._sheetsWarmUpStarted===true &&
@@ -417,6 +495,65 @@ async function runBrowser(){
       assert.strictEqual(hits.length, stopped, vp.name+' leaving login must stop the keep-alive');
       console.log('admin-login-feel browser', vp.name, 'fresh='+hits.slice(0,freshCount).map(h=>h.method+(h.action?':'+h.action:'')).join(','),
         'keepalive='+neu.map(h=>h.method+(h.action?':'+h.action:'')).join(','));
+      await page.close();
+    }
+    for(const vp of [
+      {name:'desktop',width:1280,height:800,isMobile:false},
+      {name:'phone',width:390,height:844,isMobile:true,hasTouch:true,deviceScaleFactor:2}
+    ]){
+      const page=await browser.newPage();
+      await page.setViewport(vp);
+      const hits=[];
+      await page.setRequestInterception(true);
+      page.on('request',req=>{
+        const u=req.url();
+        if(/fonts\.googleapis|fonts\.gstatic|cdnjs\.cloudflare|gstatic\.com/.test(u)){req.abort();return;}
+        if(!/script\.google\.com/.test(u)){req.continue();return;}
+        let action='';
+        try{action=JSON.parse(req.postData()||'{}').action||'';}catch(e){}
+        hits.push({method:req.method(),action,url:u});
+        req.respond({
+          status:200,
+          contentType:'application/json',
+          headers:{'Access-Control-Allow-Origin':'*'},
+          body:JSON.stringify({success:true,ok:true})
+        });
+      });
+      const navAt=Date.now();
+      await page.goto('http://127.0.0.1:'+port+'/index.html?v=warmoff1',{waitUntil:'domcontentloaded',timeout:20000});
+      const painted=await page.evaluate(()=>({
+        login:!!document.getElementById('loginScreen')?.classList.contains('active'),
+        admin:!!document.getElementById('adminScreen')?.classList.contains('active'),
+        build:document.querySelector('meta[name="admin-build"]')?.content||''
+      }));
+      assert.ok(painted.login, vp.name+' sb cut login screen is up at DOMContentLoaded');
+      assert.ok(!painted.admin, vp.name+' sb cut must not open home before Sign In');
+      assert.strictEqual(painted.build, '2026-09-24-warmoff1');
+      assert.ok(Date.now()-navAt<1500, vp.name+' sb cut first paint must not wait on warmkeep');
+      await new Promise(r=>setTimeout(r,500));
+      const quiet=await page.evaluate(()=>({
+        warm:window._sheetsWarmUpStarted===true,
+        exec:performance.getEntriesByType('resource').map(e=>e.name).filter(n=>/\/exec/.test(n))
+      }));
+      assert.notStrictEqual(quiet.warm, true, vp.name+' sb cut must not set the warm flag');
+      assert.strictEqual(quiet.exec.length, 0, vp.name+' sb cut first paint must not request /exec '+JSON.stringify(quiet.exec));
+      assert.strictEqual(hits.length, 0, vp.name+' sb cut must not call Sheets /exec on login paint');
+      await page.evaluate(()=>{
+        document.getElementById('loginScreen').classList.remove('active');
+        document.getElementById('adminScreen').classList.add('active');
+      });
+      await page.click('#adminScreen .sidebar-bottom button');
+      await new Promise(r=>setTimeout(r,1400));
+      const after=await page.evaluate(()=>({
+        login:!!document.getElementById('loginScreen').classList.contains('active'),
+        warm:window._sheetsWarmUpStarted===true,
+        exec:performance.getEntriesByType('resource').map(e=>e.name).filter(n=>/\/exec/.test(n))
+      }));
+      assert.ok(after.login, vp.name+' sb cut sign-out returns to login');
+      assert.notStrictEqual(after.warm, true, vp.name+' sb cut sign-out must not warm');
+      assert.strictEqual(after.exec.length, 0, vp.name+' sb cut sign-out must not beacon /exec');
+      assert.strictEqual(hits.length, 0, vp.name+' sb cut sign-out must not POST ping');
+      console.log('admin-login-feel browser sb-cut', vp.name, 'quiet');
       await page.close();
     }
   }finally{
