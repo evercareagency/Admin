@@ -33,7 +33,9 @@
 <!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Compliance, nurse alerts, and nurse client writes stay /exec. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
 <!-- admin broadcast 2026-09-24 v=bcast1 admin-build 2026-09-24-bcast1. Cut ON: tab open/load POST rpc/get_active_broadcast {}; Send POST rpc/send_broadcast {p_message}; Clear POST rpc/clear_broadcast {}. Office JWT via sbRestRpc. Preview from data.message (empty if data null). No localStorage broadcast_msg on cut-ON. Rollback ?sheets=1 or evercare_sheets=1 keeps local broadcast_msg exactly. No Sheets /exec for Broadcast. Write roles Ace-enforced admin+scheduler. -->
 <!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert /exec. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. No new Ace RPCs. Ace list_new_client_intakes unchanged. Compliance stays /exec on its own path. Broadcast and Schedule untouched. -->
-<meta name="admin-build" content="2026-09-24-nursespd2">
+<!-- admin schedule mobile scroll 2026-09-24 v=sched1m admin-build 2026-09-24-sched1m. Week grid horizontal scroll on touch: the day columns keep a min width so Mon–Sun are wider than a phone, and .sched-scroll is the only scroller (overflow-x auto, touch-action pan-x pan-y, -webkit-overflow-scrolling touch). Toolbar (Edit usual pattern, week, search, All|Open|Call-offs) wraps in the viewport and does not share that scroller. The “No patterns yet” notice wraps above the grid and does not cover or widen it. Desktop week layout unchanged. -->
+<!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
+<meta name="admin-build" content="2026-09-24-sched1m">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -88,24 +90,24 @@ textarea{resize:vertical;min-height:80px;}
 .sidebar-bottom button{width:100%;padding:8px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.7);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;}
 .sidebar-bottom button:hover{background:rgba(255,255,255,0.15);color:white;}
 .main-content{margin-left:220px;flex:1;padding:26px 28px;min-height:100vh;min-height:100dvh;}
-@media(max-width:768px){.sidebar{width:100%;height:auto;position:relative;}.main-content{margin-left:0;padding:14px;}.admin-layout{flex-direction:column;}}
+@media(max-width:768px){.sidebar{width:100%;height:auto;position:relative;}.main-content{margin-left:0;padding:14px;min-width:0;max-width:100%;width:100%;}.admin-layout{flex-direction:column;min-width:0;max-width:100%;}}
 .tab-panel{display:none;}.tab-panel.active{display:block;}
-.sched-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
+.sched-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;max-width:100%;min-width:0;}
 .sched-toolbar .sched-search{flex:1;min-width:180px;max-width:280px;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;}
-.sched-week{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy);}
+.sched-week{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy);max-width:100%;min-width:0;}
 .sched-week-label{min-width:11.5rem;text-align:center;font-size:0.84rem;}
-.sched-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.sched-filters{display:flex;gap:6px;flex-wrap:wrap;max-width:100%;}
 .sched-filters button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy);}
 .sched-source{font-size:0.75rem;color:var(--muted);margin:0 0 10px;}
-.sched-scroll{max-height:640px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#fff;}
-.sched-grid{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:0.78rem;}
+.sched-scroll{max-height:640px;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain;border:1px solid var(--border);border-radius:10px;background:#fff;position:relative;}
+.sched-grid{width:max-content;min-width:max(100%,52rem);border-collapse:separate;border-spacing:0;font-size:0.78rem;}
 .sched-grid th{position:sticky;top:0;z-index:2;background:var(--navy);color:#fff;padding:8px 10px;font-weight:600;text-align:center;min-width:96px;box-shadow:0 1px 0 rgba(0,0,0,.15);}
 .sched-grid th.sched-client-h,.sched-grid td.sched-name{position:sticky;left:0;min-width:148px;text-align:left;}
 .sched-grid th.sched-client-h{z-index:3;}
 .sched-grid td.sched-name{z-index:1;background:#fff;font-weight:600;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;}
 .sched-grid tr.is-jump td.sched-name{background:#e8f4f4;}
-.sched-grid td.sched-slot{padding:4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
-.sched-cell{width:100%;min-height:44px;border:1px solid transparent;border-radius:6px;background:#fff;color:var(--text);font:inherit;font-size:0.75rem;font-weight:600;cursor:pointer;padding:6px;text-align:left;line-height:1.25;}
+.sched-grid td.sched-slot{min-width:96px;padding:4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
+.sched-cell{width:100%;min-height:44px;border:1px solid transparent;border-radius:6px;background:#fff;color:var(--text);font:inherit;font-size:0.75rem;font-weight:600;cursor:pointer;padding:6px;text-align:left;line-height:1.25;touch-action:pan-x pan-y;}
 .sched-cell:focus{outline:2px solid var(--teal);outline-offset:1px;}
 .sched-cell.is-open{background:transparent;color:var(--muted);font-weight:500;border:1.5px dashed #8aa0b5;}
 .sched-cell.is-usual,.sched-cell.is-exception{background:#e8f4f4;color:#1e6060;border-color:#2a7f7f;}
@@ -113,15 +115,27 @@ textarea{resize:vertical;min-height:80px;}
 .sched-cell.is-shrunk{min-height:18px;padding:1px 3px;font-size:0;line-height:0;background:#eef2f6;color:transparent;border-color:transparent;box-shadow:none;}
 .sched-who{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:108px;}
 .sched-tag{display:block;margin-top:2px;font-size:0.62rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#9a3412;}
-.sched-layout{display:flex;gap:14px;align-items:flex-start;}
-.sched-main{flex:1;min-width:0;}
+.sched-layout{display:flex;gap:14px;align-items:flex-start;max-width:100%;min-width:0;}
+.sched-main{flex:1;min-width:0;max-width:100%;}
+#schedEmpty,#schedNoClients{max-width:100%;width:100%;position:static;}
+#schedEmpty .btn{max-width:100%;white-space:normal;height:auto;}
 .sched-panel{width:320px;flex-shrink:0;background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;box-shadow:0 1px 5px rgba(0,0,0,.04);position:sticky;top:12px;}
 .sched-panel[hidden]{display:none !important;}
 .sched-panel h2{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy);margin-bottom:8px;}
 .sched-panel .sched-meta{font-size:0.8rem;color:var(--muted);margin-bottom:10px;line-height:1.4;}
 .sched-calloff{display:flex;align-items:center;gap:8px;font-size:0.82rem;font-weight:600;color:#9a3412;margin:8px 0;}
 #tab_schedule [hidden]{display:none !important;}
-@media(max-width:900px){.sched-layout{flex-direction:column;}.sched-panel{width:100%;position:relative;top:auto;}}
+@media(max-width:900px){.sched-layout{flex-direction:column;align-items:stretch;width:100%;max-width:100%;min-width:0;}.sched-main{width:100%;max-width:100%;min-width:0;}.sched-panel{width:100%;max-width:100%;position:relative;top:auto;}}
+@media(max-width:768px){
+  #tab_schedule{max-width:100%;min-width:0;}
+  #tab_schedule .page-hdr,#tab_schedule .sched-toolbar,#tab_schedule .sched-source,#tab_schedule .sched-layout{max-width:100%;min-width:0;}
+  #tab_schedule .sched-toolbar{flex-wrap:wrap;}
+  #tab_schedule .sched-toolbar .sched-search{min-width:0;max-width:100%;flex:1 1 140px;}
+  #tab_schedule .sched-week{flex-wrap:wrap;min-width:0;max-width:100%;}
+  #tab_schedule .sched-week-label{min-width:0;}
+  #tab_schedule .sched-scroll{max-width:calc(100vw - 28px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));}
+  #schedEmpty.empty-state,#schedNoClients.empty-state{padding:8px 0 12px;}
+}
 .card{background:white;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 1px 5px rgba(0,0,0,0.04);}
 .card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);padding-bottom:9px;}
 .card-title .ico{width:26px;height:26px;background:var(--teal-light);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
