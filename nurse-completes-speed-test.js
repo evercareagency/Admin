@@ -62,8 +62,8 @@ const prefetchAt = home.indexOf('loadCompletedNewClientIntakes();');
 const complianceAt = home.indexOf('loadNurseCompliance(true)');
 assert.ok(prefetchAt > home.indexOf("showScreen('nurseScreen')") && prefetchAt < complianceAt,
   'Nurse Completes list starts after home paint and before compliance');
-assert.ok(home.indexOf('loadNurseCompliance(true)') > home.indexOf('Promise.resolve(loadCompletedNewClientIntakes())'),
-  'compliance /exec is scheduled after the Completes prefetch');
+assert.ok(home.indexOf('loadCompletedNewClientIntakes(); // nursespd1') > complianceAt,
+  'compliance load joins the same Completes prefetch');
 assert.ok(home.indexOf('refreshNurseAlertBadge()') > home.lastIndexOf('Promise.resolve(loadCompletedNewClientIntakes())'),
   'nurse-alert badge /exec is scheduled after the admin Completes prefetch');
 assert.ok(!/refreshNurseAlertBadge\(\);\s*\n\s*loadCompletedNewClientIntakes\(\)/.test(home),
@@ -81,6 +81,13 @@ assert.ok(refresh.indexOf('nciInvalidateCompleteListCache()') < refresh.indexOf(
   'Refresh bypasses the 5min cache');
 assert.ok(refresh.indexOf('loadCompletedNewClientIntakes()') < refresh.indexOf('scheduleDeferredNurseSheets()'),
   'Sheets nurse-alert waits until the Completes list has painted');
+const deferred = extractFn(html, 'function scheduleDeferredNurseSheets()');
+assert.ok(deferred.includes('loadAdminNurseAlertsAfterCompletes()'), 'badges and activity still load after Completes paints');
+assert.ok(!deferred.includes('loadNurseCompliance'), 'Completes deferral does not reload compliance');
+const abortLine = (html.match(/var nurseSheetsAction=payload&&\([^;]+\)/) || [])[0] || '';
+assert.ok(abortLine.includes("action==='list_nurse_alerts'") && abortLine.includes("action==='mark_nurse_alerts_read'") && abortLine.includes("action==='list_nurse_activity'"),
+  'Refresh can abort list, mark, and activity');
+assert.ok(!abortLine.includes('get_supervisory_compliance'), 'compliance /exec is not on the Completes abort list');
 
 const sigs = [
   'function nciCompleteListCacheGet()',

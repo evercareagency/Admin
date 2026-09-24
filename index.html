@@ -32,7 +32,7 @@
 <!-- admin schedule 2026-09-24 v=sched1 week grid clients × Mon–Sun. Usual pattern once; cell edits are exceptions for that date. Live Ace: list_schedule_week(p_week_start), upsert_schedule_pattern, upsert_schedule_exception (call_off|cover|hours_override|aide_override|clear), delete_schedule_pattern. Office access_token via sbRestRpc. No localStorage stub. No Sheets /exec. No Sandata/EVV chips. -->
 <!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Compliance, nurse alerts, and nurse client writes stay /exec. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
 <!-- admin broadcast 2026-09-24 v=bcast1 admin-build 2026-09-24-bcast1. Cut ON: tab open/load POST rpc/get_active_broadcast {}; Send POST rpc/send_broadcast {p_message}; Clear POST rpc/clear_broadcast {}. Office JWT via sbRestRpc. Preview from data.message (empty if data null). No localStorage broadcast_msg on cut-ON. Rollback ?sheets=1 or evercare_sheets=1 keeps local broadcast_msg exactly. No Sheets /exec for Broadcast. Write roles Ace-enforced admin+scheduler. -->
-<!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert /exec. In-flight list_nurse_alerts, mark_nurse_alerts_read, list_nurse_activity, and get_supervisory_compliance are aborted when Refresh starts, then deferred until the Ace Completes list has painted. Ace list_new_client_intakes unchanged. Broadcast and Schedule untouched. -->
+<!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert /exec. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. No new Ace RPCs. Ace list_new_client_intakes unchanged. Compliance stays /exec on its own path. Broadcast and Schedule untouched. -->
 <meta name="admin-build" content="2026-09-24-nursespd2">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -2257,9 +2257,9 @@ async function apiPost(payload){
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
   }
-  // nursespd2: nurse-alert + compliance /exec can be aborted so Completes Refresh is not stuck behind them.
+  // nursespd2: nurse-alert /exec can be aborted so Completes Refresh is not stuck behind list/mark/activity.
   var sheetInit={method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload),mode:'cors',cache:'no-store'};
-  var nurseSheetsAction=payload&&(payload.action==='list_nurse_alerts'||payload.action==='mark_nurse_alerts_read'||payload.action==='list_nurse_activity'||payload.action==='get_supervisory_compliance');
+  var nurseSheetsAction=payload&&(payload.action==='list_nurse_alerts'||payload.action==='mark_nurse_alerts_read'||payload.action==='list_nurse_activity');
   if(nurseSheetsAction&&typeof nurseSheetsSignal==='function'){
     try{sheetInit.signal=nurseSheetsSignal();}catch(eSig){}
   }
@@ -3546,7 +3546,7 @@ function openPortalHome(sess, opts){
     if(nRole)nRole.textContent=currentNurseName+' (Nurse)';
     showScreen('nurseScreen');
     if(typeof showNurseTab==='function')showNurseTab('compliance');
-    // nursespd2: start the Ace Completes list before any Sheets /exec. Compliance waits until it paints.
+    // nursespd1: start the one Completes list now so it overlaps compliance (same single-flight).
     loadCompletedNewClientIntakes();
   }else{
     currentNurseName=null;
@@ -3561,13 +3561,9 @@ function openPortalHome(sess, opts){
   window._mgrLoginInFlight=false;
   const run=function(){
     if(role==='Nurse'){
+      loadNurseCompliance(true);
       loadNewClientIntakeDrafts();
-      var nciHomeEpoch=nciCompleteListEpoch;
-      // nursespd2: join the Completes prefetch, then Sheets compliance. Do not overlap /exec with the Ace list.
-      Promise.resolve(loadCompletedNewClientIntakes()).then(function(){
-        if(nciHomeEpoch!==nciCompleteListEpoch)return;
-        loadNurseCompliance(true);
-      });
+      loadCompletedNewClientIntakes(); // nursespd1: join the prefetch, do not start a second list
       apiGetCached('get_clients').then(function(d){ if(d&&d.success) allClients=d.data||[]; }).catch(function(){});
       apiGetCached('get_users').then(function(d){ if(d&&d.success&&d.data) allAidesForAssign=d.data.filter(function(u){return u.username;}); }).catch(function(){});
       if(fresh)logActivity('Logged in (Nurse)');
@@ -9555,7 +9551,8 @@ function escapeAttr(str){
   return escapeHtml(str).replace(/'/g,'&#39;');
 }
 
-// nursespd2 — Sheets nurse-alert / compliance /exec. Completes Refresh aborts these, then starts them again after the Ace list paints.
+// nursespd2 — Sheets nurse-alert /exec only (list_nurse_alerts, mark_nurse_alerts_read, list_nurse_activity).
+// Completes Refresh aborts an in-flight one, then loads badges/activity again after the Ace list paints.
 var nurseSheetsGen=0;
 var nurseSheetsAbort=null;
 function cancelNurseSheetsFetches(){
@@ -9570,7 +9567,6 @@ function nurseSheetsSignal(){
 }
 
 async function loadNurseCompliance(force){
-  var gen=nurseSheetsGen;
   const tbody=document.getElementById('nurseComplianceBody');
   const empty=document.getElementById('nurseComplianceEmpty');
   const note=document.getElementById('nurseComplianceNote');
@@ -9580,7 +9576,6 @@ async function loadNurseCompliance(force){
   try{
     // TODO: Sheets live — action name locked: get_supervisory_compliance
     const data=await apiPost({action:'get_supervisory_compliance'}); // no includeInactive — skip archived
-    if(gen!==nurseSheetsGen||(data&&data.aborted))return;
     let rows=[];
     if(data&&data.success&&Array.isArray(data.data)){
       rows=data.data.map(r=>hydrateNurseComplianceRow(r));
@@ -9595,7 +9590,6 @@ async function loadNurseCompliance(force){
     renderNurseComplianceTable(rows);
     if(note)note.textContent='Cadence: 2 visits + 4 counting calls (Reached + Client/Family) per rolling 60 days.';
   }catch(e){
-    if(gen!==nurseSheetsGen||(e&&e.name==='AbortError'))return;
     nurseComplianceRows=[];
     tbody.innerHTML='';
     if(empty)empty.style.display='block';
@@ -12239,7 +12233,7 @@ async function nciRecheckPendingCompletePdfs(){
 }
 
 async function refreshCompletedNewClientIntakes(){
-  // nursespd2: drop in-flight nurse-alert / compliance /exec before the Ace list fetch.
+  // nursespd2: drop in-flight nurse-alert /exec before the Ace list fetch.
   cancelNurseSheetsFetches();
   nciInvalidateCompleteListCache();
   var epoch=nciCompleteListEpoch;
@@ -12777,11 +12771,7 @@ async function loadNurseActivityFeed(){
 }
 
 function scheduleDeferredNurseSheets(){
-  // Completes rows are already painted. Sheets /exec is not on that critical path.
-  if(currentAdminRole==='Nurse'){
-    void loadNurseCompliance(true);
-    return;
-  }
+  // Completes rows are already painted. list_nurse_alerts / mark / list_nurse_activity stay on Sheets and run after that.
   if(currentAdminRole==='Admin'||currentAdminRole==='Scheduler'){
     void loadAdminNurseAlertsAfterCompletes();
   }

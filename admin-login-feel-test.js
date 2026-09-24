@@ -187,10 +187,7 @@ assert.strictEqual(sandbox.currentNurseName, 'Ada Nurse');
 vm.runInContext('openPortalHome(readAdminSession(),{freshLogin:true})', sandbox);
 assert.ok(screens.includes('nurseScreen'), 'Nurse home paints');
 assert.ok(!screens.includes('adminScreen'), 'Nurse must not open admin tools');
-assert.ok(!screens.includes('load-compliance'), 'compliance /exec waits until the Completes prefetch settles');
-const nurseSheetsOrder = Promise.resolve().then(function(){
-  assert.ok(screens.indexOf('nurseScreen') < screens.indexOf('load-compliance'), 'compliance sheets follow the nurse home paint');
-});
+assert.ok(screens.indexOf('nurseScreen') < screens.indexOf('load-compliance'));
 
 const kept = JSON.parse(localStorage.getItem('admin_session'));
 kept.loginAt = Date.now() - eightH + 5000;
@@ -567,7 +564,7 @@ async function runBrowser(){
   }
 }
 
-nurseSheetsOrder.then(function(){return runBrowser();}).catch(function(err){
+runBrowser().catch(function(err){
   console.error(err);
   process.exit(1);
 });
