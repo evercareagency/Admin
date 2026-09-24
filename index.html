@@ -15,7 +15,8 @@
 <!-- timesheet pdf size 2026-09-24 v=sbpdfsize25 jpeg overlay guard 25MiB superseded by v=sbcut1b -->
 <!-- inservice sb dual 2026-09-24 v=sbcut1b topic assignment upsert omits uuid id; topic_id stays text -->
 <!-- timesheet pdf 1 page + desk + cert lock 2026-09-24 v=pdf1p admin-build 2026-09-24-pdf-1page-actions Letter overlay scaled inside the page so the agency line stays on page 1. Archive PATCH is_active=false only. Delete PATCH is_active=false + deleted_at. Restore archive is_active=true where deleted_at is null. Restore trash is_active=true + deleted_at null. No hard DELETE. Office cert track Personal Care / Home Making on cream; signatures on the same cream. -->
-<!-- inservice compliance delete 2026-09-24 v=isdel1 Delete is POST /rest/v1/rpc/admin_unassign_inservice_aide {p_topic_id,p_username,p_archive_active_result}. Not Completed sends false. Completed sends true so the row does not flip back to Not Completed. Not Completed rows follow aide_usernames: null = all aides, else only those usernames. -->
+<!-- inservice compliance delete 2026-09-24 v=isdel1 admin-build 2026-09-24-is-delete Delete is POST /rest/v1/rpc/admin_unassign_inservice_aide {p_topic_id,p_username,p_archive_active_result}. Not Completed sends false. Completed sends true so the row does not flip back to Not Completed. Not Completed rows follow aide_usernames: null = all aides, else only those usernames. -->
+<!-- login sheets warm off 2026-09-24 v=warmoff1 admin-build 2026-09-24-warmoff1 When evercareSbEnabled (portal_data_backend=supabase), Admin/Scheduler login does not fire blocking Sheets /exec warmkeep. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps warmkeep. Nurse feature data stays on /exec; list_new_client_intakes is unchanged. -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -27,7 +28,7 @@
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
-<meta name="admin-build" content="2026-09-24-adminpw1">
+<meta name="admin-build" content="2026-09-24-warmoff1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2085,6 +2086,9 @@ const _inflight={};
 // Cross-origin /exec redirects never show up in Resource Timing, so also beacon same-origin ./exec.
 // Flag flips only after those fetch() calls are invoked. Sign Out keep-alive resets it each tick.
 function warmUpSheets(){
+  // v=warmoff1: data-backend cut skips Sheets /exec warmkeep so Admin/Scheduler login first paint is not blocked.
+  // Rollback (?sheets=1 / evercare_sheets=1) still pings. Nurse feature /exec is not this beacon.
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled())return;
   if(window._sheetsWarmUpStarted)return;
   var post=fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'});
   var get=fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'});
@@ -2251,6 +2255,8 @@ function stopLoginWarmKeepAlive(){
   if(window._loginWarmTimer){clearInterval(window._loginWarmTimer);window._loginWarmTimer=null;}
 }
 function startLoginWarmKeepAlive(){
+  // v=warmoff1: login-screen keep-alive is Sheets-rollback only. Cut-on Admin/Scheduler must not beacon /exec.
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled())return;
   window._sheetsWarmUpStarted=false;
   window._sheetsWarmUpAt=0;
   warmUpSheets();
@@ -4394,7 +4400,6 @@ async function sbAdminWriteDispatch(payload){
 async function mgrLogin(){
   if(window._mgrLoginInFlight)return;
   window._mgrLoginInFlight=true;
-  warmUpSheets();
   const pwd=document.getElementById('mgr_pass').value;
   const btn=document.getElementById('mgrLoginBtn')||document.querySelector('#loginScreen .login-box button.btn-navy');
   const errEl=document.getElementById('mgrErr');
@@ -4422,6 +4427,7 @@ async function mgrLogin(){
       errEl.style.display='block';
       return;
     }
+    warmUpSheets();
     const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_login',password:pwd})});
     const data=await res.json();
     if(data.success&&isPortalRole(data.role)){

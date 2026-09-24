@@ -24,7 +24,8 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-is-delete">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-warmoff1">'), 'admin-build meta');
+assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
 assert.ok(html.includes('v=sbcut1b'), 'sbcut hotfix marker');
 assert.ok(html.includes('sheets=1'), 'sheets rollback query');
 assert.ok(html.includes('evercare_sheets'), 'sheets rollback storage key');
@@ -77,7 +78,8 @@ const authFns = [
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(login.includes("action:'admin_login'"), 'sheets login stays for flag off');
 assert.ok(!login.includes('softSbDualVerify'), 'soft probe must not run after sheets success');
-assert.ok(login.indexOf('warmUpSheets()') < login.indexOf('evercareSbEnabled()'), 'warm still runs before the flag branch');
+assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()'), 'sb cut login does not warm before the flag branch');
+assert.ok(login.indexOf('sbAuthRoleLogin(') < login.indexOf('warmUpSheets()'), 'sb auth is not preceded by sheets warmkeep');
 assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf("action:'admin_login'"), 'flag check precedes sheets admin_login');
 assert.ok(login.indexOf('sbAuthRoleLogin(') > 0 && login.indexOf('sbAuthRoleLogin(') < login.indexOf("action:'admin_login'"), 'auth login is the flag-on branch');
 assert.ok(!/await\s+softSbDualVerify/.test(login), 'soft verify must not be awaited');
@@ -367,7 +369,7 @@ Promise.all([
 
   const sheetsOn = results[12];
   assert.strictEqual(sheetsOn.sheets.length, 0, 'flag on does not post admin_login');
-  assert.strictEqual(sheetsOn.warmed.length, 1, 'flag on still warms /exec');
+  assert.strictEqual(sheetsOn.warmed.length, 0, 'flag on does not warm /exec on login');
   assert.deepStrictEqual(sheetsOn.box.auth, {role:'Nurse', password:'nurse-secret'});
   assert.strictEqual(sheetsOn.box.home.sess.role, 'Nurse');
   assert.strictEqual(sheetsOn.box.home.sess.name, 'Ada Nurse');
@@ -506,13 +508,31 @@ async function runBrowser(){
       }
       req.continue();
     });
+    const sheetsRollback=/(?:^|[?&])sheets=1(?:&|$)/.test(search)||(storage&&storage.evercare_sheets==='1');
     await page.goto('http://127.0.0.1:'+port+'/index.html'+search,{waitUntil:'domcontentloaded',timeout:20000});
-    await page.waitForFunction(function(){
-      return window._sheetsWarmUpStarted===true &&
-        performance.getEntriesByType('resource').some(function(e){
-          return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0;
-        });
-    },{timeout:4000});
+    if(sheetsRollback){
+      await page.waitForFunction(function(){
+        return window._sheetsWarmUpStarted===true &&
+          performance.getEntriesByType('resource').some(function(e){
+            return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0;
+          });
+      },{timeout:4000});
+    }else{
+      await page.waitForFunction(function(){
+        var el=document.getElementById('loginScreen');
+        return !!(el&&el.classList.contains('active'));
+      },{timeout:4000});
+      await new Promise(function(r){setTimeout(r,400);});
+      const quiet=await page.evaluate(function(){
+        return {
+          started:window._sheetsWarmUpStarted===true,
+          exec:performance.getEntriesByType('resource').map(function(e){return e.name;}).filter(function(n){return /\/exec/.test(n);})
+        };
+      });
+      assert.strictEqual(quiet.started, false, 'sb cut must not start sheets warmkeep before login');
+      assert.strictEqual(quiet.exec.length, 0, 'sb cut first paint must not request /exec '+JSON.stringify(quiet.exec));
+      assert.ok(!hits.some(function(h){return h.action==='ping'||(h.method==='GET'&&/\/exec/.test(h.url));}), 'sb cut first paint must not warm Sheets /exec');
+    }
     return {page:page,hits:hits,context:context};
   }
   try{
@@ -596,11 +616,16 @@ async function runBrowser(){
       assert.strictEqual(tokenHit[0].headers.authorization,'Bearer '+keyConst);
       assert.strictEqual(profileHit[0].headers.authorization,'Bearer '+access);
       assert.ok(!on.hits.some(function(h){return h.action==='admin_login';}),vp.name+' skips sheets admin_login');
-      assert.ok(on.hits.some(function(h){return h.action==='ping';}),vp.name+' still warms sheets');
+      assert.ok(!on.hits.some(function(h){return h.action==='ping'||(h.method==='GET'&&/\/exec/.test(h.url));}),vp.name+' does not warm sheets /exec');
       if(vp.home==='nurse'){
         assert.strictEqual(state.nurse,true);
         assert.strictEqual(state.admin,false);
         assert.ok(state.nurseLabel.indexOf('Ada Nurse')>=0,state.nurseLabel);
+        const nciBy=Date.now()+4000;
+        while(!on.hits.some(function(h){return h.action==='list_new_client_intakes';})&&Date.now()<nciBy){
+          await new Promise(function(r){setTimeout(r,40);});
+        }
+        assert.ok(on.hits.some(function(h){return h.action==='list_new_client_intakes';}), vp.name+' nurse intakes stay on Sheets');
       }else{
         assert.strictEqual(state.admin,true);
         assert.strictEqual(state.nurse,false);
