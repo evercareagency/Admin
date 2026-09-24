@@ -35,6 +35,9 @@ assert.ok(html.includes('data-cert-style="c2-ribbon-laurel"'), 'C2 style marker'
 assert.ok(html.includes('EVERCARE HOME AGENCY'), 'agency lockup');
 assert.ok(html.includes('Certificate of Inservice Completion'), 'title');
 assert.ok(html.includes('Personal Care / Home Making'), 'C2 ribbon text');
+assert.ok(html.includes('data-cert-track="personal-care-home-making"'), 'aide track is personal care / home making');
+assert.ok(!/Skilled Nursing|Therapy track/i.test(html.slice(html.indexOf('function certRibbonHtml'), html.indexOf('function printCert'))), 'cert is not a skilled nursing track');
+assert.ok(html.includes('background:#FDFBF0'), 'cream paper, not a dark signature band');
 assert.ok(html.includes('This certifies that'), 'body lead-in');
 assert.ok(html.includes('has successfully completed'), 'body completion line');
 assert.ok(html.includes('Employee Signature'), 'employee sig line');
