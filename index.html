@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- sb auth lists 2026-09-24 v=sblists flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- sb auth lists+pdf 2026-09-24 v=sbpdf flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -18,7 +18,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-sb-lists">
+<meta name="admin-build" content="2026-09-24-sb-pdf">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2684,6 +2684,8 @@ function sbMapTimesheet(row){
     week_start:row.week_start||'',
     pdfLink:row.pdf_link||'',
     pdf_link:row.pdf_link||'',
+    pdfStoragePath:row.pdf_storage_path||'',
+    pdf_storage_path:row.pdf_storage_path||'',
     totalHrs:row.total_hours||'0:00',
     total_hours:row.total_hours||'0:00',
     notes:row.notes||'',
@@ -2802,6 +2804,129 @@ async function sbApiList(payload){
     return {success:false,error:String(err&&err.message||err||'supabase')};
   }
 }
+var SB_PDF_BUCKET='evercare-pdfs';
+var SB_PDF_SIGN_SECONDS=120;
+function sbPdfObjectPath(path){
+  return String(path||'').trim().replace(/^\/+/,'');
+}
+function sbTimesheetStoragePath(row){
+  return sbPdfObjectPath(row&&(row.pdfStoragePath||row.pdf_storage_path));
+}
+async function sbLookupTimesheetPdfPath(entityId){
+  var id=String(entityId||'').trim();
+  if(!id)return {ok:true,path:''};
+  var got=await sbRestGet('pdf_documents',[
+    ['select','object_path,bucket'],
+    ['doc_kind','eq.timesheet'],
+    ['entity_id','eq.'+id],
+    ['is_active','eq.true'],
+    ['limit','1']
+  ]);
+  if(!got.ok)return got;
+  var doc=Array.isArray(got.data)?got.data[0]:null;
+  if(!doc||doc.bucket&&doc.bucket!==SB_PDF_BUCKET)return {ok:true,path:''};
+  return {ok:true,path:sbPdfObjectPath(doc.object_path)};
+}
+async function sbAttachPdfPaths(rows){
+  var missing=(rows||[]).filter(function(r){return r&&r.id&&!sbTimesheetStoragePath(r);});
+  if(!missing.length)return;
+  var seen={};
+  var ids=[];
+  missing.forEach(function(r){
+    var id=String(r.id);
+    if(seen[id])return;
+    seen[id]=true;
+    ids.push(id.replace(/"/g,''));
+  });
+  if(!ids.length)return;
+  var quoted=ids.map(function(id){return '"'+id+'"';}).join(',');
+  var got=await sbRestGet('pdf_documents',[
+    ['select','entity_id,object_path,bucket'],
+    ['doc_kind','eq.timesheet'],
+    ['is_active','eq.true'],
+    ['entity_id','in.('+quoted+')']
+  ]);
+  if(!got.ok||!Array.isArray(got.data))return;
+  var byId={};
+  got.data.forEach(function(doc){
+    if(!doc||!doc.entity_id||!doc.object_path)return;
+    if(doc.bucket&&doc.bucket!==SB_PDF_BUCKET)return;
+    byId[String(doc.entity_id)]=sbPdfObjectPath(doc.object_path);
+  });
+  rows.forEach(function(r){
+    if(!r||sbTimesheetStoragePath(r))return;
+    if(byId[String(r.id)]){
+      r.pdfStoragePath=byId[String(r.id)];
+      r.pdf_storage_path=r.pdfStoragePath;
+    }
+  });
+}
+function sbAbsoluteSignedUrl(signed){
+  var raw=String(signed||'').trim();
+  if(!raw)return '';
+  if(/^https?:\/\//i.test(raw))return raw;
+  if(raw.indexOf('/storage/v1/')===0)return SUPABASE_URL+raw;
+  if(raw.charAt(0)!=='/')raw='/'+raw;
+  return SUPABASE_URL+'/storage/v1'+raw;
+}
+async function sbSignPdfUrl(objectPath, refreshed){
+  var path=sbPdfObjectPath(objectPath);
+  if(!path)return {ok:false,error:'No PDF yet'};
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,error:'Not signed in',status:401};
+  var encoded=path.split('/').map(function(seg){return encodeURIComponent(seg);}).join('/');
+  var url=SUPABASE_URL+'/storage/v1/object/sign/'+SB_PDF_BUCKET+'/'+encoded;
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({expiresIn:SB_PDF_SIGN_SECONDS})
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbSignPdfUrl(path, true);
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
+  var signed=sbAbsoluteSignedUrl(data&&(data.signedURL||data.signedUrl));
+  if(!signed)return {ok:false,error:'No signed URL'};
+  return {ok:true,url:signed};
+}
+async function sbResolveTimesheetPdf(row){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {mode:'skipped'};
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {mode:'error',error:'Not signed in'};
+  try{
+    var path=sbTimesheetStoragePath(row);
+    if(!path&&row&&row.id){
+      var looked=await sbLookupTimesheetPdfPath(row.id);
+      if(!looked.ok)return {mode:'error',error:looked.error||'Could not open PDF.'};
+      path=looked.path||'';
+    }
+    if(path){
+      var signed=await sbSignPdfUrl(path);
+      if(!signed.ok||!signed.url)return {mode:'error',error:signed.error||'Could not open PDF.'};
+      return {mode:'storage',url:signed.url,path:path};
+    }
+    if(String((row&&row.pdfLink)||'').trim())return {mode:'legacy'};
+    return {mode:'missing'};
+  }catch(err){
+    return {mode:'error',error:String(err&&err.message||err||'supabase')};
+  }
+}
 
 async function mgrLogin(){
   if(window._mgrLoginInFlight)return;
@@ -2900,10 +3025,14 @@ async function renderTimesheets(){
         clientName:r.clientName||r.client_name||'',svcType:r.svcType||r.svc_type||'',
         weekStart:r.weekStart||r.week_start||'',
         pdfLink:r.PdfLink||r.pdfLink||r.pdf_link||r.PDFLink||'',
+        pdfStoragePath:r.pdfStoragePath||r.pdf_storage_path||'',
         totalHrs:r.totalHrs||r.total_hours||r.totalHours||'0:00',
         notes:r.notes||'',days:r.days||{},
         status:r.status||'submitted',correctionDays:r.correctionDays||[],correctionNote:r.correctionNote||''
       }));
+      if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbAttachPdfPaths==='function'){
+        try{await sbAttachPdfPaths(allRecords);}catch(e){}
+      }
       store.set('admin_records',allRecords);
     }
   }catch(e){allRecords=store.get('admin_records')||[];}
@@ -2911,9 +3040,34 @@ async function renderTimesheets(){
 }
 
 
+function timesheetPdfAvailable(r){
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&String((r&&(r.pdfStoragePath||r.pdf_storage_path))||'').trim())return true;
+  return !!String((r&&r.pdfLink)||'').trim();
+}
+function timesheetPdfButton(r,detail){
+  if(!timesheetPdfAvailable(r)){
+    return '<span style="font-size:'+(detail?'0.8rem':'0.72rem')+';color:var(--muted)">No PDF yet</span>';
+  }
+  return '<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="openTimesheetPdf(\''+r.id+'\')">'+(detail?'📄 View PDF':'📄 View')+'</button>';
+}
 function openTimesheetPdf(id){
   const r=allRecords.find(x=>String(x.id)===String(id));
   if(!r){showTempMsg(SIG_REQUIRED_MSG,'var(--danger)');return;}
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbResolveTimesheetPdf==='function'){
+    sbResolveTimesheetPdf(r).then(function(res){
+      if(res&&res.mode==='storage'&&res.url){window.open(res.url,'_blank','noopener');return;}
+      if(res&&res.mode==='legacy'){
+        if(!requireTimesheetSignatures(r))return;
+        const legacy=(r.pdfLink||'').trim();
+        if(!legacy){alert('No archived PDF yet for this timesheet.');return;}
+        window.open(legacy,'_blank','noopener');
+        return;
+      }
+      if(res&&res.mode==='error'){showTempMsg(res.error||'Could not open PDF.','var(--danger)');return;}
+      alert('No archived PDF yet for this timesheet.');
+    }).catch(function(){showTempMsg('Could not open PDF.','var(--danger)');});
+    return;
+  }
   if(!requireTimesheetSignatures(r))return;
   const url=(r.pdfLink||'').trim();
   if(!url){alert('No archived PDF yet for this timesheet.');return;}
@@ -2956,7 +3110,7 @@ function paintTimesheets(){
       <td><strong style="color:var(--teal)">${r.totalHrs}</strong></td>
       <td style="font-size:0.72rem;color:var(--teal)">${locSum}</td>
       <td>${statusBadge(r.status)}</td>
-      <td>${(r.pdfLink||'').trim()?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="openTimesheetPdf('${r.id}')">📄 View</button>`:`<span style="font-size:0.72rem;color:var(--muted)">No PDF yet</span>`}</td>
+      <td>${timesheetPdfButton(r,false)}</td>
       <td><div class="actions">
         <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewRec('${r.id}')">👁 View</button>
         <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="quickDelete('${r.id}')">🗑</button>
@@ -3460,7 +3614,7 @@ function buildDetailBody(){
       <div class="det-kv"><div class="lbl">Week Starting</div><div style="font-size:0.88rem;font-weight:600">${formatWeekLabel(r.weekStart)}</div></div>
       <div class="det-kv"><div class="lbl">Total Hours</div><div style="font-size:1.2rem;font-weight:700;color:var(--teal)">${r.totalHrs}</div></div>
       <div class="det-kv"><div class="lbl">Status</div><div>${r.status==='correction_requested'?'⚠️ Needs Fix':r.status==='corrected'?'🔄 Corrected':'✅ Submitted'}</div></div>
-      <div class="det-kv"><div class="lbl">Archived PDF</div><div>${(r.pdfLink||'').trim()?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32" onclick="openTimesheetPdf('${r.id}')">📄 View PDF</button>`:`<span style="font-size:0.8rem;color:var(--muted)">No PDF yet</span>`}</div></div>
+      <div class="det-kv"><div class="lbl">Archived PDF</div><div>${timesheetPdfButton(r,true)}</div></div>
     </div>
     <div style="overflow-x:auto">
       <table class="hours-tbl">

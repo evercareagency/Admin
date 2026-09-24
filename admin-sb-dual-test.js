@@ -24,7 +24,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-lists">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf">'), 'admin-build meta');
 assert.ok(html.includes("const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';"), 'supabase url');
 assert.ok(!html.includes('lvaglmztnlnsrhlluayz'), 'abandoned project ref must not appear');
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
