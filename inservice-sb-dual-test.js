@@ -152,7 +152,7 @@ function sessionWindow(){
 }
 
 (async function(){
-  const off = harness({search:''});
+  const off = harness({search:'?sheets=1'});
   const offData = await off.box.apiPost({action:'get_inservices'});
   assert.strictEqual(off.calls.length, 1, 'flag off makes one Sheets call');
   assert.ok(off.calls[0].url.indexOf('script.google.com')>=0, 'flag off stays on /exec');
@@ -165,6 +165,12 @@ function sessionWindow(){
   await stored.box.apiPost({action:'get_activity_log'});
   assert.ok(stored.calls[0].url.indexOf('script.google.com')>=0, 'non-inservice actions stay on Sheets');
   assert.strictEqual(stored.calls.filter(function(c){return c.url.indexOf('supabase.co')>=0;}).length, 0);
+
+  const missingDefault = harness({search:''});
+  const missDefault = await missingDefault.box.apiPost({action:'get_inservices'});
+  assert.strictEqual(missDefault.success, false);
+  assert.ok(/not signed in/i.test(missDefault.error));
+  assert.strictEqual(missingDefault.calls.length, 0, 'default on with no jwt must not fall through to sheets');
 
   const missing = harness({search:'?sb=1'});
   const miss = await missing.box.apiPost({action:'get_inservices'});
@@ -456,9 +462,12 @@ function sessionWindow(){
     vm.runInContext(uiNames.map(function(sig){return extractFn(html, sig);}).join('\n'), box);
     return {box:box, posts:posts};
   }
-  const sheetsUi = uiBox('', '1');
+  const sheetsUi = uiBox('?sheets=1', '1');
   await sheetsUi.box.clearAssignment();
-  assert.strictEqual(JSON.stringify(sheetsUi.posts[0]), JSON.stringify({action:'clear_assigned_topic'}), 'flag off clear has no topic id');
+  assert.strictEqual(JSON.stringify(sheetsUi.posts[0]), JSON.stringify({action:'clear_assigned_topic'}), 'sheets rollback clear has no topic id');
+  const defaultUi = uiBox('', '3');
+  await defaultUi.box.clearAssignment();
+  assert.strictEqual(defaultUi.posts[0].topicId, '3', 'default clear sends the selected topic');
   const sbUi = uiBox('?sb=1', '1');
   await sbUi.box.clearAssignment();
   assert.strictEqual(JSON.stringify(sbUi.posts[0]), JSON.stringify({action:'clear_assigned_topic', topicId:'1'}), 'flag on clear sends the selected topic only');

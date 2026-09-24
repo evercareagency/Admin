@@ -154,6 +154,7 @@ function harness(opts){
     SB_SESSION_KEY: 'evercare_sb_session',
     GAS_HEADERS: {'Content-Type':'text/plain;charset=utf-8'},
     location: {search: opts.search || ''},
+    currentAdminRole: opts.role || null,
     localStorage: {
       getItem: function(k){return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;},
       setItem: function(k, v){mem[k] = String(v);},
@@ -257,7 +258,7 @@ const clientRow = {
   ];
   for(let i=0;i<offPayloads.length;i++){
     const payload = offPayloads[i];
-    const off = harness({search:'', responses:[{status:200, raw:JSON.stringify({success:true})}]});
+    const off = harness({search:'?sheets=1', responses:[{status:200, raw:JSON.stringify({success:true})}]});
     const data = await off.box.apiPost(payload);
     assert.strictEqual(data.success, true, payload.action);
     assert.strictEqual(off.calls.length, 1, payload.action+' flag off is one sheets call');
@@ -279,7 +280,28 @@ const clientRow = {
   assert.ok(storageOn.calls[0].url.indexOf('/rest/v1/rpc/admin_create_aide') > 0, 'localStorage flag uses the RPC');
   assert.ok(!storageOn.calls.some(function(c){return c.url === sheetsUrl;}), 'localStorage flag must not hit sheets');
 
-  const noJwt = harness({search:'?sb=1'});
+  const defaultWrite = harness({
+    search:'',
+    session:session(),
+    responses:[{status:200, raw:JSON.stringify(created)}]
+  });
+  const viaDefault = await defaultWrite.box.apiPost({action:'create_aide', username:'jdoe', name:'Jane Doe', fullName:'Jane Doe', tempPassword:'EcLocal99', clientIds:[]});
+  assert.strictEqual(viaDefault.success, true);
+  assert.ok(defaultWrite.calls[0].url.indexOf('/rest/v1/rpc/admin_create_aide') > 0, 'default write uses the RPC without ?sb=1');
+  assert.ok(!defaultWrite.calls.some(function(c){return c.url === sheetsUrl;}), 'default write must not dual-write sheets');
+
+  const nurseWrite = harness({
+    search:'',
+    role:'Nurse',
+    session:session(),
+    responses:[{status:200, raw:JSON.stringify({success:true})}]
+  });
+  const nurseSaved = await nurseWrite.box.apiPost({action:'add_client', name:'Ann', address:'1 Main', lat:'', lng:'', assignedAides:[]});
+  assert.strictEqual(nurseSaved.success, true);
+  assert.strictEqual(nurseWrite.calls[0].url, sheetsUrl, 'nurse client write stays on sheets');
+  assert.ok(!nurseWrite.calls.some(function(c){return c.url.indexOf('supabase.co') >= 0;}));
+
+  const noJwt = harness({search:''});
   const missing = await noJwt.box.apiPost({action:'admin_create_aide', username:'jdoe', fullName:'Jane Doe', tempPassword:'EcLocal99'});
   assert.strictEqual(missing.success, false);
   assert.strictEqual(missing.error, 'Not signed in');

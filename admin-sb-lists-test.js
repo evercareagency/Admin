@@ -191,7 +191,7 @@ function params(url){
   return new URL(url).searchParams;
 }
 
-const off = harness({search: '', responses: [
+const off = harness({search: '?sheets=1', responses: [
   {status: 200, raw: JSON.stringify({success: true, data: []})}
 ]});
 const on = harness({search: '?sb=1', session: session, responses: [
@@ -322,7 +322,7 @@ Promise.all([
     return cached.box.apiGetCached('get_users').then(function(second){
       assert.strictEqual(second.data[0].username, 'jdoe');
       assert.strictEqual(cached.calls.length, 1, 'supabase cache is reused');
-      const sheetsCached = harness({search: '', responses: [
+      const sheetsCached = harness({search: '?sheets=1', responses: [
         {status: 200, raw: JSON.stringify({success: true, data: [{username: 'sheet-user'}]})}
       ]});
       sheetsCached.box.cacheSet('get_users', {success: true, source: 'supabase', data: [{username: 'sb-user'}]});
@@ -403,7 +403,7 @@ async function runBrowser(){
     req.continue();
   });
   try{
-    await page.goto('http://127.0.0.1:' + port + '/index.html?sb=1&v=lists', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await page.goto('http://127.0.0.1:' + port + '/index.html?v=sbcut1', {waitUntil: 'domcontentloaded', timeout: 20000});
     await page.waitForFunction(function(){
       return document.getElementById('adminScreen').classList.contains('active') &&
         document.getElementById('tsBody') &&

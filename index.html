@@ -7,12 +7,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
-<!-- sb archive §3.3/§4.3 2026-09-24 PATCH is_active=false select id,is_active single() when ?sb=1 -->
-<!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
-<!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 client-overlay no-edge GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
-<!-- timesheet pdf size 2026-09-24 v=sbpdfsize25 jpeg overlay guard 25MiB flag off unless ?sb=1 -->
-<!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
+<!-- sbcut 2026-09-24 v=sbcut1 default Supabase for migrated surfaces. Emergency rollback ONLY: ?sheets=1 or localStorage evercare_sheets=1. Missing ?sb=1 does not select Sheets. Cut surfaces do not dual-write Sheets. Nurse portal feature data + Broadcast Alert stay off Supabase. -->
+<!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 superseded by v=sbcut1 (rollback ?sheets=1 / evercare_sheets=1) -->
+<!-- sb archive §3.3/§4.3 2026-09-24 PATCH is_active=false select id,is_active single() default Supabase sbcut -->
+<!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory superseded by v=sbcut1 (rollback ?sheets=1 / evercare_sheets=1) -->
+<!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 client-overlay no-edge GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 superseded by v=sbcut1 -->
+<!-- timesheet pdf size 2026-09-24 v=sbpdfsize25 jpeg overlay guard 25MiB superseded by v=sbcut1 -->
+<!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results default Supabase sbcut -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -23,7 +24,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-sb-pdf-size">
+<meta name="admin-build" content="2026-09-24-sb-cut">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2059,9 +2060,15 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 async function apiPost(payload){
-  // Flag on: aides, clients, payroll timesheets, supervisory contacts, and inservice compliance are Supabase.
-  // Admin writes (create/reset aide, client CRUD+assignments, timesheet update/correction/soft-delete) too.
-  // Every other action stays on Sheets. Flag off never reaches these branches.
+  // sbcut v=sbcut1: aides, clients, assignments, payroll timesheets, office supervisory contacts,
+  // and inservice compliance/results are Supabase by default. Admin writes too.
+  // Those returns happen before the /exec post — no Sheets dual-write on the Supabase path.
+  // Emergency rollback (?sheets=1 or evercare_sheets=1) makes evercareSbEnabled() false.
+  // Nurse portal (currentAdminRole Nurse) always stays on Sheets /exec, including supervisory contacts.
+  // Broadcast Alert does not use apiPost. Nurse alerts, intakes, and get_supervisory_compliance are not Supabase routers.
+  var nurseSheets=false;
+  try{nurseSheets=(typeof currentAdminRole!=='undefined'&&currentAdminRole==='Nurse');}catch(eNurse){nurseSheets=false;}
+  if(!nurseSheets){
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
     return sbApiList(payload);
   }
@@ -2073,6 +2080,7 @@ async function apiPost(payload){
   }
   if(payload&&typeof sbIsAdminWriteAction==='function'&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sbIsAdminWriteAction(payload.action)){
     return sbAdminWriteDispatch(payload);
+  }
   }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
@@ -2451,12 +2459,14 @@ function bootAdminPortal(){
 }
 
 function evercareSbEnabled(){
+  // sbcut v=sbcut1 — migrated surfaces use Supabase unless emergency Sheets rollback.
+  // Rollback ONLY: ?sheets=1 or localStorage evercare_sheets=1. Missing ?sb=1 does not select Sheets.
   try{
     var search=(typeof location!=='undefined'&&location&&location.search)||'';
-    if(/(?:^|[?&])sb=1(?:&|$)/.test(search))return true;
-    if(typeof localStorage!=='undefined'&&localStorage.getItem('evercare_sb')==='1')return true;
+    if(/(?:^|[?&])sheets=1(?:&|$)/.test(search))return false;
+    if(typeof localStorage!=='undefined'&&localStorage.getItem('evercare_sheets')==='1')return false;
   }catch(e){}
-  return false;
+  return true;
 }
 function syncSbRoleField(){
   var field=document.getElementById('mgrRoleField');
@@ -3795,9 +3805,9 @@ async function sbInserviceDispatch(payload){
   return {success:false,error:'Unsupported inservice action.'};
 }
 
-// GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 — office JWT only, flag on (?sb=1 or evercare_sb=1).
+// GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 — office JWT. sbcut default on; emergency Sheets is evercareSbEnabled() false (?sheets=1 / evercare_sheets=1).
 // Ace RPCs create the Auth user. Clients, assignments, and timesheet admin writes are REST.
-// Flag off never enters here. Temp passwords are returned once for the existing modal.
+// Sheets rollback never enters here. Supabase writes do not also post Sheets. Temp passwords are returned once for the existing modal.
 function sbIsAdminWriteAction(action){
   return action==='admin_create_aide'||action==='create_aide'
     ||action==='reset_temp_password'||action==='reset_aide_temp_password'
@@ -5481,6 +5491,7 @@ async function downloadTSPDF(){
     showTempMsg('Error generating PDF. Try Print instead.','var(--danger)');
   }
 }
+// Broadcast Alert is not on the sbcut. It stays local broadcast_msg and never calls Supabase. Nurse alerts stay /exec.
 function sendBroadcast(){const msg=document.getElementById('broadcastMsg').value.trim();if(!msg){alert('Please enter a message.');return;}localStorage.setItem('broadcast_msg',msg);renderBroadcastPreview();showTempMsg('✅ Alert sent!','var(--success)');}
 function clearBroadcast(){localStorage.removeItem('broadcast_msg');document.getElementById('broadcastMsg').value='';renderBroadcastPreview();showTempMsg('Alert cleared.','var(--teal)');}
 function renderBroadcastPreview(){const msg=localStorage.getItem('broadcast_msg');const el=document.getElementById('broadcastPreview');if(msg){el.innerHTML=`<p style="font-size:0.75rem;color:var(--muted);margin-bottom:7px">Current active alert:</p><div class="broadcast-active">🚨 ${msg}</div>`;}else{el.innerHTML=`<p style="font-size:0.75rem;color:var(--muted)">No active alert.</p>`;}}
@@ -7513,8 +7524,9 @@ async function exportAllAsPDFs(){
 
 
 // ─── NURSE SUPERVISORY CONTACTS ─────────────────────────
-// Flag on (?sb=1 or evercare_sb=1): list/get/save/archive use Supabase supervisory_contacts.
-// Archive sets status=Archived only. Flag off keeps the Ace /exec actions below.
+// sbcut: office Admin/Scheduler list/get/save/archive use Supabase supervisory_contacts by default.
+// Nurse portal (currentAdminRole Nurse) stays Sheets /exec for these actions. Emergency rollback: ?sheets=1 or evercare_sheets=1.
+// Archive sets status=Archived only. Sheets rollback keeps the Ace /exec actions below.
 // LOCKED API (Friday/Sheets): get_supervisory_compliance, save_supervisory_contact,
 // list_supervisory_contacts, archive_supervisory_visit_pdf (Ace v24);
 // Ace LOCK (edit/delete): get_supervisory_contact { contactId } hydrate;
@@ -8461,7 +8473,7 @@ async function resolveLatestVisitContact(row){
 async function viewSupervisoryVisitPdf(rowIndex){
   const row=nurseComplianceRows[rowIndex];
   if(!row){showTempMsg('No client row.','var(--danger)');return;}
-  if(scPdfStoragePath(row)&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+  if(scPdfStoragePath(row)&&currentAdminRole!=='Nurse'&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
     const earlyBtn=document.getElementById('scViewPdfBtn'+rowIndex);
     if(earlyBtn&&earlyBtn.disabled)return;
     setViewPdfButtonWorking(rowIndex,true);

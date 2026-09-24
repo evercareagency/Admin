@@ -24,7 +24,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-size">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut">'), 'admin-build meta');
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes(anonFile), 'anon key stays the embedded jwt');
 assert.ok(!html.includes(".delete('supervisory_contacts'"), 'no client hard delete of supervisory_contacts');
@@ -102,6 +102,7 @@ function harness(opts){
     GAS_HEADERS: {'Content-Type':'text/plain;charset=utf-8'},
     SB_SESSION_KEY: 'evercare_sb_session',
     location: {search: opts.search || ''},
+    currentAdminRole: opts.role || null,
     localStorage: {
       getItem: function(k){return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;},
       setItem: function(k, v){mem[k] = String(v);},
@@ -237,7 +238,7 @@ const savePayload = {
   supervisorSignatureData: 'data:image/png;base64,nurseink'
 };
 
-const off = harness({search: '', responses: [
+const off = harness({search: '?sheets=1', responses: [
   {status: 200, raw: JSON.stringify({success: true, data: []})}
 ]});
 const storedFlag = harness({
@@ -290,6 +291,21 @@ const refreshed = harness({search: '?sb=1', session: session, responses: [
   {status: 200, raw: JSON.stringify([visitRow])}
 ]});
 const hard = harness({search: '?sb=1', session: session, responses: []});
+const nurseStay = harness({
+  search: '',
+  role: 'Nurse',
+  session: session,
+  responses: [{status: 200, raw: JSON.stringify({success: true, data: []})}]
+});
+const defaultOn = harness({
+  search: '',
+  session: session,
+  responses: [{status: 200, raw: JSON.stringify([])}]
+});
+const nurseAlerts = harness({
+  search: '',
+  responses: [{status: 200, raw: JSON.stringify({success: true, items: []})}]
+});
 
 Promise.all([
   off.box.apiPost({action: 'list_supervisory_contacts', sinceDays: 60}),
@@ -308,7 +324,10 @@ Promise.all([
   bare.box.apiPost({action: 'save_supervisory_contact', contactType: 'Visit'}),
   compliance.box.apiPost({action: 'get_supervisory_compliance'}),
   refreshed.box.apiPost({action: 'list_supervisory_contacts'}),
-  hard.box.sbRestWrite('DELETE', 'supervisory_contacts', [['id', 'eq.' + visitId]], {})
+  hard.box.sbRestWrite('DELETE', 'supervisory_contacts', [['id', 'eq.' + visitId]], {}),
+  nurseStay.box.apiPost({action: 'save_supervisory_contact', contactType: 'Visit'}),
+  defaultOn.box.apiPost({action: 'list_supervisory_contacts'}),
+  nurseAlerts.box.apiPost({action: 'list_nurse_alerts', username: 'ada'})
 ]).then(function(results){
   const sheetsList = results[0];
   const storedList = results[1];
@@ -463,6 +482,14 @@ Promise.all([
   assert.strictEqual(deleted.error, 'Archive only — hard delete is not allowed');
   assert.strictEqual(hard.calls.length, 0, 'DELETE never hits the network');
 
+  assert.strictEqual(nurseStay.calls.length, 1, 'nurse supervisory save is one sheets call');
+  assert.strictEqual(nurseStay.calls[0].url, sheetsUrl, 'nurse portal supervisory stays on sheets');
+  assert.ok(!nurseStay.calls.some(function(c){return c.url.indexOf('supabase.co') >= 0;}), 'nurse portal must not call supabase');
+  assert.ok(defaultOn.calls[0].url.indexOf('/rest/v1/supervisory_contacts') > 0, 'default office list is supabase without ?sb=1');
+  assert.ok(!defaultOn.calls.some(function(c){return c.url === sheetsUrl;}), 'default office list must not dual-write sheets');
+  assert.strictEqual(nurseAlerts.calls.length, 1);
+  assert.strictEqual(nurseAlerts.calls[0].url, sheetsUrl, 'nurse alerts stay on sheets');
+
   assert.strictEqual(off.box.sbUuid('not-a-uuid'), false);
   assert.strictEqual(off.box.sbUuid(visitId), true);
   assert.strictEqual(off.box.sbScTextDate('9/7/2026'), '2026-09-07');
@@ -585,7 +612,7 @@ async function runBrowser(){
     return {page: page, hits: hits, context: context};
   }
   try{
-    const offPage = await openPage('?v=sheets-supervisory', {});
+    const offPage = await openPage('?sheets=1&v=sheets-supervisory', {});
     await offPage.page.evaluate(function(){localStorage.removeItem('evercare_sb_session');});
     await offPage.page.reload({waitUntil: 'domcontentloaded'});
     await offPage.page.waitForFunction(function(){
@@ -604,7 +631,7 @@ async function runBrowser(){
     console.log('admin-sb-supervisory browser flag-off ok');
     await offPage.context.close();
 
-    const on = await openPage('?sb=1&v=supervisory');
+    const on = await openPage('?v=sbcut1');
     await on.page.evaluate(function(){
       window.__opened = [];
       window.open = function(url){window.__opened.push(url);return null;};

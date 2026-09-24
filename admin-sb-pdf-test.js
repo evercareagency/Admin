@@ -26,7 +26,7 @@ function extractFn(src, sig){
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-size">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut">'), 'admin-build meta');
 assert.ok(html.includes('v=sbpdfmake9c24'), 'make/refresh marker is greppable');
 assert.ok(html.includes('v=sbpdfsize25'), 'size marker is greppable');
 assert.ok(html.includes('var SB_PDF_MAX_BYTES=25*1024*1024'), 'client upload guard is 25 MiB');
@@ -177,7 +177,7 @@ const missing = harness({
   session: session,
   responses: [{status: 200, raw: '[]'}]
 });
-const off = harness({search: '', session: session, responses: []});
+const off = harness({search: '?sheets=1', session: session, responses: []});
 const refreshed = harness({
   search: '?sb=1',
   session: session,
@@ -239,7 +239,7 @@ function runUpload(){
       {status: 500, raw: JSON.stringify({message: 'patch denied'})}
     ]
   });
-  const flagOff = harness({search: '', session: session, responses: []});
+  const flagOff = harness({search: '?sheets=1', session: session, responses: []});
   const ensured = harness({
     search: '?sb=1',
     session: session,
@@ -564,7 +564,7 @@ async function runBrowser(){
     }, admin, sb);
     const onHits = [];
     await install(onPage, onHits);
-    await onPage.goto('http://127.0.0.1:' + port + '/index.html?sb=1&v=sbpdf', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await onPage.goto('http://127.0.0.1:' + port + '/index.html?v=sbcut1', {waitUntil: 'domcontentloaded', timeout: 20000});
     await onPage.waitForFunction(function(){
       const btn = document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]');
       return btn && btn.textContent.indexOf('View') >= 0;
@@ -605,7 +605,7 @@ async function runBrowser(){
     }, admin);
     const offHits = [];
     await install(offPage, offHits);
-    await offPage.goto('http://127.0.0.1:' + port + '/index.html', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await offPage.goto('http://127.0.0.1:' + port + '/index.html?sheets=1', {waitUntil: 'domcontentloaded', timeout: 20000});
     await offPage.waitForFunction(function(){
       return !!document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]');
     }, {timeout: 8000});
