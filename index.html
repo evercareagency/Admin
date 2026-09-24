@@ -3478,118 +3478,65 @@ function sbMergeAideUsernames(existing,incoming){
   (incoming||[]).forEach(add);
   return out;
 }
-// inservice_topic_assignment is unique on org_id only, so one row holds every topic.
-// One topic stays {topic_id, aide_usernames:null|string[]}. Several topics use
-// aide_usernames {v:2, topics:{[topicId]:{aides:null|string[]}}} (null aides = all aides).
-function sbParseAssignmentMap(row){
-  var map={};
-  if(!row)return map;
-  var names=row.aide_usernames;
-  if(typeof names==='string'){
-    try{names=JSON.parse(names);}catch(e){names=null;}
-  }
-  if(names&&typeof names==='object'&&!Array.isArray(names)&&Number(names.v)===2&&names.topics&&typeof names.topics==='object'&&!Array.isArray(names.topics)){
-    Object.keys(names.topics).forEach(function(k){
-      var entry=names.topics[k];
-      if(!entry||typeof entry!=='object'||Array.isArray(entry))return;
-      if(!Object.prototype.hasOwnProperty.call(entry,'aides'))return;
-      map[String(k)]=entry.aides==null?null:(sbUsernameList(entry.aides)||[]);
-    });
-    return map;
-  }
-  var topic=row.topic_id;
-  if(topic==null||String(topic).trim()==='')return map;
-  var key=String(topic);
-  map[key]=names==null?null:(sbUsernameList(names)||[]);
-  return map;
-}
-function sbParseAssignmentRows(rows){
-  var map={};
-  (rows||[]).forEach(function(row){
-    var part=sbParseAssignmentMap(row);
-    Object.keys(part).forEach(function(k){map[k]=part[k];});
-  });
-  return map;
-}
-function sbAssignmentWriteBody(map,focusTopicId){
-  var keys=Object.keys(map);
-  var body={org_id:sbOrgId()};
-  if(!keys.length){
-    body.topic_id=null;
-    body.aide_usernames=null;
-    return body;
-  }
-  if(keys.length===1){
-    body.topic_id=keys[0];
-    body.aide_usernames=map[keys[0]];
-    return body;
-  }
-  var topics={};
-  keys.forEach(function(k){topics[k]={aides:map[k]};});
-  var focus=focusTopicId!=null&&Object.prototype.hasOwnProperty.call(map,String(focusTopicId))?String(focusTopicId):keys[0];
-  body.topic_id=focus;
-  body.aide_usernames={v:2,topics:topics};
-  return body;
-}
-function sbProjectAssignment(map,topicId,focusTopicId){
-  var empty={success:true,topicId:null,aideUsernames:null,assignAll:false};
-  var key=null;
-  if(topicId!=null&&String(topicId).trim()!==''){
-    key=String(topicId);
-    if(!Object.prototype.hasOwnProperty.call(map,key))return empty;
-  }else{
-    var keys=Object.keys(map);
-    if(!keys.length)return empty;
-    if(focusTopicId!=null&&Object.prototype.hasOwnProperty.call(map,String(focusTopicId)))key=String(focusTopicId);
-    else key=keys[0];
-  }
-  if(map[key]==null)return {success:true,topicId:key,aideUsernames:null,assignAll:true};
-  return {success:true,topicId:key,aideUsernames:map[key].slice(),assignAll:false};
+// GHOST-INSERVICE-TOPIC-ASSIGNMENT-CONTRACT-v1 (CALLABLE).
+// UNIQUE inservice_topic_assignment_org_topic_uidx (org_id, topic_id).
+// aide_usernames text[]: null = all aides, [] = nobody, else selected usernames.
+// created_at / updated_at are database-side. Never send them. Never write topic_id null.
+var SB_ASSIGN_SELECT='id,org_id,topic_id,aide_usernames,updated_at';
+function sbEmptyAssignment(){
+  return {success:true,topicId:null,aideUsernames:null,assignAll:false};
 }
 function sbMapAssignment(row){
-  var map=sbParseAssignmentMap(row);
-  return sbProjectAssignment(map,null,row&&row.topic_id);
+  if(!row)return null;
+  var topic=row.topic_id;
+  if(topic==null||String(topic).trim()==='')return null;
+  var names=row.aide_usernames;
+  if(typeof names==='string'){
+    try{names=JSON.parse(names);}catch(e){return null;}
+  }
+  if(names!=null&&!Array.isArray(names))return null;
+  if(names==null)return {success:true,topicId:String(topic),aideUsernames:null,assignAll:true};
+  return {success:true,topicId:String(topic),aideUsernames:(sbUsernameList(names)||[]).slice(),assignAll:false};
 }
-async function sbFetchAssignmentRow(){
-  var got=await sbRestGet('inservice_topic_assignment',[
-    ['select','*'],
+async function sbFetchAssignmentRows(topicId){
+  var pairs=[
+    ['select',SB_ASSIGN_SELECT],
+    ['order','topic_id'],
     ['org_id','eq.'+sbOrgId()]
-  ]);
+  ];
+  if(topicId!=null&&String(topicId).trim()!=='')pairs.push(['topic_id','eq.'+String(topicId)]);
+  var got=await sbRestGet('inservice_topic_assignment',pairs);
   if(!got.ok)return {error:got.error||'Could not load topic assignment.'};
-  var rows=Array.isArray(got.data)?got.data:[];
-  return {row:rows.length?rows[0]:null,rows:rows};
-}
-function sbAssignmentMapFromFetch(got){
-  if(got&&Array.isArray(got.rows))return sbParseAssignmentRows(got.rows);
-  return sbParseAssignmentMap(got&&got.row);
-}
-async function sbPostAssignment(body){
-  var got=await sbRestMutate('POST','inservice_topic_assignment',[['on_conflict','org_id']],body,'resolution=merge-duplicates,return=representation');
-  if(!got.ok)return {success:false,error:got.error||'Could not save topic assignment.'};
-  var row=Array.isArray(got.data)&&got.data[0]?got.data[0]:body;
-  return {success:true,row:row};
+  return {rows:Array.isArray(got.data)?got.data:[]};
 }
 async function sbGetAssignedTopic(topicId){
-  var got=await sbFetchAssignmentRow();
+  var scoped=topicId!=null&&String(topicId).trim()!=='';
+  var got=await sbFetchAssignmentRows(scoped?topicId:null);
   if(got.error)return {success:false,error:got.error};
-  var map=sbAssignmentMapFromFetch(got);
-  if(topicId!=null&&String(topicId).trim()!=='')return sbProjectAssignment(map,topicId);
-  return sbProjectAssignment(map,null,got.row&&got.row.topic_id);
+  var mapped=(got.rows||[]).map(sbMapAssignment).filter(Boolean);
+  if(scoped)return mapped[0]||sbEmptyAssignment();
+  var out=sbEmptyAssignment();
+  out.assignments=mapped.map(function(a){
+    return {topicId:a.topicId,aideUsernames:a.aideUsernames,assignAll:a.assignAll};
+  });
+  if(mapped.length===1){
+    out.topicId=mapped[0].topicId;
+    out.aideUsernames=mapped[0].aideUsernames;
+    out.assignAll=mapped[0].assignAll;
+  }
+  return out;
 }
 async function sbUpsertAssignment(topicId,aideUsernames){
-  if(topicId==null||String(topicId).trim()===''){
-    var wiped=await sbPostAssignment({org_id:sbOrgId(),topic_id:null,aide_usernames:null});
-    if(!wiped.success)return wiped;
-    return {success:true,topicId:null,aideUsernames:null,assignAll:false};
-  }
-  var got=await sbFetchAssignmentRow();
-  if(got.error)return {success:false,error:got.error};
-  var map=sbAssignmentMapFromFetch(got);
-  var key=String(topicId);
-  map[key]=aideUsernames===null?null:(Array.isArray(aideUsernames)?aideUsernames.slice():[]);
-  var posted=await sbPostAssignment(sbAssignmentWriteBody(map,key));
-  if(!posted.success)return posted;
-  return sbProjectAssignment(map,key);
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
+  var body={
+    org_id:sbOrgId(),
+    topic_id:String(topicId),
+    aide_usernames:aideUsernames===null?null:(Array.isArray(aideUsernames)?aideUsernames.slice():[])
+  };
+  var got=await sbRestMutate('POST','inservice_topic_assignment',[['on_conflict','org_id,topic_id']],body,'resolution=merge-duplicates,return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not save topic assignment.'};
+  var row=Array.isArray(got.data)&&got.data[0]?got.data[0]:body;
+  return sbMapAssignment(row)||sbEmptyAssignment();
 }
 async function sbSetAssignedTopic(topicId){
   if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
@@ -3598,23 +3545,26 @@ async function sbSetAssignedTopic(topicId){
 async function sbAssignSelectedAides(topicId,aideUsernames){
   if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
   var incoming=sbUsernameList(aideUsernames)||[];
-  var got=await sbFetchAssignmentRow();
+  var got=await sbFetchAssignmentRows(topicId);
   if(got.error)return {success:false,error:got.error};
-  var map=sbAssignmentMapFromFetch(got);
-  var key=String(topicId);
+  var current=sbMapAssignment((got.rows||[])[0]);
   var base=[];
-  if(Object.prototype.hasOwnProperty.call(map,key)&&map[key]!=null)base=map[key];
+  if(current&&current.aideUsernames!=null)base=current.aideUsernames;
   return sbUpsertAssignment(topicId,sbMergeAideUsernames(base,incoming));
 }
+// Contract v1 clear: DELETE this org_id + topic_id row only. No Prefer body.
+// Do not upsert topic_id null. Do not delete by org_id alone.
+async function sbClearAssignedTopicRow(topicId){
+  var got=await sbRestMutate('DELETE','inservice_topic_assignment',[
+    ['org_id','eq.'+sbOrgId()],
+    ['topic_id','eq.'+String(topicId)]
+  ],null,null);
+  if(!got.ok)return {success:false,error:got.error||'Could not clear topic assignment.'};
+  return sbEmptyAssignment();
+}
 async function sbClearAssignedTopic(topicId){
-  if(topicId==null||String(topicId).trim()==='')return sbUpsertAssignment(null,null);
-  var got=await sbFetchAssignmentRow();
-  if(got.error)return {success:false,error:got.error};
-  var map=sbAssignmentMapFromFetch(got);
-  delete map[String(topicId)];
-  var posted=await sbPostAssignment(sbAssignmentWriteBody(map,null));
-  if(!posted.success)return posted;
-  return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
+  return sbClearAssignedTopicRow(topicId);
 }
 async function sbInserviceDispatch(payload){
   var action=payload&&payload.action;
@@ -5349,6 +5299,23 @@ function onAssignTopicSelChange(){
   renderInservices(true);
 }
 
+function sbDisplayedAssignment(data){
+  if(!data||data.success===false)return data;
+  var list=Array.isArray(data.assignments)?data.assignments:null;
+  if(!list)return data;
+  var sel=document.getElementById('assignTopicSel');
+  var preferred=sel&&sel.value!=null&&String(sel.value).trim()!==''?String(sel.value):'';
+  var hit=null;
+  if(preferred){
+    for(var i=0;i<list.length;i++){
+      if(String(list[i].topicId)===preferred){hit=list[i];break;}
+    }
+  }
+  if(!hit&&!isAssignTopicTouched&&list.length)hit=list[0];
+  if(!hit)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  return {success:true,topicId:hit.topicId,aideUsernames:hit.aideUsernames,assignAll:hit.assignAll===true};
+}
+
 function syncIsAssignChecksFromAssignment(data){
   if(typeof evercareSbEnabled!=='function'||!evercareSbEnabled())return;
   if(!data||data.success===false)return;
@@ -5542,14 +5509,15 @@ async function renderInservices(force){
   if(assignEl)assignEl.textContent='Loading...';
   try{
     const data=await apiGetCached('get_assigned_topic',topicExtra,force===true);
-    if(!isAssignTopicTouched&&sel&&data&&data.success&&data.topicId!=null&&String(data.topicId)!==''){
-      const want=String(data.topicId);
+    const view=sbDisplayedAssignment(data);
+    if(!isAssignTopicTouched&&sel&&view&&view.success&&view.topicId!=null&&String(view.topicId)!==''){
+      const want=String(view.topicId);
       for(let i=0;i<sel.options.length;i++){
         if(String(sel.options[i].value)===want){sel.value=want;break;}
       }
     }
-    paintIsCurrentAssignment(data);
-    syncIsAssignChecksFromAssignment(data);
+    paintIsCurrentAssignment(view);
+    syncIsAssignChecksFromAssignment(view);
   }catch(e){
     if(assignEl)assignEl.textContent='Error loading assignment status.';
   }
@@ -5832,7 +5800,8 @@ async function loadISCompliance(force){
         return;
       }
     }
-    const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
+    const assignView=sbDisplayedAssignment(assignData);
+    const assignedTopicId=assignView&&assignView.success?isAssignTopicIdFrom(assignView):null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
     const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
     const completions=((isData&&isData.success&&Array.isArray(isData.data))?isData.data:[]).filter(function(c){
@@ -5890,7 +5859,8 @@ async function sendISReminder(rowIndexOrUsername,name){
       label=row.empName||row.username;
     }
     const assignData=await apiGetCached('get_assigned_topic',sbAssignTopicQuery());
-    const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
+    const assignView=sbDisplayedAssignment(assignData);
+    const assignedTopicId=assignView&&assignView.success?isAssignTopicIdFrom(assignView):null;
     if(!assignedTopicId){showTempMsg('No topic currently assigned.','var(--danger)');return;}
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_is_reminder',username,topicId:assignedTopicId})});
     showTempMsg('📢 Reminder sent to '+(label||username)+'!','var(--success)');
