@@ -29,7 +29,7 @@
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
 <!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. Open View/PDF/edit that needs ink: get_new_client_intake includeSignatures:true (alias includeSigs:true). List, Completes prefetch, and home loads do not send that flag. -->
-<!-- admin schedule 2026-09-24 v=sched1 week grid clients × Mon–Sun. Usual pattern once; cell edits are exceptions for that date. Ace list_schedule_week(p_week_start), schedule_patterns, schedule_exceptions, upsert_schedule_pattern, upsert_schedule_exception. Until that office call works, localStorage evercare_sched_v1 (Ace will replace). No Sheets /exec. -->
+<!-- admin schedule 2026-09-24 v=sched1 week grid clients × Mon–Sun. Usual pattern once; cell edits are exceptions for that date. Live Ace: list_schedule_week(p_week_start), upsert_schedule_pattern, upsert_schedule_exception (call_off|cover|hours_override|aide_override|clear), delete_schedule_pattern. Office access_token via sbRestRpc. No localStorage stub. No Sheets /exec. No Sandata/EVV chips. -->
 <meta name="admin-build" content="2026-09-24-sched1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -990,6 +990,7 @@ else setupEverCarePWA();
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <button class="btn btn-teal" type="button" id="schedSaveBtn" onclick="schedSavePanel()">Save</button>
               <button class="btn btn-warn" type="button" id="schedClearBtn" onclick="schedClearPanel()">Clear exception</button>
+              <button class="btn btn-ghost" type="button" id="schedDeleteUsualBtn" hidden onclick="schedDeleteUsual()">Remove usual pattern</button>
               <button class="btn btn-ghost" type="button" id="schedCloseBtn" onclick="schedClosePanel()">Close</button>
             </div>
           </aside>
@@ -2426,20 +2427,20 @@ function showTab(tab){
 }
 
 // admin schedule v=sched1
-// Ace will replace localStorage evercare_sched_v1.
-// Office path: list_schedule_week(p_week_start), schedule_patterns, schedule_exceptions,
-// upsert_schedule_pattern, upsert_schedule_exception. No Sheets exec.
+// Live Ace office RPCs only (sbRestRpc + office access_token). No browser stub. No Sheets exec.
+// list_schedule_week, upsert_schedule_pattern, upsert_schedule_exception, delete_schedule_pattern.
 var schedWeekStart='';
 var schedUsual=[];
 var schedExceptions=[];
 var schedAideNames={};
-var schedAceLive=false;
+var schedWeekRows=null;
+var schedUseWeekRows=false;
+var schedLoadError='';
 var schedFilterOpen=false;
 var schedFilterCalloff=false;
 var schedEditor=null;
 var schedJumpId='';
 var schedSaving=false;
-var SCHED_STUB_KEY='evercare_sched_v1';
 var SCHED_DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 var SCHED_SHORT=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 var SCHED_MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -2554,66 +2555,6 @@ function schedRememberAide(id, name){
   if(!key||!label)return;
   schedAideNames[key]=label;
 }
-function schedKind(row){
-  var k=String((row&&(row.kind||row.exception_kind))||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
-  if(!k&&row&&(row.is_call_off===true||row.isCallOff===true))k='call_off';
-  if(k==='calloff'||k==='call_off')return 'call_off';
-  if(k==='open'||k==='uncovered')return 'open';
-  if(k==='clear'||k==='cleared'||k==='delete'||k==='deleted'||k==='none')return 'clear';
-  if(k==='cover'||k==='reassign'||k==='swap'||k==='change'||k==='exception'||k==='override')return 'exception';
-  if(k)return 'exception';
-  if(!schedPick(row,['aide_id','aideId'])&&schedNum(row&&row.hours)==null)return 'open';
-  return 'exception';
-}
-function schedMapUsual(row){
-  if(!row||typeof row!=='object')return null;
-  if(row.is_active===false||row.isActive===false)return null;
-  var clientId=schedPick(row,['client_id','clientId']);
-  var weekday=Number(row.weekday!=null?row.weekday:(row.day_of_week!=null?row.day_of_week:row.day));
-  if(!clientId||!(weekday>=1&&weekday<=7))return null;
-  var aide=schedPick(row,['usual_aide_id','usualAideId','aide_id','aideId']);
-  if(!aide&&row.usual_aide&&row.usual_aide.id)aide=String(row.usual_aide.id);
-  if(!aide&&row.aide&&row.aide.id)aide=String(row.aide.id);
-  var name='';
-  if(row.usual_aide&&(row.usual_aide.full_name||row.usual_aide.name))name=row.usual_aide.full_name||row.usual_aide.name;
-  else name=row.aide_name||row.aideName||row.usual_aide_name||'';
-  schedRememberAide(aide, name);
-  return {
-    client_id:String(clientId),
-    weekday:weekday,
-    usual_aide_id:aide?String(aide):'',
-    hours:schedNum(row.hours!=null?row.hours:row.hrs),
-    note:String(row.note||row.notes||'')
-  };
-}
-function schedMapException(row){
-  if(!row||typeof row!=='object')return null;
-  if(row.is_active===false||row.isActive===false)return null;
-  var kind=schedKind(row);
-  if(kind==='clear')return null;
-  var clientId=schedPick(row,['client_id','clientId']);
-  var onDate=schedDateOnly(row.on_date||row.onDate||row.service_date||row.serviceDate||row.date);
-  if(!clientId||!onDate)return null;
-  var aide=schedPick(row,['aide_id','aideId']);
-  if(!aide&&row.aide&&row.aide.id)aide=String(row.aide.id);
-  var name='';
-  if(row.aide&&(row.aide.full_name||row.aide.name))name=row.aide.full_name||row.aide.name;
-  else name=row.aide_name||row.aideName||'';
-  schedRememberAide(aide, name);
-  return {
-    client_id:String(clientId),
-    on_date:onDate,
-    aide_id:aide?String(aide):'',
-    hours:schedNum(row.hours!=null?row.hours:row.hrs),
-    note:String(row.note||row.notes||''),
-    kind:kind
-  };
-}
-function schedAsList(v){
-  if(Array.isArray(v))return v;
-  if(v&&typeof v==='object')return [v];
-  return [];
-}
 function schedDedup(list, keyFn){
   var map={};
   var order=[];
@@ -2625,92 +2566,79 @@ function schedDedup(list, keyFn){
   });
   return order.map(function(k){return map[k];});
 }
-function schedApplyPayload(data){
-  var usual=[];
-  var exceptions=[];
-  schedAideNames={};
+function schedUnwrapWeek(data){
   var node=data;
   if(typeof node==='string'){
-    try{node=JSON.parse(node);}catch(e){node=null;}
+    try{node=JSON.parse(node);}catch(e){return null;}
   }
-  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object'&&!node[0].client_id&&!node[0].clientId&&!Array.isArray(node[0])){
-    node=node[0];
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&!Array.isArray(node)&&node.data&&typeof node.data==='object'&&(node.data.clients||node.data.week_start))node=node.data;
+  if(!node||typeof node!=='object'||Array.isArray(node))return null;
+  return node;
+}
+function schedNormalizeKind(kind){
+  var k=String(kind||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
+  if(k==='calloff')return 'call_off';
+  if(k==='call_off'||k==='cover'||k==='hours_override'||k==='aide_override'||k==='clear')return k;
+  return '';
+}
+function schedApplyWeek(data){
+  var usual=[];
+  var exceptions=[];
+  var rows=[];
+  var seen={};
+  schedAideNames={};
+  var node=schedUnwrapWeek(data);
+  if(node&&node.week_start){
+    var ws=schedDateOnly(node.week_start);
+    if(ws)schedWeekStart=schedIsoDate(schedMondayOf(schedParseIso(ws)));
   }
-  if(node&&typeof node==='object'&&!Array.isArray(node)&&node.data&&(node.ok===true||node.success===true))node=node.data;
-  var patternRows=null;
-  var exceptionRows=null;
-  var cellRows=null;
-  if(node&&typeof node==='object'&&!Array.isArray(node)){
-    patternRows=node.patterns||node.schedule_patterns||node.usual||node.schedule_usual||null;
-    exceptionRows=node.exceptions||node.schedule_exceptions||node.schedule_exception||null;
-    if(!patternRows&&!exceptionRows)cellRows=node.rows||node.cells||node.days||null;
-  }else if(Array.isArray(node)){
-    cellRows=node;
-  }
-  if(patternRows||exceptionRows){
-    schedAsList(patternRows).forEach(function(row){
-      var u=schedMapUsual(row);
-      if(u)usual.push(u);
-    });
-    schedAsList(exceptionRows).forEach(function(row){
-      var ex=schedMapException(row);
-      if(ex)exceptions.push(ex);
-    });
-  }
-  schedAsList(cellRows).forEach(function(row){
-    if(!row||typeof row!=='object')return;
-    var onDate=schedDateOnly(row.on_date||row.onDate||row.service_date||row.serviceDate||row.date);
-    if(onDate||row.kind||row.is_call_off===true||row.isCallOff===true){
-      var ex=schedMapException(row);
-      if(ex)exceptions.push(ex);
-    }
-    if(row.usual_aide_id||row.usualAideId||(row.weekday!=null&&!onDate)){
-      var u=schedMapUsual(row);
-      if(u)usual.push(u);
+  var week=schedEnsureWeek();
+  var clients=node&&Array.isArray(node.clients)?node.clients:[];
+  clients.forEach(function(c){
+    if(!c||typeof c!=='object')return;
+    var clientId=schedPick(c,['client_id','clientId','id']);
+    if(!clientId||seen[clientId])return;
+    seen[clientId]=true;
+    rows.push({id:String(clientId), name:String(c.client_name||c.clientName||c.name||'Client')});
+    var days=c.days&&typeof c.days==='object'?c.days:{};
+    for(var wd=1;wd<=7;wd++){
+      var day=days[String(wd)];
+      if(!day&&days[wd]!=null)day=days[wd];
+      if(!day||typeof day!=='object')continue;
+      var source=String(day.source||'').trim().toLowerCase();
+      var aideId=schedPick(day,['aide_id','aideId']);
+      schedRememberAide(aideId, day.aide_name||day.aideName||day.aide_username||'');
+      var hours=schedNum(day.hours);
+      var note=String(day.note||'');
+      if(source==='pattern'||source==='usual'){
+        usual.push({client_id:String(clientId), weekday:wd, usual_aide_id:aideId?String(aideId):'', hours:hours, note:note});
+      }else if(source==='exception'){
+        var kind=schedNormalizeKind(day.exception_kind||day.kind);
+        if(!kind||kind==='clear')continue;
+        exceptions.push({
+          client_id:String(clientId),
+          on_date:schedAddDays(week, wd-1),
+          aide_id:aideId?String(aideId):'',
+          hours:hours,
+          note:note,
+          kind:kind
+        });
+      }
     }
   });
   schedUsual=schedDedup(usual,function(u){return u.client_id+'|'+u.weekday;});
   schedExceptions=schedDedup(exceptions,function(ex){return ex.client_id+'|'+ex.on_date;});
+  schedWeekRows=rows;
+  schedUseWeekRows=true;
 }
-function schedStore(){
-  try{
-    if(typeof localStorage!=='undefined'&&localStorage&&typeof localStorage.getItem==='function')return localStorage;
-  }catch(e){}
-  return null;
-}
-function schedReadStub(){
+function schedResetWeek(message){
   schedUsual=[];
   schedExceptions=[];
   schedAideNames={};
-  var store=schedStore();
-  if(!store)return;
-  try{
-    var raw=store.getItem(SCHED_STUB_KEY);
-    if(!raw)return;
-    schedApplyPayload(JSON.parse(raw));
-  }catch(e){
-    schedUsual=[];
-    schedExceptions=[];
-  }
-}
-function schedWriteStub(){
-  var store=schedStore();
-  if(!store){
-    schedToast('Schedule data not wired yet','var(--warn)');
-    return false;
-  }
-  try{
-    store.setItem(SCHED_STUB_KEY, JSON.stringify({usual:schedUsual, exceptions:schedExceptions}));
-    return true;
-  }catch(e){
-    schedToast('Schedule data not wired yet','var(--warn)');
-    return false;
-  }
-}
-function schedRpcMissing(got){
-  if(!got)return false;
-  var msg=String(got.error||'');
-  return got.status===404||/PGRST202|schema cache|Could not find the function/i.test(msg);
+  schedWeekRows=[];
+  schedUseWeekRows=true;
+  schedLoadError=message||'Could not load the office schedule.';
 }
 function schedFindUsual(clientId, weekday){
   for(var i=0;i<schedUsual.length;i++){
@@ -2767,7 +2695,11 @@ function schedIsProblem(cell, openOn, callOn){
 }
 function schedClients(){
   var list=[];
-  try{list=(typeof allClients!=='undefined'&&allClients)?allClients:[];}catch(e){list=[];}
+  if(schedUseWeekRows){
+    list=schedWeekRows||[];
+  }else{
+    try{list=(typeof allClients!=='undefined'&&allClients)?allClients:[];}catch(e){list=[];}
+  }
   return list.filter(function(c){
     if(!c||c.id==null||String(c.id)==='')return false;
     if(c.isActive===false||c.is_active===false)return false;
@@ -2883,40 +2815,56 @@ async function schedOfficeAideId(token){
   }
   return '';
 }
-async function schedReadAceTables(week){
-  if(typeof sbRestGet!=='function')return false;
-  var end=schedAddDays(week,6);
-  var patterns=await sbRestGet('schedule_patterns',[
-    ['select','id,client_id,weekday,usual_aide_id,hours,note,is_active'],
-    ['is_active','eq.true']
-  ]);
-  var exceptions=await sbRestGet('schedule_exceptions',[
-    ['select','id,client_id,on_date,aide_id,hours,note,kind,is_active'],
-    ['is_active','eq.true'],
-    ['on_date','gte.'+week],
-    ['on_date','lte.'+end]
-  ]);
-  if(!patterns||patterns.ok!==true||!exceptions||exceptions.ok!==true)return false;
-  schedApplyPayload({patterns:patterns.data||[], exceptions:exceptions.data||[]});
-  return true;
+async function schedLoadWeek(week){
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function'){
+    schedResetWeek('Sign in to load the office schedule.');
+    return;
+  }
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token){
+    schedResetWeek('Sign in to load the office schedule.');
+    return;
+  }
+  var got=await sbRestRpc('list_schedule_week',{p_week_start:week});
+  if(!got||got.ok!==true){
+    schedResetWeek((got&&got.error)||'Could not load the office schedule.');
+    return;
+  }
+  schedLoadError='';
+  schedApplyWeek(got.data);
 }
-async function schedTryAce(week){
+async function schedReloadWeek(){
   try{
-    if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return false;
-    if(typeof readSbSession!=='function'||typeof sbRestRpc!=='function')return false;
-    var sess=readSbSession();
-    if(!sess||!sess.access_token)return false;
-    var got=await sbRestRpc('list_schedule_week',{p_week_start:week});
-    if(got&&got.ok===true){
-      schedApplyPayload(got.data);
-      if(!schedUsual.length&&!schedExceptions.length)await schedReadAceTables(week);
-      return true;
+    if(typeof sbRestRpc!=='function'){
+      schedPaint();
+      return;
     }
-    if(schedRpcMissing(got))return await schedReadAceTables(week);
-    return false;
+    var got=await sbRestRpc('list_schedule_week',{p_week_start:schedEnsureWeek()});
+    if(!got||got.ok!==true){
+      schedToast((got&&got.error)||'Saved, but the week did not reload.','var(--warn)');
+      schedPaint();
+      return;
+    }
+    schedLoadError='';
+    schedApplyWeek(got.data);
   }catch(e){
+    schedToast('Saved, but the week did not reload.','var(--warn)');
+  }
+  schedPaint();
+}
+async function schedOfficeReady(){
+  if(typeof sbRestRpc!=='function'){
+    schedToast('Schedule data not wired yet','var(--warn)');
     return false;
   }
+  var sess=null;
+  try{if(typeof readSbSession==='function')sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token){
+    schedToast('Sign in to save the office schedule.','var(--warn)');
+    return false;
+  }
+  return true;
 }
 async function schedLoadRosters(){
   try{
@@ -2933,12 +2881,9 @@ async function loadAdminSchedule(){
   try{
     schedEnsureWeek();
     await schedLoadRosters();
-    var live=await schedTryAce(schedEnsureWeek());
-    schedAceLive=!!live;
-    if(!live)schedReadStub();
+    await schedLoadWeek(schedEnsureWeek());
   }catch(e){
-    schedAceLive=false;
-    schedReadStub();
+    schedResetWeek('Could not load the office schedule.');
   }
   schedPaint();
 }
@@ -2998,18 +2943,22 @@ function schedPaint(){
   if(label)label.textContent=schedWeekLabel(week);
   schedSyncFilters();
   var note=schedEl('schedSourceNote');
-  if(note){
-    note.textContent=schedAceLive
-      ?'Office schedule'
-      :'Saved in this browser (evercare_sched_v1). Ace will replace this.';
-  }
+  if(note)note.textContent=schedLoadError||'';
   var clients=schedClients();
   var noClients=schedEl('schedNoClients');
   var empty=schedEl('schedEmpty');
   var scroll=schedEl('schedScroll');
-  var showGrid=clients.length>0&&schedHasPatterns();
-  if(noClients)noClients.hidden=clients.length>0;
-  if(empty)empty.hidden=!clients.length||schedHasPatterns();
+  var showGrid=clients.length>0;
+  if(noClients){
+    noClients.hidden=clients.length>0;
+    var msgEl=noClients.querySelector?noClients.querySelector('p'):null;
+    if(msgEl){
+      msgEl.textContent=(!clients.length&&schedLoadError)
+        ?schedLoadError
+        :'No clients yet. Add clients on the Clients tab, then set a usual pattern.';
+    }
+  }
+  if(empty)empty.hidden=clients.length===0||schedHasPatterns();
   if(scroll)scroll.hidden=!showGrid;
   var head=schedEl('schedHead');
   var body=schedEl('schedBody');
@@ -3153,8 +3102,12 @@ function schedPaintPanel(){
     var call=schedEl('schedCalloff');
     if(call)call.checked=false;
     if(clearBtn)clearBtn.hidden=true;
+    schedHookUsualSelects();
+    schedSyncDeleteUsual();
     return;
   }
+  var delBtn=schedEl('schedDeleteUsualBtn');
+  if(delBtn)delBtn.hidden=true;
   var client=null;
   var clients=schedClients();
   for(var i=0;i<clients.length;i++){
@@ -3183,6 +3136,31 @@ function schedPaintPanel(){
   if(clearBtn){
     clearBtn.hidden=!can;
     clearBtn.disabled=!cell.exception;
+  }
+}
+function schedSyncDeleteUsual(){
+  var btn=schedEl('schedDeleteUsualBtn');
+  if(!btn)return;
+  if(!schedEditor||schedEditor.mode!=='usual'||!schedCanEdit()){
+    btn.hidden=true;
+    return;
+  }
+  var clientEl=schedEl('schedClientSel');
+  var dayEl=schedEl('schedWeekdaySel');
+  var clientId=String(clientEl&&clientEl.value||schedEditor.clientId||'').trim();
+  var weekday=Number(dayEl&&dayEl.value||schedEditor.weekday||0);
+  btn.hidden=!schedFindUsual(clientId, weekday);
+}
+function schedHookUsualSelects(){
+  var clientEl=schedEl('schedClientSel');
+  var dayEl=schedEl('schedWeekdaySel');
+  if(clientEl&&clientEl.dataset&&clientEl.dataset.schedHook!=='1'){
+    clientEl.dataset.schedHook='1';
+    if(clientEl.addEventListener)clientEl.addEventListener('change', schedSyncDeleteUsual);
+  }
+  if(dayEl&&dayEl.dataset&&dayEl.dataset.schedHook!=='1'){
+    dayEl.dataset.schedHook='1';
+    if(dayEl.addEventListener)dayEl.addEventListener('change', schedSyncDeleteUsual);
   }
 }
 function schedOpenUsual(){
@@ -3214,17 +3192,15 @@ function schedReadNote(){
   var el=schedEl('schedNote');
   return String(el&&el.value||'').trim();
 }
-async function schedAfterAceWrite(){
-  var beforeUsual=schedUsual.slice();
-  var beforeEx=schedExceptions.slice();
-  var live=await schedTryAce(schedEnsureWeek());
-  schedAceLive=!!live;
-  if(!live||(!schedUsual.length&&!schedExceptions.length&&(beforeUsual.length||beforeEx.length))){
-    schedUsual=beforeUsual;
-    schedExceptions=beforeEx;
-    if(!live)schedWriteStub();
-  }
-  schedPaint();
+function schedPickExceptionKind(calloff, aideId, hours, usual){
+  if(calloff)return 'call_off';
+  var usualAide=usual&&usual.usual_aide_id?String(usual.usual_aide_id):'';
+  var usualHours=usual?usual.hours:null;
+  var sameAide=!!(usualAide&&aideId&&String(aideId)===usualAide);
+  var sameHours=usualHours!=null&&hours!=null&&Number(usualHours)===Number(hours);
+  if(sameAide&&!sameHours)return 'hours_override';
+  if(!sameAide&&aideId&&sameHours)return 'aide_override';
+  return 'cover';
 }
 async function schedSaveUsualFromForm(){
   var clientEl=schedEl('schedClientSel');
@@ -3239,43 +3215,26 @@ async function schedSaveUsualFromForm(){
   if(!(weekday>=1&&weekday<=7)){schedToast('Choose a weekday.','var(--warn)');return;}
   if(!aideToken){schedToast('Choose an aide.','var(--warn)');return;}
   if(hours==null||typeof hours!=='number'||!isFinite(hours)){schedToast('Enter hours.','var(--warn)');return;}
-  var aideId=aideToken;
-  if(schedAceLive){
-    aideId=await schedOfficeAideId(aideToken);
-    if(!aideId){schedToast('Pick an aide from the office list.','var(--warn)');return;}
-  }
-  var row={client_id:clientId, weekday:weekday, usual_aide_id:aideId, hours:hours, note:note};
-  if(schedAceLive&&typeof sbRestRpc==='function'){
-    var got=await sbRestRpc('upsert_schedule_pattern',{
-      p_client_id:clientId,
-      p_weekday:weekday,
-      p_usual_aide_id:aideId,
-      p_hours:hours,
-      p_note:note||null
-    });
-    if(!got||got.ok!==true){
-      if(!(schedRpcMissing(got)||(got&&got.status===401))){
-        schedToast((got&&got.error)||'Could not save the usual pattern.','var(--danger)');
-        return;
-      }
-      schedAceLive=false;
-    }else{
-      schedRememberAide(aideId, schedAideLabel(aideToken));
-      schedUpsertUsualLocal(row);
-      if(typeof logActivity==='function')logActivity('Set usual schedule pattern');
-      schedToast('Usual pattern saved.','var(--success)');
-      schedClosePanel();
-      await schedAfterAceWrite();
-      return;
-    }
+  if(!(await schedOfficeReady()))return;
+  var aideId=await schedOfficeAideId(aideToken);
+  if(!aideId){schedToast('Pick an aide from the office list.','var(--warn)');return;}
+  var got=await sbRestRpc('upsert_schedule_pattern',{
+    p_client_id:clientId,
+    p_weekday:weekday,
+    p_usual_aide_id:aideId,
+    p_hours:hours,
+    p_note:note||null
+  });
+  if(!got||got.ok!==true){
+    schedToast((got&&got.error)||'Could not save the usual pattern.','var(--danger)');
+    return;
   }
   schedRememberAide(aideId, schedAideLabel(aideToken));
-  schedUpsertUsualLocal(row);
-  schedWriteStub();
+  schedUpsertUsualLocal({client_id:clientId, weekday:weekday, usual_aide_id:aideId, hours:hours, note:note});
   if(typeof logActivity==='function')logActivity('Set usual schedule pattern');
-  schedToast('Usual pattern saved on this browser.','var(--success)');
+  schedToast('Usual pattern saved.','var(--success)');
   schedClosePanel();
-  schedPaint();
+  await schedReloadWeek();
 }
 async function schedSaveExceptionFromForm(){
   if(!schedEditor||schedEditor.mode!=='exception')return;
@@ -3289,52 +3248,40 @@ async function schedSaveExceptionFromForm(){
   var note=schedReadNote();
   var calloff=!!(callEl&&callEl.checked);
   if(hours!=null&&(typeof hours!=='number'||!isFinite(hours))){schedToast('Enter hours as a number.','var(--warn)');return;}
+  if(!calloff&&!aideToken){schedToast('Choose an aide, or mark Call-off.','var(--warn)');return;}
   var usual=schedFindUsual(clientId, weekday);
-  var kind=calloff?'call_off':(aideToken?'exception':'open');
-  if(kind==='call_off'){
+  if(calloff){
     if(!aideToken&&usual&&usual.usual_aide_id)aideToken=usual.usual_aide_id;
-    if(hours==null&&usual)hours=usual.hours;
+    if(hours==null&&usual&&usual.hours!=null)hours=usual.hours;
+  }else if(hours==null||!isFinite(hours)){
+    schedToast('Enter hours.','var(--warn)');
+    return;
   }
-  var aideId=aideToken;
-  if(schedAceLive&&aideToken){
+  if(!(await schedOfficeReady()))return;
+  var aideId='';
+  if(aideToken){
     aideId=await schedOfficeAideId(aideToken);
     if(!aideId){schedToast('Pick an aide from the office list.','var(--warn)');return;}
   }
-  if(kind==='open')aideId='';
-  if(kind!=='open'&&(hours==null||!isFinite(hours))){schedToast('Enter hours.','var(--warn)');return;}
-  var row={client_id:clientId, on_date:onDate, aide_id:aideId||'', hours:hours, note:note, kind:kind};
-  if(schedAceLive&&typeof sbRestRpc==='function'){
-    var got=await sbRestRpc('upsert_schedule_exception',{
-      p_client_id:clientId,
-      p_on_date:onDate,
-      p_kind:kind,
-      p_aide_id:aideId||null,
-      p_hours:hours,
-      p_note:note||null
-    });
-    if(!got||got.ok!==true){
-      if(!(schedRpcMissing(got)||(got&&got.status===401))){
-        schedToast((got&&got.error)||'Could not save the exception.','var(--danger)');
-        return;
-      }
-      schedAceLive=false;
-    }else{
-      if(aideId)schedRememberAide(aideId, schedAideLabel(aideToken));
-      schedUpsertExceptionLocal(row);
-      if(typeof logActivity==='function')logActivity('Saved schedule exception');
-      schedToast(calloff?'Call-off saved.':'Exception saved.','var(--success)');
-      schedClosePanel();
-      await schedAfterAceWrite();
-      return;
-    }
+  var kind=schedPickExceptionKind(calloff, aideId, hours, usual);
+  var got=await sbRestRpc('upsert_schedule_exception',{
+    p_client_id:clientId,
+    p_on_date:onDate,
+    p_kind:kind,
+    p_aide_id:aideId||null,
+    p_hours:hours==null?null:hours,
+    p_note:note||null
+  });
+  if(!got||got.ok!==true){
+    schedToast((got&&got.error)||'Could not save the exception.','var(--danger)');
+    return;
   }
   if(aideId)schedRememberAide(aideId, schedAideLabel(aideToken));
-  schedUpsertExceptionLocal(row);
-  schedWriteStub();
+  schedUpsertExceptionLocal({client_id:clientId, on_date:onDate, aide_id:aideId||'', hours:hours, note:note, kind:kind});
   if(typeof logActivity==='function')logActivity('Saved schedule exception');
-  schedToast(calloff?'Call-off saved on this browser.':'Exception saved on this browser.','var(--success)');
+  schedToast(calloff?'Call-off saved.':'Exception saved.','var(--success)');
   schedClosePanel();
-  schedPaint();
+  await schedReloadWeek();
 }
 async function schedSavePanel(){
   if(!schedCanEdit()){schedDeny();return;}
@@ -3359,38 +3306,56 @@ async function schedClearPanel(){
     schedToast('No exception on this day.','var(--warn)');
     return;
   }
+  if(!(await schedOfficeReady()))return;
   schedSaving=true;
   try{
-    if(schedAceLive&&typeof sbRestRpc==='function'){
-      var got=await sbRestRpc('upsert_schedule_exception',{
-        p_client_id:clientId,
-        p_on_date:onDate,
-        p_kind:'clear',
-        p_aide_id:null,
-        p_hours:null,
-        p_note:null
-      });
-      if(!got||got.ok!==true){
-        if(!(schedRpcMissing(got)||(got&&got.status===401))){
-          schedToast((got&&got.error)||'Could not clear the exception.','var(--danger)');
-          return;
-        }
-        schedAceLive=false;
-      }else{
-        schedRemoveExceptionLocal(clientId, onDate);
-        if(typeof logActivity==='function')logActivity('Cleared schedule exception');
-        schedToast('Exception cleared.','var(--success)');
-        schedClosePanel();
-        await schedAfterAceWrite();
-        return;
-      }
+    var got=await sbRestRpc('upsert_schedule_exception',{
+      p_client_id:clientId,
+      p_on_date:onDate,
+      p_kind:'clear',
+      p_aide_id:null,
+      p_hours:null,
+      p_note:null
+    });
+    if(!got||got.ok!==true){
+      schedToast((got&&got.error)||'Could not clear the exception.','var(--danger)');
+      return;
     }
     schedRemoveExceptionLocal(clientId, onDate);
-    schedWriteStub();
     if(typeof logActivity==='function')logActivity('Cleared schedule exception');
-    schedToast('Exception cleared on this browser.','var(--success)');
+    schedToast('Exception cleared.','var(--success)');
     schedClosePanel();
-    schedPaint();
+    await schedReloadWeek();
+  }finally{
+    schedSaving=false;
+  }
+}
+async function schedDeleteUsual(){
+  if(!schedCanEdit()){schedDeny();return;}
+  if(!schedEditor||schedEditor.mode!=='usual'||schedSaving)return;
+  var clientEl=schedEl('schedClientSel');
+  var dayEl=schedEl('schedWeekdaySel');
+  var clientId=String(clientEl&&clientEl.value||schedEditor.clientId||'').trim();
+  var weekday=Number(dayEl&&dayEl.value||schedEditor.weekday||0);
+  if(!schedFindUsual(clientId, weekday)){
+    schedToast('No usual pattern on this day.','var(--warn)');
+    return;
+  }
+  if(!(await schedOfficeReady()))return;
+  schedSaving=true;
+  try{
+    var got=await sbRestRpc('delete_schedule_pattern',{p_client_id:clientId, p_weekday:weekday});
+    if(!got||got.ok!==true){
+      schedToast((got&&got.error)||'Could not remove the usual pattern.','var(--danger)');
+      return;
+    }
+    schedUsual=schedUsual.filter(function(u){
+      return !(String(u.client_id)===String(clientId)&&Number(u.weekday)===Number(weekday));
+    });
+    if(typeof logActivity==='function')logActivity('Removed usual schedule pattern');
+    schedToast('Usual pattern removed.','var(--success)');
+    schedClosePanel();
+    await schedReloadWeek();
   }finally{
     schedSaving=false;
   }
