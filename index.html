@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- sb dual-verify soft-fail 2026-09-23 v=sbdual flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- sb auth lists 2026-09-24 v=sblists flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -18,7 +18,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-23-sb-dual-admin">
+<meta name="admin-build" content="2026-09-24-sb-lists">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -638,6 +638,14 @@ else setupEverCarePWA();
       <span class="ec-install-cta-label" style="font-size:1.05rem">📱 Add to Home Screen</span>
       <span class="ec-install-cta-sub" style="font-size:0.72rem;font-weight:500;color:var(--muted)">Quick access — no App Store needed</span>
     </button>
+    <div class="field" id="mgrRoleField" style="display:none">
+      <label for="mgr_role">Account</label>
+      <select id="mgr_role" aria-label="Account">
+        <option value="Admin">Admin</option>
+        <option value="Scheduler">Scheduler</option>
+        <option value="Nurse">Nurse</option>
+      </select>
+    </div>
     <div class="field"><label>Password</label><div style="position:relative"><input type="password" id="mgr_pass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')mgrLogin()" style="padding-right:64px"><button type="button" onclick="togglePasswordVisibility('mgr_pass',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted,#6b7a90);font-size:0.78rem;font-weight:600;cursor:pointer;padding:4px 6px;font-family:inherit">Show</button></div></div>
     <button class="btn btn-navy btn-full" id="mgrLoginBtn" onclick="mgrLogin()">Sign In →</button>
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
@@ -2039,11 +2047,16 @@ warmUpSheets();
 
 document.addEventListener('DOMContentLoaded',function(){
   warmUpSheets();
+  if(typeof syncSbRoleField==='function')syncSbRoleField();
   if(typeof nciBindDateMask==='function')nciBindDateMask();
   if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();
 });
 
 async function apiPost(payload){
+  // Flag on: aides, clients, and payroll timesheets are Supabase. Every other action stays on Sheets.
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
+    return sbApiList(payload);
+  }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
   }
@@ -2086,15 +2099,19 @@ function cacheInvalidate(action){
   try{sessionStorage.removeItem(key);}catch(e){}
 }
 async function apiGetCached(action,extra,force){
+  const sbList=typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbIsListAction==='function'&&sbIsListAction(action);
   if(!force){
     const hit=cacheGet(action);
-    if(hit)return hit;
+    if(hit&&(sbList?hit.source==='supabase':hit.source!=='supabase'))return hit;
   }
   if(_inflight[action])return _inflight[action];
   _inflight[action]=(async()=>{
     try{
       const data=await apiPost(Object.assign({action:action},extra||{}));
-      if(data&&data.success)cacheSet(action,data);
+      if(data&&data.success){
+        if(sbList)data.source='supabase';
+        cacheSet(action,data);
+      }
       return data;
     }finally{delete _inflight[action];}
   })();
@@ -2289,6 +2306,7 @@ function isAdminSessionExpired(sess){
 }
 function clearAdminSession(){
   try{localStorage.removeItem(ADMIN_SESSION_KEY);}catch(e){}
+  try{localStorage.removeItem('evercare_sb_session');}catch(e2){}
 }
 function readAdminSession(){
   const sess=store.get(ADMIN_SESSION_KEY);
@@ -2390,9 +2408,13 @@ function enforceAdminSessionTimeout(){
 }
 function bootAdminPortal(){
   warmUpSheets();
+  syncSbRoleField();
   if(/[?&](?:printSample|certSample)=1(?:&|$)/.test(location.search||''))return;
   const sess=restoreAdminSession();
-  if(sess)openPortalHome(sess,{freshLogin:false});
+  if(sess){
+    if(evercareSbEnabled())hydrateSbSession();
+    openPortalHome(sess,{freshLogin:false});
+  }
 }
 
 function evercareSbEnabled(){
@@ -2403,6 +2425,11 @@ function evercareSbEnabled(){
   }catch(e){}
   return false;
 }
+function syncSbRoleField(){
+  var field=document.getElementById('mgrRoleField');
+  if(!field)return;
+  field.style.display=evercareSbEnabled()?'flex':'none';
+}
 function roleAccountSbEmail(role){
   var key=String(role||'').trim().toLowerCase();
   if(key==='admin')return 'admin@roles.evercare.local';
@@ -2410,18 +2437,63 @@ function roleAccountSbEmail(role){
   if(key==='nurse')return 'nurse@roles.evercare.local';
   return '';
 }
-// Soft dual-verify for Admin / Scheduler / Nurse only. Sheets stays source of truth.
-// Flag off (default) returns before any Supabase request. Failures never block Sign In.
-function softSbDualVerify(role,password){
+function sbPortalRoleFromProfile(role){
+  var key=String(role||'').trim().toLowerCase();
+  if(key==='admin')return 'Admin';
+  if(key==='scheduler')return 'Scheduler';
+  if(key==='nurse')return 'Nurse';
+  return '';
+}
+var SB_SESSION_KEY='evercare_sb_session';
+function readSbSession(){
   try{
-    if(!evercareSbEnabled())return;
-    var email=roleAccountSbEmail(role);
-    if(!email){
-      window.__sbDual={ok:false,error:'role has no supabase email'};
-      return;
-    }
-    window.__sbDual={ok:false,email:email};
-    fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
+    if(typeof window!=='undefined'&&window&&window.__sbSession&&window.__sbSession.access_token)return window.__sbSession;
+  }catch(e){}
+  try{
+    var raw=localStorage.getItem(SB_SESSION_KEY);
+    if(!raw)return null;
+    var sess=JSON.parse(raw);
+    if(!sess||typeof sess!=='object'||!sess.access_token)return null;
+    return sess;
+  }catch(e2){return null;}
+}
+function writeSbSession(sess){
+  try{localStorage.setItem(SB_SESSION_KEY,JSON.stringify(sess));}catch(e){}
+  try{window.__sbSession=sess;}catch(e2){}
+}
+function clearSbSession(){
+  try{localStorage.removeItem(SB_SESSION_KEY);}catch(e){}
+  try{if(typeof window!=='undefined'&&window)window.__sbSession=null;}catch(e2){}
+}
+function hydrateSbSession(){
+  var sess=readSbSession();
+  if(!sess)return null;
+  try{window.__sbSession=sess;}catch(e){}
+  return sess;
+}
+function sbUserIdFromToken(token){
+  var user=token&&token.user;
+  if(user&&user.id)return String(user.id);
+  var access=token&&token.access_token;
+  if(!access)return '';
+  var parts=String(access).split('.');
+  if(parts.length<2)return '';
+  try{
+    var b64=parts[1].replace(/-/g,'+').replace(/_/g,'/');
+    while(b64.length%4)b64+='=';
+    var json=JSON.parse(atob(b64));
+    return json&&json.sub?String(json.sub):'';
+  }catch(e){return '';}
+}
+function sbAuthErrorMessage(data,status){
+  var msg=(data&&(data.error_description||data.msg||data.message||data.error||data.hint))||('HTTP '+status);
+  if(msg&&typeof msg==='object')msg=msg.message||JSON.stringify(msg);
+  return String(msg||('HTTP '+status));
+}
+async function sbPasswordGrant(email,password){
+  var res;
+  try{
+    res=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
       method:'POST',
       headers:{
         apikey:SUPABASE_ANON_KEY,
@@ -2429,23 +2501,305 @@ function softSbDualVerify(role,password){
         'Content-Type':'application/json'
       },
       body:JSON.stringify({email:email,password:password})
-    }).then(function(res){
-      return res.text().then(function(raw){
-        var data=null;
-        try{data=raw?JSON.parse(raw):null;}catch(e){}
-        if(res.ok&&data&&data.access_token){
-          window.__sbDual={ok:true,email:email};
-        }else{
-          var msg=(data&&(data.error_description||data.msg||data.message||data.error))||('HTTP '+res.status);
-          if(msg&&typeof msg==='object')msg=msg.message||JSON.stringify(msg);
-          window.__sbDual={ok:false,error:String(msg),email:email};
-        }
-      });
-    }).catch(function(err){
-      window.__sbDual={ok:false,error:String(err&&err.message||err||'supabase'),email:email};
     });
   }catch(err){
-    try{window.__sbDual={ok:false,error:String(err&&err.message||err||'supabase')};}catch(e2){}
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase'),email:email};
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase'),email:email};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(res.ok&&data&&data.access_token)return {ok:true,email:email,token:data};
+  return {ok:false,email:email,error:sbAuthErrorMessage(data,res.status),status:res.status};
+}
+async function sbLoadProfile(accessToken,userId){
+  var url=SUPABASE_URL+'/rest/v1/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,org_id,role,display_name,email,is_active';
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'GET',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+accessToken,
+        Accept:'application/json'
+      }
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
+  var row=Array.isArray(data)?data[0]:data;
+  if(!row||!row.id)return {ok:false,error:'profile missing'};
+  if(row.is_active===false)return {ok:false,error:'profile inactive'};
+  var role=sbPortalRoleFromProfile(row.role);
+  if(!role)return {ok:false,error:'profile role'};
+  return {ok:true,profile:row,role:role};
+}
+// Flag on: this is the login. Flag off returns before any Supabase request.
+async function sbAuthRoleLogin(role,password){
+  if(!evercareSbEnabled())return {ok:false,skipped:true};
+  try{if(typeof sbInvalidateListCaches==='function')sbInvalidateListCaches();}catch(e){}
+  var email=roleAccountSbEmail(role);
+  if(!email){
+    try{window.__sbDual={ok:false,error:'role has no supabase email'};}catch(e){}
+    return {ok:false,error:'role has no supabase email'};
+  }
+  clearSbSession();
+  try{window.__sbDual={ok:false,email:email};}catch(e0){}
+  var signed=await sbPasswordGrant(email,password);
+  if(!signed.ok){
+    try{window.__sbDual={ok:false,error:String(signed.error||'login_failed'),email:email};}catch(e1){}
+    return signed;
+  }
+  var userId=sbUserIdFromToken(signed.token);
+  if(!userId){
+    try{window.__sbDual={ok:false,error:'missing user',email:email};}catch(e2){}
+    return {ok:false,error:'missing user',email:email};
+  }
+  var loaded=await sbLoadProfile(signed.token.access_token,userId);
+  if(!loaded.ok){
+    try{window.__sbDual={ok:false,error:String(loaded.error||'profile'),email:email};}catch(e3){}
+    return loaded;
+  }
+  if(loaded.role!==sbPortalRoleFromProfile(role)){
+    try{window.__sbDual={ok:false,error:'role mismatch',email:email};}catch(e4){}
+    return {ok:false,error:'role mismatch',email:email};
+  }
+  var profile=loaded.profile;
+  var user=signed.token.user||{};
+  var stored={
+    access_token:signed.token.access_token,
+    refresh_token:signed.token.refresh_token||'',
+    expires_in:signed.token.expires_in==null?null:signed.token.expires_in,
+    expires_at:signed.token.expires_at==null?null:signed.token.expires_at,
+    token_type:signed.token.token_type||'bearer',
+    user:{id:userId,email:user.email||email},
+    email:email,
+    profile:{
+      id:profile.id,
+      org_id:profile.org_id,
+      role:profile.role,
+      display_name:profile.display_name||'',
+      email:profile.email||email,
+      is_active:profile.is_active!==false
+    }
+  };
+  writeSbSession(stored);
+  try{window.__sbDual={ok:true,email:email,role:loaded.role};}catch(e5){}
+  return {ok:true,email:email,role:loaded.role,profile:stored.profile};
+}
+function sbSignOut(){
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return;
+  try{
+    fetch(SUPABASE_URL+'/auth/v1/logout',{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        'Content-Type':'application/json'
+      },
+      body:'{}'
+    }).catch(function(){});
+  }catch(e){}
+}
+function sbInvalidateListCaches(){
+  if(typeof cacheInvalidate!=='function')return;
+  cacheInvalidate('get_users');
+  cacheInvalidate('get_clients');
+  cacheInvalidate('get_all');
+}
+function sbIsListAction(action){
+  return action==='get_users'||action==='get_clients'||action==='get_all';
+}
+function sbFilterQuery(pairs){
+  return (pairs||[]).map(function(pair){
+    return encodeURIComponent(pair[0])+'='+encodeURIComponent(pair[1]);
+  }).join('&');
+}
+function sbActiveLinks(rows){
+  return (rows||[]).filter(function(row){return row&&row.is_active!==false;});
+}
+function sbMapAide(row){
+  var clients=sbActiveLinks(row&&row.assignments).filter(function(link){
+    return link.client&&link.client.is_active!==false;
+  }).map(function(link){
+    return {id:link.client.id,name:link.client.name||'',legacyId:link.client.legacy_id||'',isActive:link.client.is_active!==false};
+  });
+  return {
+    id:row.id,
+    username:row.username||'',
+    name:row.full_name||'',
+    fullName:row.full_name||'',
+    email:row.email||'',
+    joinedAt:row.joined_at||'',
+    locationStatus:row.location_status||'',
+    lastSeenAt:row.last_seen_at||'',
+    mustChangePassword:!!row.must_change_password,
+    isActive:row.is_active!==false,
+    profileId:row.profile_id||'',
+    legacySheetRow:row.legacy_sheet_row==null?'':row.legacy_sheet_row,
+    assignedClients:clients,
+    clientIds:clients.map(function(c){return c.id;})
+  };
+}
+function sbMapClient(row){
+  var aides=sbActiveLinks(row&&row.assignments).map(function(link){
+    return link.aide&&link.aide.username;
+  }).filter(Boolean);
+  return {
+    id:row.id,
+    legacyId:row.legacy_id||'',
+    name:row.name||'',
+    address:row.address||'',
+    lat:row.lat==null?'':row.lat,
+    lng:row.lng==null?'':row.lng,
+    isActive:row.is_active!==false,
+    assignedAides:aides
+  };
+}
+function sbMapTimesheet(row){
+  var when=row.submitted_at||row.updated_at||row.created_at||row.week_start||'';
+  return {
+    id:row.id,
+    submitted:when||true,
+    empName:row.emp_name||'',
+    emp_name:row.emp_name||'',
+    username:row.username||'',
+    clientId:row.client_id||'',
+    client_id:row.client_id||'',
+    clientName:row.client_name||'',
+    client_name:row.client_name||'',
+    svcType:row.svc_type||'',
+    svc_type:row.svc_type||'',
+    weekStart:row.week_start||'',
+    week_start:row.week_start||'',
+    pdfLink:row.pdf_link||'',
+    pdf_link:row.pdf_link||'',
+    totalHrs:row.total_hours||'0:00',
+    total_hours:row.total_hours||'0:00',
+    notes:row.notes||'',
+    days:row.days||{},
+    status:row.status||'submitted',
+    correctionDays:Array.isArray(row.correction_days)?row.correction_days:(row.correction_days?row.correction_days:[]),
+    correctionNote:row.correction_note||''
+  };
+}
+async function sbRefreshSession(sess){
+  if(!sess||!sess.refresh_token)return null;
+  var res;
+  try{
+    res=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=refresh_token',{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+SUPABASE_ANON_KEY,
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({refresh_token:sess.refresh_token})
+    });
+  }catch(err){return null;}
+  var raw='';
+  try{raw=await res.text();}catch(err2){return null;}
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok||!data||!data.access_token)return null;
+  var user=data.user||sess.user||{};
+  var next={
+    access_token:data.access_token,
+    refresh_token:data.refresh_token||sess.refresh_token,
+    expires_in:data.expires_in==null?sess.expires_in:data.expires_in,
+    expires_at:data.expires_at==null?sess.expires_at:data.expires_at,
+    token_type:data.token_type||sess.token_type||'bearer',
+    user:{id:user.id||(sess.user&&sess.user.id)||'',email:user.email||(sess.user&&sess.user.email)||sess.email||''},
+    email:sess.email||user.email||'',
+    profile:sess.profile||null
+  };
+  writeSbSession(next);
+  return next;
+}
+async function sbRestGet(table, pairs, refreshed){
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,error:'Not signed in',status:401};
+  var url=SUPABASE_URL+'/rest/v1/'+table+'?'+sbFilterQuery(pairs);
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'GET',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        Accept:'application/json'
+      }
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbRestGet(table, pairs, true);
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
+  return {ok:true,data:data,status:res.status};
+}
+var SB_AIDE_SELECT='id,username,full_name,email,joined_at,location_status,last_seen_at,must_change_password,is_active,profile_id,legacy_sheet_row,assignments:assignments(id,is_active,client:clients(id,name,legacy_id,is_active))';
+var SB_CLIENT_SELECT='id,legacy_id,name,address,lat,lng,is_active,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
+async function sbApiList(payload){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
+  var action=payload&&payload.action;
+  if(!sbIsListAction(action))return {success:false,error:'not a supabase list'};
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
+  try{
+    if(action==='get_users'){
+      var aides=await sbRestGet('aides',[
+        ['select',SB_AIDE_SELECT],
+        ['is_active','eq.true'],
+        ['order','full_name.asc']
+      ]);
+      if(!aides.ok)return {success:false,error:aides.error||'aides',httpStatus:aides.status||0};
+      var aideRows=Array.isArray(aides.data)?aides.data:[];
+      return {success:true,data:aideRows.filter(function(row){return row&&row.is_active!==false;}).map(sbMapAide)};
+    }
+    if(action==='get_clients'){
+      var clientPairs=[['select',SB_CLIENT_SELECT]];
+      if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
+      clientPairs.push(['order','name.asc']);
+      var clients=await sbRestGet('clients', clientPairs);
+      if(!clients.ok)return {success:false,error:clients.error||'clients',httpStatus:clients.status||0};
+      var clientRows=Array.isArray(clients.data)?clients.data:[];
+      return {success:true,data:clientRows.map(sbMapClient)};
+    }
+    var sheets=await sbRestGet('timesheets',[
+      ['select','*'],
+      ['is_active','eq.true'],
+      ['status','not.ilike.backup'],
+      ['status','not.ilike.draft'],
+      ['order','submitted_at.desc']
+    ]);
+    if(!sheets.ok)return {success:false,error:sheets.error||'timesheets',httpStatus:sheets.status||0};
+    var sheetRows=Array.isArray(sheets.data)?sheets.data:[];
+    return {success:true,data:sheetRows.filter(function(row){
+      if(!row||row.is_active===false)return false;
+      var status=String(row.status||'').trim().toLowerCase();
+      return status!=='backup'&&status!=='draft';
+    }).map(sbMapTimesheet)};
+  }catch(err){
+    return {success:false,error:String(err&&err.message||err||'supabase')};
   }
 }
 
@@ -2459,10 +2813,30 @@ async function mgrLogin(){
   errEl.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='Signing in…';}
   try{
+    // Flag on skips Sheets admin_login. Auth with the account email is the login.
+    if(evercareSbEnabled()){
+      const roleEl=document.getElementById('mgr_role');
+      const picked=roleEl&&roleEl.value?roleEl.value:'';
+      const sb=await sbAuthRoleLogin(picked,pwd);
+      if(sb&&sb.ok&&isPortalRole(sb.role)){
+        const passEl=document.getElementById('mgr_pass');
+        if(passEl)passEl.value='';
+        const display=(sb.profile&&(sb.profile.display_name||sb.profile.email))||sb.role;
+        const sess=startAdminSession({
+          role:sb.role,
+          username:display,
+          name:sb.role==='Nurse'?(sb.profile&&sb.profile.display_name||'Nurse'):(sb.profile&&sb.profile.display_name||'')
+        });
+        openPortalHome(sess,{freshLogin:true});
+        return;
+      }
+      errEl.textContent=sb&&sb.network?'Connection error. Please try again.':'Incorrect password.';
+      errEl.style.display='block';
+      return;
+    }
     const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_login',password:pwd})});
     const data=await res.json();
     if(data.success&&isPortalRole(data.role)){
-      try{softSbDualVerify(data.role,pwd);}catch(sbErr){}
       const passEl=document.getElementById('mgr_pass');
       if(passEl)passEl.value='';
       const sess=startAdminSession(data);
@@ -2512,7 +2886,7 @@ async function renderActivityLog(){
   }
 }
 
-function adminLogout(){logActivity('Logged out');clearAdminSession();currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
+function adminLogout(){logActivity('Logged out');try{sbSignOut();}catch(e){}try{sbInvalidateListCaches();}catch(e2){}clearSbSession();clearAdminSession();currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
