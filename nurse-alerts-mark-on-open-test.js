@@ -23,11 +23,17 @@ function extractFn(src, sig){
 }
 
 const loadFn = extractFn(html, 'async function loadAdminNurseSection()');
+const afterFn = extractFn(html, 'async function loadAdminNurseAlertsAfterCompletes()');
+const schedFn = extractFn(html, 'function scheduleDeferredNurseSheets()');
+const refreshFn = extractFn(html, 'async function refreshCompletedNewClientIntakes()');
 const markFn = extractFn(html, 'async function markNurseAlertsRead(ids)');
 const fetchFn = extractFn(html, 'async function fetchUnreadNurseAlerts()');
 const showTabFn = extractFn(html, 'function showTab(tab)');
 
 assert.ok(loadFn, 'loadAdminNurseSection missing');
+assert.ok(afterFn, 'loadAdminNurseAlertsAfterCompletes missing');
+assert.ok(schedFn, 'scheduleDeferredNurseSheets missing');
+assert.ok(refreshFn, 'refreshCompletedNewClientIntakes missing');
 assert.ok(markFn, 'markNurseAlertsRead missing');
 assert.ok(fetchFn, 'fetchUnreadNurseAlerts missing');
 assert.ok(showTabFn, 'showTab missing');
@@ -37,24 +43,32 @@ assert.ok(showTabFn.includes("if(tab==='nurse')loadAdminNurseSection()"),
 assert.ok(/onclick="loadAdminNurseSection\(\)"/.test(html),
   'Refresh must keep calling loadAdminNurseSection');
 
-assert.ok(!/await\s+markNurseAlertsRead/.test(loadFn),
-  'loadAdminNurseSection must not await markNurseAlertsRead');
-assert.ok(/void\s+markNurseAlertsRead\(ids\)/.test(loadFn),
+assert.ok(!/await\s+markNurseAlertsRead|fetchUnreadNurseAlerts|list_nurse_alerts|loadNurseActivityFeed/.test(loadFn),
+  'loadAdminNurseSection must not await or start nurse-alert /exec');
+assert.ok(!/await\s+markNurseAlertsRead/.test(afterFn),
+  'deferred alerts must not await markNurseAlertsRead');
+assert.ok(/void\s+markNurseAlertsRead\(ids\)/.test(afterFn),
   'mark must be fire-and-forget so Completes/Supervisory are not blocked');
 assert.ok(loadFn.includes('clearAdminNurseAlertsUi()'),
   'must optimistically clear badge + unread list before lists/activity');
-assert.ok(loadFn.indexOf('clearAdminNurseAlertsUi()') < loadFn.indexOf('fetchUnreadNurseAlerts()'),
-  'must clear Unread UI before awaiting list_nurse_alerts');
-assert.ok(loadFn.includes('fetchUnreadNurseAlerts()'),
-  'must fetch unread via list_nurse_alerts helper');
+assert.ok(loadFn.indexOf('clearAdminNurseAlertsUi()') < loadFn.indexOf('refreshCompletedNewClientIntakes()'),
+  'must clear Unread UI before the Completes refresh');
+assert.ok(afterFn.includes('fetchUnreadNurseAlerts()'),
+  'must fetch unread via list_nurse_alerts helper after the list paints');
 assert.ok(loadFn.includes('refreshCompletedNewClientIntakes()'),
   'must still load Completes');
 assert.ok(loadFn.includes('loadAdminSupervisoryContacts()'),
   'must still load Supervisory');
-assert.ok(loadFn.includes('loadNurseActivityFeed()'),
-  'must still load activity');
-assert.ok(/listsP=Promise\.all/.test(loadFn),
-  'Completes + Supervisory must start without waiting on mark');
+assert.ok(loadFn.indexOf('loadAdminSupervisoryContacts()') < loadFn.indexOf('await refreshCompletedNewClientIntakes()'),
+  'Supervisory starts in parallel and does not wait on nurse-alert');
+assert.ok(afterFn.includes('loadNurseActivityFeed()'),
+  'must still load activity after alerts');
+assert.ok(refreshFn.indexOf('cancelNurseSheetsFetches()') < refreshFn.indexOf('loadCompletedNewClientIntakes()'),
+  'Refresh aborts in-flight Sheets /exec before the Ace list');
+assert.ok(refreshFn.indexOf('loadCompletedNewClientIntakes()') < refreshFn.indexOf('scheduleDeferredNurseSheets()'),
+  'nurse-alert /exec is scheduled only after the Completes list paints');
+assert.ok(schedFn.includes('loadAdminNurseAlertsAfterCompletes()'),
+  'Admin/Scheduler defer list_nurse_alerts until after Completes');
 
 assert.ok(fetchFn.includes("action:'list_nurse_alerts'"),
   'fetch must use Ace list_nurse_alerts');
@@ -62,13 +76,13 @@ assert.ok(fetchFn.includes("['items','alerts','data','rows']"),
   'list_nurse_alerts must read Ace items[].id first');
 assert.ok(fetchFn.includes('username'),
   'list_nurse_alerts must send {username}');
-assert.ok(/markNurseAlertsRead\(ids\)\.then/.test(loadFn),
+assert.ok(/markNurseAlertsRead\(ids\)\.then/.test(afterFn),
   'after mark, must re-fetch list_nurse_alerts to sync badge');
 assert.ok(markFn.includes("action:'mark_nurse_alerts_read'"),
   'mark must use Ace mark_nurse_alerts_read');
 assert.ok(/username,ids:list/.test(markFn),
   'mark payload must be {username, ids[]}');
-assert.ok(!/list_admin_alerts|get_nurse_activity_unread|visitId/.test(loadFn+fetchFn+markFn),
+assert.ok(!/list_admin_alerts|get_nurse_activity_unread|visitId/.test(loadFn+afterFn+fetchFn+markFn),
   'must not invent Ace actions/fields');
 
 const appendFn = extractFn(html, 'function appendNurseActivityFeed(items)');
@@ -189,9 +203,15 @@ async function runRole(role){
     await apiPost({action:'mark_nurse_alerts_read',username,ids:listIds});
   }
   async function refreshCompletedNewClientIntakes(){
+    events.push({t:'completes-start'});
+    await new Promise(r=>setTimeout(r, 20));
     completes.innerHTML='<tr><td>ok</td></tr>';
-    await new Promise(r=>setTimeout(r, 5));
+    events.push({t:'completes-painted'});
     listsFinished = true;
+    scheduleDeferredNurseSheets();
+  }
+  function scheduleDeferredNurseSheets(){
+    void loadAdminNurseAlertsAfterCompletes();
   }
   async function loadAdminSupervisoryContacts(){
     supervisory.innerHTML='<tr><td>ok</td></tr>';
@@ -205,14 +225,7 @@ async function runRole(role){
       list.innerHTML = '<div>Latest activity</div>';
     }
   }
-
-  async function loadAdminNurseSection(){
-    if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler')return;
-    clearAdminNurseAlertsUi();
-    const listsP=Promise.all([
-      refreshCompletedNewClientIntakes(),
-      loadAdminSupervisoryContacts()
-    ]);
+  async function loadAdminNurseAlertsAfterCompletes(){
     const alerts=await fetchUnreadNurseAlerts();
     const ids=alerts.map(a=>a.id).filter(Boolean);
     adminNurseAlerts=[];
@@ -223,12 +236,22 @@ async function runRole(role){
         setNurseAlertBadge(leftover.length);
       });
     }
-    await listsP;
     await loadNurseActivityFeed();
+  }
+
+  async function loadAdminNurseSection(){
+    if(currentAdminRole!=='Admin'&&currentAdminRole!=='Scheduler')return;
+    clearAdminNurseAlertsUi();
+    const supervisoryP=loadAdminSupervisoryContacts();
+    await refreshCompletedNewClientIntakes();
+    await supervisoryP;
   }
 
   await loadAdminNurseSection();
 
+  const paintAt = events.findIndex(e=>e.t==='completes-painted');
+  const alertAt = events.findIndex(e=>e.action==='list_nurse_alerts');
+  assert.ok(paintAt>=0 && alertAt>paintAt, role+': list_nurse_alerts starts only after Completes paints');
   assert.ok(listsFinished, role+': Completes/Supervisory must finish');
   assert.ok(markStarted, role+': mark_nurse_alerts_read must fire on open');
   assert.strictEqual(markFinished, false, role+': lists/activity must not wait for mark to finish');

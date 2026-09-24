@@ -24,7 +24,9 @@ function extractFn(src, sig){
 }
 
 assert.ok(html.includes('v=nursespd1'), 'nursespd1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-bcast1">'), 'admin-build meta');
+assert.ok(html.includes('v=nursespd2'), 'nursespd2 marker');
+assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursespd2">'), 'admin-build meta');
 assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
 assert.ok(html.includes('v=warmkeep'), 'warmkeep marker stays');
 assert.ok(html.includes('Still loading from Sheets…'), 'slow copy');
@@ -48,7 +50,7 @@ assert.ok(viewInk.includes('includeSignatures:true,includeSigs:true'), 'View/PDF
 assert.ok(pollInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(pollInk), 'PDF link poll stays trimmed');
 assert.ok(recheckInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(recheckInk), 'pending PDF recheck stays trimmed');
 assert.ok(!/includeSignatures|includeSigs/.test(listInk), 'Completes list does not ask for signatures');
-assert.ok(html.includes('if(nciCompleteListInflight)return nciCompleteListInflight;'), 'single-flight guard');
+assert.ok(html.includes('if(nciCompleteListInflight&&nciCompleteListInflight.epoch===nciCompleteListEpoch)return nciCompleteListInflight;'), 'single-flight guard');
 
 const home = extractFn(html, 'function openPortalHome(sess, opts)');
 assert.ok(!/includeSignatures|includeSigs/.test(home), 'home prefetch does not ask for signatures');
@@ -60,8 +62,12 @@ const prefetchAt = home.indexOf('loadCompletedNewClientIntakes();');
 const complianceAt = home.indexOf('loadNurseCompliance(true)');
 assert.ok(prefetchAt > home.indexOf("showScreen('nurseScreen')") && prefetchAt < complianceAt,
   'Nurse Completes list starts after home paint and before compliance');
-assert.ok(home.indexOf('loadCompletedNewClientIntakes(); // nursespd1') > complianceAt,
-  'compliance load joins the same Completes prefetch');
+assert.ok(home.indexOf('loadNurseCompliance(true)') > home.indexOf('Promise.resolve(loadCompletedNewClientIntakes())'),
+  'compliance /exec is scheduled after the Completes prefetch');
+assert.ok(home.indexOf('refreshNurseAlertBadge()') > home.lastIndexOf('Promise.resolve(loadCompletedNewClientIntakes())'),
+  'nurse-alert badge /exec is scheduled after the admin Completes prefetch');
+assert.ok(!/refreshNurseAlertBadge\(\);\s*\n\s*loadCompletedNewClientIntakes\(\)/.test(home),
+  'admin home does not start nurse-alert before the Completes list');
 assert.ok(!/\bawait\b/.test(home), 'openPortalHome must not await');
 
 const showTab = extractFn(html, 'function showNurseTab(tab)');
@@ -69,8 +75,12 @@ assert.strictEqual(showTab.split('loadCompletedNewClientIntakes()').length - 1, 
   'Completes tab asks for the list once');
 
 const refresh = extractFn(html, 'async function refreshCompletedNewClientIntakes()');
+assert.ok(refresh.indexOf('cancelNurseSheetsFetches()') < refresh.indexOf('loadCompletedNewClientIntakes()'),
+  'Refresh aborts Sheets /exec before the Completes list');
 assert.ok(refresh.indexOf('nciInvalidateCompleteListCache()') < refresh.indexOf('loadCompletedNewClientIntakes()'),
   'Refresh bypasses the 5min cache');
+assert.ok(refresh.indexOf('loadCompletedNewClientIntakes()') < refresh.indexOf('scheduleDeferredNurseSheets()'),
+  'Sheets nurse-alert waits until the Completes list has painted');
 
 const sigs = [
   'function nciCompleteListCacheGet()',
@@ -222,6 +232,35 @@ async function run(){
   pendingPosts.shift()({success: true, data: []});
   await again;
   assert.strictEqual(nurseHtml(), 'EMPTY', 'empty Complete list still paints');
+
+  const beforeStale = posts.length;
+  const stale = sandbox.nciFetchCompleteList();
+  assert.strictEqual(posts.length, beforeStale + 1, 'in-flight list is one post');
+  sandbox.nciCompleteListEpoch++;
+  const fresh = sandbox.nciFetchCompleteList();
+  assert.strictEqual(posts.length, beforeStale + 2, 'a newer Refresh epoch starts its own Ace list without waiting');
+  pendingPosts.shift()({success:true, data:[]});
+  pendingPosts.shift()({success:true, data:[]});
+  await Promise.all([stale, fresh]);
+
+  const order = [];
+  const orderBox = {
+    nciCompleteListEpoch: 0,
+    cancelNurseSheetsFetches: function(){order.push('cancel');},
+    nciInvalidateCompleteListCache: function(){orderBox.nciCompleteListEpoch++; order.push('invalidate');},
+    loadCompletedNewClientIntakes: async function(){
+      order.push('list-start');
+      await new Promise(function(r){setTimeout(r, 10);});
+      order.push('list-paint');
+    },
+    scheduleDeferredNurseSheets: function(){order.push('sheets');},
+    nciRecheckPendingCompletePdfs: async function(){order.push('recheck');}
+  };
+  vm.createContext(orderBox);
+  vm.runInContext(refresh+'\nthis.refreshCompletedNewClientIntakes=refreshCompletedNewClientIntakes;', orderBox);
+  await orderBox.refreshCompletedNewClientIntakes();
+  assert.deepStrictEqual(order, ['cancel','invalidate','list-start','list-paint','sheets','recheck'],
+    'Completes Refresh paints the Ace list before any deferred Sheets nurse-alert work');
 
   console.log('nurse-completes-speed-test: ok');
 }

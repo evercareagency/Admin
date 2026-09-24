@@ -72,7 +72,8 @@ assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()')
 assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
 assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-bcast1">'), 'bcast1 admin-build after warmoff1');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-nursespd2">'), 'nursespd2 admin-build after warmoff1');
+assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(login.includes('openPortalHome('), 'login must open home after success');
 assert.ok(!/get_users|get_all|get_clients|get_assigned_topic/.test(login), 'mgrLogin must not fetch heavy lists');
 assert.ok(!/await\s+renderTimesheets|await\s+apiGetCached|await\s+loadNurseCompliance/.test(login), 'mgrLogin must not await list loads');
@@ -120,6 +121,7 @@ const sandbox = {
   window: {},
   showScreen: function(id){screens.push(id);},
   showNurseTab: function(){},
+  nciCompleteListEpoch: 0,
   loadNurseCompliance: function(){screens.push('load-compliance');},
   loadNewClientIntakeDrafts: function(){},
   loadCompletedNewClientIntakes: function(){},
@@ -185,7 +187,10 @@ assert.strictEqual(sandbox.currentNurseName, 'Ada Nurse');
 vm.runInContext('openPortalHome(readAdminSession(),{freshLogin:true})', sandbox);
 assert.ok(screens.includes('nurseScreen'), 'Nurse home paints');
 assert.ok(!screens.includes('adminScreen'), 'Nurse must not open admin tools');
-assert.ok(screens.indexOf('nurseScreen') < screens.indexOf('load-compliance'));
+assert.ok(!screens.includes('load-compliance'), 'compliance /exec waits until the Completes prefetch settles');
+const nurseSheetsOrder = Promise.resolve().then(function(){
+  assert.ok(screens.indexOf('nurseScreen') < screens.indexOf('load-compliance'), 'compliance sheets follow the nurse home paint');
+});
 
 const kept = JSON.parse(localStorage.getItem('admin_session'));
 kept.loginAt = Date.now() - eightH + 5000;
@@ -528,7 +533,7 @@ async function runBrowser(){
       }));
       assert.ok(painted.login, vp.name+' sb cut login screen is up at DOMContentLoaded');
       assert.ok(!painted.admin, vp.name+' sb cut must not open home before Sign In');
-      assert.strictEqual(painted.build, '2026-09-24-bcast1');
+      assert.strictEqual(painted.build, '2026-09-24-nursespd2');
       assert.ok(Date.now()-navAt<1500, vp.name+' sb cut first paint must not wait on warmkeep');
       await new Promise(r=>setTimeout(r,500));
       const quiet=await page.evaluate(()=>({
@@ -562,7 +567,7 @@ async function runBrowser(){
   }
 }
 
-runBrowser().catch(function(err){
+nurseSheetsOrder.then(function(){return runBrowser();}).catch(function(err){
   console.error(err);
   process.exit(1);
 });
