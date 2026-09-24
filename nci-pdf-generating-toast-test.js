@@ -179,6 +179,7 @@ async function runSaveOrder(){
   }
   function closeNewClientIntake(){ events.push('close'); }
   function loadNewClientIntakeDrafts(){ events.push('drafts'); }
+  function nciInvalidateCompleteListCache(){ events.push('invalidate-list'); }
   function loadCompletedNewClientIntakes(){ events.push('list'); }
   function showTempMsg(msg){ events.push('toast:'+msg); }
   const saveNewClientIntake = eval('('+save+')');
