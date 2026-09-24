@@ -858,7 +858,7 @@ else setupEverCarePWA();
           <p id="isAssignHelp" style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;line-height:1.45">Select a topic, then choose who should get it. Aides see a notification when they log in.<br><strong>Assign to all aides</strong> = everyone gets this month's topic.<br><strong>Choose aides</strong> = only the aides you check (for example, new hires after a group assign).</p>
           <div class="field" style="margin-bottom:12px">
             <label for="assignTopicSel">Select Topic</label>
-            <select id="assignTopicSel"></select>
+            <select id="assignTopicSel" onchange="onAssignTopicSelChange()"></select>
           </div>
           <div class="is-assign-modes" role="radiogroup" aria-label="Who should get this topic">
             <label class="is-assign-mode on" id="isAssignModeAllLbl">
@@ -2104,27 +2104,43 @@ function cacheSet(action,v){
 }
 function cacheInvalidate(action){
   const key=_cacheKey(action);
-  delete _memCache[key];
+  const prefix=key+':';
+  Object.keys(_memCache).forEach(function(k){
+    if(k===key||k.indexOf(prefix)===0)delete _memCache[k];
+  });
   try{sessionStorage.removeItem(key);}catch(e){}
+  try{
+    if(!sessionStorage||typeof sessionStorage.length!=='number'||typeof sessionStorage.key!=='function')return;
+    var drop=[];
+    for(var i=0;i<sessionStorage.length;i++){
+      var k=sessionStorage.key(i);
+      if(k&&k.indexOf(prefix)===0)drop.push(k);
+    }
+    drop.forEach(function(k){sessionStorage.removeItem(k);});
+  }catch(e2){}
 }
 async function apiGetCached(action,extra,force){
   const sbList=typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbIsListAction==='function'&&sbIsListAction(action);
+  var cacheAction=action;
+  if(action==='get_assigned_topic'&&extra&&extra.topicId!=null&&String(extra.topicId).trim()!==''){
+    cacheAction=action+':'+String(extra.topicId);
+  }
   if(!force){
-    const hit=cacheGet(action);
+    const hit=cacheGet(cacheAction);
     if(hit&&(sbList?hit.source==='supabase':hit.source!=='supabase'))return hit;
   }
-  if(_inflight[action])return _inflight[action];
-  _inflight[action]=(async()=>{
+  if(_inflight[cacheAction])return _inflight[cacheAction];
+  _inflight[cacheAction]=(async()=>{
     try{
       const data=await apiPost(Object.assign({action:action},extra||{}));
       if(data&&data.success){
         if(sbList)data.source='supabase';
-        cacheSet(action,data);
+        cacheSet(cacheAction,data);
       }
       return data;
-    }finally{delete _inflight[action];}
+    }finally{delete _inflight[cacheAction];}
   })();
-  return _inflight[action];
+  return _inflight[cacheAction];
 }
 
 
@@ -3462,40 +3478,65 @@ function sbMergeAideUsernames(existing,incoming){
   (incoming||[]).forEach(add);
   return out;
 }
+// GHOST-INSERVICE-TOPIC-ASSIGNMENT-CONTRACT-v1 (CALLABLE).
+// UNIQUE inservice_topic_assignment_org_topic_uidx (org_id, topic_id).
+// aide_usernames text[]: null = all aides, [] = nobody, else selected usernames.
+// created_at / updated_at are database-side. Never send them. Never write topic_id null.
+var SB_ASSIGN_SELECT='id,org_id,topic_id,aide_usernames,updated_at';
+function sbEmptyAssignment(){
+  return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+}
 function sbMapAssignment(row){
-  if(!row)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  if(!row)return null;
   var topic=row.topic_id;
-  if(topic==null||String(topic).trim()==='')return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  if(topic==null||String(topic).trim()==='')return null;
   var names=row.aide_usernames;
+  if(typeof names==='string'){
+    try{names=JSON.parse(names);}catch(e){return null;}
+  }
+  if(names!=null&&!Array.isArray(names))return null;
   if(names==null)return {success:true,topicId:String(topic),aideUsernames:null,assignAll:true};
-  names=sbUsernameList(names)||[];
-  return {success:true,topicId:String(topic),aideUsernames:names,assignAll:false};
+  return {success:true,topicId:String(topic),aideUsernames:(sbUsernameList(names)||[]).slice(),assignAll:false};
 }
-async function sbFetchAssignmentRow(){
-  var got=await sbRestGet('inservice_topic_assignment',[
-    ['select','*'],
+async function sbFetchAssignmentRows(topicId){
+  var pairs=[
+    ['select',SB_ASSIGN_SELECT],
+    ['order','topic_id'],
     ['org_id','eq.'+sbOrgId()]
-  ]);
+  ];
+  if(topicId!=null&&String(topicId).trim()!=='')pairs.push(['topic_id','eq.'+String(topicId)]);
+  var got=await sbRestGet('inservice_topic_assignment',pairs);
   if(!got.ok)return {error:got.error||'Could not load topic assignment.'};
-  var row=Array.isArray(got.data)&&got.data.length?got.data[0]:null;
-  return {row:row};
+  return {rows:Array.isArray(got.data)?got.data:[]};
 }
-async function sbGetAssignedTopic(){
-  var got=await sbFetchAssignmentRow();
+async function sbGetAssignedTopic(topicId){
+  var scoped=topicId!=null&&String(topicId).trim()!=='';
+  var got=await sbFetchAssignmentRows(scoped?topicId:null);
   if(got.error)return {success:false,error:got.error};
-  if(!got.row)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
-  return sbMapAssignment(got.row);
+  var mapped=(got.rows||[]).map(sbMapAssignment).filter(Boolean);
+  if(scoped)return mapped[0]||sbEmptyAssignment();
+  var out=sbEmptyAssignment();
+  out.assignments=mapped.map(function(a){
+    return {topicId:a.topicId,aideUsernames:a.aideUsernames,assignAll:a.assignAll};
+  });
+  if(mapped.length===1){
+    out.topicId=mapped[0].topicId;
+    out.aideUsernames=mapped[0].aideUsernames;
+    out.assignAll=mapped[0].assignAll;
+  }
+  return out;
 }
 async function sbUpsertAssignment(topicId,aideUsernames){
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
   var body={
     org_id:sbOrgId(),
-    topic_id:(topicId==null||topicId==='')?null:String(topicId),
-    aide_usernames:aideUsernames===null?null:(Array.isArray(aideUsernames)?aideUsernames:[])
+    topic_id:String(topicId),
+    aide_usernames:aideUsernames===null?null:(Array.isArray(aideUsernames)?aideUsernames.slice():[])
   };
-  var got=await sbRestMutate('POST','inservice_topic_assignment',[['on_conflict','org_id']],body,'resolution=merge-duplicates,return=representation');
+  var got=await sbRestMutate('POST','inservice_topic_assignment',[['on_conflict','org_id,topic_id']],body,'resolution=merge-duplicates,return=representation');
   if(!got.ok)return {success:false,error:got.error||'Could not save topic assignment.'};
   var row=Array.isArray(got.data)&&got.data[0]?got.data[0]:body;
-  return sbMapAssignment(row);
+  return sbMapAssignment(row)||sbEmptyAssignment();
 }
 async function sbSetAssignedTopic(topicId){
   if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
@@ -3504,15 +3545,26 @@ async function sbSetAssignedTopic(topicId){
 async function sbAssignSelectedAides(topicId,aideUsernames){
   if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
   var incoming=sbUsernameList(aideUsernames)||[];
-  var got=await sbFetchAssignmentRow();
+  var got=await sbFetchAssignmentRows(topicId);
   if(got.error)return {success:false,error:got.error};
+  var current=sbMapAssignment((got.rows||[])[0]);
   var base=[];
-  var row=got.row;
-  if(row&&String(row.topic_id)===String(topicId)&&row.aide_usernames!=null)base=sbUsernameList(row.aide_usernames)||[];
+  if(current&&current.aideUsernames!=null)base=current.aideUsernames;
   return sbUpsertAssignment(topicId,sbMergeAideUsernames(base,incoming));
 }
-async function sbClearAssignedTopic(){
-  return sbUpsertAssignment(null,null);
+// Contract v1 clear: DELETE this org_id + topic_id row only. No Prefer body.
+// Do not upsert topic_id null. Do not delete by org_id alone.
+async function sbClearAssignedTopicRow(topicId){
+  var got=await sbRestMutate('DELETE','inservice_topic_assignment',[
+    ['org_id','eq.'+sbOrgId()],
+    ['topic_id','eq.'+String(topicId)]
+  ],null,null);
+  if(!got.ok)return {success:false,error:got.error||'Could not clear topic assignment.'};
+  return sbEmptyAssignment();
+}
+async function sbClearAssignedTopic(topicId){
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
+  return sbClearAssignedTopicRow(topicId);
 }
 async function sbInserviceDispatch(payload){
   var action=payload&&payload.action;
@@ -3523,8 +3575,8 @@ async function sbInserviceDispatch(payload){
     if(action==='admin_update_inservice_answers')return await sbUpdateInserviceAnswers(payload.id,payload.answers||[]);
     if(action==='set_assigned_topic')return await sbSetAssignedTopic(payload.topicId);
     if(action==='assign_inservice_aides')return await sbAssignSelectedAides(payload.topicId,payload.aideUsernames||[]);
-    if(action==='get_assigned_topic')return await sbGetAssignedTopic();
-    if(action==='clear_assigned_topic')return await sbClearAssignedTopic();
+    if(action==='get_assigned_topic')return await sbGetAssignedTopic(payload.topicId);
+    if(action==='clear_assigned_topic')return await sbClearAssignedTopic(payload.topicId);
   }catch(e){
     return {success:false,error:(e&&e.message)||'Supabase request failed.'};
   }
@@ -5224,6 +5276,7 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 // ─── INSERVICE ADMIN ────────────────────────────────────
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
+let isAssignTopicTouched=false;
 let isComplianceRows=[];
 let isResultsState={rowIndex:-1,row:null,questions:[],editing:false};
 let isResultDetailById={};
@@ -5231,6 +5284,50 @@ let isResultDetailById={};
 function getIsAssignMode(){
   const el=document.querySelector('input[name="isAssignMode"]:checked');
   return (el&&el.value==='choose')?'choose':'all';
+}
+
+function sbAssignTopicQuery(){
+  if(typeof evercareSbEnabled!=='function'||!evercareSbEnabled())return null;
+  if(!isAssignTopicTouched)return null;
+  const sel=document.getElementById('assignTopicSel');
+  if(!sel||sel.value==null||String(sel.value).trim()==='')return null;
+  return {topicId:String(sel.value)};
+}
+
+function onAssignTopicSelChange(){
+  isAssignTopicTouched=true;
+  renderInservices(true);
+}
+
+function sbDisplayedAssignment(data){
+  if(!data||data.success===false)return data;
+  var list=Array.isArray(data.assignments)?data.assignments:null;
+  if(!list)return data;
+  var sel=document.getElementById('assignTopicSel');
+  var preferred=sel&&sel.value!=null&&String(sel.value).trim()!==''?String(sel.value):'';
+  var hit=null;
+  if(preferred){
+    for(var i=0;i<list.length;i++){
+      if(String(list[i].topicId)===preferred){hit=list[i];break;}
+    }
+  }
+  if(!hit&&!isAssignTopicTouched&&list.length)hit=list[0];
+  if(!hit)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  return {success:true,topicId:hit.topicId,aideUsernames:hit.aideUsernames,assignAll:hit.assignAll===true};
+}
+
+function syncIsAssignChecksFromAssignment(data){
+  if(typeof evercareSbEnabled!=='function'||!evercareSbEnabled())return;
+  if(!data||data.success===false)return;
+  const next=new Set();
+  if(data.assignAll!==true&&Array.isArray(data.aideUsernames)){
+    data.aideUsernames.forEach(function(u){
+      const s=String(u||'').trim();
+      if(s)next.add(s);
+    });
+  }
+  isAssignAideSelected=next;
+  if(getIsAssignMode()==='choose')renderIsAssignAideList();
 }
 
 function onIsAssignModeChange(){
@@ -5404,14 +5501,23 @@ async function renderInservices(force){
     cacheInvalidate('get_assigned_topic');
     cacheInvalidate('get_users');
   }
+  const topicExtra=sbAssignTopicQuery();
   // Start compliance fetches first so get_assigned_topic shares in-flight with the badge below
   loadISCompliance(force===true);
   if(getIsAssignMode()==='choose')loadAidesForInserviceAssign(force===true);
   const assignEl=document.getElementById('currentAssignment');
   if(assignEl)assignEl.textContent='Loading...';
   try{
-    const data=await apiGetCached('get_assigned_topic',null,force===true);
-    paintIsCurrentAssignment(data);
+    const data=await apiGetCached('get_assigned_topic',topicExtra,force===true);
+    const view=sbDisplayedAssignment(data);
+    if(!isAssignTopicTouched&&sel&&view&&view.success&&view.topicId!=null&&String(view.topicId)!==''){
+      const want=String(view.topicId);
+      for(let i=0;i<sel.options.length;i++){
+        if(String(sel.options[i].value)===want){sel.value=want;break;}
+      }
+    }
+    paintIsCurrentAssignment(view);
+    syncIsAssignChecksFromAssignment(view);
   }catch(e){
     if(assignEl)assignEl.textContent='Error loading assignment status.';
   }
@@ -5440,7 +5546,12 @@ async function assignTopic(){
 async function clearAssignment(){
   showTempMsg('Clearing assignment...','var(--teal)');
   try{
-    const data=await apiPost({action:'clear_assigned_topic'});
+    const payload={action:'clear_assigned_topic'};
+    const sel=document.getElementById('assignTopicSel');
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sel&&sel.value!=null&&String(sel.value).trim()!==''){
+      payload.topicId=String(sel.value);
+    }
+    const data=await apiPost(payload);
     cacheInvalidate('get_assigned_topic');
     if(data&&data.success===false){
       showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
@@ -5676,7 +5787,7 @@ async function loadISCompliance(force){
 
   try{
     const [assignData, usersData, isData]=await Promise.all([
-      apiGetCached('get_assigned_topic',null,force===true),
+      apiGetCached('get_assigned_topic',sbAssignTopicQuery(),force===true),
       apiGetCached('get_users',null,force===true),
       apiPost({action:'get_inservices'}) // no includeArchived — Ace skips Status=Archived
     ]);
@@ -5689,7 +5800,8 @@ async function loadISCompliance(force){
         return;
       }
     }
-    const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
+    const assignView=sbDisplayedAssignment(assignData);
+    const assignedTopicId=assignView&&assignView.success?isAssignTopicIdFrom(assignView):null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
     const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
     const completions=((isData&&isData.success&&Array.isArray(isData.data))?isData.data:[]).filter(function(c){
@@ -5746,8 +5858,9 @@ async function sendISReminder(rowIndexOrUsername,name){
       username=row.username;
       label=row.empName||row.username;
     }
-    const assignData=await apiGetCached('get_assigned_topic');
-    const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
+    const assignData=await apiGetCached('get_assigned_topic',sbAssignTopicQuery());
+    const assignView=sbDisplayedAssignment(assignData);
+    const assignedTopicId=assignView&&assignView.success?isAssignTopicIdFrom(assignView):null;
     if(!assignedTopicId){showTempMsg('No topic currently assigned.','var(--danger)');return;}
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_is_reminder',username,topicId:assignedTopicId})});
     showTempMsg('📢 Reminder sent to '+(label||username)+'!','var(--success)');
