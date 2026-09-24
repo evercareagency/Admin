@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -1737,6 +1738,7 @@ Call (216) 377-5991 with any questions.</textarea>
 const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
 const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplYWxrcHR3Z2lmbmtia3VhdnZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMDExMTAsImV4cCI6MjEwNTc3NzExMH0.b-3Pdb_oVR3L6JM0yd_aQcqtQH8exGV7OPwdtx0b3Xg';
+const EVERCARE_ORG_ID='4f97f4d3-6635-4544-904c-6b06aa02d40b';
 const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const PRINT_DAYS=[0,1,2,3,4,5,6]; // Sun–Sat Caregiver Timesheet paper
@@ -2053,13 +2055,16 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 async function apiPost(payload){
-  // Flag on: aides, clients, payroll timesheets, and supervisory contacts are Supabase.
+  // Flag on: aides, clients, payroll timesheets, supervisory contacts, and inservice compliance are Supabase.
   // Every other action stays on Sheets. Flag off never reaches these branches.
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
     return sbApiList(payload);
   }
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)){
     return sbApiSupervisory(payload);
+  }
+  if(payload&&evercareSbEnabled()&&typeof sbInserviceAction==='function'&&sbInserviceAction(payload.action)){
+    return sbInserviceDispatch(payload);
   }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
@@ -3254,6 +3259,276 @@ async function sbApiSupervisory(payload){
   }catch(err){
     return {success:false,error:String(err&&err.message||err||'supabase')};
   }
+}
+
+
+function sbInserviceAction(action){
+  return action==='get_inservices'||action==='get_inservice_result'||action==='delete_inservice_result'||action==='archive_inservice_result'||action==='admin_update_inservice_answers'||action==='set_assigned_topic'||action==='assign_inservice_aides'||action==='get_assigned_topic'||action==='clear_assigned_topic';
+}
+function sbOrgId(){
+  try{
+    var sess=typeof readSbSession==='function'?readSbSession():null;
+    var org=sess&&sess.profile&&sess.profile.org_id;
+    if(org)return String(org);
+  }catch(e){}
+  return EVERCARE_ORG_ID;
+}
+async function sbRestMutate(method, table, pairs, body, prefer, refreshed){
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,error:'Not signed in',status:401};
+  var url=SUPABASE_URL+'/rest/v1/'+table+(pairs&&pairs.length?('?'+sbFilterQuery(pairs)):'');
+  var headers={
+    apikey:SUPABASE_ANON_KEY,
+    Authorization:'Bearer '+sess.access_token,
+    Accept:'application/json',
+    'Content-Type':'application/json'
+  };
+  if(prefer)headers.Prefer=prefer;
+  var res;
+  try{
+    res=await fetch(url,{method:method,headers:headers,body:body==null?undefined:JSON.stringify(body)});
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbRestMutate(method, table, pairs, body, prefer, true);
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status,data:data};
+  return {ok:true,data:data,status:res.status};
+}
+function sbMapInserviceRow(r){
+  if(!r)return {};
+  var detail=r.graded_detail;
+  if(typeof detail==='string'){try{detail=JSON.parse(detail);}catch(e){detail=null;}}
+  var answers=r.answers;
+  if(typeof answers==='string'){try{answers=JSON.parse(answers);}catch(e){}}
+  var items=detail&&Array.isArray(detail.items)?detail.items:null;
+  var pct=r.score_pct!=null?r.score_pct:(detail&&detail.scorePct!=null?detail.scorePct:null);
+  return {
+    id:r.id||'',
+    legacy_id:r.legacy_id||'',
+    username:r.username||'',
+    empName:r.emp_name||r.username||'',
+    emp_name:r.emp_name||'',
+    topicId:r.topic_id,
+    topic_id:r.topic_id,
+    topicTitle:r.topic_title||'',
+    topic_title:r.topic_title||'',
+    answers:answers,
+    signature:r.signature||'',
+    scoreCorrect:r.score_correct,
+    score_correct:r.score_correct,
+    scoreTotal:r.score_total,
+    score_total:r.score_total,
+    scorePct:pct,
+    score_pct:pct,
+    gradedDetail:detail,
+    GradedDetail:detail,
+    items:items,
+    completed:r.completed||'',
+    status:r.status||'',
+    completedAt:r.submitted_at||r.completed||'',
+    submitted_at:r.submitted_at||''
+  };
+}
+function sbGradeInservice(topicId,answers){
+  var topic=(typeof INSERVICES!=='undefined'?INSERVICES:[]).find(function(t){return String(t.id)===String(topicId);});
+  var qs=topic&&topic.questions?topic.questions:[];
+  var ans=Array.isArray(answers)?answers:[];
+  var correct=0;
+  var items=qs.map(function(q,i){
+    var sel=ans[i];
+    var selNum=(sel==null||sel==='')?null:Number(sel);
+    var ok=selNum!=null&&!isNaN(selNum)&&Number(selNum)===Number(q.answer);
+    if(ok)correct++;
+    var opts=q.options||[];
+    return {
+      index:i,
+      qIndex:i,
+      selected:selNum,
+      correct:q.answer,
+      prompt:q.q,
+      question:q.q,
+      options:opts,
+      isCorrect:ok,
+      aideAnswer:(selNum!=null&&opts[selNum]!=null)?opts[selNum]:'',
+      correctAnswer:opts[q.answer]!=null?opts[q.answer]:''
+    };
+  });
+  var total=qs.length;
+  var pct=total?Math.round(correct/total*100):0;
+  return {
+    score_correct:correct,
+    score_total:total,
+    score_pct:pct,
+    graded_detail:{scoreCorrect:correct,scoreTotal:total,scorePct:pct,items:items}
+  };
+}
+async function sbListInserviceResults(){
+  var got=await sbRestGet('inservice_results',[
+    ['select','id,legacy_id,username,emp_name,topic_id,topic_title,answers,signature,score_correct,score_total,score_pct,graded_detail,completed,status,submitted_at'],
+    ['status','eq.Active'],
+    ['org_id','eq.'+sbOrgId()],
+    ['order','submitted_at.desc']
+  ]);
+  if(!got.ok)return {success:false,error:got.error};
+  var rows=Array.isArray(got.data)?got.data:[];
+  rows=rows.filter(function(r){return String((r&&r.status)||'Active').toLowerCase()!=='archived';});
+  return {success:true,data:rows.map(sbMapInserviceRow)};
+}
+async function sbGetInserviceResult(id){
+  if(id==null||String(id).trim()==='')return {success:false,error:'Result id missing.'};
+  var got=await sbRestGet('inservice_results',[
+    ['id','eq.'+String(id)],
+    ['org_id','eq.'+sbOrgId()],
+    ['select','*']
+  ]);
+  if(!got.ok)return {success:false,error:got.error};
+  var row=Array.isArray(got.data)&&got.data[0]?got.data[0]:null;
+  if(!row)return {success:false,error:'Result not found.'};
+  var mapped=sbMapInserviceRow(row);
+  mapped.success=true;
+  return mapped;
+}
+async function sbArchiveInserviceResult(id){
+  if(id==null||String(id).trim()==='')return {success:false,error:'Result id missing.'};
+  var got=await sbRestMutate('PATCH','inservice_results',[
+    ['id','eq.'+String(id)],
+    ['org_id','eq.'+sbOrgId()]
+  ],{status:'Archived'},'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not archive result.'};
+  return {success:true,id:String(id),status:'Archived'};
+}
+async function sbUpdateInserviceAnswers(id,answers){
+  if(id==null||String(id).trim()==='')return {success:false,error:'Result id missing.'};
+  var existing=await sbGetInserviceResult(id);
+  if(!(existing&&existing.success))return existing||{success:false,error:'Result not found.'};
+  var graded=sbGradeInservice(existing.topicId!=null?existing.topicId:existing.topic_id,answers);
+  var got=await sbRestMutate('PATCH','inservice_results',[
+    ['id','eq.'+String(id)],
+    ['org_id','eq.'+sbOrgId()]
+  ],{
+    answers:Array.isArray(answers)?answers:[],
+    score_correct:graded.score_correct,
+    score_total:graded.score_total,
+    score_pct:graded.score_pct,
+    graded_detail:graded.graded_detail
+  },'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not save answers.'};
+  var row=Array.isArray(got.data)&&got.data[0]?got.data[0]:null;
+  if(!row){
+    row={
+      id:id,
+      username:existing.username,
+      emp_name:existing.empName,
+      topic_id:existing.topicId,
+      topic_title:existing.topicTitle,
+      answers:answers,
+      score_correct:graded.score_correct,
+      score_total:graded.score_total,
+      score_pct:graded.score_pct,
+      graded_detail:graded.graded_detail,
+      status:'Active',
+      submitted_at:existing.submitted_at||existing.completedAt
+    };
+  }
+  var mapped=sbMapInserviceRow(row);
+  mapped.success=true;
+  return mapped;
+}
+function sbUsernameList(raw){
+  if(raw==null)return null;
+  if(typeof raw==='string'){
+    try{raw=JSON.parse(raw);}catch(e){return [];}
+  }
+  return Array.isArray(raw)?raw:[];
+}
+function sbMergeAideUsernames(existing,incoming){
+  var out=[];
+  function add(v){
+    var s=String(v==null?'':v).trim();
+    if(!s)return;
+    if(out.some(function(x){return x.toLowerCase()===s.toLowerCase();}))return;
+    out.push(s);
+  }
+  (existing||[]).forEach(add);
+  (incoming||[]).forEach(add);
+  return out;
+}
+function sbMapAssignment(row){
+  if(!row)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  var topic=row.topic_id;
+  if(topic==null||String(topic).trim()==='')return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  var names=row.aide_usernames;
+  if(names==null)return {success:true,topicId:String(topic),aideUsernames:null,assignAll:true};
+  names=sbUsernameList(names)||[];
+  return {success:true,topicId:String(topic),aideUsernames:names,assignAll:false};
+}
+async function sbFetchAssignmentRow(){
+  var got=await sbRestGet('inservice_topic_assignment',[
+    ['select','*'],
+    ['org_id','eq.'+sbOrgId()]
+  ]);
+  if(!got.ok)return {error:got.error||'Could not load topic assignment.'};
+  var row=Array.isArray(got.data)&&got.data.length?got.data[0]:null;
+  return {row:row};
+}
+async function sbGetAssignedTopic(){
+  var got=await sbFetchAssignmentRow();
+  if(got.error)return {success:false,error:got.error};
+  if(!got.row)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+  return sbMapAssignment(got.row);
+}
+async function sbUpsertAssignment(topicId,aideUsernames){
+  var body={
+    org_id:sbOrgId(),
+    topic_id:(topicId==null||topicId==='')?null:String(topicId),
+    aide_usernames:aideUsernames===null?null:(Array.isArray(aideUsernames)?aideUsernames:[])
+  };
+  var got=await sbRestMutate('POST','inservice_topic_assignment',[['on_conflict','org_id']],body,'resolution=merge-duplicates,return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not save topic assignment.'};
+  var row=Array.isArray(got.data)&&got.data[0]?got.data[0]:body;
+  return sbMapAssignment(row);
+}
+async function sbSetAssignedTopic(topicId){
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
+  return sbUpsertAssignment(topicId,null);
+}
+async function sbAssignSelectedAides(topicId,aideUsernames){
+  if(topicId==null||String(topicId).trim()==='')return {success:false,error:'Topic id missing.'};
+  var incoming=sbUsernameList(aideUsernames)||[];
+  var got=await sbFetchAssignmentRow();
+  if(got.error)return {success:false,error:got.error};
+  var base=[];
+  var row=got.row;
+  if(row&&String(row.topic_id)===String(topicId)&&row.aide_usernames!=null)base=sbUsernameList(row.aide_usernames)||[];
+  return sbUpsertAssignment(topicId,sbMergeAideUsernames(base,incoming));
+}
+async function sbClearAssignedTopic(){
+  return sbUpsertAssignment(null,null);
+}
+async function sbInserviceDispatch(payload){
+  var action=payload&&payload.action;
+  try{
+    if(action==='get_inservices')return await sbListInserviceResults();
+    if(action==='get_inservice_result')return await sbGetInserviceResult(payload.id);
+    if(action==='delete_inservice_result'||action==='archive_inservice_result')return await sbArchiveInserviceResult(payload.id);
+    if(action==='admin_update_inservice_answers')return await sbUpdateInserviceAnswers(payload.id,payload.answers||[]);
+    if(action==='set_assigned_topic')return await sbSetAssignedTopic(payload.topicId);
+    if(action==='assign_inservice_aides')return await sbAssignSelectedAides(payload.topicId,payload.aideUsernames||[]);
+    if(action==='get_assigned_topic')return await sbGetAssignedTopic();
+    if(action==='clear_assigned_topic')return await sbClearAssignedTopic();
+  }catch(e){
+    return {success:false,error:(e&&e.message)||'Supabase request failed.'};
+  }
+  return {success:false,error:'Unsupported inservice action.'};
 }
 
 async function mgrLogin(){
@@ -5078,6 +5353,10 @@ function paintIsCurrentAssignment(data){
 function isAssignSheetsFailMsg(data,err){
   const raw=(data&&(data.error||data.message))||(err&&err.message)||'';
   const text=String(raw||'').trim();
+  if(evercareSbEnabled()){
+    if(text)return text;
+    return 'Could not update the inservice assignment.';
+  }
   if(text)return /^Sheets(\serror)?:/i.test(text)?text:('Sheets error: '+text);
   return 'Sheets error: could not assign topic.';
 }
@@ -5225,6 +5504,8 @@ function isISCompletedRecord(c){
   if(c.completedAt!=null&&String(c.completedAt).trim()!=='')return true;
   if(c.completed_at!=null&&String(c.completed_at).trim()!=='')return true;
   if(c.scoreCorrect!=null||c.ScoreCorrect!=null||c.scorePct!=null||c.ScorePct!=null||c.scorePercent!=null||c.scoreTotal!=null||c.ScoreTotal!=null)return true;
+  if(c.score_correct!=null||c.score_pct!=null||c.score_total!=null)return true;
+  if(c.submitted_at!=null&&String(c.submitted_at).trim()!=='')return true;
   return parseISAnswers(c).length>0;
 }
 function isISAnswerCorrect(q,aideAns){
@@ -5240,7 +5521,7 @@ function fillISScore(row,topic,answers){
   if(!row)return row;
   row.scoreCorrect=isNumOrNull(firstISField(row,['scoreCorrect','ScoreCorrect','correct','score_correct']));
   row.scoreTotal=isNumOrNull(firstISField(row,['scoreTotal','ScoreTotal','total','score_total']));
-  row.scorePct=isNumOrNull(firstISField(row,['scorePct','ScorePct','scorePercent','percent','score_percent']));
+  row.scorePct=isNumOrNull(firstISField(row,['scorePct','ScorePct','scorePercent','percent','score_percent','score_pct']));
   row.scorePercent=row.scorePct;
   if((row.scoreCorrect==null||row.scoreTotal==null)&&topic&&topic.questions&&answers&&answers.length){
     let ok=0;
@@ -5279,7 +5560,7 @@ function hydrateISComplianceRow(c,aide,topic){
     topicId:topicId,
     topicTitle:src.topicTitle||src.topic_title||topicObj.title||'',
     topicShort:topicObj.shortTitle||src.topicTitle||src.topic_title||'',
-    completedAt:firstISField(src,['completedAt','CompletedAt','completed_at','completed']),
+    completedAt:firstISField(src,['completedAt','CompletedAt','completed_at','submitted_at','completed']),
     status:firstISField(src,['status','Status'])||'',
     isCompleted:isISCompletedRecord(src)
   });
@@ -5399,6 +5680,15 @@ async function loadISCompliance(force){
       apiGetCached('get_users',null,force===true),
       apiPost({action:'get_inservices'}) // no includeArchived — Ace skips Status=Archived
     ]);
+    if(evercareSbEnabled()){
+      const sbFail=(assignData&&assignData.success===false&&(assignData.error||assignData.message))||(isData&&isData.success===false&&(isData.error||isData.message));
+      if(sbFail){
+        if(empty)empty.style.display='none';
+        isComplianceRows=[];
+        tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--danger)">'+escapeHtml(String(sbFail))+'</td></tr>';
+        return;
+      }
+    }
     const assignedTopicId=assignData&&assignData.success?isAssignTopicIdFrom(assignData):null;
     const assignedTopic=INSERVICES.find(t=>t.id==assignedTopicId);
     const aides=(usersData&&usersData.success&&usersData.data)?usersData.data.filter(u=>u.username):[];
