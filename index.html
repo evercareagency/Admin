@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
-<!-- sb dual-verify soft-fail 2026-09-23 v=sbdual flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- sb auth login 2026-09-24 v=sbauth flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -18,7 +18,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-23-sb-dual-admin">
+<meta name="admin-build" content="2026-09-24-sb-auth-login">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -638,6 +638,14 @@ else setupEverCarePWA();
       <span class="ec-install-cta-label" style="font-size:1.05rem">📱 Add to Home Screen</span>
       <span class="ec-install-cta-sub" style="font-size:0.72rem;font-weight:500;color:var(--muted)">Quick access — no App Store needed</span>
     </button>
+    <div class="field" id="mgrRoleField" style="display:none">
+      <label for="mgr_role">Account</label>
+      <select id="mgr_role" aria-label="Account">
+        <option value="Admin">Admin</option>
+        <option value="Scheduler">Scheduler</option>
+        <option value="Nurse">Nurse</option>
+      </select>
+    </div>
     <div class="field"><label>Password</label><div style="position:relative"><input type="password" id="mgr_pass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')mgrLogin()" style="padding-right:64px"><button type="button" onclick="togglePasswordVisibility('mgr_pass',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted,#6b7a90);font-size:0.78rem;font-weight:600;cursor:pointer;padding:4px 6px;font-family:inherit">Show</button></div></div>
     <button class="btn btn-navy btn-full" id="mgrLoginBtn" onclick="mgrLogin()">Sign In →</button>
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
@@ -2039,6 +2047,7 @@ warmUpSheets();
 
 document.addEventListener('DOMContentLoaded',function(){
   warmUpSheets();
+  if(typeof syncSbRoleField==='function')syncSbRoleField();
   if(typeof nciBindDateMask==='function')nciBindDateMask();
   if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();
 });
@@ -2289,6 +2298,7 @@ function isAdminSessionExpired(sess){
 }
 function clearAdminSession(){
   try{localStorage.removeItem(ADMIN_SESSION_KEY);}catch(e){}
+  try{localStorage.removeItem('evercare_sb_session');}catch(e2){}
 }
 function readAdminSession(){
   const sess=store.get(ADMIN_SESSION_KEY);
@@ -2390,9 +2400,13 @@ function enforceAdminSessionTimeout(){
 }
 function bootAdminPortal(){
   warmUpSheets();
+  syncSbRoleField();
   if(/[?&](?:printSample|certSample)=1(?:&|$)/.test(location.search||''))return;
   const sess=restoreAdminSession();
-  if(sess)openPortalHome(sess,{freshLogin:false});
+  if(sess){
+    if(evercareSbEnabled())hydrateSbSession();
+    openPortalHome(sess,{freshLogin:false});
+  }
 }
 
 function evercareSbEnabled(){
@@ -2403,6 +2417,11 @@ function evercareSbEnabled(){
   }catch(e){}
   return false;
 }
+function syncSbRoleField(){
+  var field=document.getElementById('mgrRoleField');
+  if(!field)return;
+  field.style.display=evercareSbEnabled()?'flex':'none';
+}
 function roleAccountSbEmail(role){
   var key=String(role||'').trim().toLowerCase();
   if(key==='admin')return 'admin@roles.evercare.local';
@@ -2410,18 +2429,63 @@ function roleAccountSbEmail(role){
   if(key==='nurse')return 'nurse@roles.evercare.local';
   return '';
 }
-// Soft dual-verify for Admin / Scheduler / Nurse only. Sheets stays source of truth.
-// Flag off (default) returns before any Supabase request. Failures never block Sign In.
-function softSbDualVerify(role,password){
+function sbPortalRoleFromProfile(role){
+  var key=String(role||'').trim().toLowerCase();
+  if(key==='admin')return 'Admin';
+  if(key==='scheduler')return 'Scheduler';
+  if(key==='nurse')return 'Nurse';
+  return '';
+}
+var SB_SESSION_KEY='evercare_sb_session';
+function readSbSession(){
   try{
-    if(!evercareSbEnabled())return;
-    var email=roleAccountSbEmail(role);
-    if(!email){
-      window.__sbDual={ok:false,error:'role has no supabase email'};
-      return;
-    }
-    window.__sbDual={ok:false,email:email};
-    fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
+    if(typeof window!=='undefined'&&window&&window.__sbSession&&window.__sbSession.access_token)return window.__sbSession;
+  }catch(e){}
+  try{
+    var raw=localStorage.getItem(SB_SESSION_KEY);
+    if(!raw)return null;
+    var sess=JSON.parse(raw);
+    if(!sess||typeof sess!=='object'||!sess.access_token)return null;
+    return sess;
+  }catch(e2){return null;}
+}
+function writeSbSession(sess){
+  try{localStorage.setItem(SB_SESSION_KEY,JSON.stringify(sess));}catch(e){}
+  try{window.__sbSession=sess;}catch(e2){}
+}
+function clearSbSession(){
+  try{localStorage.removeItem(SB_SESSION_KEY);}catch(e){}
+  try{if(typeof window!=='undefined'&&window)window.__sbSession=null;}catch(e2){}
+}
+function hydrateSbSession(){
+  var sess=readSbSession();
+  if(!sess)return null;
+  try{window.__sbSession=sess;}catch(e){}
+  return sess;
+}
+function sbUserIdFromToken(token){
+  var user=token&&token.user;
+  if(user&&user.id)return String(user.id);
+  var access=token&&token.access_token;
+  if(!access)return '';
+  var parts=String(access).split('.');
+  if(parts.length<2)return '';
+  try{
+    var b64=parts[1].replace(/-/g,'+').replace(/_/g,'/');
+    while(b64.length%4)b64+='=';
+    var json=JSON.parse(atob(b64));
+    return json&&json.sub?String(json.sub):'';
+  }catch(e){return '';}
+}
+function sbAuthErrorMessage(data,status){
+  var msg=(data&&(data.error_description||data.msg||data.message||data.error||data.hint))||('HTTP '+status);
+  if(msg&&typeof msg==='object')msg=msg.message||JSON.stringify(msg);
+  return String(msg||('HTTP '+status));
+}
+async function sbPasswordGrant(email,password){
+  var res;
+  try{
+    res=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type=password',{
       method:'POST',
       headers:{
         apikey:SUPABASE_ANON_KEY,
@@ -2429,24 +2493,114 @@ function softSbDualVerify(role,password){
         'Content-Type':'application/json'
       },
       body:JSON.stringify({email:email,password:password})
-    }).then(function(res){
-      return res.text().then(function(raw){
-        var data=null;
-        try{data=raw?JSON.parse(raw):null;}catch(e){}
-        if(res.ok&&data&&data.access_token){
-          window.__sbDual={ok:true,email:email};
-        }else{
-          var msg=(data&&(data.error_description||data.msg||data.message||data.error))||('HTTP '+res.status);
-          if(msg&&typeof msg==='object')msg=msg.message||JSON.stringify(msg);
-          window.__sbDual={ok:false,error:String(msg),email:email};
-        }
-      });
-    }).catch(function(err){
-      window.__sbDual={ok:false,error:String(err&&err.message||err||'supabase'),email:email};
     });
   }catch(err){
-    try{window.__sbDual={ok:false,error:String(err&&err.message||err||'supabase')};}catch(e2){}
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase'),email:email};
   }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase'),email:email};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(res.ok&&data&&data.access_token)return {ok:true,email:email,token:data};
+  return {ok:false,email:email,error:sbAuthErrorMessage(data,res.status),status:res.status};
+}
+async function sbLoadProfile(accessToken,userId){
+  var url=SUPABASE_URL+'/rest/v1/profiles?id=eq.'+encodeURIComponent(userId)+'&select=id,org_id,role,display_name,email,is_active';
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'GET',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+accessToken,
+        Accept:'application/json'
+      }
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
+  var row=Array.isArray(data)?data[0]:data;
+  if(!row||!row.id)return {ok:false,error:'profile missing'};
+  if(row.is_active===false)return {ok:false,error:'profile inactive'};
+  var role=sbPortalRoleFromProfile(row.role);
+  if(!role)return {ok:false,error:'profile role'};
+  return {ok:true,profile:row,role:role};
+}
+// Flag on: this is the login. Flag off returns before any Supabase request.
+async function sbAuthRoleLogin(role,password){
+  if(!evercareSbEnabled())return {ok:false,skipped:true};
+  var email=roleAccountSbEmail(role);
+  if(!email){
+    try{window.__sbDual={ok:false,error:'role has no supabase email'};}catch(e){}
+    return {ok:false,error:'role has no supabase email'};
+  }
+  clearSbSession();
+  try{window.__sbDual={ok:false,email:email};}catch(e0){}
+  var signed=await sbPasswordGrant(email,password);
+  if(!signed.ok){
+    try{window.__sbDual={ok:false,error:String(signed.error||'login_failed'),email:email};}catch(e1){}
+    return signed;
+  }
+  var userId=sbUserIdFromToken(signed.token);
+  if(!userId){
+    try{window.__sbDual={ok:false,error:'missing user',email:email};}catch(e2){}
+    return {ok:false,error:'missing user',email:email};
+  }
+  var loaded=await sbLoadProfile(signed.token.access_token,userId);
+  if(!loaded.ok){
+    try{window.__sbDual={ok:false,error:String(loaded.error||'profile'),email:email};}catch(e3){}
+    return loaded;
+  }
+  if(loaded.role!==sbPortalRoleFromProfile(role)){
+    try{window.__sbDual={ok:false,error:'role mismatch',email:email};}catch(e4){}
+    return {ok:false,error:'role mismatch',email:email};
+  }
+  var profile=loaded.profile;
+  var user=signed.token.user||{};
+  var stored={
+    access_token:signed.token.access_token,
+    refresh_token:signed.token.refresh_token||'',
+    expires_in:signed.token.expires_in==null?null:signed.token.expires_in,
+    expires_at:signed.token.expires_at==null?null:signed.token.expires_at,
+    token_type:signed.token.token_type||'bearer',
+    user:{id:userId,email:user.email||email},
+    email:email,
+    profile:{
+      id:profile.id,
+      org_id:profile.org_id,
+      role:profile.role,
+      display_name:profile.display_name||'',
+      email:profile.email||email,
+      is_active:profile.is_active!==false
+    }
+  };
+  writeSbSession(stored);
+  try{window.__sbDual={ok:true,email:email,role:loaded.role};}catch(e5){}
+  return {ok:true,email:email,role:loaded.role,profile:stored.profile};
+}
+function sbSignOut(){
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return;
+  try{
+    fetch(SUPABASE_URL+'/auth/v1/logout',{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        'Content-Type':'application/json'
+      },
+      body:'{}'
+    }).catch(function(){});
+  }catch(e){}
 }
 
 async function mgrLogin(){
@@ -2459,10 +2613,30 @@ async function mgrLogin(){
   errEl.style.display='none';
   if(btn){btn.disabled=true;btn.textContent='Signing in…';}
   try{
+    // Flag on skips Sheets admin_login. Auth with the account email is the login.
+    if(evercareSbEnabled()){
+      const roleEl=document.getElementById('mgr_role');
+      const picked=roleEl&&roleEl.value?roleEl.value:'';
+      const sb=await sbAuthRoleLogin(picked,pwd);
+      if(sb&&sb.ok&&isPortalRole(sb.role)){
+        const passEl=document.getElementById('mgr_pass');
+        if(passEl)passEl.value='';
+        const display=(sb.profile&&(sb.profile.display_name||sb.profile.email))||sb.role;
+        const sess=startAdminSession({
+          role:sb.role,
+          username:display,
+          name:sb.role==='Nurse'?(sb.profile&&sb.profile.display_name||'Nurse'):(sb.profile&&sb.profile.display_name||'')
+        });
+        openPortalHome(sess,{freshLogin:true});
+        return;
+      }
+      errEl.textContent=sb&&sb.network?'Connection error. Please try again.':'Incorrect password.';
+      errEl.style.display='block';
+      return;
+    }
     const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_login',password:pwd})});
     const data=await res.json();
     if(data.success&&isPortalRole(data.role)){
-      try{softSbDualVerify(data.role,pwd);}catch(sbErr){}
       const passEl=document.getElementById('mgr_pass');
       if(passEl)passEl.value='';
       const sess=startAdminSession(data);
@@ -2512,7 +2686,7 @@ async function renderActivityLog(){
   }
 }
 
-function adminLogout(){logActivity('Logged out');clearAdminSession();currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
+function adminLogout(){logActivity('Logged out');try{sbSignOut();}catch(e){}clearSbSession();clearAdminSession();currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
 
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
