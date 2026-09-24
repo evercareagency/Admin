@@ -26,7 +26,7 @@ function extractFn(src, sig){
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-size">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut">'), 'admin-build meta');
 assert.ok(html.includes('v=sbpdfmake9c24'), 'make/refresh marker is greppable');
 assert.ok(html.includes('v=sbpdfsize25'), 'size marker is greppable');
 assert.ok(html.includes('var SB_PDF_MAX_BYTES=25*1024*1024'), 'client upload guard is 25 MiB');
@@ -37,7 +37,10 @@ assert.ok(!html.includes('/functions/v1'), 'no Edge Function');
 assert.ok(!/\.rpc\(/.test(html), 'no RPC render');
 const byteFn = extractFn(html, 'async function sbTimesheetPdfBytes(rec)');
 assert.ok(byteFn, 'client byte helper');
-assert.ok(byteFn.indexOf('renderTimesheetPdfBlob') >= 0 && byteFn.indexOf('renderTimesheetPdfBlob') < byteFn.indexOf('sbSheetsTimesheetPdfBytes'), 'overlay runs before Sheets fallback');
+assert.ok(byteFn.indexOf('renderTimesheetPdfBlob') >= 0, 'overlay is the PDF byte source');
+assert.ok(!byteFn.includes('sbSheetsTimesheetPdfBytes') && !byteFn.includes('get_timesheet_pdf'), 'default PDF bytes do not call /exec');
+assert.ok(html.includes('Sunday Drive TimesheetArchive stays ON'), 'Drive archive dual stays on');
+assert.ok(html.includes('sheets-cut-v1'), 'ace cut contract marker');
 
 const opener = extractFn(html, 'function openTimesheetPdf(id)');
 const flagOffTail = opener.slice(opener.lastIndexOf('if(!requireTimesheetSignatures(r))return;'));
@@ -79,7 +82,6 @@ const fns = [
   'function sbWrapPdfBytes(bytes)',
   'function sbB64ToBytes(b64)',
   'function sbPdfBytesFromUnknown(bytes)',
-  'async function sbSheetsTimesheetPdfBytes(row)',
   'async function sbTimesheetPdfBytes(rec)',
   'async function sbEnsureTimesheetStoragePdf(row)',
   'function timesheetPdfAvailable(r)'
@@ -177,7 +179,7 @@ const missing = harness({
   session: session,
   responses: [{status: 200, raw: '[]'}]
 });
-const off = harness({search: '', session: session, responses: []});
+const off = harness({search: '?sheets=1', session: session, responses: []});
 const refreshed = harness({
   search: '?sb=1',
   session: session,
@@ -239,7 +241,7 @@ function runUpload(){
       {status: 500, raw: JSON.stringify({message: 'patch denied'})}
     ]
   });
-  const flagOff = harness({search: '', session: session, responses: []});
+  const flagOff = harness({search: '?sheets=1', session: session, responses: []});
   const ensured = harness({
     search: '?sb=1',
     session: session,
@@ -351,15 +353,11 @@ function runUpload(){
     blocked.box.renderTimesheetPdfBlob = function(){return Promise.reject(new Error('overlay blocked'));};
     const blockedRow = {id: tsId, pdfLink: driveLink, pdfStoragePath: ''};
     return blocked.box.sbEnsureTimesheetStoragePdf(blockedRow).then(function(fromSheets){
-      assert.strictEqual(fromSheets.ok, true, 'Sheets bytes still upload when the overlay is blocked');
-      assert.ok(fromSheets.url.indexOf('token=sheets') > 0, fromSheets.url);
-      const sheetsCall = blocked.calls[0];
-      assert.ok(sheetsCall.url.indexOf('/exec') > 0, sheetsCall.url);
-      assert.deepStrictEqual(bodyOf(sheetsCall), {action: 'get_timesheet_pdf', id: tsId, timesheetId: tsId});
-      assert.strictEqual(blocked.calls[1].init.method, 'POST');
-      assert.ok(blocked.calls[1].url.indexOf('/storage/v1/object/evercare-pdfs/') > 0);
-      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0;}));
-      assert.strictEqual(blockedRow.pdfLink, driveLink);
+      assert.strictEqual(fromSheets.ok, false, 'overlay miss is a soft fail');
+      assert.strictEqual(fromSheets.soft, true);
+      assert.strictEqual(blocked.calls.length, 0, 'default PDF miss must not call /exec');
+      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0 || c.url.indexOf('script.google.com') >= 0;}));
+      assert.strictEqual(blockedRow.pdfLink, driveLink, 'Drive pdf_link stays; TimesheetArchive is not disabled');
       console.log('admin-sb-pdf-test: ok');
       return runBrowser();
     });
@@ -564,7 +562,7 @@ async function runBrowser(){
     }, admin, sb);
     const onHits = [];
     await install(onPage, onHits);
-    await onPage.goto('http://127.0.0.1:' + port + '/index.html?sb=1&v=sbpdf', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await onPage.goto('http://127.0.0.1:' + port + '/index.html?v=sbcut1', {waitUntil: 'domcontentloaded', timeout: 20000});
     await onPage.waitForFunction(function(){
       const btn = document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]');
       return btn && btn.textContent.indexOf('View') >= 0;
@@ -605,7 +603,7 @@ async function runBrowser(){
     }, admin);
     const offHits = [];
     await install(offPage, offHits);
-    await offPage.goto('http://127.0.0.1:' + port + '/index.html', {waitUntil: 'domcontentloaded', timeout: 20000});
+    await offPage.goto('http://127.0.0.1:' + port + '/index.html?sheets=1', {waitUntil: 'domcontentloaded', timeout: 20000});
     await offPage.waitForFunction(function(){
       return !!document.querySelector('#tsBody button[onclick^="openTimesheetPdf"]');
     }, {timeout: 8000});

@@ -24,7 +24,14 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-size">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut">'), 'admin-build meta');
+assert.ok(html.includes('v=sbcut1'), 'sbcut marker');
+assert.ok(html.includes('sheets=1'), 'sheets rollback query');
+assert.ok(html.includes('evercare_sheets'), 'sheets rollback storage key');
+assert.ok(html.includes("currentAdminRole==='Nurse'"), 'nurse portal stays on Sheets');
+const sendBroadcast = extractFn(html, 'function sendBroadcast()');
+assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broadcast stays local');
+assert.ok(!/supabase|evercareSbEnabled|SHEETS_URL/.test(sendBroadcast), 'broadcast is not on the sbcut');
 assert.ok(html.includes("const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';"), 'supabase url');
 assert.ok(!html.includes('lvaglmztnlnsrhlluayz'), 'abandoned project ref must not appear');
 assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
@@ -199,8 +206,28 @@ function sheetsLoginHarness(opts){
 
 const uid = '11111111-1111-1111-1111-111111111111';
 
+function flagBox(search, storage){
+  const mem = Object.assign({}, storage || {});
+  const box = {
+    location: {search: search || ''},
+    localStorage: {
+      getItem: function(k){return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null;}
+    }
+  };
+  vm.createContext(box);
+  vm.runInContext(extractFn(html, 'function evercareSbEnabled()'), box);
+  return box;
+}
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('')), true, 'default is Supabase');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=0')), true, 'missing sb=1 does not select Sheets');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=1')), true, 'old sb=1 query stays on');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('', {evercare_sb:'1'})), true, 'old evercare_sb key is not required');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sheets=1')), false, 'query rollback');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?v=1', {evercare_sheets:'1'})), false, 'storage rollback');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=1', {evercare_sheets:'1'})), false, 'sheets force wins');
+
 Promise.all([
-  runAuth({role:'Admin', password:'pw'}),
+  runAuth({role:'Admin', password:'pw', search:'?sheets=1'}),
   runAuth({role:'Scheduler', password:'sched-pw', search:'?sb=1', responses:[
     {ok:true, status:200, raw: JSON.stringify(tokenBody({email:'scheduler@roles.evercare.local'}))},
     {ok:true, status:200, raw: JSON.stringify(profileBody({role:'scheduler', email:'scheduler@roles.evercare.local', display_name:'Sched Person'}))}
@@ -218,7 +245,7 @@ Promise.all([
   runAuth({role:'Admin', password:'x', search:'?sb=1', responses:[
     {ok:false, status:500, raw:'<html>nope</html>'}
   ]}),
-  runAuth({role:'Admin', password:'x', search:'?sb=0', storage:{evercare_sb:'0', evercare_sb_session:'{"access_token":"keep"}'}}),
+  runAuth({role:'Admin', password:'x', search:'?sheets=1', storage:{evercare_sheets:'1', evercare_sb:'0', evercare_sb_session:'{"access_token":"keep"}'}}),
   runAuth({role:'Aide', password:'x', search:'?sb=1'}),
   runAuth({role:'Admin', password:'secret', search:'?sb=1', responses:[
     {ok:true, status:200, raw: JSON.stringify(tokenBody({email:'admin@roles.evercare.local'}))},
@@ -306,7 +333,7 @@ Promise.all([
   assert.strictEqual(htmlErr.mem.evercare_sb_session, undefined);
 
   const bothOff = results[6];
-  assert.strictEqual(bothOff.calls.length, 0, 'sb=0 and evercare_sb=0 stay off');
+  assert.strictEqual(bothOff.calls.length, 0, 'sheets=1 and evercare_sheets=1 stay off');
   assert.strictEqual(bothOff.out.skipped, true);
   assert.strictEqual(bothOff.mem.evercare_sb_session, '{"access_token":"keep"}', 'flag off does not clear a stored jwt');
 
@@ -491,7 +518,7 @@ async function runBrowser(){
   try{
     const desktop={width:1280,height:800};
     const phone={width:390,height:844,isMobile:true,hasTouch:true,deviceScaleFactor:2};
-    const off=await open(desktop,'?v=sheets');
+    const off=await open(desktop,'?sheets=1&v=sheets');
     const offField=await off.page.$eval('#mgrRoleField',function(el){return getComputedStyle(el).display;});
     assert.strictEqual(offField,'none','flag off hides the account picker');
     await off.page.type('#mgr_pass','sheets-secret');
@@ -517,8 +544,8 @@ async function runBrowser(){
     assert.strictEqual(offState.role,'Admin');
     await off.context.close();
 
-    for(const vp of [{name:'desktop',size:desktop,role:'Scheduler',home:'admin'},{name:'phone',size:phone,role:'Nurse',home:'nurse'}]){
-      const on=await open(vp.size,'?sb=1&v='+vp.name);
+    for(const vp of [{name:'desktop',size:desktop,role:'Scheduler',home:'admin',search:'?v=sbcut1'},{name:'phone',size:phone,role:'Nurse',home:'nurse',search:'?sb=1&v=phone'}]){
+      const on=await open(vp.size,vp.search);
       const field=await on.page.$eval('#mgrRoleField',function(el){return getComputedStyle(el).display;});
       assert.strictEqual(field,'flex',vp.name+' shows the account picker');
       await on.page.select('#mgr_role',vp.role);
