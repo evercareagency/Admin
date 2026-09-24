@@ -14,6 +14,7 @@
 <!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 client-overlay no-edge GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 superseded by v=sbcut1b -->
 <!-- timesheet pdf size 2026-09-24 v=sbpdfsize25 jpeg overlay guard 25MiB superseded by v=sbcut1b -->
 <!-- inservice sb dual 2026-09-24 v=sbcut1b topic assignment upsert omits uuid id; topic_id stays text -->
+<!-- timesheet pdf 1 page + desk + cert lock 2026-09-24 v=pdf1p Letter overlay scaled inside the page so the agency line stays on page 1. Archive PATCH is_active=false only. Delete PATCH is_active=false + deleted_at. Restore archive is_active=true where deleted_at is null. Restore trash is_active=true + deleted_at null. No hard DELETE. Office cert track Personal Care / Home Making on cream; signatures on the same cream. -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
 <!-- login warm mid-body /exec 2026-09-22 v=warmbody caregiver-parity once-flag -->
@@ -24,7 +25,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-sb-cut-hotfix">
+<meta name="admin-build" content="2026-09-24-pdf-1page-actions">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -118,6 +119,18 @@ textarea{resize:vertical;min-height:80px;}
 .mbtn-cancel{background:var(--off);color:var(--navy);border:1.5px solid var(--border);}
 .mbtn-confirm{background:var(--teal);color:white;}.mbtn-confirm:hover{background:var(--teal-dark);}
 .mbtn-danger{background:var(--danger);color:white;}
+.ts-detail-bar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+#tsDetailActions button[hidden],#tsDetailActions .ts-overflow-menu button[hidden]{display:none !important;}
+.ts-overflow{position:relative;}
+.ts-overflow-menu{position:absolute;right:0;top:calc(100% + 4px);min-width:210px;background:#fff;border:1.5px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:30;padding:6px;display:flex;flex-direction:column;gap:2px;}
+.ts-overflow-menu[hidden]{display:none !important;}
+.ts-overflow-menu button{width:100%;text-align:left;background:#fff;color:var(--navy);border:0;border-radius:6px;padding:9px 10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;}
+.ts-overflow-menu button:hover{background:var(--off);}
+.ts-overflow-menu .ts-overflow-delete{color:var(--danger);}
+.ts-desk{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;}
+.ts-desk button{min-height:36px;padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;}
+.ts-desk button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.mbtn-archive{background:#eef2f6;color:#1a2744;border:1.5px solid #c5d0dc;}
 .mbtn-warn{background:var(--warn);color:white;}
 .det-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
 @media(max-width:700px){.det-grid{grid-template-columns:1fr 1fr;}}
@@ -330,7 +343,10 @@ body.ts-print-open{overflow:hidden;}
   .ts-print-sheet{width:100%;height:auto;min-height:0;aspect-ratio:8.5/11;padding:0;}
 }
 /* iOS Safari Print Options: show ONLY the form sheet. Overlay is static.
-   Screen rules use position:fixed + body overflow:hidden — those blank iOS preview. */
+   Screen rules use position:fixed + body overflow:hidden — those blank iOS preview.
+   The agency line sits ~10.6in down the blank. A full 11in box at 100% Letter
+   spills that line onto page 2, so print draws the overlay at 96% of Letter. */
+@page{size:letter;margin:0;}
 @media print{
   html,body,body.ts-print-open,html.ts-printing,html.ts-printing body{
     background:#fff !important;
@@ -425,15 +441,26 @@ body.ts-print-open{overflow:hidden;}
     color:#111 !important;
   }
   @page{size:letter;margin:0;}
+  html.ts-printing body.ts-sheet-detached > #tsPrintOverlay{
+    display:none !important;
+    height:0 !important;
+    max-height:0 !important;
+    overflow:hidden !important;
+    visibility:hidden !important;
+  }
   html.ts-printing body > #tsPrintSheet,
   #tsPrintSheet,.ts-print-sheet{
-    width:8.5in !important;
-    height:11in !important;
-    max-height:11in !important;
+    width:8.16in !important;
+    height:10.56in !important;
+    max-height:10.56in !important;
+    margin:0 auto !important;
     padding:0 !important;
     overflow:hidden !important;
     display:block !important;
     aspect-ratio:8.5/11 !important;
+    page-break-after:avoid !important;
+    break-after:avoid-page !important;
+    break-inside:avoid !important;
   }
   .ts-blank{
     display:block !important;
@@ -702,7 +729,7 @@ else setupEverCarePWA();
       <!-- TIMESHEETS TAB -->
       <div class="tab-panel active" id="tab_timesheets">
         <div class="page-hdr">
-          <div><h1>Timesheets</h1><p>All submitted caregiver timesheets</p></div>
+          <div><h1>Timesheets</h1><p id="tsDeskSub">Active submitted caregiver timesheets</p></div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost" id="exportAllPdfsBtn" onclick="exportAllAsPDFs()">📄 Export all as PDFs</button>
             <button class="btn btn-teal" onclick="renderTimesheets()">🔄 Refresh</button>
@@ -715,6 +742,11 @@ else setupEverCarePWA();
           <div class="stat-card"><div class="stat-num" id="st_aides">—</div><div class="stat-lbl">Active Aides</div></div>
         </div>
         <div class="card">
+          <div class="ts-desk" role="tablist" aria-label="Timesheet desk">
+            <button type="button" class="on" data-ts-desk="active" role="tab" aria-selected="true" onclick="setTimesheetDesk('active')">Active</button>
+            <button type="button" data-ts-desk="archived" role="tab" aria-selected="false" onclick="setTimesheetDesk('archived')">Archived</button>
+            <button type="button" data-ts-desk="deleted" role="tab" aria-selected="false" onclick="setTimesheetDesk('deleted')">Recently deleted</button>
+          </div>
           <div class="search-bar"><input type="text" id="tsSearch" placeholder="🔍 Search by aide, client or week..." oninput="paintTimesheets()"></div>
           <div style="overflow-x:auto">
             <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>PDF</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
@@ -1651,14 +1683,21 @@ Call (216) 377-5991 with any questions.</textarea>
   <div class="modal">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <h3 id="detailTitle" style="margin-bottom:0">Timesheet Detail</h3>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="mbtn mbtn-warn" onclick="showCorrectionPanel()">⚠️ Request Correction</button>
-        <button class="mbtn" style="background:var(--success);color:white" onclick="saveEdits()">💾 Save Edits</button>
-        <button class="mbtn" style="background:#6b3fa0;color:white" onclick="collectTimesheetSignatures()">✍️ Collect Signature</button>
-        <button class="mbtn mbtn-confirm" onclick="printTS()">🖨️ Print timesheet</button>
-        <button class="mbtn" style="background:var(--navy);color:white" onclick="downloadTSPDF()">⬇️ Save as PDF File</button>
-        <button class="mbtn mbtn-danger" onclick="deleteRec()">🗄️ Archive</button>
-        <button class="mbtn mbtn-cancel" onclick="closeModal('detailModal')">✕ Close</button>
+      <div class="ts-detail-bar" id="tsDetailActions">
+        <button type="button" class="mbtn" id="tsDetailPdfBtn" style="background:var(--navy);color:white" title="View and save PDF" onclick="downloadTSPDF()">📄 PDF</button>
+        <button type="button" class="mbtn mbtn-archive" id="tsDetailArchiveBtn" onclick="deleteRec()">🗄️ Archive</button>
+        <button type="button" class="mbtn mbtn-confirm" id="tsDetailRestoreBtn" hidden onclick="restoreCurrentTimesheet()">↺ Restore</button>
+        <button type="button" class="mbtn mbtn-warn" id="tsDetailCorrectBtn" onclick="showCorrectionPanel()">⚠️ Request Correction</button>
+        <div class="ts-overflow">
+          <button type="button" class="mbtn mbtn-cancel" id="tsDetailMoreBtn" aria-expanded="false" aria-controls="tsDetailMoreMenu" onclick="toggleTimesheetMore(event)">More</button>
+          <div class="ts-overflow-menu" id="tsDetailMoreMenu" hidden>
+            <button type="button" id="tsDetailMoreSig" onclick="closeTimesheetMore();collectTimesheetSignatures()">Collect Signature</button>
+            <button type="button" id="tsDetailMoreSave" onclick="closeTimesheetMore();saveEdits()">Save Edits</button>
+            <button type="button" id="tsDetailMorePrint" onclick="closeTimesheetMore();printTS()">Print</button>
+            <button type="button" class="ts-overflow-delete" id="tsDetailMoreDelete" onclick="closeTimesheetMore();trashTimesheet()">Delete…</button>
+          </div>
+        </div>
+        <button type="button" class="mbtn mbtn-cancel" onclick="closeModal('detailModal')">✕ Close</button>
       </div>
     </div>
     <div id="detailBody"></div>
@@ -2735,8 +2774,44 @@ function sbMapTimesheet(row){
     days:row.days||{},
     status:row.status||'submitted',
     correctionDays:Array.isArray(row.correction_days)?row.correction_days:(row.correction_days?row.correction_days:[]),
-    correctionNote:row.correction_note||''
+    correctionNote:row.correction_note||'',
+    isActive:row.is_active!==false,
+    is_active:row.is_active!==false,
+    deletedAt:row.deleted_at||'',
+    deleted_at:row.deleted_at||null
   };
+}
+function sbTimesheetDesk(view){
+  var v=typeof view==='object'&&view?String(view.timesheetDesk||view.desk||'active'):String(view||'active');
+  if(v==='archived'||v==='deleted')return v;
+  return 'active';
+}
+function sbTimesheetListPairs(view){
+  var desk=sbTimesheetDesk(view);
+  var pairs=[
+    ['select','*'],
+    ['status','not.ilike.backup'],
+    ['status','not.ilike.draft']
+  ];
+  if(desk==='archived'){
+    pairs.push(['is_active','eq.false'],['deleted_at','is.null'],['order','submitted_at.desc']);
+  }else if(desk==='deleted'){
+    pairs.push(['is_active','eq.false'],['deleted_at','not.is.null'],['order','deleted_at.desc']);
+  }else{
+    pairs.push(['is_active','eq.true'],['deleted_at','is.null'],['order','submitted_at.desc']);
+  }
+  return pairs;
+}
+function sbTimesheetOnDesk(row, view){
+  if(!row)return false;
+  var status=String(row.status||'').trim().toLowerCase();
+  if(status==='backup'||status==='draft')return false;
+  var deleted=!!(row.deleted_at||row.deletedAt);
+  var active=row.is_active!==false&&row.isActive!==false;
+  var desk=sbTimesheetDesk(view);
+  if(desk==='deleted')return active===false&&deleted;
+  if(desk==='archived')return active===false&&!deleted;
+  return active&&!deleted;
 }
 async function sbRefreshSession(sess){
   if(!sess||!sess.refresh_token)return null;
@@ -2829,19 +2904,21 @@ async function sbApiList(payload){
       var clientRows=Array.isArray(clients.data)?clients.data:[];
       return {success:true,data:clientRows.map(sbMapClient)};
     }
-    var sheets=await sbRestGet('timesheets',[
-      ['select','*'],
-      ['is_active','eq.true'],
-      ['status','not.ilike.backup'],
-      ['status','not.ilike.draft'],
-      ['order','submitted_at.desc']
-    ]);
+    var desk=sbTimesheetDesk(payload);
+    var sheets=await sbRestGet('timesheets', sbTimesheetListPairs(desk));
+    if(!sheets.ok&&desk==='active'&&/deleted_at/i.test(String(sheets.error||''))){
+      sheets=await sbRestGet('timesheets',[
+        ['select','*'],
+        ['is_active','eq.true'],
+        ['status','not.ilike.backup'],
+        ['status','not.ilike.draft'],
+        ['order','submitted_at.desc']
+      ]);
+    }
     if(!sheets.ok)return {success:false,error:sheets.error||'timesheets',httpStatus:sheets.status||0};
     var sheetRows=Array.isArray(sheets.data)?sheets.data:[];
     return {success:true,data:sheetRows.filter(function(row){
-      if(!row||row.is_active===false)return false;
-      var status=String(row.status||'').trim().toLowerCase();
-      return status!=='backup'&&status!=='draft';
+      return sbTimesheetOnDesk(row, desk);
     }).map(sbMapTimesheet)};
   }catch(err){
     return {success:false,error:String(err&&err.message||err||'supabase')};
@@ -3793,7 +3870,8 @@ function sbIsAdminWriteAction(action){
     ||action==='reset_temp_password'||action==='reset_aide_temp_password'
     ||action==='add_client'||action==='update_client'
     ||action==='archive_client'||action==='delete_client'
-    ||action==='update'||action==='send_correction'||action==='delete';
+    ||action==='update'||action==='send_correction'||action==='delete'
+    ||action==='restore_timesheet'||action==='trash_timesheet'||action==='restore_trashed_timesheet';
 }
 function sbOptionalText(v){
   if(v==null)return null;
@@ -4151,9 +4229,44 @@ async function sbAdminSendCorrection(payload){
 async function sbAdminSoftDeleteTimesheet(payload){
   var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
   if(!id)return {success:false,error:'Timesheet id missing.'};
+  // Archive keeps the row forever. is_active=false only — never deleted_at, never DELETE.
   var got=await sbRestPatchActive('timesheets', id);
   if(!got.ok)return {success:false,error:got.error||'Could not archive timesheet.',httpStatus:got.status||0,is_active:null};
   return sbConfirmedArchive(sbArchiveRepresentation(got.data), id);
+}
+async function sbAdminPatchTimesheet(id, body, extraPairs){
+  var pairs=[['id','eq.'+id]];
+  (extraPairs||[]).forEach(function(pair){pairs.push(pair);});
+  var got=await sbRestMutate('PATCH','timesheets',pairs,body,'return=representation');
+  if(!got.ok)return {ok:false,error:got.error||'Could not update timesheet.',status:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {ok:false,error:'Timesheet not found.',status:got.status||0};
+  return {ok:true,row:row};
+}
+async function sbAdminRestoreTimesheet(payload){
+  var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
+  if(!id)return {success:false,error:'Timesheet id missing.'};
+  var got=await sbAdminPatchTimesheet(id,{is_active:true},[['deleted_at','is.null']]);
+  if(!got.ok)return {success:false,error:got.error||'Could not restore timesheet.',httpStatus:got.status||0,is_active:null};
+  if(got.row.is_active===false)return {success:false,error:'Restore was not confirmed',is_active:false};
+  return {success:true,id:got.row.id||id,is_active:true,deleted_at:got.row.deleted_at||null};
+}
+async function sbAdminTrashTimesheet(payload){
+  var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
+  if(!id)return {success:false,error:'Timesheet id missing.'};
+  var stamp=new Date().toISOString();
+  var got=await sbAdminPatchTimesheet(id,{is_active:false,deleted_at:stamp});
+  if(!got.ok)return {success:false,error:got.error||'Could not move timesheet to Recently deleted.',httpStatus:got.status||0};
+  if(!(got.row.is_active===false&&got.row.deleted_at))return {success:false,error:'Delete was not confirmed',is_active:got.row.is_active,deleted_at:got.row.deleted_at||null};
+  return {success:true,id:got.row.id||id,is_active:false,deleted_at:got.row.deleted_at};
+}
+async function sbAdminRestoreTrashedTimesheet(payload){
+  var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
+  if(!id)return {success:false,error:'Timesheet id missing.'};
+  var got=await sbAdminPatchTimesheet(id,{is_active:true,deleted_at:null});
+  if(!got.ok)return {success:false,error:got.error||'Could not restore timesheet.',httpStatus:got.status||0};
+  if(got.row.is_active===false||got.row.deleted_at)return {success:false,error:'Restore was not confirmed',is_active:got.row.is_active===true,deleted_at:got.row.deleted_at||null};
+  return {success:true,id:got.row.id||id,is_active:true,deleted_at:null};
 }
 async function sbAdminWriteDispatch(payload){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
@@ -4169,6 +4282,9 @@ async function sbAdminWriteDispatch(payload){
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
     if(action==='update')return await sbAdminUpdateTimesheet(payload);
     if(action==='send_correction')return await sbAdminSendCorrection(payload);
+    if(action==='restore_timesheet')return await sbAdminRestoreTimesheet(payload);
+    if(action==='trash_timesheet')return await sbAdminTrashTimesheet(payload);
+    if(action==='restore_trashed_timesheet')return await sbAdminRestoreTrashedTimesheet(payload);
     return await sbAdminSoftDeleteTimesheet(payload);
   }catch(err){
     return {success:false,error:String(err&&err.message||err||'supabase')};
@@ -4260,11 +4376,45 @@ async function renderActivityLog(){
 
 function adminLogout(){logActivity('Logged out');try{sbSignOut();}catch(e){}try{sbInvalidateListCaches();}catch(e2){}clearSbSession();clearAdminSession();currentAdminRole=null;currentAdminUsername=null;currentNurseName=null;nurseSigPads={};if(typeof resetNewClientIntake==='function')resetNewClientIntake();setNurseAlertBadge(0);showScreen('loginScreen');}
 
+let tsDesk='active';
+function setTimesheetDesk(view){
+  tsDesk=(view==='archived'||view==='deleted')?view:'active';
+  document.querySelectorAll('[data-ts-desk]').forEach(function(btn){
+    const on=btn.getAttribute('data-ts-desk')===tsDesk;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-selected', on?'true':'false');
+  });
+  const sub=document.getElementById('tsDeskSub');
+  if(sub){
+    sub.textContent=tsDesk==='archived'
+      ?'Archived timesheets stay on file. Restore puts them back on the active desk.'
+      :tsDesk==='deleted'
+        ?'Recently deleted timesheets can be restored for 7 days. After that the nightly cleanup removes the row and its PDF.'
+        :'Active submitted caregiver timesheets';
+  }
+  renderTimesheets();
+}
+function timesheetRecordDeleted(r){
+  return !!(r&&(r.deletedAt||r.deleted_at));
+}
+function timesheetRecordArchived(r){
+  return !!(r&&r.isActive===false&&!timesheetRecordDeleted(r));
+}
+function timesheetRowDeskButton(r){
+  const id=String(r&&r.id!=null?r.id:'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  if(tsDesk==='deleted'||timesheetRecordDeleted(r)){
+    return '<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="restoreTrashedTimesheet(\''+id+'\')">↺ Restore</button>';
+  }
+  if(tsDesk==='archived'||timesheetRecordArchived(r)){
+    return '<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="restoreArchivedTimesheet(\''+id+'\')">↺ Restore</button>';
+  }
+  return '<button type="button" class="btn btn-sm mbtn-archive" title="Archive" aria-label="Archive" onclick="quickDelete(\''+id+'\')">🗄️</button>';
+}
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
   if(tbody)tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr>';
   try{
-    const data=await apiPost({action:'get_all'});
+    const data=await apiPost({action:'get_all',timesheetDesk:tsDesk});
     if(data.success&&data.data){
       allRecords=data.data.filter(r=>r.submitted).map(r=>({
         id:r.id,submitted:r.submitted,empName:r.empName||r.emp_name||'',username:r.username||'',
@@ -4275,14 +4425,16 @@ async function renderTimesheets(){
         pdfStoragePath:r.pdfStoragePath||r.pdf_storage_path||'',
         totalHrs:r.totalHrs||r.total_hours||r.totalHours||'0:00',
         notes:r.notes||'',days:r.days||{},
-        status:r.status||'submitted',correctionDays:r.correctionDays||[],correctionNote:r.correctionNote||''
+        status:r.status||'submitted',correctionDays:r.correctionDays||[],correctionNote:r.correctionNote||'',
+        isActive:r.isActive!==false&&r.is_active!==false,
+        deletedAt:r.deletedAt||r.deleted_at||''
       }));
       if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbAttachPdfPaths==='function'){
         try{await sbAttachPdfPaths(allRecords);}catch(e){}
       }
-      store.set('admin_records',allRecords);
+      if(tsDesk==='active')store.set('admin_records',allRecords);
     }
-  }catch(e){allRecords=store.get('admin_records')||[];}
+  }catch(e){if(tsDesk==='active')allRecords=store.get('admin_records')||[];}
   paintTimesheets();
 }
 
@@ -4358,7 +4510,9 @@ function paintTimesheets(){
   const empty=document.getElementById('tsEmpty');
   if(!tbody)return;
   const q=(document.getElementById('tsSearch')?.value||'').toLowerCase();
-  let recs=allRecords.slice().reverse();
+  let recs=allRecords.filter(function(r){
+    return sbTimesheetOnDesk({status:r.status,is_active:r.isActive,isActive:r.isActive,deleted_at:r.deletedAt,deletedAt:r.deletedAt}, tsDesk);
+  }).slice().reverse();
   if(q)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(q)||(r.clientName||'').toLowerCase().includes(q)||(r.weekStart||'').toLowerCase().includes(q)||formatWeekLabel(r.weekStart).toLowerCase().includes(q));
 
   document.getElementById('st_total').textContent=allRecords.length;
@@ -4368,7 +4522,19 @@ function paintTimesheets(){
   document.getElementById('st_hrs').textContent=`${Math.floor(totalMins/60)}h`;
   document.getElementById('st_aides').textContent=[...new Set(allRecords.map(r=>r.username).filter(Boolean))].length;
 
-  if(!recs.length){tbody.innerHTML='';empty.style.display='block';return;}
+  if(!recs.length){
+    tbody.innerHTML='';
+    empty.style.display='block';
+    const msg=empty.querySelector('p');
+    if(msg){
+      msg.textContent=tsDesk==='archived'
+        ?'🗄️ No archived timesheets.'
+        :tsDesk==='deleted'
+          ?'No timesheets in Recently deleted.'
+          :'📭 No timesheets yet.';
+    }
+    return;
+  }
   empty.style.display='none';
 
   const statusBadge=s=>{
@@ -4392,7 +4558,7 @@ function paintTimesheets(){
       <td>${timesheetPdfButton(r,false)}</td>
       <td><div class="actions">
         <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewRec('${r.id}')">👁 View</button>
-        <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="quickDelete('${r.id}')">🗑</button>
+        ${timesheetRowDeskButton(r)}
       </div></td>
     </tr>`;}).join('');
 }
@@ -4851,6 +5017,7 @@ function viewRec(id){
   document.getElementById('correctionPanel').style.display='none';
   document.getElementById('detailTitle').textContent=`${currentRec.empName} → ${currentRec.clientName} | ${formatWeekLabel(currentRec.weekStart)}`;
   buildDetailBody();
+  syncTimesheetDetailActions(currentRec);
   openModal('detailModal');
 }
 
@@ -5093,13 +5260,77 @@ function quickDelete(id){
 function deleteRec(){
   if(!currentRec)return;
   const rec=currentRec;
-  showSharedConfirm('Archive timesheet for '+rec.empName+'?',function(){
+  showSharedConfirm('Archive this timesheet?',function(){
     logActivity('Archived timesheet for '+rec.empName+' ('+(rec.clientName||'')+', week of '+(rec.weekStart||'')+')');
     commitTimesheetDelete(rec.id);
     closeModal('detailModal');
     currentRec=null;
   },'Yes, archive');
 }
+function trashTimesheet(){
+  if(!currentRec)return;
+  const rec=currentRec;
+  showSharedConfirm('Move to Recently deleted? You can restore for 7 days.',function(){
+    logActivity('Moved timesheet to Recently deleted for '+rec.empName+' ('+(rec.clientName||'')+', week of '+(rec.weekStart||'')+')');
+    commitTimesheetTrash(rec.id);
+    closeModal('detailModal');
+    currentRec=null;
+  },'Move to Recently deleted');
+}
+function restoreCurrentTimesheet(){
+  if(!currentRec)return;
+  const rec=currentRec;
+  const trashed=timesheetRecordDeleted(rec);
+  if(trashed)commitTimesheetTrashRestore(rec.id);
+  else commitTimesheetArchiveRestore(rec.id);
+  closeModal('detailModal');
+  currentRec=null;
+}
+function restoreArchivedTimesheet(id){
+  showSharedConfirm('Restore this timesheet to Active?',function(){commitTimesheetArchiveRestore(id);},'Restore');
+}
+function restoreTrashedTimesheet(id){
+  showSharedConfirm('Restore this timesheet to Active?',function(){commitTimesheetTrashRestore(id);},'Restore');
+}
+function closeTimesheetMore(){
+  const menu=document.getElementById('tsDetailMoreMenu');
+  const btn=document.getElementById('tsDetailMoreBtn');
+  if(menu){menu.hidden=true;menu.setAttribute('hidden','');}
+  if(btn)btn.setAttribute('aria-expanded','false');
+}
+function toggleTimesheetMore(ev){
+  if(ev)ev.stopPropagation();
+  const menu=document.getElementById('tsDetailMoreMenu');
+  const btn=document.getElementById('tsDetailMoreBtn');
+  if(!menu)return;
+  const open=!!menu.hidden;
+  menu.hidden=!open;
+  if(open)menu.removeAttribute('hidden');
+  else menu.setAttribute('hidden','');
+  if(btn)btn.setAttribute('aria-expanded',open?'true':'false');
+}
+function syncTimesheetDetailActions(r){
+  const trashed=timesheetRecordDeleted(r);
+  const archived=timesheetRecordArchived(r);
+  const show=function(id,on){
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.hidden=!on;
+    if(on)el.removeAttribute('hidden');
+    else el.setAttribute('hidden','');
+  };
+  show('tsDetailArchiveBtn',!trashed&&!archived);
+  show('tsDetailRestoreBtn',trashed||archived);
+  show('tsDetailCorrectBtn',!trashed);
+  show('tsDetailMoreDelete',!trashed);
+  closeTimesheetMore();
+}
+document.addEventListener('click',function(e){
+  const menu=document.getElementById('tsDetailMoreMenu');
+  if(!menu||menu.hidden)return;
+  if(e.target&&e.target.closest&&e.target.closest('.ts-overflow'))return;
+  closeTimesheetMore();
+});
 
 async function commitTimesheetDelete(id){
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
@@ -5124,6 +5355,63 @@ async function commitTimesheetDelete(id){
   store.set('admin_records',allRecords);
   fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});
   renderTimesheets();showTempMsg('🗑️ Deleted.','var(--danger)');
+}
+async function commitTimesheetArchiveRestore(id){
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    try{
+      const data=await apiPost({action:'restore_timesheet',id:id});
+      if(!(data&&data.success===true&&data.is_active===true)){
+        showTempMsg((data&&data.error)||'Could not restore timesheet.','var(--danger)');
+        return;
+      }
+      cacheInvalidate('get_all');
+      showTempMsg('Timesheet restored.','var(--teal)');
+      renderTimesheets();
+      return;
+    }catch(e){
+      showTempMsg('Could not restore timesheet.','var(--danger)');
+      return;
+    }
+  }
+  showTempMsg('Restore needs the Supabase timesheet desk.','var(--warn)');
+}
+async function commitTimesheetTrash(id){
+  if(!(typeof evercareSbEnabled==='function'&&evercareSbEnabled())){
+    showTempMsg('Recently deleted needs the Supabase timesheet desk.','var(--warn)');
+    return;
+  }
+  try{
+    const data=await apiPost({action:'trash_timesheet',id:id});
+    if(!(data&&data.success===true&&data.is_active===false&&data.deleted_at)){
+      showTempMsg((data&&data.error)||'Could not move timesheet to Recently deleted.','var(--danger)');
+      return;
+    }
+    cacheInvalidate('get_all');
+    allRecords=allRecords.filter(r=>String(r.id)!==String(id));
+    if(tsDesk==='active')store.set('admin_records',allRecords);
+    showTempMsg('Moved to Recently deleted. You can restore it for 7 days.','var(--warn)');
+    renderTimesheets();
+  }catch(e){
+    showTempMsg('Could not move timesheet to Recently deleted.','var(--danger)');
+  }
+}
+async function commitTimesheetTrashRestore(id){
+  if(!(typeof evercareSbEnabled==='function'&&evercareSbEnabled())){
+    showTempMsg('Restore needs the Supabase timesheet desk.','var(--warn)');
+    return;
+  }
+  try{
+    const data=await apiPost({action:'restore_trashed_timesheet',id:id});
+    if(!(data&&data.success===true&&data.is_active===true&&!data.deleted_at)){
+      showTempMsg((data&&data.error)||'Could not restore timesheet.','var(--danger)');
+      return;
+    }
+    cacheInvalidate('get_all');
+    showTempMsg('Timesheet restored.','var(--teal)');
+    renderTimesheets();
+  }catch(e){
+    showTempMsg('Could not restore timesheet.','var(--danger)');
+  }
 }
 
 function tsPctX(x){return (Number(x)/TS_FORM_PT.sheetW*100).toFixed(4)+'%';}
@@ -5292,6 +5580,7 @@ async function printTimesheetSheet(){
   unlockBodyForPrint();
   const parent=sheet.parentNode;
   const next=sheet.nextSibling;
+  document.body.classList.add('ts-sheet-detached');
   document.body.appendChild(sheet);
   let finished=false;
   const done=()=>{
@@ -5301,6 +5590,7 @@ async function printTimesheetSheet(){
       if(next)parent.insertBefore(sheet,next);
       else parent.appendChild(sheet);
     }
+    document.body.classList.remove('ts-sheet-detached');
     restoreBodyAfterPrint();
     window.removeEventListener('afterprint',done);
   };
@@ -5383,6 +5673,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 const TS_PDF_ROW_MS=25000;
 const TS_PDF_JPEG_QUALITY=0.62;
+const TS_PDF_PAGE_FIT=0.96;
 function withTimeout(p,ms,msg){
   return new Promise(function(resolve,reject){
     const t=setTimeout(function(){reject(new Error(msg||'Timed out'));},ms);
@@ -5412,13 +5703,22 @@ async function renderTimesheetPdfDoc(r){
   try{
     await waitForBlankPaper(container);
     await waitForSheetImages(container);
-    const canvas=await html2canvas(container,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+    const capW=container.offsetWidth||816;
+    const capH=container.offsetHeight||1056;
+    const canvas=await html2canvas(container,{scale:2,useCORS:true,backgroundColor:'#ffffff',width:capW,height:capH,windowWidth:capW,windowHeight:capH,scrollX:0,scrollY:0});
     const imgData=canvas.toDataURL('image/jpeg', TS_PDF_JPEG_QUALITY);
     const{jsPDF}=window.jspdf;
     const pdf=new jsPDF('p','pt','letter',true);
     const pageWidth=pdf.internal.pageSize.getWidth();
     const pageHeight=pdf.internal.pageSize.getHeight();
-    pdf.addImage(imgData,'JPEG',0,0,pageWidth,pageHeight,undefined,'FAST');
+    const fit=TS_PDF_PAGE_FIT;
+    let drawW=pageWidth*fit;
+    let drawH=canvas.width?drawW*(canvas.height/canvas.width):(pageHeight*fit);
+    const maxH=pageHeight*fit;
+    if(drawH>maxH){drawH=maxH;drawW=canvas.height?drawH*(canvas.width/canvas.height):drawW;}
+    const x=(pageWidth-drawW)/2;
+    const y=(pageHeight-drawH)/2;
+    pdf.addImage(imgData,'JPEG',x,y,drawW,drawH,undefined,'FAST');
     return pdf;
   }finally{
     if(container.parentNode)container.parentNode.removeChild(container);
@@ -5439,6 +5739,12 @@ async function downloadTSPDF(){
   showTempMsg('Generating PDF, please wait...','var(--teal)');
   try{
     const pdf=await renderTimesheetPdfDoc(r);
+    try{
+      const viewBlob=pdf.output('blob');
+      const viewUrl=URL.createObjectURL(viewBlob);
+      window.open(viewUrl,'_blank','noopener');
+      setTimeout(function(){URL.revokeObjectURL(viewUrl);},60000);
+    }catch(openErr){}
     pdf.save(filename);
     if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbUploadTimesheetPdf==='function'){
       try{
@@ -6414,10 +6720,16 @@ function formatISScoreBanner(row){
   if(pct!=null&&pct!=='')return 'Score: '+Math.round(Number(pct))+'%';
   return 'Score: —';
 }
+function isOfficeCertStaff(){
+  return currentAdminRole!=='Nurse';
+}
 function isCompletedActionsHtml(i){
   return '<div class="actions is-compliance-actions">'
     +'<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewISResults('+i+')">View Results</button>'
-    +'<button type="button" class="btn btn-sm btn-view" onclick="printISCert('+i+')">Print Cert</button>'
+    +(isOfficeCertStaff()
+      ?'<button type="button" class="btn btn-sm btn-view" onclick="viewISCert('+i+')">View Cert</button>'
+        +'<button type="button" class="btn btn-sm btn-view" onclick="printISCert('+i+')">Print Cert</button>'
+      :'')
     +'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISResult('+i+')">Delete</button>'
     +'</div>';
 }
@@ -6550,9 +6862,14 @@ async function sendISReminder(rowIndexOrUsername,name){
   }
 }
 
+function viewISCert(rowIndex){
+  const row=isComplianceRows[rowIndex];
+  if(!row||!row.isCompleted||!isOfficeCertStaff())return;
+  printCert(row);
+}
 function printISCert(rowIndex){
   const row=isComplianceRows[rowIndex];
-  if(!row)return;
+  if(!row||!row.isCompleted||!isOfficeCertStaff())return;
   printCert(row);
 }
 
@@ -7057,10 +7374,7 @@ function buildCertHtml(r){
     '.cbtn-ghost{background:#fff;color:#1a2744;border:1.5px solid #dce4ef;}'+
     '.cbtn-print{background:#2a7f7f;color:#fff;}'+
     '.cert-wrap{padding:10px 8px 22px;display:flex;justify-content:center;}'+
-    '.cert{position:relative;width:min(8.5in,calc(100vw - 16px));aspect-ratio:8.5/11;background:'+
-      'radial-gradient(ellipse at 18% 12%,rgba(255,255,255,.42),transparent 52%),'+
-      'radial-gradient(ellipse at 82% 88%,rgba(176,138,70,.09),transparent 46%),'+
-      'linear-gradient(180deg,#f8efd8 0%,#f3e4c4 48%,#efe0b8 100%);'+
+    '.cert{position:relative;width:min(8.5in,calc(100vw - 16px));aspect-ratio:8.5/11;background:#FDFBF0;'+
       'box-shadow:0 8px 28px rgba(26,39,68,.18);overflow:hidden;}'+
     '.frame{position:absolute;inset:10px;border:7px solid #1e6868;}'+
     '.frame-in{position:absolute;inset:20px;border:2px solid #2a7f7f;}'+
@@ -7090,18 +7404,19 @@ function buildCertHtml(r){
     '.topic{font-family:"Playfair Display",Georgia,serif;font-size:clamp(16px,2.3vw,22px);font-weight:600;color:#174f4f;margin:8px 0 10px;max-width:90%;}'+
     '.when{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(14px,1.8vw,18px);color:#1a2744;margin:4px 0 8px;}'+
     '.when strong{font-family:"Playfair Display",serif;font-weight:600;}'+
-    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;width:92%;margin-top:10px;padding-top:4px;}'+
-    '.sig-box{text-align:center;}'+
-    '.sig-line{min-height:46px;border-bottom:1px solid #1a2744;margin-bottom:6px;display:flex;align-items:flex-end;justify-content:center;}'+
-    '.sig-line img{height:40px;max-width:100%;}'+
+    '.sig-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;width:92%;margin-top:10px;padding:8px 0 0;background:#FDFBF0;}'+
+    '.sig-box{text-align:center;background:#FDFBF0;}'+
+    '.sig-line{min-height:52px;border-bottom:1px solid #1a2744;margin-bottom:6px;display:flex;align-items:flex-end;justify-content:center;background:#FDFBF0;}'+
+    '.sig-line img{height:40px;max-width:100%;background:transparent;}'+
     '.sig-label{font-family:Cinzel,serif;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:#3d4a5c;}'+
     '.sig-name{font-size:12px;color:#5a6576;margin-top:3px;}'+
     '@page{size:letter portrait;margin:0.22in;}'+
     '@media print{'+
-      'html,body{background:#f3e4c4 !important;width:100%;height:100%;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      'html,body{background:#FDFBF0 !important;width:100%;height:100%;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
       '.no-print,.cert-toolbar{display:none !important;}'+
-      '.cert-wrap{padding:0;margin:0;width:100%;height:100%;}'+
-      '.cert{width:100% !important;height:100% !important;max-width:none;aspect-ratio:auto;box-shadow:none;}'+
+      '.cert-wrap{padding:0;margin:0;width:100%;height:100%;background:#FDFBF0 !important;}'+
+      '.cert{width:100% !important;height:100% !important;max-width:none;aspect-ratio:auto;box-shadow:none;background:#FDFBF0 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
+      '.sig-grid,.sig-box,.sig-line{background:#FDFBF0 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'+
     '}'+
     '</style></head><body>'+
     '<div class="cert-toolbar no-print">'+
@@ -7113,7 +7428,7 @@ function buildCertHtml(r){
       '</div>'+
     '</div>'+
     '<div class="cert-wrap">'+
-      '<div class="cert" data-cert-style="c2-ribbon-laurel">'+
+      '<div class="cert" data-cert-style="c2-ribbon-laurel" data-cert-track="personal-care-home-making">'+
         '<div class="frame"></div><div class="frame-in"></div><div class="frame-thin"></div>'+
         certCornerSvg('tl')+certCornerSvg('tr')+certCornerSvg('bl')+certCornerSvg('br')+
         '<div class="inner">'+

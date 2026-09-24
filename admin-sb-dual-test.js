@@ -24,7 +24,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-cut-hotfix">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-pdf-1page-actions">'), 'admin-build meta');
 assert.ok(html.includes('v=sbcut1b'), 'sbcut hotfix marker');
 assert.ok(html.includes('sheets=1'), 'sheets rollback query');
 assert.ok(html.includes('evercare_sheets'), 'sheets rollback storage key');

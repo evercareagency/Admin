@@ -65,7 +65,7 @@ assert.ok(commitTs.indexOf('evercareSbEnabled()') < commitTs.indexOf('fetch(SHEE
 assert.ok(quickDelete.includes("showSharedConfirm('Archive this timesheet?'"), 'trash confirms archive, not permanent delete');
 assert.ok(quickDelete.includes("'Yes, archive'"), 'trash confirm button is Yes, archive');
 assert.ok(!/permanently|Yes, delete/.test(quickDelete), 'default trash path is not a permanent delete');
-assert.ok(deleteRecSrc.includes("showSharedConfirm('Archive timesheet for '"), 'detail archive uses in-app confirm');
+assert.ok(deleteRecSrc.includes("showSharedConfirm('Archive this timesheet?'"), 'detail archive confirm stays Archive this timesheet?');
 assert.ok(deleteRecSrc.includes("'Yes, archive'"), 'detail confirm button is Yes, archive');
 assert.ok(!/permanently|Yes, delete/.test(deleteRecSrc), 'detail path is not a permanent delete');
 assert.ok(!deleteRecSrc.includes('quickDelete('), 'detail delete must not open a second confirm');

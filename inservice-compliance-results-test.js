@@ -92,12 +92,17 @@ assert.ok(html.includes("action:'get_inservices'"), 'get_inservices still used')
 assert.ok(html.includes('colspan="6"'), 'table colspan includes Score');
 
 assert.ok(completedActs.includes('View Results'), 'completed actions include View Results');
+assert.ok(completedActs.includes('View Cert'), 'completed actions include View Cert');
 assert.ok(completedActs.includes('Print Cert'), 'completed actions include Print Cert');
 assert.ok(completedActs.includes('Delete'), 'completed actions include Delete');
-assert.ok(completedActs.indexOf('View Results') < completedActs.indexOf('Print Cert'), 'View Results before Print Cert');
+assert.ok(completedActs.indexOf('View Results') < completedActs.indexOf('View Cert'), 'View Results before View Cert');
+assert.ok(completedActs.indexOf('View Cert') < completedActs.indexOf('Print Cert'), 'View Cert before Print Cert');
 assert.ok(completedActs.indexOf('Print Cert') < completedActs.indexOf('Delete'), 'Print Cert before Delete');
+assert.ok(completedActs.includes('isOfficeCertStaff'), 'certs are office staff only');
 assert.ok(pendingActs.includes('Send Reminder'), 'not completed keeps Send Reminder');
 assert.ok(!pendingActs.includes('View Results'), 'not completed has no View Results');
+assert.ok(!pendingActs.includes('View Cert'), 'not completed has no View Cert');
+assert.ok(!pendingActs.includes('Print Cert'), 'not completed has no Print Cert');
 assert.ok(!pendingActs.includes('Delete'), 'not completed has no Delete');
 
 assert.ok(printHook.includes('printCert(row)'), 'Print Cert calls existing printCert');

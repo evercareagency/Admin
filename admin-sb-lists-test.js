@@ -54,6 +54,9 @@ const fns = [
   'function sbMapAide(row)',
   'function sbMapClient(row)',
   'function sbMapTimesheet(row)',
+  'function sbTimesheetDesk(view)',
+  'function sbTimesheetListPairs(view)',
+  'function sbTimesheetOnDesk(row, view)',
   'async function sbRefreshSession(sess)',
   'async function sbRestGet(table, pairs, refreshed)',
   'async function sbApiList(payload)',
@@ -282,6 +285,7 @@ Promise.all([
   assert.ok(tsUrl.indexOf('/rest/v1/timesheets?') > 0, tsUrl);
   assert.strictEqual(params(tsUrl).get('select'), '*');
   assert.strictEqual(params(tsUrl).get('is_active'), 'eq.true');
+  assert.strictEqual(params(tsUrl).get('deleted_at'), 'is.null');
   assert.deepStrictEqual(params(tsUrl).getAll('status').sort(), ['not.ilike.backup', 'not.ilike.draft']);
   assert.strictEqual(params(tsUrl).get('order'), 'submitted_at.desc');
   assert.strictEqual(on.calls[2].init.headers.Authorization, 'Bearer user-jwt');
