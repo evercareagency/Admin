@@ -64,7 +64,8 @@ assert.ok(exportFn.includes('err++'), 'skip + count errors');
 assert.ok(downloadFn.includes('requireTimesheetSignatures'), 'single PDF still gated');
 assert.ok(downloadFn.includes('renderTimesheetPdfDoc'), 'single PDF uses shared helper');
 assert.ok(renderDoc.includes('buildPrintHtml(r)'), 'shared helper uses overlay HTML');
-assert.ok(renderDoc.includes("jsPDF('p','pt','letter')"), 'Letter page');
+assert.ok(renderDoc.includes("jsPDF('p','pt','letter',true)"), 'Letter page, compressed');
+assert.ok(renderDoc.includes("toDataURL('image/jpeg'"), 'overlay image is JPEG');
 assert.ok(renderDoc.includes('html2canvas'), 'html2canvas overlay capture');
 assert.ok(renderDoc.includes("data-print-mode','paper-overlay'") || renderDoc.includes('paper-overlay'), 'paper-overlay mode');
 

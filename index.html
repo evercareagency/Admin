@@ -11,6 +11,7 @@
 <!-- sb archive §3.3/§4.3 2026-09-24 PATCH is_active=false select id,is_active single() when ?sb=1 -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 client-overlay no-edge GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- timesheet pdf size 2026-09-24 v=sbpdfsize25 jpeg overlay guard 25MiB flag off unless ?sb=1 -->
 <!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
@@ -22,7 +23,7 @@
 <!-- add aide + temp password 2026-09-21 v=addaideb63d -->
 <!-- Ace lock admin_create_aide / reset_temp_password 2026-09-21 v=acelockb63d -->
 <!-- add aide collision toast 2026-09-21 v=collisione6ed -->
-<meta name="admin-build" content="2026-09-24-sb-pdf-make">
+<meta name="admin-build" content="2026-09-24-sb-pdf-size">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2839,7 +2840,7 @@ async function sbApiList(payload){
 var SB_PDF_BUCKET='evercare-pdfs';
 var SB_PDF_SIGN_SECONDS=120;
 var SB_PDF_MIN_BYTES=1024;
-var SB_PDF_MAX_BYTES=10485760;
+var SB_PDF_MAX_BYTES=25*1024*1024;
 function sbPdfObjectPath(path){
   return String(path||'').trim().replace(/^\/+/,'');
 }
@@ -5391,6 +5392,7 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 const TS_PDF_ROW_MS=25000;
+const TS_PDF_JPEG_QUALITY=0.62;
 function withTimeout(p,ms,msg){
   return new Promise(function(resolve,reject){
     const t=setTimeout(function(){reject(new Error(msg||'Timed out'));},ms);
@@ -5421,12 +5423,12 @@ async function renderTimesheetPdfDoc(r){
     await waitForBlankPaper(container);
     await waitForSheetImages(container);
     const canvas=await html2canvas(container,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
-    const imgData=canvas.toDataURL('image/png');
+    const imgData=canvas.toDataURL('image/jpeg', TS_PDF_JPEG_QUALITY);
     const{jsPDF}=window.jspdf;
-    const pdf=new jsPDF('p','pt','letter');
+    const pdf=new jsPDF('p','pt','letter',true);
     const pageWidth=pdf.internal.pageSize.getWidth();
     const pageHeight=pdf.internal.pageSize.getHeight();
-    pdf.addImage(imgData,'PNG',0,0,pageWidth,pageHeight);
+    pdf.addImage(imgData,'JPEG',0,0,pageWidth,pageHeight,undefined,'FAST');
     return pdf;
   }finally{
     if(container.parentNode)container.parentNode.removeChild(container);
