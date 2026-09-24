@@ -28,7 +28,13 @@ assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercar
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sb-pdf-make">'), 'admin-build meta');
 assert.ok(html.includes('v=sbpdfmake9c24'), 'make/refresh marker is greppable');
+assert.ok(html.includes('client-overlay no-edge'), 'client overlay marker, not an Edge render');
 assert.ok(html.includes('GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1'), 'write contract is named in the tip');
+assert.ok(!html.includes('/functions/v1'), 'no Edge Function');
+assert.ok(!/\.rpc\(/.test(html), 'no RPC render');
+const byteFn = extractFn(html, 'async function sbTimesheetPdfBytes(rec)');
+assert.ok(byteFn, 'client byte helper');
+assert.ok(byteFn.indexOf('renderTimesheetPdfBlob') >= 0 && byteFn.indexOf('renderTimesheetPdfBlob') < byteFn.indexOf('sbSheetsTimesheetPdfBytes'), 'overlay runs before Sheets fallback');
 
 const opener = extractFn(html, 'function openTimesheetPdf(id)');
 const flagOffTail = opener.slice(opener.lastIndexOf('if(!requireTimesheetSignatures(r))return;'));
@@ -65,6 +71,13 @@ const fns = [
   'function sbOrgId()',
   'async function sbRestMutate(method, table, pairs, body, prefer, refreshed)',
   'async function sbUploadTimesheetPdf(row, pdfBytes, refreshed)',
+  'function sbBytesToText(bytes, cap)',
+  'async function sbResponseBytes(res)',
+  'function sbWrapPdfBytes(bytes)',
+  'function sbB64ToBytes(b64)',
+  'function sbPdfBytesFromUnknown(bytes)',
+  'async function sbSheetsTimesheetPdfBytes(row)',
+  'async function sbTimesheetPdfBytes(rec)',
   'async function sbEnsureTimesheetStoragePdf(row)',
   'function timesheetPdfAvailable(r)'
 ].map(function(sig){
@@ -314,8 +327,39 @@ function runUpload(){
     assert.strictEqual(ensured.box.currentRec.pdfStoragePath, madePath);
     assert.strictEqual(ensured.box.currentRec.pdfLink, driveLink, 'make must not clear the legacy link');
     assert.ok(made.url.indexOf('token=ensured') > 0, made.url);
-    console.log('admin-sb-pdf-test: ok');
-    return runBrowser();
+    assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('script.google.com') >= 0;}), 'a working overlay must not call Sheets');
+    assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('/rpc/') >= 0;}));
+
+    const sheetsUrl = 'https://script.google.com/macros/s/test/exec';
+    let sheetPdf = '%PDF-1.4\n';
+    while(sheetPdf.length < 2048)sheetPdf += ' ';
+    const blocked = harness({
+      search: '?sb=1',
+      session: session,
+      responses: [
+        {status: 200, raw: sheetPdf},
+        {status: 200, raw: JSON.stringify({Key: madePath})},
+        {status: 204, raw: ''},
+        {status: 201, raw: ''},
+        {status: 200, raw: JSON.stringify({signedURL: '/object/sign/evercare-pdfs/' + madePath + '?token=sheets'})}
+      ]
+    });
+    blocked.box.SHEETS_URL = sheetsUrl;
+    blocked.box.renderTimesheetPdfBlob = function(){return Promise.reject(new Error('overlay blocked'));};
+    const blockedRow = {id: tsId, pdfLink: driveLink, pdfStoragePath: ''};
+    return blocked.box.sbEnsureTimesheetStoragePdf(blockedRow).then(function(fromSheets){
+      assert.strictEqual(fromSheets.ok, true, 'Sheets bytes still upload when the overlay is blocked');
+      assert.ok(fromSheets.url.indexOf('token=sheets') > 0, fromSheets.url);
+      const sheetsCall = blocked.calls[0];
+      assert.ok(sheetsCall.url.indexOf('/exec') > 0, sheetsCall.url);
+      assert.deepStrictEqual(bodyOf(sheetsCall), {action: 'get_timesheet_pdf', id: tsId, timesheetId: tsId});
+      assert.strictEqual(blocked.calls[1].init.method, 'POST');
+      assert.ok(blocked.calls[1].url.indexOf('/storage/v1/object/evercare-pdfs/') > 0);
+      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0;}));
+      assert.strictEqual(blockedRow.pdfLink, driveLink);
+      console.log('admin-sb-pdf-test: ok');
+      return runBrowser();
+    });
   });
 }
 

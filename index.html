@@ -10,7 +10,7 @@
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- sb archive §3.3/§4.3 2026-09-24 PATCH is_active=false select id,is_active single() when ?sb=1 -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
-<!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
+<!-- timesheet pdf make/refresh 2026-09-24 v=sbpdfmake9c24 client-overlay no-edge GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
 <!-- login warm + sign-out keep-alive 2026-09-22 v=warmkeep -->
@@ -2983,6 +2983,7 @@ async function sbPdfPayloadInfo(pdfBytes){
       if(part&&typeof part.arrayBuffer==='function')buf=await part.arrayBuffer();
       else if(typeof pdfBytes.arrayBuffer==='function')buf=await pdfBytes.arrayBuffer();
       if(buf)header=sbBytesToAscii(buf,5);
+      else if(part&&typeof part[0]==='number')header=sbBytesToAscii(part,5);
     }else if(pdfBytes&&typeof pdfBytes.byteLength==='number'){
       header=sbBytesToAscii(pdfBytes,5);
     }
@@ -3006,6 +3007,7 @@ function sbRememberTimesheetPdfPath(row, objectPath){
   }
 }
 // Soft ?sb=1 Admin JWT upload. v=sbpdfmake9c24 GHOST-TIMESHEET-PDF-WRITE-CONTRACT-v1
+// Bytes come from the client blank-letter overlay. No Edge Function and no RPC.
 async function sbUploadTimesheetPdf(row, pdfBytes, refreshed){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {ok:false,skipped:true};
   var timesheetId=String(row&&row.id||'').trim();
@@ -3060,17 +3062,105 @@ async function sbUploadTimesheetPdf(row, pdfBytes, refreshed){
   if(!signed.ok||!signed.url)return {ok:false,soft:true,error:signed.error||'sign',path:objectPath,registry:!!registered.ok};
   return {ok:true,url:signed.url,path:objectPath,registry:!!registered.ok};
 }
+function sbBytesToText(bytes, cap){
+  if(!bytes)return '';
+  var n=bytes.length||0;
+  if(cap&&n>cap)n=cap;
+  var s='';
+  for(var i=0;i<n;i++)s+=String.fromCharCode(bytes[i]);
+  return s;
+}
+async function sbResponseBytes(res){
+  if(!res)return null;
+  try{
+    if(typeof res.arrayBuffer==='function')return new Uint8Array(await res.arrayBuffer());
+    if(typeof res.text==='function'){
+      var raw=await res.text();
+      var out=new Uint8Array(raw.length);
+      for(var i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i)&255;
+      return out;
+    }
+  }catch(e){}
+  return null;
+}
+function sbWrapPdfBytes(bytes){
+  if(!bytes)return null;
+  if(typeof Blob==='function')return new Blob([bytes],{type:'application/pdf'});
+  return bytes;
+}
+function sbB64ToBytes(b64){
+  if(typeof atob!=='function')return null;
+  try{
+    var bin=atob(String(b64||'').replace(/\s/g,''));
+    var out=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i)&255;
+    return out;
+  }catch(e){return null;}
+}
+function sbPdfBytesFromUnknown(bytes){
+  if(!bytes||!bytes.length)return null;
+  if(sbBytesToAscii(bytes,5).indexOf('%PDF')===0)return sbWrapPdfBytes(bytes);
+  var text=sbBytesToText(bytes, 2000000);
+  var data=null;
+  try{data=JSON.parse(text);}catch(e){return null;}
+  var b64=data&&(data.pdfBase64||data.pdf_base64||data.pdfBytes||data.bytes);
+  if(typeof b64!=='string'||!b64)return null;
+  var comma=b64.indexOf(',');
+  if(b64.indexOf('data:')===0&&comma>=0)b64=b64.slice(comma+1);
+  var decoded=sbB64ToBytes(b64);
+  if(!decoded||sbBytesToAscii(decoded,5).indexOf('%PDF')!==0)return null;
+  return sbWrapPdfBytes(decoded);
+}
+// Overlay blocked only. Sheets /exec bytes, then the same Storage upload. Not an Edge wait.
+async function sbSheetsTimesheetPdfBytes(row){
+  var url='';
+  try{url=typeof SHEETS_URL==='string'?SHEETS_URL:'';}catch(e){url='';}
+  if(!url||url.indexOf('script.google.com')<0)return null;
+  var id=String(row&&row.id||'').trim();
+  if(!id)return null;
+  var res;
+  try{
+    var pending=fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({
+        action:'get_timesheet_pdf',
+        id:id,
+        timesheetId:id
+      }),
+      mode:'cors',
+      cache:'no-store'
+    });
+    if(typeof withTimeout==='function')pending=withTimeout(pending,20000,'PDF timed out');
+    res=await pending;
+  }catch(err){return null;}
+  var bytes=await sbResponseBytes(res);
+  return sbPdfBytesFromUnknown(bytes);
+}
+// Preferred bytes: blank-letter paper overlay (renderTimesheetPdfBlob). No Edge Function, no RPC.
+async function sbTimesheetPdfBytes(rec){
+  var blob=null;
+  if(typeof renderTimesheetPdfBlob==='function'){
+    try{
+      var rendered=renderTimesheetPdfBlob(rec);
+      if(typeof withTimeout==='function'){
+        var ms=25000;
+        try{if(typeof TS_PDF_ROW_MS==='number'&&TS_PDF_ROW_MS>0)ms=TS_PDF_ROW_MS;}catch(e){}
+        rendered=withTimeout(rendered, ms, 'PDF timed out');
+      }
+      blob=await rendered;
+    }catch(err){blob=null;}
+  }
+  var info=blob?await sbPdfPayloadInfo(blob):{ok:false};
+  if(info.ok)return blob;
+  return sbSheetsTimesheetPdfBytes(rec);
+}
 async function sbEnsureTimesheetStoragePdf(row){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {ok:false,skipped:true};
   var rec=row;
   if(typeof currentRec!=='undefined'&&currentRec&&row&&String(currentRec.id)===String(row.id))rec=currentRec;
-  if(typeof renderTimesheetPdfBlob!=='function')return {ok:false,soft:true};
-  var blob;
-  try{
-    blob=await renderTimesheetPdfBlob(rec);
-  }catch(err){
-    return {ok:false,soft:true,error:String(err&&err.message||err||'pdf')};
-  }
+  var blob=await sbTimesheetPdfBytes(rec);
+  if(!blob)return {ok:false,soft:true};
   return sbUploadTimesheetPdf(rec, blob);
 }
 
@@ -5351,12 +5441,13 @@ async function downloadTSPDF(){
   if(!currentRec)return;
   if(!requireTimesheetSignatures(currentRec))return;
   const r=currentRec;
+  const safeClient=(r.clientName||'client').replace(/[^a-z0-9]/gi,'_');
+  const safeEmp=(r.empName||'aide').replace(/[^a-z0-9]/gi,'_');
+  const filename=`EverCare_Timesheet_${safeEmp}_${safeClient}_${r.weekStart||''}.pdf`;
   showTempMsg('Generating PDF, please wait...','var(--teal)');
   try{
     const pdf=await renderTimesheetPdfDoc(r);
-    const safeClient=(r.clientName||'client').replace(/[^a-z0-9]/gi,'_');
-    const safeEmp=(r.empName||'aide').replace(/[^a-z0-9]/gi,'_');
-    pdf.save(`EverCare_Timesheet_${safeEmp}_${safeClient}_${r.weekStart||''}.pdf`);
+    pdf.save(filename);
     if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbUploadTimesheetPdf==='function'){
       try{
         const up=await sbUploadTimesheetPdf(r, pdf.output('blob'));
@@ -5370,6 +5461,20 @@ async function downloadTSPDF(){
       showTempMsg('✅ PDF downloaded!','var(--success)');
     }
   }catch(e){
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&typeof sbSheetsTimesheetPdfBytes==='function'){
+      try{
+        const bytes=await sbSheetsTimesheetPdfBytes(r);
+        if(bytes){
+          downloadBlob(bytes, filename);
+          if(typeof sbUploadTimesheetPdf==='function'){
+            const up=await sbUploadTimesheetPdf(r, bytes);
+            if(up&&up.ok)showTempMsg('✅ PDF downloaded!','var(--success)');
+            else showTempMsg('PDF downloaded. Storage copy will be picked up on the next archive.','var(--warn)');
+          }else showTempMsg('✅ PDF downloaded!','var(--success)');
+          return;
+        }
+      }catch(sheetErr){console.error(sheetErr);}
+    }
     console.error(e);
     showTempMsg('Error generating PDF. Try Print instead.','var(--danger)');
   }
