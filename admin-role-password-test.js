@@ -27,7 +27,9 @@ const MARKER = '<!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_rol
 assert.ok(html.includes(MARKER), 'tip marker missing');
 assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
-assert.ok(html.includes('content="2026-09-24-nursespd1"'), 'admin-build moves to nursespd1');
+assert.ok(html.includes('v=nursespd1'), 'nursespd1 marker stays');
+assert.ok(html.includes('<!-- admin schedule 2026-09-24 v=sched1'), 'schedule marker ships beside adminpw1');
+assert.ok(html.includes('content="2026-09-24-sched1"'), 'admin-build advances to sched1; password code stays');
 assert.ok(!/resetPasswordForEmail/.test(html), 'role passwords must not use recovery email');
 
 const resetSelect = html.slice(html.indexOf('id="adminResetRole"'), html.indexOf('id="adminRecoveryCode"'));
