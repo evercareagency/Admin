@@ -7,6 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>EverCare — Admin Portal</title>
+<!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory flag off unless ?sb=1 or evercare_sb=1 -->
 <!-- inservice sb dual 2026-09-24 v=isb1 results+assignment on inservice_results when ?sb=1 -->
 <!-- login same-origin /exec beacon 2026-09-22 v=execbeacon -->
@@ -2056,6 +2057,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
 async function apiPost(payload){
   // Flag on: aides, clients, payroll timesheets, supervisory contacts, and inservice compliance are Supabase.
+  // Admin writes (create/reset aide, client CRUD+assignments, timesheet update/correction/soft-delete) too.
   // Every other action stays on Sheets. Flag off never reaches these branches.
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
     return sbApiList(payload);
@@ -2065,6 +2067,9 @@ async function apiPost(payload){
   }
   if(payload&&evercareSbEnabled()&&typeof sbInserviceAction==='function'&&sbInserviceAction(payload.action)){
     return sbInserviceDispatch(payload);
+  }
+  if(payload&&typeof sbIsAdminWriteAction==='function'&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sbIsAdminWriteAction(payload.action)){
+    return sbAdminWriteDispatch(payload);
   }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
@@ -3583,6 +3588,345 @@ async function sbInserviceDispatch(payload){
   return {success:false,error:'Unsupported inservice action.'};
 }
 
+// GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 — office JWT only, flag on (?sb=1 or evercare_sb=1).
+// Ace RPCs create the Auth user. Clients, assignments, and timesheet admin writes are REST.
+// Flag off never enters here. Temp passwords are returned once for the existing modal.
+function sbIsAdminWriteAction(action){
+  return action==='admin_create_aide'||action==='create_aide'
+    ||action==='reset_temp_password'||action==='reset_aide_temp_password'
+    ||action==='add_client'||action==='update_client'
+    ||action==='archive_client'||action==='delete_client'
+    ||action==='update'||action==='send_correction'||action==='delete';
+}
+function sbOptionalText(v){
+  if(v==null)return null;
+  var s=String(v).trim();
+  return s?s:null;
+}
+function sbNormalizeWriteError(msg){
+  var text=String(msg||'Request failed.');
+  if(typeof looksLikeUsernameTaken==='function'&&looksLikeUsernameTaken(text))return text;
+  if(/duplicate key|unique constraint|23505/i.test(text)&&/username/i.test(text))return 'Username already taken';
+  return text;
+}
+function sbUuidList(raw){
+  var list=Array.isArray(raw)?raw:[];
+  var out=[];
+  for(var i=0;i<list.length;i++){
+    var s=String(list[i]==null?'':list[i]).trim();
+    if(typeof sbUuid!=='function'||!sbUuid(s))continue;
+    if(out.indexOf(s)<0)out.push(s);
+  }
+  return out;
+}
+function sbCoord(v){
+  if(v==null||v==='')return null;
+  var n=Number(v);
+  return isFinite(n)?n:null;
+}
+function sbSameUser(a,b){
+  return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();
+}
+function sbUsernameIn(list, name){
+  for(var i=0;i<(list||[]).length;i++){
+    if(sbSameUser(list[i], name))return true;
+  }
+  return false;
+}
+async function sbRestRpc(fnName, body){
+  return sbRestMutate('POST','rpc/'+fnName,[],body||{},'return=representation');
+}
+function sbMapAideAuth(data){
+  var row=typeof sbFirstRow==='function'?sbFirstRow(data):data;
+  if(!row||typeof row!=='object')return {success:false,error:'empty response'};
+  if(row.ok===false||row.success===false){
+    return {success:false,error:sbNormalizeWriteError(row.error||row.message||'Request failed.')};
+  }
+  var temp=row.temp_password;
+  if(temp==null)temp=row.tempPassword;
+  if(temp==null)temp='';
+  temp=String(temp);
+  var full=row.full_name||row.fullName||'';
+  return {
+    success:!!(row.ok||row.success),
+    ok:true,
+    username:row.username||'',
+    full_name:full,
+    fullName:full,
+    name:full,
+    email:row.email||'',
+    aide_id:row.aide_id||'',
+    aideId:row.aide_id||'',
+    profile_id:row.profile_id||'',
+    profileId:row.profile_id||'',
+    must_change_password:row.must_change_password!==false,
+    mustChangePassword:row.must_change_password!==false,
+    temp_password:temp,
+    tempPassword:temp,
+    assigned_count:row.assigned_count==null?0:row.assigned_count
+  };
+}
+async function sbAdminCreateAide(payload){
+  var username=String((payload&&(payload.username||payload.p_username))||'').trim();
+  var fullName=String((payload&&(payload.fullName||payload.full_name||payload.name||payload.p_full_name))||'').trim();
+  if(!username)return {success:false,error:'Enter a username.'};
+  if(!fullName)return {success:false,error:'Enter the aide\'s full name.'};
+  var ids=sbUuidList(payload&&(payload.clientIds||payload.client_ids||payload.p_client_ids));
+  var body={
+    p_username:username,
+    p_full_name:fullName,
+    p_temp_password:sbOptionalText(payload&&(payload.tempPassword||payload.temp_password||payload.p_temp_password)),
+    p_email:sbOptionalText(payload&&(payload.p_email!=null?payload.p_email:payload.email)),
+    p_client_ids:ids.length?ids:null,
+    p_joined_at:sbOptionalText(payload&&(payload.joinedAt||payload.joined_at||payload.p_joined_at))
+  };
+  var got=await sbRestRpc('admin_create_aide', body);
+  if(!got.ok)return {success:false,error:sbNormalizeWriteError(got.error||'Could not create aide.'),httpStatus:got.status||0};
+  return sbMapAideAuth(got.data);
+}
+async function sbAdminResetTempPassword(payload){
+  var username=String((payload&&(payload.username||payload.p_username))||'').trim();
+  if(!username)return {success:false,error:'Username missing.'};
+  var got=await sbRestRpc('reset_aide_temp_password', {
+    p_username:username,
+    p_temp_password:sbOptionalText(payload&&(payload.tempPassword||payload.temp_password||payload.p_temp_password))
+  });
+  if(!got.ok)return {success:false,error:sbNormalizeWriteError(got.error||'Could not reset password.'),httpStatus:got.status||0};
+  var mapped=sbMapAideAuth(got.data);
+  if(mapped.success&&!mapped.username)mapped.username=username;
+  return mapped;
+}
+function sbKnownAides(){
+  var out=[];
+  function add(list){
+    if(!list||!list.length)return;
+    for(var i=0;i<list.length;i++){
+      if(list[i]&&list[i].username)out.push(list[i]);
+    }
+  }
+  try{if(typeof loadedAidesList!=='undefined')add(loadedAidesList);}catch(e){}
+  try{if(typeof allAidesForAssign!=='undefined')add(allAidesForAssign);}catch(e2){}
+  try{
+    if(typeof cacheGet==='function'){
+      var cached=cacheGet('get_users');
+      if(cached&&cached.data)add(cached.data);
+    }
+  }catch(e3){}
+  return out;
+}
+async function sbResolveAideId(token){
+  var s=String(token||'').trim();
+  if(!s)return '';
+  if(typeof sbUuid==='function'&&sbUuid(s))return s;
+  var known=sbKnownAides();
+  for(var i=0;i<known.length;i++){
+    if(!sbSameUser(known[i].username, s))continue;
+    var id=known[i].id||known[i].aide_id||known[i].aideId||'';
+    if(typeof sbUuid==='function'&&sbUuid(id))return String(id);
+  }
+  var got=await sbRestGet('aides',[
+    ['select','id,username'],
+    ['username','eq.'+s],
+    ['org_id','eq.'+sbOrgId()],
+    ['limit','1']
+  ]);
+  if(!got.ok)return '';
+  var row=sbFirstRow(got.data);
+  if(row&&sbUuid(row.id))return String(row.id);
+  return '';
+}
+async function sbUpsertAssignment(aideId, clientId){
+  return sbRestMutate('POST','assignments',[
+    ['on_conflict','org_id,aide_id,client_id']
+  ],{
+    org_id:sbOrgId(),
+    aide_id:aideId,
+    client_id:clientId,
+    is_active:true
+  },'resolution=merge-duplicates,return=representation');
+}
+async function sbSoftUnassign(aideId, clientId){
+  return sbRestMutate('PATCH','assignments',[
+    ['aide_id','eq.'+aideId],
+    ['client_id','eq.'+clientId],
+    ['org_id','eq.'+sbOrgId()]
+  ],{is_active:false},'return=representation');
+}
+async function sbActiveAssignmentRows(clientId){
+  var got=await sbRestGet('assignments',[
+    ['select','id,aide_id,is_active,aide:aides(id,username)'],
+    ['client_id','eq.'+clientId],
+    ['org_id','eq.'+sbOrgId()],
+    ['is_active','eq.true']
+  ]);
+  if(!got.ok)return {ok:false,error:got.error||'Could not load assignments.'};
+  return {ok:true,rows:Array.isArray(got.data)?got.data:[]};
+}
+async function sbSyncClientAssignments(clientId, nextNames, currentRows){
+  var next=[];
+  (nextNames||[]).forEach(function(n){
+    var s=String(n||'').trim();
+    if(!s||sbUsernameIn(next, s))return;
+    next.push(s);
+  });
+  var rows=currentRows||[];
+  var i;
+  for(i=0;i<rows.length;i++){
+    var row=rows[i]||{};
+    var uname=row.aide&&row.aide.username;
+    var aideId=row.aide_id||(row.aide&&row.aide.id)||'';
+    if(!uname||sbUsernameIn(next, uname))continue;
+    if(!sbUuid(aideId))return {success:false,error:'Could not unassign aide @'+uname+'.'};
+    var off=await sbSoftUnassign(String(aideId), clientId);
+    if(!off.ok)return {success:false,error:off.error||'Could not unassign aide.',httpStatus:off.status||0};
+  }
+  for(i=0;i<next.length;i++){
+    var already=false;
+    for(var j=0;j<rows.length;j++){
+      var have=rows[j]&&rows[j].aide&&rows[j].aide.username;
+      if(have&&sbSameUser(have, next[i])){already=true;break;}
+    }
+    if(already)continue;
+    var resolved=await sbResolveAideId(next[i]);
+    if(!resolved)return {success:false,error:'Could not assign aide @'+next[i]+'.'};
+    var up=await sbUpsertAssignment(resolved, clientId);
+    if(!up.ok)return {success:false,error:up.error||'Could not assign aide.',httpStatus:up.status||0};
+  }
+  return {success:true};
+}
+function sbClientWriteBody(payload, isCreate){
+  var body={
+    name:String((payload&&payload.name)||'').trim(),
+    address:String((payload&&payload.address)||'').trim(),
+    lat:sbCoord(payload&&payload.lat),
+    lng:sbCoord(payload&&payload.lng)
+  };
+  if(isCreate){
+    body.org_id=sbOrgId();
+    body.legacy_id=String(Date.now());
+    body.is_active=true;
+  }
+  return body;
+}
+function sbAssignedNames(payload){
+  if(!payload)return undefined;
+  if(payload.assignedAides!=null)return payload.assignedAides;
+  if(payload.assigned_aides!=null)return payload.assigned_aides;
+  if(payload.AssignedAides!=null)return payload.AssignedAides;
+  return undefined;
+}
+async function sbAdminAddClient(payload){
+  var body=sbClientWriteBody(payload||{}, true);
+  if(!body.name||!body.address)return {success:false,error:'Please fill in client name and address.'};
+  var got=await sbRestMutate('POST','clients',[],body,'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not add client.',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row||!row.id)return {success:false,error:'Client was not created.'};
+  var names=sbAssignedNames(payload);
+  if(Array.isArray(names)&&names.length){
+    var synced=await sbSyncClientAssignments(String(row.id), names, []);
+    if(!synced.success)return synced;
+  }
+  var mapped=sbMapClient(row);
+  return {success:true,id:row.id,clientId:row.id,data:mapped,client:mapped};
+}
+async function sbAdminUpdateClient(payload){
+  var id=String((payload&&(payload.id||payload.clientId))||'').trim();
+  if(!id)return {success:false,error:'Client id missing.'};
+  var body=sbClientWriteBody(payload||{}, false);
+  if(!body.name||!body.address)return {success:false,error:'Please fill in client name and address.'};
+  var got=await sbRestMutate('PATCH','clients',[['id','eq.'+id]],body,'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not update client.',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {success:false,error:'Client not found.'};
+  var names=sbAssignedNames(payload);
+  if(names!=null){
+    var current=await sbActiveAssignmentRows(String(row.id||id));
+    if(!current.ok)return {success:false,error:current.error||'Could not load assignments.'};
+    var synced=await sbSyncClientAssignments(String(row.id||id), Array.isArray(names)?names:[], current.rows);
+    if(!synced.success)return synced;
+  }
+  return {success:true,id:row.id||id,clientId:row.id||id,data:sbMapClient(row)};
+}
+async function sbAdminArchiveClient(payload){
+  var id=String((payload&&(payload.clientId||payload.id))||'').trim();
+  if(!id)return {success:false,error:'No clientId for this row.'};
+  var got=await sbRestMutate('PATCH','clients',[['id','eq.'+id]],{is_active:false},'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not archive client.',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {success:false,error:'Client not found.'};
+  return {success:true,clientId:row.id||id,id:row.id||id,active:false,is_active:false};
+}
+async function sbAdminUpdateTimesheet(payload){
+  var id=String((payload&&payload.id)||'').trim();
+  if(!id)return {success:false,error:'Timesheet id missing.'};
+  var days=payload.days;
+  if(typeof days==='string'){
+    try{days=JSON.parse(days);}catch(e){days={};}
+  }
+  if(!days||typeof days!=='object'||Array.isArray(days))days={};
+  var body={
+    emp_name:payload.emp_name!=null?payload.emp_name:(payload.empName!=null?payload.empName:''),
+    client_name:payload.client_name!=null?payload.client_name:(payload.clientName!=null?payload.clientName:''),
+    total_hours:payload.total_hours!=null?payload.total_hours:(payload.totalHrs!=null?payload.totalHrs:''),
+    notes:payload.notes!=null?payload.notes:'',
+    days:days
+  };
+  var got=await sbRestMutate('PATCH','timesheets',[['id','eq.'+id]],body,'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not update timesheet.',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {success:false,error:'Timesheet not found.'};
+  return {success:true,id:row.id,data:sbMapTimesheet(row)};
+}
+async function sbAdminSendCorrection(payload){
+  var id=String((payload&&payload.id)||'').trim();
+  if(!id)return {success:false,error:'Timesheet id missing.'};
+  var days=payload.correctionDays!=null?payload.correctionDays:payload.correction_days;
+  if(typeof days==='string'){
+    try{days=JSON.parse(days);}catch(e){days=[];}
+  }
+  if(!Array.isArray(days))days=[];
+  var note=payload.correctionNote!=null?payload.correctionNote:payload.correction_note;
+  var body={
+    status:'correction_requested',
+    correction_days:days,
+    correction_note:note==null?'':String(note)
+  };
+  var got=await sbRestMutate('PATCH','timesheets',[['id','eq.'+id]],body,'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not send correction.',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {success:false,error:'Timesheet not found.'};
+  return {success:true,id:row.id,status:row.status||'correction_requested',data:sbMapTimesheet(row)};
+}
+async function sbAdminSoftDeleteTimesheet(payload){
+  var id=String((payload&&payload.id)||'').trim();
+  if(!id)return {success:false,error:'Timesheet id missing.'};
+  var got=await sbRestMutate('PATCH','timesheets',[['id','eq.'+id]],{is_active:false},'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not delete timesheet.',httpStatus:got.status||0};
+  var row=sbFirstRow(got.data);
+  if(!row)return {success:false,error:'Timesheet not found.'};
+  return {success:true,id:row.id||id,is_active:false};
+}
+async function sbAdminWriteDispatch(payload){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
+  var action=payload&&payload.action;
+  if(!sbIsAdminWriteAction(action))return {success:false,error:'not an admin write'};
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
+  try{
+    if(action==='admin_create_aide'||action==='create_aide')return await sbAdminCreateAide(payload);
+    if(action==='reset_temp_password'||action==='reset_aide_temp_password')return await sbAdminResetTempPassword(payload);
+    if(action==='add_client')return await sbAdminAddClient(payload);
+    if(action==='update_client')return await sbAdminUpdateClient(payload);
+    if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
+    if(action==='update')return await sbAdminUpdateTimesheet(payload);
+    if(action==='send_correction')return await sbAdminSendCorrection(payload);
+    return await sbAdminSoftDeleteTimesheet(payload);
+  }catch(err){
+    return {success:false,error:String(err&&err.message||err||'supabase')};
+  }
+}
+
 async function mgrLogin(){
   if(window._mgrLoginInFlight)return;
   window._mgrLoginInFlight=true;
@@ -4409,6 +4753,18 @@ function saveEdits(){
   let total=0;Object.values(allRecords[idx].days||{}).forEach(d=>{if(d.hrs&&d.hrs!=='—'){const[h,m]=d.hrs.split(':').map(Number);total+=h*60+(m||0);}});
   allRecords[idx].totalHrs=`${Math.floor(total/60)}:${String(total%60).padStart(2,'0')}`;
   store.set('admin_records',allRecords);currentRec=allRecords[idx];
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    const payload={action:'update',id:currentRec.id,emp_name:currentRec.empName,client_name:currentRec.clientName,total_hours:currentRec.totalHrs,notes:currentRec.notes,days:currentRec.days||{}};
+    sbAdminWriteDispatch(payload).then(function(res){
+      if(!(res&&res.success)){
+        showTempMsg((res&&res.error)||'Could not save timesheet.','var(--danger)');
+        return;
+      }
+      showTempMsg('✅ Changes saved!','var(--success)');
+      renderTimesheets();
+    }).catch(function(){showTempMsg('Could not save timesheet.','var(--danger)');});
+    return;
+  }
   fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update',id:currentRec.id,emp_name:currentRec.empName,client_name:currentRec.clientName,total_hours:currentRec.totalHrs,notes:currentRec.notes,days:currentRec.days||{}})}).catch(()=>{});
   showTempMsg('✅ Changes saved!','var(--success)');renderTimesheets();
 }
@@ -4437,7 +4793,12 @@ async function sendCorrectionRequest(){
   if(!correctionDays.length){alert('Please select at least one day that needs correction.');return;}
   const note=document.getElementById('correctionNote').value||'Please review and correct the flagged days.';
   try{
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_correction',id:currentRec.id,correctionDays,correctionNote:note})});
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+      const wrote=await sbAdminWriteDispatch({action:'send_correction',id:currentRec.id,correctionDays:correctionDays,correctionNote:note});
+      if(!(wrote&&wrote.success))throw new Error((wrote&&wrote.error)||'Error sending correction.');
+    }else{
+      await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_correction',id:currentRec.id,correctionDays,correctionNote:note})});
+    }
     const idx=allRecords.findIndex(r=>String(r.id)===String(currentRec.id));
     if(idx!==-1){allRecords[idx].status='correction_requested';store.set('admin_records',allRecords);}
     document.getElementById('correctionPanel').style.display='none';
@@ -4447,6 +4808,19 @@ async function sendCorrectionRequest(){
 
 function quickDelete(id){
   if(!confirm('Delete this timesheet permanently?'))return;
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    sbAdminWriteDispatch({action:'delete',id:id}).then(function(res){
+      if(!(res&&res.success)){
+        showTempMsg((res&&res.error)||'Could not delete timesheet.','var(--danger)');
+        return;
+      }
+      allRecords=allRecords.filter(r=>String(r.id)!==String(id));
+      store.set('admin_records',allRecords);
+      renderTimesheets();
+      showTempMsg('🗑️ Deleted.','var(--danger)');
+    }).catch(function(){showTempMsg('Could not delete timesheet.','var(--danger)');});
+    return;
+  }
   allRecords=allRecords.filter(r=>String(r.id)!==String(id));
   store.set('admin_records',allRecords);
   fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});
@@ -6620,7 +6994,11 @@ async function saveClient(){
   if(id)payload.id=id;
 
   try{
-    await apiPost(payload);
+    const saved=await apiPost(payload);
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&!(saved&&saved.success)){
+      showTempMsg((saved&&(saved.error||saved.message))||'Error saving client.','var(--danger)');
+      return;
+    }
     cacheInvalidate('get_clients');
     closeModal('clientModal');
     showTempMsg('&#10003; Client saved!','var(--success)');
@@ -6635,7 +7013,11 @@ async function deleteClient(id){
   if(!confirm('Delete this client? This cannot be undone.'))return;
   const client=allClients.find(c=>String(c.id)===String(id));
   try{
-    await apiPost({action:'delete_client',id});
+    const data=await apiPost({action:'delete_client',id});
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&!(data&&data.success)){
+      showTempMsg((data&&(data.error||data.message))||'Error deleting client.','var(--danger)');
+      return;
+    }
     cacheInvalidate('get_clients');
     showTempMsg('Client deleted.','var(--danger)');
     logActivity('Deleted client: '+(client?.name||id));
