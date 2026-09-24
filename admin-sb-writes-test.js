@@ -49,13 +49,29 @@ assert.ok(apiPost.includes('typeof sbIsAdminWriteAction'), 'missing helper must 
 const saveEdits = between('function saveEdits(){', 'function showCorrectionPanel()');
 const sendCorrFn = between('async function sendCorrectionRequest(){', 'function quickDelete(id)');
 const quickDelete = between('function quickDelete(id){', 'function deleteRec()');
+const deleteRecSrc = extractFn(html, 'function deleteRec()');
+const commitTs = extractFn(html, 'async function commitTimesheetDelete(id)');
+const deleteClientSrc = extractFn(html, 'function deleteClient(id)');
+const commitClientSrc = extractFn(html, 'async function commitDeleteClient(id)');
 assert.ok(saveEdits.includes('sbAdminWriteDispatch'), 'flag-on save edits uses the dispatcher');
 assert.ok(saveEdits.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update',id:currentRec.id,emp_name:currentRec.empName,client_name:currentRec.clientName,total_hours:currentRec.totalHrs,notes:currentRec.notes,days:currentRec.days||{}})}).catch(()=>{});"), 'flag-off timesheet update fetch is unchanged');
 assert.ok(saveEdits.indexOf('sbAdminWriteDispatch') < saveEdits.indexOf('fetch(SHEETS_URL'), 'supabase return happens before the sheets fetch');
 assert.ok(sendCorrFn.includes("action:'send_correction'"), 'correction action name stays');
 assert.ok(sendCorrFn.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_correction',id:currentRec.id,correctionDays,correctionNote:note})})"), 'flag-off send_correction fetch is unchanged');
-assert.ok(quickDelete.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});"), 'flag-off timesheet delete fetch is unchanged');
-assert.ok(quickDelete.includes("sbAdminWriteDispatch({action:'delete',id:id})"), 'flag-on delete is a soft delete dispatch');
+assert.ok(commitTs.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});"), 'flag-off timesheet delete fetch is unchanged');
+assert.ok(commitTs.includes("apiPost({action:'delete',id:id})"), 'flag-on timesheet delete posts action delete');
+assert.ok(commitTs.includes('data.success===true&&data.is_active===false'), 'timesheet success requires is_active false');
+assert.ok(commitTs.indexOf('evercareSbEnabled()') < commitTs.indexOf('fetch(SHEETS_URL'), 'sheets delete stays on the flag-off branch');
+assert.ok(quickDelete.includes("showSharedConfirm('Delete this timesheet permanently?'"), 'timesheet delete uses in-app confirm');
+assert.ok(deleteRecSrc.includes("showSharedConfirm('Delete timesheet for '"), 'detail delete uses in-app confirm');
+assert.ok(!deleteRecSrc.includes('quickDelete('), 'detail delete must not open a second confirm');
+assert.ok(deleteClientSrc.includes("showSharedConfirm('Delete this client? This cannot be undone.'"), 'client delete uses in-app confirm');
+assert.ok(commitClientSrc.includes('data.success===true&&data.is_active===false'), 'client success requires is_active false');
+assert.ok(!/window\.confirm|\bconfirm\(/.test(quickDelete+deleteRecSrc+commitTs+deleteClientSrc+commitClientSrc), 'archive ui must not use window.confirm');
+assert.ok(html.includes(".update({ is_active: false }).eq('id', id).select('id, is_active').single()"), 'archive chain is the contract shape');
+assert.ok(extractFn(html, 'async function sbRestPatchActive(table, id, refreshed)').includes("['select','id,is_active']"), 'select is id, is_active');
+assert.ok(extractFn(html, 'async function sbRestPatchActive(table, id, refreshed)').includes("Accept:'application/vnd.pgrst.object+json'"), 'single() accept header');
+assert.ok(extractFn(html, 'function sbConfirmedArchive(row, id)').includes('row.is_active!==false'), 'success follows representation.is_active');
 assert.ok(!/method:\s*'DELETE'/.test(extractFn(html, 'async function sbAdminSoftDeleteTimesheet(payload)')), 'timesheet delete is not a hard DELETE');
 assert.ok(!/method:\s*'DELETE'/.test(extractFn(html, 'async function sbAdminArchiveClient(payload)')), 'client archive is not a hard DELETE');
 assert.ok(extractFn(html, 'async function sbAdminUpdateTimesheet(payload)').includes("sbRestMutate('PATCH','timesheets'"), 'timesheet update patches by id');
@@ -104,6 +120,9 @@ const names = [
   'function sbAssignedNames(payload)',
   'async function sbAdminAddClient(payload)',
   'async function sbAdminUpdateClient(payload)',
+  'function sbArchiveRepresentation(data)',
+  'async function sbRestPatchActive(table, id, refreshed)',
+  'function sbConfirmedArchive(row, id)',
   'async function sbAdminArchiveClient(payload)',
   'async function sbAdminUpdateTimesheet(payload)',
   'async function sbAdminSendCorrection(payload)',
@@ -184,6 +203,16 @@ function session(token, org){
   };
 }
 function decoded(u){return decodeURIComponent(String(u));}
+function assertArchivePatch(call, table, id){
+  assert.strictEqual(call.init.method, 'PATCH');
+  assert.ok(call.url.indexOf('/rest/v1/'+table+'?') > 0, call.url);
+  assert.strictEqual(params(call.url).get('id'), 'eq.'+id);
+  assert.strictEqual(params(call.url).get('select'), 'id,is_active');
+  assert.deepStrictEqual(bodyOf(call), {is_active:false});
+  assert.strictEqual(call.init.headers.Accept, 'application/vnd.pgrst.object+json');
+  assert.strictEqual(call.init.headers.Prefer, 'return=representation');
+  assert.ok(!/service_role/i.test(call.init.headers.Authorization||''));
+}
 function bodyOf(call){return JSON.parse(call.init.body);}
 function params(u){return new URL(u).searchParams;}
 
@@ -413,15 +442,17 @@ const clientRow = {
   on.calls.length = 0;
   const archived = await on.box.apiPost({action:'archive_client', clientId:clientId});
   assert.strictEqual(archived.success, true);
-  assert.strictEqual(archived.active, false);
+  assert.strictEqual(archived.is_active, false);
+  assert.strictEqual(archived.representation.is_active, false);
   assert.strictEqual(archived.clientId, clientId);
-  assert.deepStrictEqual(bodyOf(on.calls[0]), {is_active:false});
-  assert.strictEqual(on.calls[0].init.method, 'PATCH');
+  assert.ok(!Object.prototype.hasOwnProperty.call(archived, 'active'), 'column is is_active, not active');
+  assertArchivePatch(on.calls[0], 'clients', clientId);
   on.calls.length = 0;
   const deletedClient = await on.box.apiPost({action:'delete_client', id:clientId});
   assert.strictEqual(deletedClient.success, true);
-  assert.strictEqual(deletedClient.active, false);
-  assert.deepStrictEqual(bodyOf(on.calls[0]), {is_active:false});
+  assert.strictEqual(deletedClient.is_active, false);
+  assert.strictEqual(deletedClient.representation.is_active, false);
+  assertArchivePatch(on.calls[0], 'clients', clientId);
 
   on.calls.length = 0;
   const days = {'0':{tin:'08:00', tout:'16:00', hrs:'8:00'}};
@@ -472,9 +503,8 @@ const clientRow = {
   const gone = await on.box.apiPost({action:'delete', id:tsId});
   assert.strictEqual(gone.success, true);
   assert.strictEqual(gone.is_active, false);
-  assert.strictEqual(on.calls[0].init.method, 'PATCH');
-  assert.deepStrictEqual(bodyOf(on.calls[0]), {is_active:false});
-  assert.strictEqual(params(on.calls[0].url).get('id'), 'eq.'+tsId);
+  assert.strictEqual(gone.representation.is_active, false);
+  assertArchivePatch(on.calls[0], 'timesheets', tsId);
 
   const taken = harness({
     search:'?sb=1',
@@ -538,6 +568,42 @@ const clientRow = {
   const fallback = await profileOrg.box.apiPost({action:'add_client', name:'Ann', address:'1', lat:'', lng:''});
   assert.strictEqual(fallback.success, true);
   assert.strictEqual(bodyOf(profileOrg.calls[0]).org_id, ORG, 'missing profile falls back to the live org id');
+
+  const stillOn = harness({
+    search:'?sb=1',
+    session:session(),
+    route: function(fetchUrl, init){
+      if(init.method==='PATCH' && decoded(fetchUrl).indexOf('/rest/v1/clients') > 0){
+        return {status:200, raw:JSON.stringify({id:clientId, is_active:true})};
+      }
+      return {status:500, raw:'{}'};
+    }
+  });
+  const notArchived = await stillOn.box.apiPost({action:'delete_client', id:clientId});
+  assert.strictEqual(notArchived.success, false);
+  assert.notStrictEqual(notArchived.is_active, false);
+  assert.strictEqual(notArchived.error, 'Archive was not confirmed');
+  assertArchivePatch(stillOn.calls[0], 'clients', clientId);
+
+  const missingCol = harness({
+    search:'?sb=1',
+    session:session(),
+    responses:[{status:200, raw:JSON.stringify({id:clientId})}]
+  });
+  const missingColOut = await missingCol.box.apiPost({action:'archive_client', clientId:clientId});
+  assert.strictEqual(missingColOut.success, false);
+  assert.notStrictEqual(missingColOut.is_active, false);
+
+  const singleOk = harness({
+    search:'?sb=1',
+    session:session(),
+    responses:[{status:200, raw:JSON.stringify({id:tsId, is_active:false})}]
+  });
+  const singleGone = await singleOk.box.apiPost({action:'delete', id:tsId});
+  assert.strictEqual(singleGone.success, true);
+  assert.strictEqual(singleGone.is_active, false);
+  assert.strictEqual(singleGone.representation.is_active, false);
+  assertArchivePatch(singleOk.calls[0], 'timesheets', tsId);
 
   console.log('admin-sb-writes-test: ok');
 })().catch(function(err){
