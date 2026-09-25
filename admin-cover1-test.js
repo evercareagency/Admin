@@ -59,9 +59,19 @@ assert.ok(desk.includes('>Assign backup<') && desk.includes('>Confirm assign<'),
 assert.ok(!/Request PTO|PTO balance|pto_request/i.test(desk), 'coverage is not a PTO product');
 
 assert.ok(!html.includes("navEditCatalog") || !extractFn(html, 'function navEditCatalog()').includes('coverage'), 'Coverage is not a bottom-tab choice');
-assert.ok(html.includes("sbRestRpc") && html.includes("'record_call_off'") && html.includes("'list_open_shifts'"), 'record and list RPC names');
-assert.ok(html.includes("'rank_backup_aides'") && html.includes("'cover_outcome'"), 'rank and outcome RPC names');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-cover1">'), 'cover1 build meta stays');
+assert.ok(html.includes("sbRestRpc('admin_record_call_off'") || html.includes("record:['admin_record_call_off']"), 'record callable name');
+assert.ok(html.includes("list:['admin_list_open_shifts']"), 'list callable name');
+assert.ok(html.includes("rank:['admin_rank_backup_aides']"), 'rank callable name');
+assert.ok(html.includes("outcome:['admin_cover_outcome']"), 'outcome callable name');
+assert.ok(!html.includes('record_coverage_call_off') && !html.includes('p_starts_at') && !html.includes("p_shift_id:"), 'old guessed names are not the contract');
+assert.ok(html.includes('p_shift_start') && html.includes('p_shift_end') && html.includes('p_reason'), 'record args');
+assert.ok(html.includes('p_include_resolved') && html.includes('p_open_shift_id') && html.includes('p_backup_aide_id') && html.includes('p_notes'), 'list rank outcome args');
+assert.ok(html.includes('awaiting_client') && html.includes('cancelled') && html.includes('reopen'), 'returned statuses are tolerated');
+assert.ok(html.includes('schedule_exceptions') && html.includes('does not also post upsert_schedule_exception'), 'Ace owns the schedule exception sync');
+assert.ok(desk.includes('id="coverEndTime"'), 'intake collects shift end');
 assert.ok(html.includes('client_refused_resume_next_day') && html.includes('assigned_backup'), 'outcome values');
+assert.ok(!extractFn(html, 'async function coverLoadRanks(shift)').includes('coverRankRows'), 'rank panel does not paint rows before the shape is locked');
 assert.ok(!/distance_miles\s*:\s*['"]?\d/.test(html.slice(html.indexOf('function coverMapRank'), html.indexOf('function coverRankRows'))), 'rank mapper does not invent miles');
 
 function extractFn(src, sig){
@@ -89,7 +99,11 @@ vm.createContext(ctx);
   'function coverMapRank(row)',
   'function coverRankRows(data)',
   'function coverIsOpen(shift)',
-  'function coverShiftRows(data)'
+  'function coverShiftRows(data)',
+  'function coverRecordBody(clientId, aideId, shiftStart, shiftEnd, reason)',
+  'function coverListBody()',
+  'function coverRankArgs(openShiftId)',
+  'function coverOutcomeBody(openShiftId, outcome, backupAideId, notes)'
 ].forEach(function(sig){
   vm.runInContext(extractFn(html, sig), ctx);
 });
@@ -116,7 +130,33 @@ assert.strictEqual(vm.runInContext('coverMapRank({aide_name:"Dee"}).distance', c
 assert.strictEqual(vm.runInContext('coverRankRows({ok:false, ranks:[{aide_name:"Nope"}]}).length', ctx), 0, 'failed rank payload is not shown');
 assert.strictEqual(vm.runInContext('coverRankRows({ranks:[{aide_name:"Dee", continuity:2}]})[0].name', ctx), 'Dee');
 assert.strictEqual(vm.runInContext('coverIsOpen({status:"assigned"})', ctx), false);
+assert.strictEqual(vm.runInContext('coverIsOpen({status:"assigned_backup"})', ctx), false);
+assert.strictEqual(vm.runInContext('coverIsOpen({status:"client_refused_resume_next_day"})', ctx), false);
+assert.strictEqual(vm.runInContext('coverIsOpen({status:"cancelled"})', ctx), false);
 assert.strictEqual(vm.runInContext('coverIsOpen({status:"open"})', ctx), true);
+assert.strictEqual(vm.runInContext('coverIsOpen({status:"awaiting_client"})', ctx), true);
+assert.strictEqual(vm.runInContext('coverIsOpen({status:"reopen"})', ctx), true);
 assert.strictEqual(vm.runInContext('coverShiftRows({shifts:[{id:"s2", client_name:"Ada"}]}).length', ctx), 1);
+
+const locked = vm.runInContext('coverMapShift({open_shift_id:"os1", client_name:"Ada", regular_aide_name:"Bea", shift_start:"2026-09-26T12:00:00Z", shift_end:"2026-09-26T16:00:00Z", status:"awaiting_client"})', ctx);
+assert.strictEqual(locked.id, 'os1');
+assert.strictEqual(locked.startsAt, '2026-09-26T12:00:00Z');
+assert.strictEqual(locked.endsAt, '2026-09-26T16:00:00Z');
+assert.strictEqual(locked.status, 'awaiting_client');
+assert.strictEqual(locked.statusExplicit, true);
+
+const recordBody = vm.runInContext('coverRecordBody("c1","a1","2026-09-26T12:00:00Z","2026-09-26T16:00:00Z","sick")', ctx);
+assert.deepStrictEqual(Object.keys(recordBody), ['p_client_id','p_regular_aide_id','p_shift_start','p_shift_end','p_reason']);
+assert.strictEqual(recordBody.p_reason, 'sick');
+assert.strictEqual(JSON.stringify(vm.runInContext('coverListBody()', ctx)), JSON.stringify({p_include_resolved:false}));
+assert.strictEqual(JSON.stringify(vm.runInContext('coverRankArgs("os1")', ctx)), JSON.stringify({p_open_shift_id:'os1'}));
+const outcomeBody = vm.runInContext('coverOutcomeBody("os1","assigned_backup","b1","desk note")', ctx);
+assert.strictEqual(outcomeBody.p_open_shift_id, 'os1');
+assert.strictEqual(outcomeBody.p_outcome, 'assigned_backup');
+assert.strictEqual(outcomeBody.p_backup_aide_id, 'b1');
+assert.strictEqual(outcomeBody.p_notes, 'desk note');
+const refuseBody = vm.runInContext('coverOutcomeBody("os1","client_refused_resume_next_day", null, "")', ctx);
+assert.strictEqual(refuseBody.p_backup_aide_id, undefined);
+assert.strictEqual(refuseBody.p_notes, undefined);
 
 console.log('admin-cover1-test: ok');

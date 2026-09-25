@@ -41,7 +41,7 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
-<!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, smart assign, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule: record_call_off {p_client_id,p_regular_aide_id,p_starts_at,p_note}, list_open_shifts {}, rank_backup_aides {p_shift_id}, cover_outcome {p_shift_id,p_outcome,p_backup_aide_id}. p_outcome is client_refused_resume_next_day or assigned_backup. If the primary name is not in the schema cache, aliases are probed once. A missing callable keeps a phone-session list and an empty smart-assign panel. Distance and continuity are shown only when Ace returns them. Never invented. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, smart assign stub, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id}, admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?}. p_outcome is client_refused_resume_next_day or assigned_backup. Returned statuses awaiting_client, cancelled, and reopen are tolerated. Ace syncs schedule_exceptions call_off to cover. This desk does not also post upsert_schedule_exception. Rank panel stays an honest stub until Ace locks the admin_rank_backup_aides response shape. No stand-in ranks. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-cover1">
 <!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Optional list helper POST rpc/admin_list_aides {p_include_deleted} when that callable answers with aide rows; otherwise Active is is_active=eq.true and deactivated_at=is.null, and Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Ace purges at 03:20 ET after 7 days. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-aidadel1">
@@ -286,6 +286,8 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .page-hdr{flex-direction:column;align-items:stretch;margin-bottom:12px;}
 #tab_coverage .field{margin-bottom:10px;}
 #tab_coverage textarea{min-height:64px;}
+#tab_coverage .cover-when-row{display:flex;gap:8px;}
+#tab_coverage .cover-when-row .field{flex:1;min-width:0;}
 #tab_coverage .page-hdr .btn,#tab_coverage .cover-actions .btn,#tab_coverage .cover-back{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
 #tab_coverage [hidden]{display:none !important;}
 #tab_coverage .cover-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
@@ -1231,9 +1233,12 @@ bindLoginKeyboard();
           <div class="field"><label for="coverClientSel">Client</label><select id="coverClientSel"></select></div>
           <div class="field"><label for="coverAideSel">Regular aide</label><select id="coverAideSel"></select></div>
           <div class="field"><label for="coverDate">Date</label><input type="date" id="coverDate"></div>
-          <div class="field"><label for="coverTime">Time</label><input type="time" id="coverTime" value="08:00"></div>
+          <div class="cover-when-row">
+            <div class="field"><label for="coverTime">Start</label><input type="time" id="coverTime" value="08:00"></div>
+            <div class="field"><label for="coverEndTime">End</label><input type="time" id="coverEndTime" value="12:00"></div>
+          </div>
           <div class="field"><label for="coverPhone">Client phone</label><input type="tel" id="coverPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
-          <div class="field"><label for="coverNote">Note</label><textarea id="coverNote" placeholder="Optional note"></textarea></div>
+          <div class="field"><label for="coverNote">Reason</label><textarea id="coverNote" placeholder="Optional reason"></textarea></div>
           <div class="cover-actions">
             <button type="button" class="btn btn-teal" id="coverRecordBtn" onclick="coverRecordCalloff()">Record call-off</button>
           </div>
@@ -1249,7 +1254,7 @@ bindLoginKeyboard();
           <article class="cover-card" id="coverOutcomeSummary" aria-label="Shift"></article>
           <section class="cover-rank" id="coverRankPanel" aria-label="Smart assign">
             <h2>Smart assign</h2>
-            <p id="coverRankBody">Ranked backups are not live yet. This panel binds to Ace rank (distance and continuity) when that callable answers. No stand-in ranks.</p>
+            <p id="coverRankBody">Ranked backups are not live yet. admin_rank_backup_aides will fill this panel when Ace locks the response shape. No stand-in ranks.</p>
             <div id="coverRankList" class="cover-rank-list"></div>
           </section>
           <section class="cover-section" aria-label="Contact the client">
@@ -3387,13 +3392,15 @@ function showTab(tab){
   }
 }
 
-// v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1.
-// Office JWT via sbRestRpc. No Sheets. No Backup writes. No PTO. No invented ranks.
+// v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
+// Office JWT via sbRestRpc. No Sheets. No Backup writes. No PTO.
+// Ace syncs schedule_exceptions call_off to cover. This desk does not post upsert_schedule_exception.
+// Rank rows stay unpainted until Ace locks the admin_rank_backup_aides response shape.
 var COVER_RPC={
-  record:['record_call_off','record_coverage_call_off','open_coverage_shift'],
-  list:['list_open_shifts','list_coverage_open_shifts','list_coverage_shifts'],
-  rank:['rank_backup_aides','rank_coverage_backups','list_ranked_backups'],
-  outcome:['cover_outcome','record_cover_outcome','set_coverage_outcome']
+  record:['admin_record_call_off'],
+  list:['admin_list_open_shifts'],
+  rank:['admin_rank_backup_aides'],
+  outcome:['admin_cover_outcome']
 };
 var coverRpcPick={record:'',list:'',rank:'',outcome:''};
 var coverRpcOff={record:false,list:false,rank:false,outcome:false};
@@ -3405,7 +3412,7 @@ var coverContacted=false;
 var coverRanks=[];
 var coverBusy=false;
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
-var COVER_RANK_STUB='Ranked backups are not live yet. This panel binds to Ace rank (distance and continuity) when that callable answers. No stand-in ranks.';
+var COVER_RANK_STUB='Ranked backups are not live yet. admin_rank_backup_aides will fill this panel when Ace locks the response shape. No stand-in ranks.';
 function coverEsc(s){
   var raw=String(s==null?'':s);
   if(typeof escapeHtml==='function')return escapeHtml(raw);
@@ -3448,6 +3455,16 @@ function coverFormatWhen(iso){
     return '—';
   }
 }
+function coverFormatSpan(start, end){
+  var a=coverFormatWhen(start);
+  if(!end)return a;
+  var b=coverFormatWhen(end);
+  if(a==='—'||b==='—')return a==='—'?b:a;
+  var aCut=a.lastIndexOf(', ');
+  var bCut=b.lastIndexOf(', ');
+  if(aCut>0&&bCut>0&&a.slice(0,aCut)===b.slice(0,bCut))return a+' – '+b.slice(bCut+2);
+  return a+' – '+b;
+}
 function coverPick(src){
   var row=src||{};
   for(var i=1;i<arguments.length;i++){
@@ -3459,13 +3476,15 @@ function coverPick(src){
 function coverMapShift(row){
   var src=row&&typeof row==='object'?row:{};
   if(src.shift&&typeof src.shift==='object'&&!src.id&&!src.shift_id)src=src.shift;
-  var id=String(coverPick(src,'id','shift_id','shiftId','open_shift_id','openShiftId')||'');
+  var id=String(coverPick(src,'open_shift_id','openShiftId','id','shift_id','shiftId')||'');
   var clientName=String(coverPick(src,'clientName','client_name','client')||'');
   var aideName=String(coverPick(src,'regularAideName','regular_aide_name','aideName','aide_name','usual_aide_name','usualAideName')||'');
-  var startsAt=String(coverPick(src,'startsAt','starts_at','when','shift_start','shiftStart')||'');
-  var status=String(coverPick(src,'status')||'open');
+  var startsAt=String(coverPick(src,'shift_start','shiftStart','p_shift_start','startsAt','starts_at','when')||'');
+  var endsAt=String(coverPick(src,'shift_end','shiftEnd','p_shift_end','endsAt','ends_at')||'');
+  var statusRaw=coverPick(src,'status','outcome');
+  var status=String(statusRaw||'open');
   var phone=String(coverPick(src,'clientPhone','client_phone','phone')||'');
-  var note=String(coverPick(src,'note','notes')||'');
+  var note=String(coverPick(src,'reason','p_reason','note','notes','p_notes')||'');
   var clientId=String(coverPick(src,'clientId','client_id')||'');
   var aideId=String(coverPick(src,'regularAideId','regular_aide_id','aideId','aide_id','usual_aide_id')||'');
   var backupId=String(coverPick(src,'backupAideId','backup_aide_id')||'');
@@ -3478,7 +3497,9 @@ function coverMapShift(row){
     aideId:aideId,
     aideName:aideName||'—',
     startsAt:startsAt,
+    endsAt:endsAt,
     status:status||'open',
+    statusExplicit:statusRaw!=null&&String(statusRaw)!=='',
     phone:phone,
     note:note,
     backupAideId:backupId,
@@ -3502,7 +3523,7 @@ function coverShiftRows(data){
   for(var i=0;i<keys.length;i++){
     if(Array.isArray(node[keys[i]]))return node[keys[i]];
   }
-  if(node.id||node.shift_id||node.client_name||node.clientName)return [node];
+  if(node.id||node.shift_id||node.open_shift_id||node.client_name||node.clientName)return [node];
   return [];
 }
 function coverMapRank(row){
@@ -3542,8 +3563,11 @@ function coverRankRows(data){
   return out;
 }
 function coverIsOpen(shift){
-  var st=String(shift&&shift.status||'open').trim().toLowerCase();
-  return st===''||st==='open'||st==='call_off'||st==='calloff'||st==='call-off';
+  var st=String(shift&&shift.status||'open').trim().toLowerCase().replace(/[\s-]+/g,'_');
+  if(st==='cancelled'||st==='canceled'||st==='assigned'||st==='assigned_backup')return false;
+  if(st==='refused'||st==='client_refused_resume_next_day'||st==='resolved'||st==='closed')return false;
+  if(st===''||st==='open'||st==='call_off'||st==='calloff'||st==='awaiting_client'||st==='reopen'||st==='reopened')return true;
+  return true;
 }
 function coverReadLocal(){
   try{
@@ -3562,6 +3586,31 @@ function coverWriteLocal(list){
 function coverUuidOrNull(v){
   if(typeof sbUuid==='function'&&sbUuid(v))return String(v).trim();
   return null;
+}
+function coverRecordBody(clientId, aideId, shiftStart, shiftEnd, reason){
+  var body={
+    p_client_id:clientId,
+    p_regular_aide_id:aideId,
+    p_shift_start:shiftStart,
+    p_shift_end:shiftEnd
+  };
+  if(reason)body.p_reason=String(reason);
+  return body;
+}
+function coverListBody(){
+  return {p_include_resolved:false};
+}
+function coverRankArgs(openShiftId){
+  return {p_open_shift_id:String(openShiftId||'')};
+}
+function coverOutcomeBody(openShiftId, outcome, backupAideId, notes){
+  var body={
+    p_open_shift_id:openShiftId,
+    p_outcome:outcome
+  };
+  if(backupAideId)body.p_backup_aide_id=backupAideId;
+  if(notes)body.p_notes=String(notes);
+  return body;
 }
 function coverFind(id){
   id=String(id||'');
@@ -3683,6 +3732,8 @@ function coverFillIntake(){
     date.value=t.getFullYear()+'-'+m+'-'+d;
   }
   if(time&&!time.value)time.value='08:00';
+  var endTime=document.getElementById('coverEndTime');
+  if(endTime&&!endTime.value)endTime.value='12:00';
   var roster=document.getElementById('coverRosterNote');
   if(roster){
     var nClients=coverClientChoices().length;
@@ -3708,7 +3759,7 @@ function coverPaintList(){
     return '<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'">'
       +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+chip+'</div>'
       +'<div class="cover-meta">Regular aide · '+coverEsc(s.aideName||'—')+'</div>'
-      +'<div class="cover-meta">When · '+coverEsc(coverFormatWhen(s.startsAt))+'</div>'
+      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(s.startsAt, s.endsAt))+'</div>'
       +'</button>';
   }).join('');
 }
@@ -3724,7 +3775,7 @@ function coverShowIntake(){
 }
 async function coverReload(){
   var note=document.getElementById('coverSourceNote');
-  var got=await coverRpc('list', {});
+  var got=await coverRpc('list', coverListBody());
   if(got&&got.ok){
     coverSource='ace';
     coverShifts=coverShiftRows(got.data).map(coverMapShift).filter(Boolean);
@@ -3780,7 +3831,7 @@ function coverPaintOutcome(){
     var chip=coverShiftUrgent(shift)?'<span class="cover-chip">Within 48h</span>':'';
     sum.innerHTML='<div class="cover-card-top"><strong>'+coverEsc(shift.clientName)+'</strong>'+chip+'</div>'
       +'<div class="cover-meta">Regular aide · '+coverEsc(shift.aideName||'—')+'</div>'
-      +'<div class="cover-meta">When · '+coverEsc(coverFormatWhen(shift.startsAt))+'</div>';
+      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(shift.startsAt, shift.endsAt))+'</div>';
   }
   var refuse=document.getElementById('coverRefuseBtn');
   var assign=document.getElementById('coverAssignBtn');
@@ -3797,43 +3848,26 @@ function coverPaintOutcome(){
 async function coverLoadRanks(shift){
   var body=document.getElementById('coverRankBody');
   var list=document.getElementById('coverRankList');
+  coverRanks=[];
   if(list)list.innerHTML='';
   if(!shift)return;
   var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!shift.id;
-  if(local){
-    coverRanks=[];
+  if(local||!coverUuidOrNull(shift.id)){
     if(body)body.textContent='This shift is on this phone. '+COVER_RANK_STUB;
     return;
   }
-  if(body)body.textContent='Checking Ace rank…';
-  var got=await coverRpc('rank', {p_shift_id:String(shift.id)});
+  if(body)body.textContent=COVER_RANK_STUB;
+  var got=await coverRpc('rank', coverRankArgs(shift.id));
   if(String(coverSelectedId)!==String(shift.id))return;
   if(!got||got.missing||got.signedOut){
-    coverRanks=[];
     if(body)body.textContent=COVER_RANK_STUB;
     return;
   }
   if(!got.ok){
-    coverRanks=[];
     if(body)body.textContent=String(got.error||'Could not load ranked backups.')+' No stand-in ranks.';
     return;
   }
-  coverRanks=coverRankRows(got.data);
-  if(!coverRanks.length){
-    if(body)body.textContent='Ace rank answered with no backup aides for this shift. No stand-in ranks.';
-    return;
-  }
-  if(body)body.textContent='Ace rank, nearest and most continuous first.';
-  if(!list)return;
-  list.innerHTML=coverRanks.map(function(r, i){
-    var bits=[];
-    if(r.distance!=null)bits.push('Distance · '+coverEsc(r.distance));
-    if(r.continuity!=null)bits.push('Continuity · '+coverEsc(r.continuity));
-    if(!bits.length)bits.push('Ranked by Ace');
-    return '<button type="button" class="cover-rank-row" data-cover-aide="'+coverAttr(r.id)+'" data-cover-aide-name="'+coverAttr(r.name)+'">'
-      +'<strong>'+String(i+1)+'. '+coverEsc(r.name)+'</strong>'
-      +'<span>'+bits.join(' · ')+'</span></button>';
-  }).join('');
+  if(body)body.textContent='Ace rank answered. Backup rows stay hidden until the response shape is locked. No stand-in ranks.';
 }
 function coverOpenOutcome(id){
   var shift=coverFind(id);
@@ -3887,6 +3921,7 @@ async function coverRecordCalloff(){
   var asel=document.getElementById('coverAideSel');
   var dateEl=document.getElementById('coverDate');
   var timeEl=document.getElementById('coverTime');
+  var endEl=document.getElementById('coverEndTime');
   var noteEl=document.getElementById('coverNote');
   var phoneEl=document.getElementById('coverPhone');
   var clientId=csel?String(csel.value||''):'';
@@ -3894,6 +3929,7 @@ async function coverRecordCalloff(){
   var clientName=coverSelectedLabel(csel);
   var aideName=coverSelectedLabel(asel);
   var startsAt=coverComposeWhen(dateEl&&dateEl.value, timeEl&&timeEl.value);
+  var endsAt=coverComposeWhen(dateEl&&dateEl.value, endEl&&endEl.value);
   var noteText=noteEl?String(noteEl.value||'').trim():'';
   var phone=phoneEl?String(phoneEl.value||'').trim():'';
   if(!clientId||!clientName){
@@ -3904,8 +3940,12 @@ async function coverRecordCalloff(){
     if(typeof showTempMsg==='function')showTempMsg('Choose the regular aide.','var(--warn)');
     return;
   }
-  if(!startsAt){
-    if(typeof showTempMsg==='function')showTempMsg('Choose the date and time.','var(--warn)');
+  if(!startsAt||!endsAt){
+    if(typeof showTempMsg==='function')showTempMsg('Choose the date, start, and end.','var(--warn)');
+    return;
+  }
+  if(Date.parse(endsAt)<=Date.parse(startsAt)){
+    if(typeof showTempMsg==='function')showTempMsg('End time needs to be after the start.','var(--warn)');
     return;
   }
   coverBusy=true;
@@ -3915,12 +3955,7 @@ async function coverRecordCalloff(){
   var aideUuid=coverUuidOrNull(aideId);
   var got=null;
   if(clientUuid&&aideUuid){
-    got=await coverRpc('record', {
-      p_client_id:clientUuid,
-      p_regular_aide_id:aideUuid,
-      p_starts_at:startsAt,
-      p_note:noteText||null
-    });
+    got=await coverRpc('record', coverRecordBody(clientUuid, aideUuid, startsAt, endsAt, noteText));
   }else{
     got={missing:true};
   }
@@ -3943,11 +3978,15 @@ async function coverRecordCalloff(){
         if(!found.clientName||found.clientName==='Client')found.clientName=clientName;
         if(!found.aideName||found.aideName==='—')found.aideName=aideName;
         if(!found.startsAt)found.startsAt=startsAt;
+        if(!found.endsAt)found.endsAt=endsAt;
+        if(!found.note&&noteText)found.note=noteText;
       }else{
         mapped.clientName=mapped.clientName&&mapped.clientName!=='Client'?mapped.clientName:clientName;
         mapped.aideName=mapped.aideName&&mapped.aideName!=='—'?mapped.aideName:aideName;
         mapped.startsAt=mapped.startsAt||startsAt;
+        mapped.endsAt=mapped.endsAt||endsAt;
         mapped.phone=mapped.phone||phone;
+        if(!mapped.note&&noteText)mapped.note=noteText;
         mapped.source='ace';
         mapped.status=mapped.status||'open';
         coverShifts.unshift(mapped);
@@ -3975,6 +4014,7 @@ async function coverRecordCalloff(){
     aideId:aideId,
     aideName:aideName,
     startsAt:startsAt,
+    endsAt:endsAt,
     status:'open',
     phone:phone,
     note:noteText,
@@ -4013,12 +4053,14 @@ async function coverApplyOutcome(outcome){
   coverBusy=true;
   var localOnly=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
   var got=null;
+  var backupUuid=outcome==='assigned_backup'?coverUuidOrNull(backupId):null;
+  if(!localOnly&&outcome==='assigned_backup'&&!backupUuid){
+    coverBusy=false;
+    if(typeof showTempMsg==='function')showTempMsg('That backup aide is not an office id yet. Nothing was saved.','var(--warn)');
+    return;
+  }
   if(!localOnly){
-    got=await coverRpc('outcome', {
-      p_shift_id:coverUuidOrNull(shift.id),
-      p_outcome:outcome,
-      p_backup_aide_id:outcome==='assigned_backup'?coverUuidOrNull(backupId):null
-    });
+    got=await coverRpc('outcome', coverOutcomeBody(coverUuidOrNull(shift.id), outcome, backupUuid, shift.note||''));
   }else{
     got={missing:true};
   }
@@ -4027,7 +4069,13 @@ async function coverApplyOutcome(outcome){
     if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the outcome.','var(--danger)');
     return;
   }
-  shift.status=outcome==='assigned_backup'?'assigned':'refused';
+  var returned=null;
+  if(got&&got.ok){
+    var rows=coverShiftRows(got.data);
+    returned=coverMapShift((rows&&rows[0])||got.data||{})||null;
+  }
+  if(returned&&returned.statusExplicit)shift.status=returned.status;
+  else shift.status=outcome==='assigned_backup'?'assigned_backup':'client_refused_resume_next_day';
   shift.backupAideId=backupId;
   shift.backupAideName=backupName;
   if(shift.source==='local'||localOnly)coverWriteLocal(coverShifts);
