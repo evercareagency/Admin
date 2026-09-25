@@ -110,6 +110,7 @@ vm.createContext(ctx);
   'function coverNameOf(v)',
   'function coverIdOf(v)',
   'function coverPickPhone(obj)',
+  'function coverIntakeSource(src)',
   'function coverMapShift(row)',
   'function coverCanAssign(shift)',
   'function coverMapRank(row)',

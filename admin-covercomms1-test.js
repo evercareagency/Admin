@@ -40,6 +40,10 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-layoutA1">
 assert.ok(html.includes('v=admintheme1'), 'admintheme1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme1">'), 'admintheme1 meta stays');
 assert.ok(html.includes('v=cover1'), 'cover1 stays on the tip');
+assert.ok(html.includes('v=coveraide1'), 'coveraide1 marker stays');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coveraide1">'), 'coveraide1 meta stays');
+assert.ok(html.indexOf('content="2026-09-25-covercomms1"') < html.indexOf('content="2026-09-25-coveraide1"'), 'covercomms1 stays ahead of coveraide1');
+assert.ok(html.indexOf('content="2026-09-25-coveraide1"') < html.indexOf('content="2026-09-25-cover1"'), 'coveraide1 stays ahead of cover1');
 
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
@@ -96,6 +100,7 @@ vm.createContext(ctx);
   'function coverNameOf(v)',
   'function coverIdOf(v)',
   'function coverPickPhone(obj)',
+  'function coverIntakeSource(src)',
   'function coverMapShift(row)',
   'function coverMapRank(row)',
   'function coverServiceDate(iso)',
@@ -144,7 +149,8 @@ assert.strictEqual(mapped.caseManagerName, 'Pat Lee');
 assert.strictEqual(mapped.caseManagerEmail, 'pat@example.com');
 assert.strictEqual(mapped.aidePhone, '2165550101');
 assert.strictEqual(mapped.backupPhone, '2165550199');
-assert.strictEqual(mapped.source, 'aide');
+assert.strictEqual(mapped.source, 'ace', 'pipeline source stays local versus ace');
+assert.strictEqual(mapped.intakeSource, 'aide', 'exact source aide stays the coveraide1 chip');
 assert.strictEqual(mapped.submittedById, 'sub1');
 assert.strictEqual(mapped.submittedByUsername, 'bea');
 assert.strictEqual(mapped.submittedByName, 'Bea Ortiz');
