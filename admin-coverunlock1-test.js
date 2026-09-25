@@ -28,7 +28,7 @@ assert.ok(html.includes('admin-build 2026-09-25-coverunlock1'), 'coverunlock1 bu
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coverunlock1">'), 'coverunlock1 meta');
 assert.ok(html.includes('<!-- coverage outcome unlock 2026-09-25 v=coverunlock1 admin-build 2026-09-25-coverunlock1'), 'coverunlock1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remiwider1'), 'remiwider1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remiwider1b'), 'remiwider1b is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
 assert.ok(html.indexOf('content="2026-09-25-coverunlock1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after coverunlock1');
@@ -71,7 +71,10 @@ assert.ok(!showAssign.includes('coverContacted') && !apply.includes('coverContac
 assert.ok(!html.includes('Text or call the client first.'), 'contact toast is gone');
 assert.ok(extractFn(html, 'function coverMarkContact(kind)').includes("coverAskOutbound('sms'"), 'text client still drafts a message');
 assert.ok(extractFn(html, 'async function coverLoadRanks(shift)').includes("coverRpc('rank'"), 'aide ranking still loads');
-assert.ok(refuse.includes("coverApplyOutcome('client_refused_resume_next_day')") && refuse.includes("coverShowRefuseDraft(shift,'refuse')"), 'refuse still opens the case-manager email');
+assert.ok(refuse.includes("coverShowRefuseDraft(shift,'refuse')") && !refuse.includes('coverApplyOutcome'), 'refuse opens the draft and waits to record');
+assert.ok(extractFn(html, 'function coverConfirmRefuse()').includes("coverApplyOutcome('client_refused_resume_next_day')"), 'confirm records the refusal');
+assert.ok(extractFn(html, 'function coverAwaiting()').includes("coverAskStatus('awaiting_client'"), 'still deciding waits for confirm');
+assert.ok(extractFn(html, 'function coverCancelStatus()').includes("coverStatusPending=''"), 'not yet clears the pending status');
 assert.ok(html.includes('id="copilotFab"') && html.includes('class="remi-chip-pill">Remi</span>'), 'Remi chip stays');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser/.test(desk + paint + showAssign + apply + refuse), 'coverage outcome path does not reseal Auth');
 
@@ -248,7 +251,7 @@ async function runBrowser(){
     }
 
     const opened = await measure('opened');
-    assert.strictEqual(opened.build, '2026-09-25-remiwider1');
+    assert.strictEqual(opened.build, '2026-09-25-remiwider1b');
     assert.strictEqual(opened.marker, 'v=coverunlock1');
     assert.strictEqual(opened.contacted, false, 'opened without text or call');
     assert.ok(opened.note.indexOf('optional') >= 0, opened.note);
@@ -295,8 +298,16 @@ async function runBrowser(){
     await page.waitForFunction(function(){
       var box = document.getElementById('coverRefuseMail');
       var draft = document.getElementById('coverCmDraft');
-      return box && !box.hidden && draft && /Ada Cole/.test(draft.value || '');
+      var go = document.getElementById('coverRefuseConfirm');
+      return box && !box.hidden && draft && /Ada Cole/.test(draft.value || '') && go && !go.hidden;
     }, {timeout: 8000});
+    assert.ok(!calls.some(function(c){
+      return c.rpc === 'admin_cover_outcome' && c.body && c.body.p_outcome === 'client_refused_resume_next_day';
+    }), 'refuse draft does not record before Confirm');
+    await page.click('#coverRefuseConfirm');
+    await page.waitForFunction(function(id){
+      return String(coverPostedKey) === String(id) + '|client_refused_resume_next_day';
+    }, {timeout: 8000}, shiftId);
     const refused = await measure('refused');
     assert.strictEqual(refused.contacted, false, 'refuse did not require text or call');
     assert.ok(calls.some(function(c){

@@ -29,7 +29,7 @@ assert.ok(html.includes('admin-build 2026-09-25-payready1b'), 'payready1b build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1b">'), 'payready1b meta');
 assert.ok(html.includes('<!-- admin pay readiness export 2026-09-25 v=payready1b admin-build 2026-09-25-payready1b'), 'payready1b comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remiwider1'), 'remiwider1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remiwider1b'), 'remiwider1b is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
 assert.ok(html.indexOf('content="2026-09-25-coverunlock1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after coverunlock1');
@@ -293,7 +293,7 @@ async function runBrowser(){
         calls: calls.map(function(c){return c.name;})
       };
     });
-    assert.strictEqual(phone.build, '2026-09-25-remiwider1');
+    assert.strictEqual(phone.build, '2026-09-25-remiwider1b');
     assert.strictEqual(phone.marker, 'v=payready1b');
     assert.ok(phone.viewW >= 380 && phone.viewW <= 400, 'phone width '+phone.viewW);
     assert.strictEqual(phone.week, 'Week of 09/21/2026\u201309/27/2026');
