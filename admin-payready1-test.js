@@ -47,7 +47,7 @@ assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser|ro
 assert.ok(html.includes("var COPILOT_KINDS=['coverage_open','timesheet_late','schedule_gap','aide_issue','backup_needed','inservice_due','intake_pending','compliance_flag','broadcast_needed','login_fail']"), 'Remi radar kinds stay');
 assert.ok(html.includes('id="copilotFab"') && html.includes('class="remi-chip-pill">Remi</span>'), 'Remi chip stays corner-only');
 
-const panel = html.slice(html.indexOf('id="payReady"'), html.indexOf('id="tsFilesToggle"'));
+const panel = html.slice(html.indexOf('id="payReady"'), html.indexOf('id="tsDeskSub"'));
 assert.ok(panel.includes('>Pay ready<'), 'all-ready title');
 assert.ok(panel.includes('>Export ready list<'), 'export button');
 assert.ok(panel.includes('>Open timesheet<'), 'open timesheet');
@@ -57,9 +57,11 @@ assert.ok(panel.includes('Nothing held this pay period'), 'empty subtitle');
 assert.ok(panel.includes('← Pay held'), 'held detail back label');
 assert.ok(!/copilotFab|remi-chip/.test(panel), 'Remi chip stays out of the pay screen');
 assert.ok(!/\$|pay_amount|gross|hourly_rate/.test(panel), 'pay screen HTML has no money fields');
+assert.ok(!html.includes('id="tsFiles"') && !html.includes('payReadyToggleFiles'), 'pay readiness does not hide the live timesheet desk');
+assert.ok(html.includes('data-ts-desk="active"') && html.includes('id="exportAllPdfsBtn"') && html.includes('id="tsSearch"'), 'existing timesheet desk stays on the page');
 
 const srcStart = html.indexOf('var PAYREADY_MARKER');
-const srcEndFn = extractFn(html, 'function payReadyToggleFiles()');
+const srcEndFn = extractFn(html, 'function payReadyExport()');
 const src = html.slice(srcStart, html.indexOf(srcEndFn) + srcEndFn.length);
 assert.ok(!/sbRestRpc\(|pay_amount|\$[0-9]/.test(extractFn(html, 'function payReadyHold()')), 'Hold pay does not post payroll');
 assert.ok(extractFn(html, 'async function payReadyFetchAce(weekStart)').includes("sbRestRpc(name, body)"), 'rollup uses sbRestRpc');
