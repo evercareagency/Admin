@@ -13,7 +13,8 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remichat1"
 assert.ok(html.includes('<!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1'), 'remichat1 comment');
 assert.ok(html.includes('data-remichat="v=remichat1"'), 'remichat1 string marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remidate1'), 'remidate1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-aidecreds1'), 'aidecreds1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-25-aidecreds1"') < html.indexOf('content="2026-09-25-remidate1"'), 'remidate1 meta stays after aidecreds1');
 assert.ok(html.indexOf('content="2026-09-25-remidate1"') < html.indexOf('content="2026-09-25-ncipdf1"'), 'ncipdf1 meta stays after remidate1');
 assert.ok(html.indexOf('content="2026-09-25-ncipdf1"') < html.indexOf('content="2026-09-25-remichat1"'), 'remichat1 meta stays after ncipdf1');
 ['v=remiscroll1','v=remi1','v=phonezoom1','v=eca-copilot1','v=navedit1','v=coveraide1b','v=layoutA1','v=admintheme1'].forEach(function(mark){
