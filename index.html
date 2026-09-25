@@ -41,7 +41,7 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
-<!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: pdfStoragePath signs via sbSignPdfUrl (office JWT, expiresIn 120s inside 60–300, same helper as timesheets and supervisory, no service_role); else pdfLink or pdf_link opens Drive (an http pdf_file_id opens too); else the in-app pending message. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
 <meta name="admin-build" content="2026-09-25-ncipdf1">
 <meta name="admin-build" content="2026-09-25-remichat1">
 <!-- phone scroll lock 2026-09-25 v=remiscroll1 admin-build 2026-09-25-remiscroll1. Phone page stays framed. html and body lock horizontal overscroll: overflow-x hidden, then clip, overscroll-behavior-x none, and touch-action pan-y. A vertical swipe cannot shove the page left or right. In-flow phone content is width-capped so a wide child cannot grow the viewport. Local horizontal scrollers stay: Schedule week board .sched-scroll, Edit tabs .nav-edit-bottom, phone .side-nav, Coverage list, and the table rows (timesheet sheet, aides, nurse, inservice, activity) keep overflow-x auto and touch-action pan-x pan-y. Remi chip, Remi name, and desk-first (sheet closed until open) stay. Quiet hours On and Coverage pin stay. No Auth reseal and no brain wiring change. Prior markers stay, including v=remi1 and v=phonezoom1. -->
@@ -16784,13 +16784,8 @@ function pickIntakePdfLink(obj){
 }
 
 function nciLegacyDriveUrl(obj){
-  const link=pickIntakePdfLink(obj);
-  if(link)return link;
-  if(!obj)return '';
-  const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
-  const file=String(obj.pdfFileId||obj.pdf_file_id||(nested&&(nested.pdfFileId||nested.pdf_file_id))||'').trim();
-  if(/^https?:\/\//i.test(file))return file;
-  return '';
+  // Old rows only. pdfLink / pdf_link. pdf_file_id stays on the row and is not a View URL.
+  return pickIntakePdfLink(obj);
 }
 
 function nciOpenExternalPdf(url){
@@ -17173,10 +17168,10 @@ function retryCompletedNewClientIntakes(){
 async function nciOpenIntakeStoragePdf(row){
   const raw=nciPdfStoragePath(row);
   if(!raw)return 'missing';
-  // GHOST-NCI-PDF-STORAGE-CONTRACT-v1. View only: sign pdfStoragePath from evercare-pdfs.
-  // Path shape is {org_id}/nci/{row uuid}.pdf. Do not mint, backfill, or clear pdf_link / pdf_file_id.
-  // Same office-JWT signer as timesheets (sbResolveTimesheetPdf) and supervisory (sbSupervisoryPdf).
-  // expiresIn is SB_PDF_SIGN_SECONDS (120), inside the contract window 60–300. Sign failure does not open Drive.
+  // GHOST-NCI-PDF-STORAGE-CONTRACT-v1. View only. Ace mints on Complete.
+  // sbSignPdfUrl is createSignedUrl: office JWT, bucket evercare-pdfs, expiresIn 120 (60–300).
+  // Path is the stored pdfStoragePath ({org_id}/nci/{nci uuid}.pdf). Sign failure does not open Drive.
+  // Do not mint, backfill, invent an RPC, or clear pdf_link / pdf_file_id.
   const path=typeof sbSupervisoryPdfPath==='function'?sbSupervisoryPdfPath(raw):raw;
   if(typeof sbSignPdfUrl!=='function'){
     showTempMsg('Could not open PDF.','var(--danger)');

@@ -41,6 +41,12 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-loginkb1">
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'isclear1 meta stays');
 assert.ok(html.includes('v=admintheme1'), 'admintheme1 marker stays');
 assert.ok(!/drive\.google\.com/.test(extractFn(html, 'async function viewCompletedIntakePdf(intakeId)')), 'View does not invent a Drive URL');
+const signSrc = extractFn(html, 'async function sbSignPdfUrl(objectPath, refreshed)');
+assert.ok(signSrc.includes("'/storage/v1/object/sign/'+SB_PDF_BUCKET+'/'"), 'sbSignPdfUrl is storage createSignedUrl');
+assert.ok(signSrc.includes('expiresIn:SB_PDF_SIGN_SECONDS'), 'createSignedUrl expiresIn is 120');
+assert.ok(signSrc.includes('readSbSession()'), 'createSignedUrl uses the office session JWT');
+assert.ok(!/service_role/.test(signSrc), 'signer has no service_role');
+assert.ok(extractFn(html, 'async function nciOpenIntakeStoragePdf(row)').includes('sbSignPdfUrl(path)'), 'View signs through createSignedUrl');
 
 const sigs = [
   'function pickIntakePdfLink(obj)',
@@ -186,9 +192,15 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   assert.deepStrictEqual(opens, [drive], 'pdf_link opens Drive');
 
   opens.length = 0;
-  sandbox.nciCompletedRows = [{intakeId:'httpf', pdf_file_id:httpFile}];
+  gets.length = 0;
+  toasts.length = 0;
+  sandbox._got = {pdf_file_id:httpFile, pdfFileId:httpFile};
+  sandbox.nciCompletedRows = [{intakeId:'httpf', pdf_file_id:httpFile, pdfFileId:httpFile}];
   await sandbox.viewCompletedIntakePdf('httpf');
-  assert.deepStrictEqual(opens, [httpFile], 'http pdf_file_id opens');
+  assert.deepStrictEqual(opens, [], 'pdf_file_id is not a Drive fallback');
+  assert.deepStrictEqual(signs, [], 'pdf_file_id does not sign');
+  assert.strictEqual(toasts[0].msg, 'PDF not ready yet');
+  assert.strictEqual(sandbox.nciCompletedRows[0].pdfFileId, httpFile, 'View leaves pdf_file_id on the row');
 
   opens.length = 0;
   gets.length = 0;
