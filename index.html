@@ -36,7 +36,8 @@
 <!-- admin schedule mobile scroll 2026-09-24 v=sched1m admin-build 2026-09-24-sched1m. Week grid horizontal scroll on touch: the day columns keep a min width so Mon–Sun are wider than a phone, and .sched-scroll is the only scroller (overflow-x auto, touch-action pan-x pan-y, -webkit-overflow-scrolling touch). Toolbar (Edit usual pattern, week, search, All|Open|Call-offs) wraps in the viewport and does not share that scroller. The “No patterns yet” notice wraps above the grid and does not cover or widen it. Desktop week layout unchanged. -->
 <!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
 <!-- caregiver password reset 2026-09-24 v=cgreset1 admin-build 2026-09-24-cgreset1. Cut ON: Settings Reset Caregiver Password uses the same office path as reset_temp_password — POST rpc/reset_aide_temp_password {p_username,p_temp_password} via sbAdminResetTempPassword (Auth + aides.must_change_password). Success shows the temp password. apiPost reset_password and set_password on cut route to that RPC and do not hit Sheets /exec. Add aide stays admin_create_aide. Rollback ?sheets=1 or evercare_sheets=1 keeps Sheets reset_password. -->
-<meta name="admin-build" content="2026-09-24-cgreset1">
+<!-- inservice clear assignment 2026-09-25 v=isclear1 admin-build 2026-09-25-isclear1. Clear Assignment on the Supabase cut requires topicId and DELETE /rest/v1/inservice_topic_assignment?org_id=eq.4f97f4d3-6635-4544-904c-6b06aa02d40b&topic_id=eq.{topicId} via sbClearAssignedTopic (office JWT). Missing topicId fails loud and does not post. Sheets /exec clear_assigned_topic runs only when evercareSbEnabled is false (?sheets=1 or evercare_sheets=1). DELETE does not touch inservice_results. Per-aide Compliance Delete stays POST rpc/admin_unassign_inservice_aide. Office quiz edit and review label each choice A–F up to the option count. Prior markers stay. -->
+<meta name="admin-build" content="2026-09-25-isclear1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -584,11 +585,16 @@ body.ts-print-open{overflow:hidden;}
 .is-result-qa .mark{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;}
 .is-result-qa.ok .mark{background:var(--success);color:white;}
 .is-result-qa.bad .mark{background:var(--danger);color:white;}
-.is-result-qa .ans{font-size:0.8rem;color:var(--text);line-height:1.45;margin-left:30px;}
+.is-result-qa .ans{font-size:0.8rem;color:var(--text);line-height:1.45;margin-left:30px;overflow-wrap:anywhere;}
 .is-result-qa .ans .wrong{color:var(--danger);font-weight:600;}
 .is-result-qa .ans .right{color:var(--success);font-weight:600;}
-.is-result-edit-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;margin:6px 0 0 30px;min-height:40px;cursor:pointer;font-size:0.82rem;}
-.is-result-edit-opt input{accent-color:var(--teal);width:18px;height:18px;}
+.is-result-edit-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;margin:6px 0 0 30px;min-height:44px;cursor:pointer;font-size:0.82rem;line-height:1.35;}
+.is-result-edit-opt input{accent-color:var(--teal);width:18px;height:18px;margin-top:2px;flex-shrink:0;}
+.is-result-edit-opt span{min-width:0;flex:1;}
+@media(max-width:640px){
+  .is-result-edit-opt{margin-left:0;}
+  .is-result-qa .ans{margin-left:0;}
+}
 .is-results-foot{justify-content:space-between;flex-shrink:0;margin-top:10px;padding-top:12px;border-top:1px solid var(--border);}
 </style>
 
@@ -8123,14 +8129,32 @@ async function assignTopic(){
 }
 
 async function clearAssignment(){
+  const sel=document.getElementById('assignTopicSel');
+  const topicId=sel&&sel.value!=null?String(sel.value).trim():'';
+  const sbOn=typeof evercareSbEnabled==='function'&&evercareSbEnabled();
+  if(sbOn){
+    if(!topicId){
+      showTempMsg('Choose a topic before clearing the assignment.','var(--danger)');
+      return;
+    }
+    showTempMsg('Clearing assignment...','var(--teal)');
+    try{
+      const data=await sbClearAssignedTopic(topicId);
+      cacheInvalidate('get_assigned_topic');
+      if(!data||data.success!==true){
+        showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
+        return;
+      }
+      showTempMsg('Assignment cleared. Completion records are kept.','var(--teal)');
+      renderInservices(true);
+    }catch(e){
+      showTempMsg(isAssignSheetsFailMsg(null,e),'var(--danger)');
+    }
+    return;
+  }
   showTempMsg('Clearing assignment...','var(--teal)');
   try{
-    const payload={action:'clear_assigned_topic'};
-    const sel=document.getElementById('assignTopicSel');
-    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sel&&sel.value!=null&&String(sel.value).trim()!==''){
-      payload.topicId=String(sel.value);
-    }
-    const data=await apiPost(payload);
+    const data=await apiPost({action:'clear_assigned_topic'});
     cacheInvalidate('get_assigned_topic');
     if(data&&data.success===false){
       showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
@@ -8712,6 +8736,32 @@ function setISResultsEditMode(on){
     el.style.display=hide?'none':'';
   });
 }
+function isQuizLetter(index){
+  const n=Number(index);
+  if(!isFinite(n)||n<0||n>25)return '';
+  return String.fromCharCode(65+Math.floor(n));
+}
+function isQuizChoiceLabel(index, text){
+  const letter=isQuizLetter(index);
+  const body=text==null?'':String(text);
+  if(!letter)return body;
+  return letter+'. '+body;
+}
+function isQuizAnswerLine(q, index, fallbackText){
+  const opts=q&&Array.isArray(q.options)?q.options:[];
+  const n=Number(index);
+  const text=fallbackText==null?'':String(fallbackText);
+  if(isFinite(n)&&n>=0&&n<opts.length){
+    const optText=opts[n]==null?'':String(opts[n]);
+    return isQuizChoiceLabel(n, optText!==''?optText:text);
+  }
+  if(text){
+    for(let i=0;i<opts.length&&i<26;i++){
+      if(String(opts[i])===text)return isQuizChoiceLabel(i, opts[i]);
+    }
+  }
+  return text||'—';
+}
 function paintISResults(){
   const banner=document.getElementById('isResultsBanner');
   const meta=document.getElementById('isResultsMeta');
@@ -8739,7 +8789,7 @@ function paintISResults(){
       const opts=(q.options&&q.options.length)?q.options:[q.aideAnswer,q.correctAnswer].filter(function(v,idx,arr){return v&&arr.indexOf(v)===idx;});
       const picks=opts.map(function(opt,oi){
         const checked=(q.selected===oi||String(opt)===String(q.aideAnswer))?' checked':'';
-        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+oi+'"'+checked+'>'+escapeHtml(opt)+'</label>';
+        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+oi+'"'+checked+'><span>'+escapeHtml(isQuizChoiceLabel(oi, opt))+'</span></label>';
       }).join('');
       return '<div class="is-result-qa"><div class="q">'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</div>'+picks+'</div>';
     }).join('');
@@ -8749,8 +8799,10 @@ function paintISResults(){
     const ok=!!q.isCorrect;
     const mark=ok?'✓':'✕';
     const cls=ok?'ok':'bad';
-    let ans='<div class="ans">Aide answer: <span class="'+(ok?'right':'wrong')+'">'+escapeHtml(q.aideAnswer||'—')+'</span></div>';
-    if(!ok)ans+='<div class="ans">Correct answer: <span class="right">'+escapeHtml(q.correctAnswer||'—')+'</span></div>';
+    const aideLine=isQuizAnswerLine(q, q.selected, q.aideAnswer);
+    const correctLine=isQuizAnswerLine(q, q.correct, q.correctAnswer);
+    let ans='<div class="ans">Aide answer: <span class="'+(ok?'right':'wrong')+'">'+escapeHtml(aideLine)+'</span></div>';
+    if(!ok)ans+='<div class="ans">Correct: <span class="right">'+escapeHtml(correctLine)+'</span></div>';
     return '<div class="is-result-qa '+cls+'"><div class="q"><span class="mark">'+mark+'</span><span>'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</span></div>'+ans+'</div>';
   }).join('');
 }

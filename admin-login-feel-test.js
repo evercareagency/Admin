@@ -72,7 +72,8 @@ assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()')
 assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
 assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-cgreset1">'), 'cgreset1 admin-build after warmoff1');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'isclear1 admin-build after cgreset1');
+assert.ok(html.includes('v=cgreset1'), 'cgreset1 marker stays');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(login.includes('openPortalHome('), 'login must open home after success');
 assert.ok(!/get_users|get_all|get_clients|get_assigned_topic/.test(login), 'mgrLogin must not fetch heavy lists');
@@ -530,7 +531,7 @@ async function runBrowser(){
       }));
       assert.ok(painted.login, vp.name+' sb cut login screen is up at DOMContentLoaded');
       assert.ok(!painted.admin, vp.name+' sb cut must not open home before Sign In');
-      assert.strictEqual(painted.build, '2026-09-24-cgreset1');
+      assert.strictEqual(painted.build, '2026-09-25-isclear1');
       assert.ok(Date.now()-navAt<1500, vp.name+' sb cut first paint must not wait on warmkeep');
       await new Promise(r=>setTimeout(r,500));
       const quiet=await page.evaluate(()=>({

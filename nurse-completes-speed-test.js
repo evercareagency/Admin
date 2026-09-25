@@ -26,7 +26,7 @@ function extractFn(src, sig){
 assert.ok(html.includes('v=nursespd1'), 'nursespd1 marker');
 assert.ok(html.includes('v=nursespd2'), 'nursespd2 marker');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-cgreset1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
 assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
 assert.ok(html.includes('v=warmkeep'), 'warmkeep marker stays');
 assert.ok(html.includes('Still loading from Sheets…'), 'slow copy');
