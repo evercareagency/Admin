@@ -52,12 +52,12 @@ assert.ok(html.includes('class="cover-chip">Within 48h</span>'), 'urgency chip c
 assert.ok(desk.includes('id="coverIntakeView"'), 'intake view');
 assert.ok(desk.includes('Record call-off'), 'intake action');
 assert.ok(desk.includes('id="coverRankPanel"'), 'smart assign panel');
-assert.ok(desk.includes('Ranked backups from the office.'), 'rank panel is the live office list');
+assert.ok(desk.includes('>Who can cover<'), 'who can cover title');
 assert.ok(!desk.includes('No stand-in ranks') && !html.includes('No stand-in ranks'), 'rank panel is not a stub');
 assert.ok(desk.includes('>Text client<') && desk.includes('>Call client<'), 'text or call the client first');
-assert.ok(desk.includes('Client refused / resume next day'), 'refused outcome');
-assert.ok(desk.includes('>Assign backup<') && desk.includes('>Confirm assign<'), 'assign only after confirm');
-assert.ok(desk.includes('>Awaiting client<') && desk.includes('>Cancel shift<') && desk.includes('>Reopen<'), 'awaiting, cancel, and reopen outcomes');
+assert.ok(desk.includes('Client refused · resume next day'), 'refused outcome');
+assert.ok(desk.includes('>Client wants backup<') && desk.includes('>Confirm assign<'), 'assign only after confirm');
+assert.ok(desk.includes('>Still deciding<') && desk.includes('>Cancel shift<') && desk.includes('>Reopen<'), 'awaiting, cancel, and reopen outcomes');
 assert.ok(!/Request PTO|PTO balance|pto_request/i.test(desk), 'coverage is not a PTO product');
 
 assert.ok(!html.includes("navEditCatalog") || !extractFn(html, 'function navEditCatalog()').includes('coverage'), 'Coverage is not a bottom-tab choice');
@@ -109,6 +109,7 @@ vm.createContext(ctx);
   'function coverPick(src)',
   'function coverNameOf(v)',
   'function coverIdOf(v)',
+  'function coverPickPhone(obj)',
   'function coverIntakeSource(src)',
   'function coverMapShift(row)',
   'function coverCanAssign(shift)',
