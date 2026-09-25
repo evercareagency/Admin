@@ -29,7 +29,8 @@ assert.ok(html.includes('admin-build 2026-09-25-payready1'), 'payready1 build no
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1">'), 'payready1 meta');
 assert.ok(html.includes('<!-- admin pay readiness 2026-09-25 v=payready1 admin-build 2026-09-25-payready1'), 'payready1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-coverunlock1'), 'coverunlock1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-payready1b'), 'payready1b is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
 assert.ok(html.indexOf('content="2026-09-25-coverunlock1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after coverunlock1');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1b"'), 'aidecreds1b stays after payready1');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1b"') < html.indexOf('content="2026-09-25-aidecreds1"'), 'aidecreds1 stays after aidecreds1b');
@@ -194,12 +195,14 @@ assert.strictEqual(ace.rows[0].timesheet_id, 'ts-js');
 
 box.payReadyState = mixed;
 box.payReadyView = 'list';
+els.payReadyExport.hidden = true;
 vm.runInContext('payReadyPaint()', box);
 assert.strictEqual(els.payReadyCount.textContent, 'Ready 12');
 assert.strictEqual(els.payHeldCount.textContent, 'Held 4');
 assert.strictEqual(els.payReadyWeek.textContent, 'Week of 09/21/2026\u201309/27/2026');
 assert.strictEqual(els.payReadyTitle.hidden, true);
 assert.strictEqual(els.payReadyEmpty.hidden, true);
+assert.strictEqual(els.payReadyExport.hidden, false, 'export stays visible when ready and held');
 assert.ok(els.payReadyRows.innerHTML.includes('Held') && els.payReadyRows.innerHTML.includes('Ready'));
 
 vm.runInContext('payReadyOpenDetail("ts-js")', box);

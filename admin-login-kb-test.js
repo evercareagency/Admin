@@ -152,7 +152,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(desk.build, '2026-09-25-coverunlock1');
+    assert.strictEqual(desk.build, '2026-09-25-payready1b');
     assert.strictEqual(desk.kb, false, 'desktop focus must not add login-kb');
     assert.strictEqual(desk.position, 'static', 'desktop login screen stays in normal flow');
     assert.strictEqual(desk.align, 'center', 'desktop login stays vertically centered');
