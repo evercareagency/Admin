@@ -28,7 +28,8 @@ assert.ok(html.includes('admin-build 2026-09-25-coverunlock1'), 'coverunlock1 bu
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coverunlock1">'), 'coverunlock1 meta');
 assert.ok(html.includes('<!-- coverage outcome unlock 2026-09-25 v=coverunlock1 admin-build 2026-09-25-coverunlock1'), 'coverunlock1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-coverunlock1'), 'coverunlock1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-payready1b'), 'payready1b is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
 assert.ok(html.indexOf('content="2026-09-25-coverunlock1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after coverunlock1');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1c"'), 'aidecreds1c stays after payready1');
 ['v=payready1','v=aidecreds1c','v=aidecreds1b','v=aidecreds1','v=covercomms1','v=coveraide1','v=cover1'].forEach(function(mark){
@@ -246,7 +247,7 @@ async function runBrowser(){
     }
 
     const opened = await measure('opened');
-    assert.strictEqual(opened.build, '2026-09-25-coverunlock1');
+    assert.strictEqual(opened.build, '2026-09-25-payready1b');
     assert.strictEqual(opened.marker, 'v=coverunlock1');
     assert.strictEqual(opened.contacted, false, 'opened without text or call');
     assert.ok(opened.note.indexOf('optional') >= 0, opened.note);

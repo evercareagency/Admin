@@ -12,7 +12,7 @@ assert.ok(html.includes('data-aidecreds1c="v=aidecreds1c"'), 'aidecreds1c string
 assert.ok(html.includes('admin-build 2026-09-25-aidecreds1c'), 'aidecreds1c build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1c">'), 'aidecreds1c meta');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('content="2026-09-25-coverunlock1"'), 'coverunlock1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('content="2026-09-25-payready1b"'), 'payready1b is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1c"'), 'aidecreds1c stays after payready1');
 assert.ok(html.includes('data-aidecreds1b="v=aidecreds1b"'), 'aidecreds1b marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1b">'), 'aidecreds1b meta stays');
@@ -238,7 +238,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(after.build, '2026-09-25-coverunlock1');
+    assert.strictEqual(after.build, '2026-09-25-payready1b');
     assert.strictEqual(after.banner, '⚠ 2 credentials need attention');
     assert.strictEqual(after.cover, '✓ All current', after.cover);
     assert.ok(after.probe.indexOf('Expiring') >= 0 && after.probe.indexOf('1 overdue') >= 0, after.probe);
