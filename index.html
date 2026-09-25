@@ -40,6 +40,8 @@
 <!-- login phone keyboard 2026-09-25 v=loginkb1 admin-build 2026-09-25-loginkb1. Cause: #loginScreen is a centered min-height 100dvh flex box and html/body overflow-x hidden, so the card does not overflow the layout viewport. The phone keyboard shrinks the visual viewport only, and Password plus Sign In stay under it. On focus of Account, username, or password, pin #loginScreen to the visual viewport (height and offset from visualViewport, not a guessed window.scrollTo) and scroll the focused field and Sign In into that open area. The same screen is the scrollport, so Forgot password can scroll into view. Desktop stays centered when there is no keyboard inset. -->
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
+<!-- remi 2026-09-25 v=remi1 admin-build 2026-09-25-remi1. Admin and Scheduler desk AI is named Remi. The corner chip is Mo's circular portrait and keeps the neon city night inside the circle. A small Remi pill sits on that chip. Tap opens the Remi sheet. The sheet stays closed until it is opened. Desk-first login stays: no full-screen Remi on sign-in. Nurse home and the Caregiver site do not get Remi. Quiet hours On and Coverage in Edit tabs stay as in v=phonezoom1. No Auth reseal and no brain wiring change. Prior markers stay, including v=phonezoom1, v=eca-copilot1, v=navedit1, v=coveraide1b, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-remi1">
 <!-- phone zoom 2026-09-25 v=phonezoom1 admin-build 2026-09-25-phonezoom1. Phone-first Edit tabs and Quiet hours. Tapping Edit tabs keeps every available tab on screen, including Coverage, so Coverage can be pinned to the bottom bar. The picker wraps, and a row scrolls sideways only if it is still wider than the phone. The Quiet hours On control and its label stay inside the card at phone width. Fluid layout only. No Auth reseal and no password rotate. Co-pilot stays closed until Mo opens it. Prior markers stay, including v=eca-copilot1, v=navedit1, v=coveraide1b, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-phonezoom1">
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
@@ -335,8 +337,10 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(max-width:520px){
   #clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr;}
 }
-#copilotFab{position:fixed;z-index:150;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));min-height:52px;padding:0 18px;border:0;border-radius:999px;background:var(--navy);color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;box-shadow:0 8px 22px rgba(26,39,68,.28);cursor:pointer;touch-action:manipulation;}
+#copilotFab{position:fixed;z-index:150;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));width:72px;height:72px;min-height:72px;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;font-family:'DM Sans',sans-serif;box-shadow:none;cursor:pointer;touch-action:manipulation;appearance:none;-webkit-appearance:none;overflow:visible;}
 #copilotFab[hidden]{display:none !important;}
+#copilotFab .remi-chip-face{display:block;width:72px;height:72px;border-radius:50%;object-fit:cover;background:transparent;box-shadow:0 8px 22px rgba(10,8,28,.45);pointer-events:none;}
+#copilotFab .remi-chip-pill{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);background:rgba(16,10,36,.92);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.02em;line-height:1;border-radius:999px;padding:3px 8px;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.35);}
 #copilotSheet{position:fixed;z-index:160;inset:0;display:flex;flex-direction:column;background:var(--off);color:var(--navy);padding:max(10px,env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box;min-width:0;max-width:100%;}
 #copilotSheet[hidden]{display:none !important;}
 #copilotSheet .copilot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
@@ -1748,10 +1752,10 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
 
     </div>
-    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" onclick="copilotOpenRadar()">Co-pilot</button>
+    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-corner-chip.png?v=remi1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
     <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
-        <h2 id="copilotTitle">Co-pilot</h2>
+        <h2 id="copilotTitle">Remi</h2>
         <button type="button" class="btn btn-ghost" id="copilotCloseBtn" onclick="copilotClose()">Close</button>
       </div>
       <div id="copilotBody"></div>
@@ -5501,12 +5505,12 @@ function copilotPlaybook(key){
     },
     timesheet_late:{
       title:'Timesheets',
-      explain:'Active timesheets, archived sheets, and recently deleted sheets live on the Timesheets desk. A correction request is a note to the aide. Co-pilot does not submit it.',
+      explain:'Active timesheets, archived sheets, and recently deleted sheets live on the Timesheets desk. A correction request is a note to the aide. Remi does not submit it.',
       steps:[
         'Open Timesheets and find the sheet.',
         'Read the days that need a fix.',
         'Write the note on the sheet. Confirm before you send the correction from that screen.',
-        'Co-pilot can copy a draft. It does not send it.'
+        'Remi can copy a draft. It does not send it.'
       ],
       actions:[
         {id:'open', label:'Open Timesheets', kind:'tab', tab:'timesheets'},
@@ -5526,11 +5530,11 @@ function copilotPlaybook(key){
     },
     aide_issue:{
       title:'Aides',
-      explain:'Aides shows who is active and who is still on a temporary password. Co-pilot does not change a password. Reset stays on the aide row, and only when you press it yourself this turn.',
+      explain:'Aides shows who is active and who is still on a temporary password. Remi does not change a password. Reset stays on the aide row, and only when you press it yourself this turn.',
       steps:[
         'Open Aides and read the status.',
         'Add an aide with first name, last name, phone, and email when you are creating one.',
-        'Do not reset a password from Co-pilot.',
+        'Do not reset a password from Remi.',
         'If a reset is required, you press Reset on that aide row yourself.'
       ],
       actions:[{id:'open', label:'Open Aides', kind:'tab', tab:'aides'}]
@@ -5548,7 +5552,7 @@ function copilotPlaybook(key){
     },
     inservice_due:{
       title:'Inservices',
-      explain:'Inservice topics and who still owes them live on the Inservices desk. Co-pilot does not clear an assignment.',
+      explain:'Inservice topics and who still owes them live on the Inservices desk. Remi does not clear an assignment.',
       steps:[
         'Open Inservices.',
         'See who is not completed.',
@@ -5559,7 +5563,7 @@ function copilotPlaybook(key){
     },
     intake_pending:{
       title:'Intakes / Completes',
-      explain:'Completed new-client intakes and drafts the nurse finished show on the Nurse desk for Admin and Scheduler. Co-pilot does not mark a packet complete.',
+      explain:'Completed new-client intakes and drafts the nurse finished show on the Nurse desk for Admin and Scheduler. Remi does not mark a packet complete.',
       steps:[
         'Open Nurse.',
         'Read Completed new client intakes.',
@@ -5570,7 +5574,7 @@ function copilotPlaybook(key){
     },
     compliance_flag:{
       title:'Compliance',
-      explain:'Supervisory visits and calls use a 57–60 day cadence. The score window stays 60 days. Co-pilot does not log a visit.',
+      explain:'Supervisory visits and calls use a 57–60 day cadence. The score window stays 60 days. Remi does not log a visit.',
       steps:[
         'Open the Nurse desk.',
         'Read who needs a visit or call.',
@@ -5581,12 +5585,12 @@ function copilotPlaybook(key){
     },
     broadcast_needed:{
       title:'Broadcast',
-      explain:'A broadcast is an alert every aide sees. Co-pilot does not send or clear it. You confirm on the Broadcast screen, then you send.',
+      explain:'A broadcast is an alert every aide sees. Remi does not send or clear it. You confirm on the Broadcast screen, then you send.',
       steps:[
         'Open Broadcast and read the current alert.',
         'Edit the wording there if it should change.',
         'Confirm, then send or clear from that screen.',
-        'Co-pilot will not send it for you.'
+        'Remi will not send it for you.'
       ],
       actions:[
         {id:'open', label:'Open Broadcast', kind:'tab', tab:'broadcast'},
@@ -5595,12 +5599,12 @@ function copilotPlaybook(key){
     },
     login_fail:{
       title:'Login fails',
-      explain:'Failed sign-ins show here when the office list answers. Co-pilot does not change a password and does not reseal an account.',
+      explain:'Failed sign-ins show here when the office list answers. Remi does not change a password and does not reseal an account.',
       steps:[
         'Read who failed and when.',
         'Decide if it is a typo or a lockout.',
         'A password change happens only when you press Reset yourself on that turn.',
-        'Co-pilot will not rotate a password.'
+        'Remi will not rotate a password.'
       ],
       actions:[{id:'copy', label:'Copy the fail note', kind:'copy', body:'Login fail noted. No password was changed.'}]
     }
@@ -5634,13 +5638,13 @@ function copilotDeskAlerts(){
     {id:'coverage_open', kind:'coverage_open', surface:'Coverage', title:'Coverage', detail:shifts? (shifts+' open shift'+(shifts===1?'':'s')+' on the desk.'):'Nothing flagged.', phone:'', email:''},
     {id:'timesheet_late', kind:'timesheet_late', surface:'Timesheets', title:'Timesheets', detail:sheets? (sheets+' sheet'+(sheets===1?'':'s')+' loaded.'):'Nothing flagged.', phone:'', email:''},
     {id:'schedule_gap', kind:'schedule_gap', surface:'Schedule', title:'Schedule', detail:'Nothing flagged.', phone:'', email:''},
-    {id:'aide_issue', kind:'aide_issue', surface:'Aides', title:'Aides', detail:temps? (temps+' still on a temporary password.'):'Nothing flagged. Co-pilot does not change passwords.', phone:'', email:''},
+    {id:'aide_issue', kind:'aide_issue', surface:'Aides', title:'Aides', detail:temps? (temps+' still on a temporary password.'):'Nothing flagged. Remi does not change passwords.', phone:'', email:''},
     {id:'backup_needed', kind:'backup_needed', surface:'Backup', title:'Backup', detail:'Phone-change drafts only. No Approve, Decline, or PTO.', phone:'', email:''},
     {id:'inservice_due', kind:'inservice_due', surface:'Inservices', title:'Inservices', detail:'Nothing flagged.', phone:'', email:''},
     {id:'intake_pending', kind:'intake_pending', surface:'Intakes/Completes', title:'Intakes / Completes', detail:'Nothing flagged.', phone:'', email:''},
     {id:'compliance_flag', kind:'compliance_flag', surface:'Compliance', title:'Compliance', detail:'Supervisory cadence is 57–60 days.', phone:'', email:''},
     {id:'broadcast_needed', kind:'broadcast_needed', surface:'Broadcast', title:'Broadcast', detail:'The alert aides see. You send it from Broadcast.', phone:'', email:''},
-    {id:'login_fail', kind:'login_fail', surface:'Login fails', title:'Login fails', detail:'Nothing flagged. Co-pilot will not change a password.', phone:'', email:''}
+    {id:'login_fail', kind:'login_fail', surface:'Login fails', title:'Login fails', detail:'Nothing flagged. Remi will not change a password.', phone:'', email:''}
   ];
 }
 function copilotNormalizeQuiet(data){
@@ -5790,7 +5794,7 @@ function copilotPaintQuiet(host){
 function copilotPaintRadar(){
   var host=copilotEl('copilotBody');
   var title=copilotEl('copilotTitle');
-  if(title)title.textContent='Co-pilot';
+  if(title)title.textContent='Remi';
   if(!host)return;
   copilotView='radar';
   copilotPending=null;
@@ -5833,7 +5837,7 @@ function copilotPaintConfirm(action){
   var box=copilotEl('copilotConfirm');
   if(!box||!action)return;
   var quiet=copilotInQuietHours();
-  var line='Confirm before this opens. You send it yourself. Co-pilot does not send it.';
+  var line='Confirm before this opens. You send it yourself. Remi does not send it.';
   if(quiet)line='Quiet hours are on. '+line;
   if(action.kind==='sms'&&!(action.phone&&String(action.phone).replace(/\D/g,'')))line='No phone is on file for this alert. Open Messages stays a draft without a number. '+line;
   if(action.kind==='mail'&&!(typeof coverEmailOk==='function'&&coverEmailOk(action.email)))line='No email is on file for this alert. Open Mail stays off until an email is known. '+line;
