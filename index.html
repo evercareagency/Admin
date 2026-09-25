@@ -40,8 +40,10 @@
 <!-- login phone keyboard 2026-09-25 v=loginkb1 admin-build 2026-09-25-loginkb1. Cause: #loginScreen is a centered min-height 100dvh flex box and html/body overflow-x hidden, so the card does not overflow the layout viewport. The phone keyboard shrinks the visual viewport only, and Password plus Sign In stay under it. On focus of Account, username, or password, pin #loginScreen to the visual viewport (height and offset from visualViewport, not a guessed window.scrollTo) and scroll the focused field and Sign In into that open area. The same screen is the scrollport, so Forgot password can scroll into view. Desktop stays centered when there is no keyboard inset. -->
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
-<!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. -->
+<!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-navedit1">
+<!-- nurse supervisory cadence copy 2026-09-25 v=nursecomp57 admin-build 2026-09-25-nursecomp57. Nurse Compliance cadence wording is 57–60 days: Cadence tip “every 57–60 days” and subtitle “Rolling 57–60 day window”. Empty-state cadence note uses the same wording. Visit/call scoring, Days-in-window, and get_supervisory_compliance stay on the 60-day window. Prior markers stay, including v=layoutA1 and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-nursecomp57">
 <meta name="admin-build" content="2026-09-25-layoutA1">
 <meta name="admin-build" content="2026-09-25-admintheme1">
 <meta name="admin-build" content="2026-09-25-loginkb1">
@@ -1539,7 +1541,7 @@ Call (216) 377-5991 with any questions.</textarea>
       <div class="page-hdr">
         <div>
           <h1>Supervisory Compliance</h1>
-          <p>Rolling 60-day window — 2 in-home visits + 4 counting phone calls per client</p>
+          <p style="font-size:0.92rem;line-height:1.4;overflow-wrap:anywhere">Rolling 57–60 day window — 2 in-home visits + 4 counting phone calls per client</p>
         </div>
         <div class="nurse-actions">
           <button type="button" class="btn btn-navy" onclick="openNewClientIntake()">Open new client — on-site intake visit</button>
@@ -1547,7 +1549,7 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
       <div class="card" style="background:var(--teal-light);margin-bottom:16px">
-        <p style="font-size:0.82rem;color:var(--teal-dark);margin:0"><strong>Cadence tip:</strong> every 60 days = 2 in-home visits + 4 phone calls (client or family, call must be Reached). Flexible scheduling — no board.</p>
+        <p style="font-size:0.92rem;line-height:1.45;color:var(--teal-dark);margin:0;overflow-wrap:anywhere"><strong>Cadence tip:</strong> every 57–60 days = 2 in-home visits + 4 phone calls (client or family, call must be Reached). Flexible scheduling — no board.</p>
       </div>
       <div class="card">
         <div style="overflow-x:auto">
@@ -10539,7 +10541,7 @@ async function loadNurseCompliance(force){
     nurseComplianceRows=rows;
     await enrichNurseComplianceContactIds(rows);
     renderNurseComplianceTable(rows);
-    if(note)note.textContent='Cadence: 2 visits + 4 counting calls (Reached + Client/Family) per rolling 60 days.';
+    if(note)note.textContent='Cadence: 2 visits + 4 counting calls (Reached + Client/Family) per rolling 57–60 days.';
   }catch(e){
     nurseComplianceRows=[];
     tbody.innerHTML='';
