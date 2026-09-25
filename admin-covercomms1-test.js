@@ -62,7 +62,7 @@ const desk = admin.slice(admin.indexOf('id="tab_coverage"'), admin.indexOf('id="
 assert.ok(desk.includes('>Who can cover<'), 'section title');
 assert.ok(desk.includes('>Text this aide<') && desk.includes('>Text client<'), 'text buttons');
 assert.ok(desk.includes('>Client wants backup<'), 'client wants backup');
-assert.ok(desk.includes('Client refused · resume next day'), 'client refused label');
+assert.ok(desk.includes('>Client refused \u00b7 resume next day<'), 'client refused label');
 assert.ok(desk.includes('>Still deciding<'), 'still deciding');
 assert.ok(desk.includes('id="coverCmDraft"'), 'editable email draft');
 assert.ok(desk.includes('>Open in Mail<') && desk.includes('>Copy draft<') && desk.includes('>Save as my template<'), 'mail actions');
@@ -147,22 +147,34 @@ assert.ok(vm.runInContext('coverSmsHref("", "Draft only")', ctx).startsWith('sms
 assert.strictEqual(vm.runInContext('coverMailHref("", "Sub", "Body")', ctx), '', 'Open Mail stays off without an email');
 assert.ok(vm.runInContext('coverMailHref("pat@example.com", "No services today", "Hello")', ctx).startsWith('mailto:pat@example.com?'), 'mailto uses the case manager email');
 
+const MO_VOICE = [
+  'Hey (Case manager name)',
+  '',
+  'I wanted to inform you that our mutual member (Client name) will not receive services today, (Date), because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.',
+  'Please let me know if you need any additional information.',
+  '',
+  'Thank you,'
+].join('\n');
+const blank = vm.runInContext('coverFillCmTemplate(COVER_CM_DEFAULT, {})', ctx);
+assert.strictEqual(blank, MO_VOICE, 'starting template is Mo\'s voice verbatim');
 const filled = vm.runInContext('coverFillCmTemplate(COVER_CM_DEFAULT, {cm:"Pat Lee", client:"Ada Cole", date:"Friday, September 25"})', ctx);
-assert.ok(filled.startsWith('Hey Pat Lee\n'), 'default voice names the case manager');
-assert.ok(filled.includes('our mutual member Ada Cole will not receive services today, Friday, September 25,'), 'default voice fills client and date');
-assert.ok(filled.includes('because her permanent aide called off'), 'default Mo voice');
-assert.ok(filled.includes('Thank you,'), 'default close');
-const edited = filled.replace('I wanted to inform you', 'I am writing to tell you');
+assert.strictEqual(filled, MO_VOICE
+  .replace('(Case manager name)', 'Pat Lee')
+  .replace('(Client name)', 'Ada Cole')
+  .replace('(Date)', 'Friday, September 25'), 'fills case manager, client, and service date');
+const edited = filled
+  .replace('I wanted to inform you', 'I am writing to tell you')
+  .replace('Please let me know if you need any additional information.', 'Call me if you need anything else.');
 const saved = vm.runInContext('coverUnfillCmTemplate(' + JSON.stringify(edited) + ', {cm:"Pat Lee", client:"Ada Cole", date:"Friday, September 25"})', ctx);
-assert.ok(saved.includes('Hey {{cm}}'), 'save keeps the case manager slot');
-assert.ok(saved.includes('{{client}}') && saved.includes('{{date}}'), 'save keeps client and date slots');
-assert.ok(saved.includes('I am writing to tell you'), 'save keeps Mo\'s edited wording');
-assert.ok(!saved.includes('Pat Lee') && !saved.includes('Ada Cole'), 'saved template does not bake in this shift');
+assert.strictEqual(saved, edited
+  .replaceAll('Pat Lee', '{{cm}}')
+  .replaceAll('Ada Cole', '{{client}}')
+  .replaceAll('Friday, September 25', '{{date}}'), 'save keeps the edited wording and the three slots');
 vm.runInContext('localStorage.setItem(COVER_CM_TEMPLATE_KEY, ' + JSON.stringify(saved) + ')', ctx);
 const next = vm.runInContext('coverFillCmTemplate(coverCmTemplate(), {cm:"Sam Ortiz", client:"Bea Lang", date:"Monday, September 28"})', ctx);
-assert.ok(next.includes('Hey Sam Ortiz'), 'next refuse uses the new case manager');
-assert.ok(next.includes('Bea Lang') && next.includes('Monday, September 28'), 'next refuse uses the new client and date');
-assert.ok(next.includes('I am writing to tell you'), 'next refuse starts from the saved wording');
-assert.ok(!next.includes('Ada Cole') && !next.includes('Pat Lee'), 'next refuse does not keep the previous names');
+assert.strictEqual(next, edited
+  .replaceAll('Pat Lee', 'Sam Ortiz')
+  .replaceAll('Ada Cole', 'Bea Lang')
+  .replaceAll('Friday, September 25', 'Monday, September 28'), 'next refuse starts from the saved wording with new names and date');
 
 console.log('admin-covercomms1-test: ok');
