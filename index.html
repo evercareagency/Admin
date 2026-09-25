@@ -41,6 +41,8 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/soft_delete_aide {p_username} bans Sign In and stamps deleted_at. Restore is POST rpc/restore_aide {p_username}. No password reseal or rotation, including lasting test aides. Recently deleted keeps the row for 7 days; nightly Auth wipe is Ace. Known client assignments PATCH is_active=false so Schedule does not keep a ghost aide. A missing RPC toasts and leaves the row on the active list. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-aidadel1">
 <meta name="admin-build" content="2026-09-25-navedit1">
 <!-- nurse supervisory cadence copy 2026-09-25 v=nursecomp57 admin-build 2026-09-25-nursecomp57. Nurse Compliance cadence wording is 57–60 days: Cadence tip “every 57–60 days” and subtitle “Rolling 57–60 day window”. Empty-state cadence note uses the same wording. Visit/call scoring, Days-in-window, and get_supervisory_compliance stay on the 60-day window. Prior markers stay, including v=layoutA1 and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-nursecomp57">
@@ -318,6 +320,19 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .ts-desk{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;}
 .ts-desk button{min-height:36px;padding:7px 12px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;}
 .ts-desk button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+#aideDesk button{min-height:44px;}
+#tab_aides .aides-sheet{display:none;}
+#tab_aides .aide-cards{display:flex;flex-direction:column;gap:10px;}
+.aide-row-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px;box-shadow:0 6px 16px rgba(26,39,68,0.05);}
+.aide-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.aide-row-top strong{color:var(--navy);font-size:0.95rem;}
+.aide-row-sub{font-size:0.88rem;color:var(--navy);font-weight:600;margin-bottom:4px;}
+.aide-row-meta{font-size:0.78rem;color:var(--muted);margin-bottom:10px;line-height:1.35;}
+#tab_aides .aide-row-card .actions{display:flex;flex-wrap:wrap;gap:8px;}
+#tab_aides .aide-row-card .actions .btn{min-height:44px;flex:1 1 auto;justify-content:center;}
+@media(min-width:900px){
+  #tab_aides .aide-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+}
 .mbtn-archive{background:#eef2f6;color:#1a2744;border:1.5px solid #c5d0dc;}
 .mbtn-warn{background:var(--warn);color:white;}
 .det-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
@@ -1177,11 +1192,15 @@ bindLoginKeyboard();
 
       <div class="tab-panel" id="tab_aides">
         <div class="page-hdr">
-          <div><h1>Aides</h1><p>Registered caregivers — username, assigned clients, and temp-password status</p></div>
+          <div><h1>Aides</h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
             <button class="btn btn-ghost" onclick="renderAides(true)">🔄 Refresh</button>
             <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Add aide</button>
           </div>
+        </div>
+        <div class="ts-desk" id="aideDesk" role="tablist" aria-label="Aides list">
+          <button type="button" class="on" data-aide-desk="active" role="tab" aria-selected="true" onclick="setAideDesk('active')">Active</button>
+          <button type="button" data-aide-desk="deleted" role="tab" aria-selected="false" onclick="setAideDesk('deleted')">Recently deleted</button>
         </div>
         <div id="aidesContainer"><p style="color:var(--muted)">Loading...</p></div>
       </div>
@@ -2690,6 +2709,7 @@ async function apiGetCached(action,extra,force){
   if(action==='get_assigned_topic'&&extra&&extra.topicId!=null&&String(extra.topicId).trim()!==''){
     cacheAction=action+':'+String(extra.topicId);
   }
+  if(action==='get_users'&&extra&&extra.aideDesk==='deleted')cacheAction='get_users:deleted';
   if(!force){
     const hit=cacheGet(cacheAction);
     if(hit&&(sbList?hit.source==='supabase':hit.source!=='supabase'))return hit;
@@ -4643,6 +4663,9 @@ function sbMapAide(row){
     lastSeenAt:row.last_seen_at||'',
     mustChangePassword:!!row.must_change_password,
     isActive:row.is_active!==false,
+    deletedAt:row.deleted_at||'',
+    deleted_at:row.deleted_at||null,
+    softDeleted:row.soft_deleted===true||!!row.deleted_at,
     profileId:row.profile_id||'',
     legacySheetRow:row.legacy_sheet_row==null?'':row.legacy_sheet_row,
     assignedClients:clients,
@@ -4802,14 +4825,26 @@ async function sbApiList(payload){
   if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
   try{
     if(action==='get_users'){
-      var aides=await sbRestGet('aides',[
-        ['select',SB_AIDE_SELECT],
-        ['is_active','eq.true'],
-        ['order','full_name.asc']
-      ]);
+      var aideView=payload&&payload.aideDesk==='deleted'?'deleted':'active';
+      var aidePairs=aideView==='deleted'
+        ?[['select',SB_AIDE_SELECT+',deleted_at'],['deleted_at','not.is.null'],['order','deleted_at.desc']]
+        :[['select',SB_AIDE_SELECT],['is_active','eq.true'],['deleted_at','is.null'],['order','full_name.asc']];
+      var aides=await sbRestGet('aides', aidePairs);
+      if(!aides.ok&&/deleted_at|soft_deleted/i.test(String(aides.error||''))){
+        if(aideView==='deleted'){
+          return {success:false,error:'Recently deleted needs the aides soft-delete fields.',rpcMissing:true,httpStatus:aides.status||0};
+        }
+        aides=await sbRestGet('aides',[
+          ['select',SB_AIDE_SELECT],
+          ['is_active','eq.true'],
+          ['order','full_name.asc']
+        ]);
+      }
       if(!aides.ok)return {success:false,error:aides.error||'aides',httpStatus:aides.status||0};
       var aideRows=Array.isArray(aides.data)?aides.data:[];
-      return {success:true,data:aideRows.filter(function(row){return row&&row.is_active!==false;}).map(sbMapAide)};
+      return {success:true,data:aideRows.filter(function(row){return row&&row.username;}).map(sbMapAide).filter(function(row){
+        return typeof aideOnDesk==='function'?aideOnDesk(row, aideView):true;
+      })};
     }
     if(action==='get_clients'){
       var clientPairs=[['select',SB_CLIENT_SELECT]];
@@ -5808,6 +5843,7 @@ function sbIsAdminWriteAction(action){
   return action==='admin_create_aide'||action==='create_aide'
     ||action==='reset_temp_password'||action==='reset_aide_temp_password'
     ||action==='reset_password'||action==='set_password'
+    ||action==='soft_delete_aide'||action==='restore_aide'
     ||action==='add_client'||action==='update_client'
     ||action==='archive_client'||action==='delete_client'
     ||action==='update'||action==='send_correction'||action==='delete'
@@ -6200,6 +6236,92 @@ async function sbAdminResetTempPassword(payload){
   if(mapped.success&&!mapped.username)mapped.username=username;
   return mapped;
 }
+function sbRpcMissing(got){
+  var err=String((got&&(got.error||got.message))||'');
+  if(got&&got.status===404)return true;
+  return /PGRST202|could not find the function|schema cache/i.test(err);
+}
+function sbMapSoftAideResult(data, username, restoring){
+  var row=data;
+  if(typeof row==='string'){
+    try{row=JSON.parse(row);}catch(e){row=null;}
+  }
+  if(Array.isArray(row))row=row[0]||null;
+  if(!row||typeof row!=='object')return {success:false,error:'empty response'};
+  if(row.ok===false||row.success===false){
+    return {success:false,error:sbNormalizeWriteError(row.error||row.message||'Request failed.')};
+  }
+  var ok=row.ok===true||row.success===true;
+  if(!ok)return {success:false,error:restoring?'Could not restore this aide.':'Could not soft-delete this aide.'};
+  var stamp=row.deleted_at||row.deletedAt||'';
+  if(!restoring&&!stamp)stamp=new Date().toISOString();
+  return {
+    success:true,
+    username:row.username||username||'',
+    deleted_at:restoring?null:(stamp||null),
+    deletedAt:restoring?'':(stamp||''),
+    is_active:!!restoring,
+    soft_deleted:!restoring,
+    assignments_cleared:row.assignments_cleared===true||row.unassigned===true
+  };
+}
+async function sbClearAideAssignments(payload){
+  // TODO Ace: soft_delete_aide should ban Sign In and unassign this aide's clients
+  // so Schedule does not show a ghost aide. Ghost follows a successful RPC with the
+  // existing assignments PATCH (sbSoftUnassign is_active=false) when client ids are known.
+  // If Ace only has a stub flag, missing ids no-op here and the UI still soft-hides the row.
+  // Do NOT reseal or rotate passwords (including mossier / lasting test aides).
+  // Do NOT delete the Auth user. Nightly wipe after 7 days is Ace.
+  var ids=[];
+  var raw=payload&&(payload.clientIds||payload.client_ids)||[];
+  if(!Array.isArray(raw))raw=[];
+  for(var i=0;i<raw.length;i++){
+    var id=raw[i]&&typeof raw[i]==='object'?(raw[i].id||raw[i].clientId):raw[i];
+    id=String(id||'').trim();
+    if(typeof sbUuid==='function'&&sbUuid(id)&&ids.indexOf(id)<0)ids.push(id);
+  }
+  if(!ids.length)return {ok:true,skipped:true};
+  var aideId=String((payload&&(payload.aideId||payload.aide_id))||'').trim();
+  if(!(typeof sbUuid==='function'&&sbUuid(aideId))){
+    aideId=await sbResolveAideId(payload&&(payload.username||payload.p_username));
+  }
+  if(!aideId)return {ok:false,error:'Could not unassign clients for this aide.'};
+  for(var j=0;j<ids.length;j++){
+    var off=await sbSoftUnassign(aideId, ids[j]);
+    if(!off.ok)return {ok:false,error:off.error||'Could not unassign clients.'};
+  }
+  return {ok:true};
+}
+async function sbAdminSoftDeleteAide(payload){
+  var username=String((payload&&(payload.username||payload.p_username))||'').trim();
+  if(!username)return {success:false,error:'Username missing.'};
+  var got=await sbRestRpc('soft_delete_aide', {p_username:username});
+  if(!got.ok){
+    if(sbRpcMissing(got)){
+      return {success:false,error:'Soft-delete is not available yet. Ace soft_delete_aide is not published.',rpcMissing:true,httpStatus:got.status||0};
+    }
+    return {success:false,error:sbNormalizeWriteError(got.error||'Could not soft-delete this aide.'),httpStatus:got.status||0};
+  }
+  var mapped=sbMapSoftAideResult(got.data, username, false);
+  if(!mapped.success)return mapped;
+  if(!mapped.assignments_cleared){
+    var cleared=await sbClearAideAssignments(payload);
+    if(!cleared.ok)mapped.assignmentsWarning='Assigned clients could not be cleared. Schedule may still show this aide until Ace unassigns them.';
+  }
+  return mapped;
+}
+async function sbAdminRestoreAide(payload){
+  var username=String((payload&&(payload.username||payload.p_username))||'').trim();
+  if(!username)return {success:false,error:'Username missing.'};
+  var got=await sbRestRpc('restore_aide', {p_username:username});
+  if(!got.ok){
+    if(sbRpcMissing(got)){
+      return {success:false,error:'Restore is not available yet. Ace restore_aide is not published.',rpcMissing:true,httpStatus:got.status||0};
+    }
+    return {success:false,error:sbNormalizeWriteError(got.error||'Could not restore this aide.'),httpStatus:got.status||0};
+  }
+  return sbMapSoftAideResult(got.data, username, true);
+}
 function sbKnownAides(){
   var out=[];
   function add(list){
@@ -6506,6 +6628,8 @@ async function sbAdminWriteDispatch(payload){
   try{
     if(action==='admin_create_aide'||action==='create_aide')return await sbAdminCreateAide(payload);
     if(action==='reset_temp_password'||action==='reset_aide_temp_password'||action==='reset_password'||action==='set_password')return await sbAdminResetTempPassword(payload);
+    if(action==='soft_delete_aide')return await sbAdminSoftDeleteAide(payload);
+    if(action==='restore_aide')return await sbAdminRestoreAide(payload);
     if(action==='add_client')return await sbAdminAddClient(payload);
     if(action==='update_client')return await sbAdminUpdateClient(payload);
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
@@ -7085,49 +7209,158 @@ function showAddAideError(msg){
   showTempMsg(text,'#b91c1c');
 }
 
+let aideDesk='active';
+var AIDE_RESTORE_WINDOW_MS=7*24*60*60*1000;
+function canManageAides(){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  return role==='Admin'||role==='Scheduler';
+}
+function aideDeletedStamp(u){
+  if(!u)return '';
+  return u.deletedAt||u.deleted_at||u.softDeletedAt||u.soft_deleted_at||'';
+}
+function aideRecordDeleted(u){
+  if(!u)return false;
+  if(u.soft_deleted===true||u.softDeleted===true)return true;
+  return !!aideDeletedStamp(u);
+}
+function aideWithinRestoreWindow(u, nowMs){
+  var stamp=aideDeletedStamp(u);
+  if(!stamp)return !!aideRecordDeleted(u);
+  var t=Date.parse(stamp);
+  if(!isFinite(t))return true;
+  var now=nowMs==null?Date.now():nowMs;
+  return (now-t)<=AIDE_RESTORE_WINDOW_MS;
+}
+function aideOnDesk(u, desk){
+  var deleted=aideRecordDeleted(u);
+  if(desk==='deleted')return deleted&&aideWithinRestoreWindow(u);
+  if(deleted)return false;
+  if(u&&(u.isActive===false||u.is_active===false))return false;
+  return !!(u&&u.username);
+}
+function aideClientIdList(u){
+  return aideAssignedClientValues(u).map(function(item){
+    if(item&&typeof item==='object')return String(item.id||item.clientId||'').trim();
+    return String(item||'').trim();
+  }).filter(function(id){return !!id;});
+}
+function syncAideManageButtons(){
+  var addBtn=document.getElementById('addAideBtn');
+  if(!addBtn)return;
+  var show=canManageAides()&&aideDesk!=='deleted';
+  addBtn.hidden=!show;
+  addBtn.style.display=show?'':'none';
+}
+async function setAideDesk(view){
+  aideDesk=view==='deleted'?'deleted':'active';
+  document.querySelectorAll('[data-aide-desk]').forEach(function(btn){
+    var on=btn.getAttribute('data-aide-desk')===aideDesk;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-selected', on?'true':'false');
+  });
+  var sub=document.getElementById('aideDeskSub');
+  if(sub){
+    sub.textContent=aideDesk==='deleted'
+      ?'Recently deleted aides can be restored for 7 days. They cannot Sign In until restored. After that the nightly cleanup removes the account.'
+      :'Registered caregivers — username, assigned clients, and temp-password status';
+  }
+  syncAideManageButtons();
+  return renderAides(true);
+}
+function aideEmptyHtml(){
+  if(aideDesk==='deleted')return '<div class="empty-state"><p>No aides in Recently deleted.</p></div>';
+  return '<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
+}
+function aideActionButtons(un, desk){
+  if(!canManageAides())return '';
+  var safe=escapeAttr(un);
+  if(desk==='deleted'){
+    return '<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="confirmRestoreAide(\''+safe+'\')">Restore</button>';
+  }
+  return '<button type="button" class="btn btn-sm btn-ghost" onclick="confirmResetAideTempPassword(\''+safe+'\')">Reset temp password</button>'
+    +'<button type="button" class="btn btn-sm btn-danger" onclick="confirmSoftDeleteAide(\''+safe+'\')">Delete</button>';
+}
+function findLoadedAide(username){
+  var un=String(username||'').trim().toLowerCase();
+  var lists=[loadedAidesList];
+  try{if(typeof allAidesForAssign!=='undefined')lists.push(allAidesForAssign);}catch(e){}
+  for(var i=0;i<lists.length;i++){
+    var list=lists[i]||[];
+    for(var j=0;j<list.length;j++){
+      if(list[j]&&String(list[j].username||'').trim().toLowerCase()===un)return list[j];
+    }
+  }
+  return null;
+}
+
 async function renderAides(force){
   const container=document.getElementById('aidesContainer');
   if(!container)return;
-  if(force===true||!cacheGet('get_users')){
+  syncAideManageButtons();
+  const cacheName=aideDesk==='deleted'?'get_users:deleted':'get_users';
+  if(force===true||!cacheGet(cacheName)){
     container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
   }
   try{
-    if(force===true||!allClients.length){
+    if(aideDesk!=='deleted'&&(force===true||!allClients.length)){
       apiGetCached('get_clients',null,force===true).then(function(d){
         if(d&&d.success&&d.data)allClients=d.data;
       }).catch(function(){});
     }
-    const data=await apiGetCached('get_users',null,force===true);
-    if(data&&data.success&&data.data&&data.data.length){
-      const aides=data.data.filter(function(u){return u&&u.username;});
-      loadedAidesList=aides;
-      if(typeof allAidesForAssign!=='undefined')allAidesForAssign=aides.slice();
-      if(!aides.length){
-        container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
-        return;
-      }
-      const rows=aides.map(function(u){
-        const un=String(u.username||'');
-        const onTemp=aideOnTempPassword(u);
-        const status=onTemp
-          ?'<span class="badge badge-warn">Still on temp password</span>'
-          :'<span class="badge badge-ok">Active</span>';
-        return '<tr>'
-          +'<td>'+escapeHtml(u.name||u.fullName||'—')+'</td>'
-          +'<td>@'+escapeHtml(un)+'</td>'
-          +'<td>'+escapeHtml(formatAideAssignedClients(u))+'</td>'
-          +'<td>'+status+'</td>'
-          +'<td class="actions"><button type="button" class="btn btn-sm btn-ghost" onclick="confirmResetAideTempPassword(\''+escapeAttr(un)+'\')">Reset temp password</button></td>'
-          +'</tr>';
-      }).join('');
-      container.innerHTML='<div class="card"><div class="card-title"><span class="ico">👥</span> '+aides.length+' Registered Aides</div>'
-        +'<div class="table-wrap" style="overflow-x:auto"><table class="data-table" id="aidesTable"><thead><tr><th>Name</th><th>Username</th><th>Assigned clients</th><th>Status</th><th>Actions</th></tr></thead><tbody>'
-        +rows+'</tbody></table></div></div>';
+    const extra=aideDesk==='deleted'?{aideDesk:'deleted'}:null;
+    const data=await apiGetCached('get_users',extra,force===true);
+    if(aideDesk==='deleted'&&data&&data.success===false){
+      showTempMsg(data.error||'Recently deleted needs the aides soft-delete fields.','var(--warn)');
+      container.innerHTML=aideEmptyHtml();
       return;
     }
+    const raw=(data&&data.success&&data.data)?data.data.filter(function(u){return u&&u.username;}):[];
+    const aides=raw.filter(function(u){return aideOnDesk(u, aideDesk);});
+    if(aideDesk!=='deleted'){
+      loadedAidesList=raw.filter(function(u){return aideOnDesk(u,'active');});
+      if(typeof allAidesForAssign!=='undefined')allAidesForAssign=loadedAidesList.slice();
+    }
+    if(!aides.length){
+      container.innerHTML=aideEmptyHtml();
+      return;
+    }
+    const title=aideDesk==='deleted'
+      ?(aides.length+' Recently deleted')
+      :(aides.length+' Registered Aides');
+    const built=aides.map(function(u){
+      const un=String(u.username||'');
+      const onTemp=aideOnTempPassword(u);
+      const status=aideDesk==='deleted'
+        ?'<span class="badge badge-fix">Deleted</span>'
+        :(onTemp
+          ?'<span class="badge badge-warn">Still on temp password</span>'
+          :'<span class="badge badge-ok">Active</span>');
+      const actions=aideActionButtons(un, aideDesk);
+      const row='<tr>'
+        +'<td>'+escapeHtml(u.name||u.fullName||'—')+'</td>'
+        +'<td>@'+escapeHtml(un)+'</td>'
+        +'<td>'+escapeHtml(formatAideAssignedClients(u))+'</td>'
+        +'<td>'+status+'</td>'
+        +'<td class="actions">'+actions+'</td>'
+        +'</tr>';
+      const card='<article class="aide-row-card">'
+        +'<div class="aide-row-top"><strong>'+escapeHtml(u.name||u.fullName||'—')+'</strong>'+status+'</div>'
+        +'<div class="aide-row-sub">@'+escapeHtml(un)+'</div>'
+        +'<div class="aide-row-meta">'+escapeHtml(formatAideAssignedClients(u))+'</div>'
+        +(actions?'<div class="actions">'+actions+'</div>':'')
+        +'</article>';
+      return {row:row, card:card};
+    });
+    container.innerHTML='<div class="card"><div class="card-title"><span class="ico">👥</span> '+title+'</div>'
+      +'<div class="aide-cards" aria-label="Aides">'+built.map(function(x){return x.card;}).join('')+'</div>'
+      +'<div class="aides-sheet table-wrap" style="overflow-x:auto"><table class="data-table" id="aidesTable"><thead><tr><th>Name</th><th>Username</th><th>Assigned clients</th><th>Status</th><th>Actions</th></tr></thead><tbody>'
+      +built.map(function(x){return x.row;}).join('')+'</tbody></table></div></div>';
+    return;
   }catch(e){}
-  loadedAidesList=[];
-  container.innerHTML='<div class="empty-state"><p>👥 No aides registered yet. Click "+ Add aide" to create one.</p></div>';
+  if(aideDesk!=='deleted')loadedAidesList=[];
+  container.innerHTML=aideEmptyHtml();
 }
 
 function onAddAideNameInput(){
@@ -7298,6 +7531,72 @@ async function resetAideTempPassword(username){
     showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'reset_temp_password'),'var(--danger)');
   }catch(e){
     showTempMsg(aceActionError(null,e,'reset_temp_password'),'var(--danger)');
+  }
+}
+function confirmSoftDeleteAide(username){
+  const un=String(username||'').trim();
+  if(!un||!canManageAides())return;
+  if(typeof showSharedConfirm!=='function')return;
+  showSharedConfirm('Are you sure? @'+un+' will be hidden for 7 days and cannot Sign In. You can restore them from Recently deleted.',function(){return softDeleteAide(un);},'Soft-delete');
+}
+async function softDeleteAide(username){
+  const un=String(username||'').trim().toLowerCase();
+  if(!un||!canManageAides())return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    showTempMsg('Soft-delete needs the Supabase aides desk.','var(--warn)');
+    return;
+  }
+  const aide=findLoadedAide(un);
+  const payload={username:un};
+  if(aide){
+    if(aide.id)payload.aideId=aide.id;
+    payload.clientIds=aideClientIdList(aide);
+  }
+  try{
+    const res=await postAideAction('soft_delete_aide','',payload);
+    const data=res&&res.data;
+    if(data&&data.success){
+      if(typeof cacheInvalidate==='function')cacheInvalidate('get_users');
+      logActivity('Soft-deleted aide @'+un);
+      const extra=data.assignmentsWarning?(' '+data.assignmentsWarning):'';
+      showTempMsg('Aide @'+un+' hidden. They cannot Sign In. Restore from Recently deleted within 7 days.'+extra,'var(--success)');
+      await renderAides(true);
+      return;
+    }
+    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'soft_delete_aide'),'var(--danger)');
+  }catch(e){
+    showTempMsg(aceActionError(null,e,'soft_delete_aide'),'var(--danger)');
+  }
+}
+function confirmRestoreAide(username){
+  const un=String(username||'').trim();
+  if(!un||!canManageAides())return;
+  if(typeof showSharedConfirm!=='function')return;
+  showSharedConfirm('Restore @'+un+' to the active list? They can Sign In again. This does not change their password.',function(){return restoreAide(un);},'Restore');
+}
+async function restoreAide(username){
+  const un=String(username||'').trim().toLowerCase();
+  if(!un||!canManageAides())return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    showTempMsg('Restore needs the Supabase aides desk.','var(--warn)');
+    return;
+  }
+  const aide=findLoadedAide(un);
+  const payload={username:un};
+  if(aide&&aide.id)payload.aideId=aide.id;
+  try{
+    const res=await postAideAction('restore_aide','',payload);
+    const data=res&&res.data;
+    if(data&&data.success){
+      if(typeof cacheInvalidate==='function')cacheInvalidate('get_users');
+      logActivity('Restored aide @'+un);
+      showTempMsg('Aide @'+un+' restored. Their password was not changed. Assign clients again if they should be on the schedule.','var(--success)');
+      await renderAides(true);
+      return;
+    }
+    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'restore_aide'),'var(--danger)');
+  }catch(e){
+    showTempMsg(aceActionError(null,e,'restore_aide'),'var(--danger)');
   }
 }
 

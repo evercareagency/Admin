@@ -104,7 +104,9 @@ assert.ok(closeOnce.includes("_aideTempPwdOnce=''") || closeOnce.includes('_aide
   'closing the modal must discard the temp password');
 assert.ok(render.includes('Still on temp password'), 'list must paint Still on temp password');
 assert.ok(render.includes('badge-ok') && render.includes('Active'), 'active aides get a green Active pill');
-assert.ok(render.includes('confirmResetAideTempPassword'), 'row must expose Reset temp password');
+const aideActions = extractFn(html, 'function aideActionButtons(un, desk)');
+assert.ok(aideActions.includes('confirmResetAideTempPassword'), 'row must expose Reset temp password');
+assert.ok(render.includes('aideActionButtons'), 'list rows use the shared aide actions');
 
 function runHelpers(){
   const src = extractFns([
