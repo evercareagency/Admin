@@ -115,6 +115,7 @@ vm.createContext(ctx);
   'function coverMapRank(row)',
   'function coverRankRows(data)',
   'function coverIsOpen(shift)',
+  'function coverCoerceNode(data)',
   'function coverShiftRows(data)',
   'function coverRecordBody(clientId, aideId, shiftStart, shiftEnd, reason)',
   'function coverListBody()',
