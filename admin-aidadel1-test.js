@@ -46,9 +46,7 @@ const confirmRes = extractFn(html, 'function confirmRestoreAide(username)');
 const restore = extractFn(html, 'async function restoreAide(username)');
 const sbDel = extractFn(html, 'async function sbAdminDeactivateAide(payload)');
 const sbRes = extractFn(html, 'async function sbAdminRestoreAide(payload)');
-const sbPatch = extractFn(html, 'async function sbPatchAideIsActive(payload, username, active)');
 const dispatch = extractFn(html, 'async function sbAdminWriteDispatch(payload)');
-const clearAsg = extractFn(html, 'async function sbClearAideAssignments(payload)');
 
 assert.ok(actions.indexOf('confirmResetAideTempPassword') < actions.indexOf('confirmSoftDeleteAide'), 'Delete sits beside Reset temp password');
 assert.ok(actions.includes('>Delete</button>'), 'Delete label');
@@ -60,14 +58,15 @@ assert.ok(!/\bconfirm\(/.test(confirmDel + softDel + confirmRes + restore), 'no 
 assert.ok(softDel.includes("'admin_deactivate_aide'"), 'UI posts admin_deactivate_aide');
 assert.ok(restore.includes("'admin_restore_aide'"), 'UI posts admin_restore_aide');
 assert.ok(!/soft_delete_aide|restore_aide\(/.test(softDel + restore), 'UI does not call the old RPC names');
-assert.ok(!/tempPassword|temp_password|reset_aide_temp_password|generateTempPassword|p_temp_password/.test(softDel + restore + sbDel + sbRes + sbPatch + confirmDel + confirmRes), 'delete and restore never rotate a password');
-assert.ok(sbDel.includes("sbRestRpc('admin_deactivate_aide'"), 'Ace admin_deactivate_aide RPC');
-assert.ok(sbDel.includes('p_username:username'), 'RPC body is p_username only');
-assert.ok(sbRes.includes("sbRestRpc('admin_restore_aide'"), 'Ace admin_restore_aide RPC');
-assert.ok(sbDel.includes('sbRpcMissing'), 'missing RPC falls through');
-assert.ok(sbPatch.includes("sbRestPatchActive('aides'"), 'missing deactivate RPC falls back to client-style is_active PATCH');
-assert.ok(sbPatch.includes('sbRestPatchRestoreActive'), 'missing restore RPC PATCH is_active true');
-assert.ok(clearAsg.includes('sbSoftUnassign'), 'known assignments use the existing unassign callable');
+assert.ok(!/tempPassword|temp_password|reset_aide_temp_password|generateTempPassword|p_temp_password/.test(softDel + restore + sbDel + sbRes + confirmDel + confirmRes), 'delete and restore never rotate a password');
+assert.ok(sbDel.includes("sbRestRpc('admin_deactivate_aide', {p_aide_id:aideId})"), 'deactivate body is p_aide_id');
+assert.ok(sbRes.includes("sbRestRpc('admin_restore_aide', {p_aide_id:aideId})"), 'restore body is p_aide_id');
+assert.ok(!/p_username/.test(sbDel + sbRes), 'aide duty RPCs do not send p_username');
+assert.ok(!/sbRestPatch|sbSoftUnassign|sbRpcMissing/.test(sbDel + sbRes), 'client does not PATCH or unassign; Ace owns the ban and assignments');
+assert.ok(html.includes("['deactivated_at','is.null']"), 'active list requires deactivated_at null');
+assert.ok(html.includes("['is_active','eq.true']") && html.includes("aidePairs.push(['is_active','eq.false'])"), 'active and deleted is_active filters');
+assert.ok(html.includes("['deactivated_at','not.is.null']"), 'recently deleted requires deactivated_at');
+assert.ok(html.includes("['order','deactivated_at.desc']"), 'recently deleted orders by deactivated_at desc');
 assert.ok(dispatch.indexOf("action==='admin_deactivate_aide'") < dispatch.indexOf('sbAdminSoftDeleteTimesheet'), 'aide deactivate is not the timesheet trash path');
 assert.ok(dispatch.includes("action==='admin_restore_aide'"), 'dispatch restores aides');
 
@@ -113,10 +112,10 @@ const names = [
   'function looksLikeUsernameTaken(text)',
   'function aceActionError(data,err,action)',
   'async function postAideAction(primary,alias,payload)',
+  'function rememberAideRows(list)',
   'function canManageAides()',
-  'function aideIsInactive(u)',
+  'function aideDeactivatedStamp(u)',
   'function aideOnDesk(u, desk)',
-  'function aideClientIdList(u)',
   'function syncAideManageButtons()',
   'async function setAideDesk(view)',
   'function aideEmptyHtml()',
@@ -152,10 +151,9 @@ const store = {
       username: 'oldaide',
       name: 'Old Aide',
       isActive: false,
-      deleted_at: '2026-09-01T00:00:00.000Z',
-      deletedAt: '2026-09-01T00:00:00.000Z',
-      softDeleted: true,
-      soft_deleted: true,
+      is_active: false,
+      deactivated_at: '2026-09-24T12:00:00.000Z',
+      deactivatedAt: '2026-09-24T12:00:00.000Z',
       assignedClients: []
     }
   ]
@@ -169,6 +167,7 @@ const box = {
   allClients: [{id: clientId, name: 'Ann Client'}],
   loadedAidesList: [],
   allAidesForAssign: [],
+  aideLookup: {},
   _sharedConfirmOnYes: null,
   Date: Date,
   isFinite: isFinite,
@@ -190,12 +189,16 @@ const box = {
     if(payload.action === 'admin_deactivate_aide'){
       row.isActive = false;
       row.is_active = false;
-      return {success: true, username: payload.username, is_active: false};
+      row.deactivated_at = '2026-09-25T12:00:00.000Z';
+      row.deactivatedAt = row.deactivated_at;
+      return {success: true, username: payload.username, is_active: false, deactivated_at: row.deactivated_at};
     }
     if(payload.action === 'admin_restore_aide'){
       row.isActive = true;
       row.is_active = true;
-      return {success: true, username: payload.username, is_active: true};
+      row.deactivated_at = null;
+      row.deactivatedAt = '';
+      return {success: true, username: payload.username, is_active: true, deactivated_at: null};
     }
     return {success: false, error: 'nope'};
   }
@@ -264,8 +267,8 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   box.hideSharedConfirm();
   await pendingDelete;
   assert.strictEqual(posts[posts.length - 1].action, 'admin_deactivate_aide');
-  assert.deepStrictEqual(posts[posts.length - 1].clientIds, [clientId], 'soft-delete sends known client ids for unassign');
-  assert.strictEqual(posts[posts.length - 1].aideId, aideId);
+  assert.strictEqual(posts[posts.length - 1].aideId, aideId, 'soft-delete sends the aide id for p_aide_id');
+  assert.ok(!('clientIds' in posts[posts.length - 1]), 'client unassign stays on the Ace RPC');
   assert.ok(!htmlOf().includes('@jdoe'), 'confirm then gone from the active list');
   assert.ok(htmlOf().includes('No aides registered yet'), htmlOf());
 
@@ -292,9 +295,11 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   assert.ok(htmlOf().includes('>Delete<'), 'restored row can be deleted again');
   assert.ok(htmlOf().includes('Reset temp password'));
 
-  assert.strictEqual(box.aideOnDesk({username: 'x', isActive: false}, 'deleted'), true, 'inactive aides are Recently deleted');
-  assert.strictEqual(box.aideOnDesk({username: 'x', is_active: false}, 'active'), false, 'default list hides inactive');
+  assert.strictEqual(box.aideOnDesk({username: 'x', isActive: false, deactivated_at: '2026-09-25T00:00:00.000Z'}, 'deleted'), true, 'inactive aides with deactivated_at are Recently deleted');
+  assert.strictEqual(box.aideOnDesk({username: 'x', isActive: false}, 'deleted'), false, 'inactive without deactivated_at stays off both desks');
+  assert.strictEqual(box.aideOnDesk({username: 'x', is_active: false, deactivated_at: '2026-09-25T00:00:00.000Z'}, 'active'), false, 'default list hides deactivated aides');
   assert.strictEqual(box.aideOnDesk({username: 'x', isActive: true}, 'active'), true);
+  assert.strictEqual(box.aideOnDesk({username: 'x', isActive: true, deactivated_at: '2026-09-25T00:00:00.000Z'}, 'active'), false);
   assert.strictEqual(box.aideOnDesk({username: 'x', isActive: true}, 'deleted'), false);
 
   console.log('admin-aidadel1-test: ui ok');
@@ -308,13 +313,8 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
 function runRpc(){
   const rpcNames = [
     'function sbUuid(v)',
-    'function sbRpcMissing(got)',
-    'function sbMapAideDutyResult(data, username, active)',
-    'function sbArchiveRepresentation(data)',
-    'function sbConfirmedArchive(row, id)',
-    'async function sbClearAideAssignments(payload)',
-    'async function sbFinishAideDeactivate(payload, mapped)',
-    'async function sbPatchAideIsActive(payload, username, active)',
+    'function sbMapAideDutyResult(data, username, active, aideId)',
+    'async function sbDutyAideId(payload)',
     'async function sbAdminDeactivateAide(payload)',
     'async function sbAdminRestoreAide(payload)'
   ];
@@ -323,75 +323,60 @@ function runRpc(){
   const rpcBox = {
     Date: Date,
     sbNormalizeWriteError: function(msg){return String(msg || 'Request failed.');},
-    sbResolveAideId: async function(){return '';},
-    sbSoftUnassign: async function(aide, client){
-      calls.push({op: 'unassign', aide: aide, client: client});
-      return {ok: true};
-    },
-    sbRestPatchActive: async function(table, id){
-      calls.push({op: 'patch', table: table, id: id, is_active: false});
-      return {ok: true, data: {id: id, is_active: false}};
-    },
-    sbRestPatchRestoreActive: async function(table, id){
-      calls.push({op: 'patch', table: table, id: id, is_active: true});
-      return {ok: true, data: {id: id, is_active: true}};
+    sbResolveAideId: async function(username){
+      calls.push({op: 'resolve', username: username});
+      return rpcBox.resolved || '';
     },
     sbRestRpc: async function(name, body){
       calls.push({op: 'rpc', name: name, body: body});
-      if(rpcBox.mode === 'missing')return {ok: false, status: 404, error: 'Could not find the function public.' + name + '(p_username) in the schema cache'};
-      if(rpcBox.mode === 'cleared')return {ok: true, data: {ok: true, success: true, username: body.p_username, assignments_cleared: true}};
-      return {ok: true, data: {ok: true, success: true, username: body.p_username}};
+      if(rpcBox.mode === 'fail')return {ok: false, status: 400, error: 'Could not hide this aide.'};
+      return {ok: true, data: {ok: true, success: true, username: 'jdoe', deactivated_at: rpcBox.stamp || '2026-09-25T12:00:00.000Z'}};
     },
-    mode: 'ok'
+    mode: 'ok',
+    resolved: '',
+    stamp: '2026-09-25T12:00:00.000Z'
   };
   vm.createContext(rpcBox);
   vm.runInContext(rpcSrc, rpcBox);
   const aide = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
-  const client = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc3';
-  return rpcBox.sbAdminDeactivateAide({username: 'jdoe', aideId: aide, clientIds: [client]}).then(function(deleted){
+  return rpcBox.sbAdminDeactivateAide({username: 'jdoe', aideId: aide, clientIds: ['cccccccc-cccc-4ccc-8ccc-ccccccccccc3']}).then(function(deleted){
     assert.strictEqual(deleted.success, true);
     assert.strictEqual(deleted.is_active, false);
+    assert.strictEqual(deleted.deactivated_at, '2026-09-25T12:00:00.000Z');
+    assert.strictEqual(calls.length, 1, 'deactivate is one RPC');
     assert.strictEqual(calls[0].name, 'admin_deactivate_aide');
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_username: 'jdoe'});
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1])), {op: 'unassign', aide: aide, client: client});
-    assert.ok(!calls.some(function(c){return c.op === 'patch';}), 'live RPC does not also PATCH');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_aide_id: aide});
     assert.ok(!/password/i.test(JSON.stringify(calls)), 'deactivate payload has no password');
     calls.length = 0;
-    rpcBox.mode = 'cleared';
-    return rpcBox.sbAdminDeactivateAide({username: 'jdoe', aideId: aide, clientIds: [client]});
-  }).then(function(already){
-    assert.strictEqual(already.success, true);
-    assert.strictEqual(calls.length, 1, 'Ace-cleared assignments are not patched again');
+    rpcBox.resolved = aide;
+    return rpcBox.sbAdminDeactivateAide({username: 'mossier'});
+  }).then(function(resolved){
+    assert.strictEqual(resolved.success, true);
+    assert.strictEqual(calls[0].op, 'resolve');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1].body)), {p_aide_id: aide});
     calls.length = 0;
-    rpcBox.mode = 'missing';
-    return rpcBox.sbAdminDeactivateAide({username: 'mossier', aideId: aide, clientIds: [client]});
-  }).then(function(missing){
-    assert.strictEqual(missing.success, true, 'missing RPC falls back to is_active PATCH');
-    assert.strictEqual(missing.fallback, 'patch');
-    assert.strictEqual(missing.authBanPending, true);
-    assert.strictEqual(missing.is_active, false);
+    rpcBox.mode = 'fail';
+    return rpcBox.sbAdminDeactivateAide({username: 'mossier', aideId: aide});
+  }).then(function(failed){
+    assert.strictEqual(failed.success, false);
+    assert.strictEqual(calls.length, 1, 'a failed RPC does not PATCH or unassign');
     assert.strictEqual(calls[0].name, 'admin_deactivate_aide');
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_username: 'mossier'});
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1])), {op: 'patch', table: 'aides', id: aide, is_active: false});
-    assert.strictEqual(calls[2].op, 'unassign');
     calls.length = 0;
     rpcBox.mode = 'ok';
-    return rpcBox.sbAdminRestoreAide({username: 'mossier'});
+    return rpcBox.sbAdminRestoreAide({username: 'mossier', aideId: aide});
   }).then(function(restored){
     assert.strictEqual(restored.success, true);
     assert.strictEqual(restored.is_active, true);
+    assert.strictEqual(restored.deactivated_at, null);
     assert.strictEqual(calls[0].name, 'admin_restore_aide');
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_username: 'mossier'});
-    assert.ok(!calls.some(function(c){return c.op === 'unassign' || c.op === 'patch';}), 'restore RPC does not rotate passwords or touch assignments');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_aide_id: aide});
+    assert.ok(!/password/i.test(JSON.stringify(calls)), 'restore payload has no password');
     calls.length = 0;
-    rpcBox.mode = 'missing';
-    return rpcBox.sbAdminRestoreAide({username: 'mossier', aideId: aide});
-  }).then(function(patched){
-    assert.strictEqual(patched.success, true);
-    assert.strictEqual(patched.is_active, true);
-    assert.strictEqual(patched.fallback, 'patch');
-    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1])), {op: 'patch', table: 'aides', id: aide, is_active: true});
-    assert.ok(!/password/i.test(JSON.stringify(calls)), 'restore fallback has no password');
+    rpcBox.resolved = '';
+    return rpcBox.sbAdminRestoreAide({username: 'mossier'});
+  }).then(function(missingId){
+    assert.strictEqual(missingId.success, false);
+    assert.strictEqual(calls.filter(function(c){return c.op === 'rpc';}).length, 0, 'restore without an aide id does not call the RPC');
     console.log('admin-aidadel1-test: ok');
   });
 }
