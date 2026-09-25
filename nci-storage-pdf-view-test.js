@@ -31,7 +31,9 @@ assert.ok(html.includes('{org_id}/nci/{new_client_intakes.id}.pdf'), 'path is th
 assert.ok(html.includes('SB_PDF_SIGN_SECONDS=120'), 'shared signer stays at 120s');
 assert.ok(!/service_role/.test(extractFn(html, 'async function nciOpenIntakeStoragePdf(row)') + extractFn(html, 'async function viewCompletedIntakePdf(intakeId)')), 'View does not use service_role');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-aidecreds1'), 'aidecreds1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remisec1'), 'remisec1 is the first admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1">'), 'aidecreds1 meta stays');
+assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-aidecreds1"'), 'aidecreds1 stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1"') < html.indexOf('content="2026-09-25-remidate1"'), 'remidate1 meta stays after aidecreds1');
 assert.ok(html.indexOf('content="2026-09-25-remidate1"') < html.indexOf('content="2026-09-25-ncipdf1"'), 'ncipdf1 meta stays after remidate1');
 assert.ok(html.indexOf('content="2026-09-25-ncipdf1"') < html.indexOf('content="2026-09-25-remichat1"'), 'remichat1 meta stays after ncipdf1');
