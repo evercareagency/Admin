@@ -3069,6 +3069,7 @@ function layoutA1ApplyRoles(){
   var role='';
   try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
   document.querySelectorAll('#adminScreen [data-layout-roles]').forEach(function(el){
+    if(el.id==='copilotSheet')return;
     var allow=String(el.getAttribute('data-layout-roles')||'').split(/\s+/).filter(Boolean);
     var show=!role||allow.indexOf(role)>=0;
     if(show)el.removeAttribute('hidden');

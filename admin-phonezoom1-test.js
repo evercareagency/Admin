@@ -124,6 +124,11 @@ async function runBrowser(){
     const page = await browser.newPage();
     await page.setViewport({width:390, height:844, isMobile:true, hasTouch:true, deviceScaleFactor:2});
     await page.goto('http://127.0.0.1:'+port+'/index.html', {waitUntil:'domcontentloaded', timeout:20000});
+    const boot = await page.evaluate(function(){
+      var sheet = document.getElementById('copilotSheet');
+      return {hidden: !!(sheet && sheet.hidden), htmlHidden: sheet ? sheet.hasAttribute('hidden') : false};
+    });
+    assert.strictEqual(boot.hidden, true, 'Co-pilot sheet stays closed until Mo opens it');
     await page.evaluate(function(){
       localStorage.clear();
       currentAdminRole = 'Admin';
@@ -137,7 +142,7 @@ async function runBrowser(){
       var sheet = document.getElementById('copilotSheet');
       return !sheet || sheet.hidden === true;
     });
-    assert.strictEqual(closed, true, 'opening Admin does not auto-open Co-pilot');
+    assert.strictEqual(closed, true, 'Admin home does not leave the Co-pilot sheet open');
     await page.click('#navEditOpen');
     await page.waitForSelector('#navEditPool [data-nav-id="coverage"]', {visible:true});
     const edit = await page.evaluate(function(){
@@ -173,6 +178,7 @@ async function runBrowser(){
     assert.ok(pinned.slot, 'Coverage can be pinned into a bottom slot');
     assert.ok(inside(pinned.slot, {left:0, top:0, right:pinned.viewW, bottom:844}), 'pinned Coverage stays on screen');
     assert.ok(inside(pinned.slot, pinned.panel), 'pinned Coverage stays inside the picker');
+    await page.screenshot({path: path.join(shotDir, 'phonezoom1-edit-tabs-coverage-pinned.png')});
 
     await page.evaluate(function(){navEditCancel(); copilotOpenRadar();});
     await page.waitForSelector('#copilotQuietOn', {visible:true});
