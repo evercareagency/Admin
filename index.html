@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- coverage pick another aide 2026-09-25 v=coverpick1 admin-build 2026-09-25-coverpick1. More → Coverage open-shift sheet keeps the ranked Who can cover list as the primary list. Pick another aide opens a search over every active aide already on this desk, including aides who are not in the ranked shortlist. Soft-deleted aides stay off that list: the same aideOnDesk active rule as Aides (not inactive, no deactivated_at). A tap uses the same check as a ranked row, coverPickRank, then Text and Call stay optional, and Confirm assign still posts admin_cover_outcome assigned_backup. The roster is the list Schedule and Aides already load: get_users, which calls admin_list_aides when that callable returns aide rows, otherwise aides where is_active is true and deactivated_at is null. No new Ace RPC. Remi stays the corner chip. No Auth reseal. Prior markers stay, including remisec1, payready1d, payready1c, coverunlock1, and payready1. -->
+<meta name="admin-build" content="2026-09-25-coverpick1">
 <!-- remi secretary 2026-09-25 v=remisec1 admin-build 2026-09-25-remisec1. Admin and Scheduler only. Remi stays the corner chip until opened, then the sheet closes back to the desk. Ask can greet, show a brief Cleveland weather card, look up a caregiver or client already loaded, and hand off an open call-off as a draft. Update client address, soft-remove aide, and add aide show the proposed change and wait for Confirm before any write. Address reuses the desk client update. Soft-remove posts admin_deactivate_aide. Add aide posts admin_add_aide and does not create a sign-in. Weather is the desk snapshot in remiSecWeatherSnapshot until a Cleveland callable exists. Nurse does not get Remi and this tip adds no nurse flow. Quiet hours rules are unchanged. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including payready1d, payready1c, payready1b, coverunlock1, payready1, aidecreds1c, aidecreds1b, remidate1, ncipdf1, remichat1, remiscroll1, and remi1. -->
 <meta name="admin-build" content="2026-09-25-remisec1">
 <!-- admin pay readiness export ready-list defense 2026-09-25 v=payready1d admin-build 2026-09-25-payready1d. Before the file downloads, Held rows and any row whose pay_status (or Readiness or status) is not ready are stripped, case-insensitive. A prebuilt csv from admin_timesheet_pay_export is still preferred when present, then parsed and filtered so a held row cannot pass through unchanged. Columns and rows are filtered the same way when that csv cannot prove ready-only. Money columns stay dropped, including rate, amount, wage, gross, net, payroll, and $. Export still posts admin_timesheet_pay_export {p_week_start}. When nothing ready remains, the screen says no ready timesheets to export and does not download a file. Export ready list stays visible when ready_count is at least 1, including when held_count is greater than 0. Not payroll. Remi stays the corner chip. No Auth reseal. Prior markers stay, including payready1c, payready1b, coverunlock1, payready1, and aidecreds1c. -->
@@ -400,6 +402,13 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-rank-row strong{display:block;font-size:1rem;line-height:1.25;}
 #tab_coverage .cover-rank-row span{display:block;font-size:0.88rem;color:var(--text);margin-top:2px;}
 #tab_coverage .cover-rank-check{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;line-height:1;}
+#tab_coverage #coverPickOtherBtn{width:100%;min-height:48px;margin-top:12px;}
+#tab_coverage .cover-roster{margin-top:10px;}
+#tab_coverage .cover-roster-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;max-height:220px;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;}
+#tab_coverage .cover-roster-row{position:relative;width:100%;min-height:48px;text-align:left;background:#fff;color:var(--navy);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:'DM Sans',sans-serif;cursor:pointer;touch-action:manipulation;}
+#tab_coverage .cover-roster-row.is-selected{background:#d7efef;border:2px solid var(--teal-dark);box-shadow:0 0 0 3px rgba(42,127,127,0.28);}
+#tab_coverage .cover-roster-row strong{display:block;font-size:1rem;line-height:1.25;}
+#tab_coverage .cover-roster-row span{display:block;font-size:0.88rem;color:var(--text);margin-top:2px;}
 #tab_coverage #coverCmDraft{min-height:200px;line-height:1.45;}
 #tab_coverage input,#tab_coverage select,#tab_coverage textarea{font-size:16px;min-height:48px;}
 #tab_coverage .btn:disabled{opacity:0.45;cursor:not-allowed;}
@@ -1506,6 +1515,13 @@ bindLoginKeyboard();
             <h2>Who can cover</h2>
             <p id="coverRankBody">Tap an aide. The check stays on the one you picked.</p>
             <div id="coverRankList" class="cover-rank-list"></div>
+            <button type="button" class="btn btn-navy" id="coverPickOtherBtn" aria-expanded="false" aria-controls="coverRosterPick" onclick="coverToggleRoster()">Pick another aide</button>
+            <div id="coverRosterPick" class="cover-roster" data-coverpick1="v=coverpick1" hidden>
+              <label class="cover-note" for="coverRosterSearch">Search all active aides</label>
+              <input type="search" id="coverRosterSearch" placeholder="Name or username" autocomplete="off" enterkeyhint="search" aria-label="Search all active aides" oninput="coverPaintRoster()">
+              <div id="coverRosterList" class="cover-roster-list" role="listbox" aria-label="All active aides"></div>
+              <p id="coverRosterEmpty" class="cover-note" hidden>No active aides on this desk yet.</p>
+            </div>
           </section>
           <section class="cover-section" aria-label="Text">
             <h2>Text</h2>
@@ -4497,6 +4513,120 @@ function coverClientChoices(){
     return {value:String(c.id), label:String(c.name||c.clientName||c.id)};
   }).filter(function(c){return c.value&&c.value!=='undefined';});
 }
+function coverRosterActive(row){
+  if(!row)return false;
+  if(typeof aideOnDesk==='function')return aideOnDesk(row, 'active');
+  var id=row.id!=null?String(row.id).trim():'';
+  var name=String(row.name||row.fullName||row.full_name||row.username||'').trim();
+  if(!id&&!name&&!row.username)return false;
+  if(row.isActive===false||row.is_active===false)return false;
+  if(row.deactivatedAt||row.deactivated_at)return false;
+  return true;
+}
+function coverRosterMatch(row, query){
+  var q=String(query||'').trim().toLowerCase();
+  if(!q)return true;
+  var name=String(row&&row.name||'').toLowerCase();
+  var user=String(row&&row.username||'').toLowerCase();
+  return name.indexOf(q)>=0||user.indexOf(q)>=0||('@'+user).indexOf(q)>=0;
+}
+function coverActiveRoster(query){
+  var list=[];
+  try{list=(typeof schedAideRosters==='function')?schedAideRosters():[];}catch(e){list=[];}
+  var seen={};
+  var out=[];
+  (list||[]).forEach(function(a){
+    if(!coverRosterActive(a))return;
+    var id=a.id!=null&&String(a.id)!==''?String(a.id):String(a.username||'');
+    var user=String(a.username||'').trim();
+    var key=id||user;
+    var userKey=user.toLowerCase();
+    if(!key||seen[key]||(userKey&&seen['@'+userKey]))return;
+    seen[key]=1;
+    if(userKey)seen['@'+userKey]=1;
+    var name=String(a.name||a.fullName||a.full_name||user||id).trim();
+    out.push({
+      id:key,
+      username:user,
+      name:name||user||key,
+      phone:(typeof coverPickPhone==='function')?coverPickPhone(a):''
+    });
+  });
+  out.sort(function(a,b){
+    return String(a.name||'').localeCompare(String(b.name||''));
+  });
+  var q=String(query||'').trim();
+  if(!q)return out;
+  return out.filter(function(row){return coverRosterMatch(row, q);});
+}
+function coverRosterById(id){
+  var key=String(id||'');
+  if(!key)return null;
+  var rows=coverActiveRoster('');
+  for(var i=0;i<rows.length;i++){
+    if(String(rows[i].id)===key)return rows[i];
+  }
+  return null;
+}
+function coverHideRoster(){
+  var box=null;
+  var btn=null;
+  var search=null;
+  try{box=document.getElementById('coverRosterPick');}catch(e){box=null;}
+  try{btn=document.getElementById('coverPickOtherBtn');}catch(e2){btn=null;}
+  try{search=document.getElementById('coverRosterSearch');}catch(e3){search=null;}
+  if(box)box.hidden=true;
+  if(btn)btn.setAttribute('aria-expanded','false');
+  if(search)search.value='';
+}
+function coverPaintRoster(){
+  var list=null;
+  var empty=null;
+  var search=null;
+  try{list=document.getElementById('coverRosterList');}catch(e){list=null;}
+  try{empty=document.getElementById('coverRosterEmpty');}catch(e2){empty=null;}
+  try{search=document.getElementById('coverRosterSearch');}catch(e3){search=null;}
+  if(!list)return;
+  var q=search?String(search.value||''):'';
+  var rows=coverActiveRoster(q);
+  if(!rows.length){
+    list.innerHTML='';
+    if(empty){
+      empty.hidden=false;
+      empty.textContent=String(q).trim()?'No active aides match that search.':'No active aides on this desk yet.';
+    }
+    return;
+  }
+  if(empty)empty.hidden=true;
+  list.innerHTML=rows.map(function(r){
+    var on=String(coverSelectedAideId||'')!==''&&String(coverSelectedAideId)===String(r.id);
+    var user=r.username?'<span>@'+coverEsc(r.username)+'</span>':'';
+    var check=on?'<span class="cover-rank-check" aria-hidden="true">✓</span>':'';
+    return '<button type="button" class="cover-roster-row'+(on?' is-selected':'')+'" role="option" aria-selected="'+(on?'true':'false')+'" aria-pressed="'+(on?'true':'false')+'" data-cover-aide="'+coverAttr(r.id)+'" data-cover-aide-name="'+coverAttr(r.name||r.username||r.id)+'">'
+      +'<span class="cover-rank-top"><strong>'+coverEsc(r.name||'Aide')+'</strong>'+check+'</span>'
+      +user+'</button>';
+  }).join('');
+}
+async function coverShowRoster(){
+  var box=null;
+  var btn=null;
+  try{box=document.getElementById('coverRosterPick');}catch(e){box=null;}
+  try{btn=document.getElementById('coverPickOtherBtn');}catch(e2){btn=null;}
+  if(!box)return;
+  box.hidden=false;
+  if(btn)btn.setAttribute('aria-expanded','true');
+  if(!coverActiveRoster('').length){
+    try{if(typeof schedLoadRosters==='function')await schedLoadRosters();}catch(e3){}
+  }
+  coverPaintRoster();
+  try{if(box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e4){}
+}
+function coverToggleRoster(){
+  var box=null;
+  try{box=document.getElementById('coverRosterPick');}catch(e){box=null;}
+  if(!box||box.hidden)coverShowRoster();
+  else coverHideRoster();
+}
 function coverAideChoices(){
   var list=[];
   try{list=(typeof schedAideRosters==='function')?schedAideRosters():[];}catch(e){list=[];}
@@ -4740,6 +4870,8 @@ function coverSelectedRank(){
   for(i=0;i<(coverRanks||[]).length;i++){
     if(String(coverRanks[i].id)===sid)return coverRanks[i];
   }
+  var fromRoster=typeof coverRosterById==='function'?coverRosterById(sid):null;
+  if(fromRoster)return fromRoster;
   return {id:sid, name:coverSelectedLabel(sel), username:'', phone:''};
 }
 function coverWhenBit(shift){
@@ -5268,6 +5400,7 @@ function coverOpenOutcome(id){
   coverRanks=[];
   coverSelectedAideId=shift.backupAideId?String(shift.backupAideId):'';
   coverPostedKey='';
+  coverHideRoster();
   coverHideAssign();
   coverHideRefuseDraft();
   coverHideOnTheWay();
@@ -5305,6 +5438,9 @@ function coverPickRank(id, name){
   }
   coverPaintRanks(coverRanks);
   coverFillBackup(shift);
+  var roster=null;
+  try{roster=document.getElementById('coverRosterPick');}catch(e){roster=null;}
+  if(roster&&!roster.hidden)coverPaintRoster();
   if(typeof showTempMsg==='function')showTempMsg('Aide checked. Text them, or confirm after you talk to the client.','var(--teal)');
 }
 function coverShowAssign(){
