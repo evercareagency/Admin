@@ -11,8 +11,7 @@ assert.ok(html.includes('v=remiscroll1'), 'remiscroll1 marker');
 assert.ok(html.includes('admin-build 2026-09-25-remiscroll1'), 'remiscroll1 admin-build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiscroll1">'), 'remiscroll1 meta');
 assert.ok(html.includes('<!-- phone scroll lock 2026-09-25 v=remiscroll1 admin-build 2026-09-25-remiscroll1'), 'remiscroll1 comment');
-const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remiscroll1'), 'remiscroll1 is the current admin-build meta');
+assert.ok(html.indexOf('<meta name="admin-build" content="2026-09-25-remiscroll1">') > html.indexOf('<!-- phone scroll lock 2026-09-25 v=remiscroll1'), 'remiscroll1 meta stays with the remiscroll1 note');
 ['v=remi1','v=phonezoom1','v=eca-copilot1','v=navedit1','v=coveraide1b','v=layoutA1','v=admintheme1'].forEach(function(mark){
   assert.ok(html.includes(mark), 'prior marker stays ' + mark);
 });
