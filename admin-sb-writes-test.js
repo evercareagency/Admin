@@ -250,6 +250,8 @@ const clientRow = {
     {action:'create_aide', username:'jdoe', name:'Jane Doe', fullName:'Jane Doe', tempPassword:'EcLocal99', clientIds:[]},
     {action:'reset_temp_password', username:'jdoe', tempPassword:'EcLocal99'},
     {action:'reset_aide_temp_password', username:'jdoe', tempPassword:'EcLocal99'},
+    {action:'reset_password', username:'jdoe', password:'EcTyped1'},
+    {action:'set_password', username:'jdoe', password:'EcTyped2'},
     {action:'add_client', name:'Ann Client', address:'123 Main', lat:'41.5', lng:'-81.6', assignedAides:['jdoe']},
     {action:'update_client', id:clientId, name:'Ann Client', address:'123 Main', lat:'', lng:'', assignedAides:['jdoe']},
     {action:'archive_client', clientId:clientId},
@@ -410,6 +412,47 @@ const clientRow = {
   const aliasReset = await on.box.apiPost({action:'reset_aide_temp_password', username:'jdoe', tempPassword:'EcLocal99'});
   assert.strictEqual(aliasReset.success, true);
   assert.ok(on.calls[0].url.indexOf('/rest/v1/rpc/reset_aide_temp_password') > 0);
+
+  on.calls.length = 0;
+  const sheetsNamed = await on.box.apiPost({action:'reset_password', username:'jdoe', password:'EcTyped1'});
+  assert.strictEqual(sheetsNamed.success, true);
+  assert.strictEqual(sheetsNamed.tempPassword, 'EcResetOnce');
+  assert.strictEqual(on.calls.length, 1);
+  assert.ok(on.calls[0].url.indexOf('/rest/v1/rpc/reset_aide_temp_password') > 0, 'reset_password on cut is Ace');
+  assert.deepStrictEqual(bodyOf(on.calls[0]), {p_username:'jdoe', p_temp_password:'EcTyped1'});
+  assert.ok(!on.calls.some(function(c){return c.url === sheetsUrl;}), 'reset_password must not hit sheets on cut');
+
+  on.calls.length = 0;
+  const setNamed = await on.box.apiPost({action:'set_password', username:'jdoe', password:'EcTyped2'});
+  assert.strictEqual(setNamed.success, true);
+  assert.ok(on.calls[0].url.indexOf('/rest/v1/rpc/reset_aide_temp_password') > 0, 'set_password on cut is Ace');
+  assert.deepStrictEqual(bodyOf(on.calls[0]), {p_username:'jdoe', p_temp_password:'EcTyped2'});
+  assert.ok(!on.calls.some(function(c){return c.url === sheetsUrl;}));
+
+  const nursePwd = harness({
+    search:'',
+    role:'Nurse',
+    session:session(),
+    route: function(fetchUrl){
+      const u = decoded(fetchUrl);
+      if(u.indexOf('/rest/v1/rpc/reset_aide_temp_password') > 0){
+        return {status:200, raw:JSON.stringify(Object.assign({}, created, {temp_password:'EcNurseOnce', assigned_count:0}))};
+      }
+      if(u.indexOf('/rest/v1/rpc/admin_create_aide') > 0){
+        return {status:200, raw:JSON.stringify(created)};
+      }
+      return {status:500, raw:JSON.stringify({message:'nurse password fell through '+u})};
+    }
+  });
+  const nurseReset = await nursePwd.box.apiPost({action:'reset_password', username:'jdoe', password:'EcTyped1'});
+  assert.strictEqual(nurseReset.success, true);
+  assert.ok(nursePwd.calls[0].url.indexOf('/rest/v1/rpc/reset_aide_temp_password') > 0, 'nurse reset_password stays on Ace');
+  assert.ok(!nursePwd.calls.some(function(c){return c.url === sheetsUrl;}));
+  nursePwd.calls.length = 0;
+  const nurseCreate = await nursePwd.box.apiPost({action:'admin_create_aide', username:'jdoe', fullName:'Jane Doe', tempPassword:'EcLocal99'});
+  assert.strictEqual(nurseCreate.success, true);
+  assert.ok(nursePwd.calls[0].url.indexOf('/rest/v1/rpc/admin_create_aide') > 0, 'create aide on cut is Ace even for Nurse');
+  assert.ok(!nursePwd.calls.some(function(c){return c.url === sheetsUrl;}));
 
   on.calls.length = 0;
   const added = await on.box.apiPost({

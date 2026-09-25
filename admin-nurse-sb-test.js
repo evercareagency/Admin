@@ -24,7 +24,7 @@ function extractFn(src, sig){
 }
 
 assert.ok(html.includes('v=nursenb1'), 'nursenb1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker');
 assert.ok(html.includes('v=nursespd2'), 'nursespd2 marker');
 assert.ok(html.includes('v=nursespd1'), 'nursespd1 single-flight UX stays');

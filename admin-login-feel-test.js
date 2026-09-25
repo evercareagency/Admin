@@ -72,7 +72,8 @@ assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()')
 assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
 assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme1">'), 'sched1m admin-build after warmoff1');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'isclear1 admin-build after cgreset1');
+assert.ok(html.includes('v=cgreset1'), 'cgreset1 marker stays');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(login.includes('openPortalHome('), 'login must open home after success');
 assert.ok(!/get_users|get_all|get_clients|get_assigned_topic/.test(login), 'mgrLogin must not fetch heavy lists');

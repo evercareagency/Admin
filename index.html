@@ -35,8 +35,13 @@
 <!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert /exec. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. No new Ace RPCs. Ace list_new_client_intakes unchanged. Compliance stays /exec on its own path. Broadcast and Schedule untouched. -->
 <!-- admin schedule mobile scroll 2026-09-24 v=sched1m admin-build 2026-09-24-sched1m. Week grid horizontal scroll on touch: the day columns keep a min width so Mon–Sun are wider than a phone, and .sched-scroll is the only scroller (overflow-x auto, touch-action pan-x pan-y, -webkit-overflow-scrolling touch). Toolbar (Edit usual pattern, week, search, All|Open|Call-offs) wraps in the viewport and does not share that scroller. The “No patterns yet” notice wraps above the grid and does not cover or widen it. Desktop week layout unchanged. -->
 <!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
-<!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In follows the Caregiver loginkb1 pattern: visualViewport pins #loginScreen and scrolls the focused field plus #mgrLoginBtn above the keyboard. #loginForgot stays on that scrollport. Desktop width does not take the keyboard path. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
+<!-- caregiver password reset 2026-09-24 v=cgreset1 admin-build 2026-09-24-cgreset1. Cut ON: Settings Reset Caregiver Password uses the same office path as reset_temp_password — POST rpc/reset_aide_temp_password {p_username,p_temp_password} via sbAdminResetTempPassword (Auth + aides.must_change_password). Success shows the temp password. apiPost reset_password and set_password on cut route to that RPC and do not hit Sheets /exec. Add aide stays admin_create_aide. Rollback ?sheets=1 or evercare_sheets=1 keeps Sheets reset_password. -->
+<!-- inservice clear assignment 2026-09-25 v=isclear1 admin-build 2026-09-25-isclear1. Clear Assignment on the Supabase cut requires topicId and DELETE /rest/v1/inservice_topic_assignment?org_id=eq.4f97f4d3-6635-4544-904c-6b06aa02d40b&topic_id=eq.{topicId} via sbClearAssignedTopic (office JWT). Missing topicId fails loud and does not post. Sheets /exec clear_assigned_topic runs only when evercareSbEnabled is false (?sheets=1 or evercare_sheets=1). DELETE does not touch inservice_results. Per-aide Compliance Delete stays POST rpc/admin_unassign_inservice_aide. Office quiz edit and review label each choice A–F up to the option count. Prior markers stay. -->
+<!-- login phone keyboard 2026-09-25 v=loginkb1 admin-build 2026-09-25-loginkb1. Cause: #loginScreen is a centered min-height 100dvh flex box and html/body overflow-x hidden, so the card does not overflow the layout viewport. The phone keyboard shrinks the visual viewport only, and Password plus Sign In stay under it. On focus of Account, username, or password, pin #loginScreen to the visual viewport (height and offset from visualViewport, not a guessed window.scrollTo) and scroll the focused field and Sign In into that open area. The same screen is the scrollport, so Forgot password can scroll into view. Desktop stays centered when there is no keyboard inset. -->
+<!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <meta name="admin-build" content="2026-09-25-admintheme1">
+<meta name="admin-build" content="2026-09-25-loginkb1">
+<meta name="admin-build" content="2026-09-25-isclear1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -46,23 +51,29 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;max-width:100%;overflow
 body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);max-width:100%;overflow-x:hidden;}
 .screen{display:none;min-height:100vh;min-height:100dvh;}
 .screen.active{display:block;}
-#loginScreen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#176868 0%,var(--teal) 46%,#3a9494 100%);min-height:100vh;min-height:100dvh;padding:max(20px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));}
-/* Phone Sign In keyboard (v=admintheme1, Caregiver loginkb1 pattern). JS adds this class only while a phone keyboard covers the login field. */
-#loginScreen.login-kb-open{justify-content:flex-start;align-items:stretch;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:28px;}
+#loginScreen.active{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#176868 0%,var(--teal) 46%,#3a9494 100%);min-height:100vh;min-height:100dvh;padding:20px;}
 .login-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;}
 .login-brand{text-align:center;color:#fff;margin-bottom:14px;}
 .login-logo{width:76px;height:76px;object-fit:cover;border-radius:50%;border:3px solid rgba(255,255,255,0.9);box-shadow:0 8px 22px rgba(0,0,0,0.18);display:block;margin:0 auto 10px;}
 .login-brand h2{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.75rem;color:#fff;letter-spacing:-0.03em;margin:0 0 2px;}
 .login-brand p{margin:0;font-size:0.98rem;font-weight:500;color:rgba(255,255,255,0.9);}
-.login-box{background:#fff;border-radius:18px;padding:20px 16px 12px;width:100%;box-shadow:0 16px 40px rgba(14,40,40,0.22);text-align:left;}
+.login-box{background:#fff;border-radius:18px;padding:22px 18px 14px;width:100%;box-shadow:0 16px 40px rgba(14,40,40,0.22);text-align:left;}
 .login-lead{text-align:center;font-size:0.84rem;color:var(--muted);margin:0 0 14px;}
 #loginScreen label{color:var(--navy);}
-#loginForm input[type="password"],#loginForm select,#mgr_role{min-height:48px;border-radius:12px;font-size:16px;}
-#loginForm .field button{min-width:44px;min-height:44px;}
-#mgrLoginBtn{min-height:48px;border-radius:12px;font-size:1rem;font-weight:700;}
+#loginScreen input[type="password"],#loginScreen select{border-radius:12px;}
+#mgrLoginBtn{border-radius:12px;font-size:1rem;font-weight:700;}
 .login-forgot-row{text-align:center;margin-top:2px;}
-#loginForgot{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;background:none;border:none;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+#mgrForgotBtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;background:none;border:none;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 @media(min-width:769px){.login-box{padding:26px 24px 16px;}.login-logo{width:84px;height:84px;}}
+/* v=loginkb1 — phone keyboard. Resting layout stays the centered rule above. */
+html.login-kb,body.login-kb{overflow:hidden;height:100%;}
+#loginScreen.active.login-kb{position:fixed;left:0;right:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:0;height:auto;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:12px 16px 28px;background:linear-gradient(180deg,#176868 0%,var(--teal) 46%,#3a9494 100%);}
+#loginScreen.active.login-kb .login-box{margin:0 auto;flex:0 0 auto;width:100%;max-width:420px;}
+@media (pointer: coarse){
+  #loginScreen input,#loginScreen select{font-size:16px;min-height:44px;}
+  #mgrLoginBtn{min-height:48px;}
+  #mgrForgotBtn{min-height:44px;padding:10px 14px;}
+}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;text-align:left;}
 label{font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
 input[type="text"],input[type="password"],input[type="date"],input[type="time"],select,textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);background:white;width:100%;transition:border 0.2s;}
@@ -168,6 +179,13 @@ textarea{resize:vertical;min-height:80px;}
   #schedEmpty.empty-state,#schedNoClients.empty-state{padding:8px 0 12px;}
 }
 .card{background:white;border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(26,39,68,0.06);}
+.cg-reset-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+#cgResetOk{word-break:break-word;overflow-wrap:anywhere;line-height:1.45;font-size:0.95rem;font-weight:700;}
+#cgResetBtn{min-height:44px;}
+@media(max-width:420px){
+  .cg-reset-fields{grid-template-columns:1fr;}
+  #cgResetBtn{width:100%;justify-content:center;}
+}
 .card-title{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.02rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);padding-bottom:9px;letter-spacing:-0.01em;}
 .card-title .ico{width:26px;height:26px;background:var(--teal-light);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
@@ -607,11 +625,16 @@ body.ts-print-open{overflow:hidden;}
 .is-result-qa .mark{flex-shrink:0;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;}
 .is-result-qa.ok .mark{background:var(--success);color:white;}
 .is-result-qa.bad .mark{background:var(--danger);color:white;}
-.is-result-qa .ans{font-size:0.8rem;color:var(--text);line-height:1.45;margin-left:30px;}
+.is-result-qa .ans{font-size:0.8rem;color:var(--text);line-height:1.45;margin-left:30px;overflow-wrap:anywhere;}
 .is-result-qa .ans .wrong{color:var(--danger);font-weight:600;}
 .is-result-qa .ans .right{color:var(--success);font-weight:600;}
-.is-result-edit-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;margin:6px 0 0 30px;min-height:40px;cursor:pointer;font-size:0.82rem;}
-.is-result-edit-opt input{accent-color:var(--teal);width:18px;height:18px;}
+.is-result-edit-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;margin:6px 0 0 30px;min-height:44px;cursor:pointer;font-size:0.82rem;line-height:1.35;}
+.is-result-edit-opt input{accent-color:var(--teal);width:18px;height:18px;margin-top:2px;flex-shrink:0;}
+.is-result-edit-opt span{min-width:0;flex:1;}
+@media(max-width:640px){
+  .is-result-edit-opt{margin-left:0;}
+  .is-result-qa .ans{margin-left:0;}
+}
 .is-results-foot{justify-content:space-between;flex-shrink:0;margin-top:10px;padding-top:12px;border-top:1px solid var(--border);}
 </style>
 
@@ -755,7 +778,7 @@ else setupEverCarePWA();
     <h2>EverCare</h2>
     <p>Admin Portal</p>
     </div>
-    <div class="login-box" id="loginForm">
+    <div class="login-box">
     <p class="login-lead">Authorized access only</p>
     <button type="button" class="ec-install-cta" onclick="installPWA()" style="width:100%;background:linear-gradient(135deg,#e8f4f4 0%,#d4ecec 100%);border:2px solid var(--teal);color:var(--navy);padding:14px 16px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:18px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(42,127,127,0.15)">
       <span class="ec-install-cta-label" style="font-size:1.05rem">📱 Add to Home Screen</span>
@@ -773,11 +796,177 @@ else setupEverCarePWA();
     <button class="btn btn-teal btn-full" id="mgrLoginBtn" onclick="mgrLogin()">Sign In →</button>
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
     <div class="login-forgot-row">
-      <button type="button" id="loginForgot" onclick="showAdminReset()">Forgot password?</button>
+      <button type="button" id="mgrForgotBtn" onclick="showAdminReset()">Forgot password?</button>
     </div>
     </div>
   </div>
 </div>
+<script>
+// v=loginkb1 — keep Password and Sign In above the phone keyboard. Does not touch mgrLogin.
+var loginKbBase=0;
+var loginKbGen=0;
+function loginKbReadViewport(){
+  var vv=window.visualViewport;
+  var inner=window.innerHeight||0;
+  if(!vv)return {height:inner,offsetTop:0,inner:inner,width:window.innerWidth||0};
+  return {height:vv.height||inner,offsetTop:vv.offsetTop||0,inner:inner,width:vv.width||window.innerWidth||0};
+}
+function loginKbInsetFrom(baseHeight, viewHeight, innerHeight){
+  var fromInner=Math.max(0,(innerHeight||0)-(viewHeight||0));
+  var fromBase=baseHeight?Math.max(0,baseHeight-(viewHeight||0)):0;
+  return Math.max(fromInner, fromBase);
+}
+function loginKbIsPhone(){
+  try{
+    if(window.matchMedia('(pointer: coarse)').matches)return true;
+    if(window.matchMedia('(hover: none) and (max-width: 1024px)').matches)return true;
+    if(window.matchMedia('(max-width: 932px)').matches)return true;
+  }catch(e){}
+  return (window.innerWidth||0)>0 && (window.innerWidth||0)<=932;
+}
+function loginKbFieldFocused(){
+  var screen=document.getElementById('loginScreen');
+  var el=document.activeElement;
+  if(!screen||!screen.classList.contains('active')||!el||!screen.contains(el))return false;
+  var tag=(el.tagName||'').toUpperCase();
+  return tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA';
+}
+function loginKbShouldLift(isPhone, fieldFocused, inset){
+  return !!isPhone && !!fieldFocused && inset>=120;
+}
+function loginKbScrollDelta(fieldRect, btnRect, extraRect, viewTop, viewHeight, pad){
+  pad=pad==null?14:pad;
+  var viewBottom=viewTop+viewHeight;
+  var low=Math.max(fieldRect.bottom, btnRect.bottom);
+  var high=Math.min(fieldRect.top, btnRect.top);
+  if(extraRect && isFinite(extraRect.top) && isFinite(extraRect.bottom)){
+    var low2=Math.max(low, extraRect.bottom);
+    var high2=Math.min(high, extraRect.top);
+    var room=(viewBottom-pad)-(viewTop+pad);
+    if((low2-high2)<=room+0.5){low=low2;high=high2;}
+  }
+  if(low>viewBottom-pad)return low-(viewBottom-pad);
+  if(high<viewTop+pad)return high-(viewTop+pad);
+  return 0;
+}
+function loginKbFixedFollowsLayout(view){
+  if(!view || (view.offsetTop||0)<2)return true;
+  var probe=document.getElementById('loginKbProbe');
+  if(!probe){
+    probe=document.createElement('div');
+    probe.id='loginKbProbe';
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;top:0;left:0;width:0;height:0;margin:0;padding:0;pointer-events:none;visibility:hidden;';
+    document.body.appendChild(probe);
+  }
+  var top=probe.getBoundingClientRect().top;
+  if(Math.abs(top)<2)return false;
+  return true;
+}
+function loginKbPin(screen, view){
+  var top=0;
+  if(loginKbFixedFollowsLayout(view))top=view.offsetTop||0;
+  screen.style.top=Math.round(top)+'px';
+  screen.style.height=Math.max(120, Math.round(view.height))+'px';
+  screen.style.left='0px';
+  screen.style.right='0px';
+  screen.style.bottom='auto';
+}
+function loginKbNudge(screen){
+  var active=document.activeElement;
+  var btn=document.getElementById('mgrLoginBtn');
+  var forgot=document.getElementById('mgrForgotBtn');
+  if(!screen||!active||!btn)return 0;
+  var port=screen.getBoundingClientRect();
+  var extra=forgot?forgot.getBoundingClientRect():null;
+  var delta=loginKbScrollDelta(active.getBoundingClientRect(), btn.getBoundingClientRect(), extra, port.top, port.height, 14);
+  if(Math.abs(delta)>1)screen.scrollTop+=delta;
+  return delta;
+}
+function loginKbRememberBase(){
+  if(document.documentElement.classList.contains('login-kb'))return;
+  var view=loginKbReadViewport();
+  var h=Math.max(view.inner||0, view.height||0);
+  if(!loginKbBase || h>loginKbBase+40)loginKbBase=h;
+}
+function loginKbClear(){
+  loginKbGen++;
+  document.documentElement.classList.remove('login-kb');
+  if(document.body)document.body.classList.remove('login-kb');
+  var screen=document.getElementById('loginScreen');
+  if(screen){
+    screen.classList.remove('login-kb');
+    screen.style.top='';
+    screen.style.height='';
+    screen.style.left='';
+    screen.style.right='';
+    screen.style.bottom='';
+  }
+  var probe=document.getElementById('loginKbProbe');
+  if(probe&&probe.parentNode)probe.parentNode.removeChild(probe);
+  var view=loginKbReadViewport();
+  var h=Math.max(view.inner||0, view.height||0);
+  if(h>200 && (!loginKbBase || h+80>=loginKbBase))loginKbBase=h;
+}
+function loginKbApply(){
+  var screen=document.getElementById('loginScreen');
+  if(!screen)return;
+  var view=loginKbReadViewport();
+  var inset=loginKbInsetFrom(loginKbBase, view.height, view.inner);
+  var focused=loginKbFieldFocused();
+  var phone=loginKbIsPhone();
+  if(!loginKbShouldLift(phone, focused, inset)){
+    if(document.documentElement.classList.contains('login-kb') && inset>=80 && screen.classList.contains('active')){
+      loginKbPin(screen, view);
+      return;
+    }
+    if(document.documentElement.classList.contains('login-kb'))loginKbClear();
+    return;
+  }
+  document.documentElement.classList.add('login-kb');
+  document.body.classList.add('login-kb');
+  screen.classList.add('login-kb');
+  loginKbPin(screen, view);
+  void screen.offsetHeight;
+  loginKbNudge(screen);
+  void screen.offsetHeight;
+  loginKbNudge(screen);
+}
+function loginKbSchedule(){
+  var gen=++loginKbGen;
+  [0,80,240,500,800].forEach(function(ms){
+    setTimeout(function(){if(gen===loginKbGen)loginKbApply();}, ms);
+  });
+}
+function loginKbOnFocusIn(){
+  loginKbRememberBase();
+  loginKbSchedule();
+}
+function bindLoginKeyboard(){
+  var screen=document.getElementById('loginScreen');
+  if(!screen || screen.getAttribute('data-login-kb')==='1')return;
+  screen.setAttribute('data-login-kb','1');
+  screen.addEventListener('focusin', loginKbOnFocusIn);
+  screen.addEventListener('focusout', function(){
+    setTimeout(function(){
+      if(loginKbFieldFocused())loginKbSchedule();
+      else loginKbApply();
+    }, 60);
+  });
+  var vv=window.visualViewport;
+  if(vv){
+    vv.addEventListener('resize', loginKbApply);
+    vv.addEventListener('scroll', loginKbApply);
+  }
+  window.addEventListener('orientationchange', function(){
+    loginKbBase=0;
+    loginKbClear();
+    setTimeout(function(){loginKbBase=0;loginKbRememberBase();loginKbApply();}, 400);
+  });
+  loginKbRememberBase();
+}
+bindLoginKeyboard();
+</script>
 
 
 <!-- iOS / Add to Home Screen help -->
@@ -1201,13 +1390,13 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="card">
           <div class="card-title"><span class="ico">👤</span> Reset Caregiver Password</div>
           <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px">Reset a caregiver's password if they've been locked out.</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-            <div class="field"><label>Caregiver Username</label><input type="text" id="cg_reset_user" placeholder="Enter username"></div>
-            <div class="field"><label>New Password</label><input type="password" id="cg_reset_pwd" placeholder="Set new password"></div>
+          <div class="cg-reset-fields">
+            <div class="field"><label>Caregiver Username</label><input type="text" id="cg_reset_user" placeholder="Enter username" autocomplete="username"></div>
+            <div class="field"><label>New Password</label><input type="password" id="cg_reset_pwd" placeholder="Set new password" autocomplete="new-password"></div>
           </div>
-          <button class="btn btn-navy" onclick="adminResetCaregiverPwd()">🔄 Reset Password</button>
+          <button class="btn btn-navy" id="cgResetBtn" type="button" onclick="adminResetCaregiverPwd()">🔄 Reset Password</button>
           <div style="color:var(--danger);font-size:0.75rem;margin-top:7px;display:none" id="cgResetErr"></div>
-          <div style="color:var(--success);font-size:0.75rem;margin-top:7px;display:none" id="cgResetOk"></div>
+          <div style="color:var(--success);margin-top:7px;display:none" id="cgResetOk"></div>
         </div>
       </div>
 
@@ -2308,6 +2497,11 @@ async function apiPost(payload){
     return sbAdminWriteDispatch(payload);
   }
   }
+  // v=cgreset1: aide Auth passwords never fall through to Sheets reset_password/set_password on the cut, including Nurse.
+  if(sbOn&&payload&&(payload.action==='reset_password'||payload.action==='set_password'||payload.action==='reset_temp_password'||payload.action==='reset_aide_temp_password'||payload.action==='admin_create_aide'||payload.action==='create_aide')){
+    if(typeof sbAdminWriteDispatch==='function')return sbAdminWriteDispatch(payload);
+    return {success:false,error:'Could not reset password.'};
+  }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
   }
@@ -2457,7 +2651,7 @@ function startLoginWarmKeepAlive(){
     warmUpSheets();
   },1100);
 }
-function showScreen(id){if(typeof loginKbRelease==='function')loginKbRelease();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();if(typeof loginKbClear==='function')loginKbClear();}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
@@ -5047,6 +5241,7 @@ async function sbInserviceDispatch(payload){
 function sbIsAdminWriteAction(action){
   return action==='admin_create_aide'||action==='create_aide'
     ||action==='reset_temp_password'||action==='reset_aide_temp_password'
+    ||action==='reset_password'||action==='set_password'
     ||action==='add_client'||action==='update_client'
     ||action==='archive_client'||action==='delete_client'
     ||action==='update'||action==='send_correction'||action==='delete'
@@ -5429,9 +5624,10 @@ async function sbAdminCreateAide(payload){
 async function sbAdminResetTempPassword(payload){
   var username=String((payload&&(payload.username||payload.p_username))||'').trim();
   if(!username)return {success:false,error:'Username missing.'};
+  var typed=payload&&(payload.tempPassword||payload.temp_password||payload.password||payload.p_temp_password);
   var got=await sbRestRpc('reset_aide_temp_password', {
     p_username:username,
-    p_temp_password:sbOptionalText(payload&&(payload.tempPassword||payload.temp_password||payload.p_temp_password))
+    p_temp_password:sbOptionalText(typed)
   });
   if(!got.ok)return {success:false,error:sbNormalizeWriteError(got.error||'Could not reset password.'),httpStatus:got.status||0};
   var mapped=sbMapAideAuth(got.data);
@@ -5743,7 +5939,7 @@ async function sbAdminWriteDispatch(payload){
   if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
   try{
     if(action==='admin_create_aide'||action==='create_aide')return await sbAdminCreateAide(payload);
-    if(action==='reset_temp_password'||action==='reset_aide_temp_password')return await sbAdminResetTempPassword(payload);
+    if(action==='reset_temp_password'||action==='reset_aide_temp_password'||action==='reset_password'||action==='set_password')return await sbAdminResetTempPassword(payload);
     if(action==='add_client')return await sbAdminAddClient(payload);
     if(action==='update_client')return await sbAdminUpdateClient(payload);
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
@@ -7380,16 +7576,46 @@ async function changeRolePassword(role){
 }
 
 async function adminResetCaregiverPwd(){
-  const user=document.getElementById('cg_reset_user').value.trim().toLowerCase(),pwd=document.getElementById('cg_reset_pwd').value;
+  const userEl=document.getElementById('cg_reset_user');
+  const pwdEl=document.getElementById('cg_reset_pwd');
+  const user=String(userEl&&userEl.value||'').trim().toLowerCase();
+  const pwd=pwdEl?pwdEl.value:'';
   const err=document.getElementById('cgResetErr'),ok=document.getElementById('cgResetOk');
-  err.style.display='none';ok.style.display='none';
-  if(!user||!pwd){err.textContent='Fill in both fields.';err.style.display='block';return;}
+  if(err)err.style.display='none';
+  if(ok)ok.style.display='none';
+  if(!user||!pwd){if(err){err.textContent='Fill in both fields.';err.style.display='block';}return;}
+  // v=cgreset1: cut uses Ace reset_aide_temp_password (Auth + must_change_password). Sheets reset_password is rollback only.
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    try{
+      const res=await postAideAction('reset_temp_password','reset_aide_temp_password',{username:user,tempPassword:pwd});
+      const data=res&&res.data;
+      if(!(data&&data.success)){
+        const msg=typeof aceActionError==='function'?aceActionError(data,res&&res.err,'reset_aide_temp_password'):((data&&(data.error||data.message))||'Error. Try again.');
+        if(err){err.textContent=msg;err.style.display='block';}
+        return;
+      }
+      const shown=String(data.tempPassword||data.temp_password||pwd);
+      cacheInvalidate('get_users');
+      if(userEl)userEl.value='';
+      if(pwdEl)pwdEl.value='';
+      if(ok){
+        ok.textContent='✅ Password reset for @'+user+'. Temporary password: '+shown;
+        ok.style.display='block';
+      }
+      if(typeof showAideTempPasswordOnce==='function')showAideTempPasswordOnce(data.username||user,shown,'New temporary password');
+      logActivity('Reset caregiver password for @'+user);
+    }catch(e){
+      if(err){err.textContent='Error. Try again.';err.style.display='block';}
+    }
+    return;
+  }
   try{
     await apiPost({action:'reset_password',username:user,password:pwd});cacheInvalidate('get_users');
-    document.getElementById('cg_reset_user').value='';document.getElementById('cg_reset_pwd').value='';
-    ok.textContent=`✅ Password reset for @${user}!`;ok.style.display='block';
+    if(userEl)userEl.value='';
+    if(pwdEl)pwdEl.value='';
+    if(ok){ok.textContent='✅ Password reset for @'+user+'!';ok.style.display='block';}
     logActivity('Reset caregiver password for @'+user);
-  }catch(e){err.textContent='Error. Try again.';err.style.display='block';}
+  }catch(e){if(err){err.textContent='Error. Try again.';err.style.display='block';}}
 }
 
 function showTempMsg(msg,color,holdMs){
@@ -8118,14 +8344,32 @@ async function assignTopic(){
 }
 
 async function clearAssignment(){
+  const sel=document.getElementById('assignTopicSel');
+  const topicId=sel&&sel.value!=null?String(sel.value).trim():'';
+  const sbOn=typeof evercareSbEnabled==='function'&&evercareSbEnabled();
+  if(sbOn){
+    if(!topicId){
+      showTempMsg('Choose a topic before clearing the assignment.','var(--danger)');
+      return;
+    }
+    showTempMsg('Clearing assignment...','var(--teal)');
+    try{
+      const data=await sbClearAssignedTopic(topicId);
+      cacheInvalidate('get_assigned_topic');
+      if(!data||data.success!==true){
+        showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
+        return;
+      }
+      showTempMsg('Assignment cleared. Completion records are kept.','var(--teal)');
+      renderInservices(true);
+    }catch(e){
+      showTempMsg(isAssignSheetsFailMsg(null,e),'var(--danger)');
+    }
+    return;
+  }
   showTempMsg('Clearing assignment...','var(--teal)');
   try{
-    const payload={action:'clear_assigned_topic'};
-    const sel=document.getElementById('assignTopicSel');
-    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sel&&sel.value!=null&&String(sel.value).trim()!==''){
-      payload.topicId=String(sel.value);
-    }
-    const data=await apiPost(payload);
+    const data=await apiPost({action:'clear_assigned_topic'});
     cacheInvalidate('get_assigned_topic');
     if(data&&data.success===false){
       showTempMsg(isAssignSheetsFailMsg(data),'var(--danger)');
@@ -8707,6 +8951,32 @@ function setISResultsEditMode(on){
     el.style.display=hide?'none':'';
   });
 }
+function isQuizLetter(index){
+  const n=Number(index);
+  if(!isFinite(n)||n<0||n>25)return '';
+  return String.fromCharCode(65+Math.floor(n));
+}
+function isQuizChoiceLabel(index, text){
+  const letter=isQuizLetter(index);
+  const body=text==null?'':String(text);
+  if(!letter)return body;
+  return letter+'. '+body;
+}
+function isQuizAnswerLine(q, index, fallbackText){
+  const opts=q&&Array.isArray(q.options)?q.options:[];
+  const n=Number(index);
+  const text=fallbackText==null?'':String(fallbackText);
+  if(isFinite(n)&&n>=0&&n<opts.length){
+    const optText=opts[n]==null?'':String(opts[n]);
+    return isQuizChoiceLabel(n, optText!==''?optText:text);
+  }
+  if(text){
+    for(let i=0;i<opts.length&&i<26;i++){
+      if(String(opts[i])===text)return isQuizChoiceLabel(i, opts[i]);
+    }
+  }
+  return text||'—';
+}
 function paintISResults(){
   const banner=document.getElementById('isResultsBanner');
   const meta=document.getElementById('isResultsMeta');
@@ -8734,7 +9004,7 @@ function paintISResults(){
       const opts=(q.options&&q.options.length)?q.options:[q.aideAnswer,q.correctAnswer].filter(function(v,idx,arr){return v&&arr.indexOf(v)===idx;});
       const picks=opts.map(function(opt,oi){
         const checked=(q.selected===oi||String(opt)===String(q.aideAnswer))?' checked':'';
-        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+oi+'"'+checked+'>'+escapeHtml(opt)+'</label>';
+        return '<label class="is-result-edit-opt"><input type="radio" name="isEditQ'+i+'" value="'+oi+'"'+checked+'><span>'+escapeHtml(isQuizChoiceLabel(oi, opt))+'</span></label>';
       }).join('');
       return '<div class="is-result-qa"><div class="q">'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</div>'+picks+'</div>';
     }).join('');
@@ -8744,8 +9014,10 @@ function paintISResults(){
     const ok=!!q.isCorrect;
     const mark=ok?'✓':'✕';
     const cls=ok?'ok':'bad';
-    let ans='<div class="ans">Aide answer: <span class="'+(ok?'right':'wrong')+'">'+escapeHtml(q.aideAnswer||'—')+'</span></div>';
-    if(!ok)ans+='<div class="ans">Correct answer: <span class="right">'+escapeHtml(q.correctAnswer||'—')+'</span></div>';
+    const aideLine=isQuizAnswerLine(q, q.selected, q.aideAnswer);
+    const correctLine=isQuizAnswerLine(q, q.correct, q.correctAnswer);
+    let ans='<div class="ans">Aide answer: <span class="'+(ok?'right':'wrong')+'">'+escapeHtml(aideLine)+'</span></div>';
+    if(!ok)ans+='<div class="ans">Correct: <span class="right">'+escapeHtml(correctLine)+'</span></div>';
     return '<div class="is-result-qa '+cls+'"><div class="q"><span class="mark">'+mark+'</span><span>'+(i+1)+'. '+escapeHtml(q.question||q.q||'')+'</span></div>'+ans+'</div>';
   }).join('');
 }
@@ -12896,152 +13168,6 @@ async function loadNewClientIntakeDrafts(){
   }
 }
 
-
-
-// Phone Sign In keyboard v=admintheme1. Same pattern as Caregiver loginkb1.
-// Pins #loginScreen to the visual viewport and scrolls the focused field and #mgrLoginBtn above the keyboard.
-// #loginForgot stays reachable because that screen is the scrollport. No window.scrollTo. Desktop width skips this path.
-// Does not sign in, store a username, or touch Auth.
-function loginKbIsPhone(width){
-  width=width==null?(window.innerWidth||0):width;
-  return width>0&&width<=932;
-}
-function loginKbCovered(layoutH,vvTop,vvHeight,baseline){
-  if(!(layoutH>0)||!(vvHeight>0))return false;
-  var visibleEnd=(vvTop||0)+vvHeight;
-  if(layoutH-visibleEnd>72)return true;
-  if(baseline>0&&layoutH<baseline-72)return true;
-  if(baseline>0&&vvHeight<baseline-72)return true;
-  return false;
-}
-function loginKbScrollDelta(viewH,inputTop,inputBottom,btnBottom,margin){
-  margin=margin==null?12:margin;
-  if(!(viewH>0))return 0;
-  var limit=viewH-margin;
-  var inputOk=inputTop>=margin&&inputBottom<=limit;
-  var btnOk=btnBottom<=limit&&btnBottom>=margin;
-  if(inputOk&&btnOk)return 0;
-  var clusterBottom=btnBottom>inputBottom?btnBottom:inputBottom;
-  var clusterH=clusterBottom-inputTop;
-  var delta=clusterBottom-limit;
-  if(clusterH+margin*2<=viewH){
-    if(inputTop-delta<margin)delta=inputTop-margin;
-  }else if(inputBottom-delta<margin){
-    delta=inputBottom-margin;
-  }
-  if(Math.abs(delta)<1)return 0;
-  return delta;
-}
-function loginKbReadVv(){
-  var vv=window.visualViewport;
-  if(!vv)return{top:0,left:0,height:window.innerHeight||0,width:window.innerWidth||0};
-  return{top:vv.offsetTop||0,left:vv.offsetLeft||0,height:vv.height||0,width:vv.width||0};
-}
-var loginKbBaseline=window.innerHeight||0;
-var loginKbBaseW=window.innerWidth||0;
-var loginKbLock=false;
-function loginKbNoteBaseline(){
-  if(loginKbActiveInput())return;
-  var w=window.innerWidth||0;
-  var h=window.innerHeight||0;
-  if(Math.abs(w-loginKbBaseW)>40){
-    loginKbBaseline=h;
-    loginKbBaseW=w;
-    return;
-  }
-  if(h>=loginKbBaseline-40)loginKbBaseline=h;
-}
-function loginKbActiveInput(){
-  var form=document.getElementById('loginForm');
-  var active=document.activeElement;
-  if(!form||!active||active.tagName!=='INPUT'||!form.contains(active))return null;
-  return active;
-}
-function loginKbRelease(){
-  var screen=document.getElementById('loginScreen');
-  if(!screen||!screen.classList.contains('login-kb-open'))return;
-  screen.classList.remove('login-kb-open');
-  screen.style.position='';
-  screen.style.left='';
-  screen.style.top='';
-  screen.style.width='';
-  screen.style.height='';
-  screen.style.maxHeight='';
-  screen.style.zIndex='';
-}
-function loginKbPin(screen,vv){
-  screen.classList.add('login-kb-open');
-  screen.style.position='fixed';
-  screen.style.left=(vv.left||0)+'px';
-  screen.style.top=(vv.top||0)+'px';
-  screen.style.width=vv.width+'px';
-  screen.style.height=vv.height+'px';
-  screen.style.maxHeight=vv.height+'px';
-  screen.style.zIndex='30';
-}
-function loginKbNudge(input){
-  var screen=document.getElementById('loginScreen');
-  var btn=document.getElementById('mgrLoginBtn');
-  if(!screen||!btn||!input)return;
-  var sRect=screen.getBoundingClientRect();
-  var iRect=input.getBoundingClientRect();
-  var bRect=btn.getBoundingClientRect();
-  var delta=loginKbScrollDelta(screen.clientHeight,iRect.top-sRect.top,iRect.bottom-sRect.top,bRect.bottom-sRect.top,12);
-  if(delta)screen.scrollTop+=delta;
-}
-function loginKbApply(input){
-  if(loginKbLock)return;
-  var screen=document.getElementById('loginScreen');
-  if(!screen||!input)return;
-  if(!loginKbIsPhone()){loginKbRelease();return;}
-  var vv=loginKbReadVv();
-  if(!loginKbCovered(window.innerHeight||0,vv.top,vv.height,loginKbBaseline)){loginKbRelease();return;}
-  loginKbLock=true;
-  try{
-    loginKbPin(screen,vv);
-    loginKbNudge(input);
-  }finally{
-    loginKbLock=false;
-  }
-}
-function loginKbSchedule(input){
-  var run=function(){
-    if(loginKbActiveInput()!==input)return;
-    loginKbApply(input);
-  };
-  run();
-  setTimeout(run,60);
-  setTimeout(run,320);
-  setTimeout(run,680);
-}
-function bindLoginKeyboard(){
-  var form=document.getElementById('loginForm');
-  if(!form||form.dataset.loginKb==='1')return;
-  form.dataset.loginKb='1';
-  form.addEventListener('focusin',function(e){
-    var t=e.target;
-    if(!t||t.tagName!=='INPUT')return;
-    loginKbSchedule(t);
-  });
-  form.addEventListener('focusout',function(){
-    setTimeout(function(){
-      if(loginKbActiveInput())return;
-      loginKbRelease();
-      setTimeout(loginKbNoteBaseline,400);
-    },180);
-  });
-  window.addEventListener('resize',loginKbNoteBaseline);
-  if(window.visualViewport){
-    var onVv=function(){
-      var input=loginKbActiveInput();
-      if(!input)return;
-      loginKbApply(input);
-    };
-    window.visualViewport.addEventListener('resize',onVv);
-    window.visualViewport.addEventListener('scroll',onVv);
-  }
-}
-bindLoginKeyboard();
 
 bootAdminPortal();
 window.addEventListener('pageshow',function(){enforceAdminSessionTimeout();});

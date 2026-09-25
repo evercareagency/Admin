@@ -23,7 +23,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme1">'), 'admin-build');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
 assert.ok(html.includes('v=pdf1p'), 'pdf1p marker');
 assert.ok(html.includes('v=sbcut1b'), 'archive hotfix marker stays');
