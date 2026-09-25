@@ -3545,8 +3545,8 @@ var coverCmStub=false;
 var coverSkipReason='';
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
 var COVER_RANK_EMPTY='No aides to show for this shift yet.';
-// Same wording Ace has seeded. Placeholders match admin_get_cover_refuse_template. Not a local save.
-var COVER_CM_DEFAULT='Hey {{case_manager}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
+// Locked CM drafts. {{greeting}} is Good morning before 12:00 America/New_York and Good afternoon from 12:00 on. No Hey. The case manager name is not on the greeting line.
+var COVER_CM_DEFAULT='{{greeting}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
 var COVER_CM_SKIP_DEFAULT='{{greeting}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, at the member\'s request due to {{reason}}. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
 function coverEsc(s){
   var raw=String(s==null?'':s);
@@ -4064,8 +4064,17 @@ function coverNyHour(now){
 function coverNyGreeting(now){
   var hour=coverNyHour(now);
   if(hour<12)return 'Good morning';
-  if(hour<17)return 'Good afternoon';
-  return 'Good evening';
+  return 'Good afternoon';
+}
+function coverEnsureGreeting(text){
+  var greet=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
+  var raw=String(text==null?'':text).replace(/^\uFEFF/, '');
+  raw=raw.replace(/^(?:Hey\b[^\n]*(?:\n+|$))+/i, '');
+  raw=raw.replace(/^\s+/, '');
+  if(/^Good evening\b/i.test(raw))raw=raw.replace(/^Good evening\b/i, greet);
+  if(/^Good morning\b/.test(raw)||/^Good afternoon\b/.test(raw))return raw;
+  if(!raw)return greet;
+  return greet+'\n\n'+raw;
 }
 function coverNyYmd(iso){
   var d=iso?new Date(iso):new Date();
@@ -4557,7 +4566,7 @@ function coverMailPayload(data){
     cm:String(coverPick(node,'case_manager_name','case_manager')||coverPick(src,'case_manager_name')||fills.case_manager||''),
     client:String(coverPick(node,'client_name','client')||fills.client||''),
     date:String(coverPick(node,'service_date','date')||fills.date||''),
-    greeting:String(fills.greeting||''),
+    greeting:String(coverPick(node,'greeting')||coverPick(src,'greeting')||fills.greeting||''),
     reason:String(coverPick(node,'reason_label','reason')||fills.reason||'')
   };
 }
@@ -4629,7 +4638,7 @@ function coverSyncCmMail(){
     var lead=ok
       ?'Edit the note. Open in Mail uses '+email+'. You press Send in Mail.'
       :'Case manager email is not on file. Open in Mail stays off until that email is known. Copy and Save as my template still work.';
-    if(coverCmFamily==='skip'&&coverCmStub)lead='Skip template is not callable yet. '+lead;
+    if(coverCmStub)lead=(coverCmFamily==='skip'?'Skip template is not callable yet. ':'The office email did not answer. ')+lead;
     note.textContent=lead;
   }
 }
@@ -4640,6 +4649,7 @@ function coverPaintRefuseMail(mail, shift){
   try{subjectEl=document.getElementById('coverCmSubject');}catch(e2){subjectEl=null;}
   var snap=coverMergeSnap(shift, mail);
   var shown=coverRenderMail(mail, snap);
+  shown.body=coverEnsureGreeting(shown.body);
   coverCmSnap=snap;
   if(ta)ta.value=shown.body;
   if(subjectEl)subjectEl.value=shown.subject;
@@ -4698,8 +4708,10 @@ async function coverShowRefuseDraft(shift, family){
   if(coverCmLoading!==key)return;
   coverCmLoading='';
   coverCmStub=false;
-  if(!mail&&fam==='skip'){
-    mail={subject:'No services today — {{client}} ({{date}})', body:COVER_CM_SKIP_DEFAULT};
+  if(!mail){
+    mail=fam==='skip'
+      ?{subject:'No services today — {{client}} ({{date}})', body:COVER_CM_SKIP_DEFAULT}
+      :{subject:'Services not delivered today — {{client}} ({{date}})', body:COVER_CM_DEFAULT};
     coverCmStub=true;
   }
   if(mail)coverPaintRefuseMail(mail, shift);
@@ -4817,10 +4829,17 @@ function coverOpenCmMail(){
     var client=(coverCmSnap&&coverCmSnap.client)||'our member';
     subject='No services today — '+client;
   }
-  coverAskOutbound('mail', coverMailHref(email, subject, coverCmText()), 'Open Mail');
+  var text=coverEnsureGreeting(coverCmText());
+  var draft=null;
+  try{draft=document.getElementById('coverCmDraft');}catch(e){draft=null;}
+  if(draft)draft.value=text;
+  coverAskOutbound('mail', coverMailHref(email, subject, text), 'Open Mail');
 }
 function coverCopyCmDraft(){
-  var text=coverCmText();
+  var text=coverEnsureGreeting(coverCmText());
+  var draft=null;
+  try{draft=document.getElementById('coverCmDraft');}catch(e){draft=null;}
+  if(draft)draft.value=text;
   if(!text.trim()){
     if(typeof showTempMsg==='function')showTempMsg('The draft is empty.','var(--warn)');
     return;
