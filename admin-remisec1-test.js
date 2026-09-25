@@ -16,6 +16,10 @@ assert.ok(html.includes('placeholder="Ask or just chat..."'), 'composer invites 
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remisec1'), 'remisec1 is the first admin-build meta');
 [
+  '2026-09-25-payready1d',
+  '2026-09-25-payready1c',
+  '2026-09-25-payready1b',
+  '2026-09-25-coverunlock1',
   '2026-09-25-payready1',
   '2026-09-25-aidecreds1c',
   '2026-09-25-aidecreds1b',
@@ -30,10 +34,14 @@ assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remisec1'), 're
 ].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="'+meta+'">'), 'prior meta stays '+meta);
 });
-assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after remisec1');
+assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
+assert.ok(html.indexOf('content="2026-09-25-payready1d"') < html.indexOf('content="2026-09-25-payready1c"'), 'payready1c stays after payready1d');
+assert.ok(html.indexOf('content="2026-09-25-payready1c"') < html.indexOf('content="2026-09-25-payready1b"'), 'payready1b stays after payready1c');
+assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
+assert.ok(html.indexOf('content="2026-09-25-coverunlock1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after coverunlock1');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1c"'), 'aidecreds1c stays after payready1');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1c"') < html.indexOf('content="2026-09-25-aidecreds1b"'), 'aidecreds1b stays after aidecreds1c');
-['v=payready1','v=aidecreds1c','v=aidecreds1b','v=aidecreds1','v=remidate1','v=ncipdf1','v=remichat1','v=remiscroll1','v=remi1','v=phonezoom1','v=eca-copilot1','v=aidadel1'].forEach(function(mark){
+['v=payready1d','v=payready1c','v=payready1b','v=coverunlock1','v=payready1','v=aidecreds1c','v=aidecreds1b','v=aidecreds1','v=remidate1','v=ncipdf1','v=remichat1','v=remiscroll1','v=remi1','v=phonezoom1','v=eca-copilot1','v=aidadel1'].forEach(function(mark){
   assert.ok(html.includes(mark), 'prior marker stays '+mark);
 });
 

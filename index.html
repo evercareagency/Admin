@@ -42,8 +42,16 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
-<!-- remi secretary 2026-09-25 v=remisec1 admin-build 2026-09-25-remisec1. Admin and Scheduler only. Remi stays the corner chip until opened, then the sheet closes back to the desk. Ask can greet, show a brief Cleveland weather card, look up a caregiver or client already loaded, and hand off an open call-off as a draft. Update client address, soft-remove aide, and add aide show the proposed change and wait for Confirm before any write. Address reuses the desk client update. Soft-remove posts admin_deactivate_aide. Add aide posts admin_add_aide and does not create a sign-in. Weather is the desk snapshot in remiSecWeatherSnapshot until a Cleveland callable exists. Nurse does not get Remi and this tip adds no nurse flow. Quiet hours rules are unchanged. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including payready1, aidecreds1c, aidecreds1b, remidate1, ncipdf1, remichat1, remiscroll1, and remi1. -->
+<!-- remi secretary 2026-09-25 v=remisec1 admin-build 2026-09-25-remisec1. Admin and Scheduler only. Remi stays the corner chip until opened, then the sheet closes back to the desk. Ask can greet, show a brief Cleveland weather card, look up a caregiver or client already loaded, and hand off an open call-off as a draft. Update client address, soft-remove aide, and add aide show the proposed change and wait for Confirm before any write. Address reuses the desk client update. Soft-remove posts admin_deactivate_aide. Add aide posts admin_add_aide and does not create a sign-in. Weather is the desk snapshot in remiSecWeatherSnapshot until a Cleveland callable exists. Nurse does not get Remi and this tip adds no nurse flow. Quiet hours rules are unchanged. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including payready1d, payready1c, payready1b, coverunlock1, payready1, aidecreds1c, aidecreds1b, remidate1, ncipdf1, remichat1, remiscroll1, and remi1. -->
 <meta name="admin-build" content="2026-09-25-remisec1">
+<!-- admin pay readiness export ready-list defense 2026-09-25 v=payready1d admin-build 2026-09-25-payready1d. Before the file downloads, Held rows and any row whose pay_status (or Readiness or status) is not ready are stripped, case-insensitive. A prebuilt csv from admin_timesheet_pay_export is still preferred when present, then parsed and filtered so a held row cannot pass through unchanged. Columns and rows are filtered the same way when that csv cannot prove ready-only. Money columns stay dropped, including rate, amount, wage, gross, net, payroll, and $. Export still posts admin_timesheet_pay_export {p_week_start}. When nothing ready remains, the screen says no ready timesheets to export and does not download a file. Export ready list stays visible when ready_count is at least 1, including when held_count is greater than 0. Not payroll. Remi stays the corner chip. No Auth reseal. Prior markers stay, including payready1c, payready1b, coverunlock1, payready1, and aidecreds1c. -->
+<meta name="admin-build" content="2026-09-25-payready1d">
+<!-- admin pay readiness export visible 2026-09-25 v=payready1c admin-build 2026-09-25-payready1c. Export ready list stays visible on the phone list whenever ready_count is at least 1, including when held_count is greater than 0. It sits between the readiness rows and the Timesheets desk, full width. Show and hide do not rely on the hidden attribute: #payReady [hidden]{display:none !important} was keeping the button invisible when that attribute stayed on it. The tap calls payReadyExportList so the payReadyExport id cannot swallow the function. It still posts admin_timesheet_pay_export {p_week_start} and downloads the ready list only. Money columns stay dropped. Held 0 with ready sheets still shows the check, All N timesheets ready, Nothing held this pay period, and Export ready list. Not payroll. Remi stays the corner chip. No Auth reseal. Prior markers stay, including payready1b, coverunlock1, payready1, and aidecreds1c. -->
+<meta name="admin-build" content="2026-09-25-payready1c">
+<!-- admin pay readiness export 2026-09-25 v=payready1b admin-build 2026-09-25-payready1b. Export ready list shows whenever ready_count is at least 1, including when held_count is greater than 0. The button sits on the list, not only inside the all-ready empty state. Held 0 with ready sheets still shows the check, All N timesheets ready, Nothing held this pay period, and Export ready list. Export still posts admin_timesheet_pay_export {p_week_start} and downloads that ready list. Money columns stay dropped. Not payroll. Remi stays the corner chip. No Auth reseal. Prior markers stay, including coverunlock1, payready1, and aidecreds1c. -->
+<meta name="admin-build" content="2026-09-25-payready1b">
+<!-- coverage outcome unlock 2026-09-25 v=coverunlock1 admin-build 2026-09-25-coverunlock1. More → Coverage open-shift outcomes stay tappable without Text client or Call client. Client wants backup, Client refused · resume next day, Still deciding, and Member called · no service today are not locked behind a client-contact step. Text this aide, Text client, and Call client stay optional drafts. Aide ranking, draft texting, and the refuse case-manager email stay. Remi stays the corner chip. No Auth reseal. Prior markers stay, including payready1 and aidecreds1c. -->
+<meta name="admin-build" content="2026-09-25-coverunlock1">
 <!-- admin pay readiness 2026-09-25 v=payready1 admin-build 2026-09-25-payready1. Timesheets phone screen is pay readiness for the week. The week label is MM/DD/YYYY–MM/DD/YYYY. Counts are Ready N and Held N. Held rows use reason chips: missing signature, not submitted, sent back, incomplete Save Day. Ready rows say All current. A held row opens the detail: client, week, Held reason banner, checklist Submitted, Save Day complete, Signature, Office review, Open timesheet, Hold pay, and the footer Not full payroll — readiness only. When nothing is held and at least one sheet is ready, the screen is the all-ready empty state: check, All N timesheets ready, Nothing held this pay period, Export ready list. GHOST-PAYREADY1-CONTRACT-v1. No pay amounts, rates, gross, net, or payroll totals. payReadyFetchAce posts sbRestRpc with the office JWT for admin_timesheet_pay_readiness {p_week_start} and leaves p_aide_id off the week list. Rows use pay_status ready or held, held_reason, label, checklist submitted, save_day_complete, signature, office_review, and pay_hold. Counts are ready_count and held_count. Ace held order is not_submitted, sent_back, incomplete_save_day, missing_signature, manual_hold. Week start is an ISO Monday. Hold pay posts admin_set_timesheet_pay_hold {p_timesheet_id, p_hold true} and does not send amounts. Export ready list posts admin_timesheet_pay_export {p_week_start} and downloads that callable's columns and rows. That file is a ready list, not a payroll file. Money fields are dropped. There is no stub roster. Remi stays the corner chip. This screen is not the Scheduler desk-brain and does not add a radar kind. The existing Timesheets desk stays on the page under this screen: Active, Archived, Recently deleted, search, and cards. Pay readiness does not hide that desk. No Auth reseal. Prior markers stay, including aidecreds1c, aidecreds1b, aidecreds1, remidate1, and ncipdf1. -->
 <meta name="admin-build" content="2026-09-25-payready1">
 <!-- aide credentials current chip 2026-09-25 v=aidecreds1c admin-build 2026-09-25-aidecreds1c. After admin_upsert_aide_credential, and when Aides Refresh runs, the phone list re-fetches admin_aide_credentials_rollup {p_aide_id:null}. An aide missing from that rollup who has credential rows is filled from admin_list_aide_credentials {p_aide_id}. When nothing is expired or expiring soon, that aide shows the All current chip. Zero credential rows stay blank. The attention banner stays the rollup attention_count. Dates stay MM/DD/YYYY. Scheduler still does not see the Credentials block. Remi stays the corner chip. No Auth reseal. Prior markers stay, including v=aidecreds1b and v=aidecreds1. -->
@@ -286,7 +294,7 @@ textarea{resize:vertical;min-height:80px;}
 }
 /* v=payready1 — phone pay readiness on Timesheets. Not payroll. */
 #payReady{max-width:100%;min-width:0;color:var(--navy);}
-#payReady[hidden],#payReady [hidden]{display:none !important;}
+#payReady[hidden],#payReady [hidden]:not(#payReadyExport){display:none !important;}
 #payReady .pay-week{margin:2px 0 12px;font-size:0.98rem;font-weight:500;color:var(--muted);}
 #payReady .pay-screen-title{margin:0 0 12px;font-family:'DM Sans',sans-serif;font-size:1.45rem;font-weight:700;letter-spacing:-0.03em;color:var(--navy);}
 #payReady .pay-counts{display:flex;align-items:stretch;background:#eef1f6;border-radius:14px;padding:4px;margin:0 0 6px;}
@@ -307,6 +315,9 @@ textarea{resize:vertical;min-height:80px;}
 #payReady .pay-empty h2{margin:0 0 6px;font-family:'DM Sans',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:-0.03em;color:var(--navy);}
 #payReady .pay-empty p{margin:0 0 18px;color:var(--muted);font-size:0.98rem;}
 #payReady .pay-wide{width:100%;min-height:50px;justify-content:center;border-radius:12px;font-size:1.02rem;font-weight:700;margin-top:10px;}
+/* v=payready1c — explicit display beats #payReady [hidden]{display:none !important}. */
+#payReady #payReadyExport{display:flex !important;width:100%;box-sizing:border-box;min-height:50px;margin-bottom:16px;}
+#payReady #payReadyExport.pay-export-off{display:none !important;}
 #payReady .pay-back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 0 8px;background:none;border:0;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:1.2rem;font-weight:700;cursor:pointer;}
 #payReady .pay-detail-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px 16px 8px;margin:4px 0 12px;box-shadow:0 8px 24px rgba(26,39,68,0.05);}
 #payReady .pay-detail-card h2{margin:0 0 6px;font-family:'DM Sans',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:-0.03em;}
@@ -363,10 +374,10 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage textarea{min-height:64px;}
 #tab_coverage .cover-when-row{display:flex;gap:8px;}
 #tab_coverage .cover-when-row .field{flex:1;min-width:0;}
-#tab_coverage .page-hdr .btn,#tab_coverage .cover-actions .btn,#tab_coverage .cover-back{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
+#tab_coverage .page-hdr .btn,#tab_coverage .cover-actions .btn,#tab_coverage .cover-back{width:100%;min-width:0;min-height:48px;height:auto;justify-content:center;text-align:center;font-size:1rem;line-height:1.25;white-space:normal;overflow-wrap:anywhere;}
 #tab_coverage [hidden]{display:none !important;}
 #tab_coverage .cover-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
-#tab_coverage{max-width:100%;min-width:0;}
+#tab_coverage{max-width:100%;min-width:0;padding-bottom:96px;}
 #tab_coverage .cover-list{display:flex;flex-direction:column;gap:10px;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 #tab_coverage .cover-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);box-shadow:0 6px 16px rgba(26,39,68,0.05);}
 #tab_coverage .cover-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
@@ -1351,7 +1362,7 @@ bindLoginKeyboard();
 
       <!-- TIMESHEETS TAB -->
       <div class="tab-panel active" id="tab_timesheets">
-        <section id="payReady" data-payready="v=payready1" aria-label="Pay readiness">
+        <section id="payReady" data-payready="v=payready1" data-payready1b="v=payready1b" data-payready1c="v=payready1c" data-payready1d="v=payready1d" aria-label="Pay readiness">
           <div id="payReadyListView">
             <p class="pay-week" id="payReadyWeek">Week of</p>
             <h2 class="pay-screen-title" id="payReadyTitle" hidden>Pay ready</h2>
@@ -1364,8 +1375,8 @@ bindLoginKeyboard();
               <div class="pay-empty-mark" id="payReadyMark" aria-hidden="true"><svg viewBox="0 0 64 64" width="78" height="78"><path d="M14 34l12 12 24-26" fill="none" stroke="#2f9e62" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <h2 id="payReadyEmptyTitle">All 0 timesheets ready</h2>
               <p id="payReadyEmptySub">Nothing held this pay period</p>
-              <button type="button" class="btn btn-teal pay-wide" id="payReadyExport" onclick="payReadyExport()">Export ready list</button>
             </div>
+            <button type="button" class="btn btn-teal pay-wide pay-export-off" id="payReadyExport" onclick="payReadyExportList()">Export ready list</button>
           </div>
           <div id="payReadyDetail" hidden>
             <button type="button" class="pay-back" id="payReadyBack" onclick="payReadyCloseDetail()">← Pay held</button>
@@ -1482,12 +1493,12 @@ bindLoginKeyboard();
             <button type="button" class="btn btn-teal" id="coverRecordBtn" onclick="coverRecordCalloff()">Record call-off</button>
           </div>
         </div>
-        <div id="coverOutcomeView" hidden>
+        <div id="coverOutcomeView" data-coverunlock1="v=coverunlock1" hidden>
           <button type="button" class="btn btn-ghost cover-back" id="coverOutcomeBack" onclick="coverShowList()">← Open shifts</button>
           <div class="page-hdr">
             <div>
               <h1>Open shift</h1>
-              <p>Text or call the client, then close the shift.</p>
+              <p>Close the shift when you know the outcome. Text and call stay optional.</p>
             </div>
           </div>
           <article class="cover-card" id="coverOutcomeSummary" aria-label="Shift"></article>
@@ -1511,15 +1522,15 @@ bindLoginKeyboard();
                 <button type="button" class="btn btn-ghost" id="coverOutboundCancel" onclick="coverCancelOutbound()">Not yet</button>
               </div>
             </div>
-            <p class="cover-note" id="coverContactNote">Text or call the client before you close this shift.</p>
+            <p class="cover-note" id="coverContactNote">Text or call is optional if you still need the client.</p>
           </section>
           <section class="cover-section" aria-label="Outcome">
             <h2>After you talk to the client</h2>
             <div class="cover-actions">
-              <button type="button" class="btn btn-teal" id="coverAssignBtn" disabled onclick="coverShowAssign()">Client wants backup</button>
-              <button type="button" class="btn btn-warn" id="coverRefuseBtn" disabled onclick="coverRefuse()">Client refused · resume next day</button>
+              <button type="button" class="btn btn-teal" id="coverAssignBtn" onclick="coverShowAssign()">Client wants backup</button>
+              <button type="button" class="btn btn-warn" id="coverRefuseBtn" onclick="coverRefuse()">Client refused · resume next day</button>
               <button type="button" class="btn btn-warn" id="coverSkipBtn" onclick="coverShowSkip()">Member called · no service today</button>
-              <button type="button" class="btn btn-navy" id="coverAwaitBtn" disabled onclick="coverAwaiting()">Still deciding</button>
+              <button type="button" class="btn btn-navy" id="coverAwaitBtn" onclick="coverAwaiting()">Still deciding</button>
               <button type="button" class="btn btn-ghost" id="coverCancelBtn" onclick="coverCancelShift()">Cancel shift</button>
               <button type="button" class="btn btn-ghost" id="coverReopenBtn" hidden onclick="coverReopen()">Reopen</button>
             </div>
@@ -5180,23 +5191,22 @@ function coverPaintOutcome(){
       +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(shift.startsAt, shift.endsAt))+'</div>'
       +'<div class="cover-meta">Source · '+coverEsc(coverSourceLabel(intake))+'</div>';
   }
-  var canClose=!!coverContacted;
-  var canAssign=canClose&&coverCanAssign(shift);
+  var canAssign=coverCanAssign(shift);
   var refuse=document.getElementById('coverRefuseBtn');
   var skip=document.getElementById('coverSkipBtn');
   var assign=document.getElementById('coverAssignBtn');
   var awaitBtn=document.getElementById('coverAwaitBtn');
   var reopen=document.getElementById('coverReopenBtn');
-  if(refuse)refuse.disabled=!canClose;
-  if(skip)skip.disabled=!coverCanAssign(shift);
+  if(refuse)refuse.disabled=false;
+  if(skip)skip.disabled=!canAssign;
   if(assign)assign.disabled=!canAssign;
-  if(awaitBtn)awaitBtn.disabled=!canClose;
-  if(reopen)reopen.hidden=coverCanAssign(shift);
+  if(awaitBtn)awaitBtn.disabled=false;
+  if(reopen)reopen.hidden=canAssign;
   var livePhone=coverClientPhone(shift);
   if(livePhone&&!shift.phone)shift.phone=livePhone;
   var note=document.getElementById('coverContactNote');
   if(note){
-    if(!coverContacted)note.textContent='Text or call the client before you close this shift.';
+    if(!coverContacted)note.textContent='Text or call is optional if you still need the client.';
     else if(shift.phone)note.textContent='Client step recorded.';
     else note.textContent='No phone on this shift. Client step recorded. Use the desk phone if you still need to dial.';
   }
@@ -5299,10 +5309,6 @@ function coverPickRank(id, name){
 }
 function coverShowAssign(){
   var shift=coverFind(coverSelectedId);
-  if(!coverContacted){
-    if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
-    return;
-  }
   if(shift&&!coverCanAssign(shift)){
     if(typeof showTempMsg==='function')showTempMsg('Assign backup is only for an open shift or one awaiting the client.','var(--warn)');
     return;
@@ -5432,11 +5438,6 @@ async function coverApplyOutcome(outcome){
     if(outcome==='assigned_backup')coverShowOnTheWay(shift.backupAideName||'');
     return;
   }
-  var needsContact=outcome==='client_refused_resume_next_day'||outcome==='assigned_backup'||outcome==='awaiting_client';
-  if(needsContact&&!coverContacted){
-    if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
-    return;
-  }
   if(outcome==='assigned_backup'&&!coverCanAssign(shift)){
     if(typeof showTempMsg==='function')showTempMsg('Assign backup is only for an open shift or one awaiting the client.','var(--warn)');
     return;
@@ -5515,10 +5516,6 @@ async function coverApplyOutcome(outcome){
 function coverRefuse(){
   var shift=coverFind(coverSelectedId);
   if(!shift)return;
-  if(!coverContacted){
-    if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
-    return;
-  }
   coverHideSkipReason();
   coverCmFamily='refuse';
   coverShowRefuseDraft(shift,'refuse');
@@ -5749,7 +5746,7 @@ function copilotPlaybook(key){
       explain:'Open shifts sit under More → Coverage. An aide call-off can end as backup or as client refused. A member who calls to skip today is a separate path.',
       steps:[
         'Open the shift and read who the regular aide is.',
-        'If the aide called off, text or call the client before you close it.',
+        'Text or call is optional. Close the shift when you know the outcome.',
         'Client wants backup, Client refused · resume next day, or Still deciding.',
         'If the member called, choose Member called · no service today.',
         'Pick Personal, Doctor appointment, Not feeling well, or Other, then confirm.',
@@ -11143,33 +11140,157 @@ function payReadyCsvCell(v){
   if(/[",\n]/.test(s))return '"'+s.replace(/"/g,'""')+'"';
   return s;
 }
+function payReadyNormKey(name){
+  return String(name==null?'':name).trim().toLowerCase().replace(/[\s-]+/g,'_');
+}
+function payReadyStatusRank(name){
+  var s=payReadyNormKey(name);
+  if(s==='pay_status')return 0;
+  if(s==='readiness'||s==='pay_readiness'||s==='readiness_status')return 1;
+  if(s==='status')return 2;
+  return -1;
+}
+function payReadyIsReadyValue(v){
+  return String(v==null?'':v).trim().toLowerCase()==='ready';
+}
+function payReadyMoneyCol(name){
+  var s=String(name==null?'':name);
+  if(/\$/.test(s)||/payroll/i.test(s))return true;
+  return PAYREADY_MONEY_KEY.test(s);
+}
+function payReadyObjectStatus(row){
+  var best=99,found=false,val=null;
+  Object.keys(row||{}).forEach(function(k){
+    var rank=payReadyStatusRank(k);
+    if(rank>=0&&rank<best){best=rank;found=true;val=row[k];}
+  });
+  return {found:found,value:val};
+}
+function payReadyKeepExportRow(row, statusAt){
+  if(Array.isArray(row)){
+    if(statusAt<0)return true;
+    return payReadyIsReadyValue(row[statusAt]);
+  }
+  if(!row||typeof row!=='object')return false;
+  var best=99,found=false,val=null;
+  Object.keys(row).forEach(function(k){
+    var rank=payReadyStatusRank(k);
+    if(rank>=0&&rank<best){best=rank;found=true;val=row[k];}
+  });
+  if(found)return payReadyIsReadyValue(val);
+  if(statusAt>=0)return false;
+  return true;
+}
+function payReadyCell(row, name){
+  if(!row||typeof row!=='object')return '';
+  if(Object.prototype.hasOwnProperty.call(row, name))return row[name];
+  var want=String(name).toLowerCase();
+  var keys=Object.keys(row);
+  for(var i=0;i<keys.length;i++){
+    if(keys[i].toLowerCase()===want)return row[keys[i]];
+  }
+  return '';
+}
+function payReadyParseCsv(text){
+  var s=String(text==null?'':text);
+  if(s.charCodeAt(0)===0xFEFF)s=s.slice(1);
+  if(!s.trim())return null;
+  var rows=[],row=[],cell='',q=false;
+  for(var i=0;i<s.length;i++){
+    var ch=s.charAt(i);
+    if(q){
+      if(ch==='"'){
+        if(s.charAt(i+1)==='"'){cell+='"';i++;}
+        else q=false;
+      }else cell+=ch;
+    }else if(ch==='"'){
+      q=true;
+    }else if(ch===','){
+      row.push(cell);cell='';
+    }else if(ch==='\n'||ch==='\r'){
+      if(ch==='\r'&&s.charAt(i+1)==='\n')i++;
+      row.push(cell);rows.push(row);row=[];cell='';
+    }else cell+=ch;
+  }
+  if(cell.length||row.length){row.push(cell);rows.push(row);}
+  while(rows.length){
+    var last=rows[rows.length-1];
+    var blank=true;
+    for(var b=0;b<last.length;b++){if(last[b]!=='')blank=false;}
+    if(!blank)break;
+    rows.pop();
+  }
+  if(!rows.length)return null;
+  return {columns:rows[0], rows:rows.slice(1)};
+}
+function payReadyRowsToCsv(cols, rawRows){
+  cols=cols||[];
+  rawRows=rawRows||[];
+  var statusAt=-1,best=99;
+  cols.forEach(function(c,i){
+    var rank=payReadyStatusRank(c);
+    if(rank>=0&&rank<best){best=rank;statusAt=i;}
+  });
+  var keep=[];
+  cols.forEach(function(c,i){if(!payReadyMoneyCol(c))keep.push(i);});
+  var useCols=keep.map(function(i){return cols[i];});
+  var lines=[useCols.map(payReadyCsvCell).join(',')];
+  var n=0;
+  rawRows.forEach(function(r){
+    if(!payReadyKeepExportRow(r, statusAt))return;
+    var cells;
+    if(Array.isArray(r))cells=keep.map(function(i){return payReadyCsvCell(r[i]);});
+    else if(r&&typeof r==='object')cells=useCols.map(function(c){return payReadyCsvCell(payReadyCell(r, c));});
+    else return;
+    lines.push(cells.join(','));
+    n++;
+  });
+  if(!n)return '';
+  return lines.join('\n');
+}
+function payReadyTableHasStatus(cols, rawRows){
+  for(var i=0;i<(cols||[]).length;i++){if(payReadyStatusRank(cols[i])>=0)return true;}
+  for(var r=0;r<(rawRows||[]).length;r++){
+    var row=rawRows[r];
+    if(row&&typeof row==='object'&&!Array.isArray(row)&&payReadyObjectStatus(row).found)return true;
+  }
+  return false;
+}
+function payReadyTableFromNode(node){
+  if(!node||typeof node!=='object'||Array.isArray(node))return null;
+  var cols=Array.isArray(node.columns)?node.columns.slice():[];
+  var rawRows=Array.isArray(node.rows)?node.rows:[];
+  if(!cols.length&&rawRows.length&&rawRows[0]&&typeof rawRows[0]==='object'&&!Array.isArray(rawRows[0]))cols=Object.keys(rawRows[0]);
+  return {csv:payReadyRowsToCsv(cols, rawRows), hasStatus:payReadyTableHasStatus(cols, rawRows)};
+}
 function payReadyTableToCsv(data){
   var node=data;
   if(typeof node==='string'){
     var t=node.trim();
-    if(t.charAt(0)==='{'||t.charAt(0)==='['){try{node=JSON.parse(t);}catch(e){return node;}}
-    else return node;
+    if(t.charAt(0)==='{'||t.charAt(0)==='['){try{node=JSON.parse(t);}catch(e){}}
   }
   if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object'&&!Array.isArray(node[0]))node=node[0];
   if(node&&typeof node==='object'&&!Array.isArray(node)&&node.data&&(typeof node.data==='string'||(typeof node.data==='object'&&(node.data.columns||node.data.rows||node.data.csv))))node=node.data;
-  if(typeof node==='string')return node;
-  if(!node||typeof node!=='object')return '';
-  if(typeof node.csv==='string')return node.csv;
-  var cols=Array.isArray(node.columns)?node.columns.slice():[];
-  var rawRows=Array.isArray(node.rows)?node.rows:[];
-  if(!cols.length&&rawRows.length&&rawRows[0]&&typeof rawRows[0]==='object'&&!Array.isArray(rawRows[0]))cols=Object.keys(rawRows[0]);
-  var keep=[];
-  cols.forEach(function(c,i){if(!PAYREADY_MONEY_KEY.test(String(c)))keep.push(i);});
-  var useCols=keep.map(function(i){return cols[i];});
-  var lines=[useCols.map(payReadyCsvCell).join(',')];
-  rawRows.forEach(function(r){
-    var cells;
-    if(Array.isArray(r))cells=keep.map(function(i){return payReadyCsvCell(r[i]);});
-    else if(r&&typeof r==='object')cells=useCols.map(function(c){return payReadyCsvCell(r[c]);});
-    else return;
-    lines.push(cells.join(','));
-  });
-  return lines.join('\n');
+  var prebuilt=null;
+  if(typeof node==='string')prebuilt=node;
+  else if(node&&typeof node==='object'&&!Array.isArray(node)&&typeof node.csv==='string')prebuilt=node.csv;
+  if(prebuilt!=null&&String(prebuilt).trim()){
+    var parsed=payReadyParseCsv(prebuilt);
+    if(parsed&&parsed.columns&&parsed.columns.length){
+      var csvHasStatus=payReadyTableHasStatus(parsed.columns, parsed.rows||[]);
+      if(csvHasStatus)return payReadyRowsToCsv(parsed.columns, parsed.rows||[]);
+      if(node&&typeof node==='object'&&!Array.isArray(node)){
+        var alt=payReadyTableFromNode(node);
+        if(alt&&alt.hasStatus)return alt.csv;
+      }
+      return payReadyRowsToCsv(parsed.columns, parsed.rows||[]);
+    }
+  }
+  if(node&&typeof node==='object'&&!Array.isArray(node)){
+    var built=payReadyTableFromNode(node);
+    if(built)return built.csv;
+  }
+  return '';
 }
 function payReadyBlank(week, error){
   return {source:'ace',error:error||'Could not load pay readiness.',rows:[],ready_count:0,held_count:0,week_start:week.week_start,week_end:week.week_end,label:week.label};
@@ -11203,6 +11324,20 @@ async function payReadyLoad(){
   if(!keep){payReadyView='list';payReadySelected='';}
   payReadyPaint();
   return next;
+}
+function payReadySyncExport(show){
+  var exportBtn=document.getElementById('payReadyExport');
+  if(!exportBtn)return;
+  if(show){
+    exportBtn.hidden=false;
+    if(exportBtn.removeAttribute)exportBtn.removeAttribute('hidden');
+    if(exportBtn.classList)exportBtn.classList.remove('pay-export-off');
+    if(exportBtn.style&&exportBtn.style.setProperty)exportBtn.style.setProperty('display','flex','important');
+    return;
+  }
+  if(exportBtn.classList)exportBtn.classList.add('pay-export-off');
+  if(exportBtn.style&&exportBtn.style.setProperty)exportBtn.style.setProperty('display','none','important');
+  exportBtn.hidden=true;
 }
 function payReadyPaint(){
   if(typeof document==='undefined'||!document.getElementById||!payReadyState)return;
@@ -11244,13 +11379,13 @@ function payReadyPaint(){
   var emptyTitle=document.getElementById('payReadyEmptyTitle');
   var emptySub=document.getElementById('payReadyEmptySub');
   var mark=document.getElementById('payReadyMark');
-  var exportBtn=document.getElementById('payReadyExport');
   if(payReadyState.error&&!(payReadyState.rows&&payReadyState.rows.length)){
     if(readyEl)readyEl.textContent='Ready \u2014';
     if(heldEl)heldEl.textContent='Held \u2014';
     if(title)title.hidden=true;
     if(empty)empty.hidden=true;
     if(rowsEl)rowsEl.innerHTML='<p class="pay-week">'+payReadyEsc(payReadyState.error)+'</p>';
+    payReadySyncExport(false);
     return;
   }
   var counted=payReadyCounts(payReadyState.rows);
@@ -11264,6 +11399,7 @@ function payReadyPaint(){
     if(title)title.hidden=true;
     if(empty)empty.hidden=true;
     if(rowsEl)rowsEl.innerHTML=payReadyRowsHtml(payReadyState.rows);
+    payReadySyncExport(counts.ready>=1);
     return;
   }
   if(rowsEl)rowsEl.innerHTML='';
@@ -11273,13 +11409,13 @@ function payReadyPaint(){
     if(emptyTitle)emptyTitle.textContent='All '+counts.ready+' timesheets ready';
     if(emptySub)emptySub.textContent='Nothing held this pay period';
     if(mark)mark.hidden=false;
-    if(exportBtn)exportBtn.hidden=false;
+    payReadySyncExport(true);
   }else{
     if(title)title.hidden=true;
     if(emptyTitle)emptyTitle.textContent='No timesheets this week';
     if(emptySub)emptySub.textContent='Nothing held this pay period';
     if(mark)mark.hidden=true;
-    if(exportBtn)exportBtn.hidden=true;
+    payReadySyncExport(false);
   }
 }
 function payReadyOpenDetail(id){
@@ -11362,6 +11498,7 @@ async function payReadyExport(){
   }
   return payReadyDownloadCsv(csv, week);
 }
+function payReadyExportList(){ return payReadyExport(); }
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
   if(tbody)tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr>';
