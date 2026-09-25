@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi secretary 2026-09-25 v=remisec1 admin-build 2026-09-25-remisec1. Admin and Scheduler only. Remi stays the corner chip until opened, then the sheet closes back to the desk. Ask can greet, show a brief Cleveland weather card, look up a caregiver or client already loaded, and hand off an open call-off as a draft. Update client address, soft-remove aide, and add aide show the proposed change and wait for Confirm before any write. Address reuses the desk client update. Soft-remove posts admin_deactivate_aide. Add aide posts admin_add_aide and does not create a sign-in. Weather is the desk snapshot in remiSecWeatherSnapshot until a Cleveland callable exists. Nurse does not get Remi and this tip adds no nurse flow. Quiet hours rules are unchanged. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including payready1d, payready1c, payready1b, coverunlock1, payready1, aidecreds1c, aidecreds1b, remidate1, ncipdf1, remichat1, remiscroll1, and remi1. -->
+<meta name="admin-build" content="2026-09-25-remisec1">
 <!-- admin pay readiness export ready-list defense 2026-09-25 v=payready1d admin-build 2026-09-25-payready1d. Before the file downloads, Held rows and any row whose pay_status (or Readiness or status) is not ready are stripped, case-insensitive. A prebuilt csv from admin_timesheet_pay_export is still preferred when present, then parsed and filtered so a held row cannot pass through unchanged. Columns and rows are filtered the same way when that csv cannot prove ready-only. Money columns stay dropped, including rate, amount, wage, gross, net, payroll, and $. Export still posts admin_timesheet_pay_export {p_week_start}. When nothing ready remains, the screen says no ready timesheets to export and does not download a file. Export ready list stays visible when ready_count is at least 1, including when held_count is greater than 0. Not payroll. Remi stays the corner chip. No Auth reseal. Prior markers stay, including payready1c, payready1b, coverunlock1, payready1, and aidecreds1c. -->
 <meta name="admin-build" content="2026-09-25-payready1d">
 <!-- admin pay readiness export visible 2026-09-25 v=payready1c admin-build 2026-09-25-payready1c. Export ready list stays visible on the phone list whenever ready_count is at least 1, including when held_count is greater than 0. It sits between the readiness rows and the Timesheets desk, full width. Show and hide do not rely on the hidden attribute: #payReady [hidden]{display:none !important} was keeping the button invisible when that attribute stayed on it. The tap calls payReadyExportList so the payReadyExport id cannot swallow the function. It still posts admin_timesheet_pay_export {p_week_start} and downloads the ready list only. Money columns stay dropped. Held 0 with ready sheets still shows the check, All N timesheets ready, Nothing held this pay period, and Export ready list. Not payroll. Remi stays the corner chip. No Auth reseal. Prior markers stay, including payready1b, coverunlock1, payready1, and aidecreds1c. -->
@@ -425,6 +427,18 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .copilot-bubble{max-width:100%;min-width:0;box-sizing:border-box;border-radius:14px;padding:12px 14px;overflow-wrap:anywhere;word-break:break-word;font-size:0.95rem;line-height:1.45;touch-action:manipulation;}
 .copilot-bubble-mo{align-self:flex-end;max-width:92%;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
 .copilot-bubble-remi{align-self:stretch;background:#fff;color:var(--navy);border:1px solid var(--border);}
+.copilot-actions.copilot-actions-row{flex-direction:row;flex-wrap:wrap;}
+.copilot-actions.copilot-actions-row .btn{width:auto;flex:1 1 8rem;min-width:0;}
+.copilot-sec-note{text-align:center;font-size:0.82rem;line-height:1.35;color:var(--muted);margin:2px 8px 8px;}
+.remi-wx-chip{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;max-width:100%;margin:0 0 8px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--border);color:var(--navy);font-size:0.88rem;font-weight:650;line-height:1.3;}
+.remi-wx-card{align-self:flex-start;width:100%;max-width:100%;box-sizing:border-box;margin:0 0 8px;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid var(--border);color:var(--navy);}
+.remi-wx-place{font-size:0.95rem;font-weight:700;margin:0 0 6px;}
+.remi-wx-now{display:flex;align-items:center;gap:12px;min-width:0;}
+.remi-wx-temp{font-size:2.4rem;font-weight:700;line-height:1;letter-spacing:-0.03em;}
+.remi-wx-cond{font-size:0.92rem;line-height:1.35;min-width:0;}
+.remi-wx-hours{display:flex;gap:10px;margin-top:12px;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;}
+.remi-wx-hour{flex:1 1 0;min-width:44px;text-align:center;font-size:0.75rem;line-height:1.2;font-weight:650;}
+.remi-wx-hour span{display:block;font-size:1.05rem;margin-bottom:2px;}
 .copilot-composer{display:flex;gap:8px;align-items:center;min-width:0;max-width:100%;padding-top:8px;box-sizing:border-box;}
 .copilot-composer[hidden]{display:none !important;}
 #copilotSheet .copilot-composer input{flex:1 1 auto;min-width:0;width:auto;}
@@ -1970,8 +1984,8 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
-      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" onsubmit="return copilotChatSubmit(event)">
-        <input id="copilotChatInput" type="text" enterkeyhint="send" maxlength="400" placeholder="Ask about a desk or a name" autocomplete="off" aria-label="Ask Remi">
+      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" onsubmit="return copilotChatSubmit(event)">
+        <input id="copilotChatInput" type="text" enterkeyhint="send" maxlength="400" placeholder="Ask or just chat..." autocomplete="off" aria-label="Ask Remi">
         <button type="submit" class="btn btn-teal" id="copilotChatSend">Ask</button>
       </form>
     </div>
@@ -6082,6 +6096,18 @@ var copilotAskActions=[];
 function copilotPaintConfirm(action){
   var box=copilotEl('copilotConfirm');
   if(!box||!action)return;
+  if(action.kind==='sec-write'){
+    box.hidden=false;
+    box.innerHTML='<h2 style="font-size:1rem;margin:8px 0">Confirm this change</h2>'
+      +'<p class="copilot-note" id="remiSecProposal">'+copilotEsc(action.summary||action.label||'')+'</p>'
+      +'<p class="copilot-note">Nothing is written until you confirm.</p>'
+      +'<div class="copilot-actions">'
+      +'<button type="button" class="btn btn-teal" id="copilotConfirmGo" onclick="copilotConfirmOutbound()">Confirm</button>'
+      +'<button type="button" class="btn btn-ghost" onclick="copilotCancelConfirm()">Not yet</button>'
+      +'</div>';
+    try{box.scrollIntoView({block:'nearest'});}catch(eSec){}
+    return;
+  }
   var quiet=copilotInQuietHours();
   var line='Confirm before this opens. You send it yourself. Remi does not send it.';
   if(quiet)line='Quiet hours are on. '+line;
@@ -6099,7 +6125,7 @@ function copilotPaintConfirm(action){
 function copilotChooseAction(index){
   var action=(copilotAskActions||[])[index];
   if(!action)return;
-  if(action.kind==='sms'||action.kind==='mail'){
+  if(action.kind==='sms'||action.kind==='mail'||action.kind==='sec-write'){
     copilotPending=action;
     copilotPaintConfirm(action);
     return;
@@ -6136,6 +6162,12 @@ function copilotCopy(text){
 function copilotConfirmOutbound(){
   var action=copilotPending;
   if(!action)return;
+  if(action.kind==='sec-write'){
+    copilotPending=null;
+    if(typeof remiSecCommit==='function')remiSecCommit(action);
+    else copilotCancelConfirm();
+    return;
+  }
   var href='';
   if(action.kind==='sms'&&typeof coverSmsHref==='function')href=coverSmsHref(action.phone, action.body);
   if(action.kind==='mail'&&typeof coverMailHref==='function')href=coverMailHref(action.email, action.subject||'No services today', action.body);
@@ -6646,6 +6678,10 @@ function copilotChatContact(kind, q){
   return {phone:String(hit.phone||hit.aidePhone||''), email:String(hit.caseManagerEmail||'')};
 }
 function copilotChatAnswer(q){
+  if(typeof remiSecAnswer==='function'){
+    var sec=remiSecAnswer(q);
+    if(sec)return sec;
+  }
   var kind=copilotChatTopic(q);
   var hints=!kind?copilotChatNameHints(q):[];
   if(!kind&&hints.length){
@@ -6694,7 +6730,7 @@ function copilotPaintChat(){
   if(copilotChat.length>40)copilotChat=copilotChat.slice(copilotChat.length-40);
   var lastKind='';
   for(var n=copilotChat.length-1;n>=0;n--){
-    if(copilotChat[n].role==='remi'&&copilotChat[n].kind){lastKind=copilotChat[n].kind;break;}
+    if(copilotChat[n].role==='remi'&&copilotChat[n].kind&&!copilotChat[n].sec){lastKind=copilotChat[n].kind;break;}
   }
   if(lastKind)copilotAskId=lastKind;
   var html='<div class="copilot-thread" id="copilotThread" role="log" aria-live="polite">';
@@ -6702,17 +6738,19 @@ function copilotPaintChat(){
     var mine=msg.role==='mo';
     html+='<div class="copilot-bubble '+(mine?'copilot-bubble-mo':'copilot-bubble-remi')+'">'+copilotChatHtml(msg.text||'');
     if(!mine&&msg.actions&&msg.actions.length){
-      html+='<div class="copilot-actions">';
+      html+='<div class="copilot-actions'+(msg.actionsLayout==='row'?' copilot-actions-row':'')+'">';
       msg.actions.forEach(function(a, ai){
         html+='<button type="button" class="btn btn-teal" onclick="copilotChatAction('+idx+','+ai+')">'+copilotEsc(a.label)+'</button>';
       });
       html+='</div>';
     }
-    if(!mine&&msg.kind&&msg.kind===lastKind&&idx===copilotChat.length-1){
+    if(!mine&&!msg.sec&&msg.kind&&msg.kind===lastKind&&idx===copilotChat.length-1){
       html+='<div class="field"><label for="copilotDirections">Short directions</label><textarea id="copilotDirections" placeholder="How you want this handled next time"></textarea></div>';
       html+='<div class="copilot-actions"><button type="button" class="btn btn-ghost" id="copilotSaveDirections" onclick="copilotSaveDirections()">Save as my template</button></div>';
     }
     html+='</div>';
+    if(!mine&&msg.wx&&typeof remiSecWxHtml==='function')html+=remiSecWxHtml(msg.wx);
+    if(!mine&&msg.note)html+='<p class="copilot-sec-note">'+copilotEsc(msg.note)+'</p>';
   });
   html+='</div>';
   host.innerHTML=html;
@@ -6745,7 +6783,7 @@ function copilotChatSubmit(ev){
   var ans=copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
   copilotChat.push({role:'mo', text:q});
-  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[]});
+  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||''});
   copilotPaintChat();
   return false;
 }
@@ -6770,6 +6808,501 @@ function copilotShowRadar(){
   copilotPaintRadar();
 }
 // Live Ace office RPCs only (sbRestRpc + office access_token). No browser stub. No Sheets exec.
+// v=remisec1 secretary. Ask-only. Confirm before address, soft-remove, and add aide.
+// Weather SWAP is remiSecWeatherSnapshot. Address SWAP reuses apiPost update_client.
+// Add aide calls sbAdminAddAide. Soft-remove calls softDeleteAide. No sign-in create.
+function remiSecPack(text, extra){
+  extra=extra||{};
+  return {
+    sec:true,
+    kind:extra.kind||'',
+    text:text,
+    actions:extra.actions||[],
+    wx:extra.wx||'',
+    note:extra.note||'',
+    actionsLayout:extra.actionsLayout||''
+  };
+}
+function remiSecNorm(s){
+  return String(s==null?'':s).toLowerCase().replace(/[^a-z0-9@\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function remiSecHelloName(){
+  var raw='';
+  try{raw=String(currentAdminUsername||'');}catch(e){raw='';}
+  var local=raw.split('@')[0]||'';
+  var bit=(local.split(/[.\s_+-]/)[0]||'').replace(/[^A-Za-z]/g,'');
+  if(!bit)return 'there';
+  return bit.charAt(0).toUpperCase()+bit.slice(1).toLowerCase();
+}
+function remiSecWeatherSnapshot(){
+  // SWAP: no Cleveland weather callable in this repo. Replace this return when one exists.
+  return {
+    city:'Cleveland',
+    place:'Cleveland OH 44129',
+    temp:72,
+    condition:'Clear',
+    breeze:'light breeze',
+    high:76,
+    low:58,
+    rain:'Rain chance after 6pm.',
+    hours:[
+      {t:'12PM', icon:'sun'},
+      {t:'1PM', icon:'sun'},
+      {t:'2PM', icon:'sun'},
+      {t:'3PM', icon:'cloud'},
+      {t:'4PM', icon:'sun'}
+    ]
+  };
+}
+function remiSecWxMark(icon){
+  return icon==='cloud'?'\u2601\uFE0F':'\u2600\uFE0F';
+}
+function remiSecWxHtml(kind){
+  var w=remiSecWeatherSnapshot();
+  if(kind==='chip'){
+    return '<div class="remi-wx-chip" data-remisec="v=remisec1">'+remiSecWxMark('sun')+' '+copilotEsc(w.city+' \u00B7 '+w.temp+'\u00B0 \u00B7 '+w.condition)+'</div>';
+  }
+  var hours=(w.hours||[]).map(function(h){
+    return '<div class="remi-wx-hour"><span>'+remiSecWxMark(h.icon)+'</span>'+copilotEsc(h.t)+'</div>';
+  }).join('');
+  return '<div class="remi-wx-card" data-remisec="v=remisec1">'
+    +'<div class="remi-wx-place">'+copilotEsc(w.place)+'</div>'
+    +'<div class="remi-wx-now"><div class="remi-wx-temp">'+copilotEsc(String(w.temp))+'\u00B0</div>'
+    +'<div class="remi-wx-cond">'+copilotEsc(w.condition)+'<br>High '+copilotEsc(String(w.high))+' \u00A0 Low '+copilotEsc(String(w.low))+'</div></div>'
+    +'<div class="remi-wx-hours">'+hours+'</div></div>';
+}
+function remiSecIsWeather(q){
+  return /\b(weather|forecast|temperature)\b/i.test(String(q||''));
+}
+function remiSecIsGreeting(q){
+  var s=String(q||'').trim().toLowerCase().replace(/[!?.]+$/g,'').replace(/\s+/g,' ');
+  if(!s||s.length>40)return false;
+  if(/\b(weather|forecast|address|aide|client|caregiver|call|coverage|timesheet|schedule|nurse|password|lookup|find)\b/.test(s))return false;
+  return /^(hey|hi|yo|good morning|good afternoon|good evening)(\s+remi)?$/.test(s);
+}
+function remiSecGreet(){
+  var w=remiSecWeatherSnapshot();
+  var part='good morning';
+  try{
+    var g=(typeof coverNyGreeting==='function')?coverNyGreeting():'';
+    if(/afternoon/i.test(g))part='good afternoon';
+    else if(/evening/i.test(g))part='good evening';
+  }catch(e){}
+  var sky=/clear/i.test(w.condition)?('Cleveland\u2019s looking clear'):('Cleveland\u2019s at '+w.temp+'\u00B0');
+  var text='Hey '+remiSecHelloName()+' \u2014 '+part+'. '+sky+'. Want the desk, or just chatting?';
+  return remiSecPack(text, {wx:'chip'});
+}
+function remiSecWeather(){
+  var w=remiSecWeatherSnapshot();
+  var text='Cleveland right now: '+w.temp+'\u00B0, '+String(w.condition||'').toLowerCase()+', '+w.breeze+'. High '+w.high+' later. '+w.rain;
+  return remiSecPack(text, {wx:'card', note:'Still on desk duty \u2014 say a name or Coverage if you need work.'});
+}
+function remiSecIsCalloff(q){
+  var s=String(q||'').toLowerCase();
+  if(/\bopen shifts?\b/.test(s))return false;
+  return /\bcall[\s-]?offs?\b/.test(s);
+}
+function remiSecCalloffWhen(shift){
+  var iso=shift&&(shift.startsAt||shift.shift_start||shift.serviceDate||shift.service_date||'');
+  var t=Date.parse(iso==null?'':iso);
+  var mdy='';
+  var wd='';
+  if(isFinite(t)){
+    var d=new Date(t);
+    mdy=(typeof formatAdminDate==='function')?formatAdminDate(d):'';
+    try{wd=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short'}).format(d);}catch(e){wd='';}
+  }else if(typeof formatAdminDate==='function'){
+    mdy=formatAdminDate(iso)||'';
+  }
+  if(wd&&mdy)return wd+' '+mdy;
+  return mdy||wd||'';
+}
+function remiSecCalloff(q){
+  var shifts=(typeof copilotOpenShifts==='function')?copilotOpenShifts():[];
+  var picked=[];
+  for(var i=0;i<shifts.length;i++){
+    var shift=shifts[i]||{};
+    if(typeof copilotMention==='function'&&(copilotMention(q, shift.clientName)||copilotMention(q, shift.aideName)))picked.push(shift);
+  }
+  var show=picked.length?picked:shifts;
+  if(!show.length){
+    return remiSecPack('No call-offs are loaded on this desk. Open Coverage under More and ask again.', {
+      kind:'coverage_open',
+      actions:[{id:'open', label:'Open Coverage', kind:'tab', tab:'coverage'}],
+      note:'Nothing sends until you confirm.',
+      actionsLayout:'row'
+    });
+  }
+  var hit=show[0];
+  var when=remiSecCalloffWhen(hit);
+  var who=String(hit.clientName||hit.client||'Client');
+  var line=(when?when+' \u2014 ':'')+who+' CALL-OFF still open. Want a backup SMS draft?';
+  if(shifts.length>1&&!picked.length)line=shifts.length+' open call-offs. '+line;
+  var body='Hi, this is Mo at EverCare. Your aide called off today. I can send a replacement caregiver. Please let me know. Thank you.';
+  try{
+    var book=(typeof copilotPlaybook==='function')?copilotPlaybook('coverage_open'):null;
+    var acts=book&&book.actions?book.actions:[];
+    for(var a=0;a<acts.length;a++){
+      if(acts[a]&&acts[a].kind==='sms'&&acts[a].body){
+        body=(typeof copilotGreetDraft==='function')?copilotGreetDraft(acts[a].body):acts[a].body;
+        break;
+      }
+    }
+  }catch(eBook){}
+  var phone=String(hit.phone||hit.clientPhone||hit.client_phone||hit.aidePhone||'');
+  return remiSecPack(line, {
+    kind:'coverage_open',
+    actionsLayout:'row',
+    note:'Nothing sends until you confirm.',
+    actions:[
+      {id:'sms', label:'Draft SMS', kind:'sms', phone:phone, body:body},
+      {id:'open', label:'Open Coverage', kind:'tab', tab:'coverage'}
+    ]
+  });
+}
+function remiSecClients(){
+  return (typeof copilotBag==='function')?copilotBag(function(){return allClients;}):[];
+}
+function remiSecAides(){
+  return (typeof copilotBag==='function')?copilotBag(function(){return loadedAidesList;}):[];
+}
+function remiSecNameHit(who, name){
+  var q=remiSecNorm(who);
+  var n=remiSecNorm(name);
+  if(!q||!n||q.length<2)return false;
+  if(n===q)return true;
+  var parts=q.split(' ').filter(function(p){return p.length>=3;});
+  if(!parts.length)return n.indexOf(q)>=0;
+  for(var i=0;i<parts.length;i++){
+    if(n.indexOf(parts[i])<0)return false;
+  }
+  return true;
+}
+function remiSecFindClients(who){
+  var q=remiSecNorm(who);
+  if(q.length<2)return [];
+  var list=remiSecClients();
+  var hits=[];
+  var seen={};
+  for(var i=0;i<list.length;i++){
+    var c=list[i]||{};
+    var name=String(c.name||c.clientName||[c.firstName||c.first_name,c.lastName||c.last_name].filter(Boolean).join(' ')||'').trim();
+    var id=String(c.id||c.clientId||name||i);
+    if(!name||seen[id])continue;
+    if(remiSecNameHit(who, name)){seen[id]=1;hits.push(c);}
+  }
+  return hits;
+}
+function remiSecFindAides(who){
+  var q=remiSecNorm(who).replace(/^@/,'');
+  if(q.length<2)return [];
+  var list=remiSecAides();
+  var hits=[];
+  var seen={};
+  for(var i=0;i<list.length;i++){
+    var u=list[i]||{};
+    var name=String(u.name||u.fullName||u.full_name||'').trim();
+    var user=String(u.username||'').trim();
+    var id=String(u.id||u.aide_id||user||i);
+    if(seen[id])continue;
+    var un=remiSecNorm(user);
+    var match=(un&&un===q)||remiSecNameHit(who, name)||remiSecNameHit(q, user);
+    if(match){seen[id]=1;hits.push(u);}
+  }
+  return hits;
+}
+function remiSecClientLine(c){
+  var name=String(c.name||c.clientName||'Client');
+  var addr=String(c.address||c.home_address||c.homeAddress||'').trim();
+  var phone=String(c.phone||'').trim();
+  var lines=[name, 'Client'];
+  if(addr)lines.push('Home: '+addr);
+  if(phone)lines.push('Phone: '+phone);
+  return lines.join('\n');
+}
+function remiSecAideLine(u){
+  var name=String(u.name||u.fullName||u.full_name||u.username||'Aide');
+  var user=String(u.username||'').trim();
+  var phone=String(u.phone||'').trim();
+  var flag=(typeof aideOnTempPassword==='function'&&aideOnTempPassword(u))?'still on a temporary password':'active';
+  var clients=(typeof formatAideAssignedClients==='function')?formatAideAssignedClients(u):'';
+  var lines=[name, 'Caregiver'+(user?' @'+user:'')+' \u00B7 '+flag];
+  if(phone)lines.push('Phone: '+phone);
+  if(clients&&clients!=='\u2014'&&clients!=='-')lines.push('Clients: '+clients);
+  return lines.join('\n');
+}
+function remiSecLookupQuery(q){
+  var s=String(q||'').trim();
+  if(/\b(add|create|remove|hide|delete|address|weather|forecast|call[\s-]?off|timesheet|schedule|coverage|inservice|broadcast|compliance|backup|password|nurse)\b/i.test(s))return null;
+  var m=s.match(/\b(?:look\s*up|lookup)\b(?:\s+(?:the|a|an))?\s*(?:caregiver|aide|client)?\s+(.+)$/i);
+  if(!m)m=s.match(/\b(?:find|search)\b(?:\s+(?:the|a|an))?\s*(?:caregiver|aide|client)\s+(.+)$/i);
+  if(!m)m=s.match(/\bwho is\s+(.+)$/i);
+  if(!m)return null;
+  var who=String(m[1]||'').replace(/[?.!]+$/,'').replace(/\b(please|on the desk|for me)\b/ig,'').trim();
+  if(who.length<2)return null;
+  return {who:who};
+}
+function remiSecLookup(q){
+  var parsed=remiSecLookupQuery(q);
+  if(!parsed)return null;
+  var aides=remiSecFindAides(parsed.who);
+  var clients=remiSecFindClients(parsed.who);
+  if(!aides.length&&!clients.length){
+    return remiSecPack('I don\u2019t have '+parsed.who+' loaded on this desk. Open Aides or Clients and ask again.');
+  }
+  var lines=[];
+  aides.slice(0,4).forEach(function(u){lines.push(remiSecAideLine(u));});
+  clients.slice(0,4).forEach(function(c){lines.push(remiSecClientLine(c));});
+  return remiSecPack(lines.join('\n\n'));
+}
+function remiSecAddressQuery(q){
+  var s=String(q||'').trim();
+  if(/\bnurse\b/i.test(s))return null;
+  if(!/\baddress\b/i.test(s))return null;
+  if(!/\b(update|change|set|correct|move)\b/i.test(s))return null;
+  var m=s.match(/\baddress\s+(?:to|as|is)\s+(.+)$/i);
+  var addr=m?String(m[1]).trim().replace(/[.?!]+$/,''):'';
+  var who=s.replace(/\baddress\b[\s\S]*$/i,'');
+  who=who.replace(/\b(please|update|change|set|correct|move|the|client|for|to|home)\b/ig,' ');
+  who=who.replace(/[^A-Za-z'\-\s]/g,' ').replace(/\s+/g,' ').trim();
+  return {who:who, address:addr};
+}
+function remiSecClientPayload(client, address){
+  var first=String(client.firstName||client.first_name||'').trim();
+  var last=String(client.lastName||client.last_name||'').trim();
+  var name=String(client.name||client.clientName||'').trim();
+  if(!first&&!last&&name){
+    var parts=name.split(/\s+/);
+    first=parts[0]||'';
+    last=parts.slice(1).join(' ');
+  }
+  if(!name)name=[first,last].filter(Boolean).join(' ');
+  return {
+    id:String(client.id||client.clientId||''),
+    name:name,
+    address:address,
+    lat:client.lat||'',
+    lng:client.lng||'',
+    firstName:first,
+    lastName:last,
+    caseManagerName:client.caseManagerName||client.case_manager_name||'',
+    caseManagerEmail:client.caseManagerEmail||client.case_manager_email||'',
+    phone:client.phone||''
+  };
+}
+function remiSecAddress(q){
+  var parsed=remiSecAddressQuery(q);
+  if(!parsed)return null;
+  if(!parsed.who)return remiSecPack('Which client? Say the name, then the new home address.');
+  var hits=remiSecFindClients(parsed.who);
+  if(!hits.length)return remiSecPack('I don\u2019t have '+parsed.who+' loaded on this desk. Nothing was written.');
+  if(hits.length>1){
+    var names=hits.slice(0,4).map(function(c){return c.name||c.clientName||'Client';}).join(', ');
+    return remiSecPack('More than one client matches. Say the full name. '+names);
+  }
+  if(!parsed.address)return remiSecPack('What is the new home address for '+(hits[0].name||parsed.who)+'?');
+  var payload=remiSecClientPayload(hits[0], parsed.address);
+  if(!payload.id||!payload.name)return remiSecPack('That client has no id on this desk. Open Clients and edit there. Nothing was written.');
+  var from=String(hits[0].address||hits[0].home_address||'').trim()||'No address on file';
+  var summary='Update address for '+payload.name+'.\nFrom: '+from+'\nTo: '+payload.address;
+  return remiSecPack(summary, {
+    note:'Nothing is written until you confirm.',
+    actions:[{
+      id:'sec-address',
+      label:'Update address',
+      kind:'sec-write',
+      write:'address',
+      summary:summary,
+      payload:payload
+    }]
+  });
+}
+function remiSecRemoveQuery(q){
+  var s=String(q||'').trim();
+  if(/\bnurse\b/i.test(s))return null;
+  if(!/\b(aide|caregiver)\b/i.test(s))return null;
+  if(!/\b(soft[-\s]?remove|soft[-\s]?delete|remove|hide|deactivate)\b/i.test(s))return null;
+  var who=s.replace(/\b(please|soft|remove|delete|hide|deactivate|the|an|a|aide|caregiver|named|called)\b/ig,' ');
+  who=who.replace(/[^A-Za-z0-9@'\-\s]/g,' ').replace(/\s+/g,' ').trim();
+  return {who:who};
+}
+function remiSecRemove(q){
+  var parsed=remiSecRemoveQuery(q);
+  if(!parsed)return null;
+  if(!parsed.who)return remiSecPack('Which aide should I soft-remove? Say the name. Nothing was written.');
+  var hits=remiSecFindAides(parsed.who);
+  if(!hits.length)return remiSecPack('I don\u2019t have '+parsed.who+' on the aides list. Nothing was written.');
+  if(hits.length>1){
+    var names=hits.slice(0,4).map(function(u){return (u.name||u.username||'Aide')+(u.username?' @'+u.username:'');}).join(', ');
+    return remiSecPack('More than one aide matches. Say which one. '+names);
+  }
+  var u=hits[0];
+  var user=String(u.username||'').trim();
+  if(!user)return remiSecPack('That aide has no username on this desk. Nothing was written.');
+  var name=String(u.name||u.fullName||u.full_name||user);
+  var summary='Soft-remove '+name+' @'+user+'.\nHidden for 7 days. They cannot Sign In. Restore from Recently deleted. Ace purges at 03:20 ET after 7 days.';
+  return remiSecPack(summary, {
+    note:'Nothing is written until you confirm.',
+    actions:[{
+      id:'sec-remove',
+      label:'Soft-remove',
+      kind:'sec-write',
+      write:'remove-aide',
+      summary:summary,
+      payload:{username:user, aideId:u.id||u.aide_id||u.aideId||'', name:name}
+    }]
+  });
+}
+function remiSecAddQuery(q){
+  var s=String(q||'').trim();
+  if(/\bnurse\b/i.test(s))return null;
+  if(!/\b(add|create|new)\b/i.test(s))return null;
+  if(!/\b(aide|caregiver)\b/i.test(s))return null;
+  if(/\b(remove|delete|hide|soft)\b/i.test(s))return null;
+  var email=(s.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)||[''])[0];
+  var pm=s.match(/\b(?:phone|tel|cell)\s*[:#]?\s*([+\d][\d\s().-]{6,}\d)/i);
+  var phone=pm?String(pm[1]).replace(/\s+/g,' ').trim():'';
+  var name=s;
+  if(email)name=name.split(email).join(' ');
+  if(pm)name=name.split(pm[0]).join(' ');
+  name=name.replace(/\b(please|add|create|new|an|aide|caregiver|named|called|phone|tel|cell|email|e-mail)\b/ig,' ');
+  name=name.replace(/\ba\b/ig,' ');
+  name=name.replace(/[^A-Za-z'\-\s]/g,' ').replace(/\s+/g,' ').trim();
+  var parts=name.split(' ').filter(Boolean);
+  return {first:parts[0]||'', last:parts.slice(1).join(' '), phone:phone, email:email};
+}
+function remiSecAdd(q){
+  var parsed=remiSecAddQuery(q);
+  if(!parsed)return null;
+  if(!parsed.first||!parsed.last)return remiSecPack('I need a first and last name before I can add an aide. Nothing was written.');
+  var full=parsed.first+' '+parsed.last;
+  var lines=['Add aide '+full+'.'];
+  if(parsed.phone)lines.push('Phone '+parsed.phone);
+  if(parsed.email)lines.push('Email '+parsed.email);
+  lines.push('No sign-in is created.');
+  var summary=lines.join('\n');
+  return remiSecPack(summary, {
+    note:'Nothing is written until you confirm.',
+    actions:[{
+      id:'sec-add',
+      label:'Add aide',
+      kind:'sec-write',
+      write:'add-aide',
+      summary:summary,
+      payload:{firstName:parsed.first, lastName:parsed.last, phone:parsed.phone, email:parsed.email}
+    }]
+  });
+}
+function remiSecAnswer(q){
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
+  if(remiSecIsWeather(q))return remiSecWeather();
+  var address=remiSecAddress(q);
+  if(address)return address;
+  var remove=remiSecRemove(q);
+  if(remove)return remove;
+  var add=remiSecAdd(q);
+  if(add)return add;
+  var look=remiSecLookup(q);
+  if(look)return look;
+  if(remiSecIsCalloff(q))return remiSecCalloff(q);
+  if(remiSecIsGreeting(q))return remiSecGreet();
+  return null;
+}
+function remiSecSay(text){
+  copilotChat.push({role:'remi', text:text, kind:'', actions:[], sec:true});
+  if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();
+}
+async function remiSecCommit(action){
+  if(!action||action.kind!=='sec-write')return;
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return;
+  if(action._sent)return;
+  action._sent=true;
+  copilotPending=null;
+  if(typeof copilotCancelConfirm==='function')copilotCancelConfirm();
+  var payload=action.payload||{};
+  if(action.write==='address'){
+    // SWAP: no address RPC in this repo. This is the Edit Client write.
+    if(typeof apiPost!=='function'){
+      remiSecSay('The client update is not callable from this desk yet. Nothing was written.');
+      return;
+    }
+    var saved=null;
+    try{
+      saved=await apiPost({
+        action:'update_client',
+        id:payload.id,
+        name:payload.name,
+        address:payload.address,
+        lat:payload.lat||'',
+        lng:payload.lng||'',
+        firstName:payload.firstName||'',
+        lastName:payload.lastName||'',
+        caseManagerName:payload.caseManagerName||'',
+        caseManagerEmail:payload.caseManagerEmail||'',
+        phone:payload.phone||''
+      });
+    }catch(err){
+      saved={success:false, error:String(err&&err.message||err||'Could not update the address.')};
+    }
+    if(saved&&saved.success){
+      try{
+        var list=(typeof allClients!=='undefined'&&allClients)?allClients:[];
+        for(var i=0;i<list.length;i++){
+          if(String(list[i]&&(list[i].id||list[i].clientId))===String(payload.id))list[i].address=payload.address;
+        }
+        if(typeof paintClients==='function')paintClients();
+      }catch(eMem){}
+      if(typeof showTempMsg==='function')showTempMsg('Address updated.','var(--success)');
+      remiSecSay('Address updated for '+payload.name+'.');
+      return;
+    }
+    remiSecSay('Address was not written. '+((saved&&(saved.error||saved.message))||'The desk did not accept it.'));
+    return;
+  }
+  if(action.write==='remove-aide'){
+    if(typeof softDeleteAide!=='function'){
+      remiSecSay('Soft-remove is not callable from this desk yet. Nothing was written.');
+      return;
+    }
+    try{await softDeleteAide(payload.username);}catch(errRm){
+      if(typeof showTempMsg==='function')showTempMsg('Could not hide this aide.','var(--danger)');
+    }
+    remiSecSay('Soft-remove requested for @'+payload.username+'. The desk toast says whether it landed.');
+    return;
+  }
+  if(action.write==='add-aide'){
+    if(!payload.firstName||!payload.lastName){
+      remiSecSay('I still need a first and last name. Nothing was written.');
+      return;
+    }
+    if(typeof sbAdminAddAide!=='function'){
+      remiSecSay('Add aide is not callable from this desk yet. Nothing was created.');
+      return;
+    }
+    var data=null;
+    try{
+      data=await sbAdminAddAide({
+        firstName:payload.firstName,
+        lastName:payload.lastName,
+        phone:payload.phone||'',
+        email:payload.email||''
+      });
+    }catch(errAdd){
+      data={success:false, missing:true};
+    }
+    if(data&&data.success){
+      if(typeof cacheInvalidate==='function')cacheInvalidate('get_users');
+      var shown=data.username||(payload.firstName+' '+payload.lastName);
+      if(typeof showTempMsg==='function')showTempMsg('Aide '+shown+' added. No sign-in was created.','var(--success)');
+      if(typeof logActivity==='function')logActivity('Added aide '+shown);
+      if(typeof renderAides==='function'){try{renderAides(true);}catch(eRen){}}
+      remiSecSay('Aide '+payload.firstName+' '+payload.lastName+' was added. No sign-in was created.');
+      return;
+    }
+    var miss=data&&data.missing;
+    remiSecSay(miss?'admin_add_aide is not live yet. Nothing was created.':((data&&(data.error||data.message))||'Aide was not created. Nothing else was changed.'));
+  }
+}
 // list_schedule_week, upsert_schedule_pattern, upsert_schedule_exception, delete_schedule_pattern.
 var schedWeekStart='';
 var schedUsual=[];

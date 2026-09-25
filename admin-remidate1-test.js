@@ -13,7 +13,9 @@ assert.ok(html.includes('admin-build 2026-09-25-remidate1'), 'remidate1 build no
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remidate1">'), 'remidate1 meta');
 assert.ok(html.includes('<!-- admin us dates 2026-09-25 v=remidate1 admin-build 2026-09-25-remidate1'), 'remidate1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-payready1d'), 'payready1d is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remisec1'), 'remisec1 is the first admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1d">'), 'payready1d meta stays');
+assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1"'), 'aidecreds1 stays after payready1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remidate1">'), 'remidate1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-ncipdf1">'), 'ncipdf1 meta stays');

@@ -29,7 +29,8 @@ assert.ok(html.includes('admin-build 2026-09-25-payready1d'), 'payready1d build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1d">'), 'payready1d meta');
 assert.ok(html.includes('<!-- admin pay readiness export ready-list defense 2026-09-25 v=payready1d admin-build 2026-09-25-payready1d'), 'payready1d comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('content="2026-09-25-payready1d"'), 'payready1d is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remisec1'), 'remisec1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1d"') < html.indexOf('content="2026-09-25-payready1c"'), 'payready1c stays after payready1d');
 assert.ok(html.indexOf('content="2026-09-25-payready1c"') < html.indexOf('content="2026-09-25-payready1b"'), 'payready1b stays after payready1c');
 assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
@@ -354,7 +355,7 @@ async function runBrowser(){
         fabTop: fabBox.top
       };
     }, heldCsv, readyOnlyCsv);
-    assert.strictEqual(phone.build, '2026-09-25-payready1d');
+    assert.strictEqual(phone.build, '2026-09-25-remisec1');
     assert.strictEqual(phone.marker, 'v=payready1d');
     assert.strictEqual(phone.prior, 'v=payready1c');
     assert.ok(phone.viewW >= 380 && phone.viewW <= 400, 'phone width '+phone.viewW);
