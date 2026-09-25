@@ -37,6 +37,8 @@
 <!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
 <!-- caregiver password reset 2026-09-24 v=cgreset1 admin-build 2026-09-24-cgreset1. Cut ON: Settings Reset Caregiver Password uses the same office path as reset_temp_password — POST rpc/reset_aide_temp_password {p_username,p_temp_password} via sbAdminResetTempPassword (Auth + aides.must_change_password). Success shows the temp password. apiPost reset_password and set_password on cut route to that RPC and do not hit Sheets /exec. Add aide stays admin_create_aide. Rollback ?sheets=1 or evercare_sheets=1 keeps Sheets reset_password. -->
 <!-- inservice clear assignment 2026-09-25 v=isclear1 admin-build 2026-09-25-isclear1. Clear Assignment on the Supabase cut requires topicId and DELETE /rest/v1/inservice_topic_assignment?org_id=eq.4f97f4d3-6635-4544-904c-6b06aa02d40b&topic_id=eq.{topicId} via sbClearAssignedTopic (office JWT). Missing topicId fails loud and does not post. Sheets /exec clear_assigned_topic runs only when evercareSbEnabled is false (?sheets=1 or evercare_sheets=1). DELETE does not touch inservice_results. Per-aide Compliance Delete stays POST rpc/admin_unassign_inservice_aide. Office quiz edit and review label each choice A–F up to the option count. Prior markers stay. -->
+<!-- login phone keyboard 2026-09-25 v=loginkb1 admin-build 2026-09-25-loginkb1. Cause: #loginScreen is a centered min-height 100dvh flex box and html/body overflow-x hidden, so the card does not overflow the layout viewport. The phone keyboard shrinks the visual viewport only, and Password plus Sign In stay under it. On focus of Account, username, or password, pin #loginScreen to the visual viewport (height and offset from visualViewport, not a guessed window.scrollTo) and scroll the focused field and Sign In into that open area. The same screen is the scrollport, so Forgot password can scroll into view. Desktop stays centered when there is no keyboard inset. -->
+<meta name="admin-build" content="2026-09-25-loginkb1">
 <meta name="admin-build" content="2026-09-25-isclear1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -52,6 +54,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);ma
 .login-box .lico{font-size:40px;margin-bottom:12px;}
 .login-box h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:4px;}
 .login-box p{font-size:0.8rem;color:var(--muted);margin-bottom:24px;}
+/* v=loginkb1 — phone keyboard. Resting layout stays the centered rule above. */
+html.login-kb,body.login-kb{overflow:hidden;height:100%;}
+#loginScreen.active.login-kb{position:fixed;left:0;right:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:0;height:auto;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:12px 16px 28px;background:var(--navy);}
+#loginScreen.active.login-kb .login-box{margin:0 auto;flex:0 0 auto;width:100%;max-width:420px;}
+@media (pointer: coarse){
+  #loginScreen input,#loginScreen select{font-size:16px;min-height:44px;}
+  #mgrLoginBtn{min-height:48px;}
+  #mgrForgotBtn{min-height:44px;padding:10px 14px;}
+}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;text-align:left;}
 label{font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
 input[type="text"],input[type="password"],input[type="date"],input[type="time"],select,textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);background:white;width:100%;transition:border 0.2s;}
@@ -752,10 +763,176 @@ else setupEverCarePWA();
     <button class="btn btn-navy btn-full" id="mgrLoginBtn" onclick="mgrLogin()">Sign In →</button>
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
     <div style="text-align:center;margin-top:12px">
-      <button onclick="showAdminReset()" style="background:none;border:none;color:#6b7a90;font-size:0.78rem;cursor:pointer;text-decoration:underline">Forgot password?</button>
+      <button type="button" id="mgrForgotBtn" onclick="showAdminReset()" style="background:none;border:none;color:#6b7a90;font-size:0.78rem;cursor:pointer;text-decoration:underline">Forgot password?</button>
     </div>
   </div>
 </div>
+<script>
+// v=loginkb1 — keep Password and Sign In above the phone keyboard. Does not touch mgrLogin.
+var loginKbBase=0;
+var loginKbGen=0;
+function loginKbReadViewport(){
+  var vv=window.visualViewport;
+  var inner=window.innerHeight||0;
+  if(!vv)return {height:inner,offsetTop:0,inner:inner,width:window.innerWidth||0};
+  return {height:vv.height||inner,offsetTop:vv.offsetTop||0,inner:inner,width:vv.width||window.innerWidth||0};
+}
+function loginKbInsetFrom(baseHeight, viewHeight, innerHeight){
+  var fromInner=Math.max(0,(innerHeight||0)-(viewHeight||0));
+  var fromBase=baseHeight?Math.max(0,baseHeight-(viewHeight||0)):0;
+  return Math.max(fromInner, fromBase);
+}
+function loginKbIsPhone(){
+  try{
+    if(window.matchMedia('(pointer: coarse)').matches)return true;
+    if(window.matchMedia('(hover: none) and (max-width: 1024px)').matches)return true;
+    if(window.matchMedia('(max-width: 932px)').matches)return true;
+  }catch(e){}
+  return (window.innerWidth||0)>0 && (window.innerWidth||0)<=932;
+}
+function loginKbFieldFocused(){
+  var screen=document.getElementById('loginScreen');
+  var el=document.activeElement;
+  if(!screen||!screen.classList.contains('active')||!el||!screen.contains(el))return false;
+  var tag=(el.tagName||'').toUpperCase();
+  return tag==='INPUT'||tag==='SELECT'||tag==='TEXTAREA';
+}
+function loginKbShouldLift(isPhone, fieldFocused, inset){
+  return !!isPhone && !!fieldFocused && inset>=120;
+}
+function loginKbScrollDelta(fieldRect, btnRect, extraRect, viewTop, viewHeight, pad){
+  pad=pad==null?14:pad;
+  var viewBottom=viewTop+viewHeight;
+  var low=Math.max(fieldRect.bottom, btnRect.bottom);
+  var high=Math.min(fieldRect.top, btnRect.top);
+  if(extraRect && isFinite(extraRect.top) && isFinite(extraRect.bottom)){
+    var low2=Math.max(low, extraRect.bottom);
+    var high2=Math.min(high, extraRect.top);
+    var room=(viewBottom-pad)-(viewTop+pad);
+    if((low2-high2)<=room+0.5){low=low2;high=high2;}
+  }
+  if(low>viewBottom-pad)return low-(viewBottom-pad);
+  if(high<viewTop+pad)return high-(viewTop+pad);
+  return 0;
+}
+function loginKbFixedFollowsLayout(view){
+  if(!view || (view.offsetTop||0)<2)return true;
+  var probe=document.getElementById('loginKbProbe');
+  if(!probe){
+    probe=document.createElement('div');
+    probe.id='loginKbProbe';
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;top:0;left:0;width:0;height:0;margin:0;padding:0;pointer-events:none;visibility:hidden;';
+    document.body.appendChild(probe);
+  }
+  var top=probe.getBoundingClientRect().top;
+  if(Math.abs(top)<2)return false;
+  return true;
+}
+function loginKbPin(screen, view){
+  var top=0;
+  if(loginKbFixedFollowsLayout(view))top=view.offsetTop||0;
+  screen.style.top=Math.round(top)+'px';
+  screen.style.height=Math.max(120, Math.round(view.height))+'px';
+  screen.style.left='0px';
+  screen.style.right='0px';
+  screen.style.bottom='auto';
+}
+function loginKbNudge(screen){
+  var active=document.activeElement;
+  var btn=document.getElementById('mgrLoginBtn');
+  var forgot=document.getElementById('mgrForgotBtn');
+  if(!screen||!active||!btn)return 0;
+  var port=screen.getBoundingClientRect();
+  var extra=forgot?forgot.getBoundingClientRect():null;
+  var delta=loginKbScrollDelta(active.getBoundingClientRect(), btn.getBoundingClientRect(), extra, port.top, port.height, 14);
+  if(Math.abs(delta)>1)screen.scrollTop+=delta;
+  return delta;
+}
+function loginKbRememberBase(){
+  if(document.documentElement.classList.contains('login-kb'))return;
+  var view=loginKbReadViewport();
+  var h=Math.max(view.inner||0, view.height||0);
+  if(!loginKbBase || h>loginKbBase+40)loginKbBase=h;
+}
+function loginKbClear(){
+  loginKbGen++;
+  document.documentElement.classList.remove('login-kb');
+  if(document.body)document.body.classList.remove('login-kb');
+  var screen=document.getElementById('loginScreen');
+  if(screen){
+    screen.classList.remove('login-kb');
+    screen.style.top='';
+    screen.style.height='';
+    screen.style.left='';
+    screen.style.right='';
+    screen.style.bottom='';
+  }
+  var probe=document.getElementById('loginKbProbe');
+  if(probe&&probe.parentNode)probe.parentNode.removeChild(probe);
+  var view=loginKbReadViewport();
+  var h=Math.max(view.inner||0, view.height||0);
+  if(h>200 && (!loginKbBase || h+80>=loginKbBase))loginKbBase=h;
+}
+function loginKbApply(){
+  var screen=document.getElementById('loginScreen');
+  if(!screen)return;
+  var view=loginKbReadViewport();
+  var inset=loginKbInsetFrom(loginKbBase, view.height, view.inner);
+  var focused=loginKbFieldFocused();
+  var phone=loginKbIsPhone();
+  if(!loginKbShouldLift(phone, focused, inset)){
+    if(document.documentElement.classList.contains('login-kb') && inset>=80 && screen.classList.contains('active')){
+      loginKbPin(screen, view);
+      return;
+    }
+    if(document.documentElement.classList.contains('login-kb'))loginKbClear();
+    return;
+  }
+  document.documentElement.classList.add('login-kb');
+  document.body.classList.add('login-kb');
+  screen.classList.add('login-kb');
+  loginKbPin(screen, view);
+  void screen.offsetHeight;
+  loginKbNudge(screen);
+  void screen.offsetHeight;
+  loginKbNudge(screen);
+}
+function loginKbSchedule(){
+  var gen=++loginKbGen;
+  [0,80,240,500,800].forEach(function(ms){
+    setTimeout(function(){if(gen===loginKbGen)loginKbApply();}, ms);
+  });
+}
+function loginKbOnFocusIn(){
+  loginKbRememberBase();
+  loginKbSchedule();
+}
+function bindLoginKeyboard(){
+  var screen=document.getElementById('loginScreen');
+  if(!screen || screen.getAttribute('data-login-kb')==='1')return;
+  screen.setAttribute('data-login-kb','1');
+  screen.addEventListener('focusin', loginKbOnFocusIn);
+  screen.addEventListener('focusout', function(){
+    setTimeout(function(){
+      if(loginKbFieldFocused())loginKbSchedule();
+      else loginKbApply();
+    }, 60);
+  });
+  var vv=window.visualViewport;
+  if(vv){
+    vv.addEventListener('resize', loginKbApply);
+    vv.addEventListener('scroll', loginKbApply);
+  }
+  window.addEventListener('orientationchange', function(){
+    loginKbBase=0;
+    loginKbClear();
+    setTimeout(function(){loginKbBase=0;loginKbRememberBase();loginKbApply();}, 400);
+  });
+  loginKbRememberBase();
+}
+bindLoginKeyboard();
+</script>
 
 
 <!-- iOS / Add to Home Screen help -->
@@ -2436,7 +2613,7 @@ function startLoginWarmKeepAlive(){
     warmUpSheets();
   },1100);
 }
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();if(typeof loginKbClear==='function')loginKbClear();}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
