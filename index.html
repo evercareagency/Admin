@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi wider tip 1 2026-09-25 v=remiwider1 admin-build 2026-09-25-remiwider1. Admin and Scheduler only. Tip 1 only. Warmer secretary desk chat and an office companion for Cleveland, weather, and local useful notes while in Admin. It still steers to desk work. Build and personal asks get a soft handoff: tell Friday. No Friday memory and No Desk-brain. Shift talk is one open cover: Remi reads the same ranked Who can cover list as the desk via admin_rank_backup_aides, suggests the order in plain English, and can open Pick another aide. Text, Call, assign, and share address are drafts until Confirm, the same gates as cover unlock and cover pick. Refuse-backup case-manager email and the client-initiated skip email are drafts from the existing templates until Confirm. Live Ace reuse is admin_list_open_shifts, admin_rank_backup_aides, and admin_cover_outcome, plus the refuse and skip template calls already on the desk. No new Ace RPC. Prefer the open coverpick shift Bowlax when its id starts with 18acd525 and it is still open. Tip 2 is out: no multi-cover triage, no who's-been-asked, no burnout, no cascade, and no escalation card. Remi stays the corner chip. Nurse does not get Remi. Quiet hours rules are unchanged. No Auth reseal. Prior markers stay, including coverpick1, remisec1, payready1d, payready1c, coverunlock1, and payready1. -->
+<meta name="admin-build" content="2026-09-25-remiwider1">
 <!-- coverage pick another aide 2026-09-25 v=coverpick1 admin-build 2026-09-25-coverpick1. More → Coverage open-shift sheet keeps the ranked Who can cover list as the primary list. Pick another aide opens a search over every active aide already on this desk, including aides who are not in the ranked shortlist. Soft-deleted aides stay off that list: the same aideOnDesk active rule as Aides (not inactive, no deactivated_at). A tap uses the same check as a ranked row, coverPickRank, then Text and Call stay optional, and Confirm assign still posts admin_cover_outcome assigned_backup. The roster is the list Schedule and Aides already load: get_users, which calls admin_list_aides when that callable returns aide rows, otherwise aides where is_active is true and deactivated_at is null. No new Ace RPC. Remi stays the corner chip. No Auth reseal. Prior markers stay, including remisec1, payready1d, payready1c, coverunlock1, and payready1. -->
 <meta name="admin-build" content="2026-09-25-coverpick1">
 <!-- remi secretary 2026-09-25 v=remisec1 admin-build 2026-09-25-remisec1. Admin and Scheduler only. Remi stays the corner chip until opened, then the sheet closes back to the desk. Ask can greet, show a brief Cleveland weather card, look up a caregiver or client already loaded, and hand off an open call-off as a draft. Update client address, soft-remove aide, and add aide show the proposed change and wait for Confirm before any write. Address reuses the desk client update. Soft-remove posts admin_deactivate_aide. Add aide posts admin_add_aide and does not create a sign-in. Weather is the desk snapshot in remiSecWeatherSnapshot until a Cleveland callable exists. Nurse does not get Remi and this tip adds no nurse flow. Quiet hours rules are unchanged. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including payready1d, payready1c, payready1b, coverunlock1, payready1, aidecreds1c, aidecreds1b, remidate1, ncipdf1, remichat1, remiscroll1, and remi1. -->
@@ -2000,7 +2002,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
-      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" onsubmit="return copilotChatSubmit(event)">
+      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" data-remiwider1="v=remiwider1" onsubmit="return copilotChatSubmit(event)">
         <input id="copilotChatInput" type="text" enterkeyhint="send" maxlength="400" placeholder="Ask or just chat..." autocomplete="off" aria-label="Ask Remi">
         <button type="submit" class="btn btn-teal" id="copilotChatSend">Ask</button>
       </form>
@@ -6244,6 +6246,24 @@ function copilotPaintConfirm(action){
     try{box.scrollIntoView({block:'nearest'});}catch(eSec){}
     return;
   }
+  if(action.kind==='wider-assign'||action.kind==='wider-call'||action.kind==='wider-outcome'||action.kind==='wider-skip'||action.kind==='wider-share'){
+    var wquiet=copilotInQuietHours();
+    var wline='Nothing is assigned, recorded, texted, or shared until you confirm.';
+    if(action.kind==='wider-call')wline='Confirm before this call opens. You place it yourself.';
+    if(action.kind==='wider-share')wline='The home address is in this draft. Confirm before it opens. You press Send.';
+    if(wquiet)wline='Quiet hours are on. '+wline;
+    if((action.kind==='wider-call'||action.kind==='wider-share')&&!(action.phone&&String(action.phone).replace(/\D/g,'')))wline='No phone is on file. Nothing is dialed or texted. '+wline;
+    box.hidden=false;
+    box.innerHTML='<h2 style="font-size:1rem;margin:8px 0">Confirm this choice</h2>'
+      +(action.summary?'<p class="copilot-note" id="remiWiderProposal">'+copilotEsc(action.summary)+'</p>':'')
+      +'<p class="copilot-note">'+copilotEsc(action.label||'This draft')+'. '+copilotEsc(wline)+'</p>'
+      +'<div class="copilot-actions">'
+      +'<button type="button" class="btn btn-teal" id="copilotConfirmGo" onclick="copilotConfirmOutbound()">Confirm</button>'
+      +'<button type="button" class="btn btn-ghost" id="copilotConfirmNotYet" onclick="copilotCancelConfirm()">Not yet</button>'
+      +'</div>';
+    try{box.scrollIntoView({block:'nearest'});}catch(eW){}
+    return;
+  }
   var quiet=copilotInQuietHours();
   var line='Confirm before this opens. You send it yourself. Remi does not send it.';
   if(quiet)line='Quiet hours are on. '+line;
@@ -6254,16 +6274,20 @@ function copilotPaintConfirm(action){
     +'<p class="copilot-note">'+copilotEsc(action.label)+'. '+copilotEsc(line)+'</p>'
     +'<div class="copilot-actions">'
     +'<button type="button" class="btn btn-teal" id="copilotConfirmGo" onclick="copilotConfirmOutbound()">Confirm</button>'
-    +'<button type="button" class="btn btn-ghost" onclick="copilotCancelConfirm()">Not yet</button>'
+    +'<button type="button" class="btn btn-ghost" id="copilotConfirmNotYet" onclick="copilotCancelConfirm()">Not yet</button>'
     +'</div>';
   try{box.scrollIntoView({block:'nearest'});}catch(e){}
 }
 function copilotChooseAction(index){
   var action=(copilotAskActions||[])[index];
   if(!action)return;
-  if(action.kind==='sms'||action.kind==='mail'||action.kind==='sec-write'){
+  if(action.kind==='sms'||action.kind==='mail'||action.kind==='sec-write'||action.kind==='wider-assign'||action.kind==='wider-call'||action.kind==='wider-outcome'||action.kind==='wider-skip'||action.kind==='wider-share'){
     copilotPending=action;
     copilotPaintConfirm(action);
+    return;
+  }
+  if(action.kind==='wider-roster'&&typeof remiWiderOpenRoster==='function'){
+    remiWiderOpenRoster(action);
     return;
   }
   if(action.kind==='copy'){
@@ -6302,6 +6326,12 @@ function copilotConfirmOutbound(){
     copilotPending=null;
     if(typeof remiSecCommit==='function')remiSecCommit(action);
     else copilotCancelConfirm();
+    return;
+  }
+  if(action.kind==='wider-assign'||action.kind==='wider-call'||action.kind==='wider-outcome'||action.kind==='wider-skip'||action.kind==='wider-share'){
+    copilotPending=null;
+    copilotCancelConfirm();
+    if(typeof remiWiderCommit==='function')remiWiderCommit(action);
     return;
   }
   var href='';
@@ -6919,8 +6949,11 @@ function copilotChatSubmit(ev){
   var ans=copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
   copilotChat.push({role:'mo', text:q});
-  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||''});
+  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||''});
   copilotPaintChat();
+  if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
+  else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
+  else if(ans.loadMail&&typeof remiWiderFetchMail==='function')remiWiderFetchMail(ans.shiftId, ans.mailFamily, ans.mailReason, ans.mailOther);
   return false;
 }
 function copilotShowChat(){
@@ -6956,7 +6989,15 @@ function remiSecPack(text, extra){
     actions:extra.actions||[],
     wx:extra.wx||'',
     note:extra.note||'',
-    actionsLayout:extra.actionsLayout||''
+    actionsLayout:extra.actionsLayout||'',
+    loadRanks:!!extra.loadRanks,
+    loadList:!!extra.loadList,
+    loadMail:!!extra.loadMail,
+    shiftId:extra.shiftId||'',
+    widerIntent:extra.widerIntent||'',
+    mailFamily:extra.mailFamily||'',
+    mailReason:extra.mailReason||'',
+    mailOther:extra.mailOther||''
   };
 }
 function remiSecNorm(s){
@@ -7025,13 +7066,13 @@ function remiSecGreet(){
     else if(/evening/i.test(g))part='good evening';
   }catch(e){}
   var sky=/clear/i.test(w.condition)?('Cleveland\u2019s looking clear'):('Cleveland\u2019s at '+w.temp+'\u00B0');
-  var text='Hey '+remiSecHelloName()+' \u2014 '+part+'. '+sky+'. Want the desk, or just chatting?';
+  var text='Hey '+remiSecHelloName()+' \u2014 '+part+'. '+sky+'. Want the desk, or just chatting? I am right here either way.';
   return remiSecPack(text, {wx:'chip'});
 }
 function remiSecWeather(){
   var w=remiSecWeatherSnapshot();
   var text='Cleveland right now: '+w.temp+'\u00B0, '+String(w.condition||'').toLowerCase()+', '+w.breeze+'. High '+w.high+' later. '+w.rain;
-  return remiSecPack(text, {wx:'card', note:'Still on desk duty \u2014 say a name or Coverage if you need work.'});
+  return remiSecPack(text, {wx:'card', note:'Still on desk duty \u2014 say a name or Coverage if you need work. I can keep you company.'});
 }
 function remiSecIsCalloff(q){
   var s=String(q||'').toLowerCase();
@@ -7341,6 +7382,10 @@ function remiSecAnswer(q){
   var look=remiSecLookup(q);
   if(look)return look;
   if(remiSecIsCalloff(q))return remiSecCalloff(q);
+  if(typeof remiWiderAnswer==='function'){
+    var wider=remiWiderAnswer(q);
+    if(wider)return wider;
+  }
   if(remiSecIsGreeting(q))return remiSecGreet();
   return null;
 }
@@ -7438,6 +7483,635 @@ async function remiSecCommit(action){
     var miss=data&&data.missing;
     remiSecSay(miss?'admin_add_aide is not live yet. Nothing was created.':((data&&(data.error||data.message))||'Aide was not created. Nothing else was changed.'));
   }
+}
+// v=remiwider1 tip 1. One open cover. Confirm before assign, text, call, share address, refuse, and skip.
+// Reads admin_rank_backup_aides and admin_list_open_shifts. Outcome stays admin_cover_outcome. No new Ace RPC.
+var remiWiderRanks={};
+var remiWiderRankToken=0;
+function remiWiderGateNote(){
+  return 'Nothing is assigned, texted, or shared until you confirm.';
+}
+function remiWiderSay(pack){
+  if(!pack)return;
+  copilotChat.push({
+    role:'remi',
+    text:pack.text,
+    kind:pack.kind||'coverage_open',
+    actions:pack.actions||[],
+    wx:pack.wx||'',
+    note:pack.note||'',
+    sec:true,
+    actionsLayout:pack.actionsLayout||'',
+    widerShift:pack.shiftId||''
+  });
+  if(typeof copilotPending!=='undefined'&&copilotPending)return;
+  if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();
+}
+function remiWiderIsHandoff(q){
+  var s=String(q||'').toLowerCase();
+  if(/\b(coverage|timesheet|schedule|call[\s-]?off|open shift|who can cover|aide|client|password|address|inservice|broadcast|shift)\b/.test(s))return false;
+  if(/\b(build|deploy|feature|code this|write code|remember this|remember my|my birthday|personal life|write a poem|tell me a joke)\b/.test(s))return true;
+  if(/\b(can you|could you|will you)\b/.test(s)&&/\b(build|code|remember|learn my)\b/.test(s))return true;
+  return false;
+}
+function remiWiderHandoff(){
+  return remiSecPack('That one is outside the desk. Tell Friday \u2014 I do not keep a memory of it, and I will not build it from here. Want Coverage, a client, or the weather?', {note:'Still on desk duty.'});
+}
+function remiWiderIsLocal(q){
+  var s=String(q||'').toLowerCase();
+  if(/\b(address|aide|client|coverage|timesheet|schedule|shift|password|call[\s-]?off)\b/.test(s))return false;
+  return /\b(downtown|public square|lunch|traffic|around the office|local tip|how'?s cleveland|how is cleveland|anything local)\b/.test(s);
+}
+function remiWiderLocal(){
+  var w=remiSecWeatherSnapshot();
+  var text='Around the office: '+w.place+' is home base, and Public Square is the useful downtown mark. Right now it is '+w.temp+'\u00B0 and '+String(w.condition||'').toLowerCase()+'. '+w.rain+' I can keep you company, and I still steer back to the desk \u2014 a name, Coverage, or a shift.';
+  return remiSecPack(text, {wx:'chip', note:'Still on desk duty.'});
+}
+function remiWiderIsWarm(q){
+  var s=String(q||'').trim().toLowerCase().replace(/[!?.]+$/g,'').replace(/\s+/g,' ');
+  if(!s||s.length>80)return false;
+  return /^(thanks|thank you|thank you remi|you'?re (the best|great|helpful)|how are you|how'?s it going|what'?s up)( remi)?$/.test(s);
+}
+function remiWiderWarm(q){
+  var s=String(q||'').toLowerCase();
+  var name=remiSecHelloName();
+  var line=/thank/.test(s)
+    ?'Anytime, '+name+'. Glad to be on the desk with you.'
+    :'I am good, '+name+'. Right here if you want the desk or a little company.';
+  return remiSecPack(line+' Say Coverage, a client, or the weather when you are ready.', {note:'Still on desk duty.'});
+}
+function remiWiderIntent(q){
+  var s=String(q||'').toLowerCase();
+  if(/\b(who has an open shift|open shifts? for)\b/.test(s))return '';
+  if(/\b(member called|no service today|client[- ]initiated|client skip)\b/.test(s))return 'skip';
+  if(/\b(client refused|refused backup|refuse backup|case manager email|email the case manager)\b/.test(s))return 'refuse';
+  if(/\b(share (the )?(home )?address|send (the )?(home )?address|text (the )?address)\b/.test(s))return 'share';
+  if(/\bpick another aide\b/.test(s))return 'roster';
+  if(/\b(assign( the)? backup|client wants backup|confirm assign)\b/.test(s))return 'assign';
+  if(/\b(call the client|call client|phone the client)\b/.test(s))return 'call';
+  if(/\b(text this aide|text the aide|text the backup|text backup)\b/.test(s))return 'text';
+  if(/\b(who can cover|who should (i |we )?(ask|text|call)|ranked backups|rank backups)\b/.test(s))return 'talk';
+  return '';
+}
+function remiWiderOpenList(){
+  return (typeof copilotOpenShifts==='function')?copilotOpenShifts():[];
+}
+function remiWiderExplicitWho(q){
+  var s=String(q||'');
+  var m=s.match(/\b(?:for|about|cover)\s+([A-Za-z][A-Za-z'’-]{2,}(?:\s+[A-Za-z][A-Za-z'’-]{2,})?)/);
+  if(!m)return '';
+  var who=String(m[1]||'').trim();
+  if(/^(the|this|that|today|backup|client|aide|shift|open|another|them|her|him|me)$/i.test(who))return '';
+  return who;
+}
+function remiWiderIsSeed(shift){
+  if(!shift)return false;
+  var id=String(shift.id||'');
+  var name=String(shift.clientName||'').trim();
+  return /^18acd525/i.test(id)||/^bowlax$/i.test(name);
+}
+function remiWiderPickShift(q){
+  var shifts=remiWiderOpenList();
+  var named=[];
+  var seen={};
+  for(var i=0;i<shifts.length;i++){
+    var s=shifts[i]||{};
+    var id=String(s.id||'');
+    var hit=false;
+    if(typeof copilotMention==='function'&&(copilotMention(q, s.clientName)||copilotMention(q, s.aideName)))hit=true;
+    if(!hit&&id.length>=8&&String(q||'').toLowerCase().indexOf(id.slice(0,8).toLowerCase())>=0)hit=true;
+    if(hit&&id&&!seen[id]){seen[id]=1;named.push(s);}
+    if(hit&&!id)named.push(s);
+  }
+  if(named.length===1)return {shift:named[0], seeded:false};
+  if(named.length>1)return {ambiguous:true};
+  var who=remiWiderExplicitWho(q);
+  if(who)return {missing:who};
+  if(shifts.length===1)return {shift:shifts[0], seeded:false};
+  for(var j=0;j<shifts.length;j++){
+    if(remiWiderIsSeed(shifts[j]))return {shift:shifts[j], seeded:true};
+  }
+  if(!shifts.length)return {empty:true};
+  return {ambiguous:true};
+}
+function remiWiderCachedRanks(shift){
+  var id=String(shift&&shift.id||'');
+  if(!id)return [];
+  if(String(coverSelectedId)===id&&typeof coverRanks!=='undefined'&&coverRanks&&coverRanks.length)return coverRanks.slice();
+  if(remiWiderRanks[id]&&remiWiderRanks[id].length)return remiWiderRanks[id].slice();
+  return [];
+}
+function remiWiderFilterRanks(shift, rows){
+  var aideId=shift&&shift.aideId?String(shift.aideId):'';
+  var out=[];
+  for(var i=0;i<(rows||[]).length;i++){
+    var r=rows[i];
+    if(!r)continue;
+    if(aideId&&String(r.id)===aideId)continue;
+    out.push(r);
+  }
+  return out;
+}
+function remiWiderNamedAide(q, rows){
+  var list=rows||[];
+  for(var i=0;i<list.length;i++){
+    var r=list[i]||{};
+    if(typeof copilotMention==='function'&&(copilotMention(q, r.name)||copilotMention(q, r.username)))return r;
+  }
+  return list[0]||null;
+}
+function remiWiderAidePhone(shift, aide){
+  if(!aide)return '';
+  if(aide.phone)return String(aide.phone);
+  if(typeof coverSelectedBackupPhone==='function'){
+    var from=coverSelectedBackupPhone(shift, aide);
+    if(from)return String(from);
+  }
+  var list=[];
+  try{list=(typeof loadedAidesList!=='undefined'&&loadedAidesList)?loadedAidesList:[];}catch(e){list=[];}
+  for(var i=0;i<list.length;i++){
+    var u=list[i]||{};
+    var id=String(u.id||u.aide_id||u.aideId||'');
+    if(id&&id===String(aide.id||''))return String(u.phone||'');
+  }
+  return '';
+}
+function remiWiderClientAddress(shift){
+  var direct=shift&&shift.clientHomeAddress?String(shift.clientHomeAddress).trim():'';
+  if(direct)return direct;
+  var rec=(typeof coverClientRecord==='function')?coverClientRecord(shift):null;
+  if(!rec)return '';
+  return String(rec.address||rec.home_address||rec.homeAddress||'').trim();
+}
+function remiWiderAddressSms(shift, aide, addr){
+  var who=(typeof coverFirstName==='function'?coverFirstName(aide&&aide.name):'')||'there';
+  var client=(shift&&shift.clientName)||'the client';
+  var when=(typeof coverWhenBit==='function')?coverWhenBit(shift):'the open shift';
+  return 'Hi '+who+', this is Mo at EverCare. The home address for '+client+' on '+when+' is '+addr+'. Please reply if you can cover. Thank you.';
+}
+function remiWiderOrderText(shift, rows){
+  var who=String(shift&&shift.clientName||'this client');
+  var when=(typeof remiSecCalloffWhen==='function')?remiSecCalloffWhen(shift):'';
+  var head='One open cover'+(when?' \u2014 '+when:'')+' \u2014 '+who+'.';
+  if(!rows||!rows.length)return head+' Who can cover did not return aides for this shift. Pick another aide still opens the active list.';
+  var lines=[head+' Ask in this order:'];
+  var n=Math.min(rows.length, 5);
+  for(var i=0;i<n;i++){
+    var r=rows[i]||{};
+    var bits=(typeof coverRankLines==='function')?coverRankLines(r):[];
+    var line=(i+1)+'. '+(r.name||r.username||'Aide');
+    if(bits.length)line+=' \u2014 '+bits.join('. ')+'.';
+    lines.push(line);
+  }
+  lines.push('I would start with '+(rows[0].name||rows[0].username||'the first aide')+'.');
+  return lines.join('\n');
+}
+function remiWiderSeedPrefix(shift, seeded){
+  if(!seeded||!shift)return '';
+  var name=String(shift.clientName||'').trim();
+  return 'I am on this one open cover'+(name?' \u2014 '+name:'')+'. ';
+}
+function remiWiderLead(intent, addr){
+  if(intent==='text')return 'The text is a draft until you confirm.';
+  if(intent==='call')return 'The call is a draft until you confirm.';
+  if(intent==='assign')return 'Assign is a draft until you confirm.';
+  if(intent==='share'){
+    if(!addr)return 'No home address is on file for this client. I will not invent one.';
+    return 'The home address stays out of the text until you confirm.';
+  }
+  if(intent==='roster')return 'Pick another aide opens the same search the desk uses.';
+  return '';
+}
+function remiWiderShiftActions(shift, rows, aide){
+  var actions=[];
+  var id=String(shift&&shift.id||'');
+  var addr=remiWiderClientAddress(shift);
+  if(aide){
+    var phone=remiWiderAidePhone(shift, aide);
+    var who=(typeof coverFirstName==='function'?coverFirstName(aide.name):'')||aide.name||'aide';
+    actions.push({
+      id:'wider-text',
+      label:'Text '+who,
+      kind:'sms',
+      phone:phone,
+      body:(typeof coverAideSms==='function')?coverAideSms(shift, aide):''
+    });
+    actions.push({
+      id:'wider-assign',
+      label:'Assign '+(aide.name||who),
+      kind:'wider-assign',
+      shiftId:id,
+      aideId:String(aide.id||''),
+      aideName:String(aide.name||''),
+      summary:'Assign '+(aide.name||'this aide')+' to '+(shift.clientName||'this client')+'. The shift leaves the open list only after you confirm.'
+    });
+    if(addr){
+      actions.push({
+        id:'wider-share',
+        label:'Share address',
+        kind:'wider-share',
+        phone:phone,
+        shiftId:id,
+        summary:'Text '+(aide.name||'the aide')+' the home address for '+(shift.clientName||'the client')+'.\n'+addr,
+        body:remiWiderAddressSms(shift, aide, addr)
+      });
+    }
+  }
+  actions.push({
+    id:'wider-call',
+    label:'Call client',
+    kind:'wider-call',
+    phone:String(shift&&(shift.phone||shift.clientPhone)||''),
+    shiftId:id,
+    summary:'Call '+(shift&&shift.clientName?shift.clientName:'the client')+'. Nothing is texted.'
+  });
+  actions.push({
+    id:'wider-roster',
+    label:'Pick another aide',
+    kind:'wider-roster',
+    shiftId:id
+  });
+  return actions;
+}
+function remiWiderReadyPack(shift, rows, intent, q, seeded){
+  var addr=remiWiderClientAddress(shift);
+  var aide=remiWiderNamedAide(q, rows);
+  var lead=remiWiderLead(intent, addr);
+  var text=remiWiderSeedPrefix(shift, seeded)+remiWiderOrderText(shift, rows)+(lead?'\n\n'+lead:'');
+  return remiSecPack(text, {
+    kind:'coverage_open',
+    widerIntent:intent||'talk',
+    shiftId:String(shift&&shift.id||''),
+    note:remiWiderGateNote(),
+    actions:remiWiderShiftActions(shift, rows, aide)
+  });
+}
+function remiWiderPendingPack(shift, intent, seeded){
+  var who=String(shift.clientName||'this client');
+  var when=(typeof remiSecCalloffWhen==='function')?remiSecCalloffWhen(shift):'';
+  var text=remiWiderSeedPrefix(shift, seeded)+'One open cover'+(when?' \u2014 '+when:'')+' \u2014 '+who+'. I am reading the same Who can cover list the desk uses.';
+  return remiSecPack(text, {
+    kind:'coverage_open',
+    widerIntent:intent||'talk',
+    shiftId:String(shift.id||''),
+    loadRanks:true,
+    note:remiWiderGateNote(),
+    actions:[{id:'wider-roster', label:'Pick another aide', kind:'wider-roster', shiftId:String(shift.id||'')}]
+  });
+}
+function remiWiderEmptyPack(){
+  return remiSecPack('No open cover is loaded on this desk. I can read the office open-shift list, or you can open Coverage.', {
+    kind:'coverage_open',
+    loadList:true,
+    note:remiWiderGateNote(),
+    actions:[{id:'open', label:'Open Coverage', kind:'tab', tab:'coverage'}]
+  });
+}
+function remiWiderAmbiguousPack(){
+  return remiSecPack('Name the client. I stay on one open cover.', {
+    kind:'coverage_open',
+    note:remiWiderGateNote()
+  });
+}
+function remiWiderSkipReason(q){
+  var s=String(q||'').toLowerCase();
+  if(/\bdoctor\b/.test(s))return 'Doctor appointment';
+  if(/\bnot feeling well\b|\bsick\b/.test(s))return 'Not feeling well';
+  if(/\bpersonal\b/.test(s))return 'Personal';
+  if(/\bother\b/.test(s))return 'Other';
+  return '';
+}
+function remiWiderSkipOther(q){
+  var m=String(q||'').match(/\bother(?:\s+reason)?\s*[:\-]\s*(.+)$/i);
+  if(!m)return '';
+  return String(m[1]||'').replace(/[?.!]+$/,'').trim();
+}
+function remiWiderFilledMail(shift, family, reasonLabel){
+  var ctx=(typeof coverCmContext==='function')?coverCmContext(shift):{};
+  var snap={
+    cm:ctx.cm||ctx.case_manager||'',
+    case_manager:ctx.cm||ctx.case_manager||'',
+    client:ctx.client||(shift&&shift.clientName)||'',
+    date:ctx.date||'',
+    email:ctx.email||ctx.case_manager_email||(shift&&shift.caseManagerEmail)||'',
+    case_manager_email:ctx.email||ctx.case_manager_email||(shift&&shift.caseManagerEmail)||'',
+    reason:reasonLabel||'',
+    greeting:(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning'
+  };
+  var subjectTpl=family==='skip'?'No services today \u2014 {{client}} ({{date}})':'Services not delivered today \u2014 {{client}} ({{date}})';
+  var bodyTpl=family==='skip'?COVER_CM_SKIP_DEFAULT:COVER_CM_DEFAULT;
+  var subject=(typeof coverFillCmTemplate==='function')?coverFillCmTemplate(subjectTpl, snap):subjectTpl;
+  var body=(typeof coverFillCmTemplate==='function')?coverFillCmTemplate(bodyTpl, snap):bodyTpl;
+  if(typeof formatAdminDateCopy==='function'){
+    subject=formatAdminDateCopy(subject);
+    body=formatAdminDateCopy(body);
+  }
+  if(typeof coverEnsureGreeting==='function')body=coverEnsureGreeting(body);
+  return {subject:subject, body:body, email:String(snap.email||'')};
+}
+function remiWiderDraftPack(shift, family, reason, other, mail){
+  var shown=mail||remiWiderFilledMail(shift, family, family==='skip'?(reason==='Other'&&other?other:reason):'');
+  var who=shift.clientName||'this client';
+  var summary=family==='skip'
+    ?'Member called \u00B7 no service today \u2014 '+who+' \u2014 '+(reason||'a reason')+(other?': '+other:'')+'.\n\n'+shown.subject+'\n\n'+shown.body
+    :'Client refused \u00B7 resume next day \u2014 '+who+'.\n\n'+shown.subject+'\n\n'+shown.body;
+  var actions=[];
+  if(family==='skip'){
+    actions.push({
+      id:'wider-skip',
+      label:'Record no service',
+      kind:'wider-skip',
+      shiftId:String(shift.id||''),
+      reason:reason||'',
+      reasonOther:other||'',
+      summary:'Record member called \u00B7 no service today for '+who+' ('+(reason||'')+').'
+    });
+  }else{
+    actions.push({
+      id:'wider-refuse',
+      label:'Record refused',
+      kind:'wider-outcome',
+      shiftId:String(shift.id||''),
+      outcome:'client_refused_resume_next_day',
+      summary:'Record client refused \u00B7 resume next day for '+who+'.'
+    });
+  }
+  actions.push({
+    id:family==='skip'?'wider-skip-mail':'wider-refuse-mail',
+    label:'Open Mail',
+    kind:'mail',
+    email:shown.email||'',
+    subject:shown.subject||'',
+    body:shown.body||''
+  });
+  return remiSecPack(summary, {
+    kind:'coverage_open',
+    shiftId:String(shift.id||''),
+    loadMail:!mail,
+    mailFamily:family,
+    mailReason:reason||'',
+    mailOther:other||'',
+    note:'Nothing is recorded or sent until you confirm.',
+    actions:actions
+  });
+}
+function remiWiderShiftAnswer(q, intent){
+  var picked=remiWiderPickShift(q);
+  if(picked.missing)return remiSecPack('I do not have '+picked.missing+' as an open cover on this desk. Nothing was assigned.', {kind:'coverage_open', note:remiWiderGateNote()});
+  if(picked.empty)return remiWiderEmptyPack();
+  if(!picked.shift)return remiWiderAmbiguousPack();
+  var rows=remiWiderFilterRanks(picked.shift, remiWiderCachedRanks(picked.shift));
+  if(!rows.length)return remiWiderPendingPack(picked.shift, intent, picked.seeded);
+  return remiWiderReadyPack(picked.shift, rows, intent, q, picked.seeded);
+}
+function remiWiderDraftAnswer(q, intent){
+  var picked=remiWiderPickShift(q);
+  if(picked.missing)return remiSecPack('I do not have '+picked.missing+' as an open cover on this desk. Nothing was recorded.', {kind:'coverage_open', note:'Nothing is recorded or sent until you confirm.'});
+  if(picked.empty)return remiWiderEmptyPack();
+  if(!picked.shift)return remiWiderAmbiguousPack();
+  var shift=picked.shift;
+  if(intent==='skip'){
+    var reason=remiWiderSkipReason(q);
+    var who=shift.clientName||'this client';
+    if(!reason){
+      return remiSecPack('Member called \u00B7 no service today stays one cover \u2014 '+who+'. Which reason: Personal, Doctor appointment, Not feeling well, or Other?', {
+        kind:'coverage_open',
+        shiftId:String(shift.id||''),
+        note:'Nothing is recorded or sent until you confirm.'
+      });
+    }
+    var other=reason==='Other'?remiWiderSkipOther(q):'';
+    if(reason==='Other'&&!other){
+      return remiSecPack('What is the other reason? Nothing is recorded until you confirm.', {
+        kind:'coverage_open',
+        shiftId:String(shift.id||''),
+        note:'Nothing is recorded or sent until you confirm.'
+      });
+    }
+    return remiWiderDraftPack(shift, 'skip', reason, other, null);
+  }
+  return remiWiderDraftPack(shift, 'refuse', '', '', null);
+}
+function remiWiderAnswer(q){
+  if(remiWiderIsHandoff(q))return remiWiderHandoff();
+  var intent=remiWiderIntent(q);
+  if(intent==='refuse'||intent==='skip')return remiWiderDraftAnswer(q, intent);
+  if(intent)return remiWiderShiftAnswer(q, intent);
+  if(remiWiderIsLocal(q))return remiWiderLocal();
+  if(remiWiderIsWarm(q))return remiWiderWarm(q);
+  return null;
+}
+function remiWiderSelectBackup(shift, aideId, aideName){
+  shift.backupAideId=String(aideId||'');
+  shift.backupAideName=String(aideName||'');
+  coverSelectedAideId=String(aideId||'');
+  if(typeof coverFillBackup==='function')coverFillBackup(shift);
+  var sel=null;
+  try{sel=document.getElementById('coverBackupSel');}catch(e){sel=null;}
+  if(!sel||!aideId)return;
+  var has=false;
+  for(var i=0;i<sel.options.length;i++){
+    if(String(sel.options[i].value)===String(aideId))has=true;
+  }
+  if(!has){
+    var opt=document.createElement('option');
+    opt.value=String(aideId);
+    opt.textContent=aideName||String(aideId);
+    sel.appendChild(opt);
+  }
+  sel.value=String(aideId);
+}
+function remiWiderOpenRoster(action){
+  var id=action&&action.shiftId?String(action.shiftId):'';
+  var shift=(typeof coverFind==='function')?coverFind(id):null;
+  if(!shift){
+    if(typeof showTempMsg==='function')showTempMsg('That open cover is not on the desk.','var(--warn)');
+    return;
+  }
+  if(typeof copilotClose==='function')copilotClose();
+  if(typeof showTab==='function')showTab('coverage');
+  if(typeof coverOpenOutcome==='function')coverOpenOutcome(shift.id);
+  if(typeof coverShowRoster==='function')coverShowRoster();
+}
+async function remiWiderCommitAssign(action){
+  var shift=(typeof coverFind==='function')?coverFind(action.shiftId):null;
+  if(!shift){remiSecSay('That open cover is not on the desk anymore. Nothing was assigned.');return;}
+  if(typeof coverCanAssign==='function'&&!coverCanAssign(shift)){
+    remiSecSay('Assign backup is only for an open shift or one awaiting the client. Nothing was assigned.');
+    return;
+  }
+  coverSelectedId=String(shift.id);
+  remiWiderSelectBackup(shift, action.aideId, action.aideName);
+  var sel=null;
+  try{sel=document.getElementById('coverBackupSel');}catch(e){sel=null;}
+  if(!sel||String(sel.value||'')!==String(action.aideId||'')){
+    remiSecSay('That backup aide is not selected. Nothing was assigned.');
+    return;
+  }
+  if(typeof coverApplyOutcome==='function')await coverApplyOutcome('assigned_backup');
+  if(String(coverPostedKey)===String(shift.id)+'|assigned_backup')remiSecSay('Client wants backup is recorded for '+(action.aideName||'the aide')+'. You still press Send on any text.');
+  else remiSecSay('Assign did not land. Nothing else was sent.');
+}
+async function remiWiderCommitRefuse(action){
+  var shift=(typeof coverFind==='function')?coverFind(action.shiftId):null;
+  if(!shift){remiSecSay('That open cover is not on the desk anymore. Nothing was recorded.');return;}
+  coverSelectedId=String(shift.id);
+  if(typeof coverHideSkipReason==='function')coverHideSkipReason();
+  coverCmFamily='refuse';
+  if(typeof coverApplyOutcome==='function')await coverApplyOutcome('client_refused_resume_next_day');
+  if(String(coverPostedKey)===String(shift.id)+'|client_refused_resume_next_day')remiSecSay('Client refused is recorded. The case-manager email still waits until you confirm Open Mail and press Send.');
+  else remiSecSay('Client refused was not recorded.');
+}
+async function remiWiderCommitSkip(action){
+  var shift=(typeof coverFind==='function')?coverFind(action.shiftId):null;
+  if(!shift){remiSecSay('That open cover is not on the desk anymore. Nothing was recorded.');return;}
+  coverSelectedId=String(shift.id);
+  coverCmFamily='skip';
+  coverSkipReason=String(action.reason||'');
+  var other=null;
+  try{other=document.getElementById('coverSkipOther');}catch(e){other=null;}
+  if(other)other.value=action.reason==='Other'?String(action.reasonOther||''):'';
+  if(typeof coverConfirmSkip==='function')await coverConfirmSkip();
+  if(String(coverPostedKey).indexOf('client_skip')>=0)remiSecSay('Member called \u00B7 no service today is recorded. The email still waits until you confirm Open Mail and press Send.');
+  else remiSecSay('No service today was not recorded.');
+}
+async function remiWiderCommit(action){
+  if(!action||action._sent)return;
+  action._sent=true;
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return;
+  if(action.kind==='wider-call'){
+    var shift=(typeof coverFind==='function')?coverFind(action.shiftId):null;
+    var phone=action.phone||(shift&&shift.phone)||'';
+    var href=(typeof coverPhoneHref==='function')?coverPhoneHref('tel', phone):'';
+    if(shift){coverContacted=true;shift.contacted=true;}
+    if(href&&typeof coverGo==='function')coverGo(href);
+    else if(typeof showTempMsg==='function')showTempMsg('No phone is on file. Nothing was dialed.','var(--warn)');
+    remiSecSay(href?'Call opened. You place it. Nothing was texted or assigned.':'No phone is on file. Nothing was dialed.');
+    return;
+  }
+  if(action.kind==='wider-share'){
+    var sms=(typeof coverSmsHref==='function')?coverSmsHref(action.phone, action.body):'';
+    if(typeof copilotRpc==='function'){
+      try{copilotRpc('choice', {p_action_key:'sms', p_choice:'confirm_open_draft', p_note:'Share address'});}catch(eShare){}
+    }
+    if(sms&&typeof coverGo==='function')coverGo(sms);
+    remiSecSay('Address draft opened. You press Send in Messages. Nothing was assigned.');
+    return;
+  }
+  if(action.kind==='wider-assign'){await remiWiderCommitAssign(action);return;}
+  if(action.kind==='wider-outcome'){await remiWiderCommitRefuse(action);return;}
+  if(action.kind==='wider-skip'){await remiWiderCommitSkip(action);return;}
+}
+async function remiWiderFetchRanks(shiftId, q, intent){
+  var token=++remiWiderRankToken;
+  var shift=(typeof coverFind==='function')?coverFind(shiftId):null;
+  if(!shift){
+    remiWiderSay(remiSecPack('That open cover is not on the desk anymore. Nothing was assigned.', {kind:'coverage_open', note:remiWiderGateNote()}));
+    return;
+  }
+  var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!(typeof coverUuidOrNull==='function'&&coverUuidOrNull(shift.id));
+  if(local){
+    remiWiderSay(remiWiderReadyPack(shift, [], intent||'talk', q||'', false));
+    return;
+  }
+  var got=null;
+  try{got=await coverRpc('rank', coverRankArgs(shift.id));}
+  catch(err){got={ok:false};}
+  if(token!==remiWiderRankToken)return;
+  if(!got||got.missing||got.signedOut||!got.ok){
+    var why=(got&&got.signedOut)?'Sign in to load who can cover.':'Who can cover did not answer.';
+    remiWiderSay(remiSecPack(why+' Pick another aide still opens the active list.', {
+      kind:'coverage_open',
+      shiftId:String(shift.id||''),
+      note:remiWiderGateNote(),
+      actions:[{id:'wider-roster', label:'Pick another aide', kind:'wider-roster', shiftId:String(shift.id||'')}]
+    }));
+    return;
+  }
+  var rows=remiWiderFilterRanks(shift, (typeof coverRankRows==='function')?coverRankRows(got.data):[]);
+  remiWiderRanks[String(shift.id)]=rows;
+  if(String(coverSelectedId)===String(shift.id)&&typeof coverPaintRanks==='function')coverPaintRanks(rows);
+  remiWiderSay(remiWiderReadyPack(shift, rows, intent||'talk', q||'', false));
+}
+async function remiWiderRefreshList(){
+  if(typeof coverReload!=='function')return;
+  try{await coverReload({keepOnFail:true});}catch(e){}
+  var picked=remiWiderPickShift('');
+  if(picked.shift){
+    var rows=remiWiderCachedRanks(picked.shift);
+    if(rows.length)remiWiderSay(remiWiderReadyPack(picked.shift, rows, 'talk', '', picked.seeded));
+    else remiWiderFetchRanks(picked.shift.id, '', 'talk');
+    return;
+  }
+  remiWiderSay(remiSecPack('The office list did not add an open cover. Open Coverage under More when one is there.', {
+    kind:'coverage_open',
+    note:remiWiderGateNote(),
+    actions:[{id:'open', label:'Open Coverage', kind:'tab', tab:'coverage'}]
+  }));
+}
+function remiWiderReplaceDraft(shiftId, pack){
+  if(typeof copilotPending!=='undefined'&&copilotPending)return;
+  var id=String(shiftId||'');
+  for(var i=copilotChat.length-1;i>=0;i--){
+    var msg=copilotChat[i];
+    if(!msg||msg.role!=='remi'||String(msg.widerShift||'')!==id)continue;
+    msg.text=pack.text;
+    msg.actions=pack.actions||[];
+    msg.note=pack.note||msg.note;
+    msg.kind=pack.kind||msg.kind;
+    if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();
+    return;
+  }
+}
+function remiWiderOfficeShown(shift, mail, family, reasonLabel){
+  var snap=(typeof coverMergeSnap==='function')?coverMergeSnap(shift, mail):{};
+  if(family==='skip'&&reasonLabel)snap.reason=reasonLabel;
+  var shown=(typeof coverRenderMail==='function')?coverRenderMail(mail, snap):{subject:mail.subject||'', body:mail.body||''};
+  if(typeof coverEnsureGreeting==='function')shown.body=coverEnsureGreeting(shown.body);
+  var email=String((mail&&mail.email)||snap.email||snap.case_manager_email||'');
+  return {subject:shown.subject||'', body:shown.body||'', email:email};
+}
+async function remiWiderFetchMail(shiftId, family, reasonLabel, reasonOther){
+  var shift=(typeof coverFind==='function')?coverFind(shiftId):null;
+  if(!shift||typeof coverRpc!=='function')return;
+  var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!(typeof coverUuidOrNull==='function'&&coverUuidOrNull(shift.id));
+  if(local)return;
+  var savedReason=coverSkipReason;
+  var savedFamily=coverCmFamily;
+  var otherEl=null;
+  var savedOther='';
+  try{otherEl=document.getElementById('coverSkipOther');}catch(e){otherEl=null;}
+  if(otherEl)savedOther=otherEl.value;
+  var previewBody=null;
+  var previewKind=family==='skip'?'skipPreview':'preview';
+  var getKind=family==='skip'?'skipGet':'tplGet';
+  try{
+    if(family==='skip'){
+      coverCmFamily='skip';
+      coverSkipReason=reasonLabel||'';
+      if(otherEl&&reasonLabel==='Other')otherEl.value=reasonOther||'';
+    }else coverCmFamily='refuse';
+    previewBody=family==='skip'&&typeof coverSkipPreviewBody==='function'
+      ?coverSkipPreviewBody(shift)
+      :(typeof coverPreviewBody==='function'?coverPreviewBody(shift.id):{p_open_shift_id:String(shift.id||'')});
+  }finally{
+    coverSkipReason=savedReason;
+    coverCmFamily=savedFamily;
+    if(otherEl)otherEl.value=savedOther;
+  }
+  var mail=null;
+  var preview=null;
+  try{preview=await coverRpc(previewKind, previewBody);}catch(e2){preview=null;}
+  if(preview&&preview.ok&&typeof coverMailPayload==='function')mail=coverMailPayload(preview.data);
+  if(!mail){
+    var tmpl=null;
+    try{tmpl=await coverRpc(getKind, (typeof coverTplGetBody==='function')?coverTplGetBody():{});}catch(e3){tmpl=null;}
+    if(tmpl&&tmpl.ok&&typeof coverMailPayload==='function')mail=coverMailPayload(tmpl.data);
+  }
+  if(!mail)return;
+  var reasonText=reasonLabel==='Other'&&reasonOther?reasonOther:(reasonLabel||'');
+  var shown=remiWiderOfficeShown(shift, mail, family, reasonText);
+  remiWiderReplaceDraft(shift.id, remiWiderDraftPack(shift, family, reasonLabel, reasonOther, shown));
 }
 // list_schedule_week, upsert_schedule_pattern, upsert_schedule_exception, delete_schedule_pattern.
 var schedWeekStart='';
