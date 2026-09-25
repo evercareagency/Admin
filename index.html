@@ -41,6 +41,8 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage comms 2026-09-25 v=covercomms1 admin-build 2026-09-25-covercomms1. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. No Auth reseal and no password rotation. Who can cover paints the Ace rank rows in plain lines only: Worked this client N times, Never worked this client, miles away, or No home address on file. Continuity and Score are not shown. The aide Mo taps stays checked and highlighted. Text this aide and Text client open sms: with a draft; Mo presses Send in Messages. After assign, Text client they're on the way is the same kind of draft. After talking to the client: Client wants backup posts assigned_backup, Client refused · resume next day posts client_refused_resume_next_day, Still deciding posts awaiting_client. Cancel and Reopen stay. Client refused shows an editable case-manager email in Mo's voice. Open in Mail is mailto: and stays disabled until case_manager_email is known. Copy draft and Save as my template stay available. Save writes localStorage evercare_covercomms1_cm_template; the next refuse fills new names and the service date into that wording. Ace fields when present: case_manager_name, case_manager_email, aide phone, client phone. Missing fields stay placeholders. This desk does not add Auth RPCs. Prior markers stay, including v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-covercomms1">
 <!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, live smart assign, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id,p_limit?:20} returns {success, aides:[{aide_id, username, name, continuity_score, distance_miles, score, rank}]}. The rank panel paints that list and does not recompute score. Null distance_miles stays empty. admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?} accepts client_refused_resume_next_day, assigned_backup (p_backup_aide_id, only from open or awaiting_client), awaiting_client, cancelled, and reopen. Record returns {success, open_shift_id, status, urgency_within_48h, schedule_exception_id} and Ace upserts schedule_exceptions kind=call_off. Assign upserts kind=cover with aide_id. sms_stub not_sent_v1 is shown and is not sent by this desk. List rows carry client, regular_aide, shift_start, shift_end, status, urgency_within_48h. Within 48h chip when shift_start is within 48 hours, shift_end is still ahead, and status is open or awaiting_client. This desk does not also post upsert_schedule_exception. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-cover1">
 <!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Optional list helper POST rpc/admin_list_aides {p_include_deleted} when that callable answers with aide rows; otherwise Active is is_active=eq.true and deactivated_at=is.null, and Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Ace purges at 03:20 ET after 7 days. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
@@ -304,9 +306,13 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-rank h2{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 8px;}
 #tab_coverage .cover-rank p{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0;}
 #tab_coverage .cover-rank-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
-#tab_coverage .cover-rank-row{width:100%;min-height:48px;text-align:left;background:var(--teal-light);color:var(--navy);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-family:'DM Sans',sans-serif;cursor:pointer;}
-#tab_coverage .cover-rank-row strong{display:block;font-size:0.95rem;}
-#tab_coverage .cover-rank-row span{display:block;font-size:0.82rem;color:var(--text);margin-top:2px;}
+#tab_coverage .cover-rank-row{position:relative;width:100%;min-height:64px;text-align:left;background:var(--teal-light);color:var(--navy);border:1px solid var(--border);border-radius:12px;padding:12px 12px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+#tab_coverage .cover-rank-row.is-selected{background:#d7efef;border:2px solid var(--teal-dark);box-shadow:0 0 0 3px rgba(42,127,127,0.28);}
+#tab_coverage .cover-rank-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+#tab_coverage .cover-rank-row strong{display:block;font-size:1rem;line-height:1.25;}
+#tab_coverage .cover-rank-row span{display:block;font-size:0.88rem;color:var(--text);margin-top:2px;}
+#tab_coverage .cover-rank-check{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;line-height:1;}
+#tab_coverage #coverCmDraft{min-height:240px;line-height:1.45;}
 #tab_coverage input,#tab_coverage select,#tab_coverage textarea{font-size:16px;min-height:48px;}
 #tab_coverage .btn:disabled{opacity:0.45;cursor:not-allowed;}
 #tab_coverage .cover-back{margin-bottom:8px;}
@@ -1252,25 +1258,27 @@ bindLoginKeyboard();
             </div>
           </div>
           <article class="cover-card" id="coverOutcomeSummary" aria-label="Shift"></article>
-          <section class="cover-rank" id="coverRankPanel" aria-label="Smart assign">
-            <h2>Smart assign</h2>
-            <p id="coverRankBody">Ranked backups from the office.</p>
+          <section class="cover-rank" id="coverRankPanel" aria-label="Who can cover">
+            <h2>Who can cover</h2>
+            <p id="coverRankBody">Tap an aide. The check stays on the one you picked.</p>
             <div id="coverRankList" class="cover-rank-list"></div>
           </section>
-          <section class="cover-section" aria-label="Contact the client">
-            <h2>1. Text or call the client</h2>
+          <section class="cover-section" aria-label="Text">
+            <h2>Text</h2>
             <div class="cover-actions">
+              <button type="button" class="btn btn-teal" id="coverTextAideBtn" onclick="coverTextAide()">Text this aide</button>
               <button type="button" class="btn btn-teal" id="coverTextBtn" onclick="coverMarkContact('text')">Text client</button>
               <button type="button" class="btn btn-navy" id="coverCallBtn" onclick="coverMarkContact('call')">Call client</button>
             </div>
+            <p class="cover-note" id="coverSmsNote">Texts open in Messages with a draft. You press Send.</p>
             <p class="cover-note" id="coverContactNote">Text or call the client before you close this shift.</p>
           </section>
           <section class="cover-section" aria-label="Outcome">
-            <h2>2. Outcome</h2>
+            <h2>After you talk to the client</h2>
             <div class="cover-actions">
-              <button type="button" class="btn btn-warn" id="coverRefuseBtn" disabled onclick="coverRefuse()">Client refused / resume next day</button>
-              <button type="button" class="btn btn-teal" id="coverAssignBtn" disabled onclick="coverShowAssign()">Assign backup</button>
-              <button type="button" class="btn btn-navy" id="coverAwaitBtn" disabled onclick="coverAwaiting()">Awaiting client</button>
+              <button type="button" class="btn btn-teal" id="coverAssignBtn" disabled onclick="coverShowAssign()">Client wants backup</button>
+              <button type="button" class="btn btn-warn" id="coverRefuseBtn" disabled onclick="coverRefuse()">Client refused · resume next day</button>
+              <button type="button" class="btn btn-navy" id="coverAwaitBtn" disabled onclick="coverAwaiting()">Still deciding</button>
               <button type="button" class="btn btn-ghost" id="coverCancelBtn" onclick="coverCancelShift()">Cancel shift</button>
               <button type="button" class="btn btn-ghost" id="coverReopenBtn" hidden onclick="coverReopen()">Reopen</button>
             </div>
@@ -1280,6 +1288,22 @@ bindLoginKeyboard();
               <div class="cover-actions">
                 <button type="button" class="btn btn-teal" id="coverAssignConfirmBtn" onclick="coverConfirmAssign()">Confirm assign</button>
                 <button type="button" class="btn btn-ghost" id="coverAssignCancel" onclick="coverHideAssign()">Not yet</button>
+              </div>
+            </div>
+            <div id="coverOnTheWay" hidden>
+              <p class="cover-note" id="coverOnTheWayNote">Backup is assigned. This text is a draft. You press Send in Messages.</p>
+              <div class="cover-actions">
+                <button type="button" class="btn btn-teal" id="coverOnTheWayBtn" onclick="coverTextOnTheWay()">Text client they're on the way</button>
+              </div>
+            </div>
+            <div id="coverRefuseMail" hidden>
+              <h2>Email the case manager</h2>
+              <p class="cover-note" id="coverCmNote">Edit the note, then open Mail or copy it.</p>
+              <div class="field"><label for="coverCmDraft">Email draft</label><textarea id="coverCmDraft"></textarea></div>
+              <div class="cover-actions">
+                <button type="button" class="btn btn-teal" id="coverCmMail" disabled onclick="coverOpenCmMail()">Open in Mail</button>
+                <button type="button" class="btn btn-navy" id="coverCmCopy" onclick="coverCopyCmDraft()">Copy draft</button>
+                <button type="button" class="btn btn-ghost" id="coverCmSave" onclick="coverSaveCmTemplate()">Save as my template</button>
               </div>
             </div>
           </section>
@@ -3413,9 +3437,23 @@ var coverView='list';
 var coverSelectedId='';
 var coverContacted=false;
 var coverRanks=[];
+var coverSelectedAideId='';
 var coverBusy=false;
+var coverPostedKey='';
+var coverCmFilledFor='';
+var coverCmSnap=null;
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
-var COVER_RANK_EMPTY='No backup aides ranked for this shift.';
+var COVER_CM_TEMPLATE_KEY='evercare_covercomms1_cm_template';
+var COVER_RANK_EMPTY='No aides to show for this shift yet.';
+var COVER_CM_DEFAULT=[
+  'Hey {{cm}}',
+  '',
+  'I wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.',
+  'Please let me know if you need any additional information.',
+  '',
+  'Thank you,',
+  ''
+].join('\n');
 function coverEsc(s){
   var raw=String(s==null?'':s);
   if(typeof escapeHtml==='function')return escapeHtml(raw);
@@ -3506,7 +3544,26 @@ function coverMapShift(row){
   var statusRaw=coverPick(src,'status','outcome');
   var status=String(statusRaw||'open');
   var phone=String(coverPick(src,'clientPhone','client_phone','phone')||'');
+  if(!phone&&src.client&&typeof src.client==='object')phone=coverPickPhone(src.client);
   var note=String(coverPick(src,'reason','p_reason','note','notes','p_notes')||'');
+  var cmName=String(coverPick(src,'case_manager_name','caseManagerName')||'');
+  var cmEmail=String(coverPick(src,'case_manager_email','caseManagerEmail')||'');
+  if(src.case_manager&&typeof src.case_manager==='object'){
+    if(!cmName)cmName=coverNameOf(src.case_manager);
+    if(!cmEmail)cmEmail=String(src.case_manager.email||src.case_manager.case_manager_email||'');
+  }
+  if(src.client&&typeof src.client==='object'){
+    if(!cmName)cmName=String(coverPick(src.client,'case_manager_name','caseManagerName')||'');
+    if(!cmEmail)cmEmail=String(coverPick(src.client,'case_manager_email','caseManagerEmail')||'');
+    if(src.client.case_manager&&typeof src.client.case_manager==='object'){
+      if(!cmName)cmName=coverNameOf(src.client.case_manager);
+      if(!cmEmail)cmEmail=String(src.client.case_manager.email||'');
+    }
+  }
+  var aidePhone='';
+  var regular=src.regular_aide||src.regularAide;
+  if(regular&&typeof regular==='object')aidePhone=coverPickPhone(regular);
+  if(!aidePhone)aidePhone=String(coverPick(src,'aide_phone','aidePhone','regular_aide_phone')||'');
   var clientId=coverIdOf(src.client);
   if(!clientId)clientId=String(coverPick(src,'clientId','client_id')||'');
   var aideId=coverIdOf(src.regular_aide||src.regularAide);
@@ -3525,6 +3582,9 @@ function coverMapShift(row){
     status:status||'open',
     statusExplicit:statusRaw!=null&&String(statusRaw)!=='',
     phone:phone,
+    aidePhone:aidePhone,
+    caseManagerName:cmName,
+    caseManagerEmail:cmEmail,
     note:note,
     backupAideId:backupId,
     backupAideName:backupName,
@@ -3551,6 +3611,10 @@ function coverShiftRows(data){
   if(node.id||node.shift_id||node.open_shift_id||node.client_name||node.clientName)return [node];
   return [];
 }
+function coverPickPhone(obj){
+  if(!obj||typeof obj!=='object')return '';
+  return String(coverPick(obj,'phone','client_phone','clientPhone','aide_phone','aidePhone','mobile','phone_number','cell')||'');
+}
 function coverMapRank(row){
   var src=row&&typeof row==='object'?row:{};
   var id=String(src.aide_id==null?'':src.aide_id).trim();
@@ -3564,7 +3628,8 @@ function coverMapRank(row){
     distance:src.distance_miles==null||src.distance_miles===''?null:src.distance_miles,
     continuity:src.continuity_score==null||src.continuity_score===''?null:src.continuity_score,
     score:src.score==null||src.score===''?null:src.score,
-    rank:src.rank==null||src.rank===''?null:src.rank
+    rank:src.rank==null||src.rank===''?null:src.rank,
+    phone:coverPickPhone(src)
   };
 }
 function coverRankRows(data){
@@ -3694,6 +3759,7 @@ async function coverRpc(kind, body){
   return last;
 }
 function coverShow(which){
+  coverEnsureBound();
   coverView=which;
   var list=document.getElementById('coverListView');
   var intake=document.getElementById('coverIntakeView');
@@ -3843,6 +3909,331 @@ function coverPhoneHref(kind, phone){
   if(!d)return '';
   return (kind==='sms'?'sms:':'tel:')+d;
 }
+function coverSmsHref(phone, body){
+  var d=String(phone||'').replace(/[^\d+]/g,'');
+  var q='body='+encodeURIComponent(String(body||''));
+  if(!d)return 'sms:?&'+q;
+  return 'sms:'+d+'?&'+q;
+}
+function coverEmailOk(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email||'').trim());
+}
+function coverMailHref(email, subject, body){
+  var addr=String(email||'').trim();
+  if(!coverEmailOk(addr))return '';
+  return 'mailto:'+addr+'?subject='+encodeURIComponent(String(subject||''))+'&body='+encodeURIComponent(String(body||''));
+}
+function coverGo(href){
+  if(!href)return;
+  try{window.location.href=href;}catch(e){}
+}
+function coverServiceDate(iso){
+  var t=Date.parse(iso==null?'':iso);
+  if(!isFinite(t))return '';
+  try{
+    return new Intl.DateTimeFormat('en-US',{
+      timeZone:'America/New_York', weekday:'long', month:'long', day:'numeric'
+    }).format(new Date(t));
+  }catch(e){
+    return '';
+  }
+}
+function coverFirstName(name){
+  var s=String(name||'').trim();
+  if(!s||s==='—'||s==='Client'||s==='Aide')return '';
+  return s.split(/\s+/)[0];
+}
+function coverContinuityLine(value){
+  if(value==null||value==='')return '';
+  var n=Number(value);
+  if(!isFinite(n))return '';
+  n=Math.round(n);
+  if(n<=0)return 'Never worked this client';
+  if(n===1)return 'Worked this client 1 time';
+  return 'Worked this client '+n+' times';
+}
+function coverMilesLine(miles){
+  var n=Math.round(Number(miles)*10)/10;
+  if(!isFinite(n)||n<0)return 'No home address on file';
+  if(n<0.1)return 'Less than a mile away';
+  if(Math.abs(n-1)<1e-9)return '1 mile away';
+  var text=Math.abs(n-Math.round(n))<1e-9?String(Math.round(n)):n.toFixed(1);
+  return text+' miles away';
+}
+function coverDistanceLine(value){
+  if(value==null||value==='')return 'No home address on file';
+  var n=Number(value);
+  if(!isFinite(n))return '';
+  return coverMilesLine(n);
+}
+function coverRankLines(row){
+  var lines=[];
+  var worked=coverContinuityLine(row&&row.continuity);
+  if(worked)lines.push(worked);
+  var away=coverDistanceLine(row?row.distance:null);
+  if(away)lines.push(away);
+  return lines;
+}
+function coverClientRecord(shift){
+  var id=shift&&shift.clientId?String(shift.clientId):'';
+  var name=shift&&shift.clientName?String(shift.clientName).trim().toLowerCase():'';
+  var list=[];
+  try{list=(typeof allClients!=='undefined'&&allClients)?allClients:[];}catch(e){list=[];}
+  for(var i=0;i<list.length;i++){
+    var c=list[i];
+    if(!c)continue;
+    if(id&&String(c.id)!=null&&String(c.id)===id)return c;
+    var cn=String(c.name||c.clientName||'').trim().toLowerCase();
+    if(name&&name!=='client'&&cn===name)return c;
+  }
+  return null;
+}
+function coverClientPhone(shift){
+  if(shift&&shift.phone)return String(shift.phone);
+  return coverPickPhone(coverClientRecord(shift));
+}
+function coverRosterAide(rank){
+  var lists=[];
+  try{lists=(typeof schedAideRosters==='function')?schedAideRosters():[];}catch(e){lists=[];}
+  var id=rank?String(rank.id||''):'';
+  var user=rank?String(rank.username||'').toLowerCase():'';
+  for(var i=0;i<lists.length;i++){
+    var a=lists[i];
+    if(!a)continue;
+    var aid=a.id!=null?String(a.id):'';
+    var un=a.username!=null?String(a.username).toLowerCase():'';
+    if((id&&(aid===id||un===id.toLowerCase()))||(user&&un===user))return a;
+  }
+  return null;
+}
+function coverAidePhone(rank){
+  if(rank&&rank.phone)return String(rank.phone);
+  var shift=coverFind(coverSelectedId);
+  if(shift&&shift.aidePhone&&rank&&String(rank.id)===String(shift.aideId||''))return String(shift.aidePhone);
+  return coverPickPhone(coverRosterAide(rank));
+}
+function coverSelectedRank(){
+  var id=String(coverSelectedAideId||'');
+  var i;
+  for(i=0;i<(coverRanks||[]).length;i++){
+    if(String(coverRanks[i].id)===id)return coverRanks[i];
+  }
+  var sel=null;
+  try{sel=document.getElementById('coverBackupSel');}catch(e){sel=null;}
+  var sid=sel?String(sel.value||''):'';
+  if(!sid)return null;
+  for(i=0;i<(coverRanks||[]).length;i++){
+    if(String(coverRanks[i].id)===sid)return coverRanks[i];
+  }
+  return {id:sid, name:coverSelectedLabel(sel), username:'', phone:''};
+}
+function coverWhenBit(shift){
+  var span=coverFormatSpan(shift&&shift.startsAt, shift&&shift.endsAt);
+  if(span&&span!=='—')return span;
+  return coverServiceDate(shift&&shift.startsAt)||'the open shift';
+}
+function coverAideSms(shift, aide){
+  var who=coverFirstName(aide&&aide.name)||'there';
+  var client=(shift&&shift.clientName&&shift.clientName!=='Client')?shift.clientName:'a client';
+  return 'Hi '+who+', this is Mo at EverCare. Can you cover '+client+' on '+coverWhenBit(shift)+'? Please reply yes or no. Thank you.';
+}
+function coverClientSms(shift){
+  var client=coverFirstName(shift&&shift.clientName)||'there';
+  var aide=(shift&&shift.aideName&&shift.aideName!=='—')?shift.aideName:'your aide';
+  var when=coverServiceDate(shift&&shift.startsAt)||'today';
+  var picked=null;
+  try{picked=coverSelectedRank();}catch(e){picked=null;}
+  var backup=(picked&&picked.name)||(shift&&shift.backupAideName)||'';
+  var offer=backup?('I can send '+backup+' instead.'):'I can send a replacement caregiver.';
+  return 'Hi '+client+', this is Mo at EverCare. '+aide+' called off for '+when+'. '+offer+' Please let me know if you want them to come. Thank you.';
+}
+function coverOnTheWaySms(shift, backupName){
+  var client=coverFirstName(shift&&shift.clientName)||'there';
+  var who=String(backupName||'').trim()||'Your caregiver';
+  var when=coverServiceDate(shift&&shift.startsAt)||'today';
+  return 'Hi '+client+', this is Mo at EverCare. '+who+' is on the way for your visit on '+when+'. Thank you.';
+}
+function coverCmTemplate(){
+  try{
+    var saved=localStorage.getItem(COVER_CM_TEMPLATE_KEY);
+    if(saved&&String(saved).trim())return String(saved);
+  }catch(e){}
+  return COVER_CM_DEFAULT;
+}
+function coverFillCmTemplate(tpl, ctx){
+  ctx=ctx||{};
+  var cm=ctx.cm||'(Case manager name)';
+  var client=ctx.client||'(Client name)';
+  var date=ctx.date||'(Date)';
+  return String(tpl==null?COVER_CM_DEFAULT:tpl)
+    .replace(/\{\{cm\}\}/g, cm)
+    .replace(/\{\{client\}\}/g, client)
+    .replace(/\{\{date\}\}/g, date);
+}
+function coverUnfillCmTemplate(text, ctx){
+  var out=String(text||'');
+  ctx=ctx||{};
+  var pairs=[
+    [ctx.cm,'{{cm}}'],
+    [ctx.client,'{{client}}'],
+    [ctx.date,'{{date}}'],
+    ['(Case manager name)','{{cm}}'],
+    ['(Client name)','{{client}}'],
+    ['(Date)','{{date}}']
+  ].filter(function(p){return p[0]&&String(p[0]).trim();});
+  pairs.sort(function(a,b){return String(b[0]).length-String(a[0]).length;});
+  var seen={};
+  pairs.forEach(function(p){
+    var key=String(p[0])+'→'+p[1];
+    if(seen[key])return;
+    seen[key]=1;
+    out=out.split(String(p[0])).join(p[1]);
+  });
+  return out;
+}
+function coverCmContext(shift){
+  var cm=shift&&shift.caseManagerName?String(shift.caseManagerName).trim():'';
+  var email=shift&&shift.caseManagerEmail?String(shift.caseManagerEmail).trim():'';
+  var client=(shift&&shift.clientName&&shift.clientName!=='Client')?String(shift.clientName).trim():'';
+  var rec=coverClientRecord(shift);
+  if(rec){
+    if(!cm)cm=String(rec.case_manager_name||rec.caseManagerName||'');
+    if(!email)email=String(rec.case_manager_email||rec.caseManagerEmail||'');
+    if(rec.case_manager&&typeof rec.case_manager==='object'){
+      if(!cm)cm=coverNameOf(rec.case_manager);
+      if(!email)email=String(rec.case_manager.email||'');
+    }
+    if(!client)client=String(rec.name||rec.clientName||'').trim();
+  }
+  return {
+    cm:String(cm||'').trim(),
+    email:String(email||'').trim(),
+    client:String(client||'').trim(),
+    date:coverServiceDate(shift&&shift.startsAt)
+  };
+}
+function coverCmText(){
+  var ta=null;
+  try{ta=document.getElementById('coverCmDraft');}catch(e){ta=null;}
+  return ta?String(ta.value||''):'';
+}
+function coverSyncCmMail(){
+  var btn=null;
+  var note=null;
+  try{btn=document.getElementById('coverCmMail');}catch(e){btn=null;}
+  try{note=document.getElementById('coverCmNote');}catch(e2){note=null;}
+  var email=coverCmSnap&&coverCmSnap.email?String(coverCmSnap.email).trim():'';
+  var ok=coverEmailOk(email);
+  if(btn)btn.disabled=!ok;
+  if(note){
+    note.textContent=ok
+      ?'Edit the note. Open in Mail uses '+email+'. You press Send in Mail.'
+      :'Case manager email is not on file. Open in Mail stays off until that email is known. Copy and Save as my template still work.';
+  }
+}
+function coverShowRefuseDraft(shift){
+  var box=null;
+  var ta=null;
+  try{box=document.getElementById('coverRefuseMail');}catch(e){box=null;}
+  try{ta=document.getElementById('coverCmDraft');}catch(e2){ta=null;}
+  if(box)box.hidden=false;
+  var key=String(shift&&shift.id||'');
+  if(ta&&coverCmFilledFor!==key){
+    var ctx=coverCmContext(shift);
+    coverCmSnap=ctx;
+    ta.value=coverFillCmTemplate(coverCmTemplate(), ctx);
+    coverCmFilledFor=key;
+  }
+  coverSyncCmMail();
+  try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e3){}
+}
+function coverHideRefuseDraft(){
+  var box=null;
+  try{box=document.getElementById('coverRefuseMail');}catch(e){box=null;}
+  if(box)box.hidden=true;
+  coverCmFilledFor='';
+  coverCmSnap=null;
+}
+function coverShowOnTheWay(name){
+  var box=null;
+  var note=null;
+  try{box=document.getElementById('coverOnTheWay');}catch(e){box=null;}
+  try{note=document.getElementById('coverOnTheWayNote');}catch(e2){note=null;}
+  if(box)box.hidden=false;
+  if(note){
+    note.textContent=name
+      ?(name+' is assigned. Text the client that they are on the way. You press Send in Messages.')
+      :'Text the client that the aide is on the way. You press Send in Messages.';
+  }
+  try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e3){}
+}
+function coverHideOnTheWay(){
+  var box=null;
+  try{box=document.getElementById('coverOnTheWay');}catch(e){box=null;}
+  if(box)box.hidden=true;
+}
+function coverTextAide(){
+  var shift=coverFind(coverSelectedId);
+  var aide=coverSelectedRank();
+  if(!aide){
+    if(typeof showTempMsg==='function')showTempMsg('Tap an aide under Who can cover first.','var(--warn)');
+    return;
+  }
+  coverGo(coverSmsHref(coverAidePhone(aide), coverAideSms(shift, aide)));
+}
+function coverTextOnTheWay(){
+  var shift=coverFind(coverSelectedId);
+  if(!shift)return;
+  var picked=coverSelectedRank();
+  var name=(shift.backupAideName||(picked&&picked.name)||'');
+  var phone=coverClientPhone(shift);
+  coverGo(coverSmsHref(phone, coverOnTheWaySms(shift, name)));
+}
+function coverOpenCmMail(){
+  var email=coverCmSnap&&coverCmSnap.email?String(coverCmSnap.email).trim():'';
+  if(!coverEmailOk(email)){
+    coverSyncCmMail();
+    if(typeof showTempMsg==='function')showTempMsg('Case manager email is not on file yet.','var(--warn)');
+    return;
+  }
+  var client=(coverCmSnap&&coverCmSnap.client)||'our member';
+  coverGo(coverMailHref(email, 'No services today — '+client, coverCmText()));
+}
+function coverCopyCmDraft(){
+  var text=coverCmText();
+  if(!text.trim()){
+    if(typeof showTempMsg==='function')showTempMsg('The draft is empty.','var(--warn)');
+    return;
+  }
+  var done=function(){if(typeof showTempMsg==='function')showTempMsg('Draft copied.','var(--success)');};
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){
+        var ta=document.getElementById('coverCmDraft');
+        if(ta){ta.focus();ta.select();}
+        try{document.execCommand('copy');done();}catch(e2){if(typeof showTempMsg==='function')showTempMsg('Select the draft and copy it.','var(--warn)');}
+      });
+      return;
+    }
+  }catch(e){}
+  var area=document.getElementById('coverCmDraft');
+  if(area){area.focus();area.select();}
+  try{document.execCommand('copy');done();}catch(e3){if(typeof showTempMsg==='function')showTempMsg('Select the draft and copy it.','var(--warn)');}
+}
+function coverSaveCmTemplate(){
+  var text=coverCmText();
+  if(!String(text).trim()){
+    if(typeof showTempMsg==='function')showTempMsg('The draft is empty.','var(--warn)');
+    return;
+  }
+  var tpl=coverUnfillCmTemplate(text, coverCmSnap||{});
+  try{localStorage.setItem(COVER_CM_TEMPLATE_KEY, tpl);}
+  catch(e){
+    if(typeof showTempMsg==='function')showTempMsg('Could not save the template on this phone.','var(--danger)');
+    return;
+  }
+  if(typeof showTempMsg==='function')showTempMsg('Saved. The next refused shift starts from this wording.','var(--success)');
+}
 function coverFillBackup(shift){
   var sel=document.getElementById('coverBackupSel');
   if(!sel)return;
@@ -3878,6 +4269,8 @@ function coverPaintOutcome(){
   if(assign)assign.disabled=!canAssign;
   if(awaitBtn)awaitBtn.disabled=!canClose;
   if(reopen)reopen.hidden=coverCanAssign(shift);
+  var livePhone=coverClientPhone(shift);
+  if(livePhone&&!shift.phone)shift.phone=livePhone;
   var note=document.getElementById('coverContactNote');
   if(note){
     if(!coverContacted)note.textContent='Text or call the client before you close this shift.';
@@ -3895,18 +4288,16 @@ function coverPaintRanks(rows){
     if(body)body.textContent=COVER_RANK_EMPTY;
     return;
   }
-  if(body)body.textContent='Ace rank. Continuity and distance from the office. No coordinates stay last.';
+  if(body)body.textContent='Tap an aide. The check stays on the one you picked.';
   if(!list)return;
   list.innerHTML=coverRanks.map(function(r){
-    var title=(r.rank!=null?coverEsc(r.rank)+'. ':'')+coverEsc(r.name||'Aide');
-    var bits=[];
-    if(r.continuity!=null)bits.push('Continuity '+coverEsc(r.continuity));
-    if(r.distance!=null)bits.push(coverEsc(r.distance)+' mi');
-    else bits.push('No coordinates');
-    if(r.score!=null)bits.push('Score '+coverEsc(r.score));
+    var on=String(coverSelectedAideId||'')!==''&&String(coverSelectedAideId)===String(r.id);
+    var lines=coverRankLines(r).map(function(line){return '<span>'+coverEsc(line)+'</span>';}).join('');
     var user=r.username?'<span>@'+coverEsc(r.username)+'</span>':'';
-    return '<button type="button" class="cover-rank-row" data-cover-aide="'+coverAttr(r.id)+'" data-cover-aide-name="'+coverAttr(r.name||r.username||r.id)+'">'
-      +'<strong>'+title+'</strong><span>'+bits.join(' · ')+'</span>'+user+'</button>';
+    var check=on?'<span class="cover-rank-check" aria-hidden="true">✓</span>':'';
+    return '<button type="button" class="cover-rank-row'+(on?' is-selected':'')+'" aria-pressed="'+(on?'true':'false')+'" data-cover-aide="'+coverAttr(r.id)+'" data-cover-aide-name="'+coverAttr(r.name||r.username||r.id)+'">'
+      +'<span class="cover-rank-top"><strong>'+coverEsc(r.name||'Aide')+'</strong>'+check+'</span>'
+      +lines+user+'</button>';
   }).join('');
 }
 async function coverLoadRanks(shift){
@@ -3917,14 +4308,14 @@ async function coverLoadRanks(shift){
   if(!shift)return;
   var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
   if(local){
-    if(body)body.textContent='This shift is not an office id yet, so ranked backups cannot load.';
+    if(body)body.textContent='This shift is still on this phone, so who can cover cannot load yet.';
     return;
   }
-  if(body)body.textContent='Loading ranked backups…';
+  if(body)body.textContent='Loading who can cover…';
   var got=await coverRpc('rank', coverRankArgs(shift.id));
   if(String(coverSelectedId)!==String(shift.id))return;
   if(!got||got.missing||got.signedOut){
-    if(body)body.textContent=got&&got.signedOut?'Sign in to load ranked backups.':'Ranked backups did not answer.';
+    if(body)body.textContent=got&&got.signedOut?'Sign in to load who can cover.':'Who can cover did not answer.';
     return;
   }
   if(!got.ok){
@@ -3942,7 +4333,11 @@ function coverOpenOutcome(id){
   coverSelectedId=String(shift.id);
   coverContacted=!!shift.contacted;
   coverRanks=[];
+  coverSelectedAideId=shift.backupAideId?String(shift.backupAideId):'';
+  coverPostedKey='';
   coverHideAssign();
+  coverHideRefuseDraft();
+  coverHideOnTheWay();
   coverShow('outcome');
   coverPaintOutcome();
   coverLoadRanks(shift);
@@ -3950,23 +4345,25 @@ function coverOpenOutcome(id){
 function coverMarkContact(kind){
   var shift=coverFind(coverSelectedId);
   if(!shift)return;
-  var href=coverPhoneHref(kind==='text'?'sms':'tel', shift.phone||'');
+  var href='';
+  if(kind==='text')href=coverSmsHref(coverClientPhone(shift), coverClientSms(shift));
+  else href=coverPhoneHref('tel', coverClientPhone(shift));
   coverContacted=true;
   shift.contacted=true;
   if(shift.source==='local')coverWriteLocal(coverShifts);
   coverPaintOutcome();
-  if(href){
-    try{window.location.href=href;}catch(e){}
-  }
+  if(href)coverGo(href);
 }
 function coverPickRank(id, name){
   var shift=coverFind(coverSelectedId);
+  coverSelectedAideId=String(id||'');
   if(shift){
     shift.backupAideId=String(id||'');
     shift.backupAideName=name||'';
   }
+  coverPaintRanks(coverRanks);
   coverFillBackup(shift);
-  if(typeof showTempMsg==='function')showTempMsg('Backup selected. Confirm assign after you text or call.','var(--teal)');
+  if(typeof showTempMsg==='function')showTempMsg('Aide checked. Text them, or confirm after you talk to the client.','var(--teal)');
 }
 function coverShowAssign(){
   var shift=coverFind(coverSelectedId);
@@ -4106,6 +4503,11 @@ async function coverRecordCalloff(){
 async function coverApplyOutcome(outcome){
   var shift=coverFind(coverSelectedId);
   if(!shift||coverBusy)return;
+  if(coverPostedKey===String(shift.id)+'|'+outcome){
+    if(outcome==='client_refused_resume_next_day')coverShowRefuseDraft(shift);
+    if(outcome==='assigned_backup')coverShowOnTheWay(shift.backupAideName||'');
+    return;
+  }
   var needsContact=outcome==='client_refused_resume_next_day'||outcome==='assigned_backup'||outcome==='awaiting_client';
   if(needsContact&&!coverContacted){
     if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
@@ -4164,10 +4566,26 @@ async function coverApplyOutcome(outcome){
   if(got&&(got.missing||got.signedOut))msg=msg+' Saved on this phone until the office outcome callable answers.';
   if(typeof showTempMsg==='function')showTempMsg(msg,'var(--success)');
   coverHideAssign();
+  coverPostedKey=String(shift.id)+'|'+outcome;
+  if(outcome==='client_refused_resume_next_day'){
+    coverShowRefuseDraft(shift);
+    return;
+  }
+  if(outcome==='assigned_backup'){
+    coverShowOnTheWay(shift.backupAideName||backupName||'');
+    return;
+  }
   coverSelectedId='';
   coverShowList();
 }
 function coverRefuse(){
+  var shift=coverFind(coverSelectedId);
+  if(!shift)return;
+  if(!coverContacted){
+    if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
+    return;
+  }
+  coverShowRefuseDraft(shift);
   coverApplyOutcome('client_refused_resume_next_day');
 }
 function coverConfirmAssign(){
