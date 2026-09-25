@@ -35,7 +35,8 @@
 <!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert /exec. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. No new Ace RPCs. Ace list_new_client_intakes unchanged. Compliance stays /exec on its own path. Broadcast and Schedule untouched. -->
 <!-- admin schedule mobile scroll 2026-09-24 v=sched1m admin-build 2026-09-24-sched1m. Week grid horizontal scroll on touch: the day columns keep a min width so Mon–Sun are wider than a phone, and .sched-scroll is the only scroller (overflow-x auto, touch-action pan-x pan-y, -webkit-overflow-scrolling touch). Toolbar (Edit usual pattern, week, search, All|Open|Call-offs) wraps in the viewport and does not share that scroller. The “No patterns yet” notice wraps above the grid and does not cover or widen it. Desktop week layout unchanged. -->
 <!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
-<meta name="admin-build" content="2026-09-24-sched1m">
+<!-- caregiver password reset 2026-09-24 v=cgreset1 admin-build 2026-09-24-cgreset1. Cut ON: Settings Reset Caregiver Password uses the same office path as reset_temp_password — POST rpc/reset_aide_temp_password {p_username,p_temp_password} via sbAdminResetTempPassword (Auth + aides.must_change_password). Success shows the temp password. apiPost reset_password and set_password on cut route to that RPC and do not hit Sheets /exec. Add aide stays admin_create_aide. Rollback ?sheets=1 or evercare_sheets=1 keeps Sheets reset_password. -->
+<meta name="admin-build" content="2026-09-24-cgreset1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -137,6 +138,13 @@ textarea{resize:vertical;min-height:80px;}
   #schedEmpty.empty-state,#schedNoClients.empty-state{padding:8px 0 12px;}
 }
 .card{background:white;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 1px 5px rgba(0,0,0,0.04);}
+.cg-reset-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+#cgResetOk{word-break:break-word;overflow-wrap:anywhere;line-height:1.45;font-size:0.95rem;font-weight:700;}
+#cgResetBtn{min-height:44px;}
+@media(max-width:420px){
+  .cg-reset-fields{grid-template-columns:1fr;}
+  #cgResetBtn{width:100%;justify-content:center;}
+}
 .card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);padding-bottom:9px;}
 .card-title .ico{width:26px;height:26px;background:var(--teal-light);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
@@ -1163,13 +1171,13 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="card">
           <div class="card-title"><span class="ico">👤</span> Reset Caregiver Password</div>
           <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px">Reset a caregiver's password if they've been locked out.</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-            <div class="field"><label>Caregiver Username</label><input type="text" id="cg_reset_user" placeholder="Enter username"></div>
-            <div class="field"><label>New Password</label><input type="password" id="cg_reset_pwd" placeholder="Set new password"></div>
+          <div class="cg-reset-fields">
+            <div class="field"><label>Caregiver Username</label><input type="text" id="cg_reset_user" placeholder="Enter username" autocomplete="username"></div>
+            <div class="field"><label>New Password</label><input type="password" id="cg_reset_pwd" placeholder="Set new password" autocomplete="new-password"></div>
           </div>
-          <button class="btn btn-navy" onclick="adminResetCaregiverPwd()">🔄 Reset Password</button>
+          <button class="btn btn-navy" id="cgResetBtn" type="button" onclick="adminResetCaregiverPwd()">🔄 Reset Password</button>
           <div style="color:var(--danger);font-size:0.75rem;margin-top:7px;display:none" id="cgResetErr"></div>
-          <div style="color:var(--success);font-size:0.75rem;margin-top:7px;display:none" id="cgResetOk"></div>
+          <div style="color:var(--success);margin-top:7px;display:none" id="cgResetOk"></div>
         </div>
       </div>
 
@@ -2267,6 +2275,11 @@ async function apiPost(payload){
   if(payload&&typeof sbIsAdminWriteAction==='function'&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sbIsAdminWriteAction(payload.action)){
     return sbAdminWriteDispatch(payload);
   }
+  }
+  // v=cgreset1: aide Auth passwords never fall through to Sheets reset_password/set_password on the cut, including Nurse.
+  if(sbOn&&payload&&(payload.action==='reset_password'||payload.action==='set_password'||payload.action==='reset_temp_password'||payload.action==='reset_aide_temp_password'||payload.action==='admin_create_aide'||payload.action==='create_aide')){
+    if(typeof sbAdminWriteDispatch==='function')return sbAdminWriteDispatch(payload);
+    return {success:false,error:'Could not reset password.'};
   }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
@@ -5007,6 +5020,7 @@ async function sbInserviceDispatch(payload){
 function sbIsAdminWriteAction(action){
   return action==='admin_create_aide'||action==='create_aide'
     ||action==='reset_temp_password'||action==='reset_aide_temp_password'
+    ||action==='reset_password'||action==='set_password'
     ||action==='add_client'||action==='update_client'
     ||action==='archive_client'||action==='delete_client'
     ||action==='update'||action==='send_correction'||action==='delete'
@@ -5389,9 +5403,10 @@ async function sbAdminCreateAide(payload){
 async function sbAdminResetTempPassword(payload){
   var username=String((payload&&(payload.username||payload.p_username))||'').trim();
   if(!username)return {success:false,error:'Username missing.'};
+  var typed=payload&&(payload.tempPassword||payload.temp_password||payload.password||payload.p_temp_password);
   var got=await sbRestRpc('reset_aide_temp_password', {
     p_username:username,
-    p_temp_password:sbOptionalText(payload&&(payload.tempPassword||payload.temp_password||payload.p_temp_password))
+    p_temp_password:sbOptionalText(typed)
   });
   if(!got.ok)return {success:false,error:sbNormalizeWriteError(got.error||'Could not reset password.'),httpStatus:got.status||0};
   var mapped=sbMapAideAuth(got.data);
@@ -5703,7 +5718,7 @@ async function sbAdminWriteDispatch(payload){
   if(!sess||!sess.access_token)return {success:false,error:'Not signed in'};
   try{
     if(action==='admin_create_aide'||action==='create_aide')return await sbAdminCreateAide(payload);
-    if(action==='reset_temp_password'||action==='reset_aide_temp_password')return await sbAdminResetTempPassword(payload);
+    if(action==='reset_temp_password'||action==='reset_aide_temp_password'||action==='reset_password'||action==='set_password')return await sbAdminResetTempPassword(payload);
     if(action==='add_client')return await sbAdminAddClient(payload);
     if(action==='update_client')return await sbAdminUpdateClient(payload);
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
@@ -7340,16 +7355,46 @@ async function changeRolePassword(role){
 }
 
 async function adminResetCaregiverPwd(){
-  const user=document.getElementById('cg_reset_user').value.trim().toLowerCase(),pwd=document.getElementById('cg_reset_pwd').value;
+  const userEl=document.getElementById('cg_reset_user');
+  const pwdEl=document.getElementById('cg_reset_pwd');
+  const user=String(userEl&&userEl.value||'').trim().toLowerCase();
+  const pwd=pwdEl?pwdEl.value:'';
   const err=document.getElementById('cgResetErr'),ok=document.getElementById('cgResetOk');
-  err.style.display='none';ok.style.display='none';
-  if(!user||!pwd){err.textContent='Fill in both fields.';err.style.display='block';return;}
+  if(err)err.style.display='none';
+  if(ok)ok.style.display='none';
+  if(!user||!pwd){if(err){err.textContent='Fill in both fields.';err.style.display='block';}return;}
+  // v=cgreset1: cut uses Ace reset_aide_temp_password (Auth + must_change_password). Sheets reset_password is rollback only.
+  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+    try{
+      const res=await postAideAction('reset_temp_password','reset_aide_temp_password',{username:user,tempPassword:pwd});
+      const data=res&&res.data;
+      if(!(data&&data.success)){
+        const msg=typeof aceActionError==='function'?aceActionError(data,res&&res.err,'reset_aide_temp_password'):((data&&(data.error||data.message))||'Error. Try again.');
+        if(err){err.textContent=msg;err.style.display='block';}
+        return;
+      }
+      const shown=String(data.tempPassword||data.temp_password||pwd);
+      cacheInvalidate('get_users');
+      if(userEl)userEl.value='';
+      if(pwdEl)pwdEl.value='';
+      if(ok){
+        ok.textContent='✅ Password reset for @'+user+'. Temporary password: '+shown;
+        ok.style.display='block';
+      }
+      if(typeof showAideTempPasswordOnce==='function')showAideTempPasswordOnce(data.username||user,shown,'New temporary password');
+      logActivity('Reset caregiver password for @'+user);
+    }catch(e){
+      if(err){err.textContent='Error. Try again.';err.style.display='block';}
+    }
+    return;
+  }
   try{
     await apiPost({action:'reset_password',username:user,password:pwd});cacheInvalidate('get_users');
-    document.getElementById('cg_reset_user').value='';document.getElementById('cg_reset_pwd').value='';
-    ok.textContent=`✅ Password reset for @${user}!`;ok.style.display='block';
+    if(userEl)userEl.value='';
+    if(pwdEl)pwdEl.value='';
+    if(ok){ok.textContent='✅ Password reset for @'+user+'!';ok.style.display='block';}
     logActivity('Reset caregiver password for @'+user);
-  }catch(e){err.textContent='Error. Try again.';err.style.display='block';}
+  }catch(e){if(err){err.textContent='Error. Try again.';err.style.display='block';}}
 }
 
 function showTempMsg(msg,color,holdMs){
