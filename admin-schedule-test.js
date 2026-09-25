@@ -15,7 +15,7 @@ assert.ok(html.includes('EVERYTHING we create must be mobile-friendly'), 'standi
 assert.ok(html.includes('Desktop-only PASS is not done'), 'desktop-only pass is not Ready');
 assert.ok(html.includes('week grid swipes Mon–Sun'), 'this tip still requires the Schedule week swipe');
 assert.ok(html.includes('v=sched1m'), 'sched1m marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-sched1m">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme1">'), 'admin-build meta');
 assert.ok(/\.sched-scroll\{[^}]*overflow-x:auto[^}]*-webkit-overflow-scrolling:touch[^}]*touch-action:pan-x pan-y/.test(html), 'week grid scroller pans on touch');
 assert.ok(html.includes('min-width:max(100%,52rem)'), 'day columns stay wider than a phone');
 assert.ok(html.includes('#tab_schedule .sched-scroll{max-width:calc(100vw - 28px'), 'phone caps the week scroller to the viewport');

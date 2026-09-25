@@ -5,7 +5,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
 <!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, nurse alerts, and nurse client writes stay /exec. Broadcast Alert is Ace RPCs as of v=bcast1 (get_active_broadcast / send_broadcast / clear_broadcast); rollback keeps local broadcast_msg — no Sheets /exec for Broadcast. Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
@@ -35,7 +35,8 @@
 <!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert /exec. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. No new Ace RPCs. Ace list_new_client_intakes unchanged. Compliance stays /exec on its own path. Broadcast and Schedule untouched. -->
 <!-- admin schedule mobile scroll 2026-09-24 v=sched1m admin-build 2026-09-24-sched1m. Week grid horizontal scroll on touch: the day columns keep a min width so Mon–Sun are wider than a phone, and .sched-scroll is the only scroller (overflow-x auto, touch-action pan-x pan-y, -webkit-overflow-scrolling touch). Toolbar (Edit usual pattern, week, search, All|Open|Call-offs) wraps in the viewport and does not share that scroller. The “No patterns yet” notice wraps above the grid and does not cover or widen it. Desktop week layout unchanged. -->
 <!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
-<meta name="admin-build" content="2026-09-24-sched1m">
+<!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In follows the Caregiver loginkb1 pattern: visualViewport pins #loginScreen and scrolls the focused field plus #mgrLoginBtn above the keyboard. #loginForgot stays on that scrollport. Desktop width does not take the keyboard path. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
+<meta name="admin-build" content="2026-09-25-admintheme1">
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -45,11 +46,23 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;max-width:100%;overflow
 body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);max-width:100%;overflow-x:hidden;}
 .screen{display:none;min-height:100vh;min-height:100dvh;}
 .screen.active{display:block;}
-#loginScreen.active{display:flex;align-items:center;justify-content:center;background:var(--navy);min-height:100vh;min-height:100dvh;padding:20px;}
-.login-box{background:white;border-radius:14px;padding:40px 36px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center;}
-.login-box .lico{font-size:40px;margin-bottom:12px;}
-.login-box h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:4px;}
-.login-box p{font-size:0.8rem;color:var(--muted);margin-bottom:24px;}
+#loginScreen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#176868 0%,var(--teal) 46%,#3a9494 100%);min-height:100vh;min-height:100dvh;padding:max(20px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom));}
+/* Phone Sign In keyboard (v=admintheme1, Caregiver loginkb1 pattern). JS adds this class only while a phone keyboard covers the login field. */
+#loginScreen.login-kb-open{justify-content:flex-start;align-items:stretch;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:28px;}
+.login-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;}
+.login-brand{text-align:center;color:#fff;margin-bottom:14px;}
+.login-logo{width:76px;height:76px;object-fit:cover;border-radius:50%;border:3px solid rgba(255,255,255,0.9);box-shadow:0 8px 22px rgba(0,0,0,0.18);display:block;margin:0 auto 10px;}
+.login-brand h2{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.75rem;color:#fff;letter-spacing:-0.03em;margin:0 0 2px;}
+.login-brand p{margin:0;font-size:0.98rem;font-weight:500;color:rgba(255,255,255,0.9);}
+.login-box{background:#fff;border-radius:18px;padding:20px 16px 12px;width:100%;box-shadow:0 16px 40px rgba(14,40,40,0.22);text-align:left;}
+.login-lead{text-align:center;font-size:0.84rem;color:var(--muted);margin:0 0 14px;}
+#loginScreen label{color:var(--navy);}
+#loginForm input[type="password"],#loginForm select,#mgr_role{min-height:48px;border-radius:12px;font-size:16px;}
+#loginForm .field button{min-width:44px;min-height:44px;}
+#mgrLoginBtn{min-height:48px;border-radius:12px;font-size:1rem;font-weight:700;}
+.login-forgot-row{text-align:center;margin-top:2px;}
+#loginForgot{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;background:none;border:none;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+@media(min-width:769px){.login-box{padding:26px 24px 16px;}.login-logo{width:84px;height:84px;}}
 .field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;text-align:left;}
 label{font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
 input[type="text"],input[type="password"],input[type="date"],input[type="time"],select,textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:var(--text);background:white;width:100%;transition:border 0.2s;}
@@ -66,15 +79,18 @@ textarea{resize:vertical;min-height:80px;}
 .btn-full{width:100%;justify-content:center;padding:12px;}
 .btn-sm{padding:5px 12px;font-size:0.75rem;}
 .btn:disabled{opacity:0.65;cursor:wait;}
-.admin-layout{display:flex;min-height:100vh;min-height:100dvh;}
-.sidebar{width:220px;background:var(--navy);color:white;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;}
-.sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
-.sidebar-logo h2{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:2px;}
-.sidebar-logo p{font-size:0.65rem;opacity:0.5;}
-.nav-item{display:flex;align-items:center;gap:9px;padding:10px 18px;cursor:pointer;font-size:0.82rem;font-weight:500;color:rgba(255,255,255,0.65);border-left:3px solid transparent;transition:all 0.2s;flex-shrink:0;}
-.nav-item:hover{background:rgba(255,255,255,0.07);color:white;}
-.nav-item.active{background:rgba(42,127,127,0.3);color:white;border-left-color:var(--teal);}
-.nav-item .ni{font-size:15px;}
+.admin-layout{display:flex;min-height:100vh;min-height:100dvh;background:var(--off);}
+.sidebar{width:248px;background:#fff;color:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;height:100dvh;z-index:100;overflow:hidden;border-right:1px solid var(--border);box-shadow:4px 0 24px rgba(26,39,68,0.04);}
+.sidebar-logo{padding:16px 16px 14px;background:var(--teal);color:#fff;border-bottom:none;}
+.sidebar-logo h2{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.08rem;color:#fff;margin-bottom:1px;letter-spacing:-0.02em;}
+.sidebar-logo p{font-size:0.75rem;font-weight:500;color:rgba(255,255,255,0.9);opacity:1;}
+.sidebar-logo img{border:2px solid rgba(255,255,255,0.9);}
+.sidebar-role{padding:10px 16px;background:var(--teal-light);color:var(--navy);font-size:0.8rem;font-weight:600;border-bottom:1px solid var(--border);line-height:1.35;}
+.side-nav{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;min-height:48px;cursor:pointer;font-size:0.95rem;font-weight:600;color:var(--navy);border-left:3px solid transparent;transition:background 0.15s,color 0.15s;flex-shrink:0;}
+.nav-item:hover{background:var(--off);color:var(--navy);}
+.nav-item.active{background:var(--teal-light);color:var(--teal-dark);border-left-color:var(--teal);}
+.nav-item .ni{font-size:1.05rem;width:1.45rem;text-align:center;flex-shrink:0;}
 #adminScreen #nav_nurse,
 #nurseScreen #nav_nurse_completes{display:flex !important;visibility:visible !important;opacity:1 !important;}
 /* Old Completed intakes nav redirects to Nurse — hide to avoid a duplicate item. */
@@ -86,11 +102,26 @@ textarea{resize:vertical;min-height:80px;}
 .nurse-alert-row:hover{background:var(--off);}
 .nurse-type-visit{background:#e8f4f4;color:var(--teal-dark);}
 .nurse-type-phone{background:#e3f2fd;color:#1565c0;}
-.sidebar-bottom{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,0.1);}
-.sidebar-bottom button{width:100%;padding:8px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.7);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;}
-.sidebar-bottom button:hover{background:rgba(255,255,255,0.15);color:white;}
-.main-content{margin-left:220px;flex:1;padding:26px 28px;min-height:100vh;min-height:100dvh;}
-@media(max-width:768px){.sidebar{width:100%;height:auto;position:relative;}.main-content{margin-left:0;padding:14px;min-width:0;max-width:100%;width:100%;}.admin-layout{flex-direction:column;min-width:0;max-width:100%;}}
+.sidebar-bottom{margin-top:auto;padding:12px 14px 14px;border-top:1px solid var(--border);background:#fff;}
+.sidebar-bottom button{width:100%;min-height:44px;padding:10px 12px;background:#fff;border:1.5px solid #f0c2bc;color:var(--danger);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;}
+.sidebar-bottom button:hover{background:#fde8e8;color:var(--danger);}
+.main-content{margin-left:248px;flex:1;padding:22px 22px 32px;min-height:100vh;min-height:100dvh;background:var(--off);min-width:0;}
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:sticky;top:0;left:auto;max-height:none;border-right:none;border-bottom:1px solid var(--border);z-index:120;}
+  .main-content{margin-left:0;padding:14px 12px 28px;min-width:0;max-width:100%;width:100%;}
+  .admin-layout{flex-direction:column;min-width:0;max-width:100%;}
+  .sidebar-logo{padding:12px 14px;}
+  .sidebar-role{padding:8px 14px;}
+  .side-nav{flex:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:8px;padding:10px 12px 12px;touch-action:pan-x pan-y;}
+  .side-nav .nav-item{border-left:none;border:1.5px solid var(--border);border-radius:999px;background:var(--off);min-height:44px;padding:8px 14px;white-space:nowrap;}
+  .side-nav .nav-item.active{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .sidebar-bottom{padding:0 12px 12px;border-top:none;}
+  .admin-layout .page-hdr h1{font-size:1.35rem;}
+  .admin-layout .page-hdr > div{max-width:100%;}
+  .admin-layout .page-hdr > div[style*="flex"]{flex-wrap:wrap;}
+  .admin-layout .page-hdr .btn{min-height:44px;}
+  .admin-layout .stats-grid{gap:10px;}
+}
 .tab-panel{display:none;}.tab-panel.active{display:block;}
 .sched-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;max-width:100%;min-width:0;}
 .sched-toolbar .sched-search{flex:1;min-width:180px;max-width:280px;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;}
@@ -136,16 +167,16 @@ textarea{resize:vertical;min-height:80px;}
   #tab_schedule .sched-scroll{max-width:calc(100vw - 28px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));}
   #schedEmpty.empty-state,#schedNoClients.empty-state{padding:8px 0 12px;}
 }
-.card{background:white;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 1px 5px rgba(0,0,0,0.04);}
-.card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);padding-bottom:9px;}
+.card{background:white;border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(26,39,68,0.06);}
+.card-title{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.02rem;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);padding-bottom:9px;letter-spacing:-0.01em;}
 .card-title .ico{width:26px;height:26px;background:var(--teal-light);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
 @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
-.stat-card{background:white;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;}
-.stat-num{font-family:'Playfair Display',serif;font-size:1.9rem;color:var(--teal);}
-.stat-lbl{font-size:0.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.stat-card{background:white;border:1px solid var(--border);border-top:4px solid var(--teal);border-radius:16px;padding:14px 12px 16px;text-align:center;box-shadow:0 8px 24px rgba(26,39,68,0.06);}
+.stat-num{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.85rem;color:var(--teal);letter-spacing:-0.03em;}
+.stat-lbl{font-size:0.72rem;color:var(--navy);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;margin-top:4px;}
 .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
-.data-table th{background:var(--navy);color:white;padding:9px 11px;text-align:left;font-weight:500;font-size:0.73rem;}
+.data-table th{background:var(--teal);color:white;padding:9px 11px;text-align:left;font-weight:600;font-size:0.73rem;}
 .data-table th:first-child{border-radius:6px 0 0 0;}.data-table th:last-child{border-radius:0 6px 0 0;}
 .data-table td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .data-table tr:last-child td{border-bottom:none;}.data-table tr:hover{background:var(--off);}
@@ -161,7 +192,7 @@ textarea{resize:vertical;min-height:80px;}
 .search-bar input:focus{outline:none;border-color:var(--teal);}
 .empty-state{text-align:center;padding:44px 20px;color:var(--muted);}
 .page-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:12px;flex-wrap:wrap;}
-.page-hdr h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);}
+.page-hdr h1{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.45rem;color:var(--navy);letter-spacing:-0.02em;}
 .page-hdr p{font-size:0.78rem;color:var(--muted);margin-top:2px;}
 .modal-bg{display:none;position:fixed;inset:0;height:100%;height:100dvh;background:rgba(0,0,0,0.65);z-index:999;align-items:flex-start;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) 16px max(32px,env(safe-area-inset-bottom,0px));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .modal-bg.show{display:flex;}
@@ -709,7 +740,7 @@ else setupEverCarePWA();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<body><div id="pwaBanner" style="display:none;background:var(--navy);color:white;padding:12px 14px;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:200">
+<body><div id="pwaBanner" style="display:none;background:var(--teal);color:white;padding:12px 14px;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:200">
   <p style="font-size:0.82rem;line-height:1.35;flex:1">📱 Add EverCare to your <strong>Home Screen</strong> for one-tap login.</p>
   <button id="pwaBannerInstallBtn" onclick="installPWA()" style="background:var(--teal);border:none;color:white;padding:8px 14px;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Install</button>
   <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:16px;cursor:pointer" aria-label="Dismiss">&#10005;</button>
@@ -718,10 +749,14 @@ else setupEverCarePWA();
 
 <!-- LOGIN -->
 <div class="screen active" id="loginScreen">
-  <div class="login-box">
-    <div style="text-align:center;margin-bottom:12px"><img src="data:image/jpeg;base64,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" alt="EverCare Home Agency" style="width:120px;height:120px;object-fit:cover;border-radius:50%;border:3px solid rgba(255,255,255,0.3);margin-bottom:16px;"></div>
-    <h2>Admin Portal</h2>
-    <p>EverCare Home Agency — Authorized Access Only</p>
+  <div class="login-wrap">
+    <div class="login-brand">
+    <img class="login-logo" src="data:image/jpeg;base64,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" alt="EverCare Home Agency">
+    <h2>EverCare</h2>
+    <p>Admin Portal</p>
+    </div>
+    <div class="login-box" id="loginForm">
+    <p class="login-lead">Authorized access only</p>
     <button type="button" class="ec-install-cta" onclick="installPWA()" style="width:100%;background:linear-gradient(135deg,#e8f4f4 0%,#d4ecec 100%);border:2px solid var(--teal);color:var(--navy);padding:14px 16px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:18px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(42,127,127,0.15)">
       <span class="ec-install-cta-label" style="font-size:1.05rem">📱 Add to Home Screen</span>
       <span class="ec-install-cta-sub" style="font-size:0.72rem;font-weight:500;color:var(--muted)">Quick access — no App Store needed</span>
@@ -735,10 +770,11 @@ else setupEverCarePWA();
       </select>
     </div>
     <div class="field"><label>Password</label><div style="position:relative"><input type="password" id="mgr_pass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')mgrLogin()" style="padding-right:64px"><button type="button" onclick="togglePasswordVisibility('mgr_pass',this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted,#6b7a90);font-size:0.78rem;font-weight:600;cursor:pointer;padding:4px 6px;font-family:inherit">Show</button></div></div>
-    <button class="btn btn-navy btn-full" id="mgrLoginBtn" onclick="mgrLogin()">Sign In →</button>
+    <button class="btn btn-teal btn-full" id="mgrLoginBtn" onclick="mgrLogin()">Sign In →</button>
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
-    <div style="text-align:center;margin-top:12px">
-      <button onclick="showAdminReset()" style="background:none;border:none;color:#6b7a90;font-size:0.78rem;cursor:pointer;text-decoration:underline">Forgot password?</button>
+    <div class="login-forgot-row">
+      <button type="button" id="loginForgot" onclick="showAdminReset()">Forgot password?</button>
+    </div>
     </div>
   </div>
 </div>
@@ -765,7 +801,8 @@ else setupEverCarePWA();
   <div class="admin-layout">
     <div class="sidebar">
       <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px"><img src="data:image/jpeg;base64,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" style="width:36px;height:36px;object-fit:cover;border-radius:50%;flex-shrink:0"><div><h2>EverCare</h2><p>Admin Portal</p></div></div>
-      <div style="padding:8px 18px;background:rgba(255,255,255,0.06);font-size:0.7rem;color:rgba(255,255,255,0.7);border-bottom:1px solid rgba(255,255,255,0.1)" id="sidebarRoleLabel">&#128100; Logged in as: <strong id="sidebarRoleName">&mdash;</strong></div>
+      <div class="sidebar-role" id="sidebarRoleLabel">&#128100; Logged in as: <strong id="sidebarRoleName">&mdash;</strong></div>
+      <nav class="side-nav" aria-label="Admin">
       <div class="nav-item active" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</div>
       <div class="nav-item" onclick="showTab('backups')" id="nav_backups"><span class="ni">☁️</span> Backup requests</div>
       <div class="nav-item" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</div>
@@ -778,6 +815,7 @@ else setupEverCarePWA();
       <div class="nav-item" onclick="showTab('links')" id="nav_links"><span class="ni">🔗</span> Links</div>
       <div class="nav-item" onclick="showTab('activity')" id="nav_activity"><span class="ni">📜</span> Activity Log</div>
       <div class="nav-item" onclick="showTab('settings')" id="nav_settings"><span class="ni">⚙️</span> Settings</div>
+      </nav>
       <div class="sidebar-bottom"><button onclick="adminLogout()">← Sign Out</button></div>
     </div>
     <div class="main-content">
@@ -1185,9 +1223,11 @@ Call (216) 377-5991 with any questions.</textarea>
         <img src="data:image/jpeg;base64,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" id="nurseLogoImg" alt="EverCare" style="width:36px;height:36px;object-fit:cover;border-radius:50%;flex-shrink:0">
         <div><h2>EverCare</h2><p>Nurse Portal</p></div>
       </div>
-      <div style="padding:8px 18px;background:rgba(255,255,255,0.06);font-size:0.7rem;color:rgba(255,255,255,0.7);border-bottom:1px solid rgba(255,255,255,0.1)">&#128100; Logged in as: <strong id="nurseSidebarRoleName">Nurse</strong></div>
+      <div class="sidebar-role">&#128100; Logged in as: <strong id="nurseSidebarRoleName">Nurse</strong></div>
+      <nav class="side-nav" aria-label="Nurse">
       <div class="nav-item active" id="nav_nurse_compliance" onclick="showNurseTab('compliance')"><span class="ni">&#9989;</span> Compliance</div>
       <div class="nav-item" id="nav_nurse_completes" onclick="showNurseTab('completes')" style="display:flex" aria-label="Completed intakes"><span class="ni">📄</span> Completed intakes</div>
+      </nav>
       <div class="sidebar-bottom"><button onclick="adminLogout()">&#8592; Sign Out</button></div>
     </div>
     <div class="main-content">
@@ -2417,7 +2457,7 @@ function startLoginWarmKeepAlive(){
     warmUpSheets();
   },1100);
 }
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();}
+function showScreen(id){if(typeof loginKbRelease==='function')loginKbRelease();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
@@ -12856,6 +12896,152 @@ async function loadNewClientIntakeDrafts(){
   }
 }
 
+
+
+// Phone Sign In keyboard v=admintheme1. Same pattern as Caregiver loginkb1.
+// Pins #loginScreen to the visual viewport and scrolls the focused field and #mgrLoginBtn above the keyboard.
+// #loginForgot stays reachable because that screen is the scrollport. No window.scrollTo. Desktop width skips this path.
+// Does not sign in, store a username, or touch Auth.
+function loginKbIsPhone(width){
+  width=width==null?(window.innerWidth||0):width;
+  return width>0&&width<=932;
+}
+function loginKbCovered(layoutH,vvTop,vvHeight,baseline){
+  if(!(layoutH>0)||!(vvHeight>0))return false;
+  var visibleEnd=(vvTop||0)+vvHeight;
+  if(layoutH-visibleEnd>72)return true;
+  if(baseline>0&&layoutH<baseline-72)return true;
+  if(baseline>0&&vvHeight<baseline-72)return true;
+  return false;
+}
+function loginKbScrollDelta(viewH,inputTop,inputBottom,btnBottom,margin){
+  margin=margin==null?12:margin;
+  if(!(viewH>0))return 0;
+  var limit=viewH-margin;
+  var inputOk=inputTop>=margin&&inputBottom<=limit;
+  var btnOk=btnBottom<=limit&&btnBottom>=margin;
+  if(inputOk&&btnOk)return 0;
+  var clusterBottom=btnBottom>inputBottom?btnBottom:inputBottom;
+  var clusterH=clusterBottom-inputTop;
+  var delta=clusterBottom-limit;
+  if(clusterH+margin*2<=viewH){
+    if(inputTop-delta<margin)delta=inputTop-margin;
+  }else if(inputBottom-delta<margin){
+    delta=inputBottom-margin;
+  }
+  if(Math.abs(delta)<1)return 0;
+  return delta;
+}
+function loginKbReadVv(){
+  var vv=window.visualViewport;
+  if(!vv)return{top:0,left:0,height:window.innerHeight||0,width:window.innerWidth||0};
+  return{top:vv.offsetTop||0,left:vv.offsetLeft||0,height:vv.height||0,width:vv.width||0};
+}
+var loginKbBaseline=window.innerHeight||0;
+var loginKbBaseW=window.innerWidth||0;
+var loginKbLock=false;
+function loginKbNoteBaseline(){
+  if(loginKbActiveInput())return;
+  var w=window.innerWidth||0;
+  var h=window.innerHeight||0;
+  if(Math.abs(w-loginKbBaseW)>40){
+    loginKbBaseline=h;
+    loginKbBaseW=w;
+    return;
+  }
+  if(h>=loginKbBaseline-40)loginKbBaseline=h;
+}
+function loginKbActiveInput(){
+  var form=document.getElementById('loginForm');
+  var active=document.activeElement;
+  if(!form||!active||active.tagName!=='INPUT'||!form.contains(active))return null;
+  return active;
+}
+function loginKbRelease(){
+  var screen=document.getElementById('loginScreen');
+  if(!screen||!screen.classList.contains('login-kb-open'))return;
+  screen.classList.remove('login-kb-open');
+  screen.style.position='';
+  screen.style.left='';
+  screen.style.top='';
+  screen.style.width='';
+  screen.style.height='';
+  screen.style.maxHeight='';
+  screen.style.zIndex='';
+}
+function loginKbPin(screen,vv){
+  screen.classList.add('login-kb-open');
+  screen.style.position='fixed';
+  screen.style.left=(vv.left||0)+'px';
+  screen.style.top=(vv.top||0)+'px';
+  screen.style.width=vv.width+'px';
+  screen.style.height=vv.height+'px';
+  screen.style.maxHeight=vv.height+'px';
+  screen.style.zIndex='30';
+}
+function loginKbNudge(input){
+  var screen=document.getElementById('loginScreen');
+  var btn=document.getElementById('mgrLoginBtn');
+  if(!screen||!btn||!input)return;
+  var sRect=screen.getBoundingClientRect();
+  var iRect=input.getBoundingClientRect();
+  var bRect=btn.getBoundingClientRect();
+  var delta=loginKbScrollDelta(screen.clientHeight,iRect.top-sRect.top,iRect.bottom-sRect.top,bRect.bottom-sRect.top,12);
+  if(delta)screen.scrollTop+=delta;
+}
+function loginKbApply(input){
+  if(loginKbLock)return;
+  var screen=document.getElementById('loginScreen');
+  if(!screen||!input)return;
+  if(!loginKbIsPhone()){loginKbRelease();return;}
+  var vv=loginKbReadVv();
+  if(!loginKbCovered(window.innerHeight||0,vv.top,vv.height,loginKbBaseline)){loginKbRelease();return;}
+  loginKbLock=true;
+  try{
+    loginKbPin(screen,vv);
+    loginKbNudge(input);
+  }finally{
+    loginKbLock=false;
+  }
+}
+function loginKbSchedule(input){
+  var run=function(){
+    if(loginKbActiveInput()!==input)return;
+    loginKbApply(input);
+  };
+  run();
+  setTimeout(run,60);
+  setTimeout(run,320);
+  setTimeout(run,680);
+}
+function bindLoginKeyboard(){
+  var form=document.getElementById('loginForm');
+  if(!form||form.dataset.loginKb==='1')return;
+  form.dataset.loginKb='1';
+  form.addEventListener('focusin',function(e){
+    var t=e.target;
+    if(!t||t.tagName!=='INPUT')return;
+    loginKbSchedule(t);
+  });
+  form.addEventListener('focusout',function(){
+    setTimeout(function(){
+      if(loginKbActiveInput())return;
+      loginKbRelease();
+      setTimeout(loginKbNoteBaseline,400);
+    },180);
+  });
+  window.addEventListener('resize',loginKbNoteBaseline);
+  if(window.visualViewport){
+    var onVv=function(){
+      var input=loginKbActiveInput();
+      if(!input)return;
+      loginKbApply(input);
+    };
+    window.visualViewport.addEventListener('resize',onVv);
+    window.visualViewport.addEventListener('scroll',onVv);
+  }
+}
+bindLoginKeyboard();
 
 bootAdminPortal();
 window.addEventListener('pageshow',function(){enforceAdminSessionTimeout();});
