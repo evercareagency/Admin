@@ -67,6 +67,10 @@ assert.ok(html.includes("['deactivated_at','is.null']"), 'active list requires d
 assert.ok(html.includes("['is_active','eq.true']") && html.includes("aidePairs.push(['is_active','eq.false'])"), 'active and deleted is_active filters');
 assert.ok(html.includes("['deactivated_at','not.is.null']"), 'recently deleted requires deactivated_at');
 assert.ok(html.includes("['order','deactivated_at.desc']"), 'recently deleted orders by deactivated_at desc');
+assert.ok(html.includes("sbRestRpc('admin_list_aides', {p_include_deleted:!!includeDeleted})"), 'optional list helper is admin_list_aides');
+assert.ok(html.includes('typeof sbAdminListAides===\'function\''), 'list helper is skipped when it is not in this client');
+assert.ok(html.includes('03:20 ET'), 'purge copy names 03:20 ET');
+assert.ok(!/DELETE\s+FROM\s+aides|method:\s*'DELETE'/.test(extractFn(html, 'async function sbAdminDeactivateAide(payload)') + extractFn(html, 'async function sbAdminRestoreAide(payload)')), 'duty RPCs do not hard-delete');
 assert.ok(dispatch.indexOf("action==='admin_deactivate_aide'") < dispatch.indexOf('sbAdminSoftDeleteTimesheet'), 'aide deactivate is not the timesheet trash path');
 assert.ok(dispatch.includes("action==='admin_restore_aide'"), 'dispatch restores aides');
 
@@ -256,6 +260,7 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   assert.ok(els.nciDiscardTitle.textContent.indexOf('Are you sure?') === 0, els.nciDiscardTitle.textContent);
   assert.ok(els.nciDiscardTitle.textContent.indexOf('cannot Sign In') > 0, 'confirm says they cannot Sign In');
   assert.ok(els.nciDiscardTitle.textContent.indexOf('7 days') > 0, 'confirm names the 7 day window');
+  assert.ok(els.nciDiscardTitle.textContent.indexOf('03:20 ET') > 0, 'confirm names the Ace purge time');
   assert.strictEqual(els.nciDiscardGoBtn.textContent, 'Soft-delete');
   box.hideSharedConfirm();
   assert.strictEqual(els.nciDiscardConfirm.hidden, true, 'Cancel closes the dialog');
@@ -276,7 +281,8 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   assert.ok(htmlOf().includes('@jdoe'), 'soft-deleted aide appears in Recently deleted');
   assert.ok(htmlOf().includes('confirmRestoreAide'), 'Recently deleted has Restore');
   assert.ok(htmlOf().includes('oldaide'), 'Recently deleted lists inactive aides');
-  assert.ok(els.aideDeskSub.textContent.indexOf('7 days') > 0, 'desk copy matches timesheets');
+  assert.ok(els.aideDeskSub.textContent.indexOf('7 days') > 0, 'desk copy names the 7 day window');
+  assert.ok(els.aideDeskSub.textContent.indexOf('03:20 ET') > 0, 'desk copy names the Ace purge time');
   assert.strictEqual(els.addAideBtn.hidden, true, 'Add stays off Recently deleted');
   assert.ok(desks[1].classList.contains('on'), 'Recently deleted tab is selected');
 
@@ -305,6 +311,8 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   console.log('admin-aidadel1-test: ui ok');
 })().then(function(){
   return runRpc();
+}).then(function(){
+  return runList();
 }).catch(function(err){
   console.error(err);
   process.exit(1);
@@ -377,6 +385,63 @@ function runRpc(){
   }).then(function(missingId){
     assert.strictEqual(missingId.success, false);
     assert.strictEqual(calls.filter(function(c){return c.op === 'rpc';}).length, 0, 'restore without an aide id does not call the RPC');
+    console.log('admin-aidadel1-test: rpc ok');
+  });
+}
+
+function runList(){
+  const src = [
+    'function sbActiveLinks(rows)',
+    'function sbMapAide(row)',
+    'function sbAideListRpcMissing(got)',
+    'function sbAideListPayload(data)',
+    'async function sbAdminListAides(includeDeleted)'
+  ].map(function(sig){return extractFn(html, sig);}).join('\n');
+  const calls = [];
+  const listBox = {
+    sbRestRpc: async function(name, body){
+      calls.push({name: name, body: JSON.parse(JSON.stringify(body))});
+      if(listBox.mode === 'missing')return {ok: false, status: 404, error: 'Could not find the function public.admin_list_aides(p_include_deleted) in the schema cache'};
+      if(listBox.mode === 'empty')return {ok: true, data: {success: true, data: []}};
+      if(listBox.mode === 'deleted')return {ok: true, data: [{id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2', username: 'oldaide', full_name: 'Old Aide', is_active: false, deactivated_at: '2026-09-24T12:00:00.000Z'}]};
+      return {ok: true, data: [{id: aideId, username: 'jdoe', full_name: 'Jane Doe', is_active: true, must_change_password: true, assignments: []}]};
+    },
+    mode: 'rows'
+  };
+  vm.createContext(listBox);
+  vm.runInContext(src, listBox);
+  return listBox.sbAdminListAides(false).then(function(active){
+    assert.strictEqual(active.success, true);
+    assert.strictEqual(active.data[0].username, 'jdoe');
+    assert.strictEqual(active.data[0].name, 'Jane Doe');
+    assert.strictEqual(active.data[0].isActive, true);
+    assert.strictEqual(calls[0].name, 'admin_list_aides');
+    assert.deepStrictEqual(calls[0].body, {p_include_deleted: false});
+    calls.length = 0;
+    listBox.mode = 'deleted';
+    return listBox.sbAdminListAides(true);
+  }).then(function(deleted){
+    assert.strictEqual(deleted.success, true);
+    assert.strictEqual(deleted.data[0].username, 'oldaide');
+    assert.strictEqual(deleted.data[0].isActive, false);
+    assert.strictEqual(deleted.data[0].deactivated_at, '2026-09-24T12:00:00.000Z');
+    assert.deepStrictEqual(calls[0].body, {p_include_deleted: true});
+    calls.length = 0;
+    listBox.mode = 'empty';
+    return listBox.sbAdminListAides(false);
+  }).then(function(empty){
+    assert.strictEqual(empty.fallback, true, 'empty helper keeps the deactivated_at filters');
+    calls.length = 0;
+    listBox.mode = 'missing';
+    return listBox.sbAdminListAides(true);
+  }).then(function(missing){
+    assert.strictEqual(missing.fallback, true);
+    assert.strictEqual(calls[0].name, 'admin_list_aides');
+    calls.length = 0;
+    return listBox.sbAdminListAides(false);
+  }).then(function(skipped){
+    assert.strictEqual(skipped.fallback, true);
+    assert.strictEqual(calls.length, 0, 'a missing list RPC is not called again');
     console.log('admin-aidadel1-test: ok');
   });
 }

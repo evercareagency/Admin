@@ -41,7 +41,7 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
-<!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Active list is is_active=eq.true and deactivated_at=is.null. Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Nightly purge after 7 days is Ace. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Optional list helper POST rpc/admin_list_aides {p_include_deleted} when that callable answers with aide rows; otherwise Active is is_active=eq.true and deactivated_at=is.null, and Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Ace purges at 03:20 ET after 7 days. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-aidadel1">
 <meta name="admin-build" content="2026-09-25-navedit1">
 <!-- nurse supervisory cadence copy 2026-09-25 v=nursecomp57 admin-build 2026-09-25-nursecomp57. Nurse Compliance cadence wording is 57–60 days: Cadence tip “every 57–60 days” and subtitle “Rolling 57–60 day window”. Empty-state cadence note uses the same wording. Visit/call scoring, Days-in-window, and get_supervisory_compliance stay on the 60-day window. Prior markers stay, including v=layoutA1 and v=admintheme1. -->
@@ -4671,6 +4671,41 @@ function sbMapAide(row){
     clientIds:clients.map(function(c){return c.id;})
   };
 }
+function sbAideListRpcMissing(got){
+  var err=String((got&&(got.error||got.message))||'');
+  if(got&&got.status===404)return true;
+  return /PGRST202|could not find the function|schema cache/i.test(err);
+}
+function sbAideListPayload(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(Array.isArray(node))return node;
+  if(!node||typeof node!=='object')return null;
+  if(node.ok===false||node.success===false)return null;
+  if(Array.isArray(node.aides))return node.aides;
+  if(Array.isArray(node.rows))return node.rows;
+  if(Array.isArray(node.data))return node.data;
+  return null;
+}
+async function sbAdminListAides(includeDeleted){
+  // Optional. Ace admin_list_aides({p_include_deleted}) when it returns aide rows.
+  // A missing callable, an empty body, or a shape we do not recognize keeps the
+  // is_active + deactivated_at filters in sbApiList.
+  if(sbAdminListAides.off||typeof sbRestRpc!=='function')return {fallback:true};
+  var got=await sbRestRpc('admin_list_aides', {p_include_deleted:!!includeDeleted});
+  if(!got||!got.ok){
+    if(!got||sbAideListRpcMissing(got)){
+      sbAdminListAides.off=true;
+      return {fallback:true};
+    }
+    return {fallback:true};
+  }
+  var rows=sbAideListPayload(got.data);
+  if(!rows||!rows.some(function(row){return row&&(row.username||row.id);}))return {fallback:true};
+  return {success:true,data:rows.filter(function(row){return row&&row.username;}).map(sbMapAide)};
+}
 function sbMapClient(row){
   var aides=sbActiveLinks(row&&row.assignments).map(function(link){
     return link.aide&&link.aide.username;
@@ -4825,6 +4860,14 @@ async function sbApiList(payload){
   try{
     if(action==='get_users'){
       var aideView=payload&&payload.aideDesk==='deleted'?'deleted':'active';
+      if(typeof sbAdminListAides==='function'){
+        var listed=await sbAdminListAides(aideView==='deleted');
+        if(listed&&listed.success&&Array.isArray(listed.data)&&listed.data.length){
+          return {success:true,data:listed.data.filter(function(row){
+            return typeof aideOnDesk==='function'?aideOnDesk(row, aideView):!!(row&&row.username);
+          })};
+        }
+      }
       var aidePairs=[['select',aideView==='deleted'?SB_AIDE_SELECT+',deactivated_at':SB_AIDE_SELECT]];
       if(aideView==='deleted'){
         aidePairs.push(['is_active','eq.false']);
@@ -7214,7 +7257,7 @@ async function setAideDesk(view){
   var sub=document.getElementById('aideDeskSub');
   if(sub){
     sub.textContent=aideDesk==='deleted'
-      ?'Recently deleted aides can be restored for 7 days. They cannot Sign In until restored. After that the nightly cleanup removes the account.'
+      ?'Recently deleted aides can be restored for 7 days. They cannot Sign In until restored. Ace purges them at 03:20 ET after 7 days.'
       :'Registered caregivers — username, assigned clients, and temp-password status';
   }
   syncAideManageButtons();
@@ -7490,7 +7533,7 @@ function confirmSoftDeleteAide(username){
   const un=String(username||'').trim();
   if(!un||!canManageAides())return;
   if(typeof showSharedConfirm!=='function')return;
-  showSharedConfirm('Are you sure? @'+un+' will be hidden for 7 days and cannot Sign In. You can restore them from Recently deleted.',function(){return softDeleteAide(un);},'Soft-delete');
+  showSharedConfirm('Are you sure? @'+un+' will be hidden for 7 days and cannot Sign In. You can restore them from Recently deleted. Ace purges at 03:20 ET after 7 days.',function(){return softDeleteAide(un);},'Soft-delete');
 }
 async function softDeleteAide(username){
   const un=String(username||'').trim().toLowerCase();
