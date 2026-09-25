@@ -42,7 +42,7 @@ const note = html.slice(html.indexOf('v=aidecreds1'), html.indexOf('<!-- admin u
 assert.ok(/Admin only/.test(note), 'credentials are Admin only');
 assert.ok(/admin_list_aide_credentials/.test(note) && /admin_upsert_aide_credential/.test(note) && /admin_soft_delete_aide_credential/.test(note) && /admin_aide_credentials_rollup/.test(note), 'note names the four Ace callables');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser|rotate password/.test(note), 'aidecreds1 note does not reseal Auth');
-assert.ok(!html.slice(0, html.indexOf('function payReadyNameList')).includes('Maya Brooks'), 'product HTML does not bake the mock roster outside the payready stub');
+assert.ok(!html.includes('Maya Brooks') && !html.includes('function payReadyNameList'), 'product HTML does not bake a pay-readiness mock roster');
 
 const sheet = html.slice(html.indexOf('id="aideCredSheet"'), html.indexOf('id="tab_broadcast"'));
 assert.ok(sheet.includes('>Cancel<') && sheet.includes('>Save<'), 'sheet has Cancel and Save');
