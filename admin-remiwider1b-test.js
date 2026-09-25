@@ -455,6 +455,41 @@ async function runBrowser(){
     assert.strictEqual(refuseHeld.hidden, true);
     assert.strictEqual(refuseHeld.outcomes, 0, 'Not yet does not record the refusal');
     assert.strictEqual(refuseHeld.status, 'open');
+    await page.evaluate(function(){
+      var shift = coverFind(coverSelectedId);
+      shift.caseManagerEmail = 'pat@example.com';
+      shift.caseManagerName = 'Pat Lee';
+      coverCmFilledFor = '';
+      coverCmSnap = null;
+    });
+    await page.click('#coverRefuseBtn');
+    await page.waitForFunction(function(){
+      var mail = document.getElementById('coverCmMail');
+      var go = document.getElementById('coverRefuseConfirm');
+      var snap = coverCmSnap || {};
+      return mail && mail.disabled && /confirm the refusal first/.test(mail.textContent||'') && go && !go.hidden && snap.email==='pat@example.com';
+    });
+    const heldMail = await page.evaluate(function(){
+      function box(id){
+        var el = document.getElementById(id);
+        el.scrollIntoView({block:'center'});
+        return {disabled:!!el.disabled, h:el.offsetHeight, text:(el.innerText||'').replace(/\s+/g,' ').trim()};
+      }
+      return {
+        reason: document.getElementById('coverCmMailReason').innerText,
+        mail: box('coverCmMail'),
+        go: box('coverRefuseConfirm'),
+        stop: box('coverRefuseNotYet'),
+        outcomes: window.__bRpc.filter(function(r){return r.kind==='outcome';}).length
+      };
+    });
+    assert.ok(/stays off until you confirm/.test(heldMail.reason), heldMail.reason);
+    assert.strictEqual(heldMail.mail.disabled, true, 'Open Mail stays off before Confirm even when the email is on file');
+    assert.ok(heldMail.go.h >= 44 && heldMail.stop.h >= 44, 'email-present refuse taps '+heldMail.go.h+'/'+heldMail.stop.h);
+    assert.strictEqual(heldMail.outcomes, 0);
+    await page.screenshot({path: path.join(shotDir, 'remiwider1b-refuse-held-mail.png')});
+    await page.click('#coverRefuseNotYet');
+    assert.strictEqual(await outcomes('client_refused_resume_next_day'), 0, 'Not yet still writes nothing when the email is on file');
     await page.click('#coverRefuseBtn');
     await page.waitForSelector('#coverRefuseMail:not([hidden]) #coverRefuseConfirm');
     await page.click('#coverRefuseConfirm');
@@ -468,35 +503,66 @@ async function runBrowser(){
     assert.strictEqual(refused.n, 1);
     assert.strictEqual(refused.id, bowlax);
     assert.deepStrictEqual(refused.goes, [], 'recording the refusal does not open Mail');
+    const mailReady = await page.evaluate(function(){
+      var mail = document.getElementById('coverCmMail');
+      return {disabled:!!mail.disabled, text:(mail.textContent||'').trim()};
+    });
+    assert.strictEqual(mailReady.disabled, false, 'Open Mail enables only after Confirm when the email is on file');
+    assert.strictEqual(mailReady.text, 'Open in Mail');
+    await page.screenshot({path: path.join(shotDir, 'remiwider1b-refuse-mail-ready.png')});
 
     const asked = await page.evaluate(function(){
-      (coverShifts||[]).forEach(function(s){ if(s)s.status='open'; });
+      (coverShifts||[]).forEach(function(s){
+        if(!s)return;
+        s.status='open';
+        s.phone='';
+        s.clientHomeAddress='';
+        s.caseManagerEmail='';
+      });
+      coverPostedKey='';
+      coverRanks=[];
       function grab(q){
         var ans = copilotChatAnswer(q);
         return {
           text: ans.text||'',
           kinds: (ans.actions||[]).map(function(a){return a.kind;}),
-          labels: (ans.actions||[]).map(function(a){return a.label;})
+          labels: (ans.actions||[]).map(function(a){return a.label;}),
+          missing: (ans.actions||[]).map(function(a){return a.missing||'';})
         };
       }
       var generic = 'I can look up Timesheets';
+      var playbook = /Open shifts sit under More → Coverage|Backup is phone-change draft timesheets/;
       var refuse = grab('refuse-backup');
-      var skip = grab('client-initiated skip');
+      var skip = grab('client-skip');
+      var share = grab('share-address');
+      var call = grab('call the client');
       var personal = grab('personal');
-      var build = grab('can you build a new screen');
-      return {generic:generic, refuse:refuse, skip:skip, personal:personal, build:build};
+      var friday = grab('build a Friday feature');
+      return {generic:generic, playbook:playbook.source, refuse:refuse, skip:skip, share:share, call:call, personal:personal, friday:friday};
     });
-    assert.ok(asked.refuse.text.indexOf(asked.generic) < 0, asked.refuse.text);
+    function notGeneric(pack, label){
+      assert.ok(pack.text.indexOf(asked.generic) < 0, label+' generic '+pack.text);
+      assert.ok(!/Open shifts sit under More → Coverage|Backup is phone-change draft timesheets/.test(pack.text), label+' playbook '+pack.text);
+    }
+    notGeneric(asked.refuse, 'refuse');
+    notGeneric(asked.skip, 'client-skip');
+    notGeneric(asked.share, 'share-address');
+    notGeneric(asked.call, 'call');
+    notGeneric(asked.friday, 'friday');
     assert.ok(/Services not delivered today/.test(asked.refuse.text), asked.refuse.text);
     assert.ok(asked.refuse.kinds.indexOf('wider-outcome') >= 0, asked.refuse.kinds.join(','));
-    assert.ok(asked.skip.text.indexOf(asked.generic) < 0, asked.skip.text);
+    assert.ok(asked.refuse.missing.some(function(m){return /stays off until you confirm/.test(m);}), 'Ask Open Mail stays off before Confirm');
     assert.ok(/Which reason/.test(asked.skip.text) && /No services today/.test(asked.skip.text), asked.skip.text);
-    assert.ok(asked.skip.kinds.indexOf('wider-skip') >= 0, 'client-initiated skip offers the confirm draft');
+    assert.ok(asked.skip.kinds.indexOf('wider-skip') >= 0, 'client-skip offers the confirm draft');
+    assert.ok(asked.share.kinds.indexOf('wider-share') >= 0, asked.share.kinds.join(','));
+    assert.ok(asked.share.missing.some(function(m){return /No home address is on file/.test(m);}), asked.share.missing.join(' | '));
+    assert.ok(asked.call.kinds.indexOf('wider-call') >= 0, asked.call.kinds.join(','));
+    assert.ok(asked.call.missing.some(function(m){return /No client phone is on file/.test(m);}), asked.call.missing.join(' | '));
     assert.ok(/Tell Friday/.test(asked.personal.text), asked.personal.text);
     assert.ok(/Desk-brain/.test(asked.personal.text), asked.personal.text);
     assert.ok(!/I remember|friday memory/i.test(asked.personal.text));
-    assert.ok(/Tell Friday/.test(asked.build.text), asked.build.text);
-    assert.ok(asked.build.text.indexOf(asked.generic) < 0, asked.build.text);
+    assert.ok(/Tell Friday/.test(asked.friday.text), asked.friday.text);
+    assert.ok(/Desk-brain/.test(asked.friday.text), asked.friday.text);
 
     await page.click('#copilotFab');
     await page.waitForSelector('#copilotTabAsk', {visible:true});
@@ -531,12 +597,37 @@ async function runBrowser(){
     assert.ok(askRefuse.go.h >= 44 && askRefuse.stop.h >= 44, 'ask refuse taps '+askRefuse.go.h+'/'+askRefuse.stop.h);
     await page.screenshot({path: path.join(shotDir, 'remiwider1b-ask-refuse-confirm.png')});
     await page.click('#copilotConfirmNotYet');
-    await ask('client-initiated skip');
+    await ask('client-skip');
     await page.waitForFunction(function(){
       return /Which reason/.test(document.getElementById('copilotThread').innerText) && /No services today/.test(document.getElementById('copilotThread').innerText);
     });
     await page.screenshot({path: path.join(shotDir, 'remiwider1b-ask-skip.png')});
-    await ask('build a personal reminder');
+    await ask('share-address');
+    await page.waitForFunction(function(){
+      var buttons = document.querySelectorAll('#copilotThread .copilot-actions .btn');
+      return Array.prototype.some.call(buttons, function(b){return b.textContent==='Share address';});
+    });
+    await page.evaluate(function(){
+      var buttons = Array.prototype.slice.call(document.querySelectorAll('#copilotThread .copilot-actions .btn'));
+      var btn = buttons.filter(function(b){return b.textContent==='Share address';}).pop();
+      btn.scrollIntoView({block:'center'});
+      btn.click();
+    });
+    await page.waitForSelector('#copilotConfirm:not([hidden]) #copilotConfirmGo[disabled]');
+    const askShare = await page.evaluate(function(){
+      function box(id){
+        var el = document.getElementById(id);
+        el.scrollIntoView({block:'center'});
+        return {h:el.offsetHeight, disabled:!!el.disabled, text:(el.innerText||'').trim()};
+      }
+      return {note: document.getElementById('copilotConfirm').innerText, go: box('copilotConfirmGo'), stop: box('copilotConfirmNotYet')};
+    });
+    assert.ok(/No home address is on file/.test(askShare.note), askShare.note);
+    assert.strictEqual(askShare.go.disabled, true, 'share Confirm stays off without an address');
+    assert.ok(askShare.go.h >= 44 && askShare.stop.h >= 44, 'ask share taps '+askShare.go.h+'/'+askShare.stop.h);
+    await page.screenshot({path: path.join(shotDir, 'remiwider1b-ask-share.png')});
+    await page.click('#copilotConfirmNotYet');
+    await ask('build a Friday feature');
     await page.waitForFunction(function(){
       var bubbles = document.querySelectorAll('#copilotThread .copilot-bubble-remi');
       var last = bubbles.length ? bubbles[bubbles.length-1].innerText : '';

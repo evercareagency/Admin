@@ -5075,18 +5075,26 @@ function coverSyncCmMail(){
   try{note=document.getElementById('coverCmNote');}catch(e2){note=null;}
   try{reason=document.getElementById('coverCmMailReason');}catch(e3){reason=null;}
   var email=coverCmSnap&&coverCmSnap.email?String(coverCmSnap.email).trim():'';
-  var ok=coverEmailOk(email);
-  var why='Open in Mail is off — case manager email is not on file. Copy and Save as my template still work. Nothing is sent.';
+  var emailOk=coverEmailOk(email);
+  var shift=null;
+  try{shift=(typeof coverFind==='function')?coverFind(coverSelectedId):null;}catch(e4){shift=null;}
+  var posted=!!(shift&&String(coverPostedKey)===String(shift.id)+'|client_refused_resume_next_day');
+  var held=coverCmFamily==='refuse'&&!posted;
+  var ok=emailOk&&!held;
+  var why='';
+  if(held&&!emailOk)why='Open in Mail stays off until you confirm this refusal. The case manager email is not on file. Nothing is sent.';
+  else if(held)why='Open in Mail stays off until you confirm this refusal. Not yet writes nothing.';
+  else if(!emailOk)why='Open in Mail is off — case manager email is not on file. Copy and Save as my template still work. Nothing is sent.';
   if(btn){
     btn.disabled=!ok;
-    btn.textContent=ok?'Open in Mail':'Open in Mail is off — no case manager email';
+    btn.textContent=ok?'Open in Mail':(emailOk?'Open in Mail is off — confirm the refusal first':'Open in Mail is off — no case manager email');
     if(ok)btn.removeAttribute('title');
     else btn.setAttribute('title', why);
     btn.setAttribute('aria-disabled', ok?'false':'true');
   }
   if(reason){
-    reason.hidden=!!ok;
-    reason.textContent=ok?'':why;
+    reason.hidden=!why;
+    reason.textContent=why;
   }
   if(note){
     var lead=ok
@@ -5121,7 +5129,7 @@ function coverSyncRefuseGate(shift, family){
   if(gate)gate.hidden=!show;
   if(note){
     note.hidden=!show;
-    if(show)note.textContent='Confirm before this refusal is recorded. Not yet writes nothing. Mail stays closed until you confirm Open in Mail.';
+    if(show)note.textContent='Confirm before this refusal is recorded. Not yet writes nothing. Open in Mail stays off until you confirm.';
   }
 }
 async function coverShowRefuseDraft(shift, family){
@@ -5305,6 +5313,12 @@ function coverTextOnTheWay(){
   coverAskOutbound('sms', coverSmsHref(phone, coverOnTheWaySms(shift, name)), 'Text client they are on the way');
 }
 function coverOpenCmMail(){
+  var shift=coverFind(coverSelectedId);
+  if(coverCmFamily==='refuse'&&!(shift&&String(coverPostedKey)===String(shift.id)+'|client_refused_resume_next_day')){
+    coverSyncCmMail();
+    if(typeof showTempMsg==='function')showTempMsg('Confirm the refusal before Open in Mail. Not yet writes nothing.','var(--warn)');
+    return;
+  }
   var email=coverCmSnap&&coverCmSnap.email?String(coverCmSnap.email).trim():'';
   if(!coverEmailOk(email)){
     coverSyncCmMail();
@@ -8006,7 +8020,14 @@ function remiWiderDraftPack(shift, family, reason, other, mail){
       summary:'Record client refused \u00B7 resume next day for '+who+'.'
     });
   }
-  var mailMissing=(typeof coverEmailOk==='function'&&coverEmailOk(shown.email))?'':'Open in Mail is off \u2014 case manager email is not on file. Nothing is sent until that email is known.';
+  var mailPosted=family==='refuse'&&String(typeof coverPostedKey!=='undefined'?coverPostedKey:'')===String(shift.id||'')+'|client_refused_resume_next_day';
+  var mailMissing='';
+  if(family==='refuse'&&!mailPosted){
+    mailMissing='Open in Mail stays off until you confirm this refusal. Not yet writes nothing.';
+    if(!(typeof coverEmailOk==='function'&&coverEmailOk(shown.email)))mailMissing+=' Case manager email is not on file.';
+  }else if(!(typeof coverEmailOk==='function'&&coverEmailOk(shown.email))){
+    mailMissing='Open in Mail is off \u2014 case manager email is not on file. Nothing is sent until that email is known.';
+  }
   actions.push({
     id:family==='skip'?'wider-skip-mail':'wider-refuse-mail',
     label:mailMissing?'Open Mail is off \u2014 no case manager email':'Open Mail',
@@ -8033,7 +8054,7 @@ function remiWiderShiftAnswer(q, intent){
   if(picked.empty)return remiWiderEmptyPack();
   if(!picked.shift)return remiWiderAmbiguousPack();
   var rows=remiWiderFilterRanks(picked.shift, remiWiderCachedRanks(picked.shift));
-  if(!rows.length)return remiWiderPendingPack(picked.shift, intent, picked.seeded);
+  if(!rows.length&&intent!=='share'&&intent!=='call')return remiWiderPendingPack(picked.shift, intent, picked.seeded);
   return remiWiderReadyPack(picked.shift, rows, intent, q, picked.seeded);
 }
 function remiWiderDraftAnswer(q, intent){
@@ -8051,7 +8072,8 @@ function remiWiderDraftAnswer(q, intent){
       var reasonActions=reasonLabels.map(function(label){
         return {id:'wider-skip-reason-'+label, label:label, kind:'wider-skip-reason', shiftId:String(shift.id||''), reason:label};
       });
-      if(/\bclient initiated\b/.test(remiWiderNorm(q))){
+      var skipNorm=remiWiderNorm(q);
+      if(/\bclient initiated\b/.test(skipNorm)||/\bclient skip\b/.test(skipNorm)){
         reasonActions.push({
           id:'wider-skip',
           label:'Record no service',
