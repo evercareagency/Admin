@@ -14,7 +14,7 @@ assert.ok(html.includes('<!-- remi secretary 2026-09-25 v=remisec1 admin-build 2
 assert.ok(html.includes('data-remisec="v=remisec1"'), 'remisec1 string marker');
 assert.ok(html.includes('placeholder="Ask or just chat..."'), 'composer invites chat');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-coverpick1'), 'coverpick1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-remiwider1'), 'remiwider1 is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-coverpick1"') < html.indexOf('content="2026-09-25-remisec1"'), 'remisec1 stays after coverpick1');
 [
   '2026-09-25-payready1d',
