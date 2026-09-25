@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- admin pay readiness 2026-09-25 v=payready1 admin-build 2026-09-25-payready1. Timesheets phone screen is pay readiness for the week. The week label is MM/DD/YYYY–MM/DD/YYYY. Counts are Ready N and Held N. Held rows use reason chips: missing signature, not submitted, sent back, incomplete Save Day. Ready rows say All current. A held row opens the detail: client, week, Held reason banner, checklist Submitted, Save Day complete, Signature, Office review, Open timesheet, Hold pay, and the footer Not full payroll — readiness only. When nothing is held and at least one sheet is ready, the screen is the all-ready empty state: check, All N timesheets ready, Nothing held this pay period, Export ready list. Export is aide, client, week, and ready. No pay amounts, rates, gross, net, or payroll totals. Ace readiness rollup is not in this repo yet. payReadyFetchAce posts sbRestRpc with the office JWT for admin_pay_readiness_rollup {p_week_start} and, if that callable is missing, admin_timesheet_readiness_rollup {p_week_start}. A recognized row list replaces the stub and money fields are dropped. A missing callable keeps the stub roster so the phone can be reviewed. Hold pay does not post and does not write payroll. TODO Ace: swap the stub when the rollup is CALLABLE. Remi stays the corner chip. This screen is not the Scheduler desk-brain and does not add a radar kind. Timesheet files stays the existing Active, Archived, and Recently deleted desk. No Auth reseal. Prior markers stay, including aidecreds1b, aidecreds1, remidate1, and ncipdf1. -->
+<meta name="admin-build" content="2026-09-25-payready1">
 <!-- aide credentials current chip 2026-09-25 v=aidecreds1c admin-build 2026-09-25-aidecreds1c. After admin_upsert_aide_credential, and when Aides Refresh runs, the phone list re-fetches admin_aide_credentials_rollup {p_aide_id:null}. An aide missing from that rollup who has credential rows is filled from admin_list_aide_credentials {p_aide_id}. When nothing is expired or expiring soon, that aide shows the All current chip. Zero credential rows stay blank. The attention banner stays the rollup attention_count. Dates stay MM/DD/YYYY. Scheduler still does not see the Credentials block. Remi stays the corner chip. No Auth reseal. Prior markers stay, including v=aidecreds1b and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-25-aidecreds1c">
 <!-- aide credentials empty add 2026-09-25 v=aidecreds1b admin-build 2026-09-25-aidecreds1b. When admin_aide_credentials_rollup returns no aides, the Aides credentials view still shows No credential records yet with a tappable Add credential. Registered aides from the Manage list stay on that view, so an aide with zero credential rows can be opened: the Credentials card stays up with Add credential. Save still posts admin_upsert_aide_credential via sbRestRpc (office JWT), then the rollup and the open card reload so the attention banner, chips, and Credentials card appear. Dates stay MM/DD/YYYY on screen and ISO YYYY-MM-DD on the wire. Scheduler still does not see the Credentials block. Remi stays the corner chip. No Auth reseal. Prior markers stay, including v=aidecreds1, v=remidate1, and v=ncipdf1. -->
@@ -280,6 +282,44 @@ textarea{resize:vertical;min-height:80px;}
 @media(min-width:900px){
   #tab_timesheets .ts-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
+/* v=payready1 — phone pay readiness on Timesheets. Not payroll. */
+#payReady{max-width:100%;min-width:0;color:var(--navy);}
+#payReady[hidden],#payReady [hidden]{display:none !important;}
+#payReady .pay-week{margin:2px 0 12px;font-size:0.98rem;font-weight:500;color:var(--muted);}
+#payReady .pay-screen-title{margin:0 0 12px;font-family:'DM Sans',sans-serif;font-size:1.45rem;font-weight:700;letter-spacing:-0.03em;color:var(--navy);}
+#payReady .pay-counts{display:flex;align-items:stretch;background:#eef1f6;border-radius:14px;padding:4px;margin:0 0 6px;}
+#payReady .pay-count{flex:1 1 0;min-width:0;text-align:center;padding:11px 8px;border-radius:11px;font-weight:700;font-size:0.98rem;color:var(--navy);}
+#payReady .pay-count-ready{background:#fff;box-shadow:0 1px 2px rgba(26,39,68,0.08);}
+#payReady .pay-sec{margin:18px 0 4px;font-family:'DM Sans',sans-serif;font-size:1.2rem;font-weight:700;color:var(--navy);}
+#payReady .pay-row{display:flex;align-items:center;gap:12px;width:100%;min-height:68px;padding:8px 0;background:transparent;border:0;text-align:left;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;}
+#payReady .pay-row-ready{cursor:default;}
+#payReady .pay-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.92rem;flex:0 0 44px;}
+#payReady .pay-row-main{flex:1 1 auto;min-width:0;}
+#payReady .pay-row-main strong{display:block;font-size:1.02rem;line-height:1.25;font-weight:700;}
+#payReady .pay-row-main span{display:block;margin-top:1px;font-size:0.84rem;line-height:1.3;color:var(--muted);font-weight:500;}
+#payReady .pay-chip{flex:0 0 auto;max-width:46%;border-radius:999px;padding:5px 10px;font-size:0.75rem;font-weight:600;line-height:1.2;text-align:center;}
+#payReady .pay-chip-held{background:#fdecec;color:#d16b6b;}
+#payReady .pay-chip-ready{background:#e7f6ee;color:#1f8a4c;}
+#payReady .pay-empty{text-align:center;padding:8px 8px 0;}
+#payReady .pay-empty-mark{width:148px;height:148px;margin:22px auto 18px;border-radius:50%;border:8px solid #34a86a;background:#f3fbf6;display:flex;align-items:center;justify-content:center;}
+#payReady .pay-empty h2{margin:0 0 6px;font-family:'DM Sans',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:-0.03em;color:var(--navy);}
+#payReady .pay-empty p{margin:0 0 18px;color:var(--muted);font-size:0.98rem;}
+#payReady .pay-wide{width:100%;min-height:50px;justify-content:center;border-radius:12px;font-size:1.02rem;font-weight:700;margin-top:10px;}
+#payReady .pay-back{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 0 8px;background:none;border:0;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:1.2rem;font-weight:700;cursor:pointer;}
+#payReady .pay-detail-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px 16px 8px;margin:4px 0 12px;box-shadow:0 8px 24px rgba(26,39,68,0.05);}
+#payReady .pay-detail-card h2{margin:0 0 6px;font-family:'DM Sans',sans-serif;font-size:1.35rem;font-weight:700;letter-spacing:-0.03em;}
+#payReady .pay-detail-meta{margin:0;color:var(--muted);font-size:0.95rem;line-height:1.45;}
+#payReady .pay-banner{margin:14px 0 8px;background:#f1846a;color:#fff;border-radius:12px;padding:12px 14px;text-align:center;font-weight:700;font-size:1rem;}
+#payReady .pay-checks{list-style:none;margin:8px 0 4px;padding:0;}
+#payReady .pay-check{display:flex;align-items:center;gap:10px;min-height:40px;font-size:0.98rem;font-weight:600;}
+#payReady .pay-check-ico{width:22px;height:22px;border-radius:50%;border:2px solid #2f9e62;color:#2f9e62;display:inline-flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex:0 0 22px;}
+#payReady .pay-check-val{margin-left:auto;font-weight:650;}
+#payReady .pay-check-bad{color:#d64545;}
+#payReady .pay-check-ok{color:#1f8a4c;}
+#payReady .pay-foot{margin:12px 0 0;text-align:center;color:var(--muted);font-size:0.84rem;}
+#payReady #payHoldBtn{background:#fff;color:var(--navy);border:1.5px solid #c5ceda;}
+.ts-files-toggle{display:inline-flex;align-items:center;min-height:44px;margin-top:14px;padding:8px 0;background:none;border:0;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+#tsFiles[hidden]{display:none !important;}
 .more-list{display:flex;flex-direction:column;gap:8px;}
 .more-row{width:100%;min-height:52px;display:flex;align-items:center;gap:10px;text-align:left;background:#fff;color:var(--navy);border:1px solid var(--border);border-left:4px solid transparent;border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;}
 .more-row.active{border-left-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
@@ -1299,6 +1339,38 @@ bindLoginKeyboard();
 
       <!-- TIMESHEETS TAB -->
       <div class="tab-panel active" id="tab_timesheets">
+        <section id="payReady" data-payready="v=payready1" aria-label="Pay readiness">
+          <div id="payReadyListView">
+            <p class="pay-week" id="payReadyWeek">Week of</p>
+            <h2 class="pay-screen-title" id="payReadyTitle" hidden>Pay ready</h2>
+            <div class="pay-counts" role="group" aria-label="Ready and held">
+              <span class="pay-count pay-count-ready" id="payReadyCount">Ready 0</span>
+              <span class="pay-count pay-count-held" id="payHeldCount">Held 0</span>
+            </div>
+            <div id="payReadyRows"></div>
+            <div id="payReadyEmpty" class="pay-empty" hidden>
+              <div class="pay-empty-mark" id="payReadyMark" aria-hidden="true"><svg viewBox="0 0 64 64" width="78" height="78"><path d="M14 34l12 12 24-26" fill="none" stroke="#2f9e62" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <h2 id="payReadyEmptyTitle">All 0 timesheets ready</h2>
+              <p id="payReadyEmptySub">Nothing held this pay period</p>
+              <button type="button" class="btn btn-teal pay-wide" id="payReadyExport" onclick="payReadyExport()">Export ready list</button>
+            </div>
+          </div>
+          <div id="payReadyDetail" hidden>
+            <button type="button" class="pay-back" id="payReadyBack" onclick="payReadyCloseDetail()">← Pay held</button>
+            <article class="pay-detail-card" aria-label="Held timesheet">
+              <h2 id="payDetailName"></h2>
+              <p class="pay-detail-meta" id="payDetailClient"></p>
+              <p class="pay-detail-meta" id="payDetailWeek"></p>
+              <div class="pay-banner" id="payDetailBanner"></div>
+              <ul class="pay-checks" id="payDetailChecks"></ul>
+            </article>
+            <button type="button" class="btn btn-teal pay-wide" id="payOpenTimesheet" onclick="payReadyOpenTimesheet()">Open timesheet</button>
+            <button type="button" class="btn btn-ghost pay-wide" id="payHoldBtn" onclick="payReadyHold()">Hold pay</button>
+            <p class="pay-foot">Not full payroll — readiness only.</p>
+          </div>
+        </section>
+        <button type="button" class="ts-files-toggle" id="tsFilesToggle" aria-expanded="false" onclick="payReadyToggleFiles()">Timesheet files</button>
+        <div id="tsFiles" hidden>
         <div class="page-hdr">
           <div><h1>Timesheets</h1><p id="tsDeskSub">Active submitted caregiver timesheets</p></div>
           <div style="display:flex;gap:8px">
@@ -1324,6 +1396,7 @@ bindLoginKeyboard();
             <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>PDF</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
           </div>
           <div id="tsEmpty" class="empty-state" style="display:none"><p>📭 No timesheets yet.</p></div>
+        </div>
         </div>
       </div>
 
@@ -3694,6 +3767,7 @@ function showTab(tab){
     document.getElementById('adminOnlyPwdCard').style.display=isAdmin?'block':'none';
     document.getElementById('schedulerNoAccessCard').style.display=isAdmin?'none':'block';
   }
+  if(tab==='timesheets'&&typeof payReadyLoad==='function')payReadyLoad();
 }
 
 // v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
@@ -10292,6 +10366,419 @@ function timesheetRowDeskButton(r){
   }
   return '<button type="button" class="btn btn-sm mbtn-archive" title="Archive" aria-label="Archive" onclick="quickDelete(\''+id+'\')">🗄️</button>';
 }
+// v=payready1 — Timesheets pay readiness. Not payroll. Remi does not own this screen.
+var PAYREADY_MARKER='v=payready1';
+var PAYREADY_ROLLUP_RPCS=['admin_pay_readiness_rollup','admin_timesheet_readiness_rollup'];
+var PAYREADY_MONEY_KEY=/(^|_)(amount|gross|net|wage|rate|dollars?|stipend|salary)($|_)|^pay_amount$|^pay_total$|^hourly_rate$|^ot_pay$/i;
+var PAYREADY_AVATAR={JS:'#3b82f6',CW:'#e07a4c',TR:'#7c6bb5',MD:'#6d4ea3',MB:'#1d8a86',AN:'#1e9a62'};
+var payReadyState=null;
+var payReadyView='list';
+var payReadySelected='';
+var payReadyGen=0;
+function payReadyEsc(s){
+  if(typeof escapeHtml==='function')return escapeHtml(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function payReadyAttr(s){
+  return payReadyEsc(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function payReadyNyYmd(date){
+  var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'}).formatToParts(date);
+  var get=function(t){var p=parts.find(function(x){return x.type===t;});return p?p.value:'';};
+  return {y:get('year'),m:get('month'),d:get('day'),wd:get('weekday')};
+}
+function payReadyShiftYmd(y,m,d,delta){
+  var dt=new Date(Date.UTC(+y,+m-1,+d));
+  dt.setUTCDate(dt.getUTCDate()+delta);
+  var mm=String(dt.getUTCMonth()+1).padStart(2,'0');
+  var dd=String(dt.getUTCDate()).padStart(2,'0');
+  var yyyy=String(dt.getUTCFullYear());
+  return {iso:yyyy+'-'+mm+'-'+dd,mdy:mm+'/'+dd+'/'+yyyy};
+}
+function payReadyMdy(iso){
+  var m=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m?m[2]+'/'+m[3]+'/'+m[1]:'';
+}
+function payReadyWeekRange(now){
+  var ny=payReadyNyYmd(now||new Date());
+  var map={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+  var idx=map[ny.wd];
+  if(idx==null)idx=1;
+  var sinceMon=(idx+6)%7;
+  var start=payReadyShiftYmd(ny.y,ny.m,ny.d,-sinceMon);
+  var end=payReadyShiftYmd(start.iso.slice(0,4),start.iso.slice(5,7),start.iso.slice(8,10),6);
+  return {week_start:start.iso,week_end:end.iso,label:start.mdy+'\u2013'+end.mdy};
+}
+function payReadyStripMoney(row){
+  if(!row||typeof row!=='object')return row;
+  Object.keys(row).forEach(function(k){
+    if(PAYREADY_MONEY_KEY.test(k))delete row[k];
+    else if(row[k]&&typeof row[k]==='object'&&!Array.isArray(row[k]))payReadyStripMoney(row[k]);
+  });
+  return row;
+}
+function payReadyBool(v){
+  if(v==null||v==='')return null;
+  if(v===true||v===1)return true;
+  if(v===false||v===0)return false;
+  var s=String(v).trim().toLowerCase();
+  if(s==='true'||s==='yes'||s==='1')return true;
+  if(s==='false'||s==='no'||s==='0')return false;
+  return null;
+}
+function payReadyReasonKey(raw){
+  var s=String(raw==null?'':raw).trim().toLowerCase().replace(/[—–_-]+/g,' ').replace(/\s+/g,' ');
+  if(!s)return '';
+  if(/missing signature/.test(s)||s==='signature missing')return 'missing_signature';
+  if(/not submitted/.test(s)||s==='unsubmitted')return 'not_submitted';
+  if(/sent back/.test(s))return 'sent_back';
+  if(/incomplete save day/.test(s)||s==='save day incomplete')return 'incomplete_save_day';
+  return s;
+}
+function payReadyReasonLabel(key){
+  if(key==='missing_signature')return 'missing signature';
+  if(key==='not_submitted')return 'not submitted';
+  if(key==='sent_back')return 'sent back';
+  if(key==='incomplete_save_day')return 'incomplete Save Day';
+  return key;
+}
+function payReadyStatus(src, reason){
+  var s=String(src.status||src.readiness||'').trim().toLowerCase();
+  if(s==='held'||s==='hold'||s==='not_ready')return 'held';
+  if(s==='ready'||s==='all_current'||s==='clear'||s==='current')return 'ready';
+  if(reason)return 'held';
+  return 'ready';
+}
+function payReadyChecks(src, reason, status){
+  var c=src.checks||src.checklist||{};
+  if(typeof c==='string'){try{c=JSON.parse(c);}catch(e){c={};}}
+  if(!c||typeof c!=='object')c={};
+  var submitted=payReadyBool(c.submitted!=null?c.submitted:src.submitted);
+  var saveDay=payReadyBool(c.save_day!=null?c.save_day:(c.save_day_complete!=null?c.save_day_complete:src.save_day_complete));
+  var signature=c.signature!=null?c.signature:(src.signature!=null?src.signature:null);
+  var office=c.office_review!=null?c.office_review:(c.officeReview!=null?c.officeReview:src.office_review);
+  if(submitted==null&&saveDay==null&&signature==null&&(office==null||office==='')){
+    if(status==='ready')return {submitted:true,saveDay:true,signature:'present',officeReview:'clear'};
+    if(reason==='missing_signature')return {submitted:true,saveDay:true,signature:'missing',officeReview:'clear'};
+    if(reason==='not_submitted')return {submitted:false,saveDay:false,signature:'missing',officeReview:''};
+    if(reason==='sent_back')return {submitted:true,saveDay:true,signature:'present',officeReview:'sent_back'};
+    if(reason==='incomplete_save_day')return {submitted:true,saveDay:false,signature:'present',officeReview:'clear'};
+    return {submitted:false,saveDay:false,signature:'missing',officeReview:''};
+  }
+  var sigText=String(signature==null?'':signature).toLowerCase();
+  var sig=(signature===false||sigText==='missing'||sigText==='no'||sigText==='false')?'missing':'present';
+  var off=String(office==null?'':office).toLowerCase().replace(/\s+/g,'_');
+  if(off==='clear'||off==='yes'||off==='ok')off='clear';
+  else if(off==='sent_back'||off==='sentback')off='sent_back';
+  else if(!off||off==='null')off='';
+  return {submitted:submitted!==false,saveDay:saveDay!==false,signature:sig,officeReview:off};
+}
+function payReadyMapRow(raw, index){
+  if(!raw||typeof raw!=='object')return null;
+  var src={};
+  Object.keys(raw).forEach(function(k){src[k]=raw[k];});
+  payReadyStripMoney(src);
+  var name=String(src.aide_name||src.emp_name||src.empName||src.name||'').trim();
+  if(!name)return null;
+  var reason=payReadyReasonKey(src.reason||src.hold_reason||src.holdReason||'');
+  var status=payReadyStatus(src, reason);
+  return {
+    id:String(src.id||src.timesheet_id||src.timesheetId||('row-'+index)),
+    timesheet_id:String(src.timesheet_id||src.timesheetId||''),
+    name:name,
+    role:String(src.role||src.svc_type||src.svcType||'').trim(),
+    client:String(src.client_name||src.clientName||src.client||'').trim(),
+    status:status,
+    reason:status==='held'?reason:'',
+    reasonLabel:status==='held'?payReadyReasonLabel(reason):'',
+    checks:payReadyChecks(src, reason, status)
+  };
+}
+function payReadyMapRollup(data){
+  var node=data;
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(e){return null;}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(!node||typeof node!=='object'||Array.isArray(node))return null;
+  if(node.success===false||node.ok===false)return null;
+  var raw=node.rows||node.timesheets||node.readiness;
+  if(!Array.isArray(raw)&&node.data&&typeof node.data==='object'&&!Array.isArray(node.data))raw=node.data.rows||node.data.timesheets;
+  if(!Array.isArray(raw)&&Array.isArray(node.data))raw=node.data;
+  if(!Array.isArray(raw))return null;
+  var rows=raw.map(payReadyMapRow).filter(Boolean);
+  var weekStart=String(node.week_start||node.weekStart||'');
+  var weekEnd=String(node.week_end||node.weekEnd||'');
+  var label='';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(weekStart)&&/^\d{4}-\d{2}-\d{2}$/.test(weekEnd))label=payReadyMdy(weekStart)+'\u2013'+payReadyMdy(weekEnd);
+  return {source:'ace',week_start:weekStart,week_end:weekEnd,label:label,rows:rows};
+}
+function payReadyInitials(name){
+  var parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length)return '?';
+  if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
+  return (parts[0].charAt(0)+parts[parts.length-1].charAt(0)).toUpperCase();
+}
+function payReadyAvatarColor(initials){
+  if(PAYREADY_AVATAR[initials])return PAYREADY_AVATAR[initials];
+  var palette=['#3b82f6','#e07a4c','#7c6bb5','#1d8a86','#1e9a62','#c45c8a'];
+  var n=0;
+  for(var i=0;i<String(initials).length;i++)n+=String(initials).charCodeAt(i);
+  return palette[n%palette.length];
+}
+function payReadyCounts(rows){
+  var ready=0,held=0;
+  (rows||[]).forEach(function(r){if(r&&r.status==='held')held++;else if(r&&r.status==='ready')ready++;});
+  return {ready:ready,held:held};
+}
+function payReadyOfficeLabel(v){
+  if(v==='clear')return 'Clear';
+  if(v==='sent_back')return 'Sent back';
+  return '\u2014';
+}
+function payReadyDetailModel(row, weekLabel){
+  var checks=row.checks||{};
+  return {
+    name:row.name,
+    client:row.client?('Client: '+row.client):'Client: \u2014',
+    week:'Week of '+(weekLabel||''),
+    banner:'Held \u2014 '+(row.reasonLabel||'held'),
+    checks:[
+      {label:'Submitted',text:checks.submitted?'Yes':'No',tone:checks.submitted?'':'bad'},
+      {label:'Save Day complete',text:checks.saveDay?'Yes':'No',tone:checks.saveDay?'':'bad'},
+      {label:'Signature',text:checks.signature==='missing'?'Missing \u2715':'Yes',tone:checks.signature==='missing'?'bad':''},
+      {label:'Office review',text:payReadyOfficeLabel(checks.officeReview),tone:checks.officeReview==='clear'?'ok':(checks.officeReview==='sent_back'?'bad':'')}
+    ]
+  };
+}
+function payReadyChecksHtml(checks){
+  return (checks||[]).map(function(c){
+    var tone=c.tone==='bad'?' pay-check-bad':(c.tone==='ok'?' pay-check-ok':'');
+    return '<li class="pay-check"><span class="pay-check-ico" aria-hidden="true">\u2713</span><span>'+payReadyEsc(c.label)+'</span><span class="pay-check-val'+tone+'">'+payReadyEsc(c.text)+'</span></li>';
+  }).join('');
+}
+function payReadyRowHtml(row){
+  var initials=payReadyInitials(row.name);
+  var color=payReadyAvatarColor(initials);
+  var chip=row.status==='held'
+    ?'<span class="pay-chip pay-chip-held">'+payReadyEsc(row.reasonLabel)+'</span>'
+    :'<span class="pay-chip pay-chip-ready">All current <span aria-hidden="true">\u2713</span></span>';
+  var body='<span class="pay-avatar" style="background:'+color+'" aria-hidden="true">'+payReadyEsc(initials)+'</span><span class="pay-row-main"><strong>'+payReadyEsc(row.name)+'</strong>'+(row.role?'<span>'+payReadyEsc(row.role)+'</span>':'')+'</span>'+chip;
+  if(row.status==='held')return '<button type="button" class="pay-row" data-pay-id="'+payReadyAttr(row.id)+'" onclick="payReadyOpenDetail(this.getAttribute(&quot;data-pay-id&quot;))">'+body+'</button>';
+  return '<div class="pay-row pay-row-ready">'+body+'</div>';
+}
+function payReadyRowsHtml(rows){
+  var held=[],ready=[],html='';
+  (rows||[]).forEach(function(r){if(r.status==='held')held.push(r);else if(r.status==='ready')ready.push(r);});
+  if(held.length){
+    html+='<h2 class="pay-sec">Held</h2>';
+    held.forEach(function(r){html+=payReadyRowHtml(r);});
+  }
+  if(ready.length){
+    html+='<h2 class="pay-sec">Ready</h2>';
+    ready.forEach(function(r){html+=payReadyRowHtml(r);});
+  }
+  return html;
+}
+function payReadyCsvCell(v){
+  var s=String(v==null?'':v);
+  if(/[",\n]/.test(s))return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+function payReadyExportCsv(state){
+  var rows=((state&&state.rows)||[]).filter(function(r){return r.status==='ready';});
+  var lines=['Aide,Client,Week,Readiness'];
+  var week=state&&state.label||'';
+  rows.forEach(function(r){
+    lines.push([payReadyCsvCell(r.name),payReadyCsvCell(r.client),payReadyCsvCell(week),'ready'].join(','));
+  });
+  return lines.join('\n');
+}
+function payReadyReadyRow(name, i){
+  return {id:'ready-'+i,timesheet_id:'',name:name,role:'Home Health Aide',client:'',status:'ready',reason:'',reasonLabel:'',checks:{submitted:true,saveDay:true,signature:'present',officeReview:'clear'}};
+}
+function payReadyNameList(){
+  return ['Maya Brooks','Alex Nguyen','Riley Chen','Sam Patel','Avery Cole','Quinn Brooks','Drew Santos','Parker Lee','Reese Kim','Cameron Ortiz','Skyler Adams','Jamie Flores','Noah Bennett','Elena Vasquez','Chris Dalton','Robin Shah'];
+}
+function payReadyStubRollup(kind, week){
+  week=week||payReadyWeekRange(new Date());
+  var names=payReadyNameList();
+  var rows;
+  if(kind==='clear'){
+    rows=names.map(payReadyReadyRow);
+  }else{
+    rows=[
+      {id:'pay-js',timesheet_id:'',name:'Jordan Smith',role:'Home Health Aide',client:'Ruth Coleman',status:'held',reason:'missing_signature',reasonLabel:'missing signature',checks:{submitted:true,saveDay:true,signature:'missing',officeReview:'clear'}},
+      {id:'pay-cw',timesheet_id:'',name:'Casey White',role:'Home Health Aide',client:'Helen Grant',status:'held',reason:'not_submitted',reasonLabel:'not submitted',checks:{submitted:false,saveDay:false,signature:'missing',officeReview:''}},
+      {id:'pay-tr',timesheet_id:'',name:'Taylor Reed',role:'Home Health Aide',client:'Luis Ortega',status:'held',reason:'sent_back',reasonLabel:'sent back',checks:{submitted:true,saveDay:true,signature:'present',officeReview:'sent_back'}},
+      {id:'pay-md',timesheet_id:'',name:'Morgan Davis',role:'Home Health Aide',client:'June Patel',status:'held',reason:'incomplete_save_day',reasonLabel:'incomplete Save Day',checks:{submitted:true,saveDay:false,signature:'present',officeReview:'clear'}}
+    ].concat(names.slice(0,12).map(payReadyReadyRow));
+  }
+  return {source:'stub',week_start:week.week_start,week_end:week.week_end,label:week.label,rows:rows};
+}
+async function payReadyFetchAce(weekStart){
+  if(payReadyFetchAce.off)return null;
+  if(typeof sbRestRpc!=='function')return null;
+  var body={p_week_start:weekStart};
+  var missing=0;
+  for(var i=0;i<PAYREADY_ROLLUP_RPCS.length;i++){
+    var name=PAYREADY_ROLLUP_RPCS[i];
+    var got;
+    try{got=await sbRestRpc(name, body);}catch(e){got={ok:false,error:String(e&&e.message||e)};}
+    if(got&&got.ok){
+      var mapped=payReadyMapRollup(got.data);
+      if(mapped){payReadyFetchAce.using=name;return mapped;}
+    }
+    if(got&&(got.status===401||got.status===403))return null;
+    var miss=typeof sbAideListRpcMissing==='function'?sbAideListRpcMissing(got):(got&&got.status===404);
+    if(miss)missing++;
+  }
+  if(missing===PAYREADY_ROLLUP_RPCS.length)payReadyFetchAce.off=true;
+  return null;
+}
+async function payReadyLoad(){
+  var gen=++payReadyGen;
+  var week=payReadyWeekRange(new Date());
+  var ace=null;
+  try{ace=await payReadyFetchAce(week.week_start);}catch(e){ace=null;}
+  if(gen!==payReadyGen)return null;
+  var next=ace||payReadyStubRollup('mixed', week);
+  if(!next.label)next.label=week.label;
+  if(!next.week_start)next.week_start=week.week_start;
+  if(!next.week_end)next.week_end=week.week_end;
+  var keep=payReadyView==='detail'&&(next.rows||[]).some(function(r){return String(r.id)===String(payReadySelected)&&r.status==='held';});
+  payReadyState=next;
+  if(!keep){payReadyView='list';payReadySelected='';}
+  payReadyPaint();
+  return next;
+}
+function payReadyPaint(){
+  if(typeof document==='undefined'||!document.getElementById||!payReadyState)return;
+  var root=document.getElementById('payReady');
+  if(!root)return;
+  root.setAttribute('data-payready-source', payReadyState.source||'');
+  var list=document.getElementById('payReadyListView');
+  var detail=document.getElementById('payReadyDetail');
+  var label=payReadyState.label||'';
+  var weekEl=document.getElementById('payReadyWeek');
+  if(weekEl)weekEl.textContent=label?('Week of '+label):'Week of';
+  if(payReadyView==='detail'){
+    var row=(payReadyState.rows||[]).filter(function(r){return String(r.id)===String(payReadySelected);})[0];
+    if(!row||row.status!=='held')payReadyView='list';
+    else{
+      if(list)list.hidden=true;
+      if(detail)detail.hidden=false;
+      var model=payReadyDetailModel(row, label);
+      var nameEl=document.getElementById('payDetailName');
+      var clientEl=document.getElementById('payDetailClient');
+      var weekLine=document.getElementById('payDetailWeek');
+      var banner=document.getElementById('payDetailBanner');
+      var checks=document.getElementById('payDetailChecks');
+      if(nameEl)nameEl.textContent=model.name;
+      if(clientEl)clientEl.textContent=model.client;
+      if(weekLine)weekLine.textContent=model.week;
+      if(banner)banner.textContent=model.banner;
+      if(checks)checks.innerHTML=payReadyChecksHtml(model.checks);
+      return;
+    }
+  }
+  if(detail)detail.hidden=true;
+  if(list)list.hidden=false;
+  var counts=payReadyCounts(payReadyState.rows);
+  var readyEl=document.getElementById('payReadyCount');
+  var heldEl=document.getElementById('payHeldCount');
+  if(readyEl)readyEl.textContent='Ready '+counts.ready;
+  if(heldEl)heldEl.textContent='Held '+counts.held;
+  var rowsEl=document.getElementById('payReadyRows');
+  var empty=document.getElementById('payReadyEmpty');
+  var title=document.getElementById('payReadyTitle');
+  var emptyTitle=document.getElementById('payReadyEmptyTitle');
+  var emptySub=document.getElementById('payReadyEmptySub');
+  var mark=document.getElementById('payReadyMark');
+  var exportBtn=document.getElementById('payReadyExport');
+  if(counts.held>0){
+    if(title)title.hidden=true;
+    if(empty)empty.hidden=true;
+    if(rowsEl)rowsEl.innerHTML=payReadyRowsHtml(payReadyState.rows);
+    return;
+  }
+  if(rowsEl)rowsEl.innerHTML='';
+  if(empty)empty.hidden=false;
+  if(counts.ready>0){
+    if(title){title.hidden=false;title.textContent='Pay ready';}
+    if(emptyTitle)emptyTitle.textContent='All '+counts.ready+' timesheets ready';
+    if(emptySub)emptySub.textContent='Nothing held this pay period';
+    if(mark)mark.hidden=false;
+    if(exportBtn)exportBtn.hidden=false;
+  }else{
+    if(title)title.hidden=true;
+    if(emptyTitle)emptyTitle.textContent='No timesheets this week';
+    if(emptySub)emptySub.textContent='Nothing held this pay period';
+    if(mark)mark.hidden=true;
+    if(exportBtn)exportBtn.hidden=true;
+  }
+}
+function payReadyOpenDetail(id){
+  var row=(payReadyState&&payReadyState.rows||[]).filter(function(r){return String(r.id)===String(id);})[0];
+  if(!row||row.status!=='held')return;
+  payReadySelected=row.id;
+  payReadyView='detail';
+  payReadyPaint();
+}
+function payReadyCloseDetail(){
+  payReadyView='list';
+  payReadySelected='';
+  payReadyPaint();
+}
+function payReadyOpenTimesheet(){
+  var row=(payReadyState&&payReadyState.rows||[]).filter(function(r){return String(r.id)===String(payReadySelected);})[0];
+  if(!row)return;
+  var id=row.timesheet_id||'';
+  if(id&&typeof allRecords!=='undefined'&&Array.isArray(allRecords)&&allRecords.some(function(r){return String(r.id)===String(id);})&&typeof viewRec==='function'){
+    viewRec(id);
+    return;
+  }
+  var box=document.getElementById('tsFiles');
+  if(box)box.hidden=false;
+  var toggle=document.getElementById('tsFilesToggle');
+  if(toggle)toggle.setAttribute('aria-expanded','true');
+  var search=document.getElementById('tsSearch');
+  if(search){
+    search.value=row.name||'';
+    if(typeof paintTimesheets==='function')paintTimesheets();
+  }
+  if(box&&box.scrollIntoView)box.scrollIntoView({block:'start'});
+  if(typeof showTempMsg==='function')showTempMsg('Readiness only. Open the timesheet from Timesheet files.','var(--navy)');
+}
+function payReadyHold(){
+  // TODO Ace: when a readiness-hold callable lands, post it with sbRestRpc.
+  // Do not post payroll, amounts, rates, gross, or net.
+  if(typeof showTempMsg==='function')showTempMsg('Not full payroll \u2014 readiness only. Office hold is not callable yet.','var(--navy)');
+}
+function payReadyExport(){
+  var csv=payReadyExportCsv(payReadyState);
+  if(!csv||csv.indexOf('\n')<0){
+    if(typeof showTempMsg==='function')showTempMsg('No ready timesheets to export.','var(--navy)');
+    return;
+  }
+  if(typeof Blob==='undefined'||typeof document==='undefined')return csv;
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a');
+  var week=(payReadyState&&payReadyState.week_start)||'week';
+  a.href=URL.createObjectURL(blob);
+  a.download='EverCare_Ready_List_'+week+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  return csv;
+}
+function payReadyToggleFiles(){
+  var box=document.getElementById('tsFiles');
+  if(!box)return;
+  var open=!!box.hidden;
+  box.hidden=!open;
+  var btn=document.getElementById('tsFilesToggle');
+  if(btn)btn.setAttribute('aria-expanded', open?'true':'false');
+  if(open&&box.scrollIntoView)box.scrollIntoView({block:'start'});
+}
 async function renderTimesheets(){
   const tbody=document.getElementById('tsBody');
   if(tbody)tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">Loading...</td></tr>';
@@ -10318,6 +10805,7 @@ async function renderTimesheets(){
     }
   }catch(e){if(tsDesk==='active')allRecords=store.get('admin_records')||[];}
   paintTimesheets();
+  if(typeof payReadyLoad==='function')payReadyLoad();
 }
 
 

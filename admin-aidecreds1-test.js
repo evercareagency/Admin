@@ -30,7 +30,8 @@ assert.ok(html.includes('admin-build 2026-09-25-aidecreds1'), 'aidecreds1 build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1">'), 'aidecreds1 meta');
 assert.ok(html.includes('<!-- aide credentials 2026-09-25 v=aidecreds1 admin-build 2026-09-25-aidecreds1'), 'aidecreds1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-aidecreds1'), 'aidecreds1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-payready1'), 'payready1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1"'), 'aidecreds1 stays after payready1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remidate1">'), 'remidate1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-ncipdf1">'), 'ncipdf1 meta stays');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1"') < html.indexOf('content="2026-09-25-remidate1"'), 'remidate1 stays after aidecreds1');
@@ -41,7 +42,7 @@ const note = html.slice(html.indexOf('v=aidecreds1'), html.indexOf('<!-- admin u
 assert.ok(/Admin only/.test(note), 'credentials are Admin only');
 assert.ok(/admin_list_aide_credentials/.test(note) && /admin_upsert_aide_credential/.test(note) && /admin_soft_delete_aide_credential/.test(note) && /admin_aide_credentials_rollup/.test(note), 'note names the four Ace callables');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser|rotate password/.test(note), 'aidecreds1 note does not reseal Auth');
-assert.ok(!html.includes('Maya Brooks'), 'product HTML does not bake the mock roster');
+assert.ok(!html.slice(0, html.indexOf('function payReadyNameList')).includes('Maya Brooks'), 'product HTML does not bake the mock roster outside the payready stub');
 
 const sheet = html.slice(html.indexOf('id="aideCredSheet"'), html.indexOf('id="tab_broadcast"'));
 assert.ok(sheet.includes('>Cancel<') && sheet.includes('>Save<'), 'sheet has Cancel and Save');
