@@ -56,8 +56,17 @@ assert.ok(!/v:\s*2|topics:\s*\{/.test(html), 'v2 aide_usernames encoding must be
 const sheetsClear = extractFn(html, 'async function clearAssignment()');
 assert.ok(sheetsClear.includes("action:'clear_assigned_topic'"), 'flag-off clear still posts Sheets');
 assert.ok(!/inservice_results/.test(sheetsClear), 'Sheets clear function must not name results table');
-assert.ok(sheetsClear.includes('evercareSbEnabled()'), 'topic id is attached only when the sb flag is on');
-assert.ok(sheetsClear.includes('payload.topicId=String(sel.value)'), 'sb clear sends the selected topic id');
+assert.ok(!/admin_unassign_inservice_aide/.test(sheetsClear), 'clear does not call the per-aide delete RPC');
+assert.ok(sheetsClear.includes('evercareSbEnabled()'), 'supabase cut is checked before any post');
+assert.ok(sheetsClear.includes('sbClearAssignedTopic(topicId)'), 'sb clear deletes that topic assignment row');
+assert.ok(sheetsClear.includes('Choose a topic before clearing the assignment.'), 'missing topicId fails loud');
+assert.ok(sheetsClear.indexOf('if(!topicId)')<sheetsClear.indexOf('sbClearAssignedTopic(topicId)'), 'missing topic returns before DELETE');
+const sheetsPostAt = sheetsClear.indexOf("apiPost({action:'clear_assigned_topic'})");
+assert.ok(sheetsPostAt > sheetsClear.indexOf('sbClearAssignedTopic(topicId)'), 'sheets post is after the sb delete');
+const sbClearBranch = sheetsClear.slice(0, sheetsPostAt);
+assert.ok(sbClearBranch.includes('sbClearAssignedTopic(topicId)'), 'supabase branch deletes before sheets');
+assert.ok(!/apiPost\(/.test(sbClearBranch), 'supabase clear does not post Sheets');
+assert.ok(sbClearBranch.indexOf('sbClearAssignedTopic(topicId)')<sbClearBranch.lastIndexOf('return;'), 'sb clear returns before the sheets post');
 assert.ok(extractFn(html, 'function sbAssignTopicQuery()').includes('isAssignTopicTouched'), 'refresh follows the topic the user selected');
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
@@ -462,6 +471,7 @@ function sessionWindow(){
   ];
   function uiBox(search, topicValue){
     const posts = [];
+    const toasts = [];
     const box = {
       location: {search: search},
       localStorage: {getItem: function(){return null;}},
@@ -469,28 +479,43 @@ function sessionWindow(){
         if(id==='assignTopicSel')return {value: topicValue};
         return null;
       }},
-      showTempMsg: function(){},
+      showTempMsg: function(msg){toasts.push(String(msg||''));},
       cacheInvalidate: function(){},
       renderInservices: function(){},
+      sbClearAssignedTopic: function(topicId){
+        posts.push({via:'sbClearAssignedTopic', topicId:String(topicId)});
+        return Promise.resolve({success:true, topicId:null, aideUsernames:null, assignAll:false});
+      },
       apiPost: function(payload){posts.push(payload); return Promise.resolve({success:true, topicId:null});},
       evercareSbEnabled: null
     };
     vm.createContext(box);
     vm.runInContext(uiNames.map(function(sig){return extractFn(html, sig);}).join('\n'), box);
-    return {box:box, posts:posts};
+    return {box:box, posts:posts, toasts:toasts};
   }
   const sheetsUi = uiBox('?sheets=1', '1');
   await sheetsUi.box.clearAssignment();
   assert.strictEqual(JSON.stringify(sheetsUi.posts[0]), JSON.stringify({action:'clear_assigned_topic'}), 'sheets rollback clear has no topic id');
+  assert.ok(!sheetsUi.posts.some(function(p){return p.via==='sbClearAssignedTopic';}), 'sheets rollback does not delete the sb row');
   const defaultUi = uiBox('', '3');
   await defaultUi.box.clearAssignment();
-  assert.strictEqual(defaultUi.posts[0].topicId, '3', 'default clear sends the selected topic');
+  assert.deepStrictEqual(defaultUi.posts[0], {via:'sbClearAssignedTopic', topicId:'3'}, 'default clear deletes the selected topic');
+  assert.ok(!defaultUi.posts.some(function(p){return p.action==='clear_assigned_topic';}), 'default clear does not post Sheets');
   const sbUi = uiBox('?sb=1', '1');
   await sbUi.box.clearAssignment();
-  assert.strictEqual(JSON.stringify(sbUi.posts[0]), JSON.stringify({action:'clear_assigned_topic', topicId:'1'}), 'flag on clear sends the selected topic only');
+  assert.deepStrictEqual(sbUi.posts[0], {via:'sbClearAssignedTopic', topicId:'1'}, 'flag on clear deletes the selected topic only');
   const sbUiB = uiBox('?sb=1', '2');
   await sbUiB.box.clearAssignment();
   assert.strictEqual(sbUiB.posts[0].topicId, '2');
+  const missingUi = uiBox('', '  ');
+  await missingUi.box.clearAssignment();
+  assert.strictEqual(missingUi.posts.length, 0, 'missing topicId does not DELETE or post Sheets');
+  assert.ok(missingUi.toasts.some(function(t){return /choose a topic/i.test(t);}), 'missing topicId fails loud');
+  const failedUi = uiBox('', '1');
+  failedUi.box.sbClearAssignedTopic=function(){return Promise.resolve({success:false, error:'Could not clear topic assignment.'});};
+  await failedUi.box.clearAssignment();
+  assert.ok(failedUi.toasts.some(function(t){return /could not clear topic assignment/i.test(t);}), 'failed DELETE is shown');
+  assert.ok(!failedUi.toasts.some(function(t){return /Assignment cleared/.test(t);}), 'failed DELETE is not reported as cleared');
 
   const rpcSrc = extractFn(html, 'async function sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult)');
   assert.ok(rpcSrc.includes("sbRestMutate('POST','rpc/admin_unassign_inservice_aide'"), 'delete posts the Ace RPC only');

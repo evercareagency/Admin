@@ -24,7 +24,8 @@ function extractFn(src, sig){
 }
 
 assert.ok(html.includes('v=cgreset1'), 'cgreset1 marker');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-24-cgreset1">'), 'admin-build meta');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build advances to isclear1');
+assert.ok(html.includes('admin-build 2026-09-24-cgreset1'), 'cgreset1 build note stays in the tip comment');
 assert.ok(html.includes('<!-- caregiver password reset 2026-09-24 v=cgreset1'), 'tip comment');
 assert.ok(html.includes('id="cgResetBtn"'), 'reset button stays tappable');
 assert.ok(html.includes('onclick="adminResetCaregiverPwd()"'), 'Settings card still calls adminResetCaregiverPwd');

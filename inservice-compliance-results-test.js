@@ -125,7 +125,10 @@ assert.ok(confirmAssign.includes('deleteISAssignment'), 'assignment confirm call
 assert.ok(!/window\.confirm/.test(confirmDel+deleteRes+confirmAssign+deleteAssign+renderTable+completedActs+pendingActs), 'no window.confirm');
 assert.ok(!/\bconfirm\(/.test(confirmDel+deleteRes+confirmAssign+deleteAssign), 'no confirm()');
 
-assert.ok(clearAssignment.includes("action:'clear_assigned_topic'"), 'clear posts clear_assigned_topic only');
+assert.ok(clearAssignment.includes("action:'clear_assigned_topic'"), 'sheets rollback still posts clear_assigned_topic');
+assert.ok(clearAssignment.includes('sbClearAssignedTopic(topicId)'), 'sb clear deletes the assignment row');
+assert.ok(clearAssignment.includes('Choose a topic before clearing the assignment.'), 'missing topicId fails loud');
+assert.ok(!/admin_unassign_inservice_aide/.test(clearAssignment), 'clear must not call the per-aide delete RPC');
 assert.ok(!/delete_inservice_result/.test(clearAssignment), 'clear must not delete results');
 assert.ok(!/delete_inservice/.test(clearAssignment), 'clear must not call delete');
 assert.ok(loadIS.includes('isISCompletedRecord'), 'after clear, completed rows still render');
@@ -154,7 +157,10 @@ assert.ok(onAssign.includes('aide_usernames null = all aides'), 'null assignment
 assert.ok(loadIS.includes('isAideOnCurrentISAssignment'), 'not completed rows follow the assignment list');
 assert.ok(loadIS.includes('!isISCompletedRecord(completion)&&!isAideOnCurrentISAssignment'), 'completed rows stay when that aide is off the list');
 assert.ok(html.includes('v=isdel1'), 'isdel1 marker');
-assert.ok(html.includes('2026-09-24-nursespd1'), 'current admin-build marker');
+assert.ok(html.includes('v=isclear1'), 'isclear1 marker');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build isclear1');
+assert.ok(html.includes('2026-09-24-nursespd1'), 'nursespd1 marker stays');
+assert.ok(html.includes('v=sched1m'), 'sched1m marker stays');
 assert.ok(html.includes('v=pdf1p'), 'pdf1p marker stays');
 assert.ok(loadIS.includes('includeArchived')===false || /no includeArchived/.test(html), 'get_inservices skips archived');
 assert.ok(!/includeArchived\s*:/.test(loadIS), 'must not pass includeArchived');
@@ -255,7 +261,11 @@ vm.runInContext(
     escapeHtml, isNum, firstField, resultIdOf, parseJsonArr, parseAns, parseItems, completedRec,
     topicIdOf, ansOk, fillScore, hydrate, certDate, formatDate, formatScore, formatBanner,
     payloadFn, applyScore, normalize, localQs, getShape, aceErr, remember, cached, mergeRow,
-    regrade, fallbackQs, adopt, setEdit, paint, viewRes, saveEdit
+    regrade, fallbackQs, adopt, setEdit,
+    extractFn(html, 'function isQuizLetter(index)'),
+    extractFn(html, 'function isQuizChoiceLabel(index, text)'),
+    extractFn(html, 'function isQuizAnswerLine(q, index, fallbackText)'),
+    paint, viewRes, saveEdit
   ].join('\n'),
   sandbox
 );
@@ -348,6 +358,36 @@ assert.ok(!sandbox.isISGetShape({success:true}), 'bare success is not get shape'
   assert.ok(els.isResultsNote.textContent.trim()!=='Unknown action', 'must not show bare Unknown action');
   assert.ok(els.isResultsBody.innerHTML.indexOf('is-result-qa')>=0, 'list-row answers paint Q&A when get fails');
   assert.ok(/class="mark"/.test(els.isResultsBody.innerHTML), 'Q&A includes correct/wrong marks');
+  assert.ok(els.isResultsBody.innerHTML.indexOf('Aide answer:')>=0, 'review names the aide answer');
+  assert.ok(els.isResultsBody.innerHTML.indexOf('A. a')>=0, 'wrong aide choice is lettered');
+  assert.ok(els.isResultsBody.innerHTML.indexOf('Correct:')>=0&&els.isResultsBody.innerHTML.indexOf('B. b')>=0, 'correct choice is lettered');
+  assert.ok(els.isResultsBody.innerHTML.indexOf('A. c')>=0, 'right aide choice is lettered');
+
+  const letterQs=sandbox.isResultsState.questions;
+  sandbox.isResultsState.editing=true;
+  sandbox.isResultsState.questions=[{
+    question:'Which event?',
+    options:['routine visit','medical emergency','hurricane','fire','flood','power outage'],
+    selected:1,
+    correct:2,
+    aideAnswer:'medical emergency',
+    correctAnswer:'hurricane',
+    isCorrect:false
+  }];
+  sandbox.paintISResults();
+  const editHtml=els.isResultsBody.innerHTML;
+  ['A. routine visit','B. medical emergency','C. hurricane','D. fire','E. flood','F. power outage'].forEach(function(label){
+    assert.ok(editHtml.indexOf(label)>=0, 'edit choice shows '+label);
+  });
+  assert.ok(!/\bG\./.test(editHtml), 'edit stops at the option count');
+  sandbox.isResultsState.editing=false;
+  sandbox.paintISResults();
+  const reviewHtml=els.isResultsBody.innerHTML;
+  assert.ok(reviewHtml.indexOf('Aide answer:')>=0&&reviewHtml.indexOf('B. medical emergency')>=0, 'review aide line is lettered');
+  assert.ok(reviewHtml.indexOf('Correct:')>=0&&reviewHtml.indexOf('C. hurricane')>=0, 'review correct line is lettered');
+  sandbox.isResultsState.questions=letterQs;
+  sandbox.isResultsState.editing=false;
+  sandbox.paintISResults();
 
   sandbox.isResultsState.questions[0].selected=1;
   sandbox.isResultsState.questions[1].selected=0;
