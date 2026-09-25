@@ -60,7 +60,7 @@ assert.ok(desk.includes('>Client wants backup<') && desk.includes('>Confirm assi
 assert.ok(desk.includes('>Still deciding<') && desk.includes('>Cancel shift<') && desk.includes('>Reopen<'), 'awaiting, cancel, and reopen outcomes');
 assert.ok(!/Request PTO|PTO balance|pto_request/i.test(desk), 'coverage is not a PTO product');
 
-assert.ok(!html.includes("navEditCatalog") || !extractFn(html, 'function navEditCatalog()').includes('coverage'), 'Coverage is not a bottom-tab choice');
+assert.ok(extractFn(html, 'function navEditCatalog()').includes('coverage'), 'Coverage stays in the Edit tabs picker');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-cover1">'), 'cover1 build meta stays');
 assert.ok(html.includes("sbRestRpc('admin_record_call_off'") || html.includes("record:['admin_record_call_off']"), 'record callable name');
 assert.ok(html.includes("list:['admin_list_open_shifts']"), 'list callable name');
