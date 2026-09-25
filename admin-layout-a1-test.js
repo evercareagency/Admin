@@ -46,7 +46,9 @@ assert.ok(html.includes('{notes:notes}'), 'mark saved writes the file note');
 assert.ok(!html.includes("status:'saved_on_file'") && !html.includes('status:"saved_on_file"'), 'mark saved does not invent a payroll status');
 
 assert.ok(admin.includes('data-layout-roles="Admin Scheduler"'), 'roles still gate shell items');
-assert.ok(!admin.includes('id="nav_coverage"'), 'coverage desk is a later More tip');
+assert.ok(admin.includes('id="nav_coverage"'), 'coverage desk is listed for Admin and Scheduler');
+const more = admin.slice(admin.indexOf('id="moreList"'), admin.indexOf('id="tab_backups"'));
+assert.ok(more.includes('id="nav_coverage"') && more.includes("showTab('coverage')"), 'coverage row is under More');
 
 function extractFn(src, sig){
   const start = src.indexOf(sig);

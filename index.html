@@ -41,6 +41,8 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, live smart assign, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id,p_limit?:20} returns {success, aides:[{aide_id, username, name, continuity_score, distance_miles, score, rank}]}. The rank panel paints that list and does not recompute score. Null distance_miles stays empty. admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?} accepts client_refused_resume_next_day, assigned_backup (p_backup_aide_id, only from open or awaiting_client), awaiting_client, cancelled, and reopen. Record returns {success, open_shift_id, status, urgency_within_48h, schedule_exception_id} and Ace upserts schedule_exceptions kind=call_off. Assign upserts kind=cover with aide_id. sms_stub not_sent_v1 is shown and is not sent by this desk. List rows carry client, regular_aide, shift_start, shift_end, status, urgency_within_48h. Within 48h chip when shift_start is within 48 hours, shift_end is still ahead, and status is open or awaiting_client. This desk does not also post upsert_schedule_exception. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-cover1">
 <!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Optional list helper POST rpc/admin_list_aides {p_include_deleted} when that callable answers with aide rows; otherwise Active is is_active=eq.true and deactivated_at=is.null, and Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Ace purges at 03:20 ET after 7 days. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-aidadel1">
 <meta name="admin-build" content="2026-09-25-navedit1">
@@ -280,6 +282,37 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .bak-card h3{font-size:0.98rem;color:var(--navy);margin-bottom:4px;}
 .bak-card p{font-size:0.8rem;color:var(--muted);margin-bottom:10px;}
 .bak-card .actions .btn{min-height:44px;}
+/* v=cover1 — Coverage desk. Phone cards. Not the Backup tab. */
+#tab_coverage .page-hdr{flex-direction:column;align-items:stretch;margin-bottom:12px;}
+#tab_coverage .field{margin-bottom:10px;}
+#tab_coverage textarea{min-height:64px;}
+#tab_coverage .cover-when-row{display:flex;gap:8px;}
+#tab_coverage .cover-when-row .field{flex:1;min-width:0;}
+#tab_coverage .page-hdr .btn,#tab_coverage .cover-actions .btn,#tab_coverage .cover-back{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
+#tab_coverage [hidden]{display:none !important;}
+#tab_coverage .cover-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
+#tab_coverage .cover-list{display:flex;flex-direction:column;gap:10px;}
+#tab_coverage .cover-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);box-shadow:0 6px 16px rgba(26,39,68,0.05);}
+#tab_coverage .cover-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
+#tab_coverage .cover-card-top strong{font-size:1.05rem;line-height:1.25;}
+#tab_coverage .cover-meta{font-size:0.92rem;line-height:1.35;color:var(--text);margin-top:2px;}
+#tab_coverage .cover-chip{display:inline-flex;align-items:center;flex-shrink:0;min-height:28px;padding:4px 10px;border-radius:999px;background:#fff3e0;color:#9a3412;font-size:0.75rem;font-weight:700;}
+#tab_coverage .cover-section{margin-top:10px;}
+#tab_coverage .cover-section h2{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 8px;}
+#tab_coverage .cover-actions{display:flex;flex-direction:column;gap:8px;}
+#tab_coverage .cover-rank{background:#fff;border:1.5px dashed var(--border);border-radius:14px;padding:12px;margin-top:8px;}
+#tab_coverage .cover-rank h2{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 8px;}
+#tab_coverage .cover-rank p{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0;}
+#tab_coverage .cover-rank-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+#tab_coverage .cover-rank-row{width:100%;min-height:48px;text-align:left;background:var(--teal-light);color:var(--navy);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-family:'DM Sans',sans-serif;cursor:pointer;}
+#tab_coverage .cover-rank-row strong{display:block;font-size:0.95rem;}
+#tab_coverage .cover-rank-row span{display:block;font-size:0.82rem;color:var(--text);margin-top:2px;}
+#tab_coverage input,#tab_coverage select,#tab_coverage textarea{font-size:16px;min-height:48px;}
+#tab_coverage .btn:disabled{opacity:0.45;cursor:not-allowed;}
+#tab_coverage .cover-back{margin-bottom:8px;}
+#coverOutcomeView .page-hdr{margin-bottom:8px;}
+#coverOutcomeView .page-hdr p{display:none;}
+#coverIntakeView .page-hdr{margin-bottom:8px;}
 .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
 .data-table th{background:var(--teal);color:white;padding:9px 11px;text-align:left;font-weight:600;font-size:0.73rem;}
 .data-table th:first-child{border-radius:6px 0 0 0;}.data-table th:last-child{border-radius:0 6px 0 0;}
@@ -1137,7 +1170,7 @@ bindLoginKeyboard();
         </div>
       </div>
 
-      <!-- MORE — Coverage desk is a future tip and is not listed here. -->
+      <!-- MORE — Coverage desk is listed here (v=cover1). It is not a bottom tab. -->
       <div class="tab-panel" id="tab_more">
         <div class="page-hdr">
           <div><h1>More</h1><p>Not on the bottom bar, plus account</p></div>
@@ -1158,6 +1191,7 @@ bindLoginKeyboard();
           </div>
         </div>
         <div class="more-list" id="moreList">
+          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('coverage')" id="nav_coverage"><span class="ni">🗺️</span> Coverage</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('nurse')" id="nav_nurse" aria-label="Nurse"><span class="ni">🩺</span> Nurse <span class="nav-badge" id="nav_nurse_badge" hidden>0</span></button>
           <button type="button" class="nav-item more-row" id="nav_completes" aria-label="Completed intakes" aria-hidden="true" onclick="showTab('completes')"><span class="ni">📄</span> Completed intakes</button>
@@ -1170,6 +1204,85 @@ bindLoginKeyboard();
             <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('settings')" id="nav_settings"><span class="ni">⚙️</span> Settings</button>
             <button type="button" class="signout-row" id="moreSignOut" onclick="adminLogout()">Sign Out</button>
           </div>
+        </div>
+      </div>
+
+      <!-- COVERAGE — call-off / open-shift desk. Not Backup. Not PTO. -->
+      <div class="tab-panel" id="tab_coverage">
+        <div id="coverListView">
+          <div class="page-hdr">
+            <div>
+              <h1>Coverage</h1>
+              <p>Call-offs and open shifts.</p>
+            </div>
+            <button type="button" class="btn btn-teal" id="coverIntakeOpen" onclick="coverShowIntake()">Record call-off</button>
+          </div>
+          <p class="cover-note" id="coverSourceNote">Open shifts from call-offs.</p>
+          <div id="coverList" class="cover-list" aria-label="Open shifts"></div>
+          <div id="coverEmpty" class="empty-state" hidden><p>No open shifts. Record a call-off to open one.</p></div>
+        </div>
+        <div id="coverIntakeView" hidden>
+          <button type="button" class="btn btn-ghost cover-back" id="coverIntakeBack" onclick="coverShowList()">← Open shifts</button>
+          <div class="page-hdr">
+            <div>
+              <h1>Record call-off</h1>
+              <p>This opens a shift on the Coverage list.</p>
+            </div>
+          </div>
+          <p class="cover-note" id="coverRosterNote">Clients and aides use the same lists as Schedule.</p>
+          <div class="field"><label for="coverClientSel">Client</label><select id="coverClientSel"></select></div>
+          <div class="field"><label for="coverAideSel">Regular aide</label><select id="coverAideSel"></select></div>
+          <div class="field"><label for="coverDate">Date</label><input type="date" id="coverDate"></div>
+          <div class="cover-when-row">
+            <div class="field"><label for="coverTime">Start</label><input type="time" id="coverTime" value="08:00"></div>
+            <div class="field"><label for="coverEndTime">End</label><input type="time" id="coverEndTime" value="12:00"></div>
+          </div>
+          <div class="field"><label for="coverPhone">Client phone</label><input type="tel" id="coverPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
+          <div class="field"><label for="coverNote">Reason</label><textarea id="coverNote" placeholder="Optional reason"></textarea></div>
+          <div class="cover-actions">
+            <button type="button" class="btn btn-teal" id="coverRecordBtn" onclick="coverRecordCalloff()">Record call-off</button>
+          </div>
+        </div>
+        <div id="coverOutcomeView" hidden>
+          <button type="button" class="btn btn-ghost cover-back" id="coverOutcomeBack" onclick="coverShowList()">← Open shifts</button>
+          <div class="page-hdr">
+            <div>
+              <h1>Open shift</h1>
+              <p>Text or call the client, then close the shift.</p>
+            </div>
+          </div>
+          <article class="cover-card" id="coverOutcomeSummary" aria-label="Shift"></article>
+          <section class="cover-rank" id="coverRankPanel" aria-label="Smart assign">
+            <h2>Smart assign</h2>
+            <p id="coverRankBody">Ranked backups from the office.</p>
+            <div id="coverRankList" class="cover-rank-list"></div>
+          </section>
+          <section class="cover-section" aria-label="Contact the client">
+            <h2>1. Text or call the client</h2>
+            <div class="cover-actions">
+              <button type="button" class="btn btn-teal" id="coverTextBtn" onclick="coverMarkContact('text')">Text client</button>
+              <button type="button" class="btn btn-navy" id="coverCallBtn" onclick="coverMarkContact('call')">Call client</button>
+            </div>
+            <p class="cover-note" id="coverContactNote">Text or call the client before you close this shift.</p>
+          </section>
+          <section class="cover-section" aria-label="Outcome">
+            <h2>2. Outcome</h2>
+            <div class="cover-actions">
+              <button type="button" class="btn btn-warn" id="coverRefuseBtn" disabled onclick="coverRefuse()">Client refused / resume next day</button>
+              <button type="button" class="btn btn-teal" id="coverAssignBtn" disabled onclick="coverShowAssign()">Assign backup</button>
+              <button type="button" class="btn btn-navy" id="coverAwaitBtn" disabled onclick="coverAwaiting()">Awaiting client</button>
+              <button type="button" class="btn btn-ghost" id="coverCancelBtn" onclick="coverCancelShift()">Cancel shift</button>
+              <button type="button" class="btn btn-ghost" id="coverReopenBtn" hidden onclick="coverReopen()">Reopen</button>
+            </div>
+            <div id="coverAssignConfirm" hidden>
+              <div class="field" style="margin-top:12px"><label for="coverBackupSel">Backup aide</label><select id="coverBackupSel"></select></div>
+              <p class="cover-note">Confirm before this shift leaves the open list.</p>
+              <div class="cover-actions">
+                <button type="button" class="btn btn-teal" id="coverAssignConfirmBtn" onclick="coverConfirmAssign()">Confirm assign</button>
+                <button type="button" class="btn btn-ghost" id="coverAssignCancel" onclick="coverHideAssign()">Not yet</button>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -3272,6 +3385,7 @@ function showTab(tab){
   if(tab==='clients')renderClients();
   if(tab==='nurse')loadAdminNurseSection();
   if(tab==='schedule')loadAdminSchedule();
+  if(tab==='coverage'&&typeof coverOpenDesk==='function')coverOpenDesk();
   if(tab==='inservices')renderInservices();
   if(tab==='activity')renderActivityLog();
   if(tab==='settings'){
@@ -3279,6 +3393,812 @@ function showTab(tab){
     document.getElementById('adminOnlyPwdCard').style.display=isAdmin?'block':'none';
     document.getElementById('schedulerNoAccessCard').style.display=isAdmin?'none':'block';
   }
+}
+
+// v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
+// Office JWT via sbRestRpc. No Sheets. No Backup writes. No PTO.
+// Ace syncs schedule_exceptions call_off to cover. This desk does not post upsert_schedule_exception.
+// Rank panel paints admin_rank_backup_aides aides[]. Score is Ace's. Null miles are not filled in.
+var COVER_RPC={
+  record:['admin_record_call_off'],
+  list:['admin_list_open_shifts'],
+  rank:['admin_rank_backup_aides'],
+  outcome:['admin_cover_outcome']
+};
+var coverRpcPick={record:'',list:'',rank:'',outcome:''};
+var coverRpcOff={record:false,list:false,rank:false,outcome:false};
+var coverShifts=[];
+var coverSource='local';
+var coverView='list';
+var coverSelectedId='';
+var coverContacted=false;
+var coverRanks=[];
+var coverBusy=false;
+var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
+var COVER_RANK_EMPTY='No backup aides ranked for this shift.';
+function coverEsc(s){
+  var raw=String(s==null?'':s);
+  if(typeof escapeHtml==='function')return escapeHtml(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function coverAttr(s){
+  if(typeof escapeAttr==='function')return escapeAttr(s);
+  return coverEsc(s).replace(/'/g,'&#39;');
+}
+function coverRpcMissing(got){
+  if(typeof sbAideListRpcMissing==='function')return sbAideListRpcMissing(got);
+  var err=String((got&&(got.error||got.message))||'');
+  if(got&&got.status===404)return true;
+  return /PGRST202|could not find the function|schema cache/i.test(err);
+}
+function coverWithin48h(startsAt, nowMs){
+  var t=Date.parse(startsAt==null?'':startsAt);
+  if(!isFinite(t))return false;
+  var now=nowMs==null?Date.now():Number(nowMs);
+  if(!isFinite(now))now=Date.now();
+  var delta=t-now;
+  var windowMs=48*60*60*1000;
+  return delta<=windowMs&&delta>=-windowMs;
+}
+function coverStatusKey(shift){
+  return String(shift&&shift.status||'open').trim().toLowerCase().replace(/[\s-]+/g,'_');
+}
+function coverShiftUrgent(shift, nowMs){
+  if(!shift)return false;
+  var st=coverStatusKey(shift);
+  if(st!==''&&st!=='open'&&st!=='awaiting_client')return false;
+  var now=nowMs==null?Date.now():Number(nowMs);
+  if(!isFinite(now))now=Date.now();
+  var start=Date.parse(shift.startsAt||shift.shift_start||'');
+  var end=Date.parse(shift.endsAt||shift.shift_end||'');
+  if(isFinite(start)&&isFinite(end))return start<=now+48*60*60*1000&&end>=now;
+  return shift.urgencyWithin48h===true||shift.urgency_within_48h===true;
+}
+function coverFormatWhen(iso){
+  var t=Date.parse(iso==null?'':iso);
+  if(!isFinite(t))return '—';
+  try{
+    return new Intl.DateTimeFormat('en-US',{
+      weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit'
+    }).format(new Date(t));
+  }catch(e){
+    return '—';
+  }
+}
+function coverFormatSpan(start, end){
+  var a=coverFormatWhen(start);
+  if(!end)return a;
+  var b=coverFormatWhen(end);
+  if(a==='—'||b==='—')return a==='—'?b:a;
+  var aCut=a.lastIndexOf(', ');
+  var bCut=b.lastIndexOf(', ');
+  if(aCut>0&&bCut>0&&a.slice(0,aCut)===b.slice(0,bCut))return a+' – '+b.slice(bCut+2);
+  return a+' – '+b;
+}
+function coverPick(src){
+  var row=src||{};
+  for(var i=1;i<arguments.length;i++){
+    var v=row[arguments[i]];
+    if(v!=null&&v!=='')return v;
+  }
+  return '';
+}
+function coverNameOf(v){
+  if(v==null||v==='')return '';
+  if(typeof v==='string'||typeof v==='number')return String(v);
+  if(typeof v==='object')return String(v.name||v.full_name||v.fullName||v.username||'');
+  return '';
+}
+function coverIdOf(v){
+  if(!v||typeof v!=='object')return '';
+  return String(v.id||v.aide_id||v.client_id||'');
+}
+function coverMapShift(row){
+  var src=row&&typeof row==='object'?row:{};
+  if(src.shift&&typeof src.shift==='object'&&!src.id&&!src.shift_id&&!src.open_shift_id)src=src.shift;
+  var id=String(coverPick(src,'open_shift_id','openShiftId','id','shift_id','shiftId')||'');
+  var clientName=coverNameOf(src.client);
+  if(!clientName)clientName=String(coverPick(src,'clientName','client_name')||'');
+  var aideName=coverNameOf(src.regular_aide||src.regularAide);
+  if(!aideName)aideName=String(coverPick(src,'regularAideName','regular_aide_name','aideName','aide_name','usual_aide_name','usualAideName')||'');
+  var startsAt=String(coverPick(src,'shift_start','shiftStart','p_shift_start','startsAt','starts_at','when')||'');
+  var endsAt=String(coverPick(src,'shift_end','shiftEnd','p_shift_end','endsAt','ends_at')||'');
+  var statusRaw=coverPick(src,'status','outcome');
+  var status=String(statusRaw||'open');
+  var phone=String(coverPick(src,'clientPhone','client_phone','phone')||'');
+  var note=String(coverPick(src,'reason','p_reason','note','notes','p_notes')||'');
+  var clientId=coverIdOf(src.client);
+  if(!clientId)clientId=String(coverPick(src,'clientId','client_id')||'');
+  var aideId=coverIdOf(src.regular_aide||src.regularAide);
+  if(!aideId)aideId=String(coverPick(src,'regularAideId','regular_aide_id','aideId','aide_id','usual_aide_id')||'');
+  var backupId=String(coverPick(src,'backupAideId','backup_aide_id')||'');
+  var backupName=String(coverPick(src,'backupAideName','backup_aide_name')||'');
+  if(!id&&!clientName)return null;
+  return {
+    id:id,
+    clientId:clientId,
+    clientName:clientName||'Client',
+    aideId:aideId,
+    aideName:aideName||'—',
+    startsAt:startsAt,
+    endsAt:endsAt,
+    status:status||'open',
+    statusExplicit:statusRaw!=null&&String(statusRaw)!=='',
+    phone:phone,
+    note:note,
+    backupAideId:backupId,
+    backupAideName:backupName,
+    urgencyWithin48h:src.urgency_within_48h===true||src.urgencyWithin48h===true,
+    scheduleExceptionId:String(coverPick(src,'schedule_exception_id','scheduleExceptionId')||''),
+    smsStub:String(coverPick(src,'sms_stub','smsStub')||''),
+    source:src.source||'ace',
+    contacted:!!src.contacted
+  };
+}
+function coverShiftRows(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return [];}
+  }
+  if(Array.isArray(node))return node;
+  if(!node||typeof node!=='object')return [];
+  if(node.ok===false||node.success===false)return [];
+  if(node.shift&&typeof node.shift==='object')return [node.shift];
+  var keys=['shifts','open_shifts','openShifts','rows','data','items'];
+  for(var i=0;i<keys.length;i++){
+    if(Array.isArray(node[keys[i]]))return node[keys[i]];
+  }
+  if(node.id||node.shift_id||node.open_shift_id||node.client_name||node.clientName)return [node];
+  return [];
+}
+function coverMapRank(row){
+  var src=row&&typeof row==='object'?row:{};
+  var id=String(src.aide_id==null?'':src.aide_id).trim();
+  var username=String(src.username==null?'':src.username).trim();
+  var name=String(src.name==null?'':src.name).trim();
+  if(!id&&!username&&!name)return null;
+  return {
+    id:id||username||name,
+    username:username,
+    name:name||username||id,
+    distance:src.distance_miles==null||src.distance_miles===''?null:src.distance_miles,
+    continuity:src.continuity_score==null||src.continuity_score===''?null:src.continuity_score,
+    score:src.score==null||src.score===''?null:src.score,
+    rank:src.rank==null||src.rank===''?null:src.rank
+  };
+}
+function coverRankRows(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return [];}
+  }
+  var list=[];
+  if(Array.isArray(node))list=node;
+  else if(node&&typeof node==='object'){
+    if(node.ok===false||node.success===false)return [];
+    if(Array.isArray(node.aides))list=node.aides;
+  }
+  var out=[];
+  for(var n=0;n<list.length;n++){
+    var mapped=coverMapRank(list[n]);
+    if(mapped)out.push(mapped);
+  }
+  out.sort(function(a,b){
+    var ar=a.rank==null||a.rank==='';
+    var br=b.rank==null||b.rank==='';
+    if(ar&&br)return 0;
+    if(ar)return 1;
+    if(br)return -1;
+    return Number(a.rank)-Number(b.rank);
+  });
+  return out;
+}
+function coverIsOpen(shift){
+  var st=String(shift&&shift.status||'open').trim().toLowerCase().replace(/[\s-]+/g,'_');
+  if(st==='cancelled'||st==='canceled'||st==='assigned'||st==='assigned_backup')return false;
+  if(st==='refused'||st==='client_refused_resume_next_day'||st==='resolved'||st==='closed')return false;
+  if(st===''||st==='open'||st==='call_off'||st==='calloff'||st==='awaiting_client'||st==='reopen'||st==='reopened')return true;
+  return true;
+}
+function coverReadLocal(){
+  try{
+    var raw=sessionStorage.getItem(COVER_LOCAL_KEY);
+    var data=raw?JSON.parse(raw):[];
+    if(!Array.isArray(data))return [];
+    return data.map(coverMapShift).filter(Boolean);
+  }catch(e){return [];}
+}
+function coverWriteLocal(list){
+  try{
+    var local=(list||[]).filter(function(s){return s&&s.source==='local'&&s.id;});
+    sessionStorage.setItem(COVER_LOCAL_KEY, JSON.stringify(local));
+  }catch(e){}
+}
+function coverUuidOrNull(v){
+  if(typeof sbUuid==='function'&&sbUuid(v))return String(v).trim();
+  return null;
+}
+function coverRecordBody(clientId, aideId, shiftStart, shiftEnd, reason){
+  var body={
+    p_client_id:clientId,
+    p_regular_aide_id:aideId,
+    p_shift_start:shiftStart,
+    p_shift_end:shiftEnd
+  };
+  if(reason)body.p_reason=String(reason);
+  return body;
+}
+function coverListBody(){
+  return {p_include_resolved:false};
+}
+function coverRankArgs(openShiftId){
+  return {p_open_shift_id:String(openShiftId||''), p_limit:20};
+}
+function coverCanAssign(shift){
+  var st=coverStatusKey(shift);
+  return st===''||st==='open'||st==='awaiting_client';
+}
+function coverOutcomeBody(openShiftId, outcome, backupAideId, notes){
+  var body={
+    p_open_shift_id:openShiftId,
+    p_outcome:outcome
+  };
+  if(backupAideId)body.p_backup_aide_id=backupAideId;
+  if(notes)body.p_notes=String(notes);
+  return body;
+}
+function coverFind(id){
+  id=String(id||'');
+  for(var i=0;i<(coverShifts||[]).length;i++){
+    if(String(coverShifts[i].id)===id)return coverShifts[i];
+  }
+  return null;
+}
+async function coverRpc(kind, body){
+  if(coverRpcOff[kind])return {missing:true};
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function')return {missing:true};
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token)return {signedOut:true};
+  var names=COVER_RPC[kind]||[];
+  var order=[];
+  if(coverRpcPick[kind])order.push(coverRpcPick[kind]);
+  for(var i=0;i<names.length;i++){
+    if(order.indexOf(names[i])<0)order.push(names[i]);
+  }
+  var last={missing:true};
+  for(var n=0;n<order.length;n++){
+    var got=null;
+    try{got=await sbRestRpc(order[n], body||{});}
+    catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+    if(got&&got.ok===true){
+      var node=got.data;
+      if(typeof sbRpcNode==='function'){
+        try{node=sbRpcNode(got.data);}catch(e2){node=got.data;}
+      }
+      var rpcErr='';
+      if(typeof sbRpcError==='function'){
+        try{rpcErr=sbRpcError(node)||'';}catch(e3){rpcErr='';}
+      }
+      if(rpcErr)return {ok:false, error:rpcErr};
+      coverRpcPick[kind]=order[n];
+      return {ok:true, data:node, name:order[n]};
+    }
+    if(coverRpcMissing(got)){
+      last={missing:true, error:got&&got.error};
+      continue;
+    }
+    return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+  }
+  coverRpcOff[kind]=true;
+  return last;
+}
+function coverShow(which){
+  coverView=which;
+  var list=document.getElementById('coverListView');
+  var intake=document.getElementById('coverIntakeView');
+  var outcome=document.getElementById('coverOutcomeView');
+  if(list)list.hidden=which!=='list';
+  if(intake)intake.hidden=which!=='intake';
+  if(outcome)outcome.hidden=which!=='outcome';
+  try{window.scrollTo(0,0);}catch(e){}
+}
+function coverClientChoices(){
+  var list=[];
+  try{list=(typeof schedClients==='function')?schedClients():(typeof allClients!=='undefined'?allClients:[]);}catch(e){list=[];}
+  return (list||[]).map(function(c){
+    return {value:String(c.id), label:String(c.name||c.clientName||c.id)};
+  }).filter(function(c){return c.value&&c.value!=='undefined';});
+}
+function coverAideChoices(){
+  var list=[];
+  try{list=(typeof schedAideRosters==='function')?schedAideRosters():[];}catch(e){list=[];}
+  var seen={};
+  var out=[];
+  (list||[]).forEach(function(a){
+    var val=a.id!=null&&String(a.id)!==''?String(a.id):String(a.username||'');
+    if(!val||seen[val])return;
+    seen[val]=1;
+    var label=String(a.name||a.fullName||a.full_name||a.username||val);
+    if(a.username)label+=' @'+a.username;
+    out.push({value:val, label:label});
+  });
+  return out;
+}
+function coverOptionHtml(list){
+  var html='';
+  var seen={};
+  (list||[]).forEach(function(item){
+    var val=String(item.value||'');
+    if(!val||seen[val])return;
+    seen[val]=1;
+    html+='<option value="'+coverAttr(val)+'">'+coverEsc(item.label||val)+'</option>';
+  });
+  return html;
+}
+function coverFillSelect(sel, list, placeholder, selected){
+  if(!sel)return;
+  sel.innerHTML='<option value="">'+coverEsc(placeholder)+'</option>'+coverOptionHtml(list);
+  if(selected)sel.value=String(selected);
+}
+function coverSelectedLabel(sel){
+  if(!sel||!sel.value)return '';
+  var opt=sel.options&&sel.selectedIndex>=0?sel.options[sel.selectedIndex]:null;
+  var text=opt?String(opt.textContent||''):'';
+  return text.replace(/\s+@\S+$/,'').trim();
+}
+function coverComposeWhen(date, time){
+  if(!date||!time)return '';
+  var parsed=new Date(String(date)+'T'+String(time));
+  if(!isFinite(parsed.getTime()))return '';
+  return parsed.toISOString();
+}
+function coverFillIntake(){
+  coverFillSelect(document.getElementById('coverClientSel'), coverClientChoices(), 'Select client', '');
+  coverFillSelect(document.getElementById('coverAideSel'), coverAideChoices(), 'Select aide', '');
+  var date=document.getElementById('coverDate');
+  var time=document.getElementById('coverTime');
+  if(date&&!date.value){
+    var t=new Date(Date.now()+24*60*60*1000);
+    var m=String(t.getMonth()+1);
+    var d=String(t.getDate());
+    if(m.length<2)m='0'+m;
+    if(d.length<2)d='0'+d;
+    date.value=t.getFullYear()+'-'+m+'-'+d;
+  }
+  if(time&&!time.value)time.value='08:00';
+  var endTime=document.getElementById('coverEndTime');
+  if(endTime&&!endTime.value)endTime.value='12:00';
+  var roster=document.getElementById('coverRosterNote');
+  if(roster){
+    var nClients=coverClientChoices().length;
+    var nAides=coverAideChoices().length;
+    roster.textContent=(nClients&&nAides)
+      ?'Clients and aides use the same lists as Schedule.'
+      :'No clients or aides loaded yet. Sign in, then open Coverage again. The lists are the same ones Schedule uses.';
+  }
+}
+function coverPaintList(){
+  var box=document.getElementById('coverList');
+  var empty=document.getElementById('coverEmpty');
+  if(!box)return;
+  var open=(coverShifts||[]).filter(coverIsOpen);
+  if(!open.length){
+    box.innerHTML='';
+    if(empty)empty.hidden=false;
+    return;
+  }
+  if(empty)empty.hidden=true;
+  box.innerHTML=open.map(function(s){
+    var chip=coverShiftUrgent(s)?'<span class="cover-chip">Within 48h</span>':'';
+    return '<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'">'
+      +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+chip+'</div>'
+      +'<div class="cover-meta">Regular aide · '+coverEsc(s.aideName||'—')+'</div>'
+      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(s.startsAt, s.endsAt))+'</div>'
+      +'</button>';
+  }).join('');
+}
+function coverShowList(){
+  coverEnsureBound();
+  coverShow('list');
+  coverPaintList();
+}
+function coverShowIntake(){
+  coverEnsureBound();
+  coverShow('intake');
+  coverFillIntake();
+}
+async function coverReload(){
+  var note=document.getElementById('coverSourceNote');
+  var got=await coverRpc('list', coverListBody());
+  if(got&&got.ok){
+    coverSource='ace';
+    coverShifts=coverShiftRows(got.data).map(coverMapShift).filter(Boolean);
+    if(note)note.textContent='Open shifts from the office.';
+  }else if(got&&(got.missing||got.signedOut)){
+    coverSource='local';
+    coverShifts=coverReadLocal();
+    if(note){
+      note.textContent=got.signedOut
+        ?'Sign in to load the office list. A call-off you record stays on this phone until then.'
+        :'The office list is not callable yet. A call-off you record stays on this phone until Ace answers.';
+    }
+  }else{
+    coverSource='local';
+    coverShifts=coverReadLocal();
+    if(note)note.textContent=(got&&got.error)||'Could not load open shifts.';
+  }
+  coverPaintList();
+}
+async function coverOpenDesk(){
+  coverEnsureBound();
+  try{if(typeof schedLoadRosters==='function')await schedLoadRosters();}catch(e){}
+  await coverReload();
+  if(coverView==='intake')coverFillIntake();
+  else if(coverView==='outcome'&&coverSelectedId)coverPaintOutcome();
+  else coverShow('list');
+}
+function coverPhoneHref(kind, phone){
+  var d=String(phone||'').replace(/[^\d+]/g,'');
+  if(!d)return '';
+  return (kind==='sms'?'sms:':'tel:')+d;
+}
+function coverFillBackup(shift){
+  var sel=document.getElementById('coverBackupSel');
+  if(!sel)return;
+  var aides=coverAideChoices().filter(function(a){
+    return !shift||String(a.value)!==String(shift.aideId);
+  });
+  var selected=shift&&shift.backupAideId?String(shift.backupAideId):'';
+  if(selected&&!aides.some(function(a){return String(a.value)===selected;})){
+    aides.unshift({value:selected, label:(shift.backupAideName||selected)});
+  }
+  coverFillSelect(sel, aides, 'Select backup aide', selected);
+}
+function coverPaintOutcome(){
+  var shift=coverFind(coverSelectedId);
+  var sum=document.getElementById('coverOutcomeSummary');
+  if(!shift){
+    if(sum)sum.innerHTML='<p>That shift is no longer open.</p>';
+    return;
+  }
+  if(sum){
+    var chip=coverShiftUrgent(shift)?'<span class="cover-chip">Within 48h</span>':'';
+    sum.innerHTML='<div class="cover-card-top"><strong>'+coverEsc(shift.clientName)+'</strong>'+chip+'</div>'
+      +'<div class="cover-meta">Regular aide · '+coverEsc(shift.aideName||'—')+'</div>'
+      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(shift.startsAt, shift.endsAt))+'</div>';
+  }
+  var canClose=!!coverContacted;
+  var canAssign=canClose&&coverCanAssign(shift);
+  var refuse=document.getElementById('coverRefuseBtn');
+  var assign=document.getElementById('coverAssignBtn');
+  var awaitBtn=document.getElementById('coverAwaitBtn');
+  var reopen=document.getElementById('coverReopenBtn');
+  if(refuse)refuse.disabled=!canClose;
+  if(assign)assign.disabled=!canAssign;
+  if(awaitBtn)awaitBtn.disabled=!canClose;
+  if(reopen)reopen.hidden=coverCanAssign(shift);
+  var note=document.getElementById('coverContactNote');
+  if(note){
+    if(!coverContacted)note.textContent='Text or call the client before you close this shift.';
+    else if(shift.phone)note.textContent='Client step recorded.';
+    else note.textContent='No phone on this shift. Client step recorded. Use the desk phone if you still need to dial.';
+  }
+  coverFillBackup(shift);
+}
+function coverPaintRanks(rows){
+  var body=document.getElementById('coverRankBody');
+  var list=document.getElementById('coverRankList');
+  coverRanks=rows||[];
+  if(list)list.innerHTML='';
+  if(!coverRanks.length){
+    if(body)body.textContent=COVER_RANK_EMPTY;
+    return;
+  }
+  if(body)body.textContent='Ace rank. Continuity and distance from the office. No coordinates stay last.';
+  if(!list)return;
+  list.innerHTML=coverRanks.map(function(r){
+    var title=(r.rank!=null?coverEsc(r.rank)+'. ':'')+coverEsc(r.name||'Aide');
+    var bits=[];
+    if(r.continuity!=null)bits.push('Continuity '+coverEsc(r.continuity));
+    if(r.distance!=null)bits.push(coverEsc(r.distance)+' mi');
+    else bits.push('No coordinates');
+    if(r.score!=null)bits.push('Score '+coverEsc(r.score));
+    var user=r.username?'<span>@'+coverEsc(r.username)+'</span>':'';
+    return '<button type="button" class="cover-rank-row" data-cover-aide="'+coverAttr(r.id)+'" data-cover-aide-name="'+coverAttr(r.name||r.username||r.id)+'">'
+      +'<strong>'+title+'</strong><span>'+bits.join(' · ')+'</span>'+user+'</button>';
+  }).join('');
+}
+async function coverLoadRanks(shift){
+  var body=document.getElementById('coverRankBody');
+  var list=document.getElementById('coverRankList');
+  coverRanks=[];
+  if(list)list.innerHTML='';
+  if(!shift)return;
+  var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
+  if(local){
+    if(body)body.textContent='This shift is not an office id yet, so ranked backups cannot load.';
+    return;
+  }
+  if(body)body.textContent='Loading ranked backups…';
+  var got=await coverRpc('rank', coverRankArgs(shift.id));
+  if(String(coverSelectedId)!==String(shift.id))return;
+  if(!got||got.missing||got.signedOut){
+    if(body)body.textContent=got&&got.signedOut?'Sign in to load ranked backups.':'Ranked backups did not answer.';
+    return;
+  }
+  if(!got.ok){
+    if(body)body.textContent=String(got.error||'Could not load ranked backups.');
+    return;
+  }
+  var rows=coverRankRows(got.data).filter(function(r){
+    return !shift.aideId||String(r.id)!==String(shift.aideId);
+  });
+  coverPaintRanks(rows);
+}
+function coverOpenOutcome(id){
+  var shift=coverFind(id);
+  if(!shift)return;
+  coverSelectedId=String(shift.id);
+  coverContacted=!!shift.contacted;
+  coverRanks=[];
+  coverHideAssign();
+  coverShow('outcome');
+  coverPaintOutcome();
+  coverLoadRanks(shift);
+}
+function coverMarkContact(kind){
+  var shift=coverFind(coverSelectedId);
+  if(!shift)return;
+  var href=coverPhoneHref(kind==='text'?'sms':'tel', shift.phone||'');
+  coverContacted=true;
+  shift.contacted=true;
+  if(shift.source==='local')coverWriteLocal(coverShifts);
+  coverPaintOutcome();
+  if(href){
+    try{window.location.href=href;}catch(e){}
+  }
+}
+function coverPickRank(id, name){
+  var shift=coverFind(coverSelectedId);
+  if(shift){
+    shift.backupAideId=String(id||'');
+    shift.backupAideName=name||'';
+  }
+  coverFillBackup(shift);
+  if(typeof showTempMsg==='function')showTempMsg('Backup selected. Confirm assign after you text or call.','var(--teal)');
+}
+function coverShowAssign(){
+  var shift=coverFind(coverSelectedId);
+  if(!coverContacted){
+    if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
+    return;
+  }
+  if(shift&&!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('Assign backup is only for an open shift or one awaiting the client.','var(--warn)');
+    return;
+  }
+  var box=document.getElementById('coverAssignConfirm');
+  if(box)box.hidden=false;
+  coverFillBackup(shift);
+}
+function coverHideAssign(){
+  var box=document.getElementById('coverAssignConfirm');
+  if(box)box.hidden=true;
+}
+async function coverRecordCalloff(){
+  if(coverBusy)return;
+  var csel=document.getElementById('coverClientSel');
+  var asel=document.getElementById('coverAideSel');
+  var dateEl=document.getElementById('coverDate');
+  var timeEl=document.getElementById('coverTime');
+  var endEl=document.getElementById('coverEndTime');
+  var noteEl=document.getElementById('coverNote');
+  var phoneEl=document.getElementById('coverPhone');
+  var clientId=csel?String(csel.value||''):'';
+  var aideId=asel?String(asel.value||''):'';
+  var clientName=coverSelectedLabel(csel);
+  var aideName=coverSelectedLabel(asel);
+  var startsAt=coverComposeWhen(dateEl&&dateEl.value, timeEl&&timeEl.value);
+  var endsAt=coverComposeWhen(dateEl&&dateEl.value, endEl&&endEl.value);
+  var noteText=noteEl?String(noteEl.value||'').trim():'';
+  var phone=phoneEl?String(phoneEl.value||'').trim():'';
+  if(!clientId||!clientName){
+    if(typeof showTempMsg==='function')showTempMsg('Choose a client.','var(--warn)');
+    return;
+  }
+  if(!aideId||!aideName){
+    if(typeof showTempMsg==='function')showTempMsg('Choose the regular aide.','var(--warn)');
+    return;
+  }
+  if(!startsAt||!endsAt){
+    if(typeof showTempMsg==='function')showTempMsg('Choose the date, start, and end.','var(--warn)');
+    return;
+  }
+  if(Date.parse(endsAt)<=Date.parse(startsAt)){
+    if(typeof showTempMsg==='function')showTempMsg('End time needs to be after the start.','var(--warn)');
+    return;
+  }
+  coverBusy=true;
+  var btn=document.getElementById('coverRecordBtn');
+  if(btn)btn.disabled=true;
+  var clientUuid=coverUuidOrNull(clientId);
+  var aideUuid=coverUuidOrNull(aideId);
+  var got=null;
+  if(clientUuid&&aideUuid){
+    got=await coverRpc('record', coverRecordBody(clientUuid, aideUuid, startsAt, endsAt, noteText));
+  }else{
+    got={missing:true};
+  }
+  function finish(){
+    coverBusy=false;
+    if(btn)btn.disabled=false;
+    if(noteEl)noteEl.value='';
+    if(phoneEl)phoneEl.value='';
+    coverShowList();
+  }
+  if(got&&got.ok){
+    var rows=coverShiftRows(got.data);
+    var mapped=coverMapShift((rows&&rows[0])||got.data||{})||null;
+    if(typeof showTempMsg==='function')showTempMsg('Call-off recorded. Shift is open.','var(--success)');
+    await coverReload();
+    if(mapped&&mapped.id){
+      var found=coverFind(mapped.id);
+      if(found){
+        if(!found.phone&&phone)found.phone=phone;
+        if(!found.clientName||found.clientName==='Client')found.clientName=clientName;
+        if(!found.aideName||found.aideName==='—')found.aideName=aideName;
+        if(!found.startsAt)found.startsAt=startsAt;
+        if(!found.endsAt)found.endsAt=endsAt;
+        if(!found.note&&noteText)found.note=noteText;
+      }else{
+        mapped.clientName=mapped.clientName&&mapped.clientName!=='Client'?mapped.clientName:clientName;
+        mapped.aideName=mapped.aideName&&mapped.aideName!=='—'?mapped.aideName:aideName;
+        mapped.startsAt=mapped.startsAt||startsAt;
+        mapped.endsAt=mapped.endsAt||endsAt;
+        mapped.phone=mapped.phone||phone;
+        if(!mapped.note&&noteText)mapped.note=noteText;
+        mapped.source='ace';
+        mapped.status=mapped.status||'open';
+        coverShifts.unshift(mapped);
+      }
+    }
+    finish();
+    return;
+  }
+  if(got&&got.ok===false){
+    coverBusy=false;
+    if(btn)btn.disabled=false;
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not record the call-off.','var(--danger)');
+    return;
+  }
+  if(coverSource==='ace'){
+    coverBusy=false;
+    if(btn)btn.disabled=false;
+    if(typeof showTempMsg==='function')showTempMsg('The office list is live, but record call-off did not answer. Nothing was saved.','var(--warn)');
+    return;
+  }
+  var shift={
+    id:'local-'+Date.now(),
+    clientId:clientId,
+    clientName:clientName,
+    aideId:aideId,
+    aideName:aideName,
+    startsAt:startsAt,
+    endsAt:endsAt,
+    status:'open',
+    phone:phone,
+    note:noteText,
+    backupAideId:'',
+    backupAideName:'',
+    source:'local',
+    contacted:false
+  };
+  var local=coverReadLocal().filter(function(s){return String(s.id)!==String(shift.id);});
+  local.unshift(shift);
+  coverWriteLocal(local);
+  coverShifts=local.concat((coverShifts||[]).filter(function(s){return s&&s.source!=='local';}));
+  var srcNote=document.getElementById('coverSourceNote');
+  if(srcNote)srcNote.textContent='Saved on this phone. The office list is not callable yet.';
+  if(typeof showTempMsg==='function')showTempMsg('Call-off recorded on this phone.','var(--teal)');
+  finish();
+}
+async function coverApplyOutcome(outcome){
+  var shift=coverFind(coverSelectedId);
+  if(!shift||coverBusy)return;
+  var needsContact=outcome==='client_refused_resume_next_day'||outcome==='assigned_backup'||outcome==='awaiting_client';
+  if(needsContact&&!coverContacted){
+    if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
+    return;
+  }
+  if(outcome==='assigned_backup'&&!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('Assign backup is only for an open shift or one awaiting the client.','var(--warn)');
+    return;
+  }
+  var backupId='';
+  var backupName='';
+  if(outcome==='assigned_backup'){
+    var sel=document.getElementById('coverBackupSel');
+    backupId=sel?String(sel.value||''):'';
+    backupName=coverSelectedLabel(sel);
+    if(!backupId){
+      if(typeof showTempMsg==='function')showTempMsg('Choose a backup aide, then confirm.','var(--warn)');
+      return;
+    }
+  }
+  coverBusy=true;
+  var localOnly=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
+  var got=null;
+  var backupUuid=outcome==='assigned_backup'?coverUuidOrNull(backupId):null;
+  if(!localOnly&&outcome==='assigned_backup'&&!backupUuid){
+    coverBusy=false;
+    if(typeof showTempMsg==='function')showTempMsg('That backup aide is not an office id yet. Nothing was saved.','var(--warn)');
+    return;
+  }
+  if(!localOnly){
+    got=await coverRpc('outcome', coverOutcomeBody(coverUuidOrNull(shift.id), outcome, backupUuid, shift.note||''));
+  }else{
+    got={missing:true};
+  }
+  if(got&&got.ok===false){
+    coverBusy=false;
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the outcome.','var(--danger)');
+    return;
+  }
+  var returned=null;
+  if(got&&got.ok){
+    var rows=coverShiftRows(got.data);
+    returned=coverMapShift((rows&&rows[0])||got.data||{})||null;
+  }
+  if(returned&&returned.statusExplicit)shift.status=returned.status;
+  else shift.status=outcome;
+  var sms='';
+  if(returned&&returned.smsStub)sms=returned.smsStub;
+  else if(got&&got.data&&got.data.sms_stub)sms=String(got.data.sms_stub);
+  shift.backupAideId=backupId;
+  shift.backupAideName=backupName;
+  if(shift.source==='local'||localOnly)coverWriteLocal(coverShifts);
+  coverBusy=false;
+  var msg=outcome==='assigned_backup'?'Backup assigned.':outcome==='awaiting_client'?'Marked awaiting client.':outcome==='cancelled'?'Shift cancelled.':outcome==='reopen'?'Shift reopened.':'Client refused. Resume next day.';
+  if(sms==='not_sent_v1')msg=msg+' Ace did not send a text (not_sent_v1).';
+  if(got&&(got.missing||got.signedOut))msg=msg+' Saved on this phone until the office outcome callable answers.';
+  if(typeof showTempMsg==='function')showTempMsg(msg,'var(--success)');
+  coverHideAssign();
+  coverSelectedId='';
+  coverShowList();
+}
+function coverRefuse(){
+  coverApplyOutcome('client_refused_resume_next_day');
+}
+function coverConfirmAssign(){
+  coverApplyOutcome('assigned_backup');
+}
+function coverAwaiting(){
+  coverApplyOutcome('awaiting_client');
+}
+function coverCancelShift(){
+  coverApplyOutcome('cancelled');
+}
+function coverReopen(){
+  coverApplyOutcome('reopen');
+}
+function coverEnsureBound(){
+  var root=document.getElementById('tab_coverage');
+  if(!root||root.getAttribute('data-cover-bound')==='1')return;
+  root.setAttribute('data-cover-bound','1');
+  root.addEventListener('click', function(ev){
+    var t=ev.target;
+    if(!t||!t.closest)return;
+    var card=t.closest('[data-cover-id]');
+    if(card&&root.contains(card)){
+      coverOpenOutcome(card.getAttribute('data-cover-id'));
+      return;
+    }
+    var rank=t.closest('[data-cover-aide]');
+    if(rank&&root.contains(rank)){
+      coverPickRank(rank.getAttribute('data-cover-aide'), rank.getAttribute('data-cover-aide-name'));
+    }
+  });
 }
 
 // admin schedule v=sched1
