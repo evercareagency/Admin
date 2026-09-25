@@ -68,6 +68,8 @@ assert.ok(!extractFn(html, 'function coverAwaiting()').includes('coverApplyOutco
 assert.ok(html.includes('function remiWiderNorm'), 'hyphenated asks are normalized');
 assert.ok(html.includes('No client phone is on file'), 'call draft names the missing phone');
 assert.ok(html.includes('No home address is on file'), 'share draft names the missing address');
+assert.ok(extractFn(html, 'function coverMapShift(row)').includes("'home_address'"), 'office home address is read when Ace sends it');
+assert.ok(extractFn(html, 'function coverClientPhone(shift)').includes('coverClientRecord'), 'call uses a phone already on the client');
 assert.ok(html.includes('if(start===end)return true;'), 'quiet hours overnight rule stays');
 assert.ok(!/admin_update_client_address|admin_ask_copilot|admin_share_address/.test(html.slice(html.indexOf('// v=remiwider1 tip 1'), html.indexOf('var schedWeekStart'))), 'no invented wider RPC');
 
@@ -262,6 +264,154 @@ async function runBrowser(){
     await page.click('#coverOutboundCancel');
     assert.deepStrictEqual(await page.evaluate(function(){return window.__bGo.slice();}), []);
 
+    const camId = '44444444-4444-4444-8444-444444444444';
+    await page.evaluate(async function(id, camId){
+      coverRpc = function(kind, body){
+        window.__bRpc.push({kind:kind, body:body||{}});
+        if(kind==='list'){
+          return Promise.resolve({ok:true, data:{success:true, shifts:[{
+            open_shift_id:id, status:'open', source:'office', client_name:'Bowlax', regular_aide_name:'Ada Cole',
+            regular_aide_id:'33333333-3333-4333-8333-333333333333', client_id:'66666666-6666-4666-8666-666666666666',
+            shift_start:'2026-09-27T16:00:00Z', shift_end:'2026-09-27T20:00:00Z',
+            client_phone:'2165550140', home_address:'100 Public Square',
+            case_manager_email:'', case_manager_name:''
+          }]}});
+        }
+        if(kind==='rank'){
+          return Promise.resolve({ok:true, data:{success:true, aides:[{
+            aide_id:camId, name:'Cam Brooks', username:'cam', phone:'2165550199',
+            continuity_score:2, distance_miles:1.2, rank:1
+          }]}});
+        }
+        if(kind==='outcome')return Promise.resolve({ok:true, data:{success:true, status:(body&&body.p_outcome)||'open', open_shift_id:id}});
+        return Promise.resolve({missing:true});
+      };
+      window.__bGo = [];
+      await coverReload();
+      coverOpenOutcome(id);
+    }, bowlax, camId);
+    await page.waitForFunction(function(id){
+      var shift = coverFind(id);
+      var row = document.querySelector('#coverRankList .cover-rank-row');
+      return shift && String(shift.phone||'')==='2165550140' && String(shift.clientHomeAddress||'')==='100 Public Square' && row && /Cam Brooks/.test(row.textContent||'');
+    }, {timeout:8000}, bowlax);
+    await page.evaluate(function(camId){
+      document.querySelector('#coverRankList [data-cover-aide="'+camId+'"]').scrollIntoView({block:'center'});
+    }, camId);
+    await page.click('#coverRankList [data-cover-aide="'+camId+'"]');
+
+    await page.evaluate(function(){
+      document.getElementById('coverCallBtn').scrollIntoView({block:'center'});
+    });
+    await page.click('#coverCallBtn');
+    await page.waitForSelector('#coverOutboundConfirm:not([hidden])');
+    const callSeed = await page.evaluate(function(){
+      function box(id){
+        var el = document.getElementById(id);
+        el.scrollIntoView({block:'center'});
+        var r = el.getBoundingClientRect();
+        var hit = document.elementFromPoint(r.left + r.width/2, r.top + r.height/2);
+        var nav = document.querySelector('#adminScreen .bottom-nav').getBoundingClientRect();
+        return {
+          disabled:!!el.disabled,
+          h:el.offsetHeight,
+          clear:r.bottom <= nav.top + 1 && r.top >= 0,
+          hit:hit===el || (hit && el.contains(hit))
+        };
+      }
+      return {
+        note: document.getElementById('coverOutboundNote').innerText,
+        go: box('coverOutboundGo'),
+        stop: box('coverOutboundCancel'),
+        overflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
+      };
+    });
+    assert.ok(/2165550140/.test(callSeed.note), callSeed.note);
+    assert.ok(!/No client phone is on file/.test(callSeed.note), callSeed.note);
+    assert.strictEqual(callSeed.go.disabled, false, 'call Confirm turns on when the phone is on the shift');
+    assert.ok(callSeed.go.h >= 44 && callSeed.stop.h >= 44, 'seeded call taps '+callSeed.go.h+'/'+callSeed.stop.h);
+    assert.strictEqual(callSeed.go.clear, true, 'call Confirm sits above the bottom nav');
+    assert.strictEqual(callSeed.go.hit, true, 'call Confirm is the tap target');
+    assert.strictEqual(callSeed.overflow, true, 'seeded call screen does not overflow');
+    await page.screenshot({path: path.join(shotDir, 'remiwider1b-call-seeded.png')});
+    await page.click('#coverOutboundCancel');
+    const callSeedHeld = await page.evaluate(function(){
+      var shift = coverFind(coverSelectedId);
+      return {goes: window.__bGo.slice(), contacted: !!(shift && shift.contacted)};
+    });
+    assert.deepStrictEqual(callSeedHeld.goes, []);
+    assert.strictEqual(callSeedHeld.contacted, false, 'Not yet does not dial');
+    await page.evaluate(function(){
+      document.getElementById('coverCallBtn').scrollIntoView({block:'center'});
+    });
+    await page.click('#coverCallBtn');
+    await page.waitForSelector('#coverOutboundGo:not([disabled])');
+    await page.evaluate(function(){
+      document.getElementById('coverOutboundGo').scrollIntoView({block:'center'});
+    });
+    await page.click('#coverOutboundGo');
+    const callOpened = await page.evaluate(function(){
+      var shift = coverFind(coverSelectedId);
+      return {href: window.__bGo[0] || '', contacted: !!(shift && shift.contacted)};
+    });
+    assert.ok(/^tel:2165550140/.test(callOpened.href), callOpened.href);
+    assert.strictEqual(callOpened.contacted, true, 'Confirm records the call step');
+
+    await page.evaluate(function(){window.__bGo = [];});
+    await page.evaluate(function(){
+      document.getElementById('coverShareBtn').scrollIntoView({block:'center'});
+    });
+    await page.click('#coverShareBtn');
+    await page.waitForSelector('#coverOutboundConfirm:not([hidden])');
+    const shareSeed = await page.evaluate(function(){
+      function box(id){
+        var el = document.getElementById(id);
+        el.scrollIntoView({block:'center'});
+        var r = el.getBoundingClientRect();
+        var nav = document.querySelector('#adminScreen .bottom-nav').getBoundingClientRect();
+        return {disabled:!!el.disabled, h:el.offsetHeight, clear:r.bottom <= nav.top + 1 && r.top >= 0};
+      }
+      return {
+        note: document.getElementById('coverOutboundNote').innerText,
+        go: box('coverOutboundGo'),
+        stop: box('coverOutboundCancel')
+      };
+    });
+    assert.ok(/100 Public Square/.test(shareSeed.note), shareSeed.note);
+    assert.ok(!/No home address is on file/.test(shareSeed.note), shareSeed.note);
+    assert.strictEqual(shareSeed.go.disabled, false, 'share Confirm turns on when the address and aide phone are on file');
+    assert.ok(shareSeed.go.h >= 44 && shareSeed.stop.h >= 44, 'seeded share taps '+shareSeed.go.h+'/'+shareSeed.stop.h);
+    assert.strictEqual(shareSeed.go.clear, true, 'share Confirm sits above the bottom nav');
+    await page.screenshot({path: path.join(shotDir, 'remiwider1b-share-seeded.png')});
+    await page.click('#coverOutboundCancel');
+    assert.deepStrictEqual(await page.evaluate(function(){return window.__bGo.slice();}), [], 'Not yet does not share the address');
+    await page.evaluate(function(){
+      document.getElementById('coverShareBtn').scrollIntoView({block:'center'});
+    });
+    await page.click('#coverShareBtn');
+    await page.waitForSelector('#coverOutboundGo:not([disabled])');
+    await page.evaluate(function(){
+      document.getElementById('coverOutboundGo').scrollIntoView({block:'center'});
+    });
+    await page.click('#coverOutboundGo');
+    const shareOpened = await page.evaluate(function(){return window.__bGo[0] || '';});
+    assert.ok(/^sms:2165550199/.test(shareOpened), shareOpened);
+    assert.ok(/100%20Public%20Square|100 Public Square/.test(decodeURIComponent(shareOpened)), shareOpened);
+
+    const seededAsk = await page.evaluate(function(){
+      function grab(q, kind){
+        var ans = copilotChatAnswer(q);
+        var hit = (ans.actions||[]).filter(function(a){return a.kind===kind;})[0] || null;
+        return {text:ans.text||'', missing:hit?String(hit.missing||''):'missing-action', phone:hit?String(hit.phone||''):'', body:hit?String(hit.body||''):''};
+      }
+      return {call:grab('call the client', 'wider-call'), share:grab('share the home address', 'wider-share')};
+    });
+    assert.strictEqual(seededAsk.call.missing, '', seededAsk.call.text);
+    assert.strictEqual(seededAsk.call.phone, '2165550140');
+    assert.strictEqual(seededAsk.share.missing, '');
+    assert.ok(/100 Public Square/.test(seededAsk.share.body), seededAsk.share.body);
+
+    await page.evaluate(function(){window.__bGo = [];});
     await page.click('#coverRefuseBtn');
     await page.waitForFunction(function(){
       var draft = document.getElementById('coverCmDraft');
