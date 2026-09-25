@@ -48,9 +48,9 @@ assert.ok(/evercareSbEnabled\(\)\)\{[\s\S]*return;[\s\S]*action:'reset_password'
 assert.ok(resetFn.indexOf("action:'reset_password'") > resetFn.indexOf('return;'), 'cut returns before Sheets');
 assert.ok(!resetFn.includes("'set_password'"), 'Settings does not invent a set_password client');
 
-assert.ok(createFn.includes("'admin_create_aide'") && createFn.includes("'create_aide'"), 'Add aide stays on admin_create_aide');
+assert.ok(createFn.includes('sbAdminAddAide') && createFn.includes('admin_add_aide'), 'Add aide form uses admin_add_aide');
 assert.ok(!createFn.includes("'reset_password'") && !createFn.includes("'set_password'"), 'Add aide does not call Sheets password actions');
-assert.ok(createFn.includes('tempPassword'), 'Add aide still sends a temp password to Ace');
+assert.ok(!createFn.includes('tempPassword') && !createFn.includes('admin_create_aide'), 'Add aide form does not create Auth');
 
 assert.ok(writeGate.includes("action==='reset_password'") && writeGate.includes("action==='set_password'"), 'Sheets password actions are admin writes on cut');
 assert.ok(dispatch.includes("action==='reset_password'") && dispatch.includes("action==='set_password'"), 'dispatch routes Sheets password names to the Ace helper');
