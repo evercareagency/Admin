@@ -25,8 +25,8 @@ function extractFn(src, sig){
 
 assert.ok(html.includes('v=eca-copilot1'), 'marker v=eca-copilot1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-eca-copilot1">'), 'admin-build eca-copilot1');
-const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-eca-copilot1'), 'eca-copilot1 is the first admin-build meta');
+assert.ok(html.includes('v=phonezoom1'), 'phonezoom1 marker stays');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-phonezoom1">'), 'phonezoom1 admin-build stays');
 ['2026-09-25-coveraide1b','2026-09-25-covercomms1','v=coveraide1','v=cover1','v=aidadel1','v=navedit1','v=nursecomp57','v=layoutA1','v=admintheme1'].forEach(function(mark){
   assert.ok(html.includes(mark), 'prior marker stays ' + mark);
 });
