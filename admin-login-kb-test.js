@@ -30,8 +30,8 @@ assert.ok(html.includes('v=isclear1'), 'prior isclear1 marker stays');
 assert.ok(html.includes('v=cgreset1'), 'prior cgreset1 marker stays');
 assert.ok(html.includes('v=sched1m'), 'prior sched1m marker stays');
 assert.ok(html.includes('v=warmoff1'), 'prior warmoff1 marker stays');
-assert.ok(html.includes('#loginScreen.active{display:flex;align-items:center;justify-content:center;background:var(--navy);min-height:100vh;min-height:100dvh;padding:20px;}'),
-  'desktop/resting login centering rule stays');
+assert.ok(html.includes('#loginScreen.active{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#176868 0%,var(--teal) 46%,#3a9494 100%);min-height:100vh;min-height:100dvh;padding:20px;}'),
+  'desktop/resting login stays centered on the teal pack');
 assert.ok(html.includes('#loginScreen.active.login-kb{position:fixed;'), 'keyboard scrollport is pinned');
 assert.ok(html.includes('overflow-y:auto'), 'login keyboard scrollport can scroll');
 assert.ok(html.includes('id="mgrForgotBtn"'), 'forgot password control stays on the login card');
@@ -152,7 +152,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(desk.build, '2026-09-25-loginkb1');
+    assert.strictEqual(desk.build, '2026-09-25-admintheme1');
     assert.strictEqual(desk.kb, false, 'desktop focus must not add login-kb');
     assert.strictEqual(desk.position, 'static', 'desktop login screen stays in normal flow');
     assert.strictEqual(desk.align, 'center', 'desktop login stays vertically centered');
