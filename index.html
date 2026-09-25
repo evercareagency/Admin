@@ -41,7 +41,7 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
-<!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, smart assign stub, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id}, admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?}. p_outcome is client_refused_resume_next_day or assigned_backup. Returned statuses awaiting_client, cancelled, and reopen are tolerated. Ace syncs schedule_exceptions call_off to cover. This desk does not also post upsert_schedule_exception. Rank panel stays an honest stub until Ace locks the admin_rank_backup_aides response shape. No stand-in ranks. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, live smart assign, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id,p_limit?:20} returns {success, aides:[{aide_id, username, name, continuity_score, distance_miles, score, rank}]}. The rank panel paints that list and does not recompute score. Null distance_miles stays empty. admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?} accepts client_refused_resume_next_day, assigned_backup (p_backup_aide_id, only from open or awaiting_client), awaiting_client, cancelled, and reopen. Record returns {success, open_shift_id, status, urgency_within_48h, schedule_exception_id} and Ace upserts schedule_exceptions kind=call_off. Assign upserts kind=cover with aide_id. sms_stub not_sent_v1 is shown and is not sent by this desk. List rows carry client, regular_aide, shift_start, shift_end, status, urgency_within_48h. Within 48h chip when shift_start is within 48 hours, shift_end is still ahead, and status is open or awaiting_client. This desk does not also post upsert_schedule_exception. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-cover1">
 <!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Optional list helper POST rpc/admin_list_aides {p_include_deleted} when that callable answers with aide rows; otherwise Active is is_active=eq.true and deactivated_at=is.null, and Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Ace purges at 03:20 ET after 7 days. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-aidadel1">
@@ -1254,7 +1254,7 @@ bindLoginKeyboard();
           <article class="cover-card" id="coverOutcomeSummary" aria-label="Shift"></article>
           <section class="cover-rank" id="coverRankPanel" aria-label="Smart assign">
             <h2>Smart assign</h2>
-            <p id="coverRankBody">Ranked backups are not live yet. admin_rank_backup_aides will fill this panel when Ace locks the response shape. No stand-in ranks.</p>
+            <p id="coverRankBody">Ranked backups from the office.</p>
             <div id="coverRankList" class="cover-rank-list"></div>
           </section>
           <section class="cover-section" aria-label="Contact the client">
@@ -1270,6 +1270,9 @@ bindLoginKeyboard();
             <div class="cover-actions">
               <button type="button" class="btn btn-warn" id="coverRefuseBtn" disabled onclick="coverRefuse()">Client refused / resume next day</button>
               <button type="button" class="btn btn-teal" id="coverAssignBtn" disabled onclick="coverShowAssign()">Assign backup</button>
+              <button type="button" class="btn btn-navy" id="coverAwaitBtn" disabled onclick="coverAwaiting()">Awaiting client</button>
+              <button type="button" class="btn btn-ghost" id="coverCancelBtn" onclick="coverCancelShift()">Cancel shift</button>
+              <button type="button" class="btn btn-ghost" id="coverReopenBtn" hidden onclick="coverReopen()">Reopen</button>
             </div>
             <div id="coverAssignConfirm" hidden>
               <div class="field" style="margin-top:12px"><label for="coverBackupSel">Backup aide</label><select id="coverBackupSel"></select></div>
@@ -3395,7 +3398,7 @@ function showTab(tab){
 // v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
 // Office JWT via sbRestRpc. No Sheets. No Backup writes. No PTO.
 // Ace syncs schedule_exceptions call_off to cover. This desk does not post upsert_schedule_exception.
-// Rank rows stay unpainted until Ace locks the admin_rank_backup_aides response shape.
+// Rank panel paints admin_rank_backup_aides aides[]. Score is Ace's. Null miles are not filled in.
 var COVER_RPC={
   record:['admin_record_call_off'],
   list:['admin_list_open_shifts'],
@@ -3412,7 +3415,7 @@ var coverContacted=false;
 var coverRanks=[];
 var coverBusy=false;
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
-var COVER_RANK_STUB='Ranked backups are not live yet. admin_rank_backup_aides will fill this panel when Ace locks the response shape. No stand-in ranks.';
+var COVER_RANK_EMPTY='No backup aides ranked for this shift.';
 function coverEsc(s){
   var raw=String(s==null?'':s);
   if(typeof escapeHtml==='function')return escapeHtml(raw);
@@ -3437,12 +3440,19 @@ function coverWithin48h(startsAt, nowMs){
   var windowMs=48*60*60*1000;
   return delta<=windowMs&&delta>=-windowMs;
 }
+function coverStatusKey(shift){
+  return String(shift&&shift.status||'open').trim().toLowerCase().replace(/[\s-]+/g,'_');
+}
 function coverShiftUrgent(shift, nowMs){
   if(!shift)return false;
-  if(shift.within48h===true||shift.within_48h===true)return true;
-  var urg=String(shift.urgency||'').toLowerCase().replace(/\s+/g,' ');
-  if(urg==='within_48h'||urg==='within 48h')return true;
-  return coverWithin48h(shift.startsAt||shift.starts_at||'', nowMs);
+  var st=coverStatusKey(shift);
+  if(st!==''&&st!=='open'&&st!=='awaiting_client')return false;
+  var now=nowMs==null?Date.now():Number(nowMs);
+  if(!isFinite(now))now=Date.now();
+  var start=Date.parse(shift.startsAt||shift.shift_start||'');
+  var end=Date.parse(shift.endsAt||shift.shift_end||'');
+  if(isFinite(start)&&isFinite(end))return start<=now+48*60*60*1000&&end>=now;
+  return shift.urgencyWithin48h===true||shift.urgency_within_48h===true;
 }
 function coverFormatWhen(iso){
   var t=Date.parse(iso==null?'':iso);
@@ -3473,20 +3483,34 @@ function coverPick(src){
   }
   return '';
 }
+function coverNameOf(v){
+  if(v==null||v==='')return '';
+  if(typeof v==='string'||typeof v==='number')return String(v);
+  if(typeof v==='object')return String(v.name||v.full_name||v.fullName||v.username||'');
+  return '';
+}
+function coverIdOf(v){
+  if(!v||typeof v!=='object')return '';
+  return String(v.id||v.aide_id||v.client_id||'');
+}
 function coverMapShift(row){
   var src=row&&typeof row==='object'?row:{};
-  if(src.shift&&typeof src.shift==='object'&&!src.id&&!src.shift_id)src=src.shift;
+  if(src.shift&&typeof src.shift==='object'&&!src.id&&!src.shift_id&&!src.open_shift_id)src=src.shift;
   var id=String(coverPick(src,'open_shift_id','openShiftId','id','shift_id','shiftId')||'');
-  var clientName=String(coverPick(src,'clientName','client_name','client')||'');
-  var aideName=String(coverPick(src,'regularAideName','regular_aide_name','aideName','aide_name','usual_aide_name','usualAideName')||'');
+  var clientName=coverNameOf(src.client);
+  if(!clientName)clientName=String(coverPick(src,'clientName','client_name')||'');
+  var aideName=coverNameOf(src.regular_aide||src.regularAide);
+  if(!aideName)aideName=String(coverPick(src,'regularAideName','regular_aide_name','aideName','aide_name','usual_aide_name','usualAideName')||'');
   var startsAt=String(coverPick(src,'shift_start','shiftStart','p_shift_start','startsAt','starts_at','when')||'');
   var endsAt=String(coverPick(src,'shift_end','shiftEnd','p_shift_end','endsAt','ends_at')||'');
   var statusRaw=coverPick(src,'status','outcome');
   var status=String(statusRaw||'open');
   var phone=String(coverPick(src,'clientPhone','client_phone','phone')||'');
   var note=String(coverPick(src,'reason','p_reason','note','notes','p_notes')||'');
-  var clientId=String(coverPick(src,'clientId','client_id')||'');
-  var aideId=String(coverPick(src,'regularAideId','regular_aide_id','aideId','aide_id','usual_aide_id')||'');
+  var clientId=coverIdOf(src.client);
+  if(!clientId)clientId=String(coverPick(src,'clientId','client_id')||'');
+  var aideId=coverIdOf(src.regular_aide||src.regularAide);
+  if(!aideId)aideId=String(coverPick(src,'regularAideId','regular_aide_id','aideId','aide_id','usual_aide_id')||'');
   var backupId=String(coverPick(src,'backupAideId','backup_aide_id')||'');
   var backupName=String(coverPick(src,'backupAideName','backup_aide_name')||'');
   if(!id&&!clientName)return null;
@@ -3504,8 +3528,9 @@ function coverMapShift(row){
     note:note,
     backupAideId:backupId,
     backupAideName:backupName,
-    within48h:src.within_48h===true||src.within48h===true,
-    urgency:src.urgency||'',
+    urgencyWithin48h:src.urgency_within_48h===true||src.urgencyWithin48h===true,
+    scheduleExceptionId:String(coverPick(src,'schedule_exception_id','scheduleExceptionId')||''),
+    smsStub:String(coverPick(src,'sms_stub','smsStub')||''),
     source:src.source||'ace',
     contacted:!!src.contacted
   };
@@ -3528,18 +3553,19 @@ function coverShiftRows(data){
 }
 function coverMapRank(row){
   var src=row&&typeof row==='object'?row:{};
-  var id=String(coverPick(src,'aide_id','aideId','id','username')||'').trim();
-  var name=String(coverPick(src,'aide_name','aideName','full_name','fullName','name','username')||'').trim();
-  if(!id&&!name)return null;
-  var distance=null;
-  if(src.distance_miles!=null&&src.distance_miles!=='')distance=src.distance_miles;
-  else if(src.distance!=null&&src.distance!=='')distance=src.distance;
-  else if(src.miles!=null&&src.miles!=='')distance=src.miles;
-  var continuity=null;
-  if(src.continuity!=null&&src.continuity!=='')continuity=src.continuity;
-  else if(src.continuity_score!=null&&src.continuity_score!=='')continuity=src.continuity_score;
-  else if(src.continuity_label!=null&&src.continuity_label!=='')continuity=src.continuity_label;
-  return {id:id||name, name:name||id, distance:distance, continuity:continuity};
+  var id=String(src.aide_id==null?'':src.aide_id).trim();
+  var username=String(src.username==null?'':src.username).trim();
+  var name=String(src.name==null?'':src.name).trim();
+  if(!id&&!username&&!name)return null;
+  return {
+    id:id||username||name,
+    username:username,
+    name:name||username||id,
+    distance:src.distance_miles==null||src.distance_miles===''?null:src.distance_miles,
+    continuity:src.continuity_score==null||src.continuity_score===''?null:src.continuity_score,
+    score:src.score==null||src.score===''?null:src.score,
+    rank:src.rank==null||src.rank===''?null:src.rank
+  };
 }
 function coverRankRows(data){
   var node=data;
@@ -3550,16 +3576,21 @@ function coverRankRows(data){
   if(Array.isArray(node))list=node;
   else if(node&&typeof node==='object'){
     if(node.ok===false||node.success===false)return [];
-    var keys=['ranks','backups','aides','rows','data','items'];
-    for(var i=0;i<keys.length;i++){
-      if(Array.isArray(node[keys[i]])){list=node[keys[i]];break;}
-    }
+    if(Array.isArray(node.aides))list=node.aides;
   }
   var out=[];
   for(var n=0;n<list.length;n++){
     var mapped=coverMapRank(list[n]);
     if(mapped)out.push(mapped);
   }
+  out.sort(function(a,b){
+    var ar=a.rank==null||a.rank==='';
+    var br=b.rank==null||b.rank==='';
+    if(ar&&br)return 0;
+    if(ar)return 1;
+    if(br)return -1;
+    return Number(a.rank)-Number(b.rank);
+  });
   return out;
 }
 function coverIsOpen(shift){
@@ -3601,7 +3632,11 @@ function coverListBody(){
   return {p_include_resolved:false};
 }
 function coverRankArgs(openShiftId){
-  return {p_open_shift_id:String(openShiftId||'')};
+  return {p_open_shift_id:String(openShiftId||''), p_limit:20};
+}
+function coverCanAssign(shift){
+  var st=coverStatusKey(shift);
+  return st===''||st==='open'||st==='awaiting_client';
 }
 function coverOutcomeBody(openShiftId, outcome, backupAideId, notes){
   var body={
@@ -3833,10 +3868,16 @@ function coverPaintOutcome(){
       +'<div class="cover-meta">Regular aide · '+coverEsc(shift.aideName||'—')+'</div>'
       +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(shift.startsAt, shift.endsAt))+'</div>';
   }
+  var canClose=!!coverContacted;
+  var canAssign=canClose&&coverCanAssign(shift);
   var refuse=document.getElementById('coverRefuseBtn');
   var assign=document.getElementById('coverAssignBtn');
-  if(refuse)refuse.disabled=!coverContacted;
-  if(assign)assign.disabled=!coverContacted;
+  var awaitBtn=document.getElementById('coverAwaitBtn');
+  var reopen=document.getElementById('coverReopenBtn');
+  if(refuse)refuse.disabled=!canClose;
+  if(assign)assign.disabled=!canAssign;
+  if(awaitBtn)awaitBtn.disabled=!canClose;
+  if(reopen)reopen.hidden=coverCanAssign(shift);
   var note=document.getElementById('coverContactNote');
   if(note){
     if(!coverContacted)note.textContent='Text or call the client before you close this shift.';
@@ -3845,29 +3886,55 @@ function coverPaintOutcome(){
   }
   coverFillBackup(shift);
 }
+function coverPaintRanks(rows){
+  var body=document.getElementById('coverRankBody');
+  var list=document.getElementById('coverRankList');
+  coverRanks=rows||[];
+  if(list)list.innerHTML='';
+  if(!coverRanks.length){
+    if(body)body.textContent=COVER_RANK_EMPTY;
+    return;
+  }
+  if(body)body.textContent='Ace rank. Continuity and distance from the office. No coordinates stay last.';
+  if(!list)return;
+  list.innerHTML=coverRanks.map(function(r){
+    var title=(r.rank!=null?coverEsc(r.rank)+'. ':'')+coverEsc(r.name||'Aide');
+    var bits=[];
+    if(r.continuity!=null)bits.push('Continuity '+coverEsc(r.continuity));
+    if(r.distance!=null)bits.push(coverEsc(r.distance)+' mi');
+    else bits.push('No coordinates');
+    if(r.score!=null)bits.push('Score '+coverEsc(r.score));
+    var user=r.username?'<span>@'+coverEsc(r.username)+'</span>':'';
+    return '<button type="button" class="cover-rank-row" data-cover-aide="'+coverAttr(r.id)+'" data-cover-aide-name="'+coverAttr(r.name||r.username||r.id)+'">'
+      +'<strong>'+title+'</strong><span>'+bits.join(' · ')+'</span>'+user+'</button>';
+  }).join('');
+}
 async function coverLoadRanks(shift){
   var body=document.getElementById('coverRankBody');
   var list=document.getElementById('coverRankList');
   coverRanks=[];
   if(list)list.innerHTML='';
   if(!shift)return;
-  var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!shift.id;
-  if(local||!coverUuidOrNull(shift.id)){
-    if(body)body.textContent='This shift is on this phone. '+COVER_RANK_STUB;
+  var local=shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
+  if(local){
+    if(body)body.textContent='This shift is not an office id yet, so ranked backups cannot load.';
     return;
   }
-  if(body)body.textContent=COVER_RANK_STUB;
+  if(body)body.textContent='Loading ranked backups…';
   var got=await coverRpc('rank', coverRankArgs(shift.id));
   if(String(coverSelectedId)!==String(shift.id))return;
   if(!got||got.missing||got.signedOut){
-    if(body)body.textContent=COVER_RANK_STUB;
+    if(body)body.textContent=got&&got.signedOut?'Sign in to load ranked backups.':'Ranked backups did not answer.';
     return;
   }
   if(!got.ok){
-    if(body)body.textContent=String(got.error||'Could not load ranked backups.')+' No stand-in ranks.';
+    if(body)body.textContent=String(got.error||'Could not load ranked backups.');
     return;
   }
-  if(body)body.textContent='Ace rank answered. Backup rows stay hidden until the response shape is locked. No stand-in ranks.';
+  var rows=coverRankRows(got.data).filter(function(r){
+    return !shift.aideId||String(r.id)!==String(shift.aideId);
+  });
+  coverPaintRanks(rows);
 }
 function coverOpenOutcome(id){
   var shift=coverFind(id);
@@ -3902,13 +3969,17 @@ function coverPickRank(id, name){
   if(typeof showTempMsg==='function')showTempMsg('Backup selected. Confirm assign after you text or call.','var(--teal)');
 }
 function coverShowAssign(){
+  var shift=coverFind(coverSelectedId);
   if(!coverContacted){
     if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
     return;
   }
+  if(shift&&!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('Assign backup is only for an open shift or one awaiting the client.','var(--warn)');
+    return;
+  }
   var box=document.getElementById('coverAssignConfirm');
   if(box)box.hidden=false;
-  var shift=coverFind(coverSelectedId);
   coverFillBackup(shift);
 }
 function coverHideAssign(){
@@ -4035,8 +4106,13 @@ async function coverRecordCalloff(){
 async function coverApplyOutcome(outcome){
   var shift=coverFind(coverSelectedId);
   if(!shift||coverBusy)return;
-  if(!coverContacted){
+  var needsContact=outcome==='client_refused_resume_next_day'||outcome==='assigned_backup'||outcome==='awaiting_client';
+  if(needsContact&&!coverContacted){
     if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
+    return;
+  }
+  if(outcome==='assigned_backup'&&!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('Assign backup is only for an open shift or one awaiting the client.','var(--warn)');
     return;
   }
   var backupId='';
@@ -4075,12 +4151,16 @@ async function coverApplyOutcome(outcome){
     returned=coverMapShift((rows&&rows[0])||got.data||{})||null;
   }
   if(returned&&returned.statusExplicit)shift.status=returned.status;
-  else shift.status=outcome==='assigned_backup'?'assigned_backup':'client_refused_resume_next_day';
+  else shift.status=outcome;
+  var sms='';
+  if(returned&&returned.smsStub)sms=returned.smsStub;
+  else if(got&&got.data&&got.data.sms_stub)sms=String(got.data.sms_stub);
   shift.backupAideId=backupId;
   shift.backupAideName=backupName;
   if(shift.source==='local'||localOnly)coverWriteLocal(coverShifts);
   coverBusy=false;
-  var msg=outcome==='assigned_backup'?'Backup assigned.':'Client refused. Resume next day.';
+  var msg=outcome==='assigned_backup'?'Backup assigned.':outcome==='awaiting_client'?'Marked awaiting client.':outcome==='cancelled'?'Shift cancelled.':outcome==='reopen'?'Shift reopened.':'Client refused. Resume next day.';
+  if(sms==='not_sent_v1')msg=msg+' Ace did not send a text (not_sent_v1).';
   if(got&&(got.missing||got.signedOut))msg=msg+' Saved on this phone until the office outcome callable answers.';
   if(typeof showTempMsg==='function')showTempMsg(msg,'var(--success)');
   coverHideAssign();
@@ -4092,6 +4172,15 @@ function coverRefuse(){
 }
 function coverConfirmAssign(){
   coverApplyOutcome('assigned_backup');
+}
+function coverAwaiting(){
+  coverApplyOutcome('awaiting_client');
+}
+function coverCancelShift(){
+  coverApplyOutcome('cancelled');
+}
+function coverReopen(){
+  coverApplyOutcome('reopen');
 }
 function coverEnsureBound(){
   var root=document.getElementById('tab_coverage');
