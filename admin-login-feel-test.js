@@ -531,7 +531,7 @@ async function runBrowser(){
       }));
       assert.ok(painted.login, vp.name+' sb cut login screen is up at DOMContentLoaded');
       assert.ok(!painted.admin, vp.name+' sb cut must not open home before Sign In');
-      assert.strictEqual(painted.build, '2026-09-25-ncipdf1');
+      assert.strictEqual(painted.build, '2026-09-25-aidecreds1');
       assert.ok(Date.now()-navAt<1500, vp.name+' sb cut first paint must not wait on warmkeep');
       await new Promise(r=>setTimeout(r,500));
       const quiet=await page.evaluate(()=>({
