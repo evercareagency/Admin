@@ -109,6 +109,7 @@ vm.createContext(ctx);
   'function coverPick(src)',
   'function coverNameOf(v)',
   'function coverIdOf(v)',
+  'function coverIntakeSource(src)',
   'function coverMapShift(row)',
   'function coverCanAssign(shift)',
   'function coverMapRank(row)',
