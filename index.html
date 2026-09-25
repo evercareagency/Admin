@@ -41,6 +41,8 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage aide source 2026-09-25 v=coveraide1 admin-build 2026-09-25-coveraide1. GHOST-COVERAIDE1-CONTRACT-v1. More → Coverage open-shift cards and the open-shift detail show a source chip: Aide or Office. Coverage stays under More. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline. No PTO. No Auth reseal and no password rotate. Office intake stays POST rpc/admin_record_call_off and paints Office. Aide-submitted open shifts from Ace aide_record_call_off paint Aide when admin_list_open_shifts returns source aide, or an aide flag (aide_submitted, from_aide, submitted_by_aide, aide_call_off). Accepted source strings: aide, caregiver, aide_portal, from_aide, aide_record_call_off. This desk does not call aide_record_call_off and does not add an RPC. Stub until that source field is on the list row: a row with no source and no aide flag paints Office. Pipeline source local versus ace is the phone-session list, not this chip. Prior markers stay, including v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-coveraide1">
 <!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, live smart assign, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id,p_limit?:20} returns {success, aides:[{aide_id, username, name, continuity_score, distance_miles, score, rank}]}. The rank panel paints that list and does not recompute score. Null distance_miles stays empty. admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?} accepts client_refused_resume_next_day, assigned_backup (p_backup_aide_id, only from open or awaiting_client), awaiting_client, cancelled, and reopen. Record returns {success, open_shift_id, status, urgency_within_48h, schedule_exception_id} and Ace upserts schedule_exceptions kind=call_off. Assign upserts kind=cover with aide_id. sms_stub not_sent_v1 is shown and is not sent by this desk. List rows carry client, regular_aide, shift_start, shift_end, status, urgency_within_48h. Within 48h chip when shift_start is within 48 hours, shift_end is still ahead, and status is open or awaiting_client. This desk does not also post upsert_schedule_exception. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-cover1">
 <!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_aide_id}: is_active=false, deactivated_at, Auth Sign In ban, and client unassign. Restore is POST rpc/admin_restore_aide {p_aide_id}: reactivates and clears the ban, does not reassign clients, password unchanged. Optional list helper POST rpc/admin_list_aides {p_include_deleted} when that callable answers with aide rows; otherwise Active is is_active=eq.true and deactivated_at=is.null, and Recently deleted is is_active=eq.false and deactivated_at=not.is.null ordered by deactivated_at desc. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. This tip never hard-deletes. Ace purges at 03:20 ET after 7 days. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
@@ -293,10 +295,13 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
 #tab_coverage .cover-list{display:flex;flex-direction:column;gap:10px;}
 #tab_coverage .cover-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);box-shadow:0 6px 16px rgba(26,39,68,0.05);}
-#tab_coverage .cover-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
-#tab_coverage .cover-card-top strong{font-size:1.05rem;line-height:1.25;}
-#tab_coverage .cover-meta{font-size:0.92rem;line-height:1.35;color:var(--text);margin-top:2px;}
-#tab_coverage .cover-chip{display:inline-flex;align-items:center;flex-shrink:0;min-height:28px;padding:4px 10px;border-radius:999px;background:#fff3e0;color:#9a3412;font-size:0.75rem;font-weight:700;}
+#tab_coverage .cover-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
+#tab_coverage .cover-card-top strong{font-size:1.05rem;line-height:1.25;min-width:0;flex:1 1 8rem;overflow-wrap:anywhere;}
+#tab_coverage .cover-meta{font-size:0.92rem;line-height:1.35;color:var(--text);margin-top:2px;overflow-wrap:anywhere;}
+#tab_coverage .cover-chips{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:100%;}
+#tab_coverage .cover-chip{display:inline-flex;align-items:center;flex-shrink:0;min-height:28px;padding:4px 10px;border-radius:999px;background:#fff3e0;color:#9a3412;font-size:0.75rem;font-weight:700;white-space:nowrap;}
+#tab_coverage .cover-chip-office{background:var(--teal-light);color:var(--teal-dark);}
+#tab_coverage .cover-chip-aide{background:#e7eef9;color:var(--navy);}
 #tab_coverage .cover-section{margin-top:10px;}
 #tab_coverage .cover-section h2{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin:0 0 8px;}
 #tab_coverage .cover-actions{display:flex;flex-direction:column;gap:8px;}
@@ -3493,6 +3498,24 @@ function coverIdOf(v){
   if(!v||typeof v!=='object')return '';
   return String(v.id||v.aide_id||v.client_id||'');
 }
+// v=coveraide1 — list source chip. Missing source/aide flag is Office (stub until Ace adds source).
+function coverIntakeSource(src){
+  var row=src&&typeof src==='object'?src:{};
+  if(row.intakeSource==='aide'||row.intake_source==='aide')return 'aide';
+  if(row.aide_submitted===true||row.from_aide===true||row.submitted_by_aide===true||row.aide_call_off===true)return 'aide';
+  var raw=coverPick(row,'calloff_source','call_off_source','intake_source','recorded_by','submitted_by','source');
+  var key=String(raw==null?'':raw).trim().toLowerCase().replace(/[\s-]+/g,'_');
+  if(key==='aide'||key==='caregiver'||key==='aide_portal'||key==='from_aide'||key==='aide_record_call_off')return 'aide';
+  return 'office';
+}
+function coverSourceLabel(key){
+  return key==='aide'?'Aide':'Office';
+}
+function coverSourceChips(shift){
+  var key=shift&&shift.intakeSource==='aide'?'aide':'office';
+  var urgent=coverShiftUrgent(shift)?'<span class="cover-chip">Within 48h</span>':'';
+  return '<span class="cover-chips"><span class="cover-chip cover-chip-source cover-chip-'+key+'">'+coverSourceLabel(key)+'</span>'+urgent+'</span>';
+}
 function coverMapShift(row){
   var src=row&&typeof row==='object'?row:{};
   if(src.shift&&typeof src.shift==='object'&&!src.id&&!src.shift_id&&!src.open_shift_id)src=src.shift;
@@ -3531,7 +3554,8 @@ function coverMapShift(row){
     urgencyWithin48h:src.urgency_within_48h===true||src.urgencyWithin48h===true,
     scheduleExceptionId:String(coverPick(src,'schedule_exception_id','scheduleExceptionId')||''),
     smsStub:String(coverPick(src,'sms_stub','smsStub')||''),
-    source:src.source||'ace',
+    source:String(src.source==null?'':src.source).trim().toLowerCase()==='local'?'local':'ace',
+    intakeSource:coverIntakeSource(src),
     contacted:!!src.contacted
   };
 }
@@ -3790,9 +3814,9 @@ function coverPaintList(){
   }
   if(empty)empty.hidden=true;
   box.innerHTML=open.map(function(s){
-    var chip=coverShiftUrgent(s)?'<span class="cover-chip">Within 48h</span>':'';
-    return '<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'">'
-      +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+chip+'</div>'
+    var intake=s&&s.intakeSource==='aide'?'aide':'office';
+    return '<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'" data-cover-intake="'+intake+'">'
+      +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+coverSourceChips(s)+'</div>'
       +'<div class="cover-meta">Regular aide · '+coverEsc(s.aideName||'—')+'</div>'
       +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(s.startsAt, s.endsAt))+'</div>'
       +'</button>';
@@ -3863,10 +3887,12 @@ function coverPaintOutcome(){
     return;
   }
   if(sum){
-    var chip=coverShiftUrgent(shift)?'<span class="cover-chip">Within 48h</span>':'';
-    sum.innerHTML='<div class="cover-card-top"><strong>'+coverEsc(shift.clientName)+'</strong>'+chip+'</div>'
+    var intake=shift.intakeSource==='aide'?'aide':'office';
+    sum.setAttribute('data-cover-intake', intake);
+    sum.innerHTML='<div class="cover-card-top"><strong>'+coverEsc(shift.clientName)+'</strong>'+coverSourceChips(shift)+'</div>'
       +'<div class="cover-meta">Regular aide · '+coverEsc(shift.aideName||'—')+'</div>'
-      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(shift.startsAt, shift.endsAt))+'</div>';
+      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(shift.startsAt, shift.endsAt))+'</div>'
+      +'<div class="cover-meta">Source · '+coverEsc(coverSourceLabel(intake))+'</div>';
   }
   var canClose=!!coverContacted;
   var canAssign=canClose&&coverCanAssign(shift);
@@ -4045,6 +4071,7 @@ async function coverRecordCalloff(){
     if(mapped&&mapped.id){
       var found=coverFind(mapped.id);
       if(found){
+        found.intakeSource='office';
         if(!found.phone&&phone)found.phone=phone;
         if(!found.clientName||found.clientName==='Client')found.clientName=clientName;
         if(!found.aideName||found.aideName==='—')found.aideName=aideName;
@@ -4059,6 +4086,7 @@ async function coverRecordCalloff(){
         mapped.phone=mapped.phone||phone;
         if(!mapped.note&&noteText)mapped.note=noteText;
         mapped.source='ace';
+        mapped.intakeSource='office';
         mapped.status=mapped.status||'open';
         coverShifts.unshift(mapped);
       }
@@ -4092,6 +4120,7 @@ async function coverRecordCalloff(){
     backupAideId:'',
     backupAideName:'',
     source:'local',
+    intakeSource:'office',
     contacted:false
   };
   var local=coverReadLocal().filter(function(s){return String(s.id)!==String(shift.id);});
