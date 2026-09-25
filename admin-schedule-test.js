@@ -225,7 +225,7 @@ assert.ok(els.schedBody.innerHTML.includes('is-usual'), 'assigned usual cell');
 assert.ok(!/sandata|evv|present|no-show|contera/i.test(els.schedBody.innerHTML), 'grid has no EVV chips');
 assert.ok(els.schedBody.innerHTML.includes('>Open<')||els.schedBody.innerHTML.includes('sched-open">Open'), 'empty cell reads Open');
 assert.ok(els.schedHead.innerHTML.includes('Mon')&&els.schedHead.innerHTML.includes('Sun'), 'day headers');
-assert.strictEqual(els.schedWeekLabel.textContent, 'Sep 21 – Sep 27, 2026');
+assert.strictEqual(els.schedWeekLabel.textContent, '09/21/2026 – 09/27/2026');
 assert.strictEqual(els.schedSourceNote.textContent, '', 'no stub status line');
 
 sandbox.schedFilterCalloff=true;
