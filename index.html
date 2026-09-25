@@ -41,6 +41,8 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage office refresh 2026-09-25 v=coveraide1b admin-build 2026-09-25-coveraide1b. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline. No PTO. No Auth reseal and no password rotate. After admin_record_call_off succeeds, the desk always re-fetches admin_list_open_shifts while the success toast is up, then paints that list. An older list response cannot replace a newer one. If the success payload includes open_shift_id or a row, that row is merged into the refreshed list when the list omits it. The same client on the same day with different hours stays two open rows. Within 48h is a chip only and does not hide a row. Source chip stays coveraide1: source exactly aide paints Aide; anything else or missing paints Office. This desk does not call aide_record_call_off and does not add an RPC. Prior markers stay, including v=covercomms1, v=coveraide1, v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-coveraide1b">
 <!-- coverage comms 2026-09-25 v=covercomms1 admin-build 2026-09-25-covercomms1. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. No Auth reseal and no password rotation. Who can cover paints the Ace rank rows in plain lines only: Worked this client N times, Never worked this client, miles away, or No home address on file. Continuity and Score are not shown. The aide Mo taps stays checked and highlighted. Text this aide and Text client open sms: with a draft; Mo presses Send in Messages. After assign, Text client they're on the way is the same kind of draft. After talking to the client: Client wants backup posts assigned_backup, Client refused · resume next day posts client_refused_resume_next_day, Still deciding posts awaiting_client. Cancel and Reopen stay. Client refused shows an editable case-manager email in Mo's voice. Open in Mail is mailto: and stays disabled until case_manager_email is known. Copy draft and Save as my template stay available. Refuse email is live Ace: admin_get_cover_refuse_template {}, admin_save_cover_refuse_template {p_subject,p_body} for Save as my template, admin_preview_cover_refuse_email {p_open_shift_id}. Placeholders are {{case_manager}} {{client}} {{date}} and optional {{case_manager_email}}. Mo's default is seeded in Ace. This desk does not keep a local template. List rows use source, submitted_by_aide_id, submitted_by_aide_username, submitted_by_aide_name, client_phone, case_manager_name, case_manager_email, regular_aide_phone, and assigned_backup_phone. source exactly aide or office stays the coveraide1 chip. Pipeline source stays local versus ace. Text client uses client_phone. Text this aide uses the selected backup phone, or regular_aide_phone when that aide is the regular aide. No localStorage template. This desk does not add Auth RPCs. Prior markers stay, including v=coveraide1, v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-covercomms1">
 <!-- coverage aide source 2026-09-25 v=coveraide1 admin-build 2026-09-25-coveraide1. GHOST-COVERAIDE1-CONTRACT-v1. More → Coverage open-shift cards and the open-shift detail show a source chip: Aide or Office. Coverage stays under More. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline. No PTO. No Auth reseal and no password rotate. Office intake stays POST rpc/admin_record_call_off and paints Office. Aide-submitted open shifts from Ace aide_record_call_off paint Aide only when admin_list_open_shifts returns source exactly aide. source exactly office paints Office. Missing source and any other value paint Office. No aide_submitted, from_aide, or other flag fallbacks. This desk does not call aide_record_call_off and does not add an RPC. Pipeline source local versus ace is the phone-session list, not this chip. Prior markers stay, including v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
@@ -295,7 +297,8 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .page-hdr .btn,#tab_coverage .cover-actions .btn,#tab_coverage .cover-back{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
 #tab_coverage [hidden]{display:none !important;}
 #tab_coverage .cover-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
-#tab_coverage .cover-list{display:flex;flex-direction:column;gap:10px;}
+#tab_coverage{max-width:100%;min-width:0;}
+#tab_coverage .cover-list{display:flex;flex-direction:column;gap:10px;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 #tab_coverage .cover-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);box-shadow:0 6px 16px rgba(26,39,68,0.05);}
 #tab_coverage .cover-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;}
 #tab_coverage .cover-card-top strong{font-size:1.05rem;line-height:1.25;min-width:0;flex:1 1 8rem;overflow-wrap:anywhere;}
@@ -3441,6 +3444,7 @@ var COVER_RPC={
 var coverRpcPick={record:'',list:'',rank:'',outcome:'',tplGet:'',tplSave:'',preview:''};
 var coverRpcOff={record:false,list:false,rank:false,outcome:false,tplGet:false,tplSave:false,preview:false};
 var coverShifts=[];
+var coverListGen=0;
 var coverSource='local';
 var coverView='list';
 var coverSelectedId='';
@@ -3621,21 +3625,219 @@ function coverMapShift(row){
     contacted:!!src.contacted
   };
 }
-function coverShiftRows(data){
+function coverCoerceNode(data){
   var node=data;
   if(typeof node==='string'){
-    try{node=JSON.parse(node);}catch(e){return [];}
+    var trimmed=node.trim();
+    if(!trimmed)return null;
+    try{node=JSON.parse(trimmed);}catch(e){return trimmed;}
   }
+  if(Array.isArray(node)&&node.length===1){
+    var one=node[0];
+    if(typeof one==='string'){
+      try{one=JSON.parse(one);}catch(e2){}
+    }
+    if(one&&typeof one==='object')return one;
+  }
+  return node;
+}
+function coverShiftRows(data){
+  var depth=coverShiftRows._depth||0;
+  if(depth>4)return [];
+  var node=coverCoerceNode(data);
   if(Array.isArray(node))return node;
   if(!node||typeof node!=='object')return [];
   if(node.ok===false||node.success===false)return [];
-  if(node.shift&&typeof node.shift==='object')return [node.shift];
-  var keys=['shifts','open_shifts','openShifts','rows','data','items'];
-  for(var i=0;i<keys.length;i++){
-    if(Array.isArray(node[keys[i]]))return node[keys[i]];
+  if(node.data&&typeof node.data==='object'&&!Array.isArray(node.data)){
+    var inner=node.data;
+    if(inner.shifts||inner.open_shifts||inner.openShifts||inner.call_offs||inner.rows||inner.items||inner.open_shift||inner.shift||inner.open_shift_id||inner.id){
+      coverShiftRows._depth=depth+1;
+      try{return coverShiftRows(inner);}
+      finally{coverShiftRows._depth=depth;}
+    }
   }
-  if(node.id||node.shift_id||node.open_shift_id||node.client_name||node.clientName)return [node];
+  var keys=['shifts','open_shifts','openShifts','call_offs','rows','items'];
+  var sawArray=false;
+  for(var i=0;i<keys.length;i++){
+    if(Array.isArray(node[keys[i]])){
+      sawArray=true;
+      if(node[keys[i]].length)return node[keys[i]];
+    }
+  }
+  if(node.open_shift&&typeof node.open_shift==='object'&&!Array.isArray(node.open_shift))return [node.open_shift];
+  if(node.shift&&typeof node.shift==='object'&&!Array.isArray(node.shift))return [node.shift];
+  if(!sawArray&&(node.id||node.shift_id||node.open_shift_id||node.p_open_shift_id||node.client_name||node.clientName))return [node];
+  if(Array.isArray(node.data))return node.data;
   return [];
+}
+function coverEnvelopeId(data, depth){
+  if(depth==null)depth=0;
+  if(depth>4)return '';
+  var node=coverCoerceNode(data);
+  if(typeof node==='string'){
+    var s=node.trim();
+    if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s))return s;
+    return '';
+  }
+  if(!node||typeof node!=='object'||Array.isArray(node))return '';
+  var direct=String(coverPick(node,'open_shift_id','openShiftId','p_open_shift_id')||'').trim();
+  if(direct)return direct;
+  var nests=['open_shift','shift','record','result','data'];
+  for(var i=0;i<nests.length;i++){
+    var child=node[nests[i]];
+    if(child&&typeof child==='object'){
+      var nested=coverEnvelopeId(child, depth+1);
+      if(nested)return nested;
+    }
+  }
+  var shiftLike=node.shift_start||node.shiftStart||node.startsAt||node.client_name||node.clientName||node.client;
+  if(shiftLike){
+    var id=String(coverPick(node,'id','shift_id','shiftId')||'').trim();
+    if(id)return id;
+  }
+  return '';
+}
+function coverSameClient(a, b){
+  if(a&&b&&a.clientId&&b.clientId)return String(a.clientId)===String(b.clientId);
+  return String((a&&a.clientName)||'')===String((b&&b.clientName)||'');
+}
+function coverSameWindow(a, b){
+  var as=Date.parse(a&&a.startsAt||'');
+  var bs=Date.parse(b&&b.startsAt||'');
+  if(!isFinite(as)||!isFinite(bs)||as!==bs)return false;
+  var ae=Date.parse(a&&a.endsAt||'');
+  var be=Date.parse(b&&b.endsAt||'');
+  if(!isFinite(ae)||!isFinite(be))return true;
+  return ae===be;
+}
+function coverWindowConflicts(row, draft){
+  var rs=Date.parse(row&&row.startsAt||'');
+  var ds=Date.parse(draft&&draft.startsAt||'');
+  if(!isFinite(rs)||!isFinite(ds))return false;
+  if(rs!==ds)return true;
+  var re=Date.parse(row&&row.endsAt||'');
+  var de=Date.parse(draft&&draft.endsAt||'');
+  if(!isFinite(re)||!isFinite(de))return false;
+  return re!==de;
+}
+function coverCopyBlanks(dest, src){
+  if(!dest||!src)return;
+  if(!dest.phone&&src.phone)dest.phone=src.phone;
+  if((!dest.clientName||dest.clientName==='Client')&&src.clientName)dest.clientName=src.clientName;
+  if((!dest.aideName||dest.aideName==='—')&&src.aideName)dest.aideName=src.aideName;
+  if(!dest.startsAt&&src.startsAt)dest.startsAt=src.startsAt;
+  if(!dest.endsAt&&src.endsAt)dest.endsAt=src.endsAt;
+  if(!dest.note&&src.note)dest.note=src.note;
+  if(!dest.clientId&&src.clientId)dest.clientId=src.clientId;
+  if(!dest.aideId&&src.aideId)dest.aideId=src.aideId;
+  if(src.urgencyWithin48h===true)dest.urgencyWithin48h=true;
+  if(!dest.scheduleExceptionId&&src.scheduleExceptionId)dest.scheduleExceptionId=src.scheduleExceptionId;
+}
+function coverDraftShift(fields){
+  var src=fields||{};
+  return {
+    id:'',
+    clientId:String(src.clientId||''),
+    clientName:String(src.clientName||'Client'),
+    aideId:String(src.aideId||''),
+    aideName:String(src.aideName||'—'),
+    startsAt:String(src.startsAt||''),
+    endsAt:String(src.endsAt||''),
+    status:'open',
+    phone:String(src.phone||''),
+    note:String(src.note||''),
+    backupAideId:'',
+    backupAideName:'',
+    source:'ace',
+    intakeSource:'office',
+    contacted:false,
+    justRecorded:true
+  };
+}
+function coverRecordedShift(payload, draft){
+  var base=coverDraftShift(draft||{});
+  var id=coverEnvelopeId(payload);
+  var rows=coverShiftRows(payload);
+  var picked=null;
+  var i;
+  if(id){
+    for(i=0;i<rows.length;i++){
+      var mapped=coverMapShift(rows[i]);
+      if(mapped&&String(mapped.id)===String(id)){picked=mapped;break;}
+    }
+  }
+  if(!picked){
+    for(i=0;i<rows.length;i++){
+      var byWindow=coverMapShift(rows[i]);
+      if(byWindow&&coverSameClient(byWindow, base)&&coverSameWindow(byWindow, base)){picked=byWindow;break;}
+    }
+  }
+  if(!picked&&id){
+    var node=coverCoerceNode(payload);
+    var stub={open_shift_id:id, status:'open'};
+    if(node&&typeof node==='object'&&!Array.isArray(node)){
+      if(node.status!=null&&String(node.status)!=='')stub.status=node.status;
+      if(node.urgency_within_48h!=null)stub.urgency_within_48h=node.urgency_within_48h;
+      if(node.schedule_exception_id)stub.schedule_exception_id=node.schedule_exception_id;
+      if(typeof node.source==='string')stub.source=node.source;
+    }
+    picked=coverMapShift(stub);
+  }
+  if(picked&&coverWindowConflicts(picked, base))picked=null;
+  if(id&&coverFind(id)&&coverWindowConflicts(coverFind(id), base)){
+    picked=null;
+    id='';
+  }
+  if(picked){
+    if(id&&!picked.id)picked.id=id;
+    coverCopyBlanks(picked, base);
+    if(base.startsAt&&!picked.startsAt)picked.startsAt=base.startsAt;
+    if(base.endsAt&&!picked.endsAt)picked.endsAt=base.endsAt;
+    picked.source='ace';
+    if(picked.intakeSource!=='aide')picked.intakeSource='office';
+    picked.justRecorded=true;
+    if(!picked.status)picked.status='open';
+    return picked;
+  }
+  if(id&&!coverFind(id))base.id=id;
+  else if(id&&coverFind(id)&&coverWindowConflicts(coverFind(id), base))base.id='';
+  else if(id)base.id=id;
+  base.intakeSource='office';
+  base.justRecorded=true;
+  base.status='open';
+  base.source='ace';
+  return base;
+}
+function coverMergeRecorded(created){
+  if(!created)return;
+  var rowId=String(created.id||'');
+  var found=rowId?coverFind(rowId):null;
+  if(found&&!coverWindowConflicts(found, created)){
+    coverCopyBlanks(found, created);
+    if(found.intakeSource!=='aide')found.intakeSource='office';
+    found.justRecorded=true;
+    return;
+  }
+  var i;
+  for(i=0;i<(coverShifts||[]).length;i++){
+    var row=coverShifts[i];
+    if(!coverSameClient(row, created)||!coverSameWindow(row, created))continue;
+    coverCopyBlanks(row, created);
+    if(row.intakeSource!=='aide')row.intakeSource='office';
+    row.justRecorded=true;
+    if(rowId&&(!row.id||String(row.id).indexOf('office:')===0)&&!coverWindowConflicts(row, created))row.id=rowId;
+    return;
+  }
+  if(!created.id)created.id='office:'+String(created.clientId||created.clientName||'shift')+':'+String(created.startsAt||'');
+  if(coverFind(created.id))created.id=String(created.id)+':'+String(created.startsAt||Date.now());
+  created.intakeSource=created.intakeSource==='aide'?'aide':'office';
+  created.justRecorded=true;
+  created.source=created.source==='local'?'local':'ace';
+  coverShifts=coverShifts||[];
+  coverShifts.unshift(created);
+}
+function coverListVisible(shift){
+  return coverIsOpen(shift)||!!(shift&&shift.justRecorded);
 }
 function coverPickPhone(obj){
   if(!obj||typeof obj!=='object')return '';
@@ -3883,7 +4085,7 @@ function coverPaintList(){
   var box=document.getElementById('coverList');
   var empty=document.getElementById('coverEmpty');
   if(!box)return;
-  var open=(coverShifts||[]).filter(coverIsOpen);
+  var open=(coverShifts||[]).filter(coverListVisible);
   if(!open.length){
     box.innerHTML='';
     if(empty)empty.hidden=false;
@@ -3909,13 +4111,19 @@ function coverShowIntake(){
   coverShow('intake');
   coverFillIntake();
 }
-async function coverReload(){
+async function coverReload(opts){
+  var keepOnFail=!!(opts&&opts.keepOnFail);
+  var gen=++coverListGen;
+  var prev=(coverShifts||[]).slice();
   var note=document.getElementById('coverSourceNote');
   var got=await coverRpc('list', coverListBody());
+  if(gen!==coverListGen)return {stale:true};
   if(got&&got.ok){
     coverSource='ace';
     coverShifts=coverShiftRows(got.data).map(coverMapShift).filter(Boolean);
     if(note)note.textContent='Open shifts from the office.';
+  }else if(keepOnFail&&prev.length){
+    coverShifts=prev;
   }else if(got&&(got.missing||got.signedOut)){
     coverSource='local';
     coverShifts=coverReadLocal();
@@ -3929,7 +4137,9 @@ async function coverReload(){
     coverShifts=coverReadLocal();
     if(note)note.textContent=(got&&got.error)||'Could not load open shifts.';
   }
+  if(gen!==coverListGen)return {stale:true};
   coverPaintList();
+  return {ok:!!(got&&got.ok), stale:false};
 }
 async function coverOpenDesk(){
   coverEnsureBound();
@@ -4571,33 +4781,21 @@ async function coverRecordCalloff(){
     coverShowList();
   }
   if(got&&got.ok){
-    var rows=coverShiftRows(got.data);
-    var mapped=coverMapShift((rows&&rows[0])||got.data||{})||null;
+    var created=coverRecordedShift(got.data, {
+      clientId:clientId,
+      clientName:clientName,
+      aideId:aideId,
+      aideName:aideName,
+      startsAt:startsAt,
+      endsAt:endsAt,
+      phone:phone,
+      note:noteText
+    });
+    if(created)created.intakeSource='office';
+    var reloaded=coverReload({keepOnFail:true});
     if(typeof showTempMsg==='function')showTempMsg('Call-off recorded. Shift is open.','var(--success)');
-    await coverReload();
-    if(mapped&&mapped.id){
-      var found=coverFind(mapped.id);
-      if(found){
-        found.intakeSource='office';
-        if(!found.phone&&phone)found.phone=phone;
-        if(!found.clientName||found.clientName==='Client')found.clientName=clientName;
-        if(!found.aideName||found.aideName==='—')found.aideName=aideName;
-        if(!found.startsAt)found.startsAt=startsAt;
-        if(!found.endsAt)found.endsAt=endsAt;
-        if(!found.note&&noteText)found.note=noteText;
-      }else{
-        mapped.clientName=mapped.clientName&&mapped.clientName!=='Client'?mapped.clientName:clientName;
-        mapped.aideName=mapped.aideName&&mapped.aideName!=='—'?mapped.aideName:aideName;
-        mapped.startsAt=mapped.startsAt||startsAt;
-        mapped.endsAt=mapped.endsAt||endsAt;
-        mapped.phone=mapped.phone||phone;
-        if(!mapped.note&&noteText)mapped.note=noteText;
-        mapped.source='ace';
-        mapped.intakeSource='office';
-        mapped.status=mapped.status||'open';
-        coverShifts.unshift(mapped);
-      }
-    }
+    try{await reloaded;}catch(eReload){}
+    coverMergeRecorded(created);
     finish();
     return;
   }
