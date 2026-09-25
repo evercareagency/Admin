@@ -40,6 +40,8 @@
 <!-- login phone keyboard 2026-09-25 v=loginkb1 admin-build 2026-09-25-loginkb1. Cause: #loginScreen is a centered min-height 100dvh flex box and html/body overflow-x hidden, so the card does not overflow the layout viewport. The phone keyboard shrinks the visual viewport only, and Password plus Sign In stay under it. On focus of Account, username, or password, pin #loginScreen to the visual viewport (height and offset from visualViewport, not a guessed window.scrollTo) and scroll the focused field and Sign In into that open area. The same screen is the scrollport, so Forgot password can scroll into view. Desktop stays centered when there is no keyboard inset. -->
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
+<!-- phone scroll lock 2026-09-25 v=remiscroll1 admin-build 2026-09-25-remiscroll1. Phone page stays framed. html and body lock horizontal overscroll: overflow-x hidden, then clip, overscroll-behavior-x none, and touch-action pan-y. A vertical swipe cannot shove the page left or right. In-flow phone content is width-capped so a wide child cannot grow the viewport. Local horizontal scrollers stay: Schedule week board .sched-scroll, Edit tabs .nav-edit-bottom, phone .side-nav, Coverage list, and the table rows (timesheet sheet, aides, nurse, inservice, activity) keep overflow-x auto and touch-action pan-x pan-y. Remi chip, Remi name, and desk-first (sheet closed until open) stay. Quiet hours On and Coverage pin stay. No Auth reseal and no brain wiring change. Prior markers stay, including v=remi1 and v=phonezoom1. -->
+<meta name="admin-build" content="2026-09-25-remiscroll1">
 <!-- remi 2026-09-25 v=remi1 admin-build 2026-09-25-remi1. Admin and Scheduler desk AI is named Remi. The corner chip is Mo's circular portrait and keeps the neon city night inside the circle. A small Remi pill sits on that chip. Tap opens the Remi sheet. The sheet stays closed until it is opened. Desk-first login stays: no full-screen Remi on sign-in. Nurse home and the Caregiver site do not get Remi. Quiet hours On and Coverage in Edit tabs stay as in v=phonezoom1. No Auth reseal and no brain wiring change. Prior markers stay, including v=phonezoom1, v=eca-copilot1, v=navedit1, v=coveraide1b, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-remi1">
 <!-- phone zoom 2026-09-25 v=phonezoom1 admin-build 2026-09-25-phonezoom1. Phone-first Edit tabs and Quiet hours. Tapping Edit tabs keeps every available tab on screen, including Coverage, so Coverage can be pinned to the bottom bar. The picker wraps, and a row scrolls sideways only if it is still wider than the phone. The Quiet hours On control and its label stay inside the card at phone width. Fluid layout only. No Auth reseal and no password rotate. Co-pilot stays closed until Mo opens it. Prior markers stay, including v=eca-copilot1, v=navedit1, v=coveraide1b, v=layoutA1, and v=admintheme1. -->
@@ -69,8 +71,17 @@
 <style>
 :root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
 *{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;max-width:100%;overflow-x:hidden;}
-body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);max-width:100%;overflow-x:hidden;}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;width:100%;max-width:100%;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;touch-action:pan-y;}
+body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);width:100%;max-width:100%;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;touch-action:pan-y;}
+/* v=remiscroll1 — page scrolls up and down only. These inner scrollers keep sideways pan. */
+.sched-scroll,.nav-edit-bottom,.ts-sheet,.table-wrap,#tab_coverage .cover-list,.card > [style*="overflow-x:auto"]{overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain;max-width:100%;min-width:0;}
+@media(max-width:900px){
+  .main-content,.tab-panel,.page-hdr,.card,.sched-layout,.sched-main{max-width:100%;min-width:0;}
+  .main-content{overflow-wrap:anywhere;}
+  .sched-main{overflow-x:clip;}
+  #pwaBanner{max-width:100%;min-width:0;box-sizing:border-box;overflow-x:clip;}
+  #pwaBanner p{min-width:0;overflow-wrap:anywhere;}
+}
 .screen{display:none;min-height:100vh;min-height:100dvh;}
 .screen.active{display:block;}
 #loginScreen.active{display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#176868 0%,var(--teal) 46%,#3a9494 100%);min-height:100vh;min-height:100dvh;padding:20px;}
@@ -146,7 +157,7 @@ textarea{resize:vertical;min-height:80px;}
   .admin-layout{flex-direction:column;min-width:0;max-width:100%;}
   .sidebar-logo{padding:12px 14px;}
   .sidebar-role{padding:8px 14px;}
-  .side-nav{flex:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:8px;padding:10px 12px 12px;touch-action:pan-x pan-y;}
+  .side-nav{flex:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;gap:8px;padding:10px 12px 12px;touch-action:pan-x pan-y;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;max-width:100%;min-width:0;}
   .side-nav .nav-item{border-left:none;border:1.5px solid var(--border);border-radius:999px;background:var(--off);min-height:44px;padding:8px 14px;white-space:nowrap;}
   .side-nav .nav-item.active{background:var(--teal);color:#fff;border-color:var(--teal);}
   .sidebar-bottom{padding:0 12px 12px;border-top:none;}
@@ -198,7 +209,7 @@ textarea{resize:vertical;min-height:80px;}
   #tab_schedule .sched-toolbar .sched-search{min-width:0;max-width:100%;flex:1 1 140px;}
   #tab_schedule .sched-week{flex-wrap:wrap;min-width:0;max-width:100%;}
   #tab_schedule .sched-week-label{min-width:0;}
-  #tab_schedule .sched-scroll{max-width:calc(100vw - 28px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));}
+  #tab_schedule .sched-scroll{max-width:100%;}
   #schedEmpty.empty-state,#schedNoClients.empty-state{padding:8px 0 12px;}
 }
 .card{background:white;border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(26,39,68,0.06);}
