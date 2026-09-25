@@ -462,10 +462,10 @@ async function runBrowser(){
       await page.evaluate(()=>{
         document.getElementById('loginScreen').classList.remove('active');
         document.getElementById('adminScreen').classList.add('active');
-        const btn=document.querySelector('#adminScreen .sidebar-bottom button');
-        if(btn)btn.scrollIntoView({block:'center'});
+        var menu=document.getElementById('avatarMenu');
+        if(menu)menu.hidden=false;
       });
-      await page.click('#adminScreen .sidebar-bottom button');
+      await page.click('#adminSignOut');
       const oneShotBy=Date.now()+3000;
       while(hits.length<freshCount+2&&Date.now()<oneShotBy)await new Promise(r=>setTimeout(r,20));
       assert.ok(hits.length>=freshCount+2, vp.name+' sign-out must fire a POST ping and a GET');
@@ -531,7 +531,7 @@ async function runBrowser(){
       }));
       assert.ok(painted.login, vp.name+' sb cut login screen is up at DOMContentLoaded');
       assert.ok(!painted.admin, vp.name+' sb cut must not open home before Sign In');
-      assert.strictEqual(painted.build, '2026-09-25-admintheme1');
+      assert.strictEqual(painted.build, '2026-09-25-layoutA1');
       assert.ok(Date.now()-navAt<1500, vp.name+' sb cut first paint must not wait on warmkeep');
       await new Promise(r=>setTimeout(r,500));
       const quiet=await page.evaluate(()=>({
@@ -544,8 +544,10 @@ async function runBrowser(){
       await page.evaluate(()=>{
         document.getElementById('loginScreen').classList.remove('active');
         document.getElementById('adminScreen').classList.add('active');
+        var menu=document.getElementById('avatarMenu');
+        if(menu)menu.hidden=false;
       });
-      await page.click('#adminScreen .sidebar-bottom button');
+      await page.click('#adminSignOut');
       await new Promise(r=>setTimeout(r,1400));
       const after=await page.evaluate(()=>({
         login:!!document.getElementById('loginScreen').classList.contains('active'),

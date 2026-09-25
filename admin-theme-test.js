@@ -17,7 +17,7 @@ assert.ok(html.includes('v=loginkb1') && html.includes('v=isclear1') && html.inc
 assert.ok(html.includes('id="mgrForgotBtn"'), 'forgot control stays for loginkb1');
 assert.ok(html.includes('id="mgrLoginBtn"') && html.includes('onclick="mgrLogin()"'), 'sign in still calls mgrLogin');
 assert.ok(html.includes('function loginKbClear()') && html.includes('function bindLoginKeyboard()'), 'loginkb1 keyboard script stays');
-assert.ok(html.includes('class="side-nav"'), 'left nav wrapper');
+assert.ok(html.includes('class="bottom-nav"'), 'layoutA1 bottom nav keeps the teal shell');
 assert.ok(html.includes('.sidebar-logo{padding:16px 16px 14px;background:var(--teal);'), 'teal nav header');
 assert.ok(html.includes('.stat-card{background:white;border:1px solid var(--border);border-top:4px solid var(--teal);'), 'home stat cards');
 
