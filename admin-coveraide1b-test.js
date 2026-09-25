@@ -14,11 +14,11 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coveraide1
 assert.ok(html.indexOf('content="2026-09-25-coveraide1b"') < html.indexOf('content="2026-09-25-coveraide1"'), 'coveraide1b is the current build meta');
 assert.ok(html.includes('v=coveraide1'), 'coveraide1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coveraide1">'), 'coveraide1 meta stays');
+assert.ok(html.includes('v=covercomms1'), 'covercomms1 marker stays');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-covercomms1">'), 'covercomms1 meta stays');
+assert.ok(html.indexOf('content="2026-09-25-coveraide1b"') < html.indexOf('content="2026-09-25-covercomms1"'), 'coveraide1b is ahead of covercomms1');
 assert.ok(html.includes('v=cover1'), 'cover1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-cover1">'), 'cover1 meta stays');
-assert.ok(!html.includes('v=covercomms1'), 'covercomms1 stays off this tip');
-assert.ok(!html.includes('admin_get_cover_refuse_template'), 'refuse email stays off this tip');
-assert.ok(!html.includes('admin_preview_cover_refuse_email'), 'refuse preview stays off this tip');
 
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
@@ -71,6 +71,7 @@ vm.createContext(ctx);
   'function coverSourceChips(shift)',
   'function coverNameOf(v)',
   'function coverIdOf(v)',
+  'function coverPickPhone(obj)',
   'function coverMapShift(row)',
   'function coverCoerceNode(data)',
   'function coverShiftRows(data)',

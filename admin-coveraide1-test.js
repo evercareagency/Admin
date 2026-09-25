@@ -82,6 +82,7 @@ vm.createContext(ctx);
   'function coverSourceChips(shift)',
   'function coverNameOf(v)',
   'function coverIdOf(v)',
+  'function coverPickPhone(obj)',
   'function coverMapShift(row)'
 ].forEach(function(sig){
   vm.runInContext(extractFn(html, sig), ctx);
