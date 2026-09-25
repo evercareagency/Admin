@@ -103,6 +103,7 @@ vm.createContext(ctx);
   'function coverIntakeSource(src)',
   'function coverMapShift(row)',
   'function coverMapRank(row)',
+  'function formatAdminDate(val)',
   'function coverServiceDate(iso)',
   'function coverContinuityLine(value)',
   'function coverMilesLine(miles)',
@@ -159,7 +160,7 @@ assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1",
 assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"b1", phone:""})', ctx), '2165550199');
 assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"a9", phone:""})', ctx), '2165550101');
 assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"other", phone:""})', ctx), '');
-assert.strictEqual(vm.runInContext('coverServiceDate("2026-09-25T16:00:00Z")', ctx), 'Friday, September 25');
+assert.strictEqual(vm.runInContext('coverServiceDate("2026-09-25T16:00:00Z")', ctx), '09/25/2026');
 
 const sms = vm.runInContext('coverSmsHref("(216) 555-0199", "Hi Cam")', ctx);
 assert.ok(sms.startsWith('sms:2165550199?&body='), 'sms opens Messages');

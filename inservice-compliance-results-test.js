@@ -270,12 +270,12 @@ vm.runInContext(
   sandbox
 );
 
-assert.strictEqual(sandbox.formatISCompletedDate('2026-08-02T01:42:29.000Z'), 'Aug 2, 2026');
-assert.strictEqual(sandbox.formatISCompletedDate('2026-08-02'), 'Aug 2, 2026');
+assert.strictEqual(sandbox.formatISCompletedDate('2026-08-02T01:42:29.000Z'), '08/02/2026');
+assert.strictEqual(sandbox.formatISCompletedDate('2026-08-02'), '08/02/2026');
 assert.ok(!/T|Z/.test(sandbox.formatISCompletedDate('2026-08-02T01:42:29.000Z')), 'never raw ISO');
 assert.ok(!/2026-08-02/.test(sandbox.formatISCompletedDate('2026-08-02T01:42:29.000Z')), 'never YYYY-MM-DD in table');
-assert.strictEqual(sandbox.formatISCompletedDate('08/02/2026'), 'Aug 2, 2026');
-assert.strictEqual(sandbox.formatISCompletedDate('August 2, 2026'), 'Aug 2, 2026');
+assert.strictEqual(sandbox.formatISCompletedDate('08/02/2026'), '08/02/2026');
+assert.strictEqual(sandbox.formatISCompletedDate('August 2, 2026'), '08/02/2026');
 
 const completed = sandbox.hydrateISComplianceRow({
   id:'is-asha-1', username:'aide1', empName:'Asha Aide', topicId:1,
@@ -286,7 +286,7 @@ const completed = sandbox.hydrateISComplianceRow({
 assert.strictEqual(completed.isCompleted, true);
 assert.strictEqual(sandbox.formatISScoreColumn(completed), '9/10 · 90%');
 assert.strictEqual(sandbox.formatISScoreBanner(completed), 'Score: 9/10 (90%)');
-assert.strictEqual(sandbox.formatISCompletedDate(sandbox.certDateFromRecord(completed)), 'Aug 2, 2026');
+assert.strictEqual(sandbox.formatISCompletedDate(sandbox.certDateFromRecord(completed)), '08/02/2026');
 
 const pending = sandbox.hydrateISComplianceRow({}, {username:'aide2', name:'Pat Pending'}, {id:1, title:'Diabetes', shortTitle:'Diabetes Complications'});
 assert.strictEqual(pending.isCompleted, false);
