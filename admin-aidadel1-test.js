@@ -44,8 +44,9 @@ const confirmDel = extractFn(html, 'function confirmSoftDeleteAide(username)');
 const softDel = extractFn(html, 'async function softDeleteAide(username)');
 const confirmRes = extractFn(html, 'function confirmRestoreAide(username)');
 const restore = extractFn(html, 'async function restoreAide(username)');
-const sbDel = extractFn(html, 'async function sbAdminSoftDeleteAide(payload)');
+const sbDel = extractFn(html, 'async function sbAdminDeactivateAide(payload)');
 const sbRes = extractFn(html, 'async function sbAdminRestoreAide(payload)');
+const sbPatch = extractFn(html, 'async function sbPatchAideIsActive(payload, username, active)');
 const dispatch = extractFn(html, 'async function sbAdminWriteDispatch(payload)');
 const clearAsg = extractFn(html, 'async function sbClearAideAssignments(payload)');
 
@@ -56,17 +57,19 @@ assert.ok(actions.includes("canManageAides()"), 'actions use the Add-aide role g
 assert.ok(confirmDel.includes("showSharedConfirm('Are you sure?"), 'confirm title starts Are you sure?');
 assert.ok(confirmDel.includes("'Soft-delete'"), 'confirm button is Soft-delete');
 assert.ok(!/\bconfirm\(/.test(confirmDel + softDel + confirmRes + restore), 'no window.confirm on aide delete');
-assert.ok(softDel.includes("'soft_delete_aide'"), 'UI posts soft_delete_aide');
-assert.ok(restore.includes("'restore_aide'"), 'UI posts restore_aide');
-assert.ok(!/tempPassword|temp_password|reset_aide_temp_password|generateTempPassword|p_temp_password/.test(softDel + restore + sbDel + sbRes + confirmDel + confirmRes), 'delete and restore never rotate a password');
-assert.ok(sbDel.includes("sbRestRpc('soft_delete_aide'"), 'Ace soft_delete_aide RPC');
+assert.ok(softDel.includes("'admin_deactivate_aide'"), 'UI posts admin_deactivate_aide');
+assert.ok(restore.includes("'admin_restore_aide'"), 'UI posts admin_restore_aide');
+assert.ok(!/soft_delete_aide|restore_aide\(/.test(softDel + restore), 'UI does not call the old RPC names');
+assert.ok(!/tempPassword|temp_password|reset_aide_temp_password|generateTempPassword|p_temp_password/.test(softDel + restore + sbDel + sbRes + sbPatch + confirmDel + confirmRes), 'delete and restore never rotate a password');
+assert.ok(sbDel.includes("sbRestRpc('admin_deactivate_aide'"), 'Ace admin_deactivate_aide RPC');
 assert.ok(sbDel.includes('p_username:username'), 'RPC body is p_username only');
-assert.ok(sbRes.includes("sbRestRpc('restore_aide'"), 'Ace restore_aide RPC');
-assert.ok(sbDel.includes('rpcMissing'), 'missing RPC fails closed');
-assert.ok(clearAsg.includes('TODO Ace'), 'unassign leaves a TODO for Ace');
+assert.ok(sbRes.includes("sbRestRpc('admin_restore_aide'"), 'Ace admin_restore_aide RPC');
+assert.ok(sbDel.includes('sbRpcMissing'), 'missing RPC falls through');
+assert.ok(sbPatch.includes("sbRestPatchActive('aides'"), 'missing deactivate RPC falls back to client-style is_active PATCH');
+assert.ok(sbPatch.includes('sbRestPatchRestoreActive'), 'missing restore RPC PATCH is_active true');
 assert.ok(clearAsg.includes('sbSoftUnassign'), 'known assignments use the existing unassign callable');
-assert.ok(dispatch.indexOf("action==='soft_delete_aide'") < dispatch.indexOf('sbAdminSoftDeleteTimesheet'), 'aide soft-delete is not the timesheet trash path');
-assert.ok(dispatch.includes("action==='restore_aide'"), 'dispatch restores aides');
+assert.ok(dispatch.indexOf("action==='admin_deactivate_aide'") < dispatch.indexOf('sbAdminSoftDeleteTimesheet'), 'aide deactivate is not the timesheet trash path');
+assert.ok(dispatch.includes("action==='admin_restore_aide'"), 'dispatch restores aides');
 
 function classList(){
   const set = new Set();
@@ -111,9 +114,7 @@ const names = [
   'function aceActionError(data,err,action)',
   'async function postAideAction(primary,alias,payload)',
   'function canManageAides()',
-  'function aideDeletedStamp(u)',
-  'function aideRecordDeleted(u)',
-  'function aideWithinRestoreWindow(u, nowMs)',
+  'function aideIsInactive(u)',
   'function aideOnDesk(u, desk)',
   'function aideClientIdList(u)',
   'function syncAideManageButtons()',
@@ -164,7 +165,6 @@ const toasts = [];
 let failRpc = false;
 const box = {
   aideDesk: 'active',
-  AIDE_RESTORE_WINDOW_MS: 7 * 24 * 60 * 60 * 1000,
   currentAdminRole: 'Admin',
   allClients: [{id: clientId, name: 'Ann Client'}],
   loadedAidesList: [],
@@ -185,23 +185,17 @@ const box = {
   apiGetCached: async function(){return {success: true, data: store.aides.slice()};},
   apiPost: async function(payload){
     posts.push(JSON.parse(JSON.stringify(payload)));
-    if(failRpc)return {success: false, error: 'Soft-delete is not available yet. Ace soft_delete_aide is not published.', rpcMissing: true};
+    if(failRpc)return {success: false, error: 'Could not hide this aide.'};
     const row = store.aides.find(function(a){return a.username === payload.username;});
-    if(payload.action === 'soft_delete_aide'){
-      row.deleted_at = new Date().toISOString();
-      row.deletedAt = row.deleted_at;
-      row.softDeleted = true;
-      row.soft_deleted = true;
+    if(payload.action === 'admin_deactivate_aide'){
       row.isActive = false;
-      return {success: true, username: payload.username, deleted_at: row.deleted_at, is_active: false};
+      row.is_active = false;
+      return {success: true, username: payload.username, is_active: false};
     }
-    if(payload.action === 'restore_aide'){
-      row.deleted_at = null;
-      row.deletedAt = '';
-      row.softDeleted = false;
-      row.soft_deleted = false;
+    if(payload.action === 'admin_restore_aide'){
       row.isActive = true;
-      return {success: true, username: payload.username, deleted_at: null, is_active: true};
+      row.is_active = true;
+      return {success: true, username: payload.username, is_active: true};
     }
     return {success: false, error: 'nope'};
   }
@@ -245,10 +239,10 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   failRpc = true;
   toasts.length = 0;
   await box.softDeleteAide('jdoe');
-  assert.strictEqual(posts[posts.length - 1].action, 'soft_delete_aide');
-  assert.ok(!('tempPassword' in posts[posts.length - 1]), 'missing-RPC post has no temp password');
+  assert.strictEqual(posts[posts.length - 1].action, 'admin_deactivate_aide');
+  assert.ok(!('tempPassword' in posts[posts.length - 1]), 'failed deactivate post has no temp password');
   assert.ok(!('password' in posts[posts.length - 1]));
-  assert.ok(/not published/.test(toasts[toasts.length - 1].msg), 'missing RPC toasts');
+  assert.ok(/Could not hide this aide/.test(toasts[toasts.length - 1].msg), 'hard failure toasts');
   assert.strictEqual(toasts[toasts.length - 1].color, 'var(--danger)');
   assert.ok(htmlOf().includes('@jdoe') && htmlOf().includes('>Delete<'), 'failed delete stays on the active list');
   failRpc = false;
@@ -269,7 +263,7 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   const pendingDelete = box._sharedConfirmOnYes();
   box.hideSharedConfirm();
   await pendingDelete;
-  assert.strictEqual(posts[posts.length - 1].action, 'soft_delete_aide');
+  assert.strictEqual(posts[posts.length - 1].action, 'admin_deactivate_aide');
   assert.deepStrictEqual(posts[posts.length - 1].clientIds, [clientId], 'soft-delete sends known client ids for unassign');
   assert.strictEqual(posts[posts.length - 1].aideId, aideId);
   assert.ok(!htmlOf().includes('@jdoe'), 'confirm then gone from the active list');
@@ -278,7 +272,7 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   await box.setAideDesk('deleted');
   assert.ok(htmlOf().includes('@jdoe'), 'soft-deleted aide appears in Recently deleted');
   assert.ok(htmlOf().includes('confirmRestoreAide'), 'Recently deleted has Restore');
-  assert.ok(!htmlOf().includes('oldaide'), 'past the 7 day window is not offered for restore');
+  assert.ok(htmlOf().includes('oldaide'), 'Recently deleted lists inactive aides');
   assert.ok(els.aideDeskSub.textContent.indexOf('7 days') > 0, 'desk copy matches timesheets');
   assert.strictEqual(els.addAideBtn.hidden, true, 'Add stays off Recently deleted');
   assert.ok(desks[1].classList.contains('on'), 'Recently deleted tab is selected');
@@ -289,7 +283,7 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   const pendingRestore = box._sharedConfirmOnYes();
   box.hideSharedConfirm();
   await pendingRestore;
-  assert.strictEqual(posts[posts.length - 1].action, 'restore_aide');
+  assert.strictEqual(posts[posts.length - 1].action, 'admin_restore_aide');
   assert.ok(!('tempPassword' in posts[posts.length - 1]), 'restore does not send a password');
   assert.ok(!htmlOf().includes('@jdoe'), 'restored aide leaves Recently deleted');
 
@@ -298,12 +292,10 @@ function htmlOf(){return els.aidesContainer.innerHTML;}
   assert.ok(htmlOf().includes('>Delete<'), 'restored row can be deleted again');
   assert.ok(htmlOf().includes('Reset temp password'));
 
-  const aged = box.aideOnDesk({username: 'x', deleted_at: '2026-09-01T00:00:00.000Z', softDeleted: true}, 'deleted');
-  assert.strictEqual(aged, false, '8+ days is outside the restore window');
-  const fresh = box.aideOnDesk({username: 'x', deleted_at: new Date().toISOString(), softDeleted: true}, 'deleted');
-  assert.strictEqual(fresh, true, 'a delete from today is restorable');
+  assert.strictEqual(box.aideOnDesk({username: 'x', isActive: false}, 'deleted'), true, 'inactive aides are Recently deleted');
+  assert.strictEqual(box.aideOnDesk({username: 'x', is_active: false}, 'active'), false, 'default list hides inactive');
   assert.strictEqual(box.aideOnDesk({username: 'x', isActive: true}, 'active'), true);
-  assert.strictEqual(box.aideOnDesk({username: 'x', deleted_at: new Date().toISOString(), softDeleted: true}, 'active'), false);
+  assert.strictEqual(box.aideOnDesk({username: 'x', isActive: true}, 'deleted'), false);
 
   console.log('admin-aidadel1-test: ui ok');
 })().then(function(){
@@ -317,9 +309,13 @@ function runRpc(){
   const rpcNames = [
     'function sbUuid(v)',
     'function sbRpcMissing(got)',
-    'function sbMapSoftAideResult(data, username, restoring)',
+    'function sbMapAideDutyResult(data, username, active)',
+    'function sbArchiveRepresentation(data)',
+    'function sbConfirmedArchive(row, id)',
     'async function sbClearAideAssignments(payload)',
-    'async function sbAdminSoftDeleteAide(payload)',
+    'async function sbFinishAideDeactivate(payload, mapped)',
+    'async function sbPatchAideIsActive(payload, username, active)',
+    'async function sbAdminDeactivateAide(payload)',
     'async function sbAdminRestoreAide(payload)'
   ];
   const rpcSrc = rpcNames.map(function(sig){return extractFn(html, sig);}).join('\n');
@@ -332,12 +328,19 @@ function runRpc(){
       calls.push({op: 'unassign', aide: aide, client: client});
       return {ok: true};
     },
+    sbRestPatchActive: async function(table, id){
+      calls.push({op: 'patch', table: table, id: id, is_active: false});
+      return {ok: true, data: {id: id, is_active: false}};
+    },
+    sbRestPatchRestoreActive: async function(table, id){
+      calls.push({op: 'patch', table: table, id: id, is_active: true});
+      return {ok: true, data: {id: id, is_active: true}};
+    },
     sbRestRpc: async function(name, body){
       calls.push({op: 'rpc', name: name, body: body});
       if(rpcBox.mode === 'missing')return {ok: false, status: 404, error: 'Could not find the function public.' + name + '(p_username) in the schema cache'};
-      if(rpcBox.mode === 'cleared')return {ok: true, data: {ok: true, success: true, username: body.p_username, deleted_at: '2026-09-25T12:00:00.000Z', assignments_cleared: true}};
-      if(name === 'restore_aide')return {ok: true, data: {ok: true, success: true, username: body.p_username}};
-      return {ok: true, data: {ok: true, success: true, username: body.p_username, deleted_at: '2026-09-25T12:00:00.000Z'}};
+      if(rpcBox.mode === 'cleared')return {ok: true, data: {ok: true, success: true, username: body.p_username, assignments_cleared: true}};
+      return {ok: true, data: {ok: true, success: true, username: body.p_username}};
     },
     mode: 'ok'
   };
@@ -345,37 +348,50 @@ function runRpc(){
   vm.runInContext(rpcSrc, rpcBox);
   const aide = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
   const client = 'cccccccc-cccc-4ccc-8ccc-ccccccccccc3';
-  return rpcBox.sbAdminSoftDeleteAide({username: 'jdoe', aideId: aide, clientIds: [client]}).then(function(deleted){
+  return rpcBox.sbAdminDeactivateAide({username: 'jdoe', aideId: aide, clientIds: [client]}).then(function(deleted){
     assert.strictEqual(deleted.success, true);
-    assert.strictEqual(calls[0].name, 'soft_delete_aide');
+    assert.strictEqual(deleted.is_active, false);
+    assert.strictEqual(calls[0].name, 'admin_deactivate_aide');
     assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_username: 'jdoe'});
     assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1])), {op: 'unassign', aide: aide, client: client});
-    assert.ok(!/password/i.test(JSON.stringify(calls[0].body)), 'RPC payload has no password');
+    assert.ok(!calls.some(function(c){return c.op === 'patch';}), 'live RPC does not also PATCH');
+    assert.ok(!/password/i.test(JSON.stringify(calls)), 'deactivate payload has no password');
     calls.length = 0;
     rpcBox.mode = 'cleared';
-    return rpcBox.sbAdminSoftDeleteAide({username: 'jdoe', aideId: aide, clientIds: [client]});
+    return rpcBox.sbAdminDeactivateAide({username: 'jdoe', aideId: aide, clientIds: [client]});
   }).then(function(already){
     assert.strictEqual(already.success, true);
     assert.strictEqual(calls.length, 1, 'Ace-cleared assignments are not patched again');
     calls.length = 0;
     rpcBox.mode = 'missing';
-    return rpcBox.sbAdminSoftDeleteAide({username: 'mossier', aideId: aide, clientIds: [client]});
+    return rpcBox.sbAdminDeactivateAide({username: 'mossier', aideId: aide, clientIds: [client]});
   }).then(function(missing){
-    assert.strictEqual(missing.success, false);
-    assert.strictEqual(missing.rpcMissing, true);
-    assert.ok(/not published/.test(missing.error));
-    assert.ok(!calls.some(function(c){return c.op === 'unassign';}), 'missing RPC does not unassign');
+    assert.strictEqual(missing.success, true, 'missing RPC falls back to is_active PATCH');
+    assert.strictEqual(missing.fallback, 'patch');
+    assert.strictEqual(missing.authBanPending, true);
+    assert.strictEqual(missing.is_active, false);
+    assert.strictEqual(calls[0].name, 'admin_deactivate_aide');
     assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_username: 'mossier'});
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1])), {op: 'patch', table: 'aides', id: aide, is_active: false});
+    assert.strictEqual(calls[2].op, 'unassign');
     calls.length = 0;
     rpcBox.mode = 'ok';
     return rpcBox.sbAdminRestoreAide({username: 'mossier'});
   }).then(function(restored){
     assert.strictEqual(restored.success, true);
     assert.strictEqual(restored.is_active, true);
-    assert.strictEqual(restored.deleted_at, null);
-    assert.strictEqual(calls[0].name, 'restore_aide');
+    assert.strictEqual(calls[0].name, 'admin_restore_aide');
     assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[0].body)), {p_username: 'mossier'});
-    assert.ok(!calls.some(function(c){return c.op === 'unassign';}), 'restore does not touch assignments or passwords');
+    assert.ok(!calls.some(function(c){return c.op === 'unassign' || c.op === 'patch';}), 'restore RPC does not rotate passwords or touch assignments');
+    calls.length = 0;
+    rpcBox.mode = 'missing';
+    return rpcBox.sbAdminRestoreAide({username: 'mossier', aideId: aide});
+  }).then(function(patched){
+    assert.strictEqual(patched.success, true);
+    assert.strictEqual(patched.is_active, true);
+    assert.strictEqual(patched.fallback, 'patch');
+    assert.deepStrictEqual(JSON.parse(JSON.stringify(calls[1])), {op: 'patch', table: 'aides', id: aide, is_active: true});
+    assert.ok(!/password/i.test(JSON.stringify(calls)), 'restore fallback has no password');
     console.log('admin-aidadel1-test: ok');
   });
 }

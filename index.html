@@ -41,7 +41,7 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
-<!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/soft_delete_aide {p_username} bans Sign In and stamps deleted_at. Restore is POST rpc/restore_aide {p_username}. No password reseal or rotation, including lasting test aides. Recently deleted keeps the row for 7 days; nightly Auth wipe is Ace. Known client assignments PATCH is_active=false so Schedule does not keep a ghost aide. A missing RPC toasts and leaves the row on the active list. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- aides soft delete 2026-09-25 v=aidadel1 admin-build 2026-09-25-aidadel1. Aides Actions Delete sits beside Reset temp password for Admin and Scheduler (same gate as Add aide). Are you sure? then POST rpc/admin_deactivate_aide {p_username} (Auth ban). Restore is POST rpc/admin_restore_aide {p_username}. No password reseal or rotation, including lasting test aides. Never reset_aide_temp_password on Delete or Restore. Active list is is_active=true. Recently deleted is is_active=false, restorable for 7 days; nightly Auth wipe is Ace. If the RPC is not published, PATCH aides.is_active the same way clients soft-hide. Known client assignments PATCH is_active=false when the RPC does not clear them. Prior markers stay, including v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-aidadel1">
 <meta name="admin-build" content="2026-09-25-navedit1">
 <!-- nurse supervisory cadence copy 2026-09-25 v=nursecomp57 admin-build 2026-09-25-nursecomp57. Nurse Compliance cadence wording is 57–60 days: Cadence tip “every 57–60 days” and subtitle “Rolling 57–60 day window”. Empty-state cadence note uses the same wording. Visit/call scoring, Days-in-window, and get_supervisory_compliance stay on the 60-day window. Prior markers stay, including v=layoutA1 and v=admintheme1. -->
@@ -4826,20 +4826,12 @@ async function sbApiList(payload){
   try{
     if(action==='get_users'){
       var aideView=payload&&payload.aideDesk==='deleted'?'deleted':'active';
-      var aidePairs=aideView==='deleted'
-        ?[['select',SB_AIDE_SELECT+',deleted_at'],['deleted_at','not.is.null'],['order','deleted_at.desc']]
-        :[['select',SB_AIDE_SELECT],['is_active','eq.true'],['deleted_at','is.null'],['order','full_name.asc']];
+      var aidePairs=[
+        ['select',SB_AIDE_SELECT],
+        ['is_active',aideView==='deleted'?'eq.false':'eq.true'],
+        ['order','full_name.asc']
+      ];
       var aides=await sbRestGet('aides', aidePairs);
-      if(!aides.ok&&/deleted_at|soft_deleted/i.test(String(aides.error||''))){
-        if(aideView==='deleted'){
-          return {success:false,error:'Recently deleted needs the aides soft-delete fields.',rpcMissing:true,httpStatus:aides.status||0};
-        }
-        aides=await sbRestGet('aides',[
-          ['select',SB_AIDE_SELECT],
-          ['is_active','eq.true'],
-          ['order','full_name.asc']
-        ]);
-      }
       if(!aides.ok)return {success:false,error:aides.error||'aides',httpStatus:aides.status||0};
       var aideRows=Array.isArray(aides.data)?aides.data:[];
       return {success:true,data:aideRows.filter(function(row){return row&&row.username;}).map(sbMapAide).filter(function(row){
@@ -5843,7 +5835,7 @@ function sbIsAdminWriteAction(action){
   return action==='admin_create_aide'||action==='create_aide'
     ||action==='reset_temp_password'||action==='reset_aide_temp_password'
     ||action==='reset_password'||action==='set_password'
-    ||action==='soft_delete_aide'||action==='restore_aide'
+    ||action==='admin_deactivate_aide'||action==='admin_restore_aide'
     ||action==='add_client'||action==='update_client'
     ||action==='archive_client'||action==='delete_client'
     ||action==='update'||action==='send_correction'||action==='delete'
@@ -6241,7 +6233,7 @@ function sbRpcMissing(got){
   if(got&&got.status===404)return true;
   return /PGRST202|could not find the function|schema cache/i.test(err);
 }
-function sbMapSoftAideResult(data, username, restoring){
+function sbMapAideDutyResult(data, username, active){
   var row=data;
   if(typeof row==='string'){
     try{row=JSON.parse(row);}catch(e){row=null;}
@@ -6251,27 +6243,23 @@ function sbMapSoftAideResult(data, username, restoring){
   if(row.ok===false||row.success===false){
     return {success:false,error:sbNormalizeWriteError(row.error||row.message||'Request failed.')};
   }
-  var ok=row.ok===true||row.success===true;
-  if(!ok)return {success:false,error:restoring?'Could not restore this aide.':'Could not soft-delete this aide.'};
-  var stamp=row.deleted_at||row.deletedAt||'';
-  if(!restoring&&!stamp)stamp=new Date().toISOString();
+  var ok=row.ok===true||row.success===true||row.is_active===active||row.isActive===active;
+  if(!ok)return {success:false,error:active?'Could not restore this aide.':'Could not hide this aide.'};
   return {
     success:true,
     username:row.username||username||'',
-    deleted_at:restoring?null:(stamp||null),
-    deletedAt:restoring?'':(stamp||''),
-    is_active:!!restoring,
-    soft_deleted:!restoring,
+    is_active:active,
+    soft_deleted:!active,
     assignments_cleared:row.assignments_cleared===true||row.unassigned===true
   };
 }
 async function sbClearAideAssignments(payload){
-  // TODO Ace: soft_delete_aide should ban Sign In and unassign this aide's clients
-  // so Schedule does not show a ghost aide. Ghost follows a successful RPC with the
-  // existing assignments PATCH (sbSoftUnassign is_active=false) when client ids are known.
-  // If Ace only has a stub flag, missing ids no-op here and the UI still soft-hides the row.
+  // Ace admin_deactivate_aide should ban Sign In and unassign clients so Schedule
+  // does not show a ghost aide. When the RPC does not report assignments_cleared,
+  // Ghost PATCHes assignments is_active=false via sbSoftUnassign.
   // Do NOT reseal or rotate passwords (including mossier / lasting test aides).
-  // Do NOT delete the Auth user. Nightly wipe after 7 days is Ace.
+  // Do NOT delete the Auth user.
+  // Nightly wipe after 7 days is Ace.
   var ids=[];
   var raw=payload&&(payload.clientIds||payload.client_ids)||[];
   if(!Array.isArray(raw))raw=[];
@@ -6292,35 +6280,60 @@ async function sbClearAideAssignments(payload){
   }
   return {ok:true};
 }
-async function sbAdminSoftDeleteAide(payload){
+async function sbFinishAideDeactivate(payload, mapped){
+  if(!mapped||!mapped.success||mapped.assignments_cleared)return mapped;
+  var cleared=await sbClearAideAssignments(payload);
+  if(!cleared.ok)mapped.assignmentsWarning='Assigned clients could not be cleared. Schedule may still show this aide until Ace unassigns them.';
+  return mapped;
+}
+async function sbPatchAideIsActive(payload, username, active){
+  var aideId=String((payload&&(payload.aideId||payload.aide_id||payload.id))||'').trim();
+  if(!(typeof sbUuid==='function'&&sbUuid(aideId))){
+    aideId=typeof sbResolveAideId==='function'?await sbResolveAideId(username):'';
+  }
+  if(!aideId)return {success:false,error:'Could not find this aide to update.'};
+  if(active){
+    var on=await sbRestPatchRestoreActive('aides', aideId);
+    if(!on.ok)return {success:false,error:on.error||'Could not restore this aide.',httpStatus:on.status||0,fallback:'patch'};
+    var row=sbArchiveRepresentation(on.data);
+    if(!row||row.is_active!==true)return {success:false,error:'Restore was not confirmed',is_active:row&&row.is_active,fallback:'patch'};
+    return {success:true,username:row.username||username,id:row.id||aideId,is_active:true,soft_deleted:false,fallback:'patch',authBanPending:true};
+  }
+  var off=await sbRestPatchActive('aides', aideId);
+  if(!off.ok)return {success:false,error:off.error||'Could not hide this aide.',httpStatus:off.status||0,fallback:'patch'};
+  var confirmed=sbConfirmedArchive(sbArchiveRepresentation(off.data), aideId);
+  if(!confirmed.success)return confirmed;
+  confirmed.username=username;
+  confirmed.soft_deleted=true;
+  confirmed.fallback='patch';
+  confirmed.authBanPending=true;
+  return confirmed;
+}
+async function sbAdminDeactivateAide(payload){
   var username=String((payload&&(payload.username||payload.p_username))||'').trim();
   if(!username)return {success:false,error:'Username missing.'};
-  var got=await sbRestRpc('soft_delete_aide', {p_username:username});
-  if(!got.ok){
-    if(sbRpcMissing(got)){
-      return {success:false,error:'Soft-delete is not available yet. Ace soft_delete_aide is not published.',rpcMissing:true,httpStatus:got.status||0};
-    }
-    return {success:false,error:sbNormalizeWriteError(got.error||'Could not soft-delete this aide.'),httpStatus:got.status||0};
+  // Auth ban rides on admin_deactivate_aide. Never send or rotate a password.
+  var got=await sbRestRpc('admin_deactivate_aide', {p_username:username});
+  if(got&&got.ok){
+    var mapped=sbMapAideDutyResult(got.data, username, false);
+    if(!mapped.success)return mapped;
+    return sbFinishAideDeactivate(payload, mapped);
   }
-  var mapped=sbMapSoftAideResult(got.data, username, false);
-  if(!mapped.success)return mapped;
-  if(!mapped.assignments_cleared){
-    var cleared=await sbClearAideAssignments(payload);
-    if(!cleared.ok)mapped.assignmentsWarning='Assigned clients could not be cleared. Schedule may still show this aide until Ace unassigns them.';
+  if(got&&sbRpcMissing(got)){
+    var patched=await sbPatchAideIsActive(payload, username, false);
+    if(!patched.success)return patched;
+    return sbFinishAideDeactivate(payload, patched);
   }
-  return mapped;
+  return {success:false,error:sbNormalizeWriteError((got&&got.error)||'Could not hide this aide.'),httpStatus:(got&&got.status)||0};
 }
 async function sbAdminRestoreAide(payload){
   var username=String((payload&&(payload.username||payload.p_username))||'').trim();
   if(!username)return {success:false,error:'Username missing.'};
-  var got=await sbRestRpc('restore_aide', {p_username:username});
-  if(!got.ok){
-    if(sbRpcMissing(got)){
-      return {success:false,error:'Restore is not available yet. Ace restore_aide is not published.',rpcMissing:true,httpStatus:got.status||0};
-    }
-    return {success:false,error:sbNormalizeWriteError(got.error||'Could not restore this aide.'),httpStatus:got.status||0};
-  }
-  return sbMapSoftAideResult(got.data, username, true);
+  // Re-enable Sign In only. Do not reseal or rotate the password.
+  var got=await sbRestRpc('admin_restore_aide', {p_username:username});
+  if(got&&got.ok)return sbMapAideDutyResult(got.data, username, true);
+  if(got&&sbRpcMissing(got))return sbPatchAideIsActive(payload, username, true);
+  return {success:false,error:sbNormalizeWriteError((got&&got.error)||'Could not restore this aide.'),httpStatus:(got&&got.status)||0};
 }
 function sbKnownAides(){
   var out=[];
@@ -6520,6 +6533,42 @@ async function sbRestPatchActive(table, id, refreshed){
   if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status,data:data};
   return {ok:true,data:data,status:res.status};
 }
+async function sbRestPatchRestoreActive(table, id, refreshed){
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,error:'Not signed in',status:401};
+  var url=SUPABASE_URL+'/rest/v1/'+table+'?'+sbFilterQuery([
+    ['id','eq.'+id],
+    ['select','id,is_active']
+  ]);
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'PATCH',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        Accept:'application/vnd.pgrst.object+json',
+        'Content-Type':'application/json',
+        Prefer:'return=representation'
+      },
+      body:JSON.stringify({is_active:true})
+    });
+  }catch(err){
+    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbRestPatchRestoreActive(table, id, true);
+  }
+  var raw='';
+  try{raw=await res.text();}catch(err2){
+    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
+  }
+  var data=null;
+  try{data=raw?JSON.parse(raw):null;}catch(e){}
+  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status,data:data};
+  return {ok:true,data:data,status:res.status};
+}
 function sbConfirmedArchive(row, id){
   if(!row||row.is_active!==false){
     return {success:false,error:'Archive was not confirmed',is_active:row&&typeof row.is_active==='boolean'?row.is_active:null,representation:row||null};
@@ -6628,8 +6677,8 @@ async function sbAdminWriteDispatch(payload){
   try{
     if(action==='admin_create_aide'||action==='create_aide')return await sbAdminCreateAide(payload);
     if(action==='reset_temp_password'||action==='reset_aide_temp_password'||action==='reset_password'||action==='set_password')return await sbAdminResetTempPassword(payload);
-    if(action==='soft_delete_aide')return await sbAdminSoftDeleteAide(payload);
-    if(action==='restore_aide')return await sbAdminRestoreAide(payload);
+    if(action==='admin_deactivate_aide')return await sbAdminDeactivateAide(payload);
+    if(action==='admin_restore_aide')return await sbAdminRestoreAide(payload);
     if(action==='add_client')return await sbAdminAddClient(payload);
     if(action==='update_client')return await sbAdminUpdateClient(payload);
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
@@ -7210,35 +7259,20 @@ function showAddAideError(msg){
 }
 
 let aideDesk='active';
-var AIDE_RESTORE_WINDOW_MS=7*24*60*60*1000;
 function canManageAides(){
   var role='';
   try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
   return role==='Admin'||role==='Scheduler';
 }
-function aideDeletedStamp(u){
-  if(!u)return '';
-  return u.deletedAt||u.deleted_at||u.softDeletedAt||u.soft_deleted_at||'';
-}
-function aideRecordDeleted(u){
+function aideIsInactive(u){
   if(!u)return false;
-  if(u.soft_deleted===true||u.softDeleted===true)return true;
-  return !!aideDeletedStamp(u);
-}
-function aideWithinRestoreWindow(u, nowMs){
-  var stamp=aideDeletedStamp(u);
-  if(!stamp)return !!aideRecordDeleted(u);
-  var t=Date.parse(stamp);
-  if(!isFinite(t))return true;
-  var now=nowMs==null?Date.now():nowMs;
-  return (now-t)<=AIDE_RESTORE_WINDOW_MS;
+  return u.isActive===false||u.is_active===false;
 }
 function aideOnDesk(u, desk){
-  var deleted=aideRecordDeleted(u);
-  if(desk==='deleted')return deleted&&aideWithinRestoreWindow(u);
-  if(deleted)return false;
-  if(u&&(u.isActive===false||u.is_active===false))return false;
-  return !!(u&&u.username);
+  if(!u||!u.username)return false;
+  var inactive=aideIsInactive(u);
+  if(desk==='deleted')return inactive;
+  return !inactive;
 }
 function aideClientIdList(u){
   return aideAssignedClientValues(u).map(function(item){
@@ -7553,19 +7587,22 @@ async function softDeleteAide(username){
     payload.clientIds=aideClientIdList(aide);
   }
   try{
-    const res=await postAideAction('soft_delete_aide','',payload);
+    const res=await postAideAction('admin_deactivate_aide','',payload);
     const data=res&&res.data;
     if(data&&data.success){
       if(typeof cacheInvalidate==='function')cacheInvalidate('get_users');
       logActivity('Soft-deleted aide @'+un);
-      const extra=data.assignmentsWarning?(' '+data.assignmentsWarning):'';
-      showTempMsg('Aide @'+un+' hidden. They cannot Sign In. Restore from Recently deleted within 7 days.'+extra,'var(--success)');
+      var msg=data.authBanPending
+        ?'Aide @'+un+' hidden. Sign In ban waits for Ace admin_deactivate_aide. Restore from Recently deleted within 7 days.'
+        :'Aide @'+un+' hidden. They cannot Sign In. Restore from Recently deleted within 7 days.';
+      if(data.assignmentsWarning)msg+=' '+data.assignmentsWarning;
+      showTempMsg(msg,data.authBanPending?'var(--warn)':'var(--success)');
       await renderAides(true);
       return;
     }
-    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'soft_delete_aide'),'var(--danger)');
+    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'admin_deactivate_aide'),'var(--danger)');
   }catch(e){
-    showTempMsg(aceActionError(null,e,'soft_delete_aide'),'var(--danger)');
+    showTempMsg(aceActionError(null,e,'admin_deactivate_aide'),'var(--danger)');
   }
 }
 function confirmRestoreAide(username){
@@ -7585,18 +7622,21 @@ async function restoreAide(username){
   const payload={username:un};
   if(aide&&aide.id)payload.aideId=aide.id;
   try{
-    const res=await postAideAction('restore_aide','',payload);
+    const res=await postAideAction('admin_restore_aide','',payload);
     const data=res&&res.data;
     if(data&&data.success){
       if(typeof cacheInvalidate==='function')cacheInvalidate('get_users');
       logActivity('Restored aide @'+un);
-      showTempMsg('Aide @'+un+' restored. Their password was not changed. Assign clients again if they should be on the schedule.','var(--success)');
+      var msg=data.authBanPending
+        ?'Aide @'+un+' restored to the list. Sign In re-enable waits for Ace admin_restore_aide. Their password was not changed.'
+        :'Aide @'+un+' restored. Their password was not changed. Assign clients again if they should be on the schedule.';
+      showTempMsg(msg,data.authBanPending?'var(--warn)':'var(--success)');
       await renderAides(true);
       return;
     }
-    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'restore_aide'),'var(--danger)');
+    showTempMsg(aceActionError(data,res&&res.err,res&&res.action||'admin_restore_aide'),'var(--danger)');
   }catch(e){
-    showTempMsg(aceActionError(null,e,'restore_aide'),'var(--danger)');
+    showTempMsg(aceActionError(null,e,'admin_restore_aide'),'var(--danger)');
   }
 }
 
