@@ -39,7 +39,7 @@ assert.ok(html.includes('v=layoutA1'), 'layoutA1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-layoutA1">'), 'layoutA1 meta stays');
 assert.ok(html.includes('v=admintheme1'), 'admintheme1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme1">'), 'admintheme1 meta stays');
-assert.ok(!html.includes('v=coveraide1'), 'coveraide1 is not on this tip');
+assert.ok(html.includes('v=cover1'), 'cover1 stays on the tip');
 
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
@@ -81,14 +81,15 @@ assert.ok(coverJs.includes("outcome:['admin_cover_outcome']"), 'outcome callable
 assert.ok(coverJs.includes("coverApplyOutcome('client_refused_resume_next_day')"), 'refused outcome value');
 assert.ok(coverJs.includes("coverApplyOutcome('assigned_backup')"), 'backup outcome value');
 assert.ok(coverJs.includes("coverApplyOutcome('awaiting_client')"), 'still deciding outcome value');
-assert.ok(coverJs.includes('evercare_covercomms1_cm_template'), 'template storage key');
+assert.ok(coverJs.includes("tplGet:['admin_get_cover_refuse_template']"), 'get template callable');
+assert.ok(coverJs.includes("tplSave:['admin_save_cover_refuse_template']"), 'save template callable');
+assert.ok(coverJs.includes("preview:['admin_preview_cover_refuse_email']"), 'preview email callable');
+assert.ok(coverJs.includes('{{case_manager}}') && coverJs.includes('{{client}}') && coverJs.includes('{{date}}') && coverJs.includes('{{case_manager_email}}'), 'Ace placeholders');
+assert.ok(!coverJs.includes('evercare_covercomms1_cm_template'), 'no local template key');
+assert.ok(!coverJs.includes('localStorage'), 'refuse template is not stored on this phone');
 assert.ok(!/reset_aide_temp_password|sbAdminResetTempPassword|auth\.updateUser/.test(coverJs), 'no Auth reseal on the coverage desk');
 
-const ctx = { localStorage: {
-  store: {},
-  getItem(k){ return Object.prototype.hasOwnProperty.call(this.store, k) ? this.store[k] : null; },
-  setItem(k, v){ this.store[k] = String(v); }
-}};
+const ctx = {};
 vm.createContext(ctx);
 [
   'function coverPick(src)',
@@ -105,11 +106,15 @@ vm.createContext(ctx);
   'function coverSmsHref(phone, body)',
   'function coverEmailOk(email)',
   'function coverMailHref(email, subject, body)',
+  'function coverClientPhone(shift)',
+  'function coverSelectedBackupPhone(shift, aide)',
   'function coverFillCmTemplate(tpl, ctx)',
   'function coverUnfillCmTemplate(text, ctx)',
-  'function coverCmTemplate()',
-  'var COVER_CM_DEFAULT',
-  'var COVER_CM_TEMPLATE_KEY'
+  'function coverMailPayload(data)',
+  'function coverTplGetBody()',
+  'function coverTplSaveBody(subject, body)',
+  'function coverPreviewBody(openShiftId)',
+  'var COVER_CM_DEFAULT'
 ].forEach(function(sig){
   if(sig.indexOf('var ') === 0){
     const name = sig.slice(4);
@@ -133,11 +138,21 @@ assert.strictEqual(vm.runInContext('coverContinuityLine(null)', ctx), '');
 assert.strictEqual(vm.runInContext('coverMapRank({aide_id:"a1", name:"Cam", continuity_score:2, distance_miles:1.2, score:88, phone:"2165550199"}).phone', ctx), '2165550199');
 assert.strictEqual(vm.runInContext('coverMapRank({aide_id:"a1", name:"Cam", continuity_score:2, distance_miles:1.2, score:88}).score', ctx), 88, 'score stays stored and is not recomputed');
 
-const mapped = vm.runInContext('coverMapShift({open_shift_id:"os1", client_name:"Ada Cole", client_phone:"2165550142", case_manager_name:"Pat Lee", case_manager_email:"pat@example.com", regular_aide:{aide_id:"a9", name:"Bea", phone:"2165550101"}, shift_start:"2026-09-25T16:00:00Z"})', ctx);
+const mapped = vm.runInContext('coverMapShift({open_shift_id:"os1", source:"aide", submitted_by_aide_id:"sub1", submitted_by_aide_username:"bea", submitted_by_aide_name:"Bea Ortiz", client_name:"Ada Cole", client_phone:"2165550142", case_manager_name:"Pat Lee", case_manager_email:"pat@example.com", regular_aide_phone:"2165550101", assigned_backup_phone:"2165550199", shift_start:"2026-09-25T16:00:00Z"})', ctx);
 assert.strictEqual(mapped.phone, '2165550142');
 assert.strictEqual(mapped.caseManagerName, 'Pat Lee');
 assert.strictEqual(mapped.caseManagerEmail, 'pat@example.com');
 assert.strictEqual(mapped.aidePhone, '2165550101');
+assert.strictEqual(mapped.backupPhone, '2165550199');
+assert.strictEqual(mapped.source, 'aide');
+assert.strictEqual(mapped.submittedById, 'sub1');
+assert.strictEqual(mapped.submittedByUsername, 'bea');
+assert.strictEqual(mapped.submittedByName, 'Bea Ortiz');
+assert.strictEqual(vm.runInContext('coverClientPhone({phone:"2165550142"})', ctx), '2165550142');
+assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"cam", phone:"2165550177"})', ctx), '2165550177');
+assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"b1", phone:""})', ctx), '2165550199');
+assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"a9", phone:""})', ctx), '2165550101');
+assert.strictEqual(vm.runInContext('coverSelectedBackupPhone({backupAideId:"b1", backupPhone:"2165550199", aideId:"a9", aidePhone:"2165550101"}, {id:"other", phone:""})', ctx), '');
 assert.strictEqual(vm.runInContext('coverServiceDate("2026-09-25T16:00:00Z")', ctx), 'Friday, September 25');
 
 const sms = vm.runInContext('coverSmsHref("(216) 555-0199", "Hi Cam")', ctx);
@@ -165,13 +180,23 @@ assert.strictEqual(filled, MO_VOICE
 const edited = filled
   .replace('I wanted to inform you', 'I am writing to tell you')
   .replace('Please let me know if you need any additional information.', 'Call me if you need anything else.');
-const saved = vm.runInContext('coverUnfillCmTemplate(' + JSON.stringify(edited) + ', {cm:"Pat Lee", client:"Ada Cole", date:"Friday, September 25"})', ctx);
+const saved = vm.runInContext('coverUnfillCmTemplate(' + JSON.stringify(edited) + ', {cm:"Pat Lee", client:"Ada Cole", date:"Friday, September 25", email:"pat@example.com"})', ctx);
 assert.strictEqual(saved, edited
-  .replaceAll('Pat Lee', '{{cm}}')
+  .replaceAll('Pat Lee', '{{case_manager}}')
   .replaceAll('Ada Cole', '{{client}}')
-  .replaceAll('Friday, September 25', '{{date}}'), 'save keeps the edited wording and the three slots');
-vm.runInContext('localStorage.setItem(COVER_CM_TEMPLATE_KEY, ' + JSON.stringify(saved) + ')', ctx);
-const next = vm.runInContext('coverFillCmTemplate(coverCmTemplate(), {cm:"Sam Ortiz", client:"Bea Lang", date:"Monday, September 28"})', ctx);
+  .replaceAll('Friday, September 25', '{{date}}'), 'save keeps the edited wording and the Ace slots');
+const saveBody = vm.runInContext('coverTplSaveBody(' + JSON.stringify('No services today — {{client}}') + ', ' + JSON.stringify(saved) + ')', ctx);
+assert.strictEqual(saveBody.p_subject, 'No services today — {{client}}');
+assert.strictEqual(saveBody.p_body, saved);
+assert.deepStrictEqual(JSON.parse(JSON.stringify(vm.runInContext('coverPreviewBody("os1")', ctx))), {p_open_shift_id:'os1'});
+assert.deepStrictEqual(JSON.parse(JSON.stringify(vm.runInContext('coverTplGetBody()', ctx))), {});
+const preview = vm.runInContext('coverMailPayload({success:true, subject:"No services today — Ada Cole", body:' + JSON.stringify(filled) + ', case_manager_email:"pat@example.com"})', ctx);
+assert.strictEqual(preview.subject, 'No services today — Ada Cole');
+assert.strictEqual(preview.body, filled);
+assert.strictEqual(preview.email, 'pat@example.com');
+assert.strictEqual(vm.runInContext('coverMailPayload({success:false, body:"no"})', ctx), null);
+assert.strictEqual(vm.runInContext('coverFillCmTemplate("Write {{case_manager_email}}", {email:"pat@example.com"})', ctx), 'Write pat@example.com');
+const next = vm.runInContext('coverFillCmTemplate(' + JSON.stringify(saved) + ', {cm:"Sam Ortiz", client:"Bea Lang", date:"Monday, September 28"})', ctx);
 assert.strictEqual(next, edited
   .replaceAll('Pat Lee', 'Sam Ortiz')
   .replaceAll('Ada Cole', 'Bea Lang')

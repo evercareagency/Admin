@@ -41,7 +41,7 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
-<!-- coverage comms 2026-09-25 v=covercomms1 admin-build 2026-09-25-covercomms1. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. No Auth reseal and no password rotation. Who can cover paints the Ace rank rows in plain lines only: Worked this client N times, Never worked this client, miles away, or No home address on file. Continuity and Score are not shown. The aide Mo taps stays checked and highlighted. Text this aide and Text client open sms: with a draft; Mo presses Send in Messages. After assign, Text client they're on the way is the same kind of draft. After talking to the client: Client wants backup posts assigned_backup, Client refused · resume next day posts client_refused_resume_next_day, Still deciding posts awaiting_client. Cancel and Reopen stay. Client refused shows an editable case-manager email in Mo's voice. Open in Mail is mailto: and stays disabled until case_manager_email is known. Copy draft and Save as my template stay available. Save writes localStorage evercare_covercomms1_cm_template; the next refuse fills new names and the service date into that wording. Ace fields when present: case_manager_name, case_manager_email, aide phone, client phone. Missing fields stay placeholders. This desk does not add Auth RPCs. Prior markers stay, including v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- coverage comms 2026-09-25 v=covercomms1 admin-build 2026-09-25-covercomms1. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. No Auth reseal and no password rotation. Who can cover paints the Ace rank rows in plain lines only: Worked this client N times, Never worked this client, miles away, or No home address on file. Continuity and Score are not shown. The aide Mo taps stays checked and highlighted. Text this aide and Text client open sms: with a draft; Mo presses Send in Messages. After assign, Text client they're on the way is the same kind of draft. After talking to the client: Client wants backup posts assigned_backup, Client refused · resume next day posts client_refused_resume_next_day, Still deciding posts awaiting_client. Cancel and Reopen stay. Client refused shows an editable case-manager email in Mo's voice. Open in Mail is mailto: and stays disabled until case_manager_email is known. Copy draft and Save as my template stay available. Refuse email is live Ace: admin_get_cover_refuse_template {}, admin_save_cover_refuse_template {p_subject,p_body} for Save as my template, admin_preview_cover_refuse_email {p_open_shift_id}. Placeholders are {{case_manager}} {{client}} {{date}} and optional {{case_manager_email}}. Mo's default is seeded in Ace. This desk does not keep a local template. List rows use source, submitted_by_aide_id, submitted_by_aide_username, submitted_by_aide_name, client_phone, case_manager_name, case_manager_email, regular_aide_phone, and assigned_backup_phone. Text client uses client_phone. Text this aide uses the selected backup phone, or regular_aide_phone when that aide is the regular aide. No localStorage template. This desk does not add Auth RPCs. Prior markers stay, including v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-covercomms1">
 <!-- coverage desk 2026-09-25 v=cover1 admin-build 2026-09-25-cover1. GHOST-COVER1-CONTRACT-v1 locked names. More → Coverage is the call-off / open-shift desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. Admin and Scheduler (data-layout-roles). Nurse does not get this screen. Phone-first cards: open shifts (client, regular aide, when, Within 48h chip), record call-off intake, live smart assign, then Text or call the client before Client refused / resume next day or Assign backup (confirm only). Office JWT via sbRestRpc, same org pattern as Schedule. Exact callables: admin_record_call_off {p_client_id,p_regular_aide_id,p_shift_start,p_shift_end,p_reason?}, admin_list_open_shifts {p_include_resolved?}, admin_rank_backup_aides {p_open_shift_id,p_limit?:20} returns {success, aides:[{aide_id, username, name, continuity_score, distance_miles, score, rank}]}. The rank panel paints that list and does not recompute score. Null distance_miles stays empty. admin_cover_outcome {p_open_shift_id,p_outcome,p_backup_aide_id?,p_notes?} accepts client_refused_resume_next_day, assigned_backup (p_backup_aide_id, only from open or awaiting_client), awaiting_client, cancelled, and reopen. Record returns {success, open_shift_id, status, urgency_within_48h, schedule_exception_id} and Ace upserts schedule_exceptions kind=call_off. Assign upserts kind=cover with aide_id. sms_stub not_sent_v1 is shown and is not sent by this desk. List rows carry client, regular_aide, shift_start, shift_end, status, urgency_within_48h. Within 48h chip when shift_start is within 48 hours, shift_end is still ahead, and status is open or awaiting_client. This desk does not also post upsert_schedule_exception. A missing callable keeps a phone-session list. Prior markers stay, including v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-cover1">
@@ -312,7 +312,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-rank-row strong{display:block;font-size:1rem;line-height:1.25;}
 #tab_coverage .cover-rank-row span{display:block;font-size:0.88rem;color:var(--text);margin-top:2px;}
 #tab_coverage .cover-rank-check{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;line-height:1;}
-#tab_coverage #coverCmDraft{min-height:240px;line-height:1.45;}
+#tab_coverage #coverCmDraft{min-height:200px;line-height:1.45;}
 #tab_coverage input,#tab_coverage select,#tab_coverage textarea{font-size:16px;min-height:48px;}
 #tab_coverage .btn:disabled{opacity:0.45;cursor:not-allowed;}
 #tab_coverage .cover-back{margin-bottom:8px;}
@@ -1299,6 +1299,7 @@ bindLoginKeyboard();
             <div id="coverRefuseMail" hidden>
               <h2>Email the case manager</h2>
               <p class="cover-note" id="coverCmNote">Edit the note, then open Mail or copy it.</p>
+              <div class="field"><label for="coverCmSubject">Subject</label><input type="text" id="coverCmSubject" autocomplete="off"></div>
               <div class="field"><label for="coverCmDraft">Email draft</label><textarea id="coverCmDraft"></textarea></div>
               <div class="cover-actions">
                 <button type="button" class="btn btn-teal" id="coverCmMail" disabled onclick="coverOpenCmMail()">Open in Mail</button>
@@ -3427,10 +3428,13 @@ var COVER_RPC={
   record:['admin_record_call_off'],
   list:['admin_list_open_shifts'],
   rank:['admin_rank_backup_aides'],
-  outcome:['admin_cover_outcome']
+  outcome:['admin_cover_outcome'],
+  tplGet:['admin_get_cover_refuse_template'],
+  tplSave:['admin_save_cover_refuse_template'],
+  preview:['admin_preview_cover_refuse_email']
 };
-var coverRpcPick={record:'',list:'',rank:'',outcome:''};
-var coverRpcOff={record:false,list:false,rank:false,outcome:false};
+var coverRpcPick={record:'',list:'',rank:'',outcome:'',tplGet:'',tplSave:'',preview:''};
+var coverRpcOff={record:false,list:false,rank:false,outcome:false,tplGet:false,tplSave:false,preview:false};
 var coverShifts=[];
 var coverSource='local';
 var coverView='list';
@@ -3441,12 +3445,12 @@ var coverSelectedAideId='';
 var coverBusy=false;
 var coverPostedKey='';
 var coverCmFilledFor='';
+var coverCmLoading='';
 var coverCmSnap=null;
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
-var COVER_CM_TEMPLATE_KEY='evercare_covercomms1_cm_template';
 var COVER_RANK_EMPTY='No aides to show for this shift yet.';
-// Mo refuse-email default voice, verbatim. {{cm}} {{client}} {{date}} are the only fills.
-var COVER_CM_DEFAULT='Hey {{cm}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
+// Same wording Ace has seeded. Placeholders match admin_get_cover_refuse_template. Not a local save.
+var COVER_CM_DEFAULT='Hey {{case_manager}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
 function coverEsc(s){
   var raw=String(s==null?'':s);
   if(typeof escapeHtml==='function')return escapeHtml(raw);
@@ -3556,7 +3560,11 @@ function coverMapShift(row){
   var aidePhone='';
   var regular=src.regular_aide||src.regularAide;
   if(regular&&typeof regular==='object')aidePhone=coverPickPhone(regular);
-  if(!aidePhone)aidePhone=String(coverPick(src,'aide_phone','aidePhone','regular_aide_phone')||'');
+  if(!aidePhone)aidePhone=String(coverPick(src,'regular_aide_phone','aide_phone','aidePhone')||'');
+  var backupPhone=String(coverPick(src,'assigned_backup_phone','assignedBackupPhone')||'');
+  var submittedById=String(coverPick(src,'submitted_by_aide_id','submittedByAideId')||'');
+  var submittedByUsername=String(coverPick(src,'submitted_by_aide_username','submitted_by_username','submittedByAideUsername')||'');
+  var submittedByName=String(coverPick(src,'submitted_by_aide_name','submitted_by_name','submittedByAideName')||'');
   var clientId=coverIdOf(src.client);
   if(!clientId)clientId=String(coverPick(src,'clientId','client_id')||'');
   var aideId=coverIdOf(src.regular_aide||src.regularAide);
@@ -3576,15 +3584,19 @@ function coverMapShift(row){
     statusExplicit:statusRaw!=null&&String(statusRaw)!=='',
     phone:phone,
     aidePhone:aidePhone,
+    backupPhone:backupPhone,
     caseManagerName:cmName,
     caseManagerEmail:cmEmail,
+    submittedById:submittedById,
+    submittedByUsername:submittedByUsername,
+    submittedByName:submittedByName,
     note:note,
     backupAideId:backupId,
     backupAideName:backupName,
     urgencyWithin48h:src.urgency_within_48h===true||src.urgencyWithin48h===true,
     scheduleExceptionId:String(coverPick(src,'schedule_exception_id','scheduleExceptionId')||''),
     smsStub:String(coverPick(src,'sms_stub','smsStub')||''),
-    source:src.source||'ace',
+    source:src.source!=null&&String(src.source)!==''?String(src.source):'ace',
     contacted:!!src.contacted
   };
 }
@@ -3606,7 +3618,7 @@ function coverShiftRows(data){
 }
 function coverPickPhone(obj){
   if(!obj||typeof obj!=='object')return '';
-  return String(coverPick(obj,'phone','client_phone','clientPhone','aide_phone','aidePhone','mobile','phone_number','cell')||'');
+  return String(coverPick(obj,'phone','client_phone','clientPhone','aide_phone','aidePhone','regular_aide_phone','assigned_backup_phone','mobile','phone_number','cell')||'');
 }
 function coverMapRank(row){
   var src=row&&typeof row==='object'?row:{};
@@ -3695,6 +3707,15 @@ function coverRankArgs(openShiftId){
 function coverCanAssign(shift){
   var st=coverStatusKey(shift);
   return st===''||st==='open'||st==='awaiting_client';
+}
+function coverTplGetBody(){
+  return {};
+}
+function coverTplSaveBody(subject, body){
+  return {p_subject:String(subject==null?'':subject), p_body:String(body==null?'':body)};
+}
+function coverPreviewBody(openShiftId){
+  return {p_open_shift_id:String(openShiftId||'')};
 }
 function coverOutcomeBody(openShiftId, outcome, backupAideId, notes){
   var body={
@@ -3982,28 +4003,19 @@ function coverClientRecord(shift){
   return null;
 }
 function coverClientPhone(shift){
-  if(shift&&shift.phone)return String(shift.phone);
-  return coverPickPhone(coverClientRecord(shift));
+  return shift&&shift.phone?String(shift.phone):'';
 }
-function coverRosterAide(rank){
-  var lists=[];
-  try{lists=(typeof schedAideRosters==='function')?schedAideRosters():[];}catch(e){lists=[];}
-  var id=rank?String(rank.id||''):'';
-  var user=rank?String(rank.username||'').toLowerCase():'';
-  for(var i=0;i<lists.length;i++){
-    var a=lists[i];
-    if(!a)continue;
-    var aid=a.id!=null?String(a.id):'';
-    var un=a.username!=null?String(a.username).toLowerCase():'';
-    if((id&&(aid===id||un===id.toLowerCase()))||(user&&un===user))return a;
-  }
-  return null;
+function coverSelectedBackupPhone(shift, aide){
+  if(aide&&aide.phone)return String(aide.phone);
+  if(!shift)return '';
+  var id=aide?String(aide.id||''):'';
+  if(id&&shift.backupPhone&&id===String(shift.backupAideId||''))return String(shift.backupPhone);
+  if(id&&shift.aidePhone&&id===String(shift.aideId||''))return String(shift.aidePhone);
+  if(!id&&shift.backupPhone)return String(shift.backupPhone);
+  return '';
 }
 function coverAidePhone(rank){
-  if(rank&&rank.phone)return String(rank.phone);
-  var shift=coverFind(coverSelectedId);
-  if(shift&&shift.aidePhone&&rank&&String(rank.id)===String(shift.aideId||''))return String(shift.aidePhone);
-  return coverPickPhone(coverRosterAide(rank));
+  return coverSelectedBackupPhone(coverFind(coverSelectedId), rank);
 }
 function coverSelectedRank(){
   var id=String(coverSelectedAideId||'');
@@ -4046,31 +4058,30 @@ function coverOnTheWaySms(shift, backupName){
   var when=coverServiceDate(shift&&shift.startsAt)||'today';
   return 'Hi '+client+', this is Mo at EverCare. '+who+' is on the way for your visit on '+when+'. Thank you.';
 }
-function coverCmTemplate(){
-  try{
-    var saved=localStorage.getItem(COVER_CM_TEMPLATE_KEY);
-    if(saved&&String(saved).trim())return String(saved);
-  }catch(e){}
-  return COVER_CM_DEFAULT;
-}
 function coverFillCmTemplate(tpl, ctx){
   ctx=ctx||{};
-  var cm=ctx.cm||'(Case manager name)';
+  var cm=ctx.case_manager||ctx.cm||'(Case manager name)';
   var client=ctx.client||'(Client name)';
   var date=ctx.date||'(Date)';
-  return String(tpl==null?COVER_CM_DEFAULT:tpl)
-    .replace(/\{\{cm\}\}/g, cm)
+  var email=ctx.case_manager_email||ctx.email||'(Case manager email)';
+  return String(tpl==null?'':tpl)
+    .replace(/\{\{case_manager_email\}\}/g, email)
+    .replace(/\{\{case_manager\}\}/g, cm)
     .replace(/\{\{client\}\}/g, client)
     .replace(/\{\{date\}\}/g, date);
 }
 function coverUnfillCmTemplate(text, ctx){
   var out=String(text||'');
   ctx=ctx||{};
+  var cm=ctx.case_manager||ctx.cm||'';
+  var email=ctx.case_manager_email||ctx.email||'';
   var pairs=[
-    [ctx.cm,'{{cm}}'],
+    [email,'{{case_manager_email}}'],
+    [cm,'{{case_manager}}'],
     [ctx.client,'{{client}}'],
     [ctx.date,'{{date}}'],
-    ['(Case manager name)','{{cm}}'],
+    ['(Case manager email)','{{case_manager_email}}'],
+    ['(Case manager name)','{{case_manager}}'],
     ['(Client name)','{{client}}'],
     ['(Date)','{{date}}']
   ].filter(function(p){return p[0]&&String(p[0]).trim();});
@@ -4083,6 +4094,31 @@ function coverUnfillCmTemplate(text, ctx){
     out=out.split(String(p[0])).join(p[1]);
   });
   return out;
+}
+function coverMailPayload(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(!node||typeof node!=='object')return null;
+  if(node.ok===false||node.success===false)return null;
+  var src=node;
+  if(node.template&&typeof node.template==='object')src=node.template;
+  else if(node.email&&typeof node.email==='object')src=node.email;
+  else if(node.preview&&typeof node.preview==='object')src=node.preview;
+  var subject=String(coverPick(src,'subject','p_subject','email_subject')||'');
+  var body=String(coverPick(src,'body','p_body','email_body','text')||'');
+  if(!subject&&src!==node)subject=String(coverPick(node,'subject','p_subject')||'');
+  if(!body&&src!==node)body=String(coverPick(node,'body','p_body','email_body')||'');
+  if(!subject&&!body)return null;
+  return {
+    subject:subject,
+    body:body,
+    email:String(coverPick(node,'case_manager_email','to')||coverPick(src,'case_manager_email','to')||''),
+    cm:String(coverPick(node,'case_manager_name','case_manager')||coverPick(src,'case_manager_name')||''),
+    client:String(coverPick(node,'client_name','client')||''),
+    date:String(coverPick(node,'service_date','date')||'')
+  };
 }
 function coverCmContext(shift){
   var cm=shift&&shift.caseManagerName?String(shift.caseManagerName).trim():'';
@@ -4098,17 +4134,43 @@ function coverCmContext(shift){
     }
     if(!client)client=String(rec.name||rec.clientName||'').trim();
   }
+  cm=String(cm||'').trim();
+  email=String(email||'').trim();
   return {
-    cm:String(cm||'').trim(),
-    email:String(email||'').trim(),
+    cm:cm,
+    case_manager:cm,
+    email:email,
+    case_manager_email:email,
     client:String(client||'').trim(),
     date:coverServiceDate(shift&&shift.startsAt)
   };
+}
+function coverMergeSnap(shift, mail){
+  var ctx=coverCmContext(shift);
+  if(mail&&mail.cm)ctx.cm=ctx.case_manager=String(mail.cm);
+  if(mail&&mail.client)ctx.client=String(mail.client);
+  if(mail&&mail.date)ctx.date=String(mail.date);
+  if(mail&&mail.email)ctx.email=ctx.case_manager_email=String(mail.email);
+  return ctx;
+}
+function coverRenderMail(mail, snap){
+  var subject=mail&&mail.subject?String(mail.subject):'';
+  var body=mail&&mail.body?String(mail.body):'';
+  if(/\{\{/.test(subject+'\n'+body)){
+    subject=coverFillCmTemplate(subject, snap);
+    body=coverFillCmTemplate(body, snap);
+  }
+  return {subject:subject, body:body};
 }
 function coverCmText(){
   var ta=null;
   try{ta=document.getElementById('coverCmDraft');}catch(e){ta=null;}
   return ta?String(ta.value||''):'';
+}
+function coverCmSubject(){
+  var el=null;
+  try{el=document.getElementById('coverCmSubject');}catch(e){el=null;}
+  return el?String(el.value||''):'';
 }
 function coverSyncCmMail(){
   var btn=null;
@@ -4124,27 +4186,75 @@ function coverSyncCmMail(){
       :'Case manager email is not on file. Open in Mail stays off until that email is known. Copy and Save as my template still work.';
   }
 }
-function coverShowRefuseDraft(shift){
+function coverPaintRefuseMail(mail, shift){
+  var ta=null;
+  var subjectEl=null;
+  try{ta=document.getElementById('coverCmDraft');}catch(e){ta=null;}
+  try{subjectEl=document.getElementById('coverCmSubject');}catch(e2){subjectEl=null;}
+  var snap=coverMergeSnap(shift, mail);
+  var shown=coverRenderMail(mail, snap);
+  coverCmSnap=snap;
+  if(ta)ta.value=shown.body;
+  if(subjectEl)subjectEl.value=shown.subject;
+  coverCmFilledFor=String(shift&&shift.id||'');
+  coverSyncCmMail();
+}
+async function coverShowRefuseDraft(shift){
   var box=null;
   var ta=null;
+  var note=null;
   try{box=document.getElementById('coverRefuseMail');}catch(e){box=null;}
   try{ta=document.getElementById('coverCmDraft');}catch(e2){ta=null;}
+  try{note=document.getElementById('coverCmNote');}catch(e3){note=null;}
   if(box)box.hidden=false;
   var key=String(shift&&shift.id||'');
-  if(ta&&coverCmFilledFor!==key){
-    var ctx=coverCmContext(shift);
-    coverCmSnap=ctx;
-    ta.value=coverFillCmTemplate(coverCmTemplate(), ctx);
-    coverCmFilledFor=key;
+  if(coverCmFilledFor===key){
+    coverSyncCmMail();
+    try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e4){}
+    return;
   }
+  if(coverCmLoading===key)return;
+  coverCmLoading=key;
+  coverCmSnap=coverCmContext(shift);
+  if(ta)ta.value='';
+  var subjectEl=null;
+  try{subjectEl=document.getElementById('coverCmSubject');}catch(e5){subjectEl=null;}
+  if(subjectEl)subjectEl.value='';
+  if(note)note.textContent='Loading the office email…';
   coverSyncCmMail();
-  try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e3){}
+  var localOnly=!shift||shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
+  var mail=null;
+  if(!localOnly){
+    var preview=await coverRpc('preview', coverPreviewBody(shift.id));
+    if(coverCmLoading!==key)return;
+    if(preview&&preview.ok)mail=coverMailPayload(preview.data);
+    if(!mail){
+      var tmpl=await coverRpc('tplGet', coverTplGetBody());
+      if(coverCmLoading!==key)return;
+      if(tmpl&&tmpl.ok)mail=coverMailPayload(tmpl.data);
+    }
+    if(!mail&&note){
+      note.textContent=(preview&&preview.signedOut)
+        ?'Sign in to load the office email.'
+        :(preview&&preview.ok===false)
+          ?(preview.error||'The office email did not answer.')
+          :'The office email did not answer. Nothing was saved on this phone.';
+    }
+  }else if(note){
+    note.textContent='This shift is still on this phone, so the office email cannot load.';
+  }
+  if(coverCmLoading!==key)return;
+  coverCmLoading='';
+  if(mail)coverPaintRefuseMail(mail, shift);
+  else coverSyncCmMail();
+  try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e6){}
 }
 function coverHideRefuseDraft(){
   var box=null;
   try{box=document.getElementById('coverRefuseMail');}catch(e){box=null;}
   if(box)box.hidden=true;
   coverCmFilledFor='';
+  coverCmLoading='';
   coverCmSnap=null;
 }
 function coverShowOnTheWay(name){
@@ -4189,8 +4299,12 @@ function coverOpenCmMail(){
     if(typeof showTempMsg==='function')showTempMsg('Case manager email is not on file yet.','var(--warn)');
     return;
   }
-  var client=(coverCmSnap&&coverCmSnap.client)||'our member';
-  coverGo(coverMailHref(email, 'No services today — '+client, coverCmText()));
+  var subject=coverCmSubject();
+  if(!subject){
+    var client=(coverCmSnap&&coverCmSnap.client)||'our member';
+    subject='No services today — '+client;
+  }
+  coverGo(coverMailHref(email, subject, coverCmText()));
 }
 function coverCopyCmDraft(){
   var text=coverCmText();
@@ -4213,16 +4327,22 @@ function coverCopyCmDraft(){
   if(area){area.focus();area.select();}
   try{document.execCommand('copy');done();}catch(e3){if(typeof showTempMsg==='function')showTempMsg('Select the draft and copy it.','var(--warn)');}
 }
-function coverSaveCmTemplate(){
+async function coverSaveCmTemplate(){
   var text=coverCmText();
   if(!String(text).trim()){
     if(typeof showTempMsg==='function')showTempMsg('The draft is empty.','var(--warn)');
     return;
   }
-  var tpl=coverUnfillCmTemplate(text, coverCmSnap||{});
-  try{localStorage.setItem(COVER_CM_TEMPLATE_KEY, tpl);}
-  catch(e){
-    if(typeof showTempMsg==='function')showTempMsg('Could not save the template on this phone.','var(--danger)');
+  var snap=coverCmSnap||{};
+  var body=coverUnfillCmTemplate(text, snap);
+  var subject=coverUnfillCmTemplate(coverCmSubject(), snap);
+  var got=await coverRpc('tplSave', coverTplSaveBody(subject, body));
+  if(got&&got.ok===false){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the template.','var(--danger)');
+    return;
+  }
+  if(!got||got.missing||got.signedOut){
+    if(typeof showTempMsg==='function')showTempMsg(got&&got.signedOut?'Sign in to save the template.':'The office template did not save. Nothing was stored on this phone.','var(--warn)');
     return;
   }
   if(typeof showTempMsg==='function')showTempMsg('Saved. The next refused shift starts from this wording.','var(--success)');
