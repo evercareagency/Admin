@@ -12,8 +12,7 @@ assert.ok(html.includes('data-aidecreds1b="v=aidecreds1b"'), 'aidecreds1b string
 assert.ok(html.includes('admin-build 2026-09-25-aidecreds1b'), 'aidecreds1b build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1b">'), 'aidecreds1b meta');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-25-aidecreds1'), 'an aidecreds admin-build meta is first');
-assert.ok(html.indexOf('content="2026-09-25-aidecreds1b"') > buildAt, 'aidecreds1b meta stays in the head');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('content="2026-09-25-aidecreds1b"'), 'aidecreds1b is the first admin-build meta');
 assert.ok(html.includes('data-aidecreds="v=aidecreds1"'), 'aidecreds1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1">'), 'aidecreds1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remidate1">'), 'remidate1 meta stays');
@@ -215,7 +214,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(empty.hidden, false, 'Admin sees credentials on an empty rollup');
-    assert.ok(String(empty.build).indexOf('2026-09-25-aidecreds1') === 0, empty.build);
+    assert.strictEqual(empty.build, '2026-09-25-aidecreds1b');
     assert.ok(empty.text.includes('No credential records yet'), empty.text);
     assert.ok(empty.text.includes('Add credential'), empty.text);
     assert.ok(empty.text.includes('Probe QA Test') && empty.text.includes('QA CoverAide'), empty.text);

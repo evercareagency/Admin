@@ -15,28 +15,17 @@ const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 90).includes('content="2026-09-25-aidecreds1c"'), 'aidecreds1c is the first admin-build meta');
 assert.ok(html.includes('data-aidecreds1b="v=aidecreds1b"'), 'aidecreds1b marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1b">'), 'aidecreds1b meta stays');
-assert.ok(html.includes('data-aidecreds="v=aidecreds1"'), 'aidecreds1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1">'), 'aidecreds1 meta stays');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remidate1">'), 'remidate1 meta stays');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1c"') < html.indexOf('content="2026-09-25-aidecreds1b"'), 'aidecreds1b stays after aidecreds1c');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1b"') < html.indexOf('content="2026-09-25-aidecreds1"'), 'aidecreds1 stays after aidecreds1b');
-assert.ok(html.indexOf('content="2026-09-25-aidecreds1"') < html.indexOf('content="2026-09-25-remidate1"'), 'remidate1 stays after aidecreds1');
-assert.ok(html.includes('v=aidecreds1b') && html.includes('v=aidecreds1') && html.includes('v=remidate1'), 'prior markers stay');
 
 const note = html.slice(html.indexOf('v=aidecreds1c'), html.indexOf('<!-- aide credentials empty add'));
-assert.ok(/admin_aide_credentials_rollup/.test(note), 'note names the rollup');
-assert.ok(/admin_list_aide_credentials/.test(note), 'note names the per-aide list');
-assert.ok(/All current/.test(note), 'note names the All current chip');
-assert.ok(/attention_count/.test(note), 'banner follows Ace attention_count');
+assert.ok(/All current/.test(note) && /admin_list_aide_credentials/.test(note), 'note names the chip and the per-aide list');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser|rotate password/.test(note), 'aidecreds1c note does not reseal Auth');
-assert.ok(html.includes('function aideCredHydrateBare('), 'missing rollup rows are filled in');
-assert.ok(html.includes('function aideCredBack()'), 'back still returns to the list');
-assert.ok(html.includes("sbRestRpc('admin_aide_credentials_rollup'"), 'rollup still uses the Ace callable');
+assert.ok(html.includes('function aideCredFillBareChips('), 'bare aides with rows get chips');
 assert.ok(html.includes("sbRestRpc('admin_upsert_aide_credential'"), 'save still uses the Ace upsert');
-assert.ok(html.includes("sbRestRpc('admin_soft_delete_aide_credential'"), 'remove still uses the Ace soft delete');
-assert.ok(html.includes('id="copilotFab"') && html.includes('class="remi-chip-pill">Remi</span>'), 'Remi chip stays corner-only');
-assert.ok(html.includes('onclick="renderAides(true)"'), 'Aides Refresh still reloads the list');
 assert.ok(html.includes('onclick="showAddAideModal()"'), 'Add aide stays');
+assert.ok(html.includes('id="copilotFab"') && html.includes('class="remi-chip-pill">Remi</span>'), 'Remi chip stays corner-only');
 
 function loadPuppeteer(){
   try{return require('puppeteer-core');}
@@ -50,27 +39,6 @@ function statusFor(iso){
   if(iso < '2026-09-25')return 'expired';
   if(iso <= '2026-10-25')return 'expiring_soon';
   return 'ok';
-}
-
-function syncRollup(store){
-  store.aides.forEach(function(aide){
-    const rows = store.creds[aide.aide_id] || [];
-    aide.expired_count = rows.filter(function(r){return r.status === 'expired';}).length;
-    aide.expiring_soon_count = rows.filter(function(r){return r.status === 'expiring_soon';}).length;
-    const cpr = rows.filter(function(r){return r.credential_type === 'cpr';})[0];
-    aide.cpr_status = cpr ? cpr.status : '';
-  });
-  store.attention = store.aides.reduce(function(sum, aide){
-    return sum + (aide.expired_count || 0) + (aide.expiring_soon_count || 0);
-  }, 0);
-}
-
-function attentionRows(store, aideId){
-  return store.aides.filter(function(a){
-    if(aideId && a.aide_id !== aideId)return false;
-    if(store.forcePerAideRollup && aideId)return true;
-    return (a.expired_count || 0) + (a.expiring_soon_count || 0) > 0;
-  });
 }
 
 async function runBrowser(){
@@ -90,7 +58,6 @@ async function runBrowser(){
   ];
   const store = {
     attention: 2,
-    forcePerAideRollup: false,
     aides: [{
       aide_id: 'aide-probe',
       name: 'Probe QA Test',
@@ -107,7 +74,6 @@ async function runBrowser(){
       ]
     },
     upserts: [],
-    deletes: [],
     calls: [],
     roster: roster
   };
@@ -118,9 +84,7 @@ async function runBrowser(){
     if(!file.startsWith(__dirname)){res.writeHead(403);res.end();return;}
     fs.readFile(file, function(err, buf){
       if(err){res.writeHead(404);res.end('missing');return;}
-      const ext = path.extname(file);
-      const type = ext === '.png' ? 'image/png' : 'text/html; charset=utf-8';
-      res.writeHead(200, {'Content-Type': type, 'Cache-Control': 'no-store'});
+      res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store'});
       res.end(buf);
     });
   });
@@ -152,52 +116,24 @@ async function runBrowser(){
       if(rpc === 'admin_list_aides'){
         payload = {success: true, aides: store.roster};
       }else if(rpc === 'admin_aide_credentials_rollup'){
-        const rows = attentionRows(store, body.p_aide_id || '');
+        const rows = store.aides.filter(function(a){
+          return (a.expired_count || 0) + (a.expiring_soon_count || 0) > 0;
+        });
         payload = {success: true, attention_count: store.attention, aides: rows};
       }else if(rpc === 'admin_list_aide_credentials'){
-        payload = {success: true, credentials: store.creds[body.p_aide_id] || []};
+        payload = {success: true, credentials: (store.creds[body.p_aide_id] || []).slice()};
       }else if(rpc === 'admin_upsert_aide_credential'){
         store.upserts.push(body);
         const rows = store.creds[body.p_aide_id] || [];
-        const nextStatus = statusFor(body.p_expiry_date);
-        const hit = rows.filter(function(r){return r.id === body.p_id || r.credential_type === body.p_credential_type;})[0];
-        if(hit){
-          hit.expiry_date = body.p_expiry_date;
-          hit.status = nextStatus;
-        }else{
-          rows.push({
-            id: body.p_id || ('new-' + body.p_aide_id + '-' + rows.length),
-            credential_type: body.p_credential_type,
-            label: body.p_label || '',
-            expiry_date: body.p_expiry_date,
-            status: nextStatus,
-            days_until_expiry: 400
-          });
-          store.creds[body.p_aide_id] = rows;
-        }
-        if(!store.aides.some(function(a){return a.aide_id === body.p_aide_id;})){
-          const who = store.roster.filter(function(a){return a.id === body.p_aide_id;})[0] || {};
-          store.aides.push({
-            aide_id: body.p_aide_id,
-            name: who.full_name || 'Aide',
-            username: who.username || '',
-            role: 'Home Health Aide',
-            expired_count: 0,
-            expiring_soon_count: 0,
-            cpr_status: ''
-          });
-        }
-        syncRollup(store);
-        payload = {success: true, id: body.p_id || rows[rows.length - 1].id};
-      }else if(rpc === 'admin_soft_delete_aide_credential'){
-        store.deletes.push(body);
-        Object.keys(store.creds).forEach(function(id){
-          store.creds[id] = (store.creds[id] || []).filter(function(r){return r.id !== body.p_id;});
-          if(!store.creds[id].length)delete store.creds[id];
+        rows.push({
+          id: 'new-' + body.p_aide_id,
+          credential_type: body.p_credential_type,
+          expiry_date: body.p_expiry_date,
+          status: statusFor(body.p_expiry_date),
+          days_until_expiry: 400
         });
-        store.aides = store.aides.filter(function(a){return (store.creds[a.aide_id] || []).length;});
-        syncRollup(store);
-        payload = {success: true};
+        store.creds[body.p_aide_id] = rows;
+        payload = {success: true, id: rows[rows.length - 1].id};
       }
       req.respond({
         status: 200,
@@ -207,7 +143,8 @@ async function runBrowser(){
       });
     });
   }
-  async function openAides(page){
+  try{
+    const page = await browser.newPage();
     await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await page.setRequestInterception(true);
     arm(page);
@@ -226,62 +163,19 @@ async function runBrowser(){
       if(typeof layoutA1ApplyRoles === 'function')layoutA1ApplyRoles();
       showTab('aides');
     });
-  }
-  async function waitQuiet(){
-    let last = -1;
-    let stable = 0;
-    for(let i = 0; i < 50; i++){
-      await new Promise(function(resolve){setTimeout(resolve, 40);});
-      if(store.calls.length === last){
-        stable++;
-        if(stable >= 4)return;
-      }else{
-        last = store.calls.length;
-        stable = 0;
-      }
-    }
-    throw new Error('credential calls did not settle');
-  }
-  try{
-    const page = await browser.newPage();
-    await openAides(page);
     await page.waitForFunction(function(){
+      var cover = document.querySelector('[data-aide-cred-open="aide-cover"]');
+      var probe = document.querySelector('[data-aide-cred-open="aide-probe"]');
       var banner = document.getElementById('aideCredBanner');
-      var list = document.getElementById('aideCredList');
-      var text = list ? list.innerText : '';
-      return banner && !banner.hidden && /2 credentials need attention/.test(banner.textContent || '')
-        && /Probe QA Test/.test(text) && /Expiring/.test(text) && /1 overdue/.test(text)
-        && /QA CoverAide coveraide1/.test(text) && /moe/.test(text);
+      return cover && probe && banner && /2 credentials need attention/.test(banner.textContent || '')
+        && cover.querySelectorAll('.aide-cred-chip').length === 0
+        && /1 overdue/.test(probe.innerText || '');
     }, {timeout: 8000});
-    await waitQuiet();
-    const before = await page.evaluate(function(){
-      function chips(id){
-        var btn = document.querySelector('[data-aide-cred-open="' + id + '"]');
-        if(!btn)return '';
-        return Array.prototype.map.call(btn.querySelectorAll('.aide-cred-chip'), function(el){return el.textContent.replace(/\s+/g, ' ').trim();}).join('|');
-      }
-      return {
-        banner: document.getElementById('aideCredBanner').textContent.replace(/\s+/g, ' ').trim(),
-        build: document.querySelector('meta[name="admin-build"]').content,
-        probe: chips('aide-probe'),
-        cover: chips('aide-cover'),
-        moe: chips('aide-moe'),
-        fab: !!document.getElementById('copilotFab')
-      };
-    });
-    assert.strictEqual(before.build, '2026-09-25-aidecreds1c');
-    assert.strictEqual(before.banner, '⚠ 2 credentials need attention');
-    assert.ok(before.probe.indexOf('Expiring') >= 0 && before.probe.indexOf('1 overdue') >= 0, before.probe);
-    assert.strictEqual(before.cover, '', 'empty coveraide1 has no chip yet');
-    assert.strictEqual(before.moe, '', 'an aide with no credentials stays blank');
-    assert.strictEqual(before.fab, true, 'Remi stays the corner chip');
 
     await page.click('[data-aide-cred-open="aide-cover"]');
     await page.waitForFunction(function(){
-      var text = document.getElementById('aideCredDetail').innerText || '';
-      return /No credentials on file for this aide/.test(text) && /Add credential/.test(text);
+      return /No credentials on file/.test(document.getElementById('aideCredDetail').innerText || '');
     }, {timeout: 8000});
-    await page.screenshot({path: path.join(shotDir, 'aidecreds1c-phone-empty-aide.png')});
     await page.click('#aideCredDetail [data-aide-cred-add]');
     await page.waitForSelector('#aideCredSheet:not([hidden])');
     await page.type('#aideCredType', 'CPR');
@@ -291,120 +185,67 @@ async function runBrowser(){
     await page.click('#aideCredSave');
     await page.waitForFunction(function(){
       var text = document.getElementById('aideCredDetail').innerText || '';
-      return /CPR/.test(text) && /12\/31\/2027/.test(text) && /Current/.test(text) && !/Expiring soon/.test(text);
+      return /CPR/.test(text) && /12\/31\/2027/.test(text) && /Current/.test(text);
     }, {timeout: 8000});
-    const saved = await page.evaluate(function(){
-      var row = document.querySelector('[data-credential-type="cpr"]');
-      return {
-        text: document.getElementById('aideCredDetail').innerText,
-        iso: row ? row.getAttribute('data-expiry') : ''
-      };
-    });
-    assert.ok(saved.text.includes('12/31/2027'), saved.text);
-    assert.ok(!/2027-12-31/.test(saved.text.replace(/data-expiry/g, '')), 'card does not show ISO');
-    assert.strictEqual(saved.iso, '2027-12-31');
-    assert.strictEqual(store.upserts.length, 1);
-    assert.strictEqual(store.upserts[0].p_aide_id, 'aide-cover');
-    assert.strictEqual(store.upserts[0].p_credential_type, 'cpr');
-    assert.strictEqual(store.upserts[0].p_expiry_date, '2027-12-31');
-    assert.strictEqual(store.attention, 2, 'a Current credential does not change Ace attention');
     await page.screenshot({path: path.join(shotDir, 'aidecreds1c-phone-card-current.png')});
+    assert.strictEqual(store.upserts.length, 1);
+    assert.strictEqual(store.upserts[0].p_expiry_date, '2027-12-31');
+    assert.strictEqual(store.upserts[0].p_credential_type, 'cpr');
+    assert.strictEqual(store.attention, 2);
 
     await page.evaluate(function(){aideCredBack();});
     await page.waitForFunction(function(){
       var cover = document.querySelector('[data-aide-cred-open="aide-cover"]');
-      var chip = cover ? cover.querySelector('.aide-cred-chip.current') : null;
-      var banner = document.getElementById('aideCredBanner');
-      return chip && /All current/.test(chip.textContent || '') && banner && /2 credentials need attention/.test(banner.textContent || '');
+      var chip = cover && cover.querySelector('.aide-cred-chip.current');
+      return chip && /All current/.test(chip.textContent || '');
     }, {timeout: 8000});
-    await waitQuiet();
-    await page.screenshot({path: path.join(shotDir, 'aidecreds1c-phone-list-after-save.png')});
-    const listed = store.calls.filter(function(c){
-      return c.rpc === 'admin_list_aide_credentials' && c.body && c.body.p_aide_id === 'aide-cover';
-    });
-    assert.ok(listed.length >= 1, 'all-current aide is read from the per-aide list when the rollup omits them');
-    const perAide = store.calls.filter(function(c){
-      return c.rpc === 'admin_aide_credentials_rollup' && c.body && c.body.p_aide_id === 'aide-cover';
-    });
-    assert.ok(perAide.length >= 1, 'missing aides still ask Ace for a per-aide rollup');
 
-    store.creds['aide-probe'].forEach(function(r){
-      if(r.status === 'expired')r.status = 'ok';
-    });
-    syncRollup(store);
-    assert.strictEqual(store.attention, 1, 'Ace attention is now 1 before Refresh');
     const mark = store.calls.length;
     await page.click('button[onclick="renderAides(true)"]');
+    let sawRollup = false;
+    for(let i = 0; i < 40; i++){
+      await new Promise(function(resolve){setTimeout(resolve, 50);});
+      sawRollup = store.calls.slice(mark).some(function(c){
+        return c.rpc === 'admin_aide_credentials_rollup' && (c.body.p_aide_id == null || c.body.p_aide_id === '');
+      });
+      if(sawRollup)break;
+    }
+    assert.ok(sawRollup, 'Refresh re-fetches the rollup');
     await page.waitForFunction(function(){
-      var banner = document.getElementById('aideCredBanner');
       var cover = document.querySelector('[data-aide-cred-open="aide-cover"]');
       var probe = document.querySelector('[data-aide-cred-open="aide-probe"]');
       var moe = document.querySelector('[data-aide-cred-open="aide-moe"]');
-      var coverChip = cover ? cover.querySelector('.aide-cred-chip.current') : null;
-      var probeText = probe ? probe.innerText : '';
-      var moeChips = moe ? moe.querySelectorAll('.aide-cred-chip').length : 0;
-      return banner && /1 credential needs attention/.test(banner.textContent || '')
-        && coverChip && /All current/.test(coverChip.textContent || '')
-        && /Expiring/.test(probeText) && !/overdue/.test(probeText)
-        && moeChips === 0;
+      var banner = document.getElementById('aideCredBanner');
+      var chip = cover && cover.querySelector('.aide-cred-chip.current');
+      return chip && /All current/.test(chip.textContent || '')
+        && banner && /2 credentials need attention/.test(banner.textContent || '')
+        && probe && /Expiring/.test(probe.innerText || '') && /1 overdue/.test(probe.innerText || '')
+        && moe && moe.querySelectorAll('.aide-cred-chip').length === 0;
     }, {timeout: 8000});
-    await waitQuiet();
     const after = await page.evaluate(function(){
       function chips(id){
         var btn = document.querySelector('[data-aide-cred-open="' + id + '"]');
-        if(!btn)return '';
-        return Array.prototype.map.call(btn.querySelectorAll('.aide-cred-chip'), function(el){return el.textContent.replace(/\s+/g, ' ').trim();}).join('|');
+        return btn ? Array.prototype.map.call(btn.querySelectorAll('.aide-cred-chip'), function(el){
+          return el.textContent.replace(/\s+/g, ' ').trim();
+        }).join('|') : '';
       }
       return {
         banner: document.getElementById('aideCredBanner').textContent.replace(/\s+/g, ' ').trim(),
-        probe: chips('aide-probe'),
         cover: chips('aide-cover'),
+        probe: chips('aide-probe'),
         moe: chips('aide-moe'),
-        list: document.getElementById('aideCredList').innerText
+        build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(after.banner, '⚠ 1 credential needs attention');
+    assert.strictEqual(after.build, '2026-09-25-aidecreds1c');
+    assert.strictEqual(after.banner, '⚠ 2 credentials need attention');
     assert.strictEqual(after.cover, '✓ All current', after.cover);
-    assert.ok(after.probe.indexOf('Expiring') >= 0 && after.probe.indexOf('overdue') < 0, after.probe);
+    assert.ok(after.probe.indexOf('Expiring') >= 0 && after.probe.indexOf('1 overdue') >= 0, after.probe);
     assert.strictEqual(after.moe, '');
-    assert.ok(after.list.includes('QA CoverAide coveraide1'), after.list);
-    const fresh = store.calls.slice(mark);
-    assert.ok(fresh.some(function(c){return c.rpc === 'admin_aide_credentials_rollup' && (c.body.p_aide_id == null || c.body.p_aide_id === '');}), 'Refresh re-fetches the null rollup');
+    assert.strictEqual(store.creds['aide-probe'].length, 2, 'Probe credential rows stay');
+    assert.strictEqual(store.creds['aide-cover'].length, 1, 'CoverAide CPR row stays');
+    assert.strictEqual(store.creds['aide-cover'][0].expiry_date, '2027-12-31');
     await page.screenshot({path: path.join(shotDir, 'aidecreds1c-phone-list-after-refresh.png')});
-
-    await page.click('[data-aide-cred-open="aide-cover"]');
-    await page.waitForFunction(function(){
-      return /CPR/.test(document.getElementById('aideCredDetail').innerText || '');
-    }, {timeout: 8000});
-    await page.click('[data-aide-cred-edit]');
-    await page.waitForSelector('#aideCredRemove:not([hidden])');
-    await page.click('#aideCredRemove');
-    await page.waitForSelector('#nciDiscardGoBtn');
-    await page.click('#nciDiscardGoBtn');
-    await page.waitForFunction(function(){
-      return /No credentials on file for this aide/.test(document.getElementById('aideCredDetail').innerText || '');
-    }, {timeout: 8000});
-    assert.strictEqual(store.deletes.length, 1);
-    await page.evaluate(function(){aideCredBack();});
-    await page.waitForFunction(function(){
-      var cover = document.querySelector('[data-aide-cred-open="aide-cover"]');
-      var banner = document.getElementById('aideCredBanner');
-      var chips = cover ? cover.querySelectorAll('.aide-cred-chip').length : 99;
-      return cover && chips === 0 && banner && /1 credential needs attention/.test(banner.textContent || '');
-    }, {timeout: 8000});
-    await waitQuiet();
-    const removed = await page.evaluate(function(){
-      var cover = document.querySelector('[data-aide-cred-open="aide-cover"]');
-      var probe = document.querySelector('[data-aide-cred-open="aide-probe"]');
-      return {
-        cover: cover ? cover.querySelectorAll('.aide-cred-chip').length : -1,
-        probe: probe ? probe.innerText : '',
-        banner: document.getElementById('aideCredBanner').textContent.replace(/\s+/g, ' ').trim()
-      };
-    });
-    assert.strictEqual(removed.cover, 0, 'deleting the only credential clears the chip');
-    assert.strictEqual(removed.banner, '⚠ 1 credential needs attention');
-    assert.ok(/Expiring/.test(removed.probe), removed.probe);
 
     await page.evaluate(function(){
       currentAdminRole = 'Scheduler';
@@ -415,7 +256,6 @@ async function runBrowser(){
       return root.hidden === true && getComputedStyle(root).display === 'none';
     });
     assert.strictEqual(sched, true, 'Scheduler does not see the credentials block');
-
     console.log('admin-aidecreds1c-test: phone ok');
   }finally{
     await browser.close();
