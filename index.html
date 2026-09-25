@@ -41,6 +41,8 @@
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<!-- admin desk co-pilot 2026-09-25 v=eca-copilot1 admin-build 2026-09-25-eca-copilot1. Full Admin desk co-pilot for Admin and Scheduler only. Nurse home and the Caregiver site do not get it. Radar kinds are coverage_open, timesheet_late, schedule_gap, aide_issue, backup_needed, inservice_due, intake_pending, compliance_flag, broadcast_needed, and login_fail. Ask opens explain, steps, then action buttons. Learning is Save as my template, short directions via admin_log_copilot_choice, and Confirm before any outbound. Quiet hours are America/New_York. Drafts only: Copy, Open Messages (sms:), Open Mail (mailto:) when phone or email is on file. Mailto To is case_manager_email. This desk does not send SMS or email and never prepends Hey. Ace preview fills {{greeting}}. Backup radar stays drafts-only: no Approve, Decline, or PTO. Co-pilot never reseals Auth and never rotates a password. Coverage stays under More. Refuse email stays admin_get_cover_refuse_template {}, admin_save_cover_refuse_template {p_subject,p_body}, admin_preview_cover_refuse_email {p_open_shift_id}. Client-skip email is admin_get_cover_client_skip_template {}, admin_save_cover_client_skip_template {p_body,p_subject}, admin_preview_cover_client_skip_email {p_case_manager_name,p_client_name,p_service_date,p_reason_label}. Recording a skip is admin_record_client_skip {p_client_id,p_service_date,p_reason,p_open_shift_id,p_shift_start,p_shift_end,p_reason_other,p_notes} with reason personal, doctor, not_feeling_well, or other. Add Client is admin_add_client {p_first_name,p_last_name,p_home_address,p_case_manager_name,p_case_manager_email,p_phone}. Add Aide is admin_add_aide {p_first_name,p_last_name,p_phone,p_email} and does not create Auth. Quiet hours are admin_get_quiet_hours {} and admin_save_quiet_hours {p_enabled,p_start_local,p_end_local,p_timezone}. Radar is admin_list_radar_signals {p_limit}, admin_ack_radar_signal {p_id}, admin_resolve_radar_signal {p_id}. Open-shift chips use is_client_skip and is_client_refused_backup. A missing callable keeps the desk on screen and does not store a template on this phone. Prior markers stay, including v=coveraide1b, v=covercomms1, v=coveraide1, and v=cover1. -->
+<meta name="admin-build" content="2026-09-25-eca-copilot1">
 <!-- coverage office refresh 2026-09-25 v=coveraide1b admin-build 2026-09-25-coveraide1b. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline. No PTO. No Auth reseal and no password rotate. After admin_record_call_off succeeds, the desk always re-fetches admin_list_open_shifts while the success toast is up, then paints that list. An older list response cannot replace a newer one. If the success payload includes open_shift_id or a row, that row is merged into the refreshed list when the list omits it. The same client on the same day with different hours stays two open rows. Within 48h is a chip only and does not hide a row. Source chip stays coveraide1: source exactly aide paints Aide; anything else or missing paints Office. This desk does not call aide_record_call_off and does not add an RPC. Prior markers stay, including v=covercomms1, v=coveraide1, v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-coveraide1b">
 <!-- coverage comms 2026-09-25 v=covercomms1 admin-build 2026-09-25-covercomms1. More → Coverage stays the call-off desk. It is not a bottom tab and it is not on Backup. Backup stays phone-change draft timesheets only: Open drafts and Mark saved on file. No Approve-Decline on Backup. No PTO. No Auth reseal and no password rotation. Who can cover paints the Ace rank rows in plain lines only: Worked this client N times, Never worked this client, miles away, or No home address on file. Continuity and Score are not shown. The aide Mo taps stays checked and highlighted. Text this aide and Text client open sms: with a draft; Mo presses Send in Messages. After assign, Text client they're on the way is the same kind of draft. After talking to the client: Client wants backup posts assigned_backup, Client refused · resume next day posts client_refused_resume_next_day, Still deciding posts awaiting_client. Cancel and Reopen stay. Client refused shows an editable case-manager email in Mo's voice. Open in Mail is mailto: and stays disabled until case_manager_email is known. Copy draft and Save as my template stay available. Refuse email is live Ace: admin_get_cover_refuse_template {}, admin_save_cover_refuse_template {p_subject,p_body} for Save as my template, admin_preview_cover_refuse_email {p_open_shift_id}. Placeholders are {{case_manager}} {{client}} {{date}} and optional {{case_manager_email}}. Mo's default is seeded in Ace. This desk does not keep a local template. List rows use source, submitted_by_aide_id, submitted_by_aide_username, submitted_by_aide_name, client_phone, case_manager_name, case_manager_email, regular_aide_phone, and assigned_backup_phone. source exactly aide or office stays the coveraide1 chip. Pipeline source stays local versus ace. Text client uses client_phone. Text this aide uses the selected backup phone, or regular_aide_phone when that aide is the regular aide. No localStorage template. This desk does not add Auth RPCs. Prior markers stay, including v=coveraide1, v=cover1, v=aidadel1, v=navedit1, v=nursecomp57, v=layoutA1, and v=admintheme1. -->
@@ -324,6 +326,39 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage input,#tab_coverage select,#tab_coverage textarea{font-size:16px;min-height:48px;}
 #tab_coverage .btn:disabled{opacity:0.45;cursor:not-allowed;}
 #tab_coverage .cover-back{margin-bottom:8px;}
+#tab_coverage .cover-reason.is-selected{border-color:var(--teal-dark);background:var(--teal-light);color:var(--teal-dark);}
+#clientModal input,#clientModal select,#clientModal textarea,#addAideModal input,#addAideModal select,#addAideModal textarea{font-size:16px;min-height:48px;}
+#clientModal .mbtn,#addAideModal .mbtn{min-height:48px;}
+#clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr 1fr;}
+@media(max-width:520px){
+  #clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr;}
+}
+#copilotFab{position:fixed;z-index:150;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));min-height:52px;padding:0 18px;border:0;border-radius:999px;background:var(--navy);color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;box-shadow:0 8px 22px rgba(26,39,68,.28);cursor:pointer;touch-action:manipulation;}
+#copilotFab[hidden]{display:none !important;}
+#copilotSheet{position:fixed;z-index:160;inset:0;display:flex;flex-direction:column;background:var(--off);color:var(--navy);padding:max(10px,env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));}
+#copilotSheet[hidden]{display:none !important;}
+#copilotSheet .copilot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+#copilotSheet h2{font-family:'DM Sans',sans-serif;font-size:1.25rem;font-weight:700;margin:0;}
+#copilotBody{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;}
+.copilot-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 10px;}
+.copilot-list{display:flex;flex-direction:column;gap:8px;}
+.copilot-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;touch-action:manipulation;}
+.copilot-card strong{display:block;font-size:1.02rem;line-height:1.3;}
+.copilot-card span{display:block;margin-top:4px;font-size:0.9rem;line-height:1.35;color:var(--text);}
+.copilot-actions{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
+.copilot-actions .btn,#copilotSheet .copilot-back{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
+#copilotSheet input,#copilotSheet textarea,#copilotSheet select{font-size:16px;min-height:48px;width:100%;}
+#copilotSheet textarea{min-height:96px;}
+.copilot-steps{margin:0 0 12px;padding-left:1.2rem;}
+.copilot-steps li{font-size:0.95rem;line-height:1.4;margin:0 0 8px;}
+.copilot-quiet{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:10px;}
+.copilot-quiet-row{display:flex;align-items:center;gap:10px;min-height:48px;font-weight:700;font-size:1rem;}
+.copilot-quiet-row input{width:22px;height:22px;}
+.copilot-quiet-times{display:flex;gap:8px;}
+.copilot-quiet-times label{flex:1;font-size:0.85rem;font-weight:700;}
+@media(min-width:900px){
+  #copilotSheet{left:auto;width:min(440px,100%);box-shadow:-12px 0 30px rgba(26,39,68,.18);}
+}
 #coverOutcomeView .page-hdr{margin-bottom:8px;}
 #coverOutcomeView .page-hdr p{display:none;}
 #coverIntakeView .page-hdr{margin-bottom:8px;}
@@ -1279,6 +1314,13 @@ bindLoginKeyboard();
               <button type="button" class="btn btn-navy" id="coverCallBtn" onclick="coverMarkContact('call')">Call client</button>
             </div>
             <p class="cover-note" id="coverSmsNote">Texts open in Messages with a draft. You press Send.</p>
+            <div id="coverOutboundConfirm" hidden>
+              <p class="cover-note" id="coverOutboundNote">Confirm before this opens. You send it yourself.</p>
+              <div class="cover-actions">
+                <button type="button" class="btn btn-teal" id="coverOutboundGo" onclick="coverConfirmOutbound()">Confirm</button>
+                <button type="button" class="btn btn-ghost" id="coverOutboundCancel" onclick="coverCancelOutbound()">Not yet</button>
+              </div>
+            </div>
             <p class="cover-note" id="coverContactNote">Text or call the client before you close this shift.</p>
           </section>
           <section class="cover-section" aria-label="Outcome">
@@ -1286,6 +1328,7 @@ bindLoginKeyboard();
             <div class="cover-actions">
               <button type="button" class="btn btn-teal" id="coverAssignBtn" disabled onclick="coverShowAssign()">Client wants backup</button>
               <button type="button" class="btn btn-warn" id="coverRefuseBtn" disabled onclick="coverRefuse()">Client refused · resume next day</button>
+              <button type="button" class="btn btn-warn" id="coverSkipBtn" onclick="coverShowSkip()">Member called · no service today</button>
               <button type="button" class="btn btn-navy" id="coverAwaitBtn" disabled onclick="coverAwaiting()">Still deciding</button>
               <button type="button" class="btn btn-ghost" id="coverCancelBtn" onclick="coverCancelShift()">Cancel shift</button>
               <button type="button" class="btn btn-ghost" id="coverReopenBtn" hidden onclick="coverReopen()">Reopen</button>
@@ -1302,6 +1345,23 @@ bindLoginKeyboard();
               <p class="cover-note" id="coverOnTheWayNote">Backup is assigned. This text is a draft. You press Send in Messages.</p>
               <div class="cover-actions">
                 <button type="button" class="btn btn-teal" id="coverOnTheWayBtn" onclick="coverTextOnTheWay()">Text client they're on the way</button>
+              </div>
+            </div>
+            <div id="coverSkipReason" hidden>
+              <h2>Why no service today</h2>
+              <p class="cover-note">The member called. Pick a reason, then confirm. This is not a backup refusal.</p>
+              <div class="cover-actions" id="coverSkipReasons">
+                <button type="button" class="btn btn-navy cover-reason" data-skip-reason="Personal" onclick="coverPickSkipReason('Personal')">Personal</button>
+                <button type="button" class="btn btn-navy cover-reason" data-skip-reason="Doctor appointment" onclick="coverPickSkipReason('Doctor appointment')">Doctor appointment</button>
+                <button type="button" class="btn btn-navy cover-reason" data-skip-reason="Not feeling well" onclick="coverPickSkipReason('Not feeling well')">Not feeling well</button>
+                <button type="button" class="btn btn-navy cover-reason" data-skip-reason="Other" onclick="coverPickSkipReason('Other')">Other</button>
+              </div>
+              <div class="field" id="coverSkipOtherWrap" hidden>
+                <label for="coverSkipOther">Other reason</label>
+                <input type="text" id="coverSkipOther" autocomplete="off" placeholder="Short reason">
+              </div>
+              <div class="cover-actions">
+                <button type="button" class="btn btn-warn" id="coverSkipConfirm" onclick="coverConfirmSkip()">Confirm no service today</button>
               </div>
             </div>
             <div id="coverRefuseMail" hidden>
@@ -1682,6 +1742,14 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
 
+    </div>
+    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" onclick="copilotOpenRadar()">Co-pilot</button>
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+      <div class="copilot-top">
+        <h2 id="copilotTitle">Co-pilot</h2>
+        <button type="button" class="btn btn-ghost" id="copilotCloseBtn" onclick="copilotClose()">Close</button>
+      </div>
+      <div id="copilotBody"></div>
     </div>
   </div>
 </div>
@@ -2250,8 +2318,14 @@ Call (216) 377-5991 with any questions.</textarea>
 <div class="modal-bg" id="addAideModal">
   <div class="modal" style="max-width:560px">
     <h3>Add aide</h3>
-    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5">Username is filled from the name (first initial + last name). You can edit it before creating. No email here — the aide adds email when they change the temp password.</p>
-    <div class="field"><label>Full name</label><input type="text" id="addAideFullName" placeholder="Jane Doe" autocomplete="off" oninput="onAddAideNameInput()"></div>
+    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5">First name and last name are required. Phone and email are optional. This form does not create a sign-in and does not make a temporary password.</p>
+    <div class="det-grid copilot-name-grid" style="margin-bottom:0">
+      <div class="field"><label for="addAideFirstName">First name</label><input type="text" id="addAideFirstName" placeholder="Jane" autocomplete="given-name" oninput="onAddAideNameInput()"></div>
+      <div class="field"><label for="addAideLastName">Last name</label><input type="text" id="addAideLastName" placeholder="Doe" autocomplete="family-name" oninput="onAddAideNameInput()"></div>
+    </div>
+    <input type="hidden" id="addAideFullName">
+    <div class="field"><label for="addAidePhone">Phone</label><input type="tel" id="addAidePhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
+    <div class="field"><label for="addAideEmail">Email</label><input type="email" id="addAideEmail" inputmode="email" autocomplete="email" placeholder="name@example.com"></div>
     <div class="field"><label>Username</label><input type="text" id="addAideUsername" placeholder="jdoe" autocomplete="off" oninput="onAddAideUsernameInput()"></div>
     <div class="card" style="background:var(--off);margin-bottom:14px">
       <div class="card-title" style="margin-bottom:10px"><span class="ico">🏠</span> Assign clients</div>
@@ -2289,10 +2363,15 @@ Call (216) 377-5991 with any questions.</textarea>
   <div class="modal" style="max-width:600px">
     <h3 id="clientModalTitle">Add Client</h3>
     <input type="hidden" id="editClientId">
-    <div class="det-grid" style="grid-template-columns:1fr 1fr;margin-bottom:14px">
-      <div class="field"><label>Client Name</label><input type="text" id="clientName" placeholder="Full name"></div>
-      <div class="field"><label>Home Address</label><input type="text" id="clientAddress" placeholder="Street, City, State, Zip"></div>
+    <input type="hidden" id="clientName">
+    <div class="det-grid copilot-name-grid" style="margin-bottom:0">
+      <div class="field"><label for="clientFirstName">First name</label><input type="text" id="clientFirstName" placeholder="Ada" autocomplete="given-name"></div>
+      <div class="field"><label for="clientLastName">Last name</label><input type="text" id="clientLastName" placeholder="Cole" autocomplete="family-name"></div>
     </div>
+    <div class="field"><label for="clientAddress">Home address</label><input type="text" id="clientAddress" placeholder="Street, City, State, Zip" autocomplete="street-address"></div>
+    <div class="field"><label for="clientCmName">Case manager name</label><input type="text" id="clientCmName" placeholder="Pat Lee" autocomplete="name"></div>
+    <div class="field"><label for="clientCmEmail">Case manager email</label><input type="email" id="clientCmEmail" inputmode="email" autocomplete="email" placeholder="pat@example.com"></div>
+    <div class="field"><label for="clientPhone">Phone</label><input type="tel" id="clientPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
     <div class="field" style="margin-bottom:14px">
       <button class="btn btn-ghost" onclick="geocodeClientAddress()">&#128205; Verify Address & Get GPS Coordinates</button>
       <p id="geocodeResult" style="font-size:0.76rem;color:var(--muted);margin-top:6px"></p>
@@ -2996,6 +3075,7 @@ function layoutA1ApplyRoles(){
     btn.textContent=(label.charAt(0)||'A').toUpperCase();
     if(role)btn.setAttribute('aria-label','Account menu, '+role);
   }
+  if(typeof copilotSyncRole==='function')copilotSyncRole();
 }
 var NAV_EDIT_META={
   timesheets:{label:'Timesheets',icon:'📋',short:''},
@@ -3439,10 +3519,14 @@ var COVER_RPC={
   outcome:['admin_cover_outcome'],
   tplGet:['admin_get_cover_refuse_template'],
   tplSave:['admin_save_cover_refuse_template'],
-  preview:['admin_preview_cover_refuse_email']
+  preview:['admin_preview_cover_refuse_email'],
+  skipGet:['admin_get_cover_client_skip_template'],
+  skipSave:['admin_save_cover_client_skip_template'],
+  skipPreview:['admin_preview_cover_client_skip_email'],
+  skipRecord:['admin_record_client_skip']
 };
-var coverRpcPick={record:'',list:'',rank:'',outcome:'',tplGet:'',tplSave:'',preview:''};
-var coverRpcOff={record:false,list:false,rank:false,outcome:false,tplGet:false,tplSave:false,preview:false};
+var coverRpcPick={record:'',list:'',rank:'',outcome:'',tplGet:'',tplSave:'',preview:'',skipGet:'',skipSave:'',skipPreview:'',skipRecord:''};
+var coverRpcOff={record:false,list:false,rank:false,outcome:false,tplGet:false,tplSave:false,preview:false,skipGet:false,skipSave:false,skipPreview:false,skipRecord:false};
 var coverShifts=[];
 var coverListGen=0;
 var coverSource='local';
@@ -3456,10 +3540,14 @@ var coverPostedKey='';
 var coverCmFilledFor='';
 var coverCmLoading='';
 var coverCmSnap=null;
+var coverCmFamily='refuse';
+var coverCmStub=false;
+var coverSkipReason='';
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
 var COVER_RANK_EMPTY='No aides to show for this shift yet.';
-// Same wording Ace has seeded. Placeholders match admin_get_cover_refuse_template. Not a local save.
-var COVER_CM_DEFAULT='Hey {{case_manager}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
+// Locked CM drafts. {{greeting}} is America/New_York: Good morning before 12:00, Good afternoon from 12:00 through 16:59, Good evening from 17:00. No Hey. The case manager name is not on the greeting line.
+var COVER_CM_DEFAULT='{{greeting}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
+var COVER_CM_SKIP_DEFAULT='{{greeting}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, at the member\'s request due to {{reason}}. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
 function coverEsc(s){
   var raw=String(s==null?'':s);
   if(typeof escapeHtml==='function')return escapeHtml(raw);
@@ -3550,7 +3638,12 @@ function coverSourceLabel(key){
 function coverSourceChips(shift){
   var key=shift&&shift.intakeSource==='aide'?'aide':'office';
   var urgent=coverShiftUrgent(shift)?'<span class="cover-chip">Within 48h</span>':'';
-  return '<span class="cover-chips"><span class="cover-chip cover-chip-source cover-chip-'+key+'">'+coverSourceLabel(key)+'</span>'+urgent+'</span>';
+  var st=coverStatusKey(shift);
+  var skip=shift&&(shift.isClientSkip||shift.exceptionKind==='client_skip'||st==='client_skipped'||st==='client_skip');
+  var refused=shift&&(shift.isClientRefusedBackup||st==='client_refused_resume_next_day'||shift.exceptionKind==='client_refused_backup');
+  var skipChip=skip?'<span class="cover-chip">CLIENT-SKIP</span>':'';
+  var refusedChip=refused?'<span class="cover-chip">Refused backup</span>':'';
+  return '<span class="cover-chips"><span class="cover-chip cover-chip-source cover-chip-'+key+'">'+coverSourceLabel(key)+'</span>'+skipChip+refusedChip+urgent+'</span>';
 }
 function coverMapShift(row){
   var src=row&&typeof row==='object'?row:{};
@@ -3622,7 +3715,13 @@ function coverMapShift(row){
     smsStub:String(coverPick(src,'sms_stub','smsStub')||''),
     source:String(src.source==null?'':src.source).trim().toLowerCase()==='local'?'local':'ace',
     intakeSource:coverIntakeSource(src),
-    contacted:!!src.contacted
+    contacted:!!src.contacted,
+    isClientSkip:src.is_client_skip===true||src.isClientSkip===true,
+    isClientRefusedBackup:src.is_client_refused_backup===true||src.isClientRefusedBackup===true,
+    exceptionKind:String(coverPick(src,'exception_kind','exceptionKind')||''),
+    clientFirstName:String(coverPick(src,'client_first_name','clientFirstName')||(src.client&&src.client.first_name)||''),
+    clientLastName:String(coverPick(src,'client_last_name','clientLastName')||(src.client&&src.client.last_name)||''),
+    clientHomeAddress:String(coverPick(src,'client_home_address','clientHomeAddress')||(src.client&&(src.client.home_address||src.client.address))||'')
   };
 }
 function coverCoerceNode(data){
@@ -3889,7 +3988,7 @@ function coverRankRows(data){
 function coverIsOpen(shift){
   var st=String(shift&&shift.status||'open').trim().toLowerCase().replace(/[\s-]+/g,'_');
   if(st==='cancelled'||st==='canceled'||st==='assigned'||st==='assigned_backup')return false;
-  if(st==='refused'||st==='client_refused_resume_next_day'||st==='resolved'||st==='closed')return false;
+  if(st==='refused'||st==='client_refused_resume_next_day'||st==='client_skipped_resume_next_day'||st==='client_skipped'||st==='client_skip'||st==='resolved'||st==='closed')return false;
   if(st===''||st==='open'||st==='call_off'||st==='calloff'||st==='awaiting_client'||st==='reopen'||st==='reopened')return true;
   return true;
 }
@@ -3947,6 +4046,114 @@ function coverOutcomeBody(openShiftId, outcome, backupAideId, notes){
   };
   if(backupAideId)body.p_backup_aide_id=backupAideId;
   if(notes)body.p_notes=String(notes);
+  return body;
+}
+function coverNyHour(now){
+  var d=now instanceof Date?now:new Date();
+  var hour=NaN;
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',hourCycle:'h23'}).formatToParts(d);
+    for(var i=0;i<parts.length;i++){
+      if(parts[i].type==='hour')hour=Number(parts[i].value);
+    }
+  }catch(e){hour=d.getHours();}
+  if(hour===24)hour=0;
+  if(!isFinite(hour))hour=d.getHours();
+  return hour;
+}
+function coverNyGreeting(now){
+  var hour=coverNyHour(now);
+  if(hour<12)return 'Good morning';
+  if(hour<17)return 'Good afternoon';
+  return 'Good evening';
+}
+function coverEnsureGreeting(text){
+  var greet=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
+  var raw=String(text==null?'':text).replace(/^\uFEFF/, '');
+  raw=raw.replace(/^(?:Hey\b[^\n]*(?:\n+|$))+/i, '');
+  raw=raw.replace(/^\s+/, '');
+  if(/^Good morning\b/i.test(raw))return raw.replace(/^Good morning\b/i, 'Good morning');
+  if(/^Good afternoon\b/i.test(raw))return raw.replace(/^Good afternoon\b/i, 'Good afternoon');
+  if(/^Good evening\b/i.test(raw))return raw.replace(/^Good evening\b/i, 'Good evening');
+  if(!raw)return greet;
+  return greet+'\n\n'+raw;
+}
+function coverNyYmd(iso){
+  var d=iso?new Date(iso):new Date();
+  if(!isFinite(d.getTime()))d=new Date();
+  try{
+    var parts=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+    var y='',m='',day='';
+    for(var i=0;i<parts.length;i++){
+      if(parts[i].type==='year')y=parts[i].value;
+      if(parts[i].type==='month')m=parts[i].value;
+      if(parts[i].type==='day')day=parts[i].value;
+    }
+    if(y&&m&&day)return y+'-'+m+'-'+day;
+  }catch(e){}
+  return d.toISOString().slice(0,10);
+}
+function coverSkipReasonCode(label){
+  if(label==='Personal')return 'personal';
+  if(label==='Doctor appointment')return 'doctor';
+  if(label==='Not feeling well')return 'not_feeling_well';
+  if(label==='Other')return 'other';
+  return '';
+}
+function coverSkipOtherText(){
+  var el=null;
+  try{el=document.getElementById('coverSkipOther');}catch(e){el=null;}
+  return el?String(el.value||'').trim():'';
+}
+function coverSkipReasonLabel(){
+  var picked=String(coverSkipReason||'');
+  if(picked==='Other'){
+    var typed=coverSkipOtherText();
+    return typed||'Other';
+  }
+  return picked;
+}
+function coverSkipReasonValue(){
+  return coverSkipReasonLabel();
+}
+function coverSkipPreviewBody(shift){
+  var ctx=coverCmContext(shift);
+  var client=ctx.client||'';
+  if(client==='Client')client='';
+  var first=shift&&shift.clientFirstName?String(shift.clientFirstName).trim():'';
+  var last=shift&&shift.clientLastName?String(shift.clientLastName).trim():'';
+  if(!client&&(first||last))client=[first,last].filter(Boolean).join(' ');
+  if(!client&&shift&&shift.clientName&&shift.clientName!=='Client')client=String(shift.clientName);
+  return {
+    p_case_manager_name:String(ctx.cm||''),
+    p_client_name:String(client||''),
+    p_service_date:coverNyYmd(shift&&shift.startsAt),
+    p_reason_label:String(coverSkipReasonLabel()||'')
+  };
+}
+function coverSkipSaveBody(subject, body){
+  var out={p_body:String(body==null?'':body)};
+  var sub=String(subject==null?'':subject).trim();
+  if(sub)out.p_subject=sub;
+  return out;
+}
+function coverRecordSkipBody(shift){
+  var code=coverSkipReasonCode(coverSkipReason);
+  var body={
+    p_client_id:coverUuidOrNull(shift&&shift.clientId),
+    p_service_date:coverNyYmd(shift&&shift.startsAt),
+    p_reason:code
+  };
+  var openId=coverUuidOrNull(shift&&shift.id);
+  if(openId)body.p_open_shift_id=openId;
+  if(shift&&shift.startsAt)body.p_shift_start=String(shift.startsAt);
+  if(shift&&shift.endsAt)body.p_shift_end=String(shift.endsAt);
+  if(code==='other'){
+    var other=coverSkipOtherText();
+    if(other)body.p_reason_other=other;
+  }
+  var note=shift&&shift.note?String(shift.note).trim():'';
+  if(note)body.p_notes=note;
   return body;
 }
 function coverFind(id){
@@ -4291,15 +4498,20 @@ function coverOnTheWaySms(shift, backupName){
 }
 function coverFillCmTemplate(tpl, ctx){
   ctx=ctx||{};
+  var greeting=ctx.greeting;
+  if(!greeting)greeting=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
   var cm=ctx.case_manager||ctx.cm||'(Case manager name)';
   var client=ctx.client||'(Client name)';
   var date=ctx.date||'(Date)';
   var email=ctx.case_manager_email||ctx.email||'(Case manager email)';
+  var reason=ctx.reason||'(reason)';
   return String(tpl==null?'':tpl)
+    .replace(/\{\{greeting\}\}/g, greeting)
     .replace(/\{\{case_manager_email\}\}/g, email)
     .replace(/\{\{case_manager\}\}/g, cm)
     .replace(/\{\{client\}\}/g, client)
-    .replace(/\{\{date\}\}/g, date);
+    .replace(/\{\{date\}\}/g, date)
+    .replace(/\{\{reason\}\}/g, reason);
 }
 function coverUnfillCmTemplate(text, ctx){
   var out=String(text||'');
@@ -4314,7 +4526,13 @@ function coverUnfillCmTemplate(text, ctx){
     ['(Case manager email)','{{case_manager_email}}'],
     ['(Case manager name)','{{case_manager}}'],
     ['(Client name)','{{client}}'],
-    ['(Date)','{{date}}']
+    ['(Date)','{{date}}'],
+    [ctx.reason,'{{reason}}'],
+    ['(reason)','{{reason}}'],
+    [ctx.greeting,'{{greeting}}'],
+    ['Good evening','{{greeting}}'],
+    ['Good afternoon','{{greeting}}'],
+    ['Good morning','{{greeting}}']
   ].filter(function(p){return p[0]&&String(p[0]).trim();});
   pairs.sort(function(a,b){return String(b[0]).length-String(a[0]).length;});
   var seen={};
@@ -4337,6 +4555,7 @@ function coverMailPayload(data){
   if(node.template&&typeof node.template==='object')src=node.template;
   else if(node.email&&typeof node.email==='object')src=node.email;
   else if(node.preview&&typeof node.preview==='object')src=node.preview;
+  var fills=(node.fills&&typeof node.fills==='object')?node.fills:{};
   var subject=String(coverPick(src,'subject','p_subject','email_subject')||'');
   var body=String(coverPick(src,'body','p_body','email_body','text')||'');
   if(!subject&&src!==node)subject=String(coverPick(node,'subject','p_subject')||'');
@@ -4345,10 +4564,12 @@ function coverMailPayload(data){
   return {
     subject:subject,
     body:body,
-    email:String(coverPick(node,'case_manager_email','to')||coverPick(src,'case_manager_email','to')||''),
-    cm:String(coverPick(node,'case_manager_name','case_manager')||coverPick(src,'case_manager_name')||''),
-    client:String(coverPick(node,'client_name','client')||''),
-    date:String(coverPick(node,'service_date','date')||'')
+    email:String(coverPick(node,'case_manager_email','to_email','to')||coverPick(src,'case_manager_email','to_email','to')||fills.case_manager_email||''),
+    cm:String(coverPick(node,'case_manager_name','case_manager')||coverPick(src,'case_manager_name')||fills.case_manager||''),
+    client:String(coverPick(node,'client_name','client')||fills.client||''),
+    date:String(coverPick(node,'service_date','date')||fills.date||''),
+    greeting:String(coverPick(node,'greeting')||coverPick(src,'greeting')||fills.greeting||''),
+    reason:String(coverPick(node,'reason_label','reason')||fills.reason||'')
   };
 }
 function coverCmContext(shift){
@@ -4367,7 +4588,7 @@ function coverCmContext(shift){
   }
   cm=String(cm||'').trim();
   email=String(email||'').trim();
-  return {
+  var ctx={
     cm:cm,
     case_manager:cm,
     email:email,
@@ -4375,6 +4596,8 @@ function coverCmContext(shift){
     client:String(client||'').trim(),
     date:coverServiceDate(shift&&shift.startsAt)
   };
+  if(coverCmFamily==='skip')ctx.reason=coverSkipReasonValue();
+  return ctx;
 }
 function coverMergeSnap(shift, mail){
   var ctx=coverCmContext(shift);
@@ -4382,6 +4605,8 @@ function coverMergeSnap(shift, mail){
   if(mail&&mail.client)ctx.client=String(mail.client);
   if(mail&&mail.date)ctx.date=String(mail.date);
   if(mail&&mail.email)ctx.email=ctx.case_manager_email=String(mail.email);
+  if(mail&&mail.greeting)ctx.greeting=String(mail.greeting);
+  if(mail&&mail.reason)ctx.reason=String(mail.reason);
   return ctx;
 }
 function coverRenderMail(mail, snap){
@@ -4412,9 +4637,11 @@ function coverSyncCmMail(){
   var ok=coverEmailOk(email);
   if(btn)btn.disabled=!ok;
   if(note){
-    note.textContent=ok
+    var lead=ok
       ?'Edit the note. Open in Mail uses '+email+'. You press Send in Mail.'
       :'Case manager email is not on file. Open in Mail stays off until that email is known. Copy and Save as my template still work.';
+    if(coverCmStub)lead=(coverCmFamily==='skip'?'Skip template is not callable yet. ':'The office email did not answer. ')+lead;
+    note.textContent=lead;
   }
 }
 function coverPaintRefuseMail(mail, shift){
@@ -4424,13 +4651,16 @@ function coverPaintRefuseMail(mail, shift){
   try{subjectEl=document.getElementById('coverCmSubject');}catch(e2){subjectEl=null;}
   var snap=coverMergeSnap(shift, mail);
   var shown=coverRenderMail(mail, snap);
+  shown.body=coverEnsureGreeting(shown.body);
   coverCmSnap=snap;
   if(ta)ta.value=shown.body;
   if(subjectEl)subjectEl.value=shown.subject;
   coverCmFilledFor=String(shift&&shift.id||'');
   coverSyncCmMail();
 }
-async function coverShowRefuseDraft(shift){
+async function coverShowRefuseDraft(shift, family){
+  var fam=family==='skip'?'skip':'refuse';
+  coverCmFamily=fam;
   var box=null;
   var ta=null;
   var note=null;
@@ -4438,7 +4668,7 @@ async function coverShowRefuseDraft(shift){
   try{ta=document.getElementById('coverCmDraft');}catch(e2){ta=null;}
   try{note=document.getElementById('coverCmNote');}catch(e3){note=null;}
   if(box)box.hidden=false;
-  var key=String(shift&&shift.id||'');
+  var key=String(shift&&shift.id||'')+'|'+fam;
   if(coverCmFilledFor===key){
     coverSyncCmMail();
     try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e4){}
@@ -4455,38 +4685,60 @@ async function coverShowRefuseDraft(shift){
   coverSyncCmMail();
   var localOnly=!shift||shift.source==='local'||String(shift.id||'').indexOf('local-')===0||!coverUuidOrNull(shift.id);
   var mail=null;
+  var previewKind=fam==='skip'?'skipPreview':'preview';
+  var getKind=fam==='skip'?'skipGet':'tplGet';
+  var previewBody=fam==='skip'?coverSkipPreviewBody(shift):coverPreviewBody(shift&&shift.id);
   if(!localOnly){
-    var preview=await coverRpc('preview', coverPreviewBody(shift.id));
+    var preview=await coverRpc(previewKind, previewBody);
     if(coverCmLoading!==key)return;
     if(preview&&preview.ok)mail=coverMailPayload(preview.data);
     if(!mail){
-      var tmpl=await coverRpc('tplGet', coverTplGetBody());
+      var tmpl=await coverRpc(getKind, coverTplGetBody());
       if(coverCmLoading!==key)return;
       if(tmpl&&tmpl.ok)mail=coverMailPayload(tmpl.data);
     }
-    if(!mail&&note){
+    if(!mail&&fam!=='skip'&&note){
       note.textContent=(preview&&preview.signedOut)
         ?'Sign in to load the office email.'
         :(preview&&preview.ok===false)
           ?(preview.error||'The office email did not answer.')
           :'The office email did not answer. Nothing was saved on this phone.';
     }
-  }else if(note){
+  }else if(fam!=='skip'&&note){
     note.textContent='This shift is still on this phone, so the office email cannot load.';
   }
   if(coverCmLoading!==key)return;
   coverCmLoading='';
+  coverCmStub=false;
+  if(!mail){
+    mail=fam==='skip'
+      ?{subject:'No services today — {{client}} ({{date}})', body:COVER_CM_SKIP_DEFAULT}
+      :{subject:'Services not delivered today — {{client}} ({{date}})', body:COVER_CM_DEFAULT};
+    coverCmStub=true;
+  }
   if(mail)coverPaintRefuseMail(mail, shift);
   else coverSyncCmMail();
   try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e6){}
+}
+function coverHideSkipReason(){
+  var box=null;
+  try{box=document.getElementById('coverSkipReason');}catch(e){box=null;}
+  if(box)box.hidden=true;
+  var other=null;
+  try{other=document.getElementById('coverSkipOtherWrap');}catch(e2){other=null;}
+  if(other)other.hidden=true;
 }
 function coverHideRefuseDraft(){
   var box=null;
   try{box=document.getElementById('coverRefuseMail');}catch(e){box=null;}
   if(box)box.hidden=true;
+  coverHideSkipReason();
   coverCmFilledFor='';
   coverCmLoading='';
   coverCmSnap=null;
+  coverCmFamily='refuse';
+  coverCmStub=false;
+  coverSkipReason='';
 }
 function coverShowOnTheWay(name){
   var box=null;
@@ -4506,6 +4758,50 @@ function coverHideOnTheWay(){
   try{box=document.getElementById('coverOnTheWay');}catch(e){box=null;}
   if(box)box.hidden=true;
 }
+var coverOutbound=null;
+function coverAskOutbound(kind, href, label, onConfirm){
+  if(kind==='mail'&&!href){
+    if(typeof showTempMsg==='function')showTempMsg('Case manager email is not on file yet.','var(--warn)');
+    return;
+  }
+  coverOutbound={kind:kind, href:href||'', label:label||'', onConfirm:onConfirm||null};
+  var box=null;
+  var note=null;
+  try{box=document.getElementById('coverOutboundConfirm');}catch(e){box=null;}
+  try{note=document.getElementById('coverOutboundNote');}catch(e2){note=null;}
+  var quiet=typeof copilotInQuietHours==='function'&&copilotInQuietHours();
+  var line='Confirm before this opens. You send it yourself.';
+  if(quiet)line='Quiet hours are on. '+line;
+  if(kind==='sms'&&String(href||'').indexOf('sms:?')===0)line='No phone is on file. Open Messages stays a draft without a number. '+line;
+  if(note)note.textContent=(label?label+'. ':'')+line;
+  if(box){
+    box.hidden=false;
+    try{box.scrollIntoView({block:'nearest'});}catch(e3){}
+  }
+}
+function coverCancelOutbound(){
+  coverOutbound=null;
+  var box=null;
+  try{box=document.getElementById('coverOutboundConfirm');}catch(e){box=null;}
+  if(box)box.hidden=true;
+}
+function coverConfirmOutbound(){
+  var pending=coverOutbound;
+  coverOutbound=null;
+  var box=null;
+  try{box=document.getElementById('coverOutboundConfirm');}catch(e){box=null;}
+  if(box)box.hidden=true;
+  if(!pending)return;
+  if(typeof pending.onConfirm==='function'){
+    try{pending.onConfirm();}catch(e2){}
+  }
+  if(typeof copilotRpc==='function'){
+    var body={p_action_key:pending.kind==='mail'?'mail':'sms', p_choice:'confirm_open_draft'};
+    if(pending.label)body.p_note=String(pending.label);
+    try{copilotRpc('choice', body);}catch(e3){}
+  }
+  if(pending.href)coverGo(pending.href);
+}
 function coverTextAide(){
   var shift=coverFind(coverSelectedId);
   var aide=coverSelectedRank();
@@ -4513,7 +4809,7 @@ function coverTextAide(){
     if(typeof showTempMsg==='function')showTempMsg('Tap an aide under Who can cover first.','var(--warn)');
     return;
   }
-  coverGo(coverSmsHref(coverAidePhone(aide), coverAideSms(shift, aide)));
+  coverAskOutbound('sms', coverSmsHref(coverAidePhone(aide), coverAideSms(shift, aide)), 'Text this aide');
 }
 function coverTextOnTheWay(){
   var shift=coverFind(coverSelectedId);
@@ -4521,7 +4817,7 @@ function coverTextOnTheWay(){
   var picked=coverSelectedRank();
   var name=(shift.backupAideName||(picked&&picked.name)||'');
   var phone=coverClientPhone(shift);
-  coverGo(coverSmsHref(phone, coverOnTheWaySms(shift, name)));
+  coverAskOutbound('sms', coverSmsHref(phone, coverOnTheWaySms(shift, name)), 'Text client they are on the way');
 }
 function coverOpenCmMail(){
   var email=coverCmSnap&&coverCmSnap.email?String(coverCmSnap.email).trim():'';
@@ -4535,10 +4831,17 @@ function coverOpenCmMail(){
     var client=(coverCmSnap&&coverCmSnap.client)||'our member';
     subject='No services today — '+client;
   }
-  coverGo(coverMailHref(email, subject, coverCmText()));
+  var text=coverEnsureGreeting(coverCmText());
+  var draft=null;
+  try{draft=document.getElementById('coverCmDraft');}catch(e){draft=null;}
+  if(draft)draft.value=text;
+  coverAskOutbound('mail', coverMailHref(email, subject, text), 'Open Mail');
 }
 function coverCopyCmDraft(){
-  var text=coverCmText();
+  var text=coverEnsureGreeting(coverCmText());
+  var draft=null;
+  try{draft=document.getElementById('coverCmDraft');}catch(e){draft=null;}
+  if(draft)draft.value=text;
   if(!text.trim()){
     if(typeof showTempMsg==='function')showTempMsg('The draft is empty.','var(--warn)');
     return;
@@ -4567,7 +4870,9 @@ async function coverSaveCmTemplate(){
   var snap=coverCmSnap||{};
   var body=coverUnfillCmTemplate(text, snap);
   var subject=coverUnfillCmTemplate(coverCmSubject(), snap);
-  var got=await coverRpc('tplSave', coverTplSaveBody(subject, body));
+  var saveKind=coverCmFamily==='skip'?'skipSave':'tplSave';
+  var saveBody=coverCmFamily==='skip'?coverSkipSaveBody(subject, body):coverTplSaveBody(subject, body);
+  var got=await coverRpc(saveKind, saveBody);
   if(got&&got.ok===false){
     if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the template.','var(--danger)');
     return;
@@ -4576,7 +4881,10 @@ async function coverSaveCmTemplate(){
     if(typeof showTempMsg==='function')showTempMsg(got&&got.signedOut?'Sign in to save the template.':'The office template did not save. Nothing was stored on this phone.','var(--warn)');
     return;
   }
-  if(typeof showTempMsg==='function')showTempMsg('Saved. The next refused shift starts from this wording.','var(--success)');
+  var savedMsg=coverCmFamily==='skip'
+    ?'Saved. The next member-called shift starts from this wording.'
+    :'Saved. The next refused shift starts from this wording.';
+  if(typeof showTempMsg==='function')showTempMsg(savedMsg,'var(--success)');
 }
 function coverFillBackup(shift){
   var sel=document.getElementById('coverBackupSel');
@@ -4608,10 +4916,12 @@ function coverPaintOutcome(){
   var canClose=!!coverContacted;
   var canAssign=canClose&&coverCanAssign(shift);
   var refuse=document.getElementById('coverRefuseBtn');
+  var skip=document.getElementById('coverSkipBtn');
   var assign=document.getElementById('coverAssignBtn');
   var awaitBtn=document.getElementById('coverAwaitBtn');
   var reopen=document.getElementById('coverReopenBtn');
   if(refuse)refuse.disabled=!canClose;
+  if(skip)skip.disabled=!coverCanAssign(shift);
   if(assign)assign.disabled=!canAssign;
   if(awaitBtn)awaitBtn.disabled=!canClose;
   if(reopen)reopen.hidden=coverCanAssign(shift);
@@ -4684,6 +4994,8 @@ function coverOpenOutcome(id){
   coverHideAssign();
   coverHideRefuseDraft();
   coverHideOnTheWay();
+  coverHideSkipReason();
+  coverCancelOutbound();
   coverShow('outcome');
   coverPaintOutcome();
   coverLoadRanks(shift);
@@ -4691,9 +5003,16 @@ function coverOpenOutcome(id){
 function coverMarkContact(kind){
   var shift=coverFind(coverSelectedId);
   if(!shift)return;
-  var href='';
-  if(kind==='text')href=coverSmsHref(coverClientPhone(shift), coverClientSms(shift));
-  else href=coverPhoneHref('tel', coverClientPhone(shift));
+  if(kind==='text'){
+    coverAskOutbound('sms', coverSmsHref(coverClientPhone(shift), coverClientSms(shift)), 'Text client', function(){
+      coverContacted=true;
+      shift.contacted=true;
+      if(shift.source==='local')coverWriteLocal(coverShifts);
+      coverPaintOutcome();
+    });
+    return;
+  }
+  var href=coverPhoneHref('tel', coverClientPhone(shift));
   coverContacted=true;
   shift.contacted=true;
   if(shift.source==='local')coverWriteLocal(coverShifts);
@@ -4841,7 +5160,8 @@ async function coverApplyOutcome(outcome){
   var shift=coverFind(coverSelectedId);
   if(!shift||coverBusy)return;
   if(coverPostedKey===String(shift.id)+'|'+outcome){
-    if(outcome==='client_refused_resume_next_day')coverShowRefuseDraft(shift);
+    if(outcome==='client_refused_resume_next_day')coverShowRefuseDraft(shift,'refuse');
+    if(outcome==='client_skipped_resume_next_day')coverShowRefuseDraft(shift,'skip');
     if(outcome==='assigned_backup')coverShowOnTheWay(shift.backupAideName||'');
     return;
   }
@@ -4875,7 +5195,8 @@ async function coverApplyOutcome(outcome){
     return;
   }
   if(!localOnly){
-    got=await coverRpc('outcome', coverOutcomeBody(coverUuidOrNull(shift.id), outcome, backupUuid, shift.note||''));
+    var skipReason=outcome==='client_skipped_resume_next_day'?coverSkipReasonValue():'';
+    got=await coverRpc('outcome', coverOutcomeBody(coverUuidOrNull(shift.id), outcome, backupUuid, shift.note||'', skipReason));
   }else{
     got={missing:true};
   }
@@ -4898,14 +5219,23 @@ async function coverApplyOutcome(outcome){
   shift.backupAideName=backupName;
   if(shift.source==='local'||localOnly)coverWriteLocal(coverShifts);
   coverBusy=false;
-  var msg=outcome==='assigned_backup'?'Client wants backup.':outcome==='awaiting_client'?'Still deciding.':outcome==='cancelled'?'Shift cancelled.':outcome==='reopen'?'Shift reopened.':'Client refused · resume next day.';
+  var msg='Client refused · resume next day.';
+  if(outcome==='assigned_backup')msg='Client wants backup.';
+  else if(outcome==='awaiting_client')msg='Still deciding.';
+  else if(outcome==='cancelled')msg='Shift cancelled.';
+  else if(outcome==='reopen')msg='Shift reopened.';
+  else if(outcome==='client_skipped_resume_next_day')msg='Member called · no service today.';
   if(sms==='not_sent_v1')msg=msg+' Ace did not send a text (not_sent_v1).';
   if(got&&(got.missing||got.signedOut))msg=msg+' Saved on this phone until the office outcome callable answers.';
   if(typeof showTempMsg==='function')showTempMsg(msg,'var(--success)');
   coverHideAssign();
   coverPostedKey=String(shift.id)+'|'+outcome;
   if(outcome==='client_refused_resume_next_day'){
-    coverShowRefuseDraft(shift);
+    coverShowRefuseDraft(shift,'refuse');
+    return;
+  }
+  if(outcome==='client_skipped_resume_next_day'){
+    coverShowRefuseDraft(shift,'skip');
     return;
   }
   if(outcome==='assigned_backup'){
@@ -4922,8 +5252,74 @@ function coverRefuse(){
     if(typeof showTempMsg==='function')showTempMsg('Text or call the client first.','var(--warn)');
     return;
   }
-  coverShowRefuseDraft(shift);
+  coverHideSkipReason();
+  coverCmFamily='refuse';
+  coverShowRefuseDraft(shift,'refuse');
   coverApplyOutcome('client_refused_resume_next_day');
+}
+function coverPickSkipReason(reason){
+  coverSkipReason=String(reason||'');
+  var buttons=[];
+  try{buttons=document.querySelectorAll('#coverSkipReasons .cover-reason');}catch(e){buttons=[];}
+  for(var i=0;i<buttons.length;i++){
+    var on=buttons[i].getAttribute('data-skip-reason')===coverSkipReason;
+    buttons[i].classList.toggle('is-selected', on);
+    buttons[i].setAttribute('aria-pressed', on?'true':'false');
+  }
+  var other=null;
+  try{other=document.getElementById('coverSkipOtherWrap');}catch(e2){other=null;}
+  if(other)other.hidden=coverSkipReason!=='Other';
+}
+function coverShowSkip(){
+  var shift=coverFind(coverSelectedId);
+  if(!shift)return;
+  if(!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('No service today is for an open shift or one awaiting the client.','var(--warn)');
+    return;
+  }
+  coverHideRefuseDraft();
+  coverCmFamily='skip';
+  coverSkipReason='';
+  var box=document.getElementById('coverSkipReason');
+  if(box)box.hidden=false;
+  coverPickSkipReason('');
+  try{if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest'});}catch(e){}
+}
+async function coverConfirmSkip(){
+  var shift=coverFind(coverSelectedId);
+  if(!shift||coverBusy)return;
+  var code=coverSkipReasonCode(coverSkipReason);
+  if(!code){
+    if(typeof showTempMsg==='function')showTempMsg('Pick a reason first.','var(--warn)');
+    return;
+  }
+  if(!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('No service today is for an open shift or one awaiting the client.','var(--warn)');
+    return;
+  }
+  var clientId=coverUuidOrNull(shift.clientId);
+  if(!clientId){
+    if(typeof showTempMsg==='function')showTempMsg('This client is not an office id yet. Nothing was saved.','var(--warn)');
+    return;
+  }
+  coverCmFamily='skip';
+  coverBusy=true;
+  var got=await coverRpc('skipRecord', coverRecordSkipBody(shift));
+  coverBusy=false;
+  if(got&&got.ok===false){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not record no service today.','var(--danger)');
+    return;
+  }
+  if(!got||got.missing||got.signedOut){
+    if(typeof showTempMsg==='function')showTempMsg(got&&got.signedOut?'Sign in to record no service today.':'admin_record_client_skip is not live yet. Nothing was saved.','var(--warn)');
+    return;
+  }
+  shift.status='client_skipped';
+  shift.isClientSkip=true;
+  shift.exceptionKind='client_skip';
+  coverPostedKey=String(shift.id)+'|client_skip';
+  if(typeof showTempMsg==='function')showTempMsg('Member called · no service today.','var(--success)');
+  coverShowRefuseDraft(shift,'skip');
 }
 function coverConfirmAssign(){
   coverApplyOutcome('assigned_backup');
@@ -4957,6 +5353,679 @@ function coverEnsureBound(){
 }
 
 // admin schedule v=sched1
+
+// v=eca-copilot1 Admin desk co-pilot. Admin and Scheduler only.
+// Drafts only. Confirm before sms: or mailto:. No connectors. No password changes.
+var COPILOT_RPC={
+  radar:['admin_list_radar_signals'],
+  ack:['admin_ack_radar_signal'],
+  resolve:['admin_resolve_radar_signal'],
+  quietGet:['admin_get_quiet_hours'],
+  quietSave:['admin_save_quiet_hours'],
+  choice:['admin_log_copilot_choice']
+};
+var COPILOT_KINDS=['coverage_open','timesheet_late','schedule_gap','aide_issue','backup_needed','inservice_due','intake_pending','compliance_flag','broadcast_needed','login_fail'];
+var copilotRpcOff={};
+var copilotView='radar';
+var copilotAskId='';
+var copilotAlerts=[];
+var copilotPending=null;
+var copilotQuiet={enabled:true, start:'20:00', end:'07:00', start_local:'20:00', end_local:'07:00', timezone:'America/New_York', source:'desk'};
+function copilotEsc(s){
+  var raw=String(s==null?'':s);
+  if(typeof coverEsc==='function')return coverEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function copilotRoleOk(){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function copilotSyncRole(){
+  if(!copilotRoleOk())copilotClose();
+}
+function copilotMinutes(hhmm){
+  var m=String(hhmm||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return null;
+  var h=Number(m[1]);
+  var min=Number(m[2]);
+  if(h>23||min>59)return null;
+  return h*60+min;
+}
+function copilotNyMinutes(now){
+  var d=now instanceof Date?now:new Date();
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'numeric',hourCycle:'h23'}).formatToParts(d);
+    var h=0,m=0;
+    for(var i=0;i<parts.length;i++){
+      if(parts[i].type==='hour')h=Number(parts[i].value);
+      if(parts[i].type==='minute')m=Number(parts[i].value);
+    }
+    if(h===24)h=0;
+    if(isFinite(h)&&isFinite(m))return h*60+m;
+  }catch(e){}
+  return d.getHours()*60+d.getMinutes();
+}
+function copilotInQuietHours(now, quiet){
+  var q=quiet||copilotQuiet;
+  if(!q||!q.enabled)return false;
+  if(!now&&q.source==='ace'&&typeof q.quiet_hours_active==='boolean')return q.quiet_hours_active;
+  var start=copilotMinutes(q.start_local||q.start);
+  var end=copilotMinutes(q.end_local||q.end);
+  if(start==null||end==null)return false;
+  var cur=copilotNyMinutes(now||new Date());
+  if(start===end)return true;
+  if(start<end)return cur>=start&&cur<end;
+  return cur>=start||cur<end;
+}
+function copilotQuietSaveBody(q){
+  q=q||copilotQuiet;
+  return {
+    p_enabled:!!q.enabled,
+    p_start_local:String(q.start_local||q.start||'20:00'),
+    p_end_local:String(q.end_local||q.end||'07:00'),
+    p_timezone:'America/New_York'
+  };
+}
+function copilotKindTab(kind){
+  if(kind==='coverage_open')return 'coverage';
+  if(kind==='timesheet_late')return 'timesheets';
+  if(kind==='schedule_gap')return 'schedule';
+  if(kind==='aide_issue'||kind==='login_fail')return 'aides';
+  if(kind==='backup_needed')return 'backups';
+  if(kind==='inservice_due')return 'inservices';
+  if(kind==='intake_pending'||kind==='compliance_flag')return 'nurse';
+  if(kind==='broadcast_needed')return 'broadcast';
+  return '';
+}
+function copilotKindTitle(kind){
+  var titles={
+    coverage_open:'Coverage',
+    timesheet_late:'Timesheets',
+    schedule_gap:'Schedule',
+    aide_issue:'Aides',
+    backup_needed:'Backup',
+    inservice_due:'Inservices',
+    intake_pending:'Intakes / Completes',
+    compliance_flag:'Compliance',
+    broadcast_needed:'Broadcast',
+    login_fail:'Login fails'
+  };
+  return titles[kind]||'';
+}
+function copilotSafeAction(action){
+  if(!action||typeof action!=='object')return null;
+  var blob=String(action.kind||action.type||'')+' '+String(action.id||'')+' '+String(action.label||'');
+  if(/approve|decline|\bpto\b|reseal|rotate password|send broadcast/i.test(blob))return null;
+  var kind=String(action.kind||action.type||'tab');
+  if(kind!=='tab'&&kind!=='copy'&&kind!=='sms'&&kind!=='mail')kind='tab';
+  return {
+    id:String(action.id||kind),
+    label:String(action.label||'Open'),
+    kind:kind,
+    tab:String(action.tab||''),
+    phone:String(action.phone||''),
+    email:String(action.email||''),
+    subject:String(action.subject||''),
+    body:String(action.body||'')
+  };
+}
+function copilotPlaybook(key){
+  var books={
+    coverage_open:{
+      title:'Coverage',
+      explain:'Open shifts sit under More → Coverage. An aide call-off can end as backup or as client refused. A member who calls to skip today is a separate path.',
+      steps:[
+        'Open the shift and read who the regular aide is.',
+        'If the aide called off, text or call the client before you close it.',
+        'Client wants backup, Client refused · resume next day, or Still deciding.',
+        'If the member called, choose Member called · no service today.',
+        'Pick Personal, Doctor appointment, Not feeling well, or Other, then confirm.',
+        'Edit the case-manager note. Copy, Open Mail, or Save as my template. You press Send.'
+      ],
+      actions:[
+        {id:'open', label:'Open Coverage', kind:'tab', tab:'coverage'},
+        {id:'copy', label:'Copy a text draft', kind:'copy', body:'Hi, this is Mo at EverCare. Your aide called off today. I can send a replacement caregiver. Please let me know. Thank you.'},
+        {id:'sms', label:'Open Messages', kind:'sms', body:'Hi, this is Mo at EverCare. Your aide called off today. I can send a replacement caregiver. Please let me know. Thank you.'},
+        {id:'mail', label:'Open Mail', kind:'mail', subject:'No services today', body:'{{greeting}}\n\nI wanted to inform you that our mutual member will not receive services today. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,'}
+      ]
+    },
+    timesheet_late:{
+      title:'Timesheets',
+      explain:'Active timesheets, archived sheets, and recently deleted sheets live on the Timesheets desk. A correction request is a note to the aide. Co-pilot does not submit it.',
+      steps:[
+        'Open Timesheets and find the sheet.',
+        'Read the days that need a fix.',
+        'Write the note on the sheet. Confirm before you send the correction from that screen.',
+        'Co-pilot can copy a draft. It does not send it.'
+      ],
+      actions:[
+        {id:'open', label:'Open Timesheets', kind:'tab', tab:'timesheets'},
+        {id:'copy', label:'Copy a correction note', kind:'copy', body:'Please add the missing time and client signature for the day I marked. Thank you.'}
+      ]
+    },
+    schedule_gap:{
+      title:'Schedule',
+      explain:'The week grid is the usual pattern plus exceptions. Call-offs on Coverage are not edited from this card.',
+      steps:[
+        'Open Schedule and swipe to the day.',
+        'Check the usual aide and the hours.',
+        'Change a cell only when you mean that date.',
+        'A call-off still belongs on Coverage.'
+      ],
+      actions:[{id:'open', label:'Open Schedule', kind:'tab', tab:'schedule'}]
+    },
+    aide_issue:{
+      title:'Aides',
+      explain:'Aides shows who is active and who is still on a temporary password. Co-pilot does not change a password. Reset stays on the aide row, and only when you press it yourself this turn.',
+      steps:[
+        'Open Aides and read the status.',
+        'Add an aide with first name, last name, phone, and email when you are creating one.',
+        'Do not reset a password from Co-pilot.',
+        'If a reset is required, you press Reset on that aide row yourself.'
+      ],
+      actions:[{id:'open', label:'Open Aides', kind:'tab', tab:'aides'}]
+    },
+    backup_needed:{
+      title:'Backup',
+      explain:'Backup is phone-change draft timesheets only. Open a draft or mark it saved on file. There is no Approve, Decline, or PTO here.',
+      steps:[
+        'Open Backup.',
+        'Open the phone-change draft.',
+        'Mark it saved on file when the office copy is updated.',
+        'Do not treat this as payroll or as Coverage.'
+      ],
+      actions:[{id:'open', label:'Open Backup', kind:'tab', tab:'backups'}]
+    },
+    inservice_due:{
+      title:'Inservices',
+      explain:'Inservice topics and who still owes them live on the Inservices desk. Co-pilot does not clear an assignment.',
+      steps:[
+        'Open Inservices.',
+        'See who is not completed.',
+        'Open the topic if you need the answers.',
+        'Clear an assignment only from that screen, on purpose.'
+      ],
+      actions:[{id:'open', label:'Open Inservices', kind:'tab', tab:'inservices'}]
+    },
+    intake_pending:{
+      title:'Intakes / Completes',
+      explain:'Completed new-client intakes and drafts the nurse finished show on the Nurse desk for Admin and Scheduler. Co-pilot does not mark a packet complete.',
+      steps:[
+        'Open Nurse.',
+        'Read Completed new client intakes.',
+        'View the PDF when it is there.',
+        'Leave drafts for the nurse unless you are only checking status.'
+      ],
+      actions:[{id:'open', label:'Open Nurse desk', kind:'tab', tab:'nurse'}]
+    },
+    compliance_flag:{
+      title:'Compliance',
+      explain:'Supervisory visits and calls use a 57–60 day cadence. The score window stays 60 days. Co-pilot does not log a visit.',
+      steps:[
+        'Open the Nurse desk.',
+        'Read who needs a visit or call.',
+        'Open the contact if you need the PDF.',
+        'The nurse logs the visit. You are checking, not charting.'
+      ],
+      actions:[{id:'open', label:'Open compliance', kind:'tab', tab:'nurse'}]
+    },
+    broadcast_needed:{
+      title:'Broadcast',
+      explain:'A broadcast is an alert every aide sees. Co-pilot does not send or clear it. You confirm on the Broadcast screen, then you send.',
+      steps:[
+        'Open Broadcast and read the current alert.',
+        'Edit the wording there if it should change.',
+        'Confirm, then send or clear from that screen.',
+        'Co-pilot will not send it for you.'
+      ],
+      actions:[
+        {id:'open', label:'Open Broadcast', kind:'tab', tab:'broadcast'},
+        {id:'copy', label:'Copy a draft alert', kind:'copy', body:'EverCare alert: please check your schedule before you leave today.'}
+      ]
+    },
+    login_fail:{
+      title:'Login fails',
+      explain:'Failed sign-ins show here when the office list answers. Co-pilot does not change a password and does not reseal an account.',
+      steps:[
+        'Read who failed and when.',
+        'Decide if it is a typo or a lockout.',
+        'A password change happens only when you press Reset yourself on that turn.',
+        'Co-pilot will not rotate a password.'
+      ],
+      actions:[{id:'copy', label:'Copy the fail note', kind:'copy', body:'Login fail noted. No password was changed.'}]
+    }
+  };
+  return books[key]||books.coverage_open;
+}
+function copilotCountOpenShifts(){
+  var n=0;
+  var list=[];
+  try{list=coverShifts||[];}catch(e){list=[];}
+  for(var i=0;i<list.length;i++){
+    if(typeof coverListVisible==='function'&&coverListVisible(list[i]))n++;
+  }
+  return n;
+}
+function copilotCountTempAides(){
+  var n=0;
+  var list=[];
+  try{list=loadedAidesList||[];}catch(e){list=[];}
+  for(var i=0;i<list.length;i++){
+    if(typeof aideOnTempPassword==='function'&&aideOnTempPassword(list[i]))n++;
+  }
+  return n;
+}
+function copilotDeskAlerts(){
+  var shifts=copilotCountOpenShifts();
+  var temps=copilotCountTempAides();
+  var sheets=0;
+  try{sheets=(typeof allRecords!=='undefined'&&allRecords)?allRecords.length:0;}catch(e){sheets=0;}
+  return [
+    {id:'coverage_open', kind:'coverage_open', surface:'Coverage', title:'Coverage', detail:shifts? (shifts+' open shift'+(shifts===1?'':'s')+' on the desk.'):'Nothing flagged.', phone:'', email:''},
+    {id:'timesheet_late', kind:'timesheet_late', surface:'Timesheets', title:'Timesheets', detail:sheets? (sheets+' sheet'+(sheets===1?'':'s')+' loaded.'):'Nothing flagged.', phone:'', email:''},
+    {id:'schedule_gap', kind:'schedule_gap', surface:'Schedule', title:'Schedule', detail:'Nothing flagged.', phone:'', email:''},
+    {id:'aide_issue', kind:'aide_issue', surface:'Aides', title:'Aides', detail:temps? (temps+' still on a temporary password.'):'Nothing flagged. Co-pilot does not change passwords.', phone:'', email:''},
+    {id:'backup_needed', kind:'backup_needed', surface:'Backup', title:'Backup', detail:'Phone-change drafts only. No Approve, Decline, or PTO.', phone:'', email:''},
+    {id:'inservice_due', kind:'inservice_due', surface:'Inservices', title:'Inservices', detail:'Nothing flagged.', phone:'', email:''},
+    {id:'intake_pending', kind:'intake_pending', surface:'Intakes/Completes', title:'Intakes / Completes', detail:'Nothing flagged.', phone:'', email:''},
+    {id:'compliance_flag', kind:'compliance_flag', surface:'Compliance', title:'Compliance', detail:'Supervisory cadence is 57–60 days.', phone:'', email:''},
+    {id:'broadcast_needed', kind:'broadcast_needed', surface:'Broadcast', title:'Broadcast', detail:'The alert aides see. You send it from Broadcast.', phone:'', email:''},
+    {id:'login_fail', kind:'login_fail', surface:'Login fails', title:'Login fails', detail:'Nothing flagged. Co-pilot will not change a password.', phone:'', email:''}
+  ];
+}
+function copilotNormalizeQuiet(data){
+  var node=data;
+  if(node&&node.quiet&&typeof node.quiet==='object')node=node.quiet;
+  if(!node||typeof node!=='object')return null;
+  var enabled=node.enabled;
+  if(enabled==null)enabled=node.p_enabled;
+  if(enabled==null)enabled=node.quiet_enabled;
+  var start=node.start_local||node.start||node.p_start_local||node.p_start||node.quiet_start||'';
+  var end=node.end_local||node.end||node.p_end_local||node.p_end||node.quiet_end||'';
+  if(enabled==null&&!start&&!end&&node.quiet_hours_active==null)return null;
+  var startText=String(start||'20:00');
+  var endText=String(end||'07:00');
+  return {
+    enabled:enabled!==false,
+    start:startText,
+    end:endText,
+    start_local:startText,
+    end_local:endText,
+    timezone:String(node.timezone||'America/New_York'),
+    quiet_hours_active:typeof node.quiet_hours_active==='boolean'?node.quiet_hours_active:undefined,
+    source:'ace'
+  };
+}
+function copilotMapAceAlert(row){
+  if(!row||typeof row!=='object')return null;
+  var kind=String(row.kind||'').trim();
+  var id=String(row.id||'').trim();
+  var title=String(row.title||'').trim();
+  if(!id&&!kind&&!title)return null;
+  var actions=[];
+  var raw=Array.isArray(row.suggested_actions)?row.suggested_actions:(Array.isArray(row.actions)?row.actions:[]);
+  for(var i=0;i<raw.length;i++){
+    var item=raw[i];
+    if(typeof item==='string'){
+      var named=copilotSafeAction({id:item, label:item, kind:'tab', tab:copilotKindTab(kind)});
+      if(named)actions.push(named);
+    }else{
+      var safe=copilotSafeAction(item);
+      if(safe)actions.push(safe);
+    }
+  }
+  var bookKey=kind||id;
+  var label=title||copilotKindTitle(kind)||kind||'Alert';
+  return {
+    id:id||bookKey,
+    kind:kind||bookKey,
+    ace:!!id,
+    surface:label,
+    title:label,
+    detail:String(row.summary||row.detail||''),
+    phone:String(row.phone||''),
+    email:String(row.email||row.case_manager_email||''),
+    explain:String(row.explain||''),
+    steps:Array.isArray(row.steps)?row.steps:[],
+    actions:actions,
+    status:String(row.status||''),
+    severity:String(row.severity||'')
+  };
+}
+async function copilotRpc(kind, body){
+  if(copilotRpcOff[kind])return {missing:true};
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function')return {missing:true};
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token)return {signedOut:true};
+  var names=COPILOT_RPC[kind]||[];
+  var last={missing:true};
+  for(var i=0;i<names.length;i++){
+    var got=null;
+    try{got=await sbRestRpc(names[i], body||{});}catch(err){
+      return {ok:false, error:String(err&&err.message||err||'Request failed.')};
+    }
+    if(got&&got.ok===true){
+      var node=got.data;
+      if(typeof sbRpcNode==='function'){
+        try{node=sbRpcNode(got.data);}catch(e2){node=got.data;}
+      }
+      var rpcErr='';
+      if(typeof sbRpcError==='function'){
+        try{rpcErr=sbRpcError(node)||'';}catch(e3){rpcErr='';}
+      }
+      if(rpcErr)return {ok:false, error:rpcErr};
+      return {ok:true, data:node, name:names[i]};
+    }
+    var missing=got&&(got.status===404||(typeof coverRpcMissing==='function'&&coverRpcMissing(got)));
+    if(missing||!got){
+      last={missing:true, error:got&&got.error};
+      continue;
+    }
+    return {ok:false, error:(got&&got.error)||'Request failed.'};
+  }
+  copilotRpcOff[kind]=true;
+  return last;
+}
+function copilotFind(id){
+  id=String(id||'');
+  for(var i=0;i<(copilotAlerts||[]).length;i++){
+    if(String(copilotAlerts[i].id)===id)return copilotAlerts[i];
+  }
+  return null;
+}
+function copilotGreetDraft(text){
+  var raw=String(text||'');
+  if(raw.indexOf('{{greeting}}')<0)return raw;
+  var greet=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
+  return raw.replace(/\{\{greeting\}\}/g, greet);
+}
+function copilotAskModel(alert){
+  var key=String((alert&&(alert.kind||alert.id))||'coverage_open');
+  var book=copilotPlaybook(key);
+  var explain=(alert&&alert.explain)||book.explain;
+  var steps=(alert&&alert.steps&&alert.steps.length)?alert.steps:book.steps;
+  var actions=(alert&&alert.actions&&alert.actions.length)?alert.actions:book.actions.map(copilotSafeAction).filter(Boolean);
+  actions=actions.map(function(a){
+    var copy=copilotSafeAction(a);
+    if(!copy)return null;
+    if(!copy.phone&&alert&&alert.phone)copy.phone=alert.phone;
+    if(!copy.email&&alert&&alert.email)copy.email=alert.email;
+    copy.body=copilotGreetDraft(copy.body);
+    return copy;
+  }).filter(Boolean);
+  return {id:key, title:(alert&&alert.title)||book.title, explain:explain, steps:steps, actions:actions};
+}
+function copilotEl(id){
+  try{return document.getElementById(id);}catch(e){return null;}
+}
+function copilotPaintQuiet(host){
+  var q=copilotQuiet||{};
+  var quietNow=copilotInQuietHours();
+  var note=q.source==='ace'
+    ?'Quiet hours come from the office.'
+    :'Office quiet hours are not callable yet. This screen is using 8:00 PM–7:00 AM until admin_get_quiet_hours answers.';
+  if(quietNow)note='Quiet hours are on. '+note;
+  host.insertAdjacentHTML('beforeend',
+    '<section class="copilot-quiet" id="copilotQuiet">'
+    +'<label class="copilot-quiet-row"><input type="checkbox" id="copilotQuietOn"'+(q.enabled?' checked':'')+' onchange="copilotQuietToggle()"> Quiet hours</label>'
+    +'<div class="copilot-quiet-times">'
+    +'<label>From <input type="time" id="copilotQuietStart" value="'+copilotEsc(q.start||'20:00')+'" onchange="copilotQuietToggle()"></label>'
+    +'<label>Until <input type="time" id="copilotQuietEnd" value="'+copilotEsc(q.end||'07:00')+'" onchange="copilotQuietToggle()"></label>'
+    +'</div><p class="copilot-note" id="copilotQuietNote">'+copilotEsc(note)+'</p></section>');
+}
+function copilotPaintRadar(){
+  var host=copilotEl('copilotBody');
+  var title=copilotEl('copilotTitle');
+  if(title)title.textContent='Co-pilot';
+  if(!host)return;
+  copilotView='radar';
+  copilotPending=null;
+  host.innerHTML='<p class="copilot-note">Radar for the Admin desk. Tap an alert. You stay in charge. Nothing is sent until you press Send in Messages or Mail.</p>';
+  copilotPaintQuiet(host);
+  var html='<div class="copilot-list" id="copilotList">';
+  (copilotAlerts||[]).forEach(function(a){
+    html+='<button type="button" class="copilot-card" data-copilot-id="'+copilotEsc(a.id)+'" onclick="copilotOpenAsk(\''+copilotEsc(a.id).replace(/'/g,'')+'\')">'
+      +'<strong>'+copilotEsc(a.surface||a.title)+'</strong><span>'+copilotEsc(a.detail||a.title)+'</span></button>';
+  });
+  html+='</div>';
+  host.insertAdjacentHTML('beforeend', html);
+}
+function copilotPaintAsk(){
+  var host=copilotEl('copilotBody');
+  var title=copilotEl('copilotTitle');
+  var alert=copilotFind(copilotAskId);
+  var model=copilotAskModel(alert||{id:copilotAskId});
+  if(title)title.textContent=model.title||'Ask';
+  if(!host)return;
+  copilotView='ask';
+  var steps=(model.steps||[]).map(function(step){return '<li>'+copilotEsc(step)+'</li>';}).join('');
+  var buttons=(model.actions||[]).map(function(a, i){
+    return '<button type="button" class="btn btn-teal" data-copilot-action="'+i+'" onclick="copilotChooseAction('+i+')">'+copilotEsc(a.label)+'</button>';
+  }).join('');
+  host.innerHTML='<button type="button" class="btn btn-ghost copilot-back" onclick="copilotPaintRadar()">← Radar</button>'
+    +'<p class="copilot-note" id="copilotExplain">'+copilotEsc(model.explain)+'</p>'
+    +'<ol class="copilot-steps" id="copilotSteps">'+steps+'</ol>'
+    +'<div class="copilot-actions" id="copilotActions">'+buttons+'</div>'
+    +'<div class="field"><label for="copilotDirections">Short directions</label><textarea id="copilotDirections" placeholder="How you want this alert handled next time"></textarea></div>'
+    +'<div class="copilot-actions"><button type="button" class="btn btn-ghost" id="copilotSaveDirections" onclick="copilotSaveDirections()">Save as my template</button>'
+    +(alert&&alert.ace?'<button type="button" class="btn btn-navy" id="copilotAckBtn" onclick="copilotAckSignal()">Ack</button><button type="button" class="btn btn-ghost" id="copilotResolveBtn" onclick="copilotResolveSignal()">Resolve</button>':'')
+    +'</div>'
+    +'<div id="copilotConfirm" hidden></div>';
+  copilotAskActions=model.actions||[];
+  copilotLoadDirections(model.id);
+}
+var copilotAskActions=[];
+function copilotPaintConfirm(action){
+  var box=copilotEl('copilotConfirm');
+  if(!box||!action)return;
+  var quiet=copilotInQuietHours();
+  var line='Confirm before this opens. You send it yourself. Co-pilot does not send it.';
+  if(quiet)line='Quiet hours are on. '+line;
+  if(action.kind==='sms'&&!(action.phone&&String(action.phone).replace(/\D/g,'')))line='No phone is on file for this alert. Open Messages stays a draft without a number. '+line;
+  if(action.kind==='mail'&&!(typeof coverEmailOk==='function'&&coverEmailOk(action.email)))line='No email is on file for this alert. Open Mail stays off until an email is known. '+line;
+  box.hidden=false;
+  box.innerHTML='<h2 style="font-size:1rem;margin:8px 0">Confirm this choice</h2>'
+    +'<p class="copilot-note">'+copilotEsc(action.label)+'. '+copilotEsc(line)+'</p>'
+    +'<div class="copilot-actions">'
+    +'<button type="button" class="btn btn-teal" id="copilotConfirmGo" onclick="copilotConfirmOutbound()">Confirm</button>'
+    +'<button type="button" class="btn btn-ghost" onclick="copilotCancelConfirm()">Not yet</button>'
+    +'</div>';
+  try{box.scrollIntoView({block:'nearest'});}catch(e){}
+}
+function copilotChooseAction(index){
+  var action=(copilotAskActions||[])[index];
+  if(!action)return;
+  if(action.kind==='sms'||action.kind==='mail'){
+    copilotPending=action;
+    copilotPaintConfirm(action);
+    return;
+  }
+  if(action.kind==='copy'){
+    copilotCopy(action.body);
+    return;
+  }
+  if(action.kind==='tab'&&action.tab&&typeof showTab==='function'){
+    copilotClose();
+    showTab(action.tab);
+  }
+}
+function copilotCancelConfirm(){
+  copilotPending=null;
+  var box=copilotEl('copilotConfirm');
+  if(box){box.hidden=true;box.innerHTML='';}
+}
+function copilotCopy(text){
+  var value=String(text||'');
+  if(!value.trim()){
+    if(typeof showTempMsg==='function')showTempMsg('The draft is empty.','var(--warn)');
+    return;
+  }
+  var done=function(){if(typeof showTempMsg==='function')showTempMsg('Draft copied. You send it yourself.','var(--success)');};
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(value).then(done).catch(function(){done();});
+      return;
+    }
+  }catch(e){}
+  done();
+}
+function copilotConfirmOutbound(){
+  var action=copilotPending;
+  if(!action)return;
+  var href='';
+  if(action.kind==='sms'&&typeof coverSmsHref==='function')href=coverSmsHref(action.phone, action.body);
+  if(action.kind==='mail'&&typeof coverMailHref==='function')href=coverMailHref(action.email, action.subject||'No services today', action.body);
+  if(action.kind==='mail'&&!href){
+    if(typeof showTempMsg==='function')showTempMsg('Email is not on file. Open Mail stays off.','var(--warn)');
+    return;
+  }
+  copilotPending=null;
+  copilotCancelConfirm();
+  var alert=copilotFind(copilotAskId);
+  var choiceBody={
+    p_action_key:action.kind==='mail'?'mail':'sms',
+    p_choice:'confirm_open_draft'
+  };
+  if(alert&&alert.ace&&alert.id)choiceBody.p_signal_id=String(alert.id);
+  if(action.label)choiceBody.p_note=String(action.label);
+  try{copilotRpc('choice', choiceBody);}catch(e){}
+  if(href&&typeof coverGo==='function')coverGo(href);
+  else if(typeof showTempMsg==='function')showTempMsg('Draft is ready. Nothing was sent.','var(--teal)');
+}
+async function copilotLoadDirections(key){
+  var ta=copilotEl('copilotDirections');
+  if(!ta||copilotAskId!==key)return;
+}
+async function copilotSaveDirections(){
+  var ta=copilotEl('copilotDirections');
+  var text=ta?String(ta.value||'').trim():'';
+  if(!text){
+    if(typeof showTempMsg==='function')showTempMsg('Write a short direction first.','var(--warn)');
+    return;
+  }
+  var alert=copilotFind(copilotAskId);
+  var body={
+    p_action_key:String((alert&&alert.kind)||copilotAskId||'coverage_open'),
+    p_choice:'save_directions',
+    p_note:text
+  };
+  if(alert&&alert.ace&&alert.id)body.p_signal_id=String(alert.id);
+  var got=await copilotRpc('choice', body);
+  if(got&&got.ok){
+    if(typeof showTempMsg==='function')showTempMsg('Saved. The next time this alert opens, it can start from your directions.','var(--success)');
+    return;
+  }
+  if(typeof showTempMsg==='function'){
+    showTempMsg(got&&got.signedOut?'Sign in to save the directions.':'admin_log_copilot_choice did not save. Nothing was stored on this phone.','var(--warn)');
+  }
+}
+async function copilotAckSignal(){
+  var alert=copilotFind(copilotAskId);
+  if(!alert||!alert.ace||!alert.id)return;
+  var got=await copilotRpc('ack', {p_id:String(alert.id)});
+  if(got&&got.ok){
+    alert.status='acked';
+    if(typeof showTempMsg==='function')showTempMsg('Noted.','var(--success)');
+    return;
+  }
+  if(typeof showTempMsg==='function')showTempMsg(got&&got.signedOut?'Sign in to note this.':'admin_ack_radar_signal did not answer.','var(--warn)');
+}
+async function copilotResolveSignal(){
+  var alert=copilotFind(copilotAskId);
+  if(!alert||!alert.ace||!alert.id)return;
+  var got=await copilotRpc('resolve', {p_id:String(alert.id)});
+  if(got&&got.ok){
+    alert.status='resolved';
+    if(typeof showTempMsg==='function')showTempMsg('Resolved.','var(--success)');
+    return;
+  }
+  if(typeof showTempMsg==='function')showTempMsg(got&&got.signedOut?'Sign in to resolve this.':'admin_resolve_radar_signal did not answer.','var(--warn)');
+}
+function copilotQuietFromForm(){
+  var on=copilotEl('copilotQuietOn');
+  var start=copilotEl('copilotQuietStart');
+  var end=copilotEl('copilotQuietEnd');
+  var startVal=start&&start.value?start.value:(copilotQuiet.start_local||copilotQuiet.start||'20:00');
+  var endVal=end&&end.value?end.value:(copilotQuiet.end_local||copilotQuiet.end||'07:00');
+  copilotQuiet={
+    enabled:on?!!on.checked:!!copilotQuiet.enabled,
+    start:startVal,
+    end:endVal,
+    start_local:startVal,
+    end_local:endVal,
+    timezone:'America/New_York',
+    source:copilotQuiet.source||'desk'
+  };
+}
+async function copilotQuietToggle(){
+  copilotQuietFromForm();
+  var got=await copilotRpc('quietSave', copilotQuietSaveBody(copilotQuiet));
+  if(got&&got.ok){
+    copilotQuiet.source='ace';
+    if(typeof showTempMsg==='function')showTempMsg('Quiet hours saved.','var(--success)');
+  }else if(!(got&&got.missing)){
+    if(got&&got.signedOut){
+      if(typeof showTempMsg==='function')showTempMsg('Sign in to save quiet hours.','var(--warn)');
+    }
+  }
+  if(copilotView==='radar')copilotPaintRadar();
+}
+async function copilotLoadQuiet(){
+  var got=await copilotRpc('quietGet', {});
+  if(got&&got.ok){
+    var next=copilotNormalizeQuiet(got.data);
+    if(next)copilotQuiet=next;
+  }
+}
+async function copilotLoadRadar(){
+  var local=copilotDeskAlerts();
+  var got=await copilotRpc('radar', {p_limit:50});
+  if(got&&got.ok&&got.data){
+    if(typeof got.data.quiet_hours_active==='boolean')copilotQuiet.quiet_hours_active=got.data.quiet_hours_active;
+    var list=Array.isArray(got.data.signals)?got.data.signals:[];
+    var mapped=[];
+    var seenKind={};
+    for(var n=0;n<list.length;n++){
+      var one=copilotMapAceAlert(list[n]);
+      if(!one)continue;
+      mapped.push(one);
+      if(one.kind)seenKind[one.kind]=1;
+    }
+    local.forEach(function(a){
+      if(!seenKind[a.kind])mapped.push(a);
+    });
+    if(mapped.length)local=mapped;
+  }
+  copilotAlerts=local;
+}
+async function copilotOpenRadar(){
+  if(!copilotRoleOk())return;
+  var sheet=copilotEl('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  copilotAlerts=copilotDeskAlerts();
+  copilotPaintRadar();
+  await copilotLoadQuiet();
+  await copilotLoadRadar();
+  if(copilotView==='radar')copilotPaintRadar();
+}
+function copilotOpenAsk(id){
+  if(!copilotRoleOk())return;
+  copilotAskId=String(id||'');
+  copilotPending=null;
+  var sheet=copilotEl('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  copilotPaintAsk();
+}
+function copilotClose(){
+  var sheet=copilotEl('copilotSheet');
+  if(sheet)sheet.hidden=true;
+  copilotPending=null;
+  copilotView='radar';
+}
 // Live Ace office RPCs only (sbRestRpc + office access_token). No browser stub. No Sheets exec.
 // list_schedule_week, upsert_schedule_pattern, upsert_schedule_exception, delete_schedule_pattern.
 var schedWeekStart='';
@@ -6389,6 +7458,10 @@ function sbMapClient(row){
     id:row.id,
     legacyId:row.legacy_id||'',
     name:row.name||'',
+    firstName:row.first_name||row.firstName||'',
+    lastName:row.last_name||row.lastName||'',
+    caseManagerName:row.case_manager_name||row.caseManagerName||'',
+    caseManagerEmail:row.case_manager_email||row.caseManagerEmail||'',
     address:row.address||'',
     lat:row.lat==null?'':row.lat,
     lng:row.lng==null?'':row.lng,
@@ -7937,6 +9010,45 @@ async function sbAdminCreateAide(payload){
   if(!got.ok)return {success:false,error:sbNormalizeWriteError(got.error||'Could not create aide.'),httpStatus:got.status||0};
   return sbMapAideAuth(got.data);
 }
+function sbAddAideBody(payload){
+  var first=String((payload&&(payload.firstName||payload.first_name||payload.p_first_name))||'').trim();
+  var last=String((payload&&(payload.lastName||payload.last_name||payload.p_last_name))||'').trim();
+  var body={p_first_name:first, p_last_name:last};
+  var phone=sbOptionalText(payload&&(payload.phone||payload.p_phone));
+  var email=sbOptionalText(payload&&(payload.email||payload.p_email));
+  if(phone)body.p_phone=phone;
+  if(email)body.p_email=email;
+  return body;
+}
+async function sbAdminAddAide(payload){
+  var body=sbAddAideBody(payload);
+  if(!body.p_first_name||!body.p_last_name)return {success:false, error:'Enter the aide\'s first and last name.'};
+  var got=await sbRestRpc('admin_add_aide', body);
+  if(!got||got.ok!==true){
+    var missing=!got||got.status===404||(typeof sbAideListRpcMissing==='function'&&sbAideListRpcMissing(got));
+    if(missing)return {success:false, missing:true, error:'admin_add_aide is not live yet. Nothing was created.'};
+    return {success:false, error:sbNormalizeWriteError((got&&got.error)||'Could not add aide.')};
+  }
+  var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
+  var err=typeof sbRpcError==='function'?(sbRpcError(node)||''):'';
+  if(err)return {success:false, error:err};
+  var row=node&&typeof node==='object'&&!Array.isArray(node)?node:{};
+  var id=row.aide_id||row.id||'';
+  if(!id&&!(row.ok||row.success))return {success:false, error:'Aide was not created.'};
+  return {
+    success:true,
+    ok:true,
+    aide_id:id,
+    aideId:id,
+    username:row.username||'',
+    first_name:row.first_name||body.p_first_name,
+    last_name:row.last_name||body.p_last_name,
+    full_name:row.full_name||'',
+    phone:row.phone||body.p_phone||'',
+    email:row.email||body.p_email||'',
+    auth_created:false
+  };
+}
 async function sbAdminResetTempPassword(payload){
   var username=String((payload&&(payload.username||payload.p_username))||'').trim();
   if(!username)return {success:false,error:'Username missing.'};
@@ -8122,7 +9234,59 @@ function sbAssignedNames(payload){
   if(payload.AssignedAides!=null)return payload.AssignedAides;
   return undefined;
 }
+function sbClientDeskPayload(payload){
+  var src=payload||{};
+  var first=String(src.firstName||src.first_name||src.p_first_name||'').trim();
+  var last=String(src.lastName||src.last_name||src.p_last_name||'').trim();
+  var cm=String(src.caseManagerName||src.case_manager_name||src.p_case_manager_name||'').trim();
+  var email=String(src.caseManagerEmail||src.case_manager_email||src.p_case_manager_email||'').trim();
+  var phone=String(src.phone||src.p_phone||'').trim();
+  return {first:first, last:last, cm:cm, email:email, phone:phone, has:!!(first&&last)};
+}
+function sbClientDeskBody(payload){
+  var desk=sbClientDeskPayload(payload);
+  var body={
+    p_first_name:desk.first,
+    p_last_name:desk.last
+  };
+  var home=String((payload&&(payload.address||payload.home_address||payload.p_home_address))||'').trim();
+  if(home)body.p_home_address=home;
+  if(desk.cm)body.p_case_manager_name=desk.cm;
+  if(desk.email)body.p_case_manager_email=desk.email;
+  if(desk.phone)body.p_phone=desk.phone;
+  return body;
+}
+async function sbTrySaveClientDesk(payload){
+  var desk=sbClientDeskPayload(payload);
+  if(!desk.has)return {skipped:true};
+  var got=await sbRestRpc('admin_add_client', sbClientDeskBody(payload));
+  if(got&&got.ok){
+    var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
+    var err=typeof sbRpcError==='function'?(sbRpcError(node)||''):'';
+    if(err)return {ok:false, error:err};
+    var row=typeof sbFirstRow==='function'?sbFirstRow(node):null;
+    if(!row||typeof row!=='object')row=node&&typeof node==='object'&&!Array.isArray(node)?node:null;
+    var cid=row&&(row.id||row.client_id||row.clientId);
+    if(!cid&&node&&node.client&&node.client.id)cid=node.client.id;
+    if(!cid)return {ok:false, error:'Client was not created.'};
+    var mapped=sbMapClient(Object.assign({id:cid, name:payload&&payload.name, address:payload&&payload.address}, row));
+    return {ok:true, id:String(mapped.id||cid), mapped:mapped};
+  }
+  var missing=!got||got.status===404||(typeof sbAideListRpcMissing==='function'&&sbAideListRpcMissing(got));
+  if(missing)return {missing:true};
+  return {ok:false, error:(got&&got.error)||'Could not save client.'};
+}
 async function sbAdminAddClient(payload){
+  var deskTry=await sbTrySaveClientDesk(payload);
+  if(deskTry&&deskTry.ok){
+    var names=sbAssignedNames(payload);
+    if(Array.isArray(names)&&names.length){
+      var synced=await sbSyncClientAssignments(String(deskTry.id), names, []);
+      if(!synced.success)return synced;
+    }
+    return {success:true, id:deskTry.id, clientId:deskTry.id, data:deskTry.mapped, client:deskTry.mapped};
+  }
+  if(deskTry&&deskTry.ok===false)return {success:false, error:deskTry.error||'Could not add client.'};
   var body=sbClientWriteBody(payload||{}, true);
   if(!body.name||!body.address)return {success:false,error:'Please fill in client name and address.'};
   var got=await sbRestMutate('POST','clients',[],body,'return=representation');
@@ -8135,7 +9299,8 @@ async function sbAdminAddClient(payload){
     if(!synced.success)return synced;
   }
   var mapped=sbMapClient(row);
-  return {success:true,id:row.id,clientId:row.id,data:mapped,client:mapped};
+  var pending=deskTry&&deskTry.missing?true:false;
+  return {success:true,id:row.id,clientId:row.id,data:mapped,client:mapped,deskPending:pending};
 }
 async function sbAdminUpdateClient(payload){
   var id=String((payload&&(payload.id||payload.clientId))||'').trim();
@@ -9034,11 +10199,23 @@ async function renderAides(force){
   container.innerHTML=aideEmptyHtml();
 }
 
-function onAddAideNameInput(){
-  if(addAideUsernameDirty)return;
+function addAideComposedName(){
+  const firstEl=document.getElementById('addAideFirstName');
+  const lastEl=document.getElementById('addAideLastName');
+  const first=firstEl?String(firstEl.value||'').trim():'';
+  const last=lastEl?String(lastEl.value||'').trim():'';
+  const joined=[first,last].filter(Boolean).join(' ');
+  if(joined)return joined;
   const nameEl=document.getElementById('addAideFullName');
+  return nameEl?String(nameEl.value||'').trim():'';
+}
+function onAddAideNameInput(){
+  const nameEl=document.getElementById('addAideFullName');
+  const joined=addAideComposedName();
+  if(nameEl&&joined)nameEl.value=joined;
+  if(addAideUsernameDirty)return;
   const userEl=document.getElementById('addAideUsername');
-  if(nameEl&&userEl)userEl.value=suggestAideUsername(nameEl.value);
+  if(userEl)userEl.value=suggestAideUsername(nameEl?nameEl.value:joined);
 }
 function onAddAideUsernameInput(){
   addAideUsernameDirty=true;
@@ -9095,7 +10272,15 @@ function showAddAideModal(){
   const nameEl=document.getElementById('addAideFullName');
   const userEl=document.getElementById('addAideUsername');
   const searchEl=document.getElementById('addAideClientSearch');
+  const firstEl=document.getElementById('addAideFirstName');
+  const lastEl=document.getElementById('addAideLastName');
+  const phoneEl=document.getElementById('addAidePhone');
+  const emailEl=document.getElementById('addAideEmail');
   if(nameEl)nameEl.value='';
+  if(firstEl)firstEl.value='';
+  if(lastEl)lastEl.value='';
+  if(phoneEl)phoneEl.value='';
+  if(emailEl)emailEl.value='';
   if(userEl)userEl.value='';
   if(searchEl)searchEl.value='';
   clearAddAideError();
@@ -9138,37 +10323,45 @@ async function submitCreateAide(){
   const nameEl=document.getElementById('addAideFullName');
   const userEl=document.getElementById('addAideUsername');
   const btn=document.getElementById('createAideBtn');
-  const fullName=(nameEl&&nameEl.value||'').trim();
+  const firstEl=document.getElementById('addAideFirstName');
+  const lastEl=document.getElementById('addAideLastName');
+  var firstName=firstEl?String(firstEl.value||'').trim():'';
+  var lastName=lastEl?String(lastEl.value||'').trim():'';
+  const phone=(document.getElementById('addAidePhone')&&document.getElementById('addAidePhone').value||'').trim();
+  const email=(document.getElementById('addAideEmail')&&document.getElementById('addAideEmail').value||'').trim();
+  if(!firstName&&!lastName){
+    var full=nameEl?String(nameEl.value||'').trim():'';
+    var parts=full.split(/\s+/).filter(Boolean);
+    firstName=parts[0]||'';
+    lastName=parts.slice(1).join(' ');
+  }
+  var fullName=[firstName,lastName].filter(Boolean).join(' ');
+  if(nameEl)nameEl.value=fullName;
   const username=(userEl&&userEl.value||'').trim().toLowerCase().replace(/\s+/g,'');
   if(userEl)userEl.value=username;
   clearAddAideError();
-  if(!fullName){showAddAideError('Enter the aide\'s full name.');return;}
+  if(!firstName||!lastName){showAddAideError('Enter the aide\'s first and last name.');return;}
   if(!username){showAddAideError('Enter a username.');return;}
   if(aideUsernameAlreadyTaken(username)){
     showAddAideError('Username already taken');
     return;
   }
-  const clientIds=Array.from(addAideSelectedClients);
-  const tempPassword=generateTempPassword();
   if(btn){btn.disabled=true;btn.textContent='Creating...';}
   try{
-    const payload={username:username,name:fullName,fullName:fullName,tempPassword:tempPassword,clientIds:clientIds};
-    const res=await postAideAction('admin_create_aide','create_aide',payload);
-    const data=res&&res.data;
+    const data=await sbAdminAddAide({firstName:firstName, lastName:lastName, phone:phone, email:email});
     if(data&&data.success){
       cacheInvalidate('get_users');
       closeModal('addAideModal');
       const shownUser=data.username||username;
-      const shownPwd=data.tempPassword||tempPassword;
-      showTempMsg('Aide @'+shownUser+' created. Copy the temp password now — it will not be shown again.','var(--success)');
-      showAideTempPasswordOnce(shownUser,shownPwd,'Temporary password');
-      logActivity('Created aide @'+shownUser);
+      showTempMsg('Aide @'+shownUser+' added. No sign-in was created.','var(--success)');
+      logActivity('Added aide @'+shownUser);
       renderAides(true);
       return;
     }
-    showAddAideError(aceActionError(data,res&&res.err,res&&res.action||'admin_create_aide'));
+    var errMsg=(data&&data.missing)?'admin_add_aide is not live yet. Nothing was created.':((data&&(data.error||data.message))||'Could not add aide.');
+    showAddAideError(errMsg);
   }catch(e){
-    showAddAideError(aceActionError(null,e,'admin_create_aide'));
+    showAddAideError('admin_add_aide is not live yet. Nothing was created.');
   }finally{
     if(btn){btn.disabled=false;btn.textContent='Create aide';}
   }
@@ -12049,11 +13242,32 @@ async function loadAidesForAssignment(selectedIds=[]){
   }
 }
 
+function clientSplitName(name){
+  const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length)return {first:'', last:''};
+  if(parts.length===1)return {first:parts[0], last:''};
+  return {first:parts[0], last:parts.slice(1).join(' ')};
+}
+function clientSetNameFields(first, last, full){
+  const split=clientSplitName(full);
+  const firstEl=document.getElementById('clientFirstName');
+  const lastEl=document.getElementById('clientLastName');
+  const nameEl=document.getElementById('clientName');
+  if(firstEl)firstEl.value=first||split.first||'';
+  if(lastEl)lastEl.value=last||split.last||'';
+  if(nameEl)nameEl.value=String(full||[first,last].filter(Boolean).join(' ')||'').trim();
+}
 function showAddClientModal(){
   document.getElementById('clientModalTitle').textContent='Add Client';
   document.getElementById('editClientId').value='';
-  document.getElementById('clientName').value='';
+  clientSetNameFields('','','');
   document.getElementById('clientAddress').value='';
+  const cmName=document.getElementById('clientCmName');
+  const cmEmail=document.getElementById('clientCmEmail');
+  if(cmName)cmName.value='';
+  if(cmEmail)cmEmail.value='';
+  const phoneEl=document.getElementById('clientPhone');
+  if(phoneEl)phoneEl.value='';
   document.getElementById('geocodeResult').textContent='';
   document.getElementById('geocodeResult').dataset.lat='';
   document.getElementById('geocodeResult').dataset.lng='';
@@ -12066,8 +13280,14 @@ function editClient(id){
   if(!c)return;
   document.getElementById('clientModalTitle').textContent='Edit Client';
   document.getElementById('editClientId').value=c.id;
-  document.getElementById('clientName').value=c.name;
+  clientSetNameFields(c.firstName||c.first_name||'', c.lastName||c.last_name||'', c.name||'');
   document.getElementById('clientAddress').value=c.address;
+  const cmName=document.getElementById('clientCmName');
+  const cmEmail=document.getElementById('clientCmEmail');
+  if(cmName)cmName.value=c.caseManagerName||c.case_manager_name||'';
+  if(cmEmail)cmEmail.value=c.caseManagerEmail||c.case_manager_email||'';
+  const phoneEl=document.getElementById('clientPhone');
+  if(phoneEl)phoneEl.value=c.phone||'';
   const geo=document.getElementById('geocodeResult');
   if(c.lat&&c.lng){
     geo.textContent='&#10003; GPS: '+c.lat+', '+c.lng;
@@ -12108,17 +13328,24 @@ async function geocodeClientAddress(){
 
 async function saveClient(){
   const id=document.getElementById('editClientId').value;
-  const name=document.getElementById('clientName').value.trim();
+  const firstName=(document.getElementById('clientFirstName')&&document.getElementById('clientFirstName').value||'').trim();
+  const lastName=(document.getElementById('clientLastName')&&document.getElementById('clientLastName').value||'').trim();
+  const name=[firstName,lastName].filter(Boolean).join(' ')||(document.getElementById('clientName').value||'').trim();
+  const nameEl=document.getElementById('clientName');
+  if(nameEl)nameEl.value=name;
   const address=document.getElementById('clientAddress').value.trim();
+  const caseManagerName=(document.getElementById('clientCmName')&&document.getElementById('clientCmName').value||'').trim();
+  const caseManagerEmail=(document.getElementById('clientCmEmail')&&document.getElementById('clientCmEmail').value||'').trim();
+  const phone=(document.getElementById('clientPhone')&&document.getElementById('clientPhone').value||'').trim();
   const geo=document.getElementById('geocodeResult');
   const lat=geo.dataset.lat||'';
   const lng=geo.dataset.lng||'';
   const assignedAides=Array.from(document.querySelectorAll('.assign-aide-cb:checked')).map(cb=>cb.value);
 
-  if(!name||!address){showTempMsg('Please fill in client name and address.','var(--danger)');return;}
+  if(!firstName||!lastName||!address){showTempMsg('Please fill in first name, last name, and home address.','var(--danger)');return;}
 
   const action=id?'update_client':'add_client';
-  const payload={action,name,address,lat,lng,assignedAides};
+  const payload={action,name,address,lat,lng,assignedAides,firstName,lastName,caseManagerName,caseManagerEmail,phone};
   if(id)payload.id=id;
 
   try{
@@ -12129,7 +13356,9 @@ async function saveClient(){
     }
     cacheInvalidate('get_clients');
     closeModal('clientModal');
-    showTempMsg('&#10003; Client saved!','var(--success)');
+    var savedMsg='Client saved.';
+    if(saved&&saved.deskPending)savedMsg='Client saved. Case manager fields are waiting on admin_add_client.';
+    showTempMsg(savedMsg,'var(--success)');
     logActivity((id?'Updated':'Added')+' client: '+name);
     renderClients(true);
   }catch(e){

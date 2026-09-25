@@ -169,7 +169,7 @@ assert.strictEqual(vm.runInContext('coverMailHref("", "Sub", "Body")', ctx), '',
 assert.ok(vm.runInContext('coverMailHref("pat@example.com", "No services today", "Hello")', ctx).startsWith('mailto:pat@example.com?'), 'mailto uses the case manager email');
 
 const MO_VOICE = [
-  'Hey (Case manager name)',
+  'Good morning',
   '',
   'I wanted to inform you that our mutual member (Client name) will not receive services today, (Date), because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.',
   'Please let me know if you need any additional information.',
@@ -177,18 +177,19 @@ const MO_VOICE = [
   'Thank you,'
 ].join('\n');
 const blank = vm.runInContext('coverFillCmTemplate(COVER_CM_DEFAULT, {})', ctx);
-assert.strictEqual(blank, MO_VOICE, 'starting template is Mo\'s voice verbatim');
+assert.strictEqual(blank, MO_VOICE, 'starting template opens with Good morning, not Hey');
+assert.ok(!/^Hey\b/m.test(blank), 'refuse draft does not open with Hey');
+assert.ok(!blank.split('\n')[0].includes('Case manager'), 'case manager name is not on the greeting line');
 const filled = vm.runInContext('coverFillCmTemplate(COVER_CM_DEFAULT, {cm:"Pat Lee", client:"Ada Cole", date:"Friday, September 25"})', ctx);
 assert.strictEqual(filled, MO_VOICE
-  .replace('(Case manager name)', 'Pat Lee')
   .replace('(Client name)', 'Ada Cole')
-  .replace('(Date)', 'Friday, September 25'), 'fills case manager, client, and service date');
+  .replace('(Date)', 'Friday, September 25'), 'fills client and service date');
 const edited = filled
   .replace('I wanted to inform you', 'I am writing to tell you')
   .replace('Please let me know if you need any additional information.', 'Call me if you need anything else.');
 const saved = vm.runInContext('coverUnfillCmTemplate(' + JSON.stringify(edited) + ', {cm:"Pat Lee", client:"Ada Cole", date:"Friday, September 25", email:"pat@example.com"})', ctx);
 assert.strictEqual(saved, edited
-  .replaceAll('Pat Lee', '{{case_manager}}')
+  .replaceAll('Good morning', '{{greeting}}')
   .replaceAll('Ada Cole', '{{client}}')
   .replaceAll('Friday, September 25', '{{date}}'), 'save keeps the edited wording and the Ace slots');
 const saveBody = vm.runInContext('coverTplSaveBody(' + JSON.stringify('No services today — {{client}}') + ', ' + JSON.stringify(saved) + ')', ctx);

@@ -38,8 +38,11 @@ assert.ok(html.includes('id="addAideErr"'), 'in-modal collision error #addAideEr
 const errBeforeBtn=html.indexOf('id="addAideErr"');
 const createBtnAt=html.indexOf('id="createAideBtn"');
 assert.ok(errBeforeBtn>=0&&createBtnAt>errBeforeBtn, '#addAideErr must sit above the Create button');
-assert.ok(!/id="addAide[^"]*[Ee]mail"/.test(html), 'Add aide form must not capture email');
-assert.ok(!/id="addAideModal"[\s\S]{0,1800}type="email"/.test(html), 'Add aide modal must not have an email input');
+assert.ok(html.includes('id="addAideFirstName"'), 'First name field missing');
+assert.ok(html.includes('id="addAideLastName"'), 'Last name field missing');
+assert.ok(html.includes('id="addAidePhone"'), 'Phone field missing');
+assert.ok(html.includes('id="addAideEmail"'), 'Email field missing');
+assert.ok(/id="addAideModal"[\s\S]{0,2500}type="email"/.test(html), 'Add aide modal must capture email');
 assert.ok(html.includes('id="aideTempPwdModal"'), 'One-time temp password modal missing');
 assert.ok(html.includes('onclick="copyAideTempPassword()"'), 'Copy button missing on temp password card');
 assert.ok(html.includes('onclick="closeAideTempPasswordModal()"'), 'Done must discard the one-time password');
@@ -79,11 +82,11 @@ assert.ok(taken, 'looksLikeUsernameTaken missing');
 assert.ok(already, 'aideUsernameAlreadyTaken missing');
 assert.ok(showErr, 'showAddAideError missing');
 
-assert.ok(create.includes("'admin_create_aide'") && create.includes("'create_aide'"),
-  'create must POST admin_create_aide with create_aide alias');
-assert.ok(create.includes('name:') && create.includes('username') && create.includes('tempPassword') && create.includes('clientIds'),
-  'admin_create_aide payload must include name, username, tempPassword, clientIds');
-assert.ok(!/\bemail\b/.test(create), 'admin_create_aide must not send email');
+assert.ok(create.includes('sbAdminAddAide({firstName:firstName, lastName:lastName, phone:phone, email:email})'),
+  'Add aide form posts admin_add_aide with first, last, phone, and email');
+assert.ok(create.includes('admin_add_aide is not live yet'), 'missing admin_add_aide stays in the modal');
+assert.ok(!create.includes('admin_create_aide') && !create.includes('tempPassword') && !create.includes('sbAdminSetAideContact'),
+  'Add aide form does not create Auth or post a contact alias');
 assert.ok(create.includes('aideUsernameAlreadyTaken'), 'must pre-check loaded aides before POST');
 assert.ok(create.includes('Username already taken'), 'pre-check must show Username already taken');
 assert.ok(create.includes('showAddAideError'), 'non-success must use in-modal + toast helper');
@@ -206,7 +209,7 @@ async function runSubmitPrecheck(){
     'var loadedAidesList=[{username:"jdoe"}];',
     'var allAidesForAssign=[];',
     'function cacheGet(){return {success:true,data:[{username:"jdoe"}]};}',
-    'async function postAideAction(){posted++;return {data:{success:false,error:"Username already taken"},err:null,action:"admin_create_aide"};}',
+    'async function sbAdminAddAide(){posted++;return {success:false,error:"Username already taken"};}',
     'function closeModal(){modalClosed=true;}',
     'var store={};',
     'function el(id){if(!store[id])store[id]={id:id,value:id==="addAideFullName"?"Jane Doe":id==="addAideUsername"?"JDOE":"",textContent:"",style:{cssText:"",display:"none"},disabled:false,parentNode:null,setAttribute:function(){}};return store[id];}',
@@ -239,7 +242,7 @@ async function runSubmitAceCollision(){
     'function logActivity(){}',
     'function renderAides(){}',
     'function showAideTempPasswordOnce(){}',
-    'async function postAideAction(){posted++;return {data:{success:false,error:"Username already taken"},err:null,action:"admin_create_aide"};}',
+    'async function sbAdminAddAide(){posted++;return {success:false,error:"Username already taken"};}',
     'function closeModal(){modalClosed=true;}',
     'var store={};',
     'function el(id){if(!store[id])store[id]={id:id,value:id==="addAideFullName"?"Jane Doe":id==="addAideUsername"?"jdoe":"",textContent:id==="createAideBtn"?"Create aide":"",style:{cssText:"",display:"none"},disabled:false,parentNode:null,setAttribute:function(){}};return store[id];}',
