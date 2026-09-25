@@ -124,20 +124,19 @@ vm.runInContext('var coverSkipReason="";var coverCmFamily="skip";function coverC
 assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-25T15:59:00Z"))', ctx), 'Good morning');
 assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-25T16:00:00Z"))', ctx), 'Good afternoon');
 assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-25T20:59:00Z"))', ctx), 'Good afternoon');
-assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-25T21:00:00Z"))', ctx), 'Good afternoon');
-assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-26T03:30:00Z"))', ctx), 'Good afternoon');
+assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-25T21:00:00Z"))', ctx), 'Good evening');
+assert.strictEqual(vm.runInContext('coverNyGreeting(new Date("2026-09-26T03:30:00Z"))', ctx), 'Good evening');
 assert.strictEqual(vm.runInContext('coverSkipReasonCode("Personal")', ctx), 'personal');
 assert.strictEqual(vm.runInContext('coverSkipReasonCode("Doctor appointment")', ctx), 'doctor');
 assert.strictEqual(vm.runInContext('coverSkipReasonCode("Not feeling well")', ctx), 'not_feeling_well');
 assert.strictEqual(vm.runInContext('coverSkipReasonCode("Other")', ctx), 'other');
 assert.strictEqual(vm.runInContext('coverEnsureGreeting("Good morning\\n\\nBody")', ctx), 'Good morning\n\nBody');
 assert.strictEqual(vm.runInContext('coverEnsureGreeting("Good afternoon\\n\\nBody")', ctx), 'Good afternoon\n\nBody');
+assert.strictEqual(vm.runInContext('coverEnsureGreeting("Good evening\\n\\nBody")', ctx), 'Good evening\n\nBody');
 const heyGone = vm.runInContext('coverEnsureGreeting("Hey Pat Lee\\n\\nI wanted to inform you.")', ctx);
 assert.ok(!/^Hey\b/m.test(heyGone), 'Hey is not the greeting line');
-assert.ok(/^Good (morning|afternoon)\n\nI wanted to inform you\.$/.test(heyGone), 'a missing greeting is injected');
-const eveningGone = vm.runInContext('coverEnsureGreeting("Good evening\\n\\nBody")', ctx);
-assert.ok(!eveningGone.includes('Good evening'), 'Good evening is not used');
-assert.ok(/^Good (morning|afternoon)\n\nBody$/.test(eveningGone), 'evening becomes the New York bucket');
+assert.ok(/^Good (morning|afternoon|evening)\n\nI wanted to inform you\.$/.test(heyGone), 'a missing greeting is injected');
+assert.ok(!heyGone.split('\n')[0].includes('Pat'), 'case manager name stays off the greeting line');
 
 vm.runInContext('coverSkipReason="Doctor appointment";', ctx);
 function plain(expr){

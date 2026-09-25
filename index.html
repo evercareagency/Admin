@@ -3545,7 +3545,7 @@ var coverCmStub=false;
 var coverSkipReason='';
 var COVER_LOCAL_KEY='evercare_cover1_local_shifts';
 var COVER_RANK_EMPTY='No aides to show for this shift yet.';
-// Locked CM drafts. {{greeting}} is Good morning before 12:00 America/New_York and Good afternoon from 12:00 on. No Hey. The case manager name is not on the greeting line.
+// Locked CM drafts. {{greeting}} is America/New_York: Good morning before 12:00, Good afternoon from 12:00 through 16:59, Good evening from 17:00. No Hey. The case manager name is not on the greeting line.
 var COVER_CM_DEFAULT='{{greeting}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, because her permanent aide called off. I offered a replacement caregiver, but she declined and stated that she preferred to wait for her regular aide to return. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
 var COVER_CM_SKIP_DEFAULT='{{greeting}}\n\nI wanted to inform you that our mutual member {{client}} will not receive services today, {{date}}, at the member\'s request due to {{reason}}. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,';
 function coverEsc(s){
@@ -4064,15 +4064,17 @@ function coverNyHour(now){
 function coverNyGreeting(now){
   var hour=coverNyHour(now);
   if(hour<12)return 'Good morning';
-  return 'Good afternoon';
+  if(hour<17)return 'Good afternoon';
+  return 'Good evening';
 }
 function coverEnsureGreeting(text){
   var greet=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
   var raw=String(text==null?'':text).replace(/^\uFEFF/, '');
   raw=raw.replace(/^(?:Hey\b[^\n]*(?:\n+|$))+/i, '');
   raw=raw.replace(/^\s+/, '');
-  if(/^Good evening\b/i.test(raw))raw=raw.replace(/^Good evening\b/i, greet);
-  if(/^Good morning\b/.test(raw)||/^Good afternoon\b/.test(raw))return raw;
+  if(/^Good morning\b/i.test(raw))return raw.replace(/^Good morning\b/i, 'Good morning');
+  if(/^Good afternoon\b/i.test(raw))return raw.replace(/^Good afternoon\b/i, 'Good afternoon');
+  if(/^Good evening\b/i.test(raw))return raw.replace(/^Good evening\b/i, 'Good evening');
   if(!raw)return greet;
   return greet+'\n\n'+raw;
 }
