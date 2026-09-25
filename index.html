@@ -40,6 +40,8 @@
 <!-- login phone keyboard 2026-09-25 v=loginkb1 admin-build 2026-09-25-loginkb1. Cause: #loginScreen is a centered min-height 100dvh flex box and html/body overflow-x hidden, so the card does not overflow the layout viewport. The phone keyboard shrinks the visual viewport only, and Password plus Sign In stay under it. On focus of Account, username, or password, pin #loginScreen to the visual viewport (height and offset from visualViewport, not a guessed window.scrollTo) and scroll the focused field and Sign In into that open area. The same screen is the scrollport, so Forgot password can scroll into view. Desktop stays centered when there is no keyboard inset. -->
 <!-- admin theme 2026-09-25 v=admintheme1 admin-build 2026-09-25-admintheme1. Sign In and the post-login shell (left nav and home cards) use the Aide Portal teal/navy pack: teal headers and accents, navy text, white rounded cards, phone-first tap targets. Phone Sign In keeps v=loginkb1: visualViewport pins #loginScreen and scrolls the focused field, Sign In, and Forgot password above the keyboard. Desktop stays centered when there is no keyboard inset. Auth, mgrLogin, password reset, Clear assignment, and assign logic are unchanged. Schedule, Inservices, Broadcast, and Nurse interiors keep their behavior and only inherit chrome. -->
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
+<!-- nav edit 2026-09-25 v=navedit1 admin-build 2026-09-25-navedit1. Phone and desktop share one bottom bar: always 5 slots, More pinned far right. The other four default to the layoutA1 set (Timesheets, Schedule, Aides, Backup). More → Edit tabs swaps any of those four with Clients, Nurse, Inservices, Broadcast Alert, Links, or Activity Log; the one that leaves the bar shows in the More list. Save writes localStorage evercare_nav_tabs keyed by the signed-in admin id or email. Cancel restores the tabs from before this edit. Empty storage keeps the layoutA1 set. Settings, Sign Out, and Account stay under More → Account and are not bottom-tab choices. data-layout-roles still hides an item the role cannot open, including Nurse, from the picker. Teal/navy from v=admintheme1 stays. No auth changes. Prior markers stay, including v=nursecomp57, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-25-navedit1">
 <!-- nurse supervisory cadence copy 2026-09-25 v=nursecomp57 admin-build 2026-09-25-nursecomp57. Nurse Compliance cadence wording is 57–60 days: Cadence tip “every 57–60 days” and subtitle “Rolling 57–60 day window”. Empty-state cadence note uses the same wording. Visit/call scoring, Days-in-window, and get_supervisory_compliance stay on the 60-day window. Prior markers stay, including v=layoutA1 and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-25-nursecomp57">
 <meta name="admin-build" content="2026-09-25-layoutA1">
@@ -108,6 +110,7 @@ textarea{resize:vertical;min-height:80px;}
 .nav-item .ni{font-size:1.05rem;width:1.45rem;text-align:center;flex-shrink:0;}
 #adminScreen #nav_nurse,
 #nurseScreen #nav_nurse_completes{display:flex !important;visibility:visible !important;opacity:1 !important;}
+#adminScreen #nav_nurse[hidden]{display:none !important;}
 /* Old Completed intakes nav redirects to Nurse — hide to avoid a duplicate item. */
 #adminScreen #nav_completes{display:none !important;}
 .nav-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c0392b;color:#fff;font-size:0.65rem;font-weight:700;display:none;align-items:center;justify-content:center;line-height:1;}
@@ -210,7 +213,8 @@ textarea{resize:vertical;min-height:80px;}
 .signout-row{display:flex;width:100%;min-height:48px;align-items:center;padding:12px 14px;background:#fff;color:var(--danger);font-weight:700;border:0;border-top:1px solid #f0c2bc;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.95rem;text-align:left;}
 .signout-row:hover{background:#fde8e8;}
 #adminScreen .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:140;display:flex;background:#fff;border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -6px 18px rgba(26,39,68,0.06);}
-#adminScreen .bottom-tab{flex:1 1 0;min-width:0;appearance:none;-webkit-appearance:none;border:0;border-left:0;border-radius:0;background:transparent;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.62rem;line-height:1.15;letter-spacing:-0.01em;min-height:58px;padding:6px 2px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;white-space:nowrap;}
+#adminScreen .bottom-tab{position:relative;flex:1 1 0;min-width:0;appearance:none;-webkit-appearance:none;border:0;border-left:0;border-radius:0;background:transparent;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.62rem;line-height:1.15;letter-spacing:-0.01em;min-height:58px;padding:6px 2px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;white-space:normal;text-align:center;}
+#adminScreen .bottom-tab .nav-badge{margin-left:0;position:absolute;top:4px;right:4px;}
 #adminScreen .bottom-tab .ni{font-size:1.05rem;width:auto;line-height:1;}
 #adminScreen .bottom-tab.active{background:var(--teal-light);color:var(--teal-dark);}
 #adminScreen .bottom-tab[hidden]{display:none !important;}
@@ -244,6 +248,31 @@ textarea{resize:vertical;min-height:80px;}
 .more-account{margin-top:8px;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .more-account-label{padding:10px 14px 0;font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);}
 .more-account .more-row{border:0;border-radius:0;border-bottom:1px solid var(--border);}
+#navEditOpen{min-height:44px;padding:10px 16px;font-weight:700;flex-shrink:0;}
+#navEditOpen[hidden],#moreList[hidden],#navEditPanel[hidden]{display:none !important;}
+html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
+#navEditPanel{position:fixed;z-index:200;left:0;right:0;top:60px;bottom:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--off);padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px));}
+.nav-edit-inner{max-width:640px;margin:0 auto;}
+.nav-edit-title{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.35rem;color:var(--navy);letter-spacing:-0.02em;margin:0 0 10px;}
+.nav-edit-actions{display:flex;gap:8px;margin-bottom:12px;}
+.nav-edit-actions .btn{flex:1;min-height:48px;justify-content:center;font-size:1rem;font-weight:700;border-radius:12px;}
+.nav-edit-hint{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
+.nav-edit-label{font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
+.nav-edit-bottom{display:flex;gap:4px;margin-bottom:14px;}
+.nav-edit-slot,.nav-edit-choice{font-family:'DM Sans',sans-serif;color:var(--navy);touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+.nav-edit-slot{flex:1 1 0;min-width:0;min-height:72px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-weight:700;font-size:0.62rem;line-height:1.15;padding:6px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;text-align:center;}
+.nav-edit-slot .ni{font-size:1.05rem;line-height:1;}
+.nav-edit-slot .nav-edit-name{display:block;max-width:100%;}
+.nav-edit-slot.is-lock{cursor:default;background:#f4f7fb;color:var(--muted);border-style:dashed;}
+.nav-edit-pin{display:block;font-size:0.56rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--teal-dark);}
+.nav-edit-slot.is-picked,.nav-edit-choice.is-picked{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);box-shadow:0 0 0 2px var(--teal);}
+.nav-edit-slot.is-fresh,.nav-edit-choice.is-fresh{border-color:var(--teal);background:var(--teal-light);box-shadow:0 0 0 2px var(--teal);}
+.nav-edit-pool{display:flex;flex-direction:column;gap:8px;}
+.nav-edit-choice{width:100%;min-height:48px;display:flex;flex-direction:row;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-weight:700;font-size:0.95rem;cursor:pointer;}
+.nav-edit-choice .ni{font-size:1.05rem;width:1.45rem;text-align:center;flex-shrink:0;}
+@media(min-width:900px){
+  .nav-edit-slot{font-size:0.72rem;min-height:76px;flex-direction:column;}
+}
 .bak-cards{display:flex;flex-direction:column;gap:10px;}
 .bak-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;}
 .bak-card h3{font-size:0.98rem;color:var(--navy);margin-bottom:4px;}
@@ -1095,7 +1124,24 @@ bindLoginKeyboard();
 
       <!-- MORE — Coverage desk is a future tip and is not listed here. -->
       <div class="tab-panel" id="tab_more">
-        <div class="page-hdr"><div><h1>More</h1><p>Clients, nurse, training, and account</p></div></div>
+        <div class="page-hdr">
+          <div><h1>More</h1><p>Not on the bottom bar, plus account</p></div>
+          <button type="button" class="btn btn-teal" id="navEditOpen" onclick="navEditOpen()">Edit tabs</button>
+        </div>
+        <div id="navEditPanel" class="nav-edit" hidden>
+          <div class="nav-edit-inner">
+            <h2 class="nav-edit-title">Edit tabs</h2>
+            <div class="nav-edit-actions">
+              <button type="button" class="btn btn-ghost" id="navEditCancel" onclick="navEditCancel()">Cancel</button>
+              <button type="button" class="btn btn-teal" id="navEditDone" onclick="navEditSave()">Save</button>
+            </div>
+            <p id="navEditHint" class="nav-edit-hint" aria-live="polite">Tap a bottom tab, then tap what should replace it. More stays on the right.</p>
+            <div class="nav-edit-label">Bottom</div>
+            <div id="navEditBottom" class="nav-edit-bottom" role="list" aria-label="Bottom tabs"></div>
+            <div class="nav-edit-label">In More</div>
+            <div id="navEditPool" class="nav-edit-pool" role="list" aria-label="More items"></div>
+          </div>
+        </div>
         <div class="more-list" id="moreList">
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('nurse')" id="nav_nurse" aria-label="Nurse"><span class="ni">🩺</span> Nurse <span class="nav-badge" id="nav_nurse_badge" hidden>0</span></button>
@@ -2745,6 +2791,12 @@ function unlockBodyScroll(){
 function openModal(id){document.getElementById(id).classList.add('show');lockBodyScroll();}
 function closeModal(id){document.getElementById(id).classList.remove('show');if(!document.querySelector('.modal-bg.show'))unlockBodyScroll();}
 function layoutA1Primary(tab){
+  if(typeof navEditIsBottom==='function'){
+    try{
+      var picked=navEditIsBottom(tab);
+      if(picked)return picked;
+    }catch(e){}
+  }
   if(tab==='timesheets'||tab==='schedule'||tab==='aides'||tab==='backups')return tab;
   return 'more';
 }
@@ -2778,6 +2830,402 @@ function layoutA1ApplyRoles(){
     btn.textContent=(label.charAt(0)||'A').toUpperCase();
     if(role)btn.setAttribute('aria-label','Account menu, '+role);
   }
+}
+var NAV_EDIT_META={
+  timesheets:{label:'Timesheets',icon:'📋',short:''},
+  schedule:{label:'Schedule',icon:'📅',short:''},
+  aides:{label:'Aides',icon:'👥',short:''},
+  backups:{label:'Backup',icon:'☁️',short:''},
+  clients:{label:'Clients',icon:'🏠',short:''},
+  nurse:{label:'Nurse',icon:'🩺',short:''},
+  inservices:{label:'Inservices',icon:'📚',short:''},
+  broadcast:{label:'Broadcast Alert',icon:'📢',short:'Broadcast'},
+  links:{label:'Links',icon:'🔗',short:''},
+  activity:{label:'Activity Log',icon:'📜',short:'Activity'}
+};
+var navEditDraft=null;
+var navEditPick='';
+var navEditNote='';
+var navEditFresh={};
+var navEditDrag=null;
+var navEditIgnoreClick=false;
+function navEditDefaults(){
+  return ['timesheets','schedule','aides','backups'];
+}
+function navEditCatalog(){
+  return ['timesheets','schedule','aides','backups','clients','nurse','inservices','broadcast','links','activity'];
+}
+function navEditRoleOk(tab){
+  if(navEditCatalog().indexOf(tab)<0)return false;
+  var el=null;
+  try{el=document.getElementById('nav_'+tab);}catch(e){el=null;}
+  if(!el||typeof el.getAttribute!=='function')return true;
+  var allow=String(el.getAttribute('data-layout-roles')||'').split(/\s+/).filter(Boolean);
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e2){role='';}
+  if(allow.length&&role&&allow.indexOf(role)<0)return false;
+  return true;
+}
+function navEditSanitize(slots){
+  var used={};
+  var out=[];
+  function push(id){
+    if(out.length>=4)return;
+    id=String(id||'');
+    if(!id||used[id]||id==='more'||id==='settings')return;
+    if(!navEditRoleOk(id))return;
+    used[id]=1;
+    out.push(id);
+  }
+  (slots||[]).forEach(push);
+  navEditDefaults().forEach(push);
+  navEditCatalog().forEach(push);
+  return out.slice(0,4);
+}
+function navEditPool(slots){
+  var on={};
+  (slots||[]).forEach(function(id){on[id]=1;});
+  return navEditCatalog().filter(function(id){return !on[id]&&navEditRoleOk(id);});
+}
+function navEditParse(raw){
+  if(!raw)return null;
+  try{
+    var data=JSON.parse(raw);
+    if(Array.isArray(data))return data;
+    if(data&&Array.isArray(data.slots))return data.slots;
+  }catch(e){}
+  return null;
+}
+function navEditStorageKeyFor(id, email){
+  id=String(id||'').trim();
+  email=String(email||'').trim().toLowerCase();
+  var part=(id&&email)?(id+'|'+email):(id||email||'browser');
+  return 'evercare_nav_tabs:'+part;
+}
+function navEditIdentity(){
+  var id='';
+  var email='';
+  try{
+    var sb=(typeof readSbSession==='function')?readSbSession():null;
+    if(sb){
+      id=String((sb.user&&sb.user.id)||(sb.profile&&sb.profile.id)||'').trim();
+      email=String((sb.profile&&sb.profile.email)||sb.email||(sb.user&&sb.user.email)||'').trim().toLowerCase();
+    }
+  }catch(e){}
+  if(!id&&!email){
+    var u='';
+    try{
+      var sess=(typeof readAdminSession==='function')?readAdminSession():null;
+      u=String((sess&&(sess.email||sess.username))||'').trim();
+    }catch(e2){}
+    if(!u){
+      try{u=String((typeof currentAdminUsername!=='undefined'&&currentAdminUsername)||'').trim();}catch(e3){u='';}
+    }
+    if(u.indexOf('@')>=0)email=u.toLowerCase();
+    else id=u.toLowerCase();
+  }
+  return {id:id,email:email};
+}
+function navEditStorageKey(){
+  var who=navEditIdentity();
+  return navEditStorageKeyFor(who.id, who.email);
+}
+function navEditRead(){
+  var raw=null;
+  try{raw=localStorage.getItem(navEditStorageKey());}catch(e){}
+  var parsed=navEditParse(raw);
+  if(!parsed)return navEditSanitize(navEditDefaults());
+  return navEditSanitize(parsed);
+}
+function navEditCurrent(){
+  return navEditRead();
+}
+function navEditSwapIds(slots, a, b){
+  a=String(a||'');
+  b=String(b||'');
+  var next=(slots||[]).slice();
+  if(!a||!b||a===b)return next;
+  if(a==='more'||b==='more'||a==='settings'||b==='settings')return next;
+  if(!navEditRoleOk(a)||!navEditRoleOk(b))return next;
+  var ia=next.indexOf(a);
+  var ib=next.indexOf(b);
+  if(ia<0&&ib<0)return next;
+  if(ia>=0&&ib>=0){
+    next[ia]=b;
+    next[ib]=a;
+    return navEditSanitize(next);
+  }
+  if(ia>=0)next[ia]=b;
+  else next[ib]=a;
+  return navEditSanitize(next);
+}
+function navEditIsBottom(tab){
+  if(tab==='more')return 'more';
+  if(!tab||tab==='settings'||tab==='completes')return null;
+  var slots=null;
+  try{slots=navEditCurrent();}catch(e){slots=null;}
+  if(!slots||!slots.length)return null;
+  if(slots.indexOf(tab)>=0)return tab;
+  if(navEditCatalog().indexOf(tab)>=0)return 'more';
+  return null;
+}
+function navEditSetLabel(el, id, bottom){
+  var meta=NAV_EDIT_META[id];
+  if(!el||!meta)return;
+  var text=(bottom&&meta.short)?meta.short:meta.label;
+  var icon=el.querySelector?el.querySelector('.ni'):null;
+  var node=icon?icon.nextSibling:null;
+  while(node&&node.nodeType!==3)node=node.nextSibling;
+  if(node)node.textContent=' '+text+' ';
+  else if(el.insertBefore){
+    var t=document.createTextNode(' '+text+' ');
+    var badge=el.querySelector?el.querySelector('.nav-badge'):null;
+    if(badge)el.insertBefore(t, badge);
+    else el.appendChild(t);
+  }
+  if(el.setAttribute)el.setAttribute('aria-label', meta.label);
+}
+function navEditApply(){
+  var bottom=document.querySelector('#adminScreen .bottom-nav');
+  var list=document.getElementById('moreList');
+  if(!bottom||!list)return;
+  var account=list.querySelector('.more-account');
+  var more=document.getElementById('nav_more');
+  var slots=navEditCurrent();
+  var on={};
+  slots.forEach(function(id){on[id]=1;});
+  slots.forEach(function(id){
+    var el=document.getElementById('nav_'+id);
+    if(!el)return;
+    el.classList.add('nav-item','bottom-tab');
+    el.classList.remove('more-row');
+    navEditSetLabel(el, id, true);
+    bottom.insertBefore(el, more||null);
+  });
+  if(more){
+    more.classList.add('nav-item','bottom-tab');
+    more.classList.remove('more-row');
+    bottom.appendChild(more);
+  }
+  navEditCatalog().forEach(function(id){
+    if(on[id])return;
+    var el=document.getElementById('nav_'+id);
+    if(!el)return;
+    el.classList.add('nav-item','more-row');
+    el.classList.remove('bottom-tab');
+    navEditSetLabel(el, id, false);
+    if(!navEditRoleOk(id))el.setAttribute('hidden','');
+    if(account)list.insertBefore(el, account);
+    else list.appendChild(el);
+  });
+  var completes=document.getElementById('nav_completes');
+  if(completes&&account)list.insertBefore(completes, account);
+  if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
+  var active=document.querySelector('#adminScreen .tab-panel.active');
+  var tab=active&&active.id?String(active.id).replace(/^tab_/,''):'';
+  var items=document.querySelectorAll('#adminScreen .nav-item');
+  for(var i=0;i<items.length;i++)items[i].classList.remove('active');
+  if(tab){
+    var nav=document.getElementById('nav_'+tab);
+    if(nav)nav.classList.add('active');
+    var primary='more';
+    try{primary=layoutA1Primary(tab);}catch(e){primary='more';}
+    var pnav=document.getElementById('nav_'+primary);
+    if(pnav)pnav.classList.add('active');
+  }
+}
+function navEditChoice(id, where){
+  var meta=NAV_EDIT_META[id]||{label:id,icon:'•',short:''};
+  var btn=document.createElement('button');
+  btn.type='button';
+  var cls=where==='bottom'?'nav-edit-slot':'nav-edit-choice';
+  if(navEditPick===id)cls+=' is-picked';
+  if(navEditFresh[id])cls+=' is-fresh';
+  btn.className=cls;
+  btn.setAttribute('data-nav-id', id);
+  btn.setAttribute('aria-pressed', navEditPick===id?'true':'false');
+  var icon=document.createElement('span');
+  icon.className='ni';
+  icon.textContent=meta.icon||'';
+  var name=document.createElement('span');
+  name.className='nav-edit-name';
+  name.textContent=(where==='bottom'&&meta.short)?meta.short:meta.label;
+  btn.appendChild(icon);
+  btn.appendChild(name);
+  return btn;
+}
+function navEditRender(){
+  var hint=document.getElementById('navEditHint');
+  var bottom=document.getElementById('navEditBottom');
+  var pool=document.getElementById('navEditPool');
+  if(hint){
+    hint.textContent=navEditNote||(navEditPick
+      ?((NAV_EDIT_META[navEditPick]&&NAV_EDIT_META[navEditPick].label)||navEditPick)+' selected. Tap another tab to swap. Save keeps this. Cancel restores the previous tabs.'
+      :'Tap a bottom tab, then tap what should replace it. You can drag too. More stays on the right. Save keeps this. Cancel restores the previous tabs.');
+  }
+  if(!bottom||!pool)return;
+  var slots=navEditSanitize(navEditDraft||navEditRead());
+  navEditDraft=slots.slice();
+  bottom.textContent='';
+  pool.textContent='';
+  slots.forEach(function(id){bottom.appendChild(navEditChoice(id,'bottom'));});
+  var lock=document.createElement('div');
+  lock.className='nav-edit-slot is-lock';
+  lock.setAttribute('aria-label','More, pinned');
+  var lockIcon=document.createElement('span');
+  lockIcon.className='ni';
+  lockIcon.textContent='☰';
+  var lockName=document.createElement('span');
+  lockName.className='nav-edit-name';
+  lockName.textContent='More';
+  var pin=document.createElement('span');
+  pin.className='nav-edit-pin';
+  pin.textContent='Pinned';
+  lock.appendChild(lockIcon);
+  lock.appendChild(lockName);
+  lock.appendChild(pin);
+  bottom.appendChild(lock);
+  navEditPool(slots).forEach(function(id){pool.appendChild(navEditChoice(id,'pool'));});
+}
+function navEditPlaceSheet(){
+  var panel=document.getElementById('navEditPanel');
+  var top=document.querySelector('#adminScreen .shell-top');
+  if(panel&&top)panel.style.top=top.offsetHeight+'px';
+}
+function navEditOpen(){
+  navEditDraft=navEditRead().slice();
+  navEditPick='';
+  navEditNote='';
+  navEditFresh={};
+  var panel=document.getElementById('navEditPanel');
+  var list=document.getElementById('moreList');
+  var open=document.getElementById('navEditOpen');
+  if(panel)panel.hidden=false;
+  if(list)list.setAttribute('hidden','');
+  if(open)open.setAttribute('hidden','');
+  document.documentElement.classList.add('nav-edit-on');
+  navEditEnsureBound();
+  navEditPlaceSheet();
+  navEditRender();
+  try{window.scrollTo(0,0);}catch(e){}
+}
+function navEditClose(){
+  var panel=document.getElementById('navEditPanel');
+  var list=document.getElementById('moreList');
+  var open=document.getElementById('navEditOpen');
+  if(panel)panel.hidden=true;
+  if(list)list.removeAttribute('hidden');
+  if(open)open.removeAttribute('hidden');
+  document.documentElement.classList.remove('nav-edit-on');
+  navEditDrag=null;
+}
+function navEditCancel(){
+  navEditDraft=null;
+  navEditPick='';
+  navEditNote='';
+  navEditFresh={};
+  navEditClose();
+}
+function navEditSave(){
+  var slots=navEditSanitize(navEditDraft||navEditRead());
+  try{localStorage.setItem(navEditStorageKey(), JSON.stringify({v:1,slots:slots}));}catch(e){}
+  navEditDraft=null;
+  navEditPick='';
+  navEditNote='';
+  navEditFresh={};
+  navEditClose();
+  navEditApply();
+}
+function navEditTap(id){
+  if(!id||id==='more'||id==='settings')return;
+  if(!navEditDraft)navEditDraft=navEditRead().slice();
+  if(!navEditRoleOk(id))return;
+  if(!navEditPick){
+    navEditPick=id;
+    navEditNote='';
+    navEditRender();
+    return;
+  }
+  if(navEditPick===id){
+    navEditPick='';
+    navEditNote='';
+    navEditRender();
+    return;
+  }
+  var a=navEditPick;
+  var b=id;
+  navEditDraft=navEditSwapIds(navEditDraft, a, b);
+  navEditPick='';
+  var al=(NAV_EDIT_META[a]&&NAV_EDIT_META[a].label)||a;
+  var bl=(NAV_EDIT_META[b]&&NAV_EDIT_META[b].label)||b;
+  navEditNote=al+' and '+bl+' swapped. Save keeps this. Cancel restores the previous tabs.';
+  navEditFresh={};
+  navEditFresh[a]=1;
+  navEditFresh[b]=1;
+  navEditRender();
+}
+function navEditEnsureBound(){
+  var panel=document.getElementById('navEditPanel');
+  if(!panel||panel.getAttribute('data-nav-bound')==='1')return;
+  panel.setAttribute('data-nav-bound','1');
+  panel.addEventListener('click', function(ev){
+    if(navEditIgnoreClick){navEditIgnoreClick=false;return;}
+    var btn=ev.target&&ev.target.closest?ev.target.closest('[data-nav-id]'):null;
+    if(!btn)return;
+    navEditTap(btn.getAttribute('data-nav-id'));
+  });
+  panel.addEventListener('pointerdown', function(ev){
+    var btn=ev.target&&ev.target.closest?ev.target.closest('[data-nav-id]'):null;
+    if(!btn)return;
+    navEditDrag={id:btn.getAttribute('data-nav-id'),x:ev.clientX,y:ev.clientY,moved:false,el:btn};
+  });
+  panel.addEventListener('pointermove', function(ev){
+    if(!navEditDrag)return;
+    var dx=ev.clientX-navEditDrag.x;
+    var dy=ev.clientY-navEditDrag.y;
+    if(dx*dx+dy*dy>144){
+      navEditDrag.moved=true;
+      if(navEditDrag.el)navEditDrag.el.style.pointerEvents='none';
+    }
+  });
+  function navEditDrop(ev){
+    if(!navEditDrag)return;
+    var drag=navEditDrag;
+    navEditDrag=null;
+    if(!drag.moved){
+      if(drag.el)drag.el.style.pointerEvents='';
+      return;
+    }
+    navEditIgnoreClick=true;
+    setTimeout(function(){navEditIgnoreClick=false;}, 400);
+    var under=document.elementFromPoint(ev.clientX, ev.clientY);
+    if(drag.el)drag.el.style.pointerEvents='';
+    var btn=under&&under.closest?under.closest('[data-nav-id]'):null;
+    if(!btn)return;
+    var id=btn.getAttribute('data-nav-id');
+    if(!id||id===drag.id||id==='more'||id==='settings')return;
+    if(!navEditDraft)navEditDraft=navEditRead().slice();
+    if(!navEditRoleOk(drag.id)||!navEditRoleOk(id))return;
+    navEditDraft=navEditSwapIds(navEditDraft, drag.id, id);
+    navEditPick='';
+    var al=(NAV_EDIT_META[drag.id]&&NAV_EDIT_META[drag.id].label)||drag.id;
+    var bl=(NAV_EDIT_META[id]&&NAV_EDIT_META[id].label)||id;
+    navEditNote=al+' and '+bl+' swapped. Save keeps this. Cancel restores the previous tabs.';
+    navEditFresh={};
+    navEditFresh[drag.id]=1;
+    navEditFresh[id]=1;
+    navEditRender();
+  }
+  panel.addEventListener('pointerup', navEditDrop);
+  panel.addEventListener('pointercancel', function(){
+    if(navEditDrag&&navEditDrag.el)navEditDrag.el.style.pointerEvents='';
+    navEditDrag=null;
+  });
+  document.addEventListener('keydown', function(ev){
+    var sheet=document.getElementById('navEditPanel');
+    if(!sheet||sheet.hidden)return;
+    if(ev.key==='Escape')navEditCancel();
+  });
 }
 function layoutA1DraftOpen(r){
   if(!r)return false;
@@ -3919,6 +4367,7 @@ function openPortalHome(sess, opts){
     const side=document.getElementById('sidebarRoleName');
     if(side)side.textContent=role;
     if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
+    if(typeof navEditApply==='function')navEditApply();
     showScreen('adminScreen');
   }
   const btn=document.getElementById('mgrLoginBtn');
