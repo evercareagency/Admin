@@ -27,10 +27,13 @@ assert.ok(html.indexOf('<table class="sched-grid">', scrollAt) > scrollAt, 'grid
 assert.ok(html.includes('<!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->'), 'adminpw1 marker stays');
 assert.ok(html.includes('No patterns yet — Add usual pattern'), 'empty-state copy');
 
-const nurseAt = html.indexOf('id="nav_nurse"');
 const schedAt = html.indexOf('id="nav_schedule"');
-assert.ok(nurseAt > 0 && schedAt > nurseAt, 'Schedule nav follows Nurse');
-assert.ok(html.slice(nurseAt, schedAt).indexOf('id="nav_completes"') < 0, 'Schedule sits before Completed intakes');
+const moreAt = html.indexOf('id="nav_more"');
+const nurseAt = html.indexOf('id="nav_nurse"');
+const completesAt = html.indexOf('id="nav_completes"');
+assert.ok(schedAt > 0 && moreAt > schedAt, 'Schedule is a bottom tab before More');
+assert.ok(nurseAt > moreAt, 'Nurse stays under More');
+assert.ok(completesAt > nurseAt, 'Completed intakes stays with Nurse, after Schedule');
 assert.ok(html.includes('onclick="showTab(\'schedule\')"'), 'nav uses showTab(schedule)');
 assert.ok(html.includes("if(tab==='schedule')loadAdminSchedule();"), 'showTab loads the schedule');
 assert.ok(html.includes('id="tab_schedule"') && html.includes('id="tab_nurse"'), 'schedule is its own tab');

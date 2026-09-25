@@ -429,6 +429,7 @@ async function runBrowser(){
     assert.ok(aidesText.indexOf('Still on temp password') >= 0, aidesText);
     assert.ok(aidesText.indexOf('Hidden Client') < 0, aidesText);
     await page.screenshot({path: path.join('/opt/cursor/artifacts', 'sb_lists_aides.png')});
+    await page.click('#nav_more');
     await page.click('#nav_clients');
     await page.waitForFunction(function(){
       const el = document.getElementById('clientsContainer');

@@ -622,6 +622,7 @@ async function runBrowser(){
       return document.getElementById('adminScreen').classList.contains('active');
     }, {timeout: 8000});
     offPage.hits.length = 0;
+    await offPage.page.click('#nav_more');
     await offPage.page.click('#nav_nurse');
     await offPage.page.waitForFunction(function(){
       const el = document.getElementById('adminSupervisoryBody');
@@ -639,6 +640,7 @@ async function runBrowser(){
       window.__opened = [];
       window.open = function(url){window.__opened.push(url);return null;};
     });
+    await on.page.click('#nav_more');
     await on.page.click('#nav_nurse');
     await on.page.waitForFunction(function(){
       const el = document.getElementById('adminSupervisoryBody');
@@ -711,6 +713,7 @@ async function runBrowser(){
 
     rows.length = 0;
     const blank = await openPage('?v=stored-flag', {evercare_sb: '1'});
+    await blank.page.click('#nav_more');
     await blank.page.click('#nav_nurse');
     await blank.page.waitForFunction(function(){
       const el = document.getElementById('adminSupervisoryBody');
