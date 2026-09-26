@@ -58,6 +58,18 @@ assert.ok(/@media\(max-width:768px\)\{[^}]*#tab_schedule \.sched-swipe-hint\{dis
 assert.ok(html.includes('.sched-slot-ctrls .btn{min-height:44px'), 'mark controls are tappable');
 assert.ok(html.includes('@media(max-width:900px)') && html.includes('.sched-slot-detail{width:100%'), 'day detail stacks on a phone');
 
+const askJs = html.slice(html.indexOf('// v=remiask1 status look-ups'), html.indexOf('function remiSecAnswer(q)'));
+assert.ok(askJs.includes('function remiAskSlotMarks'), 'Remi reads schedule marks from the desk');
+assert.ok(askJs.includes('function remiAskIsMark') && askJs.includes('function remiAskIsPay'), 'mark and pay intents are separate');
+assert.ok(askJs.indexOf('if(/\\b(ready|held)\\b/.test(s)&&!/\\b(cover|shift)\\b/.test(s))') < 0, 'a name containing Ready does not open pay readiness');
+assert.ok(askJs.includes('if(/\\bschedule for\\b/.test(s)&&!remiAskIsMark(s))return true;'), 'schedule for does not swallow mark asks');
+const askBody = askJs.slice(askJs.indexOf('function remiAskAnswer'));
+const markAt = askBody.indexOf('remiAskIsMark');
+const skipAt = askBody.indexOf('remiAskSkip');
+const payAt = askBody.indexOf('remiAskIsPay');
+assert.ok(markAt > 0 && skipAt > markAt && payAt > markAt, 'mark readout runs before skip and pay');
+assert.ok(!/sbRestRpc|fetch\(/.test(askJs), 'mark readout stays on desk data');
+
 const rpc = [];
 const toasts = [];
 const els = {};
@@ -339,6 +351,7 @@ async function phoneShots(){
   const browser = await puppeteer.launch({
     executablePath: chrome,
     headless: 'new',
+    protocolTimeout: 60000,
     args: ['--no-sandbox', '--disable-dev-shm-usage']
   });
   const outDir = process.env.CLIENTHRS_SHOTS || '/opt/cursor/artifacts';
@@ -542,6 +555,113 @@ async function phoneShots(){
     assert.ok(wide.detailRight > wide.gridRight - 2, 'day detail sits to the right of the week grid');
     assert.ok(wide.fabRight > wide.viewW - 120, 'Remi chip stays on the right');
     assert.strictEqual(wide.hiddenRemiPage, true);
+
+    const marks = await page.evaluate(function(){
+      currentAdminRole = 'Admin';
+      payReadyState = {week_start:'2026-09-21', rows:[]};
+      var id = '55555555-5555-4555-8555-555555555555';
+      var days = {};
+      for(var n = 1; n <= 7; n++){
+        var on = schedAddDays('2026-09-28', n - 1);
+        var slots = [];
+        if(n === 3){
+          slots = [
+            {slot_key:'am', label:'Morning', hours:5, pattern_hours:5, aide_name:'Sara Cole', sort_order:0, mark:'worked', deep_link:{client_id:id, on_date:on, slot_key:'am'}},
+            {slot_key:'pm', label:'Afternoon', hours:4, pattern_hours:4, aide_name:'Kim Lee', sort_order:1, mark:'missed', deep_link:{client_id:id, on_date:on, slot_key:'pm'}},
+            {slot_key:'eve', label:'Evening', hours:4, pattern_hours:4, aide_name:'Moe Hart', sort_order:2, mark:'cover', cover_aide_name:'Moe Hart', deep_link:{client_id:id, on_date:on, slot_key:'eve'}}
+          ];
+        }
+        days[String(n)] = {on_date:on, weekday:n, slots:slots};
+      }
+      schedApplySlotWeek({
+        week_start:'2026-09-28',
+        clients:[{client_id:id, client_name:'payready1 Probe Ready', weekly_authorized_hours:40, days:days}]
+      });
+      schedFocusDeepLink({client_id:id, on_date:'2026-09-30', slot_key:'am'});
+      function text(q){
+        var ans = copilotChatAnswer(q);
+        return (ans && ans.text) || '';
+      }
+      var named = text('What are the marks for payready1 Probe Ready on 09/30/2026?');
+      var status = text('What is the schedule status for payready1 Probe Ready?');
+      var scheduleFor = text('What are the marks on the schedule for payready1 Probe Ready on 09/30/2026?');
+      var how = text('How is the schedule?');
+      var readyMiss = text("who's Ready?");
+      payReadyState = {week_start:'2026-09-21', rows:[
+        {name:'Ada Cole', status:'ready', reason:'', reasonLabel:''},
+        {name:'Dana Ruiz', status:'held', reason:'missing_signature', reasonLabel:'missing signature'}
+      ]};
+      return {
+        named: named,
+        status: status,
+        scheduleFor: scheduleFor,
+        how: how,
+        readyMiss: readyMiss,
+        ready: text("who's Ready?"),
+        held: text("who's Held and why?"),
+        both: text("who's Ready and who's Held?"),
+        focus: text('What are the marks for the focused slot?'),
+        onDate: schedSlotFocus && schedSlotFocus.on_date,
+        slotKey: schedSlotFocus && schedSlotFocus.slot_key
+      };
+    });
+    assert.ok(marks.named.indexOf('pay readiness') < 0, 'named marks are not a pay miss: ' + marks.named);
+    assert.strictEqual(marks.named.indexOf('YES.'), 0, marks.named);
+    assert.ok(marks.named.indexOf('payready1 Probe Ready') >= 0, marks.named);
+    assert.ok(marks.named.indexOf('09/30/2026') >= 0, marks.named);
+    assert.ok(marks.named.indexOf('am Morning: Worked 5h') >= 0, marks.named);
+    assert.ok(marks.named.indexOf('pm Afternoon: Missed 0h') >= 0, marks.named);
+    assert.ok(marks.named.indexOf('Cover') >= 0, marks.named);
+    assert.ok(marks.status.indexOf('pay readiness') < 0, marks.status);
+    assert.ok(marks.status.indexOf('Worked 5h') >= 0 && marks.status.indexOf('Missed 0h') >= 0 && marks.status.indexOf('Cover') >= 0, marks.status);
+    assert.ok(marks.scheduleFor.indexOf('pay readiness') < 0 && marks.scheduleFor.indexOf('Worked 5h') >= 0, marks.scheduleFor);
+    assert.strictEqual(marks.how.indexOf('YES.'), 0, marks.how);
+    assert.ok(marks.how.indexOf('Worked') < 0 && marks.how.indexOf('pay readiness') < 0, marks.how);
+    assert.ok(marks.readyMiss.indexOf('pay readiness') >= 0, marks.readyMiss);
+    assert.ok(marks.ready.indexOf('Ada Cole') >= 0 && marks.ready.indexOf('Ready') >= 0, marks.ready);
+    assert.ok(marks.held.indexOf('Dana Ruiz') >= 0, marks.held);
+    assert.ok(marks.both.indexOf('Ada Cole') >= 0 && marks.both.indexOf('Dana Ruiz') >= 0, marks.both);
+    assert.ok(marks.focus.indexOf('Worked 5h') >= 0, marks.focus);
+    assert.ok(marks.focus.indexOf('Missed') < 0 && marks.focus.indexOf('Cover') < 0, marks.focus);
+    assert.strictEqual(marks.onDate, '2026-09-30');
+    assert.strictEqual(marks.slotKey, 'am');
+
+    await page.evaluate(function(){
+      currentAdminRole = 'Admin';
+      copilotChat = [];
+      copilotShowChat();
+      var input = document.getElementById('copilotChatInput');
+      if(input) input.value = 'What are the marks for payready1 Probe Ready on 09/30/2026?';
+      copilotChatSubmit({preventDefault: function(){}});
+    });
+    const thread = await page.evaluate(function(){
+      var bubbles = document.querySelectorAll('#copilotThread .copilot-bubble-remi');
+      var last = bubbles.length ? bubbles[bubbles.length - 1] : null;
+      if(last && last.scrollIntoView) last.scrollIntoView({block:'center'});
+      var sheet = document.getElementById('copilotSheet');
+      var box = sheet.getBoundingClientRect();
+      var fab = document.getElementById('copilotFab').getBoundingClientRect();
+      return {
+        text: last ? last.innerText.replace(/\s+/g, ' ').trim() : '',
+        hidden: sheet.hidden,
+        sheetRight: box.right,
+        fabRight: fab.right,
+        viewW: window.innerWidth,
+        viewH: window.innerHeight,
+        askSelected: document.getElementById('copilotTabAsk').getAttribute('aria-selected')
+      };
+    });
+    assert.strictEqual(thread.viewW, 390);
+    assert.strictEqual(thread.viewH, 844);
+    assert.strictEqual(thread.hidden, false);
+    assert.strictEqual(thread.askSelected, 'true');
+    assert.ok(thread.text.indexOf('am Morning: Worked 5h') >= 0, thread.text);
+    assert.ok(thread.text.indexOf('pm Afternoon: Missed 0h') >= 0, thread.text);
+    assert.ok(thread.text.indexOf('Cover') >= 0, thread.text);
+    assert.ok(thread.text.indexOf('pay readiness') < 0, thread.text);
+    assert.ok(thread.sheetRight <= thread.viewW + 1, 'Remi stays inside the phone');
+    assert.ok(thread.fabRight > thread.viewW - 120, 'Remi chip stays on the right');
+    await page.screenshot({path: path.join(outDir, 'clienthrs1b-remi-marks-phone.png')});
     console.log('admin-clienthrs1b phone layout ok');
   } finally {
     await browser.close();

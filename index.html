@@ -9244,7 +9244,7 @@ function remiAskSkip(s){
   if(/\bbroadcast alert\b/.test(s))return true;
   if(/\blogin fails\b/.test(s))return true;
   if(/\btimesheet for\b/.test(s)&&!/\b(status|submitted|signature|correction|missing)\b/.test(s))return true;
-  if(/\bschedule for\b/.test(s))return true;
+  if(/\bschedule for\b/.test(s)&&!remiAskIsMark(s))return true;
   return false;
 }
 function remiAskIsTimesheet(s){
@@ -9700,17 +9700,201 @@ function remiAskLoginAnswer(){
   if(!lines.length)return 'I don\u2019t see login fails on this desk. I will not guess a password.';
   return lines.slice(0,5).join('\n')+'\nI will not guess a password.';
 }
+function remiAskIsMark(s){
+  if(!s)return false;
+  if(/\bmarks?\b/.test(s))return true;
+  if(/\b(worked|missed|no show)\b/.test(s))return true;
+  if(/\bcover\b/.test(s)&&/\b(schedule|slot|mark|shift)\b/.test(s)&&!/\bwho can cover\b/.test(s))return true;
+  if(/\bschedule status for\b/.test(s)||/\bstatus of the schedule for\b/.test(s))return true;
+  if(/\bfocused slot\b|\bthis slot\b|\bdeep link\b/.test(s))return true;
+  if(/\bslot\b/.test(s)&&/\b(schedule|mark|worked|missed|cover)\b/.test(s))return true;
+  return false;
+}
+function remiAskIsPay(s){
+  if(!s)return false;
+  if(/\bpay readiness\b/.test(s))return true;
+  if(/\bpay\b/.test(s)&&/\b(ready|held)\b/.test(s))return true;
+  if(/\bready list\b/.test(s))return true;
+  if(/\bwho(?:s| is| are)\b/.test(s)&&/\b(ready|held)\b/.test(s))return true;
+  if(/\b(ready|held)\b/.test(s)&&/\b(payroll|paycheck)\b/.test(s))return true;
+  return false;
+}
+function remiAskIsoDate(y, m, d){
+  var mm=String(m).padStart(2,'0');
+  var dd=String(d).padStart(2,'0');
+  var month=Number(mm), day=Number(dd), year=Number(y);
+  if(year<2000||year>2100)return '';
+  if(month<1||month>12||day<1||day>31)return '';
+  return year+'-'+mm+'-'+dd;
+}
+function remiAskSlotDate(q){
+  var raw=String(q||'');
+  var mdy=raw.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/);
+  if(mdy){
+    var fromMdy=remiAskIsoDate(mdy[3], mdy[1], mdy[2]);
+    if(fromMdy)return fromMdy;
+  }
+  var iso=raw.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+  if(iso){
+    var fromIso=remiAskIsoDate(iso[1], iso[2], iso[3]);
+    if(fromIso)return fromIso;
+  }
+  var fold=remiAskFold(q);
+  var spaced=fold.match(/\b(\d{1,2}) (\d{1,2}) (\d{4})\b/);
+  if(spaced){
+    var fromSp=remiAskIsoDate(spaced[3], spaced[1], spaced[2]);
+    if(fromSp)return fromSp;
+  }
+  var spacedIso=fold.match(/\b(\d{4}) (\d{2}) (\d{2})\b/);
+  if(spacedIso)return remiAskIsoDate(spacedIso[1], spacedIso[2], spacedIso[3]);
+  return '';
+}
+function remiAskSlotRows(){
+  try{
+    if(typeof schedSlotClients!=='undefined'&&Array.isArray(schedSlotClients))return schedSlotClients;
+  }catch(e){}
+  return [];
+}
+function remiAskSlotFocusNow(){
+  try{
+    if(typeof schedSlotFocus!=='undefined'&&schedSlotFocus&&schedSlotFocus.client_id&&schedSlotFocus.on_date)return schedSlotFocus;
+  }catch(e2){}
+  return null;
+}
+function remiAskSlotFindClient(q, rows){
+  var hits=[];
+  var i;
+  for(i=0;i<rows.length;i++){
+    if(rows[i]&&remiAskPersonHit(q, rows[i].name||''))hits.push(rows[i]);
+  }
+  if(hits.length===1)return hits[0];
+  var words=remiAskFold(q).split(' ');
+  var loose=[];
+  var skip={schedule:1,status:1,marks:1,mark:1,worked:1,missed:1,cover:1,client:1,clients:1,morning:1,afternoon:1,evening:1,focused:1,slot:1,slots:1,ready:1,held:1};
+  for(i=0;i<rows.length;i++){
+    var parts=remiAskFold(rows[i]&&rows[i].name).split(' ');
+    for(var p=0;p<parts.length;p++){
+      var token=parts[p];
+      if(token.length<6||skip[token])continue;
+      if(words.indexOf(token)>=0){loose.push(rows[i]);break;}
+    }
+  }
+  if(loose.length===1)return loose[0];
+  if(hits.length)return hits[0];
+  return null;
+}
+function remiAskSlotDayOf(client, iso){
+  var days=client&&client.days;
+  if(!days)return null;
+  var keys=Object.keys(days);
+  for(var i=0;i<keys.length;i++){
+    var day=days[keys[i]];
+    if(!day)continue;
+    if(String(day.on_date||'').slice(0,10)===iso)return day;
+  }
+  return null;
+}
+function remiAskMarkHours(slot){
+  if(!slot)return 0;
+  if(typeof schedSlotToward==='function')return schedSlotToward(slot);
+  var mark=String(slot.mark||'');
+  if(mark==='missed')return 0;
+  if(slot.hours!=null&&slot.hours!=='')return Number(slot.hours)||0;
+  return Number(slot.pattern_hours)||0;
+}
+function remiAskHourText(n){
+  var num=Math.round((Number(n)||0)*100)/100;
+  var text=String(num);
+  if(text.indexOf('.')>=0)text=text.replace(/0+$/,'').replace(/\.$/,'');
+  return text+'h';
+}
+function remiAskMarkLabel(mark){
+  if(mark==='worked')return 'Worked';
+  if(mark==='missed')return 'Missed';
+  if(mark==='cover')return 'Cover';
+  return 'Unmarked';
+}
+function remiAskSlotLine(slot){
+  var key=String(slot.slot_key||'').trim();
+  var label=String(slot.label||'').trim();
+  var head=label?(key+' '+label):key;
+  return head+': '+remiAskMarkLabel(String(slot.mark||''))+' '+remiAskHourText(remiAskMarkHours(slot));
+}
+function remiAskHasWord(s, word){
+  if(!s||!word)return false;
+  var from=0;
+  while(from<=s.length){
+    var i=s.indexOf(word, from);
+    if(i<0)return false;
+    var beforeOk=i===0||s.charAt(i-1)===' ';
+    var end=i+word.length;
+    var afterOk=end===s.length||s.charAt(end)===' ';
+    if(beforeOk&&afterOk)return true;
+    from=i+1;
+  }
+  return false;
+}
+function remiAskPickSlots(s, slots, focus){
+  var only=/\b(this slot|focused slot|deep link)\b/.test(s);
+  if(only&&focus&&focus.slot_key){
+    var hit=slots.filter(function(slot){return String(slot.slot_key)===String(focus.slot_key);});
+    if(hit.length)return hit;
+  }
+  var stop={on:1,for:1,the:1,to:1,of:1,and:1,or:1,is:1,at:1,by:1,in:1,an:1,it:1,no:1,do:1,we:1,me:1,my:1,up:1};
+  var named=[];
+  for(var i=0;i<slots.length;i++){
+    var key=String(slots[i].slot_key||'').toLowerCase();
+    if(key.length<2||stop[key])continue;
+    if(remiAskHasWord(s, key))named.push(slots[i]);
+  }
+  if(named.length&&named.length<slots.length)return named;
+  return slots;
+}
+function remiAskSlotMarks(q, s){
+  var rows=remiAskSlotRows();
+  if(!rows.length)return remiAskMiss('schedule marks');
+  var focus=remiAskSlotFocusNow();
+  var client=remiAskSlotFindClient(q, rows);
+  var i;
+  if(!client&&focus){
+    for(i=0;i<rows.length;i++){
+      if(String(rows[i].id)===String(focus.client_id)){client=rows[i];break;}
+    }
+  }
+  if(!client)return 'Name the client. I can read schedule marks on this desk.';
+  var iso=remiAskSlotDate(q);
+  if(!iso&&focus&&String(focus.client_id)===String(client.id))iso=String(focus.on_date||'').slice(0,10);
+  var shownName=String(client.name||'Client');
+  if(!iso)return 'Name the date. I can read schedule marks for '+shownName+' on this desk.';
+  var day=remiAskSlotDayOf(client, iso);
+  var shown=typeof formatAdminDate==='function'?(formatAdminDate(iso)||iso):iso;
+  var slots=day&&Array.isArray(day.slots)?day.slots.slice():[];
+  if(!slots.length)return 'I don\u2019t see schedule marks for '+shownName+' on '+shown+' on this desk.';
+  slots.sort(function(a,b){
+    var ao=Number(a&&a.sort_order)||0, bo=Number(b&&b.sort_order)||0;
+    if(ao!==bo)return ao-bo;
+    var ak=String(a&&a.slot_key||''), bk=String(b&&b.slot_key||'');
+    if(ak<bk)return -1;
+    if(ak>bk)return 1;
+    return 0;
+  });
+  var sameFocus=focus&&String(focus.client_id)===String(client.id)&&String(focus.on_date||'').slice(0,10)===iso?focus:null;
+  var use=remiAskPickSlots(s, slots, sameFocus);
+  return 'YES. '+shownName+' on '+shown+' \u2014 '+use.map(remiAskSlotLine).join('; ')+'.';
+}
 function remiAskAnswer(q){
   if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
   var s=remiAskFold(q);
-  if(!s||remiAskSkip(s))return null;
+  if(!s)return null;
+  if(remiAskIsMark(s))return remiAskPack(remiAskSlotMarks(q,s));
+  if(remiAskSkip(s))return null;
   if(/\bpassword\b/.test(s)){
     if(/\btemp/.test(s))return null;
     return remiAskPack('I don\u2019t see passwords on this desk. I will not guess one.');
   }
   if(/\blogin status\b|\bwho failed\b|\bfailed sign\b|\bsign in status\b/.test(s))return remiAskPack(remiAskLoginAnswer());
   if(/\bcredentials?\b/.test(s))return remiAskPack(remiAskCredAnswer(q));
-  if(/\b(ready|held)\b/.test(s)&&!/\b(cover|shift)\b/.test(s))return remiAskPack(remiAskPayAnswer(s));
+  if(remiAskIsPay(s))return remiAskPack(remiAskPayAnswer(s));
   if(remiAskIsInservice(s))return remiAskPack(remiAskInserviceAnswer(q,s));
   if(remiAskIsTimesheet(s))return remiAskPack(remiAskTimesheetAnswer(q,s));
   if(/\bwho(?:s| is) ranked\b|\branked to cover\b|\bwho is listed to cover\b|\blisted to cover\b/.test(s))return remiAskPack(remiAskRanked(q));
