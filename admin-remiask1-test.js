@@ -13,7 +13,7 @@ assert.ok(html.includes('admin-build 2026-09-25-remiask1'), 'remiask1 build note
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiask1">'), 'remiask1 meta');
 assert.ok(html.includes('<!-- remi ask lookups 2026-09-25 v=remiask1 admin-build 2026-09-25-remiask1'), 'remiask1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-aidechat1'), 'aidechat1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-26-clienthrs1a'), 'clienthrs1a is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-aidechat1"') < html.indexOf('content="2026-09-25-remiask1"'), 'remiask1 stays on the next meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiwider1c">'), 'remiwider1c meta stays');
 assert.ok(html.indexOf('content="2026-09-25-remiask1"') < html.indexOf('content="2026-09-25-remiwider1c"'), 'remiwider1c stays after remiask1');
@@ -133,7 +133,7 @@ async function runBrowser(){
         onScreen: r.left >= 0 && r.right <= window.innerWidth + 1 && r.bottom <= window.innerHeight + 1
       };
     });
-    assert.strictEqual(chip.build, '2026-09-25-aidechat1');
+    assert.strictEqual(chip.build, '2026-09-26-clienthrs1a');
     assert.strictEqual(chip.marker, 'v=remiask1');
     assert.strictEqual(chip.sheetHidden, true);
     assert.strictEqual(chip.label, 'Remi');

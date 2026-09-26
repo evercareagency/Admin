@@ -13,7 +13,7 @@ assert.ok(html.includes('admin-build 2026-09-25-remiwider1'), 'remiwider1 build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiwider1">'), 'remiwider1 meta');
 assert.ok(html.includes('<!-- remi wider tip 1 2026-09-25 v=remiwider1 admin-build 2026-09-25-remiwider1'), 'remiwider1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-25-aidechat1'), 'aidechat1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-26-clienthrs1a'), 'clienthrs1a is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-remiwider1"') < html.indexOf('content="2026-09-25-coverpick1"'), 'coverpick1 stays after remiwider1');
 assert.ok(html.indexOf('content="2026-09-25-coverpick1"') < html.indexOf('content="2026-09-25-remisec1"'), 'remisec1 stays after coverpick1');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
@@ -137,7 +137,7 @@ async function runBrowser(){
     assert.strictEqual(boot.sheetHidden, true, 'Remi sheet stays closed on login');
     assert.strictEqual(boot.adminActive, false, 'login is the desk, not a Remi takeover');
     assert.strictEqual(boot.fabVisible, false, 'Remi chip stays off the login screen');
-    assert.strictEqual(boot.build, '2026-09-25-aidechat1');
+    assert.strictEqual(boot.build, '2026-09-26-clienthrs1a');
 
     await page.evaluate(function(ids){
       localStorage.clear();

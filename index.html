@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- weekly authorized hours 2026-09-26 v=clienthrs1a admin-build 2026-09-26-clienthrs1a. GHOST-CLIENTHRS1A-CONTRACT-v1. Ace CALLABLE. Add Client and Edit Client show Weekly authorized hours (hrs/week) immediately above Assigned Aides. One weekly bucket for this client. All assigned aides fill the same hours. Field clients.weekly_authorized_hours numeric hrs/week, nullable. Create is POST rpc/admin_add_client(p_case_manager_email, p_case_manager_name, p_first_name, p_home_address, p_last_name, p_phone, p_weekly_authorized_hours). A typed number passes optional p_weekly_authorized_hours. The jsonb return uses weekly_authorized_hours. Edit PATCHes /rest/v1/clients?id=eq.<uuid> with {weekly_authorized_hours: number or null}. List select includes weekly_authorized_hours. Empty on add omits the optional argument. A missing argument or column is left off that call so Save Client still writes the other fields. No alternate argument names. No local-only store. Assigned Aides stay as they are. No schedule grid. No Remi change. Prior markers stay, including aidechat1 and remiask1. -->
+<meta name="admin-build" content="2026-09-26-clienthrs1a">
 <!-- aide office chat 2026-09-25 v=aidechat1 admin-build 2026-09-25-aidechat1. Admin and Scheduler only. More → Aide chat is the inbox of aide↔office threads, one thread per aide. Open a thread and reply as the office inside the app. Remi auto-reply is On/Off plus a window in America/New_York, for example 2:00 PM to 8:00 AM. When On and inside that window, Remi may answer that aide's own clear status look-ups from portal data only: timesheet submitted, missing signature, empty services that day, and pay Ready, Held, or submitted. Call-offs are never approved. Remi tells the aide to call the main office at (216) 377-5991, includes that number, and flags the thread Open and Urgent for Admin with a Coverage heads-up. Pay disputes stay on portal facts and never invent a deposit, a text, or a bank, and flag the office. Outside the window, or when Off, Remi does not reply. Office replies are human. Ace LIVE names: admin_list_aide_office_threads {p_escalate_only?}, admin_list_aide_office_messages {p_thread_id?, p_aide_id?, p_limit?, p_before?}, admin_send_aide_office_message {p_body, p_thread_id?, p_aide_id?}, admin_clear_aide_office_escalate {p_thread_id} clears the flag only and never approves a call-off, admin_mark_aide_office_messages_read {p_thread_id} when a thread opens, admin_get_aide_chat_call_off_script {}, admin_get_aide_chat_remi_settings {}, admin_save_aide_chat_remi_settings {p_enabled, p_start_local?, p_end_local?, p_timezone?}, admin_aide_chat_remi_context {p_aide_id}. Every Remi call-off script shows exactly (216) 377-5991 as tap-to-call. A missing callable keeps the inbox on this phone and does not invent a reply. No SMS and no email send. No Auth reseal. Nurse does not get Remi and does not get this chat. Prior markers stay, including remiask1. -->
 <meta name="admin-build" content="2026-09-25-aidechat1">
 <!-- remi ask lookups 2026-09-25 v=remiask1 admin-build 2026-09-25-remiask1. Admin and Scheduler only. Status look-ups answer in chat from lists already on this desk: Timesheets, Inservices, pay readiness, credentials, Coverage, Aides, clients, Schedule, Backup, Completes, Compliance, Broadcast, and login fails. The shape is YES or NO and the names, or a short status for a named aide or week. If that list is not loaded, Remi says it is not on this desk and does not invent it. Desk-word typos still match. These answers have no Confirm and do not text, email, or send. Who can cover stays the Tip 1 draft: Text, Assign, Share, and Call still wait for Confirm. Tell Friday stays for build and personal asks. Confirm stays on the existing text, email, and record drafts. No Auth reseal. No EVV, Sandata, or clock-in. No new Ace RPC. Remi stays the corner chip. Nurse does not get Remi. Prior markers stay, including remiwider1c. -->
@@ -429,6 +431,16 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr 1fr;}
 @media(max-width:520px){
   #clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr;}
+}
+/* v=clienthrs1a — weekly authorized hours, above Assigned Aides. Phone tap target. */
+#clientModal .client-hrs{background:var(--teal-light);border:1px solid #b8dcdc;border-radius:10px;padding:14px 16px;margin:0 0 16px;max-width:100%;min-width:0;box-sizing:border-box;}
+#clientModal .client-hrs .field{margin-bottom:0;min-width:0;}
+#clientModal .client-hrs label{color:var(--teal-dark);text-transform:none;letter-spacing:0;font-size:0.95rem;font-weight:700;line-height:1.35;}
+#clientModal .client-hrs input[type="number"]{width:100%;max-width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);background:#fff;min-height:48px;}
+#clientModal .client-hrs-hint{font-size:0.82rem;color:var(--muted);margin-top:6px;line-height:1.4;font-weight:500;}
+@media(max-width:420px){
+  #clientModal .modal{padding:16px 14px 18px;}
+  #clientModal .client-hrs{padding:12px;}
 }
 /* v=aidechat1 — Aide↔office inbox. Admin and Scheduler. Phone cards. No SMS. No email. */
 #tab_aidechat{max-width:100%;min-width:0;padding-bottom:12px;}
@@ -2742,6 +2754,13 @@ Call (216) 377-5991 with any questions.</textarea>
     <div class="field" style="margin-bottom:14px">
       <button class="btn btn-ghost" onclick="geocodeClientAddress()">&#128205; Verify Address & Get GPS Coordinates</button>
       <p id="geocodeResult" style="font-size:0.76rem;color:var(--muted);margin-top:6px"></p>
+    </div>
+    <div class="client-hrs" data-clienthrs1a="v=clienthrs1a">
+      <div class="field">
+        <label for="clientWeeklyHours">Weekly authorized hours (hrs/week)</label>
+        <input type="number" id="clientWeeklyHours" min="0" step="1" inputmode="decimal" placeholder="27 or 63" autocomplete="off" data-field="weekly_authorized_hours">
+        <p class="client-hrs-hint">One weekly bucket for this client. All assigned aides fill the same hours.</p>
+      </div>
     </div>
     <div class="card" style="background:var(--off);margin-bottom:14px">
       <div class="card-title" style="margin-bottom:10px"><span class="ico">&#128101;</span> Assigned Aides</div>
@@ -11886,7 +11905,7 @@ function sbMapClient(row){
   var aides=sbActiveLinks(row&&row.assignments).map(function(link){
     return link.aide&&link.aide.username;
   }).filter(Boolean);
-  return {
+  var mapped={
     id:row.id,
     legacyId:row.legacy_id||'',
     name:row.name||'',
@@ -11900,6 +11919,13 @@ function sbMapClient(row){
     isActive:row.is_active!==false,
     assignedAides:aides
   };
+  if(row&&(Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')||Object.prototype.hasOwnProperty.call(row,'weeklyAuthorizedHours'))){
+    var raw=Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')?row.weekly_authorized_hours:row.weeklyAuthorizedHours;
+    var n=sbClientHoursValue({weekly_authorized_hours:raw==null?null:raw});
+    mapped.weekly_authorized_hours=typeof n==='number'?n:null;
+    mapped.weeklyAuthorizedHours=mapped.weekly_authorized_hours;
+  }
+  return mapped;
 }
 function sbMapTimesheet(row){
   var when=row.submitted_at||row.updated_at||row.created_at||row.week_start||'';
@@ -12030,7 +12056,7 @@ async function sbRestGet(table, pairs, refreshed){
   return {ok:true,data:data,status:res.status};
 }
 var SB_AIDE_SELECT='id,username,full_name,email,joined_at,location_status,last_seen_at,must_change_password,is_active,profile_id,legacy_sheet_row,assignments:assignments(id,is_active,client:clients(id,name,legacy_id,is_active))';
-var SB_CLIENT_SELECT='id,legacy_id,name,address,lat,lng,is_active,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
+var SB_CLIENT_SELECT='id,legacy_id,name,address,lat,lng,is_active,weekly_authorized_hours,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
 async function sbApiList(payload){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
   var action=payload&&payload.action;
@@ -12066,10 +12092,17 @@ async function sbApiList(payload){
       })};
     }
     if(action==='get_clients'){
-      var clientPairs=[['select',SB_CLIENT_SELECT]];
+      var hoursState=sbClientHoursState();
+      var clientSelect=hoursState.col===false?String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours',''):SB_CLIENT_SELECT;
+      var clientPairs=[['select',clientSelect]];
       if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
       clientPairs.push(['order','name.asc']);
       var clients=await sbRestGet('clients', clientPairs);
+      if(!clients.ok && hoursState.col!==false && sbClientHoursColumnMissing(clients)){
+        hoursState.col=false;
+        clientPairs[0]=['select', String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours','')];
+        clients=await sbRestGet('clients', clientPairs);
+      }
       if(!clients.ok)return {success:false,error:clients.error||'clients',httpStatus:clients.status||0};
       var clientRows=Array.isArray(clients.data)?clients.data:[];
       return {success:true,data:clientRows.map(sbMapClient)};
@@ -13645,6 +13678,58 @@ async function sbSyncClientAssignments(clientId, nextNames, currentRows){
   }
   return {success:true};
 }
+// v=clienthrs1a GHOST-CLIENTHRS1A-CONTRACT-v1. Ace CALLABLE.
+// Create: POST rpc/admin_add_client with optional p_weekly_authorized_hours.
+// Edit: PATCH /rest/v1/clients?id=eq.<uuid> {weekly_authorized_hours}.
+// Session flags only — not a store of the hours.
+function sbClientHoursState(){
+  if(!sbClientHoursState.box)sbClientHoursState.box={col:null, rpc:''};
+  return sbClientHoursState.box;
+}
+function sbClientHoursValue(payload){
+  if(!payload)return undefined;
+  var has=Object.prototype.hasOwnProperty.call(payload,'weekly_authorized_hours')||Object.prototype.hasOwnProperty.call(payload,'weeklyAuthorizedHours');
+  if(!has)return undefined;
+  var raw=Object.prototype.hasOwnProperty.call(payload,'weekly_authorized_hours')?payload.weekly_authorized_hours:payload.weeklyAuthorizedHours;
+  if(raw==null||(typeof raw==='string'&&raw.trim()===''))return null;
+  var n=Number(raw);
+  if(!isFinite(n)||n<0)return undefined;
+  return n;
+}
+function sbClientHoursColumnMissing(got){
+  if(!got||got.ok)return false;
+  var err=String(got.error||got.message||'');
+  if(!/weekly_authorized_hours/i.test(err))return false;
+  return /42703|PGRST204|does not exist|schema cache|could not find/i.test(err);
+}
+function sbClientHoursRpcMissing(got){
+  if(!got)return true;
+  if(got.ok)return false;
+  var err=String(got.error||got.message||'');
+  var code=String((got.data&&got.data.code)||'');
+  if(code==='PGRST204')return false;
+  if(/weekly_authorized_hours/i.test(err)&&/column/i.test(err))return false;
+  if(got.status===404||code==='PGRST202')return true;
+  return /PGRST202|could not find the function/i.test(err);
+}
+function sbClientHoursRpcBodies(payload){
+  var base=sbClientDeskBody(payload);
+  var n=sbClientHoursValue(payload);
+  if(typeof n!=='number'||sbClientHoursState().rpc==='off')return [base];
+  var withHours=Object.assign({}, base);
+  withHours.p_weekly_authorized_hours=n;
+  return [withHours, base];
+}
+async function sbPatchClientHours(id, hours){
+  if(sbClientHoursState().col===false)return {ok:true, skipped:true, data:null};
+  var got=await sbRestMutate('PATCH','clients',[['id','eq.'+id]],{weekly_authorized_hours:hours},'return=representation');
+  if(!got.ok && sbClientHoursColumnMissing(got)){
+    sbClientHoursState().col=false;
+    return {ok:true, hoursOmitted:true, skipped:true, data:null};
+  }
+  if(got&&got.ok)sbClientHoursState().col=true;
+  return got;
+}
 function sbClientWriteBody(payload, isCreate){
   var body={
     name:String((payload&&payload.name)||'').trim(),
@@ -13691,22 +13776,36 @@ function sbClientDeskBody(payload){
 async function sbTrySaveClientDesk(payload){
   var desk=sbClientDeskPayload(payload);
   if(!desk.has)return {skipped:true};
-  var got=await sbRestRpc('admin_add_client', sbClientDeskBody(payload));
-  if(got&&got.ok){
-    var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
-    var err=typeof sbRpcError==='function'?(sbRpcError(node)||''):'';
-    if(err)return {ok:false, error:err};
-    var row=typeof sbFirstRow==='function'?sbFirstRow(node):null;
-    if(!row||typeof row!=='object')row=node&&typeof node==='object'&&!Array.isArray(node)?node:null;
-    var cid=row&&(row.id||row.client_id||row.clientId);
-    if(!cid&&node&&node.client&&node.client.id)cid=node.client.id;
-    if(!cid)return {ok:false, error:'Client was not created.'};
-    var mapped=sbMapClient(Object.assign({id:cid, name:payload&&payload.name, address:payload&&payload.address}, row));
-    return {ok:true, id:String(mapped.id||cid), mapped:mapped};
+  var bodies=sbClientHoursRpcBodies(payload);
+  var got=null;
+  var used=null;
+  var i;
+  for(i=0;i<bodies.length;i++){
+    got=await sbRestRpc('admin_add_client', bodies[i]);
+    if(got&&got.ok){
+      var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
+      var err=typeof sbRpcError==='function'?(sbRpcError(node)||''):'';
+      if(err){
+        if(i<bodies.length-1 && sbClientHoursRpcMissing({ok:false,status:got.status,error:err,data:got.data}))continue;
+        return {ok:false, error:err};
+      }
+      used=bodies[i];
+      var row=typeof sbFirstRow==='function'?sbFirstRow(node):null;
+      if(!row||typeof row!=='object')row=node&&typeof node==='object'&&!Array.isArray(node)?node:null;
+      var cid=row&&(row.id||row.client_id||row.clientId);
+      if(!cid&&node&&node.client&&node.client.id)cid=node.client.id;
+      if(!cid)return {ok:false, error:'Client was not created.'};
+      var mapped=sbMapClient(Object.assign({id:cid, name:payload&&payload.name, address:payload&&payload.address}, row));
+      var hoursOn=!!(used&&Object.prototype.hasOwnProperty.call(used,'p_weekly_authorized_hours'));
+      if(hoursOn)sbClientHoursState().rpc='p_weekly_authorized_hours';
+      else if(typeof sbClientHoursValue(payload)==='number' && bodies.length>1)sbClientHoursState().rpc='off';
+      return {ok:true, id:String(mapped.id||cid), mapped:mapped, hoursOnWire:hoursOn};
+    }
+    if(sbClientHoursRpcMissing(got) && i<bodies.length-1)continue;
+    if(sbClientHoursRpcMissing(got))return {missing:true};
+    return {ok:false, error:(got&&got.error)||'Could not save client.'};
   }
-  var missing=!got||got.status===404||(typeof sbAideListRpcMissing==='function'&&sbAideListRpcMissing(got));
-  if(missing)return {missing:true};
-  return {ok:false, error:(got&&got.error)||'Could not save client.'};
+  return {missing:true};
 }
 async function sbAdminAddClient(payload){
   var deskTry=await sbTrySaveClientDesk(payload);
@@ -13743,6 +13842,16 @@ async function sbAdminUpdateClient(payload){
   if(!got.ok)return {success:false,error:got.error||'Could not update client.',httpStatus:got.status||0};
   var row=sbFirstRow(got.data);
   if(!row)return {success:false,error:'Client not found.'};
+  var hours=sbClientHoursValue(payload);
+  if(hours!==undefined){
+    var patched=await sbPatchClientHours(String(row.id||id), hours);
+    if(patched&&patched.ok&&patched.data){
+      var prow=sbFirstRow(patched.data);
+      if(prow)row=Object.assign({}, row, prow);
+    }else if(patched&&patched.ok===false){
+      return {success:false, error:patched.error||'Could not save weekly authorized hours.', httpStatus:patched.status||0};
+    }
+  }
   var names=sbAssignedNames(payload);
   if(names!=null){
     var current=await sbActiveAssignmentRows(String(row.id||id));
@@ -19022,6 +19131,25 @@ function clientSetNameFields(first, last, full){
   if(lastEl)lastEl.value=last||split.last||'';
   if(nameEl)nameEl.value=String(full||[first,last].filter(Boolean).join(' ')||'').trim();
 }
+var CLIENTHRS_MARKER='v=clienthrs1a';
+function clientHoursFill(c){
+  var el=document.getElementById('clientWeeklyHours');
+  if(!el)return;
+  var known=!!(c&&(Object.prototype.hasOwnProperty.call(c,'weekly_authorized_hours')||Object.prototype.hasOwnProperty.call(c,'weeklyAuthorizedHours')));
+  var raw=known?(Object.prototype.hasOwnProperty.call(c,'weekly_authorized_hours')?c.weekly_authorized_hours:c.weeklyAuthorizedHours):undefined;
+  var n=known?sbClientHoursValue({weekly_authorized_hours:raw==null?null:raw}):undefined;
+  el.value=typeof n==='number'?String(n):'';
+  el.dataset.known=known?'1':'';
+}
+function clientHoursRead(){
+  var el=document.getElementById('clientWeeklyHours');
+  if(!el)return {omit:true};
+  var raw=String(el.value==null?'':el.value).trim();
+  if(raw==='')return {empty:true, known:el.dataset.known==='1'};
+  var n=Number(raw);
+  if(!isFinite(n)||n<0)return {invalid:true};
+  return {value:n};
+}
 function showAddClientModal(){
   document.getElementById('clientModalTitle').textContent='Add Client';
   document.getElementById('editClientId').value='';
@@ -19036,6 +19164,7 @@ function showAddClientModal(){
   document.getElementById('geocodeResult').textContent='';
   document.getElementById('geocodeResult').dataset.lat='';
   document.getElementById('geocodeResult').dataset.lng='';
+  clientHoursFill(null);
   loadAidesForAssignment([]);
   openModal('clientModal');
 }
@@ -19053,6 +19182,7 @@ function editClient(id){
   if(cmEmail)cmEmail.value=c.caseManagerEmail||c.case_manager_email||'';
   const phoneEl=document.getElementById('clientPhone');
   if(phoneEl)phoneEl.value=c.phone||'';
+  clientHoursFill(c);
   const geo=document.getElementById('geocodeResult');
   if(c.lat&&c.lng){
     geo.textContent='&#10003; GPS: '+c.lat+', '+c.lng;
@@ -19106,11 +19236,15 @@ async function saveClient(){
   const lat=geo.dataset.lat||'';
   const lng=geo.dataset.lng||'';
   const assignedAides=Array.from(document.querySelectorAll('.assign-aide-cb:checked')).map(cb=>cb.value);
+  const hours=clientHoursRead();
 
   if(!firstName||!lastName||!address){showTempMsg('Please fill in first name, last name, and home address.','var(--danger)');return;}
+  if(hours.invalid){showTempMsg('Weekly authorized hours must be 0 or more.','var(--danger)');return;}
 
   const action=id?'update_client':'add_client';
   const payload={action,name,address,lat,lng,assignedAides,firstName,lastName,caseManagerName,caseManagerEmail,phone};
+  if(typeof hours.value==='number')payload.weekly_authorized_hours=hours.value;
+  else if(id&&hours.known)payload.weekly_authorized_hours=null;
   if(id)payload.id=id;
 
   try{
