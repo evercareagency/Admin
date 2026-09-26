@@ -40,13 +40,20 @@ assert.strictEqual(nurse.indexOf('id="copilotFab"'), -1, 'Nurse screen has no Re
 const chatJs = html.slice(html.indexOf('// v=aidechat1 aide'), html.indexOf('// v=remiask1 status look-ups'));
 assert.ok(chatJs.includes('function aidechatRemiDecide'), 'slice is the aide chat block');
 assert.ok(chatJs.includes('AIDECHAT_CALLOFF_REPLY'), 'call-off reply constant');
-assert.ok(chatJs.includes('(216) 377-5991'), 'main office number');
-assert.ok(chatJs.includes("list:['list_aide_threads','admin_list_aide_threads']"), 'list_aide_threads');
-assert.ok(chatJs.includes("messages:['get_thread_messages','admin_get_thread_messages']"), 'get_thread_messages');
-assert.ok(chatJs.includes("send:['send_office_message','admin_send_office_message']"), 'send_office_message');
-assert.ok(chatJs.includes("urgent:['set_thread_urgent','admin_set_thread_urgent']"), 'set_thread_urgent');
-assert.ok(chatJs.includes("settingsGet:['get_remi_auto_reply_settings','admin_get_remi_auto_reply_settings']"), 'get_remi_auto_reply_settings');
-assert.ok(chatJs.includes("settingsSet:['set_remi_auto_reply_settings','admin_set_remi_auto_reply_settings']"), 'set_remi_auto_reply_settings');
+assert.ok(chatJs.includes('remiCalloffReply()'), 'aide chat uses the locked call-off helper');
+assert.ok(html.includes("return '(216) 377-5991';"), 'locked office number');
+assert.ok(html.includes('function remiCalloffReply'), 'Remi call-off helper');
+assert.ok(html.includes("list:['admin_list_aide_office_threads']"), 'admin_list_aide_office_threads');
+assert.ok(html.includes("messages:['admin_list_aide_office_messages']"), 'admin_list_aide_office_messages');
+assert.ok(html.includes("send:['admin_send_aide_office_message']"), 'admin_send_aide_office_message');
+assert.ok(html.includes("clear:['admin_clear_aide_office_escalate']"), 'admin_clear_aide_office_escalate');
+assert.ok(chatJs.includes('p_escalate_only'), 'list accepts p_escalate_only');
+assert.ok(chatJs.includes('p_limit:80'), 'messages accept p_limit');
+assert.ok(chatJs.includes('p_before'), 'messages accept p_before');
+assert.ok(!/admin_record_call_off/.test(chatJs), 'clearing a flag does not record a call-off');
+const calloffHelper = html.slice(html.indexOf('function remiCalloffPhone'), html.indexOf('function remiSecCalloff(q)'));
+const helperPhones = calloffHelper.match(/\(\d{3}\) \d{3}-\d{4}/g) || [];
+assert.deepStrictEqual(Array.from(new Set(helperPhones)), ['(216) 377-5991']);
 assert.ok(chatJs.includes('America/New_York'), 'window timezone');
 assert.ok(chatJs.includes("start_local:'14:00'"), 'default window start 2pm');
 assert.ok(chatJs.includes("end_local:'08:00'"), 'default window end 8am');
@@ -177,6 +184,10 @@ async function runBrowser(){
         beaPay: aidechatRemiDecide('is my pay ready?', {username:'bea', name:'Bea Lin'}, settingsOn, inside),
         dispute: aidechatRemiDecide('where is my direct deposit from Chase?', ada, settingsOn, inside),
         hello: aidechatRemiDecide('hello there', ada, settingsOn, inside),
+        phone: remiCalloffPhone(),
+        poison: remiLockCalloffLine('Please call (440) 555-0199 so I can approve the call-off.'),
+        sec: (remiSecCalloff('any call-offs today?') || {}).text || '',
+        playbook: (copilotPlaybook('coverage_open') || {}).explain || '',
         windowNight: aidechatInWindow(night, settingsOn),
         windowOut: aidechatInWindow(outside, settingsOn),
         windowIn: aidechatInWindow(inside, settingsOn)
@@ -200,8 +211,13 @@ async function runBrowser(){
     assert.strictEqual(rules.windowIn, true);
     assert.strictEqual(rules.windowNight, true, '2am is inside the overnight window');
     assert.strictEqual(rules.night.text, rules.call.text);
+    assert.strictEqual(rules.phone, '(216) 377-5991');
     assert.strictEqual(rules.call.text, 'I can\'t approve a call-off. Please call the office at (216) 377-5991 so someone can help you right away. I\'ve also noted this for the scheduler.');
     assert.ok(rules.call.text.indexOf('(216) 377-5991') >= 0);
+    assert.ok(rules.poison.indexOf('(216) 377-5991') >= 0, rules.poison);
+    assert.ok(rules.poison.indexOf('440') < 0 && rules.poison.indexOf('555-0199') < 0, rules.poison);
+    assert.ok(rules.sec.indexOf('(216) 377-5991') >= 0, rules.sec);
+    assert.ok(rules.playbook.indexOf('(216) 377-5991') >= 0, rules.playbook);
     assert.strictEqual(rules.call.urgent, true);
     assert.strictEqual(rules.call.reason, 'call_off');
     assert.strictEqual(rules.call.headsUp, 'coverage');
@@ -388,12 +404,10 @@ async function runBrowser(){
       var calls = [];
       sbRestRpc = async function(name, body){
         calls.push({name:name, body:body||{}});
-        if(name === 'list_aide_threads')return {ok:true, data:{success:true, threads:[]}};
-        if(name === 'get_thread_messages')return {ok:true, data:{success:true, messages:[]}};
-        if(name === 'get_remi_auto_reply_settings')return {ok:true, data:{success:true, enabled:true, start_local:'14:00', end_local:'08:00', timezone:'America/New_York'}};
-        if(name === 'set_remi_auto_reply_settings')return {ok:true, data:{success:true, enabled:body.p_enabled, start_local:body.p_start_local, end_local:body.p_end_local, timezone:body.p_timezone}};
-        if(name === 'send_office_message')return {ok:true, data:{success:true, message:{id:'ace-1', sender:body.p_sender, body:body.p_body}}};
-        if(name === 'set_thread_urgent')return {ok:true, data:{success:true, urgent:body.p_urgent, urgent_reason:body.p_reason}};
+        if(name === 'admin_list_aide_office_threads')return {ok:true, data:{success:true, threads:[{thread_id:'ace-ada', aide_id:'ada-1', aide_username:'ada', aide_name:'Ada Cole', escalated:true, escalate_reason:'call_off', last_message:'noted'}]}};
+        if(name === 'admin_list_aide_office_messages')return {ok:true, data:{success:true, messages:[]}};
+        if(name === 'admin_send_aide_office_message')return {ok:true, data:{success:true, message:{id:'ace-1', body:body.p_body}}};
+        if(name === 'admin_clear_aide_office_escalate')return {ok:true, data:{success:true, escalated:false}};
         return {ok:false, status:404, error:'Could not find the function'};
       };
       readSbSession = function(){return {access_token:'office-jwt'};};
@@ -402,14 +416,22 @@ async function runBrowser(){
       aidechatThreads = [];
       aidechatSource = 'local';
       aidechatSettings = {enabled:true, start_local:'14:00', end_local:'08:00', timezone:'America/New_York', source:'desk'};
+      document.getElementById('aidechatEscalateOnly').checked = false;
       await aidechatIngestAideMessage({username:'ada', name:'Ada Cole', aideId:'ada-1', body:'I need to call off today', now:new Date('2026-09-25T19:00:00Z')});
-      var sent = calls.filter(function(c){return c.name === 'send_office_message';});
-      var urgent = calls.filter(function(c){return c.name === 'set_thread_urgent';});
+      var sent = calls.filter(function(c){return c.name === 'admin_send_aide_office_message';});
+      var ada = aidechatThreads.filter(function(t){return t.username === 'ada';})[0];
+      var escalated = !!(ada && ada.urgent && ada.urgent_reason === 'call_off');
+      aidechatSelectedId = ada ? ada.id : '';
+      await aidechatClearUrgent();
+      var cleared = calls.filter(function(c){return c.name === 'admin_clear_aide_office_escalate';});
       document.getElementById('aidechatOn').checked = false;
       await aidechatSettingsChanged();
-      var saved = calls.filter(function(c){return c.name === 'set_remi_auto_reply_settings';}).pop();
+      document.getElementById('aidechatEscalateOnly').checked = true;
+      await aidechatRefresh();
+      var listed = calls.filter(function(c){return c.name === 'admin_list_aide_office_threads';});
+      var names = calls.map(function(c){return c.name;});
       aidechatRpcOff = {};
-      sbRestRpc = async function(){return {ok:false, status:404, error:'Could not find the function public.list_aide_threads in the schema cache'};};
+      sbRestRpc = async function(){return {ok:false, status:404, error:'Could not find the function public.admin_list_aide_office_threads in the schema cache'};};
       var missing = null;
       var threw = '';
       try{missing = await aidechatRpc('list', {});}catch(err){threw = String(err && err.message || err);}
@@ -417,23 +439,36 @@ async function runBrowser(){
       try{await aidechatRefresh(); after = 'painted';}catch(err2){after = String(err2 && err2.message || err2);}
       return {
         sent: sent.map(function(c){return c.body;}),
-        urgent: urgent.map(function(c){return c.body;}),
-        saved: saved ? saved.body : null,
+        cleared: cleared.map(function(c){return c.body;}),
+        listed: listed.map(function(c){return c.body;}),
+        names: names,
+        settings: {enabled: aidechatSettings.enabled, start: aidechatSettings.start_local, end: aidechatSettings.end_local},
+        escalated: escalated,
+        flagCleared: !(ada && ada.urgent),
         missing: missing,
         threw: threw,
         after: after,
         note: document.getElementById('aidechatSourceNote').textContent
       };
     });
-    assert.ok(rpc.sent.some(function(b){return b.p_sender === 'remi' && String(b.p_body).indexOf('(216) 377-5991') >= 0;}));
-    assert.ok(rpc.urgent.some(function(b){return b.p_urgent === true && b.p_reason === 'call_off';}));
-    assert.ok(rpc.saved && rpc.saved.p_enabled === false && rpc.saved.p_timezone === 'America/New_York');
-    assert.strictEqual(rpc.saved.p_start_local, '14:00');
-    assert.strictEqual(rpc.saved.p_end_local, '08:00');
+    assert.ok(rpc.sent.some(function(b){
+      return b.p_sender == null && String(b.p_body).indexOf('(216) 377-5991') >= 0 && !!b.p_thread_id && !b.p_aide_id;
+    }), JSON.stringify(rpc.sent));
+    assert.ok(rpc.sent.every(function(b){return String(b.p_body).indexOf('(440)') < 0 && String(b.p_body).indexOf('555-') < 0;}));
+    assert.ok(!rpc.sent.some(function(b){return /\bapproved\b/i.test(String(b.p_body));}));
+    assert.strictEqual(rpc.escalated, true, 'call-off still flags the inbox');
+    assert.strictEqual(rpc.flagCleared, true, 'clear drops the flag and does not approve');
+    assert.ok(rpc.cleared.length === 1 && rpc.cleared[0].p_thread_id && rpc.cleared[0].p_urgent == null, JSON.stringify(rpc.cleared));
+    assert.ok(rpc.names.indexOf('admin_record_call_off') < 0, rpc.names.join(','));
+    assert.ok(rpc.names.indexOf('set_thread_urgent') < 0);
+    assert.ok(rpc.listed.some(function(b){return b.p_escalate_only === true;}));
+    assert.strictEqual(rpc.settings.enabled, false);
+    assert.strictEqual(rpc.settings.start, '14:00');
+    assert.strictEqual(rpc.settings.end, '08:00');
     assert.strictEqual(rpc.threw, '');
     assert.strictEqual(rpc.missing && rpc.missing.missing, true);
     assert.strictEqual(rpc.after, 'painted');
-    assert.ok(/list_aide_threads|Sign in|this phone/.test(rpc.note), rpc.note);
+    assert.ok(/admin_list_aide_office_threads|Sign in|this phone/.test(rpc.note), rpc.note);
 
     const roles = await page.evaluate(async function(){
       currentAdminRole = 'Scheduler';
