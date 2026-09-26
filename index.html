@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- aide office chat 2026-09-25 v=aidechat1 admin-build 2026-09-25-aidechat1. Admin and Scheduler only. More → Aide chat is the inbox of aide↔office threads, one thread per aide. Open a thread and reply as the office inside the app. Remi auto-reply is On/Off plus a window in America/New_York, for example 2:00 PM to 8:00 AM. When On and inside that window, Remi may answer that aide's own clear status look-ups from portal data only: timesheet submitted, missing signature, empty services that day, and pay Ready, Held, or submitted. Call-offs are never approved. Remi tells the aide to call the main office at (216) 377-5991, includes that number, and flags the thread Open and Urgent for Admin with a Coverage heads-up. Pay disputes stay on portal facts and never invent a deposit, a text, or a bank, and flag the office. Outside the window, or when Off, Remi does not reply. Office replies are human. Ace LIVE names: admin_list_aide_office_threads {p_escalate_only?}, admin_list_aide_office_messages {p_thread_id?, p_aide_id?, p_limit?, p_before?}, admin_send_aide_office_message {p_body, p_thread_id?, p_aide_id?}, admin_clear_aide_office_escalate {p_thread_id} clears the flag only and never approves a call-off, admin_mark_aide_office_messages_read {p_thread_id} when a thread opens, admin_get_aide_chat_call_off_script {}, admin_get_aide_chat_remi_settings {}, admin_save_aide_chat_remi_settings {p_enabled, p_start_local?, p_end_local?, p_timezone?}, admin_aide_chat_remi_context {p_aide_id}. Every Remi call-off script shows exactly (216) 377-5991 as tap-to-call. A missing callable keeps the inbox on this phone and does not invent a reply. No SMS and no email send. No Auth reseal. Nurse does not get Remi and does not get this chat. Prior markers stay, including remiask1. -->
+<meta name="admin-build" content="2026-09-25-aidechat1">
 <!-- remi ask lookups 2026-09-25 v=remiask1 admin-build 2026-09-25-remiask1. Admin and Scheduler only. Status look-ups answer in chat from lists already on this desk: Timesheets, Inservices, pay readiness, credentials, Coverage, Aides, clients, Schedule, Backup, Completes, Compliance, Broadcast, and login fails. The shape is YES or NO and the names, or a short status for a named aide or week. If that list is not loaded, Remi says it is not on this desk and does not invent it. Desk-word typos still match. These answers have no Confirm and do not text, email, or send. Who can cover stays the Tip 1 draft: Text, Assign, Share, and Call still wait for Confirm. Tell Friday stays for build and personal asks. Confirm stays on the existing text, email, and record drafts. No Auth reseal. No EVV, Sandata, or clock-in. No new Ace RPC. Remi stays the corner chip. Nurse does not get Remi. Prior markers stay, including remiwider1c. -->
 <meta name="admin-build" content="2026-09-25-remiask1">
 <!-- remi wider tip 1c 2026-09-25 v=remiwider1c admin-build 2026-09-25-remiwider1c. Admin and Scheduler only. Tip 1 only. Still deciding on Coverage, with or without an aide checked, and from Remi Ask, shows the draft with Confirm and Not yet. It does not post awaiting_client until Confirm. Not yet writes nothing. When Still deciding sits on the bottom edge above the phone nav, that same tap does not count as Confirm. Refuse Confirm and Open in Mail stay gated. Ask refuse, skip, and share stay Tip 1 drafts. Tell Friday handoff stays. Call and share blocked drafts stay. Remi stays the corner chip. Nurse does not get Remi. Tip 1 LEAN only. No Auth reseal. No new Ace RPC. Quiet hours rules are unchanged. Prior markers stay, including remiwider1b and remiwider1. -->
@@ -428,6 +430,47 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(max-width:520px){
   #clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr;}
 }
+/* v=aidechat1 — Aide↔office inbox. Admin and Scheduler. Phone cards. No SMS. No email. */
+#tab_aidechat{max-width:100%;min-width:0;padding-bottom:12px;}
+#tab_aidechat[hidden]{display:none !important;}
+#tab_aidechat [hidden]{display:none !important;}
+#tab_aidechat .page-hdr{flex-direction:column;align-items:stretch;margin-bottom:10px;}
+#tab_aidechat .page-hdr h1{font-size:1.35rem;}
+#tab_aidechat .page-hdr p{font-size:0.9rem;line-height:1.35;}
+#tab_aidechat .aidechat-settings{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;margin:0 0 12px;max-width:100%;min-width:0;box-sizing:border-box;}
+#tab_aidechat .aidechat-set-row{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;font-weight:700;font-size:1rem;color:var(--navy);}
+#tab_aidechat .aidechat-set-on{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-weight:700;text-transform:none;letter-spacing:0;font-size:1rem;color:var(--navy);}
+#tab_aidechat .aidechat-set-on input{width:22px;height:22px;min-width:22px;min-height:22px;max-width:22px;margin:0;accent-color:var(--teal);}
+#tab_aidechat .aidechat-set-times{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+#tab_aidechat .aidechat-set-times label{flex:1 1 9rem;min-width:0;display:flex;flex-direction:column;gap:4px;font-size:0.85rem;font-weight:700;text-transform:none;letter-spacing:0;color:var(--navy);}
+#tab_aidechat input[type="time"],#tab_aidechat textarea{font-size:16px;min-height:48px;width:100%;max-width:100%;box-sizing:border-box;}
+#tab_aidechat .aidechat-window,#tab_aidechat .aidechat-rules{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:8px 0 0;}
+#tab_aidechat .aidechat-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
+#tab_aidechat .aidechat-list{display:flex;flex-direction:column;gap:10px;max-width:100%;min-width:0;}
+#tab_aidechat .aidechat-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);box-shadow:0 6px 16px rgba(26,39,68,0.05);touch-action:manipulation;}
+#tab_aidechat .aidechat-card.is-urgent{border-left-color:var(--danger);}
+#tab_aidechat .aidechat-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+#tab_aidechat .aidechat-card-top strong{font-size:1.05rem;line-height:1.25;min-width:0;flex:1 1 8rem;overflow-wrap:anywhere;}
+#tab_aidechat .aidechat-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;}
+#tab_aidechat .aidechat-chip{display:inline-flex;align-items:center;min-height:28px;padding:4px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;white-space:nowrap;}
+#tab_aidechat .aidechat-chip-open{background:var(--teal-light);color:var(--teal-dark);}
+#tab_aidechat .aidechat-chip-urgent{background:#fde8e8;color:var(--danger);}
+#tab_aidechat .aidechat-chip-cover{background:#fff3e0;color:#9a3412;}
+#tab_aidechat .aidechat-chip-pay{background:#e7eef9;color:var(--navy);}
+#tab_aidechat .aidechat-preview{display:block;margin-top:6px;font-size:0.92rem;line-height:1.35;color:var(--text);overflow-wrap:anywhere;}
+#tab_aidechat .aidechat-back{width:100%;min-height:48px;margin-bottom:8px;justify-content:center;}
+#tab_aidechat .aidechat-urgent{background:#fde8e8;color:var(--navy);border:1px solid #f0c2bc;border-radius:14px;padding:12px;margin:0 0 10px;font-size:0.95rem;line-height:1.4;font-weight:650;}
+#tab_aidechat .aidechat-urgent .btn{width:100%;min-height:48px;margin-top:8px;justify-content:center;}
+#tab_aidechat .aidechat-thread{display:flex;flex-direction:column;gap:8px;min-width:0;max-width:100%;}
+#tab_aidechat .aidechat-bubble{max-width:92%;min-width:0;box-sizing:border-box;border-radius:14px;padding:12px 14px;overflow-wrap:anywhere;word-break:break-word;font-size:0.95rem;line-height:1.45;}
+#tab_aidechat .aidechat-bubble-aide{align-self:flex-start;background:#fff;color:var(--navy);border:1px solid var(--border);border-bottom-left-radius:4px;}
+#tab_aidechat .aidechat-bubble-office{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
+#tab_aidechat .aidechat-bubble-remi{align-self:flex-start;background:#fff8e8;color:var(--navy);border:1px solid #f0d9a0;border-bottom-left-radius:4px;}
+#tab_aidechat .aidechat-who{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;opacity:0.85;}
+#tab_aidechat a.aidechat-phone,.copilot-bubble a.aidechat-phone{color:inherit;font-weight:800;text-decoration:underline;display:inline-block;min-height:44px;line-height:44px;padding:0 4px;overflow-wrap:anywhere;}
+#tab_aidechat .aidechat-composer{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-width:100%;min-width:0;}
+#tab_aidechat .aidechat-composer .btn{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
+#tab_aidechat textarea{min-height:72px;}
 #copilotFab{position:fixed;z-index:150;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));width:72px;height:72px;min-height:72px;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;font-family:'DM Sans',sans-serif;box-shadow:none;cursor:pointer;touch-action:manipulation;appearance:none;-webkit-appearance:none;overflow:visible;}
 #copilotFab[hidden]{display:none !important;}
 #copilotFab .remi-chip-face{display:block;width:72px;height:72px;border-radius:50%;object-fit:cover;background:transparent;box-shadow:0 8px 22px rgba(10,8,28,.45);pointer-events:none;}
@@ -1459,6 +1502,7 @@ bindLoginKeyboard();
         </div>
         <div class="more-list" id="moreList">
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('coverage')" id="nav_coverage"><span class="ni">🗺️</span> Coverage</button>
+          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" onclick="showTab('aidechat')" id="nav_aidechat"><span class="ni">💬</span> Aide chat</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('nurse')" id="nav_nurse" aria-label="Nurse"><span class="ni">🩺</span> Nurse <span class="nav-badge" id="nav_nurse_badge" hidden>0</span></button>
           <button type="button" class="nav-item more-row" id="nav_completes" aria-label="Completed intakes" aria-hidden="true" onclick="showTab('completes')"><span class="ni">📄</span> Completed intakes</button>
@@ -2009,6 +2053,53 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
 
+      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1">
+        <div id="aidechatInboxView">
+          <div class="page-hdr">
+            <div>
+              <h1>Aide chat</h1>
+              <p>One thread per aide. Office replies stay in the app.</p>
+            </div>
+          </div>
+          <section class="aidechat-settings" id="aidechatSettings" aria-label="Remi auto-reply">
+            <div class="aidechat-set-row">
+              <span id="aidechatSetLabel">Remi auto-reply</span>
+              <label class="aidechat-set-on" for="aidechatOn">
+                <input type="checkbox" id="aidechatOn" onchange="aidechatSettingsChanged()">
+                <span>On</span>
+              </label>
+            </div>
+            <div class="aidechat-set-times">
+              <label>From <input type="time" id="aidechatStart" value="14:00" onchange="aidechatSettingsChanged()"></label>
+              <label>Until <input type="time" id="aidechatEnd" value="08:00" onchange="aidechatSettingsChanged()"></label>
+            </div>
+            <p class="aidechat-window" id="aidechatWindowNote">2:00 PM → 8:00 AM · America/New_York. Remi auto-reply is off. A person replies.</p>
+            <p class="aidechat-rules" id="aidechatRules">Call-offs are never approved. Remi tells the aide to call <a class="aidechat-phone" href="tel:+12163775991">(216) 377-5991</a>. Pay uses Ready, Held, or submitted only.</p>
+            <label class="aidechat-set-on" for="aidechatEscalateOnly">
+              <input type="checkbox" id="aidechatEscalateOnly" onchange="aidechatRefresh()">
+              <span>Urgent only</span>
+            </label>
+          </section>
+          <p class="aidechat-note" id="aidechatSourceNote">Aide message callables are not on this desk yet. Threads stay on this phone until admin_list_aide_office_threads answers. Nothing here sends a text or an email.</p>
+          <div id="aidechatList" class="aidechat-list" aria-label="Aide threads"></div>
+          <div id="aidechatEmpty" class="empty-state"><p>No aide threads yet.</p></div>
+        </div>
+        <div id="aidechatThreadView" hidden>
+          <button type="button" class="btn btn-ghost aidechat-back" id="aidechatBack" onclick="aidechatShowInbox()">Back to inbox</button>
+          <div class="page-hdr">
+            <div>
+              <h1 id="aidechatThreadTitle">Aide</h1>
+              <p id="aidechatThreadMeta">Open</p>
+            </div>
+          </div>
+          <div id="aidechatUrgentBanner" class="aidechat-urgent" hidden></div>
+          <div id="aidechatMessages" class="aidechat-thread" aria-live="polite"></div>
+          <form id="aidechatComposer" class="aidechat-composer" onsubmit="aidechatSendOffice(event); return false;">
+            <textarea id="aidechatReply" maxlength="1000" placeholder="Reply as office" aria-label="Reply as office" autocomplete="off"></textarea>
+            <button type="submit" class="btn btn-teal" id="aidechatSend">Send</button>
+          </form>
+        </div>
+      </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-corner-chip.png?v=remi1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
     <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
@@ -3406,7 +3497,8 @@ var NAV_EDIT_META={
   inservices:{label:'Inservices',icon:'📚',short:''},
   broadcast:{label:'Broadcast Alert',icon:'📢',short:'Broadcast'},
   links:{label:'Links',icon:'🔗',short:''},
-  activity:{label:'Activity Log',icon:'📜',short:'Activity'}
+  activity:{label:'Activity Log',icon:'📜',short:'Activity'},
+  aidechat:{label:'Aide chat',icon:'💬',short:'Chat'}
 };
 var navEditDraft=null;
 var navEditPick='';
@@ -3418,7 +3510,7 @@ function navEditDefaults(){
   return ['timesheets','schedule','aides','backups'];
 }
 function navEditCatalog(){
-  return ['timesheets','schedule','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity'];
+  return ['timesheets','schedule','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity','aidechat'];
 }
 function navEditRoleOk(tab){
   if(navEditCatalog().indexOf(tab)<0)return false;
@@ -3818,6 +3910,7 @@ function showTab(tab){
   if(tab==='nurse')loadAdminNurseSection();
   if(tab==='schedule')loadAdminSchedule();
   if(tab==='coverage'&&typeof coverOpenDesk==='function')coverOpenDesk();
+  if(tab==='aidechat'&&typeof aidechatOpen==='function')aidechatOpen();
   if(tab==='inservices')renderInservices();
   if(tab==='activity')renderActivityLog();
   if(tab==='settings'){
@@ -6111,7 +6204,7 @@ function copilotPlaybook(key){
   var books={
     coverage_open:{
       title:'Coverage',
-      explain:'Open shifts sit under More → Coverage. An aide call-off can end as backup or as client refused. A member who calls to skip today is a separate path.',
+      explain:'Open shifts sit under More → Coverage. An aide call-off can end as backup or as client refused. A member who calls to skip today is a separate path. Remi never approves a call-off. Call the office at '+remiCalloffPhone()+'.',
       steps:[
         'Open the shift and read who the regular aide is.',
         'Text or call is optional. Close the shift when you know the outcome.',
@@ -7125,7 +7218,12 @@ function copilotChatAnswer(q){
 }
 function copilotChatHtml(text){
   var raw=typeof formatAdminDateCopy==='function'?formatAdminDateCopy(text):text;
-  return copilotEsc(raw).replace(/\n/g,'<br>');
+  var html=copilotEsc(raw).replace(/\n/g,'<br>');
+  if(typeof remiCalloffPhone==='function'){
+    var phone=copilotEsc(remiCalloffPhone());
+    html=html.split(phone).join('<a class="aidechat-phone" href="tel:+12163775991">'+phone+'</a>');
+  }
+  return html;
 }
 function copilotChatEnsureHello(){
   if(copilotChat.length)return;
@@ -7341,6 +7439,31 @@ function remiSecCalloffWhen(shift){
   if(wd&&mdy)return wd+' '+mdy;
   return mdy||wd||'';
 }
+function remiCalloffPhone(){
+  return '(216) 377-5991';
+}
+function remiLockCalloffLine(text){
+  var phone=remiCalloffPhone();
+  var s=String(text||'').replace(/(?:\+?1[\s.\-]*)?\(?\d{3}\)?[\s.\-]*\d{3}[\s.\-]*\d{4}/g, function(hit){
+    var digits=String(hit||'').replace(/\D/g,'');
+    if(digits.slice(-10)==='2163775991')return phone;
+    return phone;
+  });
+  if(s.indexOf(phone)<0){
+    s=s.replace(/\s+$/,'');
+    if(s&&!/[.!?]$/.test(s))s+='.';
+    s=(s?s+' ':'')+'Call the office at '+phone+'.';
+  }
+  return s;
+}
+function remiCalloffReply(){
+  var phone=remiCalloffPhone();
+  var text='I can\'t approve a call-off. Please call the office at '+phone+' so someone can help you right away. I\'ve also noted this for the scheduler.';
+  if(phone!=='(216) 377-5991'||text.indexOf('(216) 377-5991')<0){
+    text='I can\'t approve a call-off. Please call the office at (216) 377-5991 so someone can help you right away. I\'ve also noted this for the scheduler.';
+  }
+  return remiLockCalloffLine(text);
+}
 function remiSecCalloff(q){
   var shifts=(typeof copilotOpenShifts==='function')?copilotOpenShifts():[];
   var picked=[];
@@ -7350,7 +7473,7 @@ function remiSecCalloff(q){
   }
   var show=picked.length?picked:shifts;
   if(!show.length){
-    return remiSecPack('No call-offs are loaded on this desk. Open Coverage under More and ask again.', {
+    return remiSecPack(remiLockCalloffLine('No call-offs are loaded on this desk. Open Coverage under More and ask again.'), {
       kind:'coverage_open',
       actions:[{id:'open', label:'Open Coverage', kind:'tab', tab:'coverage'}],
       note:'Nothing sends until you confirm.',
@@ -7362,6 +7485,7 @@ function remiSecCalloff(q){
   var who=String(hit.clientName||hit.client||'Client');
   var line=(when?when+' \u2014 ':'')+who+' CALL-OFF still open. Want a backup SMS draft?';
   if(shifts.length>1&&!picked.length)line=shifts.length+' open call-offs. '+line;
+  line=remiLockCalloffLine(line);
   var body='Hi, this is Mo at EverCare. Your aide called off today. I can send a replacement caregiver. Please let me know. Thank you.';
   try{
     var book=(typeof copilotPlaybook==='function')?copilotPlaybook('coverage_open'):null;
@@ -7616,6 +7740,1118 @@ function remiSecAdd(q){
       payload:{firstName:parsed.first, lastName:parsed.last, phone:parsed.phone, email:parsed.email}
     }]
   });
+}
+// v=aidechat1 aide↔office inbox. Admin and Scheduler only. One thread per aide.
+// Remi auto-reply is On plus the America/New_York window, or it stays quiet.
+// Call-offs are never approved. Pay is Ready, Held, or submitted from portal rows only.
+// GHOST-AIDECHAT1-CONTRACT-v1. from_remi only while Remi is On and inside the window.
+// aide_chat_remi_context {} is the zero-arg fallback when admin_aide_chat_remi_context is missing.
+// Ace LIVE: list {p_escalate_only?}, messages {p_thread_id?,p_aide_id?,p_limit?,p_before?},
+// send {p_body,p_thread_id?,p_aide_id?}, clear {p_thread_id} only,
+// read {p_thread_id} when a thread opens, script {}, settings get {},
+// settings save {p_enabled,p_start_local?,p_end_local?,p_timezone?}, context {p_aide_id}.
+// Clear never approves a call-off. A missing callable stays on this phone.
+// No SMS. No email. No Auth reseal. Nurse does not enter this chat.
+var AIDECHAT_MARKER='v=aidechat1';
+var AIDECHAT_OFFICE_PHONE=remiCalloffPhone();
+var AIDECHAT_CALLOFF_REPLY=remiCalloffReply();
+var AIDECHAT_RPC={
+  list:['admin_list_aide_office_threads'],
+  messages:['admin_list_aide_office_messages'],
+  send:['admin_send_aide_office_message'],
+  clear:['admin_clear_aide_office_escalate'],
+  read:['admin_mark_aide_office_messages_read'],
+  script:['admin_get_aide_chat_call_off_script'],
+  settingsGet:['admin_get_aide_chat_remi_settings'],
+  settingsSet:['admin_save_aide_chat_remi_settings'],
+  context:['admin_aide_chat_remi_context'],
+  contextOwn:['aide_chat_remi_context']
+};
+var aidechatAceScript='';
+var aidechatScriptLoaded=false;
+var AIDECHAT_SESSION_THREADS='evercare_aidechat1_threads';
+var AIDECHAT_SESSION_SETTINGS='evercare_aidechat1_settings';
+var aidechatThreads=[];
+var aidechatSettings={enabled:false, start_local:'14:00', end_local:'08:00', timezone:'America/New_York', source:'desk'};
+var aidechatSource='local';
+var aidechatView='inbox';
+var aidechatSelectedId='';
+var aidechatRpcOff={};
+var aidechatRpcPick={};
+var aidechatGen=0;
+var aidechatSettingsGen=0;
+var aidechatSeq=0;
+var aidechatBound=false;
+function aidechatEsc(s){
+  var raw=String(s==null?'':s);
+  if(typeof coverEsc==='function')return coverEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function aidechatRoleOk(){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function aidechatId(prefix){
+  aidechatSeq+=1;
+  return String(prefix||'id')+'-'+aidechatSeq+'-'+Math.random().toString(36).slice(2,8);
+}
+function aidechatNorm(s){
+  return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+}
+function aidechatValidTime(v){
+  var m=String(v||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return '';
+  var h=Number(m[1]);
+  var min=Number(m[2]);
+  if(h>23||min>59)return '';
+  return String(h).padStart(2,'0')+':'+String(min).padStart(2,'0');
+}
+function aidechatClockLabel(hhmm){
+  var m=String(hhmm||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return String(hhmm||'');
+  var h=Number(m[1]);
+  var ap=h>=12?'PM':'AM';
+  var h12=h%12;
+  if(h12===0)h12=12;
+  return h12+':'+m[2]+' '+ap;
+}
+function aidechatInWindow(now, settings){
+  var s=settings||aidechatSettings||{};
+  var start=typeof copilotMinutes==='function'?copilotMinutes(s.start_local||s.start):null;
+  var end=typeof copilotMinutes==='function'?copilotMinutes(s.end_local||s.end):null;
+  if(start==null||end==null)return false;
+  var cur=typeof copilotNyMinutes==='function'?copilotNyMinutes(now||new Date()):null;
+  if(cur==null)return false;
+  if(start===end)return true;
+  if(start<end)return cur>=start&&cur<end;
+  return cur>=start||cur<end;
+}
+function aidechatRemiOn(settings, now){
+  var s=settings||aidechatSettings;
+  if(!s||!s.enabled)return false;
+  return aidechatInWindow(now, s);
+}
+function aidechatIsAide(aide, name, username, id){
+  if(!aide)return false;
+  var idA=aidechatNorm(aide.id||aide.aide_id);
+  var userA=aidechatNorm(aide.username);
+  var nameA=aidechatNorm(aide.name);
+  var idB=aidechatNorm(id);
+  var userB=aidechatNorm(username);
+  var nameB=aidechatNorm(name);
+  if(idA&&idB&&idA===idB)return true;
+  if(userA&&userB&&userA===userB)return true;
+  if(nameA&&nameB&&nameA===nameB)return true;
+  if(userA&&nameB&&userA===nameB)return true;
+  if(nameA&&userB&&nameA===userB)return true;
+  if(idA&&userB&&idA===userB)return true;
+  if(userA&&idB&&userA===idB)return true;
+  return false;
+}
+function aidechatEscRe(s){
+  return String(s||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+}
+function aidechatNameInText(name, text){
+  var parts=String(name||'').trim().split(/\s+/);
+  var i;
+  for(i=0;i<parts.length;i++){
+    var p=parts[i].replace(/[^A-Za-z]/g,'');
+    if(p.length<3)continue;
+    var re=new RegExp('\\b'+aidechatEscRe(p)+'\\b','i');
+    if(re.test(String(text||'')))return true;
+  }
+  return false;
+}
+function aidechatOtherAide(aide, text){
+  var list=[];
+  try{list=(typeof loadedAidesList!=='undefined'&&loadedAidesList)?loadedAidesList:[];}catch(e){list=[];}
+  var i;
+  for(i=0;i<list.length;i++){
+    var u=list[i];
+    if(!u)continue;
+    if(aidechatIsAide(aide, u.name||u.fullName, u.username, u.id||u.aide_id))continue;
+    var name=String(u.name||u.fullName||'').trim();
+    var user=String(u.username||'').trim();
+    if(name&&aidechatNameInText(name, text))return name;
+    if(user&&user.length>=3&&new RegExp('\\b'+aidechatEscRe(user)+'\\b','i').test(String(text||'')))return user;
+  }
+  return '';
+}
+function aidechatIsCalloff(text){
+  var s=String(text||'').toLowerCase();
+  if(/\bcall[\s-]?offs?\b|\bcalling off\b|\bcalled off\b/.test(s))return true;
+  if(/\b(cannot|can't|cant|won't|wont)\b/.test(s)&&/\b(come in|make it|work|coming|be in)\b/.test(s))return true;
+  if(/\b(i'm sick|im sick|i am sick|out sick|need the day off|need a day off|day off|not coming)\b/.test(s))return true;
+  return false;
+}
+function aidechatIsPayDispute(text){
+  var s=String(text||'').toLowerCase();
+  if(/\$\s?\d|\bdollars?\b/.test(s))return true;
+  if(/\b(deposit|direct deposit|bank|routing|account number|paycheck amount|didn't get paid|didnt get paid|not been paid|not paid|missing pay|short pay|wrong pay|zelle|cash app|venmo|wire)\b/.test(s))return true;
+  if(/\b(sms|text|texted)\b/.test(s)&&/\bpay\b/.test(s))return true;
+  return false;
+}
+function aidechatIsPayStatus(text){
+  if(aidechatIsPayDispute(text))return false;
+  return /\b(pay|paid|payroll)\b/i.test(String(text||''));
+}
+function aidechatIsSignature(text){
+  return /\b(signature|signed|unsigned)\b/i.test(String(text||''));
+}
+function aidechatIsServices(text){
+  var s=String(text||'').toLowerCase();
+  if(/\b(empty services|services are empty|no services|services today|services that day|service today)\b/.test(s))return true;
+  if(/\bservices?\b/.test(s)&&/\b(today|empty|that day|none|any|schedule)\b/.test(s))return true;
+  if(/\b(do i work today|am i scheduled today|clients today|on the schedule today)\b/.test(s))return true;
+  return false;
+}
+function aidechatIsTimesheet(text){
+  var s=String(text||'').toLowerCase();
+  if(/\bpay\b/.test(s))return false;
+  if(/\b(timesheets?|time sheets?)\b/.test(s))return true;
+  return /\b(submitted|turned in|turn in)\b/.test(s);
+}
+function aidechatIsStatusAsk(text){
+  var s=String(text||'').toLowerCase();
+  return /\b(timesheets?|signature|signed|pay|paid|services?|submitted|ready|held|schedule)\b/.test(s);
+}
+function aidechatSheetsFor(aide){
+  var sheets=[];
+  try{sheets=(typeof allRecords!=='undefined'&&allRecords)?allRecords:[];}catch(e){sheets=[];}
+  var out=[];
+  var i;
+  for(i=0;i<sheets.length;i++){
+    var r=sheets[i];
+    if(!r||r.deleted_at||r.deletedAt)continue;
+    if(aidechatIsAide(aide, r.empName||r.name, r.username, r.aide_id||r.aideId||r.id))out.push(r);
+  }
+  return out;
+}
+function aidechatPayFor(aide){
+  var rows=[];
+  try{
+    if(typeof payReadyState!=='undefined'&&payReadyState&&Array.isArray(payReadyState.rows))rows=payReadyState.rows;
+  }catch(e){rows=[];}
+  var i;
+  for(i=0;i<rows.length;i++){
+    var r=rows[i];
+    if(!r)continue;
+    if(aidechatIsAide(aide, r.name||r.empName, r.username, r.aide_id||r.aideId))return r;
+  }
+  return null;
+}
+function aidechatSafeBit(s){
+  var t=String(s||'').replace(/\$[\d,]+(?:\.\d{2})?/g,'').replace(/\s+/g,' ').trim();
+  if(!t)return '';
+  if(/\b(deposit|bank|routing|zelle|venmo|cash app|sms|text message)\b/i.test(t))return '';
+  return t;
+}
+function aidechatGuard(text){
+  return String(text||'').replace(/\$[\d,]+(?:\.\d{2})?/g,'').replace(/[ \t]{2,}/g,' ').trim();
+}
+function aidechatPayFacts(aide){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    var bits=[];
+    if(ctx.payStatus==='ready')bits.push('Ready');
+    else if(ctx.payStatus==='held')bits.push(ctx.payReason?('Held — '+ctx.payReason):'Held');
+    if(ctx.paySubmitted===true)bits.push('submitted');
+    else if(ctx.paySubmitted===false)bits.push('not submitted');
+    if(!bits.length)return '';
+    return 'Your pay on this desk: '+bits.join(', ')+'.';
+  }
+  var row=aidechatPayFor(aide);
+  if(!row)return '';
+  var bits=[];
+  var st=String(row.status||row.pay_status||'').toLowerCase();
+  if(st==='ready')bits.push('Ready');
+  else if(st==='held'||st==='hold'){
+    var why=aidechatSafeBit(row.reasonLabel||row.reason_label||row.held_reason||'');
+    bits.push(why?('Held — '+why):'Held');
+  }
+  var checks=row.checks||row.checklist||{};
+  var sub=checks.submitted;
+  if(sub==null&&row.submitted!=null)sub=row.submitted;
+  if(sub==='yes'||sub===true||sub==='submitted')bits.push('submitted');
+  else if(sub==='no'||sub===false||sub==='not_submitted'||sub==='missing')bits.push('not submitted');
+  if(!bits.length)return '';
+  return 'Your pay on this desk: '+bits.join(', ')+'.';
+}
+function aidechatSubmittedAnswer(aide){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    if(ctx.submitted===true)return 'Yes. Your timesheet is submitted.';
+    if(ctx.submitted===false)return 'No. Your timesheet is not submitted.';
+    return 'I don\'t see your timesheet on this desk.';
+  }
+  var sheets=aidechatSheetsFor(aide).filter(function(r){
+    return String(r.status||'').toLowerCase()!=='backup';
+  });
+  if(!sheets.length)return 'I don\'t see your timesheet on this desk.';
+  var pending=false;
+  var i;
+  for(i=0;i<sheets.length;i++){
+    var ok=typeof remiAskIsSubmitted==='function'?remiAskIsSubmitted(sheets[i]):String(sheets[i].status||'').toLowerCase()!=='draft';
+    if(!ok)pending=true;
+  }
+  if(pending)return 'No. Your timesheet is not submitted.';
+  return 'Yes. Your timesheet is submitted.';
+}
+function aidechatSignatureAnswer(aide){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    if(ctx.signatureMissing===true)return 'Yes. A signature is missing on your timesheet.';
+    if(ctx.signatureMissing===false)return 'No. I don\'t see a missing signature on your timesheet.';
+    return 'I don\'t see a signature status for you on this desk.';
+  }
+  var sheets=aidechatSheetsFor(aide);
+  var pay=aidechatPayFor(aide);
+  var missing=false;
+  var known=false;
+  var i;
+  for(i=0;i<sheets.length;i++){
+    var sig=typeof remiAskSig==='function'?remiAskSig(sheets[i]):'';
+    if(sig==='missing'){missing=true;known=true;}
+    else if(sig==='ok')known=true;
+  }
+  if(pay){
+    var reason=String(pay.reason||pay.held_reason||'');
+    var checks=pay.checks||{};
+    var ps=checks.signature;
+    if(reason==='missing_signature'||ps==='missing'){missing=true;known=true;}
+    else if(ps==='present'||ps==='ok'||ps==='yes')known=true;
+  }
+  if(!known)return 'I don\'t see a signature status for you on this desk.';
+  if(missing)return 'Yes. A signature is missing on your timesheet.';
+  return 'No. I don\'t see a missing signature on your timesheet.';
+}
+function aidechatNyIso(now){
+  var d=now instanceof Date?now:new Date();
+  try{
+    var fmt=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
+    var s=fmt.format(d);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  }catch(e){}
+  if(typeof payReadyNyYmd==='function'){
+    var ny=payReadyNyYmd(d);
+    if(ny&&ny.y&&ny.m&&ny.d)return ny.y+'-'+ny.m+'-'+ny.d;
+  }
+  return '';
+}
+function aidechatDayOffset(weekStart, iso){
+  var m1=String(weekStart||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  var m2=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m1||!m2)return -1;
+  var a=Date.UTC(+m1[1], +m1[2]-1, +m1[3]);
+  var b=Date.UTC(+m2[1], +m2[2]-1, +m2[3]);
+  var diff=Math.round((b-a)/86400000);
+  if(diff<0||diff>6)return -1;
+  return diff;
+}
+function aidechatServicesFromSheet(aide, iso){
+  var sheets=aidechatSheetsFor(aide);
+  if(!sheets.length||!iso)return null;
+  var found=false;
+  var empty=false;
+  var filled=false;
+  var i;
+  for(i=0;i<sheets.length;i++){
+    var r=sheets[i];
+    var week=String(r.weekStart||r.week_start||'').slice(0,10);
+    var idx=aidechatDayOffset(week, iso);
+    if(idx<0)continue;
+    var day=null;
+    if(typeof dayEntry==='function')day=dayEntry(r.days, idx);
+    else if(r.days)day=r.days[idx]||r.days[String(idx)]||null;
+    found=true;
+    if(!day){empty=true;continue;}
+    var svcs=day.svcs||day.services;
+    if(Array.isArray(svcs)){
+      if(svcs.length)filled=true;
+      else empty=true;
+      continue;
+    }
+    if(typeof isWorkedDay==='function'&&isWorkedDay(day))filled=true;
+    else empty=true;
+  }
+  if(!found)return null;
+  return {empty:empty&&!filled, filled:filled};
+}
+function aidechatScheduleToday(aide, iso){
+  var week='';
+  var usualLen=0;
+  var exLen=0;
+  var rowsLen=0;
+  try{week=typeof schedWeekStart!=='undefined'?String(schedWeekStart||''):'';}catch(e){week='';}
+  try{usualLen=(schedUsual||[]).length;}catch(e1){usualLen=0;}
+  try{exLen=(schedExceptions||[]).length;}catch(e2){exLen=0;}
+  try{rowsLen=(schedWeekRows||[]).length;}catch(e3){rowsLen=0;}
+  if(!week&&!usualLen&&!exLen&&!rowsLen)return {loaded:false, names:[]};
+  if(typeof schedCellFor!=='function'||typeof schedClients!=='function'||typeof schedWeekdayFromIso!=='function')return {loaded:false, names:[]};
+  var wd=schedWeekdayFromIso(iso);
+  var names=[];
+  var clients=[];
+  try{clients=schedClients()||[];}catch(e4){clients=[];}
+  var i;
+  for(i=0;i<clients.length;i++){
+    var c=clients[i];
+    if(!c)continue;
+    var cell=null;
+    try{cell=schedCellFor(c.id, iso, wd);}catch(e5){cell=null;}
+    if(!cell||cell.state==='open'||cell.state==='calloff')continue;
+    var label='';
+    try{label=typeof schedAideLabel==='function'?schedAideLabel(cell.aideId):'';}catch(e6){label='';}
+    if(aidechatIsAide(aide, label, cell.aideId, cell.aideId)){
+      var who=String(c.name||c.clientName||'').trim();
+      if(who)names.push(who);
+    }
+  }
+  return {loaded:true, names:names};
+}
+function aidechatServicesAnswer(aide, now){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    if(ctx.servicesEmpty===true)return 'Yes. Services are empty on your timesheet that day.';
+    if(ctx.servicesEmpty===false)return 'No. Services are on your timesheet that day.';
+    if(ctx.scheduledWith)return 'No. You are scheduled today with '+ctx.scheduledWith+'.';
+    return 'I don\'t see today\'s services on this desk.';
+  }
+  var iso=aidechatNyIso(now);
+  if(!iso)return 'I don\'t see today\'s services on this desk.';
+  var sheet=aidechatServicesFromSheet(aide, iso);
+  if(sheet&&sheet.filled)return 'No. Services are on your timesheet that day.';
+  if(sheet&&sheet.empty)return 'Yes. Services are empty on your timesheet that day.';
+  var sched=aidechatScheduleToday(aide, iso);
+  if(!sched.loaded)return 'I don\'t see today\'s services on this desk.';
+  if(sched.names.length){
+    var shown=sched.names.slice(0,4).join(', ');
+    return 'No. You are scheduled today with '+shown+'.';
+  }
+  return 'Yes. You have no services on the schedule today.';
+}
+function aidechatTri(v){
+  if(v==null||v==='')return null;
+  if(v===true||v===1)return true;
+  if(v===false||v===0)return false;
+  var s=String(v).toLowerCase();
+  if(s==='yes'||s==='true'||s==='submitted'||s==='present'||s==='ok')return true;
+  if(s==='no'||s==='false'||s==='not_submitted'||s==='missing')return false;
+  return null;
+}
+function aidechatPick(obj, keys){
+  if(!obj)return undefined;
+  var i;
+  for(i=0;i<keys.length;i++){
+    if(obj[keys[i]]!=null&&obj[keys[i]]!=='')return obj[keys[i]];
+  }
+  return undefined;
+}
+function aidechatContextFrom(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(Array.isArray(node))node=node[0]||null;
+  if(!node||typeof node!=='object')return null;
+  var bag=node.facts||node.context||node;
+  if(bag&&bag.facts&&typeof bag.facts==='object')bag=bag.facts;
+  var checks=bag.checks||bag.checklist||{};
+  var submitted=aidechatPick(bag, ['timesheet_submitted','submitted']);
+  if(submitted==null&&checks.submitted!=null)submitted=checks.submitted;
+  var sig=aidechatPick(bag, ['signature_missing','signature']);
+  if(sig==null&&checks.signature!=null)sig=checks.signature;
+  var servicesEmpty=aidechatPick(bag, ['services_empty']);
+  var services=aidechatPick(bag, ['services','services_today']);
+  var scheduled=aidechatPick(bag, ['scheduled_with','client_name','client_names']);
+  var payStatus=aidechatPick(bag, ['pay_status']);
+  var paySub=aidechatPick(bag, ['pay_submitted']);
+  if(paySub==null&&checks.pay_submitted!=null)paySub=checks.pay_submitted;
+  var payReason=aidechatPick(bag, ['held_reason','reason_label','reasonLabel']);
+  if(submitted==null&&sig==null&&servicesEmpty==null&&services==null&&scheduled==null&&payStatus==null&&paySub==null)return null;
+  var sigMissing=null;
+  if(sig!=null){
+    var sl=String(sig).toLowerCase();
+    if(sig===true||sl==='missing'||sl==='yes'||sl==='true')sigMissing=true;
+    else if(sig===false||sl==='present'||sl==='ok'||sl==='no'||sl==='false')sigMissing=false;
+  }
+  var empty=null;
+  if(servicesEmpty!=null)empty=aidechatTri(servicesEmpty);
+  else if(Array.isArray(services))empty=services.length===0;
+  var pay='';
+  if(payStatus!=null){
+    var ps=String(payStatus).toLowerCase();
+    if(ps==='ready')pay='ready';
+    else if(ps==='held'||ps==='hold')pay='held';
+  }
+  var names='';
+  if(Array.isArray(scheduled))names=scheduled.filter(Boolean).slice(0,4).join(', ');
+  else if(scheduled!=null)names=String(scheduled);
+  return {
+    loaded:true,
+    submitted:aidechatTri(submitted),
+    signatureMissing:sigMissing,
+    servicesEmpty:empty,
+    scheduledWith:aidechatSafeBit(names),
+    payStatus:pay,
+    paySubmitted:aidechatTri(paySub),
+    payReason:aidechatSafeBit(payReason||'')
+  };
+}
+function aidechatCtx(aide){
+  return aide&&aide.context&&aide.context.loaded?aide.context:null;
+}
+function aidechatScriptText(data){
+  if(typeof data==='string')return String(data).trim();
+  var node=data||{};
+  if(Array.isArray(node))node=node[0]||{};
+  if(node&&node.script==null&&node.call_off_script==null&&node.data)node=node.data;
+  return String(node.script||node.call_off_script||node.body||node.text||node.message||'').trim();
+}
+function aidechatCalloffText(){
+  return aidechatAceScript||remiCalloffReply();
+}
+async function aidechatLoadCalloffScript(){
+  if(aidechatScriptLoaded)return;
+  var got=await aidechatRpc('script', {});
+  if(got&&got.signedOut)return;
+  aidechatScriptLoaded=true;
+  if(!got||!got.ok)return;
+  var text=aidechatScriptText(got.data);
+  if(!text)return;
+  text=remiLockCalloffLine(text);
+  if(/\b(you are approved|you're approved|call-off is approved|approved the call-off|assigned a backup)\b/i.test(text))text=remiCalloffReply();
+  if(text.indexOf(remiCalloffPhone())<0)text=remiCalloffReply();
+  aidechatAceScript=text;
+}
+async function aidechatLoadContext(aide){
+  var id=String(aide&&(aide.id||aide.aide_id)||'');
+  if(id){
+    var got=await aidechatRpc('context', {p_aide_id:id});
+    if(got&&got.ok)return aidechatContextFrom(got.data);
+    if(!(got&&got.missing))return null;
+  }
+  var own=await aidechatRpc('contextOwn', {});
+  if(own&&own.ok)return aidechatContextFrom(own.data);
+  return null;
+}
+function aidechatRemiDecide(text, aide, settings, now){
+  var empty={text:'', urgent:false, reason:'', headsUp:''};
+  if(!aidechatRemiOn(settings, now))return empty;
+  var raw=String(text||'').trim();
+  if(!raw)return empty;
+  if(aidechatIsCalloff(raw)){
+    return {text:aidechatCalloffText(), urgent:true, reason:'call_off', headsUp:'coverage'};
+  }
+  if(aidechatOtherAide(aide, raw)&&aidechatIsStatusAsk(raw)){
+    return {text:'I can only look up your own status.', urgent:false, reason:'', headsUp:''};
+  }
+  if(aidechatIsPayDispute(raw)){
+    var facts=aidechatPayFacts(aide);
+    var line=(facts?facts+' ':'')+'I don\'t see a deposit, a bank, or a text about pay, and I won\'t guess one. I\'ve flagged this for the office.';
+    return {text:aidechatGuard(line), urgent:true, reason:'pay_dispute', headsUp:'office'};
+  }
+  if(aidechatIsPayStatus(raw)){
+    var pay=aidechatPayFacts(aide);
+    return {text:pay||'I don\'t see your pay status on this desk.', urgent:false, reason:'', headsUp:''};
+  }
+  if(aidechatIsSignature(raw)){
+    return {text:aidechatSignatureAnswer(aide), urgent:false, reason:'', headsUp:''};
+  }
+  if(aidechatIsServices(raw)){
+    return {text:aidechatServicesAnswer(aide, now), urgent:false, reason:'', headsUp:''};
+  }
+  if(aidechatIsTimesheet(raw)){
+    return {text:aidechatSubmittedAnswer(aide), urgent:false, reason:'', headsUp:''};
+  }
+  return empty;
+}
+function aidechatRpcMissing(got){
+  if(typeof coverRpcMissing==='function')return coverRpcMissing(got);
+  if(typeof sbAideListRpcMissing==='function')return sbAideListRpcMissing(got);
+  var err=String((got&&(got.error||got.message))||'');
+  if(got&&got.status===404)return true;
+  return /PGRST202|could not find the function|schema cache/i.test(err);
+}
+async function aidechatRpc(kind, body){
+  if(aidechatRpcOff[kind])return {missing:true};
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function')return {missing:true};
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token)return {signedOut:true};
+  var names=AIDECHAT_RPC[kind]||[];
+  var order=[];
+  if(aidechatRpcPick[kind])order.push(aidechatRpcPick[kind]);
+  var i;
+  for(i=0;i<names.length;i++){
+    if(order.indexOf(names[i])<0)order.push(names[i]);
+  }
+  var last={missing:true};
+  for(i=0;i<order.length;i++){
+    var got=null;
+    try{got=await sbRestRpc(order[i], body||{});}
+    catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+    if(got&&got.ok===true){
+      var node=got.data;
+      if(typeof sbRpcNode==='function'){
+        try{node=sbRpcNode(got.data);}catch(e2){node=got.data;}
+      }
+      var rpcErr='';
+      if(typeof sbRpcError==='function'){
+        try{rpcErr=sbRpcError(node)||'';}catch(e3){rpcErr='';}
+      }
+      if(rpcErr)return {ok:false, error:rpcErr};
+      aidechatRpcPick[kind]=order[i];
+      return {ok:true, data:node, name:order[i]};
+    }
+    if(aidechatRpcMissing(got)||!got){
+      last={missing:true, error:got&&got.error};
+      continue;
+    }
+    return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+  }
+  aidechatRpcOff[kind]=true;
+  return last;
+}
+function aidechatMapMessage(raw){
+  raw=raw||{};
+  var sender=String(raw.sender||raw.role||raw.from||'aide').toLowerCase();
+  if(raw.from_remi===true||raw.from_remi==='true'||raw.from_remi==='t')sender='remi';
+  else if(sender==='remi'||sender==='assistant')sender='remi';
+  else if(sender==='office'||sender==='admin'||sender==='scheduler'||sender==='staff')sender='office';
+  else sender='aide';
+  return {
+    id:String(raw.id||raw.message_id||aidechatId('m')),
+    sender:sender,
+    body:String(raw.body||raw.text||raw.message||'').trim(),
+    created_at:String(raw.created_at||raw.sent_at||raw.at||''),
+    kind:String(raw.kind||'')
+  };
+}
+function aidechatMessagesFrom(data){
+  var node=data;
+  if(Array.isArray(node))return node.map(aidechatMapMessage).filter(function(m){return m&&m.body;});
+  if(node&&Array.isArray(node.messages))return node.messages.map(aidechatMapMessage).filter(function(m){return m&&m.body;});
+  if(node&&Array.isArray(node.rows))return node.rows.map(aidechatMapMessage).filter(function(m){return m&&m.body;});
+  return null;
+}
+function aidechatMapThread(raw){
+  raw=raw||{};
+  var id=String(raw.thread_id||raw.id||raw.aide_id||raw.aideId||raw.aide_username||raw.username||'');
+  if(!id)id=aidechatId('t');
+  var reason=String(raw.urgent_reason||raw.escalate_reason||raw.reason||raw.escalate_kind||'');
+  if(reason==='calloff'||reason==='call-off')reason='call_off';
+  if(reason==='pay')reason='pay_dispute';
+  var escalated=!!(raw.urgent||raw.is_urgent||raw.escalated||raw.is_escalated||raw.escalate);
+  var msgs=aidechatMessagesFrom(raw);
+  var name=String(raw.aide_name||raw.name||raw.aide_username||raw.username||'Aide');
+  return {
+    id:id,
+    aide_id:String(raw.aide_id||raw.aideId||''),
+    username:String(raw.aide_username||raw.username||''),
+    name:name,
+    urgent:escalated,
+    urgent_reason:reason,
+    heads_up:String(raw.heads_up||raw.headsUp||''),
+    status:String(raw.status||'open'),
+    last_message:String(raw.last_message||raw.preview||(msgs&&msgs.length?msgs[msgs.length-1].body:'')||''),
+    last_at:String(raw.last_at||raw.updated_at||''),
+    messages:msgs||[]
+  };
+}
+function aidechatThreadsFrom(data){
+  var node=data;
+  var list=null;
+  if(Array.isArray(node))list=node;
+  else if(node&&Array.isArray(node.threads))list=node.threads;
+  else if(node&&Array.isArray(node.rows))list=node.rows;
+  if(!list)return [];
+  return list.map(aidechatMapThread).filter(function(t){return t&&(t.aide_id||t.username||t.name);});
+}
+function aidechatKey(row){
+  if(!row)return '';
+  return aidechatNorm(row.aide_id||row.id||row.username||row.name);
+}
+function aidechatFind(id){
+  id=String(id||'');
+  var i;
+  for(i=0;i<aidechatThreads.length;i++){
+    if(String(aidechatThreads[i].id)===id)return aidechatThreads[i];
+  }
+  return null;
+}
+function aidechatFindByAide(aide){
+  var user=aidechatNorm(aide&&aide.username);
+  var name=aidechatNorm(aide&&aide.name);
+  var id=aidechatNorm(aide&&(aide.id||aide.aide_id));
+  var i;
+  for(i=0;i<aidechatThreads.length;i++){
+    var t=aidechatThreads[i];
+    if(id&&aidechatNorm(t.aide_id)===id)return t;
+    if(user&&aidechatNorm(t.username)===user)return t;
+    if(name&&aidechatNorm(t.name)===name)return t;
+  }
+  return null;
+}
+function aidechatDedupe(list){
+  var map={};
+  var order=[];
+  (list||[]).forEach(function(t){
+    if(!t)return;
+    var key=aidechatNorm(t.aide_id||t.username||t.name||t.id);
+    if(!key)return;
+    if(!map[key]){map[key]=t;order.push(key);return;}
+    var prev=map[key];
+    var prevAt=String(prev.last_at||'');
+    var nextAt=String(t.last_at||'');
+    if((t.urgent&&!prev.urgent)||nextAt>=prevAt){
+      if((prev.messages||[]).length>(t.messages||[]).length)t.messages=prev.messages;
+      map[key]=t;
+    }else if((t.messages||[]).length>(prev.messages||[]).length){
+      prev.messages=t.messages;
+    }
+  });
+  return order.map(function(k){return map[k];});
+}
+function aidechatIsOpen(t){
+  var st=String(t&&t.status||'open').toLowerCase();
+  return st!=='closed'&&st!=='archived';
+}
+function aidechatSorted(){
+  var rows=aidechatThreads.filter(aidechatIsOpen);
+  if(aidechatWantEscalateOnly())rows=rows.filter(function(t){return t&&t.urgent;});
+  return rows.slice().sort(function(a,b){
+    if(!!a.urgent!==!!b.urgent)return a.urgent?-1:1;
+    return String(b.last_at||'').localeCompare(String(a.last_at||''));
+  });
+}
+function aidechatReadSession(){
+  try{
+    var raw=sessionStorage.getItem(AIDECHAT_SESSION_THREADS);
+    var data=raw?JSON.parse(raw):[];
+    return Array.isArray(data)?data:[];
+  }catch(e){return [];}
+}
+function aidechatWriteSession(){
+  try{sessionStorage.setItem(AIDECHAT_SESSION_THREADS, JSON.stringify(aidechatThreads||[]));}catch(e){}
+}
+function aidechatReadSettings(){
+  try{
+    var raw=sessionStorage.getItem(AIDECHAT_SESSION_SETTINGS);
+    if(!raw)return null;
+    var data=JSON.parse(raw);
+    if(!data||typeof data!=='object')return null;
+    return {
+      enabled:!!data.enabled,
+      start_local:aidechatValidTime(data.start_local)||'14:00',
+      end_local:aidechatValidTime(data.end_local)||'08:00',
+      timezone:'America/New_York',
+      source:'desk'
+    };
+  }catch(e){return null;}
+}
+function aidechatWriteSettings(s){
+  try{sessionStorage.setItem(AIDECHAT_SESSION_SETTINGS, JSON.stringify({
+    enabled:!!(s&&s.enabled),
+    start_local:(s&&s.start_local)||'14:00',
+    end_local:(s&&s.end_local)||'08:00',
+    timezone:'America/New_York'
+  }));}catch(e){}
+}
+function aidechatMapSettings(data){
+  var node=data||{};
+  if(Array.isArray(node))node=node[0]||{};
+  var enabled=node.enabled;
+  if(enabled==null)enabled=node.p_enabled;
+  if(enabled==null)enabled=node.remi_enabled;
+  var start=aidechatValidTime(node.start_local||node.p_start_local||node.start)||'14:00';
+  var end=aidechatValidTime(node.end_local||node.p_end_local||node.end)||'08:00';
+  return {
+    enabled:enabled===true||enabled==='true'||enabled==='on'||enabled===1,
+    start_local:start,
+    end_local:end,
+    timezone:'America/New_York',
+    source:'ace'
+  };
+}
+function aidechatAideOf(thread){
+  return {id:thread&&thread.aide_id||'', username:thread&&thread.username||'', name:thread&&thread.name||''};
+}
+function aidechatPreview(text){
+  var s=String(text||'').replace(/\s+/g,' ').trim();
+  if(s.length>90)s=s.slice(0,87)+'…';
+  return s;
+}
+function aidechatChips(t){
+  var html='<span class="aidechat-chip aidechat-chip-open">Open</span>';
+  if(t&&t.urgent){
+    html+='<span class="aidechat-chip aidechat-chip-urgent">Urgent</span>';
+    if(t.urgent_reason==='call_off'||t.heads_up==='coverage')html+='<span class="aidechat-chip aidechat-chip-cover">Coverage</span>';
+    if(t.urgent_reason==='pay_dispute'||t.heads_up==='office')html+='<span class="aidechat-chip aidechat-chip-pay">Pay</span>';
+  }
+  return html;
+}
+function aidechatWindowSentence(){
+  var s=aidechatSettings||{};
+  var from=aidechatClockLabel(s.start_local||'14:00');
+  var until=aidechatClockLabel(s.end_local||'08:00');
+  var state;
+  if(!s.enabled)state='Remi auto-reply is off. A person replies.';
+  else if(aidechatInWindow(new Date(), s))state='Remi can reply now.';
+  else state='Outside this window, Remi does not reply.';
+  var where=s.source==='ace'?'Saved with the office.':'Saved on this phone until the office callable answers.';
+  return from+' → '+until+' · America/New_York. '+state+' '+where;
+}
+function aidechatSourceNote(){
+  if(aidechatSource==='ace')return 'Threads come from the office. Replies stay in this app.';
+  if(aidechatSource==='signed-out'&&!(aidechatThreads&&aidechatThreads.length))return 'Sign in to load aide threads. Nothing here sends a text or an email.';
+  if(aidechatSource==='signed-out')return 'These threads are on this phone. Sign in to reach the office list. Nothing here sends a text or an email.';
+  return 'Aide message callables are not on this desk yet. Threads stay on this phone until admin_list_aide_office_threads answers. Nothing here sends a text or an email.';
+}
+function aidechatPaintSettings(){
+  var s=aidechatSettings||{};
+  var on=document.getElementById('aidechatOn');
+  var start=document.getElementById('aidechatStart');
+  var end=document.getElementById('aidechatEnd');
+  var note=document.getElementById('aidechatWindowNote');
+  if(on)on.checked=!!s.enabled;
+  if(start&&s.start_local)start.value=s.start_local;
+  if(end&&s.end_local)end.value=s.end_local;
+  if(note)note.textContent=aidechatWindowSentence();
+}
+function aidechatPaintInbox(){
+  var list=document.getElementById('aidechatList');
+  var empty=document.getElementById('aidechatEmpty');
+  var note=document.getElementById('aidechatSourceNote');
+  if(note)note.textContent=aidechatSourceNote();
+  aidechatPaintSettings();
+  var rows=aidechatSorted();
+  if(empty)empty.hidden=rows.length>0;
+  if(!list)return;
+  if(!rows.length){list.innerHTML='';return;}
+  list.innerHTML=rows.map(function(t){
+    var urgent=t.urgent?' is-urgent':'';
+    var flag=t.urgent?'1':'0';
+    return '<button type="button" class="aidechat-card'+urgent+'" data-aidechat-thread="'+aidechatEsc(t.id)+'" data-aidechat-urgent="'+flag+'">'
+      +'<span class="aidechat-card-top"><strong>'+aidechatEsc(t.name||t.username||'Aide')+'</strong><span class="aidechat-chips">'+aidechatChips(t)+'</span></span>'
+      +'<span class="aidechat-preview">'+aidechatEsc(aidechatPreview(t.last_message)||'No messages yet')+'</span>'
+      +'</button>';
+  }).join('');
+}
+function aidechatLinkPhones(escaped){
+  var phone=aidechatEsc(remiCalloffPhone());
+  return String(escaped||'').split(phone).join('<a class="aidechat-phone" href="tel:+12163775991">'+phone+'</a>');
+}
+function aidechatWho(sender){
+  if(sender==='office')return 'Office';
+  if(sender==='remi')return 'Remi';
+  return 'Aide';
+}
+function aidechatBannerText(t){
+  if(!t||!t.urgent)return '';
+  if(t.urgent_reason==='call_off'||t.heads_up==='coverage')return 'Open · Urgent — call-off. Noted for the scheduler. Coverage heads-up. Clearing this flag does not approve the call-off. Call '+remiCalloffPhone()+'.';
+  if(t.urgent_reason==='pay_dispute'||t.heads_up==='office')return 'Open · Urgent — pay. Flagged for the office.';
+  return 'Open · Urgent.';
+}
+function aidechatPaintThread(){
+  var thread=aidechatFind(aidechatSelectedId);
+  var title=document.getElementById('aidechatThreadTitle');
+  var meta=document.getElementById('aidechatThreadMeta');
+  var banner=document.getElementById('aidechatUrgentBanner');
+  var box=document.getElementById('aidechatMessages');
+  if(!thread){
+    aidechatShowInbox();
+    return;
+  }
+  if(title)title.textContent=thread.name||thread.username||'Aide';
+  if(meta){
+    var bits=['Open'];
+    if(thread.username)bits.push('@'+thread.username);
+    if(thread.urgent)bits.push('Urgent');
+    meta.textContent=bits.join(' · ');
+  }
+  if(banner){
+    var line=aidechatBannerText(thread);
+    if(line){
+      banner.hidden=false;
+      banner.innerHTML='<div>'+aidechatLinkPhones(aidechatEsc(line))+'</div><button type="button" class="btn btn-ghost" id="aidechatClearUrgent" onclick="aidechatClearUrgent()">Clear urgent</button>';
+    }else banner.hidden=true;
+  }
+  if(!box)return;
+  var msgs=thread.messages||[];
+  if(!msgs.length){
+    box.innerHTML='<p class="aidechat-note">No messages in this thread yet.</p>';
+    return;
+  }
+  box.innerHTML=msgs.map(function(m){
+    var sender=m.sender==='office'||m.sender==='remi'?m.sender:'aide';
+    return '<div class="aidechat-bubble aidechat-bubble-'+sender+'"><span class="aidechat-who">'+aidechatWho(sender)+'</span>'+aidechatLinkPhones(aidechatEsc(m.body))+'</div>';
+  }).join('');
+  try{box.scrollTop=box.scrollHeight;}catch(e){}
+}
+function aidechatShow(which){
+  aidechatView=which;
+  var inbox=document.getElementById('aidechatInboxView');
+  var thread=document.getElementById('aidechatThreadView');
+  if(inbox)inbox.hidden=which!=='inbox';
+  if(thread)thread.hidden=which!=='thread';
+  try{window.scrollTo(0,0);}catch(e){}
+}
+function aidechatShowInbox(){
+  if(!aidechatRoleOk())return;
+  aidechatSelectedId='';
+  aidechatShow('inbox');
+  aidechatPaintInbox();
+}
+function aidechatEnsureBound(){
+  if(aidechatBound)return;
+  aidechatBound=true;
+  var list=document.getElementById('aidechatList');
+  if(!list)return;
+  list.addEventListener('click', function(ev){
+    var card=ev.target&&ev.target.closest?ev.target.closest('[data-aidechat-thread]'):null;
+    if(!card)return;
+    aidechatOpenThread(card.getAttribute('data-aidechat-thread'));
+  });
+}
+function aidechatWantEscalateOnly(){
+  var box=document.getElementById('aidechatEscalateOnly');
+  return !!(box&&box.checked);
+}
+function aidechatWireSend(thread, body){
+  var out={p_body:String(body||'')};
+  var tid=String(thread&&thread.id||'');
+  var aid=String(thread&&(thread.aide_id||thread.username)||'');
+  if(tid)out.p_thread_id=tid;
+  else if(aid)out.p_aide_id=aid;
+  return out;
+}
+function aidechatWireMessages(thread, before){
+  var out={p_limit:80};
+  var tid=String(thread&&thread.id||'');
+  var aid=String(thread&&(thread.aide_id||thread.username)||'');
+  if(tid)out.p_thread_id=tid;
+  else if(aid)out.p_aide_id=aid;
+  if(before)out.p_before=String(before);
+  return out;
+}
+async function aidechatLoadSettings(){
+  var gen=++aidechatSettingsGen;
+  var got=await aidechatRpc('settingsGet', {});
+  if(gen!==aidechatSettingsGen)return;
+  if(got&&got.ok&&got.data){
+    aidechatSettings=aidechatMapSettings(got.data);
+  }else{
+    var saved=aidechatReadSettings();
+    if(saved)aidechatSettings=saved;
+    else if(got&&got.signedOut)aidechatSettings.source='signed-out';
+  }
+  aidechatPaintSettings();
+}
+async function aidechatRefresh(){
+  var gen=++aidechatGen;
+  var listBody={};
+  if(aidechatWantEscalateOnly())listBody.p_escalate_only=true;
+  var got=await aidechatRpc('list', listBody);
+  if(gen!==aidechatGen)return;
+  if(got.ok){
+    var incoming=aidechatDedupe(aidechatThreadsFrom(got.data));
+    if((aidechatThreads||[]).length){
+      incoming.forEach(function(t){
+        var prev=aidechatFind(t.id)||aidechatFindByAide(t);
+        if(prev&&(prev.messages||[]).length>(t.messages||[]).length)t.messages=prev.messages;
+      });
+    }
+    aidechatThreads=incoming;
+    aidechatSource='ace';
+  }else{
+    if(!aidechatThreads.length)aidechatThreads=aidechatReadSession();
+    aidechatSource=got.signedOut?'signed-out':'local';
+  }
+  if(aidechatView==='thread')aidechatPaintThread();
+  else aidechatPaintInbox();
+}
+async function aidechatOpen(){
+  if(!aidechatRoleOk()){
+    var panel=document.getElementById('tab_aidechat');
+    if(panel){
+      panel.classList.remove('active');
+      panel.setAttribute('hidden','');
+    }
+    return;
+  }
+  var panelOk=document.getElementById('tab_aidechat');
+  if(panelOk)panelOk.removeAttribute('hidden');
+  aidechatEnsureBound();
+  aidechatShow('inbox');
+  await aidechatLoadSettings();
+  await aidechatRefresh();
+}
+async function aidechatMaybeRemi(thread, now){
+  if(!thread||!aidechatRoleOk())return;
+  var msgs=thread.messages||[];
+  if(!msgs.length)return;
+  var last=msgs[msgs.length-1];
+  if(!last||last.sender!=='aide'||last.remi||last.from_remi)return;
+  var when=now||new Date();
+  if(!aidechatRemiOn(aidechatSettings, when))return;
+  await aidechatLoadCalloffScript();
+  var aide=aidechatAideOf(thread);
+  var ctx=await aidechatLoadContext(aide);
+  if(ctx)aide.context=ctx;
+  var decision=aidechatRemiDecide(last.body, aide, aidechatSettings, when);
+  if(!decision.text)return;
+  if(!aidechatRemiOn(aidechatSettings, when))return;
+  var reply=decision.reason==='call_off'?aidechatCalloffText():decision.text;
+  last.remi=true;
+  thread.messages.push({
+    id:aidechatId('m'),
+    sender:'remi',
+    from_remi:true,
+    body:reply,
+    created_at:new Date().toISOString(),
+    kind:decision.reason||'status'
+  });
+  thread.last_message=reply;
+  thread.last_at=thread.messages[thread.messages.length-1].created_at;
+  if(decision.urgent){
+    thread.urgent=true;
+    thread.urgent_reason=decision.reason;
+    thread.heads_up=decision.headsUp||'';
+  }
+  await aidechatRpc('send', aidechatWireSend(thread, reply));
+}
+async function aidechatOpenThread(id){
+  if(!aidechatRoleOk())return;
+  var thread=aidechatFind(id);
+  if(!thread)return;
+  aidechatSelectedId=thread.id;
+  if(thread.id)await aidechatRpc('read', {p_thread_id:thread.id});
+  var got=await aidechatRpc('messages', aidechatWireMessages(thread));
+  if(got.ok){
+    var msgs=aidechatMessagesFrom(got.data);
+    if(msgs&&msgs.length)thread.messages=msgs;
+  }
+  await aidechatMaybeRemi(thread, new Date());
+  if(aidechatSource!=='ace')aidechatWriteSession();
+  aidechatShow('thread');
+  aidechatPaintThread();
+}
+async function aidechatIngestAideMessage(input){
+  if(!aidechatRoleOk())return null;
+  aidechatGen++;
+  input=input||{};
+  var aide={
+    id:String(input.aideId||input.aide_id||input.id||''),
+    username:String(input.username||''),
+    name:String(input.name||input.username||'Aide')
+  };
+  var body=String(input.body||input.text||'').trim();
+  var thread=aidechatFindByAide(aide);
+  if(!thread){
+    thread={
+      id:aidechatId('t'),
+      aide_id:aide.id,
+      username:aide.username,
+      name:aide.name,
+      urgent:false,
+      urgent_reason:'',
+      heads_up:'',
+      status:'open',
+      last_message:'',
+      last_at:'',
+      messages:[]
+    };
+    aidechatThreads.push(thread);
+  }
+  if(!body){
+    if(aidechatSource!=='ace')aidechatWriteSession();
+    aidechatPaintInbox();
+    return thread;
+  }
+  var msg={
+    id:aidechatId('m'),
+    sender:'aide',
+    body:body,
+    created_at:new Date().toISOString()
+  };
+  thread.messages.push(msg);
+  thread.last_message=body;
+  thread.last_at=msg.created_at;
+  thread.status='open';
+  await aidechatMaybeRemi(thread, input.now||new Date());
+  if(aidechatSource!=='ace')aidechatWriteSession();
+  if(aidechatView==='thread'&&aidechatSelectedId===thread.id)aidechatPaintThread();
+  else aidechatPaintInbox();
+  return thread;
+}
+async function aidechatSendOffice(ev){
+  if(ev&&ev.preventDefault)ev.preventDefault();
+  if(!aidechatRoleOk())return false;
+  var box=document.getElementById('aidechatReply');
+  var text=String(box&&box.value||'').trim();
+  if(!text)return false;
+  var thread=aidechatFind(aidechatSelectedId);
+  if(!thread)return false;
+  var msg={
+    id:aidechatId('m'),
+    sender:'office',
+    body:text,
+    created_at:new Date().toISOString(),
+    kind:'office'
+  };
+  thread.messages.push(msg);
+  thread.last_message=text;
+  thread.last_at=msg.created_at;
+  if(box)box.value='';
+  aidechatPaintThread();
+  await aidechatRpc('send', aidechatWireSend(thread, text));
+  if(aidechatSource!=='ace')aidechatWriteSession();
+  return false;
+}
+async function aidechatClearUrgent(){
+  if(!aidechatRoleOk())return;
+  var thread=aidechatFind(aidechatSelectedId);
+  if(!thread)return;
+  thread.urgent=false;
+  thread.urgent_reason='';
+  thread.heads_up='';
+  aidechatPaintThread();
+  var tid=String(thread.id||'');
+  if(tid)await aidechatRpc('clear', {p_thread_id:tid});
+  if(aidechatSource!=='ace')aidechatWriteSession();
+}
+async function aidechatSettingsChanged(){
+  if(!aidechatRoleOk())return;
+  aidechatSettingsGen++;
+  var on=document.getElementById('aidechatOn');
+  var start=document.getElementById('aidechatStart');
+  var end=document.getElementById('aidechatEnd');
+  var next={
+    enabled:!!(on&&on.checked),
+    start_local:aidechatValidTime(start&&start.value)||aidechatSettings.start_local||'14:00',
+    end_local:aidechatValidTime(end&&end.value)||aidechatSettings.end_local||'08:00',
+    timezone:'America/New_York',
+    source:aidechatSettings.source||'desk'
+  };
+  aidechatSettings=next;
+  var got=await aidechatRpc('settingsSet', {
+    p_enabled:next.enabled,
+    p_start_local:next.start_local,
+    p_end_local:next.end_local,
+    p_timezone:'America/New_York'
+  });
+  if(got&&got.ok){
+    aidechatSettings=got.data?aidechatMapSettings(got.data):next;
+    aidechatSettings.source='ace';
+    aidechatSettings.timezone='America/New_York';
+  }else{
+    aidechatSettings.source=got&&got.signedOut?'signed-out':'desk';
+    aidechatWriteSettings(aidechatSettings);
+  }
+  aidechatPaintSettings();
 }
 // v=remiask1 status look-ups. In-memory desk lists only. No Confirm. No send. No new Ace RPC.
 var REMI_ASK_MARKER='v=remiask1';
