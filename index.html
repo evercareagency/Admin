@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi ask lookups 2026-09-25 v=remiask1 admin-build 2026-09-25-remiask1. Admin and Scheduler only. Status look-ups answer in chat from lists already on this desk: Timesheets, Inservices, pay readiness, credentials, Coverage, Aides, clients, Schedule, Backup, Completes, Compliance, Broadcast, and login fails. The shape is YES or NO and the names, or a short status for a named aide or week. If that list is not loaded, Remi says it is not on this desk and does not invent it. Desk-word typos still match. These answers have no Confirm and do not text, email, or send. Who can cover stays the Tip 1 draft: Text, Assign, Share, and Call still wait for Confirm. Tell Friday stays for build and personal asks. Confirm stays on the existing text, email, and record drafts. No Auth reseal. No EVV, Sandata, or clock-in. No new Ace RPC. Remi stays the corner chip. Nurse does not get Remi. Prior markers stay, including remiwider1c. -->
+<meta name="admin-build" content="2026-09-25-remiask1">
 <!-- remi wider tip 1c 2026-09-25 v=remiwider1c admin-build 2026-09-25-remiwider1c. Admin and Scheduler only. Tip 1 only. Still deciding on Coverage, with or without an aide checked, and from Remi Ask, shows the draft with Confirm and Not yet. It does not post awaiting_client until Confirm. Not yet writes nothing. When Still deciding sits on the bottom edge above the phone nav, that same tap does not count as Confirm. Refuse Confirm and Open in Mail stay gated. Ask refuse, skip, and share stay Tip 1 drafts. Tell Friday handoff stays. Call and share blocked drafts stay. Remi stays the corner chip. Nurse does not get Remi. Tip 1 LEAN only. No Auth reseal. No new Ace RPC. Quiet hours rules are unchanged. Prior markers stay, including remiwider1b and remiwider1. -->
 <meta name="admin-build" content="2026-09-25-remiwider1c">
 <!-- remi wider tip 1b 2026-09-25 v=remiwider1b admin-build 2026-09-25-remiwider1b. Admin and Scheduler only. Tip 1 only. Tip 2 is out: no multi-cover triage, no who's-been-asked, no burnout, no cascade, and no escalation card. Refuse-backup on Coverage shows the existing case-manager draft first. Confirm records client_refused_resume_next_day. Not yet writes nothing and does not open Mail. Open in Mail stays a second Confirm. When the case manager email is missing, Open in Mail says it is off because that email is not on file. Ask routes refuse-backup to that Confirm draft, client-initiated skip to the skip Confirm draft, and build or personal asks to a soft tell Friday handoff. No Friday memory and No Desk-brain. Call client and Share address stay on the open-shift sheet even when the phone or home address is empty: the draft and Confirm show, and Confirm stays off until that seed is on file. When the office list already includes the phone or home address, Confirm opens that call or address text. This desk does not invent the seed. Still deciding waits for Confirm before awaiting_client. Not yet writes nothing. Live Ace reuse stays admin_list_open_shifts, admin_rank_backup_aides, admin_cover_outcome, and the refuse and skip template calls already on the desk. No new Ace RPC. Remi stays the corner chip. Nurse does not get Remi. Quiet hours rules are unchanged. No Auth reseal. Prior markers stay, including remiwider1 and coverpick1. -->
@@ -2020,7 +2022,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
-      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" data-remiwider1="v=remiwider1" data-remiwider1b="v=remiwider1b" onsubmit="return copilotChatSubmit(event)">
+      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" data-remiwider1="v=remiwider1" data-remiwider1b="v=remiwider1b" data-remiask1="v=remiask1" onsubmit="return copilotChatSubmit(event)">
         <input id="copilotChatInput" type="text" enterkeyhint="send" maxlength="400" placeholder="Ask or just chat..." autocomplete="off" aria-label="Ask Remi">
         <button type="submit" class="btn btn-teal" id="copilotChatSend">Ask</button>
       </form>
@@ -7615,11 +7617,746 @@ function remiSecAdd(q){
     }]
   });
 }
+// v=remiask1 status look-ups. In-memory desk lists only. No Confirm. No send. No new Ace RPC.
+var REMI_ASK_MARKER='v=remiask1';
+var REMI_ASK_CANON=['timesheets','timesheet','submitted','submit','signature','signatures','correction','inservices','inservice','finished','finish','overdue','credentials','credential','current','coverage','schedule','backup','completes','complete','completed','compliance','broadcast','login','active','address','phone','assigned','status','missing','ready','shift','shifts','week','password','draft','drafts','intake','intakes','supervisory'];
+function remiAskDist(a,b){
+  if(a===b)return 0;
+  var al=a.length, bl=b.length;
+  if(Math.abs(al-bl)>2)return 3;
+  var prev=[], cur=[], i, j;
+  for(j=0;j<=bl;j++)prev[j]=j;
+  for(i=1;i<=al;i++){
+    cur[0]=i;
+    var ca=a.charAt(i-1);
+    for(j=1;j<=bl;j++){
+      var cost=ca===b.charAt(j-1)?0:1;
+      var del=prev[j]+1, ins=cur[j-1]+1, sub=prev[j-1]+cost;
+      cur[j]=del<ins?del:ins;
+      if(sub<cur[j])cur[j]=sub;
+    }
+    var tmp=prev; prev=cur; cur=tmp;
+  }
+  return prev[bl];
+}
+function remiAskCanonToken(t){
+  if(!t||t.length<6)return t;
+  var best='', bestD=3, ties=0, i;
+  for(i=0;i<REMI_ASK_CANON.length;i++){
+    var c=REMI_ASK_CANON[i];
+    if(c===t)return t;
+    var limit=t.length>=9?2:1;
+    if(Math.abs(c.length-t.length)>limit)continue;
+    var d=remiAskDist(t,c);
+    if(d<=limit&&d<bestD){bestD=d;best=c;ties=0;}
+    else if(d===bestD&&d<=limit&&c!==best)ties=1;
+  }
+  if(!ties&&best)return best;
+  if(t.length>=8){
+    var key=t.split('').sort().join('');
+    var hit='', n=0;
+    for(i=0;i<REMI_ASK_CANON.length;i++){
+      var word=REMI_ASK_CANON[i];
+      if(word.length!==t.length)continue;
+      if(word.split('').sort().join('')===key){hit=word;n++;}
+    }
+    if(n===1)return hit;
+  }
+  return t;
+}
+function remiAskFold(q){
+  var raw=String(q||'').toLowerCase().replace(/['\u2019]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  if(!raw)return '';
+  var parts=raw.split(' ');
+  var out=[];
+  for(var i=0;i<parts.length;i++){
+    var t=parts[i];
+    if(t==='creds'||t==='cred'){out.push('credentials');continue;}
+    if(t==='time'&&(parts[i+1]==='sheet'||parts[i+1]==='sheets')){out.push(parts[i+1]==='sheets'?'timesheets':'timesheet');i++;continue;}
+    out.push(remiAskCanonToken(t));
+  }
+  return out.join(' ');
+}
+function remiAskPack(text){
+  return remiSecPack(String(text||''), {kind:'', actions:[], note:'', wx:''});
+}
+function remiAskMiss(what){
+  return 'I don\u2019t see '+what+' on this desk.';
+}
+function remiAskList(names){
+  var uniq=[], seen={};
+  (names||[]).forEach(function(n){
+    n=String(n||'').replace(/\s+/g,' ').trim();
+    var key=n.toLowerCase().replace(/\s*\([^)]*\)/g,'').trim();
+    if(!n||!key||seen[key])return;
+    seen[key]=1;
+    uniq.push(n);
+  });
+  if(!uniq.length)return '';
+  if(uniq.length===1)return uniq[0];
+  if(uniq.length===2)return uniq[0]+' and '+uniq[1];
+  if(uniq.length<=8)return uniq.slice(0,-1).join(', ')+', and '+uniq[uniq.length-1];
+  return uniq.slice(0,8).join(', ')+', and '+(uniq.length-8)+' more on this desk';
+}
+function remiAskPersonHit(q, name){
+  var label=String(name||'').trim();
+  if(!label)return false;
+  if(typeof copilotMention==='function'&&copilotMention(q, label))return true;
+  if(typeof remiSecNameHit==='function'&&remiSecNameHit(q, label))return true;
+  var qt=remiAskFold(q).split(' ').filter(function(t){return t.length>=4;});
+  var nt=remiAskFold(label).split(' ').filter(function(t){return t.length>=4;});
+  if(!qt.length||!nt.length)return false;
+  for(var i=0;i<nt.length;i++){
+    var ok=false;
+    for(var j=0;j<qt.length;j++){
+      if(qt[j]===nt[i]||(Math.abs(qt[j].length-nt[i].length)<=1&&remiAskDist(qt[j], nt[i])<=1))ok=true;
+    }
+    if(!ok)return false;
+  }
+  return true;
+}
+function remiAskPullName(q){
+  var s=String(q||'').replace(/[?!.]+$/g,'').replace(/\s+/g,' ').trim();
+  var stop=/^(the|this|that|all|week|weeks|pay|ready|held|open|shift|shifts|desk|timesheet|timesheets|inservice|inservices|signature|correction|credential|credentials|coverage|schedule|backup|login|broadcast|compliance|completes|aide|aides|client|clients|her|him|them|today|current|missing|status|what|whats|who|whos|any|every|everyone|my|our|their|short|overdue|left|finished|active|phone|address|assigned|in|to|a|an|no|one|not|it|of|for|on|is|and|or|by|at|with|from|into)$/i;
+  var m=s.match(/\b([A-Za-z][A-Za-z'\u2019.-]{2,})['\u2019]s\b/);
+  if(!m)m=s.match(/\bassigned to\s+([A-Za-z][A-Za-z'\u2019.-]{1,}(?:\s+[A-Za-z][A-Za-z'\u2019.-]{1,})?)/i);
+  if(!m)m=s.match(/\bfor\s+([A-Za-z][A-Za-z'\u2019.-]{1,}(?:\s+[A-Za-z][A-Za-z'\u2019.-]{1,})?)/i);
+  if(!m)m=s.match(/\babout\s+([A-Za-z][A-Za-z'\u2019.-]{1,}(?:\s+[A-Za-z][A-Za-z'\u2019.-]{1,})?)/i);
+  if(!m)m=s.match(/\bon\s+(?!the\b|this\b|a\b|an\b)([A-Za-z][A-Za-z'\u2019.-]{1,}(?:\s+[A-Za-z][A-Za-z'\u2019.-]{1,})?)/i);
+  if(!m)m=s.match(/\bis\s+([A-Za-z][A-Za-z'\u2019.-]{1,}(?:\s+[A-Za-z][A-Za-z'\u2019.-]{1,})?)/i);
+  if(!m)return '';
+  var parts=String(m[1]||'').split(/[\s-]+/).filter(function(p){return p&&!stop.test(p.replace(/['\u2019]s$/,''));});
+  return parts.join(' ').replace(/['\u2019]s$/,'').trim();
+}
+function remiAskWeekLabel(iso){
+  if(typeof formatAdminDate==='function'){
+    var shown=formatAdminDate(iso);
+    if(shown)return shown;
+  }
+  if(typeof payReadyMdy==='function'){
+    var mdy=payReadyMdy(iso);
+    if(mdy)return mdy;
+  }
+  return String(iso||'');
+}
+function remiAskSheets(){
+  var sheets=typeof copilotBag==='function'?copilotBag(function(){return allRecords;}):[];
+  var desk=[];
+  for(var i=0;i<sheets.length;i++){
+    var row=sheets[i];
+    if(!row)continue;
+    var on=typeof sbTimesheetOnDesk==='function'?sbTimesheetOnDesk(row,'active'):String(row.status||'').toLowerCase()!=='draft';
+    if(on)desk.push(row);
+  }
+  return desk;
+}
+function remiAskPayRows(){
+  try{
+    if(typeof payReadyState!=='undefined'&&payReadyState&&Array.isArray(payReadyState.rows)&&payReadyState.rows.length)return payReadyState.rows;
+  }catch(e){}
+  return null;
+}
+function remiAskWeekIso(sheets){
+  var pay='';
+  try{
+    if(typeof payReadyState!=='undefined'&&payReadyState)pay=String(payReadyState.week_start||'').slice(0,10);
+  }catch(e){pay='';}
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(pay))pay='';
+  var seen={};
+  (sheets||[]).forEach(function(r){
+    var w=String(r.weekStart||r.week_start||'').slice(0,10);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(w))seen[w]=1;
+  });
+  if(pay&&seen[pay])return pay;
+  var keys=Object.keys(seen).sort();
+  if(keys.length)return keys[keys.length-1];
+  return pay;
+}
+function remiAskInWeek(r, week){
+  if(!week)return true;
+  var w=String((r&&(r.weekStart||r.week_start))||'').slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(w))return true;
+  return w===week;
+}
+function remiAskIsSubmitted(r){
+  var st=String(r&&r.status||'submitted').trim().toLowerCase();
+  if(st==='draft'||st==='backup'||st==='not submitted'||st==='unsubmitted'||st==='missing'||st==='open'||st==='rejected')return false;
+  return true;
+}
+function remiAskTsLabel(r){
+  var who=String(r.empName||r.username||'Aide');
+  var client=String(r.clientName||'').trim();
+  return client?who+' ('+client+')':who;
+}
+function remiAskSig(r){
+  if(!r)return '';
+  if(r.signature==='missing'||r.signatureMissing===true||r.missingSignature===true)return 'missing';
+  if(/missing signature/i.test(String(r.notes||'')+' '+String(r.correctionNote||'')))return 'missing';
+  if(typeof timesheetInkStatus==='function'){
+    var st=timesheetInkStatus(r);
+    if(st&&st.worked>0)return st.missing>0?'missing':'ok';
+  }
+  return '';
+}
+function remiAskCorrection(r){
+  if(typeof copilotTsLate==='function'&&copilotTsLate(r))return true;
+  var st=String(r&&r.status||'').toLowerCase();
+  return st==='correction'||st==='in correction'||st==='sent back';
+}
+function remiAskActiveAides(){
+  var list=typeof copilotBag==='function'?copilotBag(function(){return loadedAidesList;}):[];
+  return list.filter(function(u){
+    if(!u)return false;
+    return typeof aideOnDesk==='function'?aideOnDesk(u,'active'):!!(u.username||u.name);
+  });
+}
+function remiAskAidePool(){
+  var out=[], seen={};
+  function add(u){
+    if(!u)return;
+    var key=String(u.username||u.id||u.name||u.fullName||'').toLowerCase();
+    if(!key||seen[key])return;
+    seen[key]=1;
+    out.push(u);
+  }
+  remiAskActiveAides().forEach(add);
+  try{ if(typeof allAidesForAssign!=='undefined')(allAidesForAssign||[]).forEach(add); }catch(e){}
+  try{
+    if(typeof aideLookup==='object'&&aideLookup){
+      Object.keys(aideLookup).forEach(function(k){add(aideLookup[k]);});
+    }
+  }catch(e2){}
+  var loaded=typeof copilotBag==='function'?copilotBag(function(){return loadedAidesList;}):[];
+  loaded.forEach(add);
+  return out;
+}
+function remiAskAideName(u){
+  return String((u&&(u.name||u.fullName||u.full_name||u.username))||'').trim();
+}
+function remiAskSheetForAide(sheets, u, week){
+  var name=remiAskAideName(u);
+  var user=String(u&&u.username||'').toLowerCase();
+  for(var i=0;i<sheets.length;i++){
+    var r=sheets[i];
+    if(!remiAskInWeek(r, week))continue;
+    if(user&&String(r.username||'').toLowerCase()===user)return r;
+    if(name&&(remiAskPersonHit(name, r.empName||'')||remiAskPersonHit(name, r.username||'')))return r;
+  }
+  return null;
+}
+function remiAskPayFor(rows, u){
+  var name=remiAskAideName(u);
+  var user=String(u&&u.username||'');
+  for(var i=0;i<(rows||[]).length;i++){
+    var r=rows[i];
+    if(name&&remiAskPersonHit(name, r.name||''))return r;
+    if(user&&remiAskPersonHit(user, r.username||r.name||''))return r;
+  }
+  return null;
+}
+function remiAskSkip(s){
+  if(/\b(text|sms|email|mailto|send|confirm|assign|share|update|remove|delete|refuse|refused|still deciding|member called|no service|build|deploy|joke|poem)\b/.test(s))return true;
+  if(/\bcall the\b|\bcall client\b|\badd aide\b|\badd caregiver\b|\bdesk brain\b/.test(s))return true;
+  if(/\bwho can cover\b|\bwho has an open shift\b|\bopen shift for\b|\bopen shifts for\b/.test(s))return true;
+  if(/\btemp\b/.test(s)&&/\bpassword\b/.test(s))return true;
+  if(/\bphone change drafts\b|\bphone change draft\b/.test(s))return true;
+  if(/\bwhich inservice\b/.test(s))return true;
+  if(/\bcompleted intakes\b/.test(s))return true;
+  if(/\bbehind on compliance\b/.test(s))return true;
+  if(/\bbroadcast alert\b/.test(s))return true;
+  if(/\blogin fails\b/.test(s))return true;
+  if(/\btimesheet for\b/.test(s)&&!/\b(status|submitted|signature|correction|missing)\b/.test(s))return true;
+  if(/\bschedule for\b/.test(s))return true;
+  return false;
+}
+function remiAskIsTimesheet(s){
+  if(/\b(all|everyone|every)\b/.test(s)&&/\bsubmitted\b/.test(s))return true;
+  if(/\bsubmitted this week\b/.test(s))return true;
+  if(/\b(who hasnt|who has not|not submitted|hasnt submitted|havent submitted|turned in|turn in)\b/.test(s)&&!/\binservice/.test(s))return true;
+  if(/\bmissing signature\b|\bno signature\b|\bunsigned\b/.test(s))return true;
+  if(/\bin correction\b|\bneeds a correction\b|\bneeds correction\b/.test(s))return true;
+  if(/\bstatus for\b/.test(s)&&!/\b(schedule|coverage|shift|broadcast|compliance|backup|credential|inservice)\b/.test(s))return true;
+  if(/\btimesheets?\b/.test(s)&&/\b(status|submitted|signature|correction|missing)\b/.test(s))return true;
+  return false;
+}
+function remiAskIsInservice(s){
+  if(/\binservices?\b/.test(s)&&/\b(finished|finish|short|overdue|left|behind|due|status)\b/.test(s))return true;
+  if(/\ball finished\b|\beveryone finished\b|\bwhos short\b|\bwho is short\b|\bwhats left\b|\bwhat is left\b|\bwho is overdue\b|\bwhos overdue\b/.test(s))return true;
+  return false;
+}
+function remiAskSubmittedAnswer(){
+  var sheets=remiAskSheets();
+  var pay=remiAskPayRows();
+  if(!sheets.length&&!(pay&&pay.length))return remiAskMiss('timesheets');
+  var week=remiAskWeekIso(sheets);
+  var weekBit=week?(' this week ('+remiAskWeekLabel(week)+')'):' on this desk';
+  var missing=[], ok=[];
+  var weekSheets=sheets.filter(function(r){return remiAskInWeek(r, week);});
+  if(!weekSheets.length&&week&&sheets.length)return remiAskMiss('timesheets for the week of '+remiAskWeekLabel(week));
+  weekSheets.forEach(function(r){
+    if(remiAskIsSubmitted(r))ok.push(remiAskTsLabel(r));
+    else missing.push(remiAskTsLabel(r));
+  });
+  if(pay){
+    pay.forEach(function(r){
+      var name=String(r.name||'').trim();
+      if(!name)return;
+      var reason=String(r.reason||'');
+      var sub=r.checks&&r.checks.submitted;
+      if(reason==='not_submitted'||sub==='no')missing.push(name);
+      else ok.push(name);
+    });
+  }
+  if(remiAskActiveAides().length&&(weekSheets.length||(pay&&pay.length))){
+    remiAskActiveAides().forEach(function(u){
+      var name=remiAskAideName(u);
+      if(!name)return;
+      if(remiAskSheetForAide(weekSheets, u, ''))return;
+      var prow=pay?remiAskPayFor(pay, u):null;
+      if(prow&&String(prow.reason||'')!=='not_submitted'&&!(prow.checks&&prow.checks.submitted==='no'))return;
+      if(prow)return;
+      missing.push(name);
+    });
+  }
+  var missText=remiAskList(missing);
+  var okText=remiAskList(ok);
+  if(!missText&&!okText)return remiAskMiss(week?'timesheets for this week':'timesheets');
+  if(!missText)return 'YES. All submitted'+weekBit+': '+okText+'.';
+  var text='NO. Not submitted'+weekBit+': '+missText+'.';
+  if(okText)text+=' Submitted: '+okText+'.';
+  return text;
+}
+function remiAskFilterNamed(q, rows, read){
+  var who=remiAskPullName(q);
+  if(!who)return {rows:rows, who:''};
+  var hits=rows.filter(function(r){
+    var label=read(r);
+    return remiAskPersonHit(who, label)||remiAskPersonHit(q, label);
+  });
+  if(!hits.length)return {rows:[], who:who, missing:true};
+  return {rows:hits, who:who};
+}
+function remiAskSignatureAnswer(q){
+  var sheets=remiAskSheets();
+  var pay=remiAskPayRows()||[];
+  var picked=remiAskFilterNamed(q, sheets, function(r){return (r.empName||'')+' '+(r.username||'');});
+  if(picked.missing)return 'I don\u2019t see '+picked.who+' on timesheets on this desk.';
+  var missing=[], ok=[];
+  picked.rows.forEach(function(r){
+    var sig=remiAskSig(r);
+    if(sig==='missing')missing.push(remiAskTsLabel(r));
+    else if(sig==='ok')ok.push(remiAskTsLabel(r));
+  });
+  pay.forEach(function(r){
+    if(picked.who&&!(remiAskPersonHit(picked.who, r.name||'')||remiAskPersonHit(q, r.name||'')))return;
+    var reason=String(r.reason||'');
+    var sig=r.checks&&r.checks.signature;
+    if(reason==='missing_signature'||sig==='missing')missing.push(r.name);
+    else if(sig==='present')ok.push(r.name);
+  });
+  if(missing.length)return 'NO. Missing a signature: '+remiAskList(missing)+'.';
+  if(ok.length)return 'YES. No missing signature on this desk: '+remiAskList(ok)+'.';
+  return remiAskMiss('signature ink');
+}
+function remiAskCorrectionAnswer(q){
+  var sheets=remiAskSheets();
+  if(!sheets.length)return remiAskMiss('timesheets');
+  var picked=remiAskFilterNamed(q, sheets, function(r){return (r.empName||'')+' '+(r.username||'');});
+  if(picked.missing)return 'I don\u2019t see '+picked.who+' on timesheets on this desk.';
+  var bad=[], ok=[];
+  picked.rows.forEach(function(r){
+    if(remiAskCorrection(r))bad.push(remiAskTsLabel(r));
+    else ok.push(remiAskTsLabel(r));
+  });
+  if(bad.length)return 'NO. In correction: '+remiAskList(bad)+'.';
+  return 'YES. No one is in correction on this desk'+(ok.length?(': '+remiAskList(ok)):'')+'.';
+}
+function remiAskStatusLine(r){
+  var submitted=remiAskIsSubmitted(r);
+  var corr=remiAskCorrection(r);
+  var sig=remiAskSig(r);
+  var head=(submitted&&!corr&&sig!=='missing')?'YES. ':'NO. ';
+  var rest=[];
+  rest.push(submitted?'submitted':'not submitted');
+  var week=String(r.weekStart||r.week_start||'').slice(0,10);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(week))rest.push('week '+remiAskWeekLabel(week));
+  if(r.clientName)rest.push(r.clientName);
+  if(sig==='missing')rest.push('missing signature');
+  else if(sig==='ok')rest.push('signature on file');
+  if(corr)rest.push('in correction');
+  var hrs=String(r.totalHrs||r.total_hours||'').trim();
+  if(hrs&&hrs!=='0:00')rest.push(hrs);
+  return head+(r.empName||r.username||'Aide')+' \u2014 '+rest.join(', ')+'.';
+}
+function remiAskTimesheetStatus(q){
+  var who=remiAskPullName(q);
+  var sheets=remiAskSheets();
+  var pay=remiAskPayRows();
+  if(!who){
+    if(!sheets.length&&!(pay&&pay.length))return remiAskMiss('timesheets');
+    return 'Name the aide. I can read timesheet status on this desk.';
+  }
+  var hits=sheets.filter(function(r){
+    return remiAskPersonHit(who, r.empName||'')||remiAskPersonHit(who, r.username||'')||remiAskPersonHit(q, r.empName||'');
+  });
+  var payHit=null;
+  if(pay){
+    for(var i=0;i<pay.length;i++){
+      if(remiAskPersonHit(who, pay[i].name||'')||remiAskPersonHit(q, pay[i].name||'')){payHit=pay[i];break;}
+    }
+  }
+  if(!hits.length&&!payHit)return 'I don\u2019t see '+who+' on timesheets on this desk.';
+  if(!hits.length){
+    var bit=payHit.status==='held'?('Held \u2014 '+(payHit.reasonLabel||'held')):'Ready';
+    return (payHit.status==='held'?'NO. ':'YES. ')+(payHit.name||who)+' \u2014 pay '+bit+'.';
+  }
+  var lines=hits.slice(0,4).map(remiAskStatusLine);
+  if(payHit)lines.push('Pay: '+(payHit.status==='held'?('Held \u2014 '+(payHit.reasonLabel||'held')):'Ready')+'.');
+  return lines.join('\n');
+}
+function remiAskTimesheetAnswer(q,s){
+  if(/\bmissing signature\b|\bno signature\b|\bunsigned\b/.test(s))return remiAskSignatureAnswer(q);
+  if(/\bin correction\b|\bneeds a correction\b|\bneeds correction\b/.test(s))return remiAskCorrectionAnswer(q);
+  if(/\bstatus for\b/.test(s)||(/\btimesheets?\b/.test(s)&&/\bstatus\b/.test(s)&&!/\b(all|everyone|submitted|who hasnt|who has not)\b/.test(s)))return remiAskTimesheetStatus(q);
+  return remiAskSubmittedAnswer();
+}
+function remiAskInserviceAnswer(q,s){
+  var rows=typeof copilotBag==='function'?copilotBag(function(){return isComplianceRows;}):[];
+  if(!rows.length)return remiAskMiss('inservices');
+  var who='';
+  if(/\b(left|for|status)\b/.test(s))who=remiAskPullName(q);
+  var use=rows;
+  if(who){
+    var hits=rows.filter(function(r){return remiAskPersonHit(who, r.empName||'')||remiAskPersonHit(who, r.username||'')||remiAskPersonHit(q, r.empName||'');});
+    if(!hits.length)return 'I don\u2019t see '+who+' on inservices on this desk.';
+    use=hits;
+  }
+  function label(r){
+    var name=r.empName||r.username||'Aide';
+    var topic=r.topicShort||r.topicTitle||'';
+    return topic?name+' ('+topic+')':name;
+  }
+  var due=use.filter(function(r){return r&&!r.isCompleted;});
+  var done=use.filter(function(r){return r&&r.isCompleted;});
+  if(/\b(left|short|overdue|behind|due)\b/.test(s)){
+    if(!due.length)return 'YES. Nothing left'+(who?' for '+(use[0].empName||who):'')+' on inservices on this desk.';
+    return 'NO. Still short: '+remiAskList(due.map(label))+'.';
+  }
+  if(!due.length)return 'YES. All finished on this desk: '+remiAskList(done.map(label))+'.';
+  var text='NO. Still short: '+remiAskList(due.map(label))+'.';
+  if(done.length)text+=' Finished: '+remiAskList(done.map(label))+'.';
+  return text;
+}
+function remiAskPayAnswer(s){
+  var rows=remiAskPayRows();
+  if(!rows)return remiAskMiss('pay readiness');
+  var ready=[], held=[];
+  rows.forEach(function(r){
+    var name=String(r.name||'').trim();
+    if(!name)return;
+    if(r.status==='held')held.push(name+' \u2014 '+(r.reasonLabel||r.reason||'held'));
+    else ready.push(name);
+  });
+  var wantR=/\bready\b/.test(s), wantH=/\bheld\b/.test(s);
+  if(wantR&&!wantH){
+    if(!ready.length)return 'NO. No one is Ready on this desk.'+(held.length?(' Held: '+remiAskList(held)+'.'):'');
+    return 'YES. Ready: '+remiAskList(ready)+'.';
+  }
+  if(wantH&&!wantR){
+    if(!held.length)return 'YES. No one is Held on this desk.';
+    return 'NO. Held: '+remiAskList(held)+'.';
+  }
+  var text=ready.length?('YES. Ready: '+remiAskList(ready)+'. '):'NO. No one is Ready. ';
+  text+=held.length?('NO. Held: '+remiAskList(held)+'.'):'YES. No one is Held.';
+  return text.trim();
+}
+function remiAskCredWhy(a){
+  var why=[];
+  var expired=typeof aideCredCount==='function'?aideCredCount(a.expired_count):Number(a.expired_count||0);
+  var soon=typeof aideCredCount==='function'?aideCredCount(a.expiring_soon_count):Number(a.expiring_soon_count||0);
+  var cpr=String(a.cpr_status||'').toLowerCase();
+  if(expired>0)why.push(expired+' overdue');
+  if(soon>0)why.push(soon+' expiring soon');
+  if(cpr==='expired'||cpr==='overdue')why.push('CPR overdue');
+  else if(cpr==='expiring_soon'||cpr==='expiring')why.push('CPR soon');
+  if(typeof aideCredChipsFromRollup==='function'){
+    aideCredChipsFromRollup(a).forEach(function(c){
+      if(!c||c.kind==='current')return;
+      if(why.indexOf(c.label)<0)why.push(c.label);
+    });
+  }
+  return why;
+}
+function remiAskCredAnswer(q){
+  var state=null;
+  try{state=aideCredState;}catch(e){state=null;}
+  var aides=state&&Array.isArray(state.aides)?state.aides.filter(function(a){return a&&!a.bare;}):[];
+  if(!aides.length)return remiAskMiss('credentials');
+  var who=remiAskPullName(q);
+  if(!who)return 'Name the aide. I can read credentials on this desk.';
+  var hits=aides.filter(function(a){return remiAskPersonHit(who, a.name||'')||remiAskPersonHit(who, a.username||'')||remiAskPersonHit(q, a.name||'');});
+  if(!hits.length)return 'I don\u2019t see credentials for '+who+' on this desk.';
+  var a=hits[0];
+  var why=remiAskCredWhy(a);
+  var name=a.name||who;
+  if(!why.length)return 'YES. '+name+' is credential-current.';
+  return 'NO. '+name+' is not credential-current: '+why.join(', ')+'.';
+}
+function remiAskOpenList(){
+  if(typeof copilotOpenShifts==='function')return copilotOpenShifts();
+  return (typeof copilotBag==='function'?copilotBag(function(){return coverShifts;}):[]).filter(function(s){
+    var st=String(s&&s.status||'open').toLowerCase();
+    return st==='open'||st==='awaiting client'||st==='awaiting_client';
+  });
+}
+function remiAskShiftLine(shift){
+  var client=shift.clientName||'Client';
+  var aide=shift.aideName?String(shift.aideName):'';
+  var st=String(shift.status||'open').replace(/_/g,' ');
+  var when='';
+  try{
+    if(typeof coverFormatSpan==='function')when=coverFormatSpan(shift.startsAt, shift.endsAt)||'';
+  }catch(e){when='';}
+  if(when==='\u2014'||when==='-')when='';
+  var line=client+' \u2014 '+st;
+  if(aide)line+=', regular aide '+aide;
+  if(when)line+=', '+when;
+  return line;
+}
+function remiAskOpenAnswer(){
+  var open=remiAskOpenList();
+  if(!open.length)return remiAskMiss('an open shift');
+  if(open.length===1)return 'NO. One shift is open. '+remiAskShiftLine(open[0])+'.';
+  return 'NO. Open on this desk: '+open.slice(0,6).map(remiAskShiftLine).join('; ')+'.';
+}
+function remiAskShiftStatus(q){
+  var shifts=typeof copilotBag==='function'?copilotBag(function(){return coverShifts;}):[];
+  if(!shifts.length)return remiAskMiss('an open shift');
+  var who=remiAskPullName(q);
+  if(!who){
+    var open=remiAskOpenList();
+    if(open.length===1)return remiAskShiftLine(open[0])+'.';
+    if(!open.length)return remiAskMiss('an open shift');
+    return 'Name the client. Open: '+remiAskList(open.map(function(s){return s.clientName||'Client';}))+'.';
+  }
+  var hits=shifts.filter(function(s){
+    return remiAskPersonHit(who, s.clientName||'')||remiAskPersonHit(who, s.aideName||'')||remiAskPersonHit(q, s.clientName||'');
+  });
+  if(!hits.length)return 'I don\u2019t see '+who+' on coverage on this desk.';
+  if(hits.length>1)return 'Name the shift. '+hits.slice(0,4).map(remiAskShiftLine).join('; ')+'.';
+  return remiAskShiftLine(hits[0])+'.';
+}
+function remiAskRanked(q){
+  var shifts=typeof copilotBag==='function'?copilotBag(function(){return coverShifts;}):[];
+  if(!shifts.length)return remiAskMiss('a who-can-cover list');
+  var who=remiAskPullName(q);
+  var pool=who?shifts.filter(function(s){return remiAskPersonHit(who, s.clientName||'')||remiAskPersonHit(q, s.clientName||'');}):shifts;
+  if(who&&!pool.length)return 'I don\u2019t see '+who+' on coverage on this desk.';
+  if(pool.length!==1)return 'Name the client. I stay on one open cover.';
+  var shift=pool[0];
+  var rows=[];
+  try{rows=(typeof remiWiderCachedRanks==='function'?remiWiderCachedRanks(shift):[])||[];}catch(e){rows=[];}
+  if(!rows.length)return 'I don\u2019t see a who-can-cover list for '+(shift.clientName||'that shift')+' on this desk.';
+  return 'Who can cover '+(shift.clientName||'this shift')+' on this desk: '+remiAskList(rows.map(function(r){return r.name;}))+'.';
+}
+function remiAskPhoneOf(obj){
+  if(!obj)return '';
+  return String(obj.phone||obj.mobile||obj.cell||obj.phoneNumber||obj.phone_number||obj.aidePhone||obj.clientPhone||'').trim();
+}
+function remiAskAddressOf(obj){
+  if(!obj)return '';
+  return String(obj.address||obj.home_address||obj.homeAddress||obj.clientHomeAddress||'').trim();
+}
+function remiAskContact(q,s){
+  var who=remiAskPullName(q);
+  var wantPhone=/\bphone\b/.test(s), wantAddr=/\baddress\b/.test(s);
+  if(!who)return 'Name the person. I only read a phone or address already on this desk.';
+  var aides=remiAskAidePool().filter(function(u){return remiAskPersonHit(who, remiAskAideName(u))||remiAskPersonHit(who, u.username||'')||remiAskPersonHit(q, remiAskAideName(u));});
+  var clients=(typeof remiSecClients==='function'?remiSecClients():[]).filter(function(c){
+    var name=c.name||c.clientName||'';
+    return remiAskPersonHit(who, name)||remiAskPersonHit(q, name);
+  });
+  var shifts=(typeof copilotBag==='function'?copilotBag(function(){return coverShifts;}):[]).filter(function(sh){
+    return remiAskPersonHit(who, sh.clientName||'')||remiAskPersonHit(q, sh.clientName||'');
+  });
+  if(!aides.length&&!clients.length&&!shifts.length)return 'I don\u2019t see '+who+' on this desk.';
+  var lines=[];
+  function takePhone(obj, name){
+    if(!wantPhone)return;
+    var phone=remiAskPhoneOf(obj);
+    if(phone)lines.push(name+' phone: '+phone);
+  }
+  function takeAddr(obj, name){
+    if(!wantAddr)return;
+    var addr=remiAskAddressOf(obj);
+    if(addr)lines.push(name+' address: '+addr);
+  }
+  aides.forEach(function(u){var name=remiAskAideName(u)||who; takePhone(u, name); takeAddr(u, name);});
+  clients.forEach(function(c){var name=c.name||c.clientName||who; takePhone(c, name); takeAddr(c, name);});
+  shifts.forEach(function(sh){var name=sh.clientName||who; takePhone(sh, name); takeAddr(sh, name);});
+  if(!lines.length){
+    var bit=wantPhone&&wantAddr?'phone or address':(wantPhone?'phone':'address');
+    var article=bit==='address'?'an':'a';
+    return 'I don\u2019t see '+article+' '+bit+' for '+who+' on this desk.';
+  }
+  var uniq=[];
+  lines.forEach(function(line){if(uniq.indexOf(line)<0)uniq.push(line);});
+  return uniq.slice(0,4).join('\n');
+}
+function remiAskActiveAnswer(q){
+  var pool=remiAskAidePool();
+  if(!pool.length)return remiAskMiss('aides');
+  var who=remiAskPullName(q);
+  if(!who)return 'Name the aide.';
+  var hits=pool.filter(function(u){return remiAskPersonHit(who, remiAskAideName(u))||remiAskPersonHit(who, u.username||'')||remiAskPersonHit(q, remiAskAideName(u));});
+  if(!hits.length)return 'I don\u2019t see '+who+' on this desk.';
+  var u=hits[0];
+  var on=typeof aideOnDesk==='function'?aideOnDesk(u,'active'):!(u.isActive===false||u.is_active===false);
+  var name=remiAskAideName(u)||who;
+  if(on)return 'YES. '+name+' is active.';
+  return 'NO. '+name+' is not active on this desk.';
+}
+function remiAskAssigned(q){
+  var who=remiAskPullName(q);
+  var clients=typeof remiSecClients==='function'?remiSecClients():[];
+  var aides=remiAskAidePool();
+  if(!who)return 'Name the client.';
+  if(!clients.length&&!aides.length)return remiAskMiss('assignments');
+  var names=[];
+  aides.forEach(function(u){
+    var labels=typeof aideAssignedClientValues==='function'?aideAssignedClientValues(u):[];
+    var hit=false;
+    labels.forEach(function(item){
+      var label=typeof resolveClientLabel==='function'?resolveClientLabel(item):String(item&&item.name||item||'');
+      if(remiAskPersonHit(who, label)||remiAskPersonHit(q, label))hit=true;
+    });
+    if(hit)names.push(remiAskAideName(u));
+  });
+  var foundClient=false;
+  clients.forEach(function(c){
+    var cname=c.name||c.clientName||'';
+    if(!(remiAskPersonHit(who, cname)||remiAskPersonHit(q, cname)))return;
+    foundClient=true;
+    var assigned=c.assignedAides||c.assigned_aides||[];
+    if(!Array.isArray(assigned))assigned=String(assigned||'').split(',');
+    assigned.forEach(function(a){
+      var label=typeof a==='object'?(a.name||a.fullName||a.username||''):String(a||'');
+      label=String(label||'').trim();
+      if(!label)return;
+      var named=label;
+      remiAskAidePool().forEach(function(u){
+        if(String(u.username||'').toLowerCase()===label.toLowerCase())named=remiAskAideName(u)||named;
+      });
+      names.push(named);
+    });
+  });
+  if(!names.length){
+    if(!foundClient)return 'I don\u2019t see '+who+' on this desk.';
+    return 'NO. No aide is assigned to '+who+' on this desk.';
+  }
+  return 'YES. Assigned to '+who+': '+remiAskList(names)+'.';
+}
+function remiAskSchedule(){
+  var rows=typeof copilotBag==='function'?copilotBag(function(){return schedWeekRows;}):[];
+  var usual=typeof copilotBag==='function'?copilotBag(function(){return schedUsual;}):[];
+  var ex=typeof copilotBag==='function'?copilotBag(function(){return schedExceptions;}):[];
+  if(!rows.length&&!usual.length&&!ex.length)return remiAskMiss('the schedule');
+  var gaps=0;
+  usual.forEach(function(u){if(u&&!String(u.usual_aide_id||'').trim())gaps++;});
+  var week='';
+  try{ if(typeof schedWeekStart!=='undefined'&&schedWeekStart&&typeof schedWeekLabel==='function')week=schedWeekLabel(schedWeekStart); }catch(e){week='';}
+  var head=week?(week+'. '):'';
+  if(gaps)return 'NO. '+head+gaps+' usual cell'+(gaps===1?' has':'s have')+' no aide. '+rows.length+' client'+(rows.length===1?'':'s')+' on the grid.';
+  return 'YES. '+head+rows.length+' client'+(rows.length===1?'':'s')+' on the grid. '+ex.length+' exception'+(ex.length===1?'':'s')+'.';
+}
+function remiAskBackup(){
+  var drafts=(typeof copilotBag==='function'?copilotBag(function(){return allBackupRecords;}):[]).filter(function(r){
+    return typeof layoutA1DraftOpen==='function'?layoutA1DraftOpen(r):String(r&&r.status||'').toLowerCase()==='draft';
+  });
+  if(!drafts.length){
+    drafts=(typeof copilotBag==='function'?copilotBag(function(){return allRecords;}):[]).filter(function(r){
+      return typeof layoutA1DraftOpen==='function'&&layoutA1DraftOpen(r);
+    });
+  }
+  if(!drafts.length)return remiAskMiss('phone-change drafts');
+  var names=drafts.map(function(r){return (r.empName||r.username||'Aide')+(r.clientName?' ('+r.clientName+')':'');});
+  return 'NO. Open phone-change drafts: '+remiAskList(names)+'.';
+}
+function remiAskCompletes(){
+  var packets=typeof copilotBag==='function'?copilotBag(function(){return nciCompletedRows;}):[];
+  if(!packets.length)return remiAskMiss('completes');
+  var names=packets.map(function(r){
+    var cn=(typeof nciIntakeClientName==='function')?nciIntakeClientName(r):(r&&r.clientName);
+    return cn||'Untitled';
+  });
+  return 'YES. '+packets.length+' complete'+(packets.length===1?'':'s')+' on this desk: '+remiAskList(names)+'.';
+}
+function remiAskCompliance(){
+  var rows=typeof copilotBag==='function'?copilotBag(function(){return nurseComplianceRows;}):[];
+  if(!rows.length)return remiAskMiss('compliance');
+  var behind=rows.filter(function(r){return r&&r.status&&r.status!=='On track';});
+  if(!behind.length)return 'YES. On track on this desk: '+remiAskList(rows.map(function(r){return r.clientName||'Client';}))+'.';
+  return 'NO. Not on track: '+remiAskList(behind.map(function(r){return (r.clientName||'Client')+' \u2014 '+(r.status||'behind');}))+'.';
+}
+function remiAskBroadcast(){
+  var painted='';
+  try{
+    var box=document.getElementById('broadcastPreview');
+    painted=box?String(box.textContent||'').replace(/\s+/g,' ').trim():'';
+  }catch(e){painted='';}
+  if(!painted)return remiAskMiss('a broadcast');
+  if(/no active alert/i.test(painted))return 'YES. No active broadcast on this desk.';
+  painted=painted.replace(/^Current active alert:\s*/i,'').replace(/^\uD83D\uDEA8\s*/,'');
+  return 'Active alert: '+painted;
+}
+function remiAskLoginAnswer(){
+  var alerts=typeof copilotBag==='function'?copilotBag(function(){return copilotAlerts;}):[];
+  var lines=[];
+  alerts.forEach(function(a){
+    if(!a||a.kind!=='login_fail'||!a.ace)return;
+    var detail=String(a.detail||'').replace(/\bpassword\b\s*[:=]?\s*\S*/ig,'');
+    detail=detail.replace(/\s+/g,' ').trim();
+    if(!detail||/nothing flagged/i.test(detail))return;
+    lines.push((a.title?a.title+': ':'')+detail);
+  });
+  if(!lines.length)return 'I don\u2019t see login fails on this desk. I will not guess a password.';
+  return lines.slice(0,5).join('\n')+'\nI will not guess a password.';
+}
+function remiAskAnswer(q){
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
+  var s=remiAskFold(q);
+  if(!s||remiAskSkip(s))return null;
+  if(/\bpassword\b/.test(s)){
+    if(/\btemp/.test(s))return null;
+    return remiAskPack('I don\u2019t see passwords on this desk. I will not guess one.');
+  }
+  if(/\blogin status\b|\bwho failed\b|\bfailed sign\b|\bsign in status\b/.test(s))return remiAskPack(remiAskLoginAnswer());
+  if(/\bcredentials?\b/.test(s))return remiAskPack(remiAskCredAnswer(q));
+  if(/\b(ready|held)\b/.test(s)&&!/\b(cover|shift)\b/.test(s))return remiAskPack(remiAskPayAnswer(s));
+  if(remiAskIsInservice(s))return remiAskPack(remiAskInserviceAnswer(q,s));
+  if(remiAskIsTimesheet(s))return remiAskPack(remiAskTimesheetAnswer(q,s));
+  if(/\bwho(?:s| is) ranked\b|\branked to cover\b|\bwho is listed to cover\b|\blisted to cover\b/.test(s))return remiAskPack(remiAskRanked(q));
+  if(/\bwhats open\b|\bwhat is open\b|\bwhat open\b|\bany open coverage\b/.test(s))return remiAskPack(remiAskOpenAnswer());
+  if(/\bstatus on\b/.test(s)||(/\bstatus\b/.test(s)&&/\b(shift|coverage)\b/.test(s)))return remiAskPack(remiAskShiftStatus(q));
+  if(/\b(phone|address)\b/.test(s))return remiAskPack(remiAskContact(q,s));
+  if(/\bassigned to\b/.test(s))return remiAskPack(remiAskAssigned(q));
+  if(/\bactive\b/.test(s)&&/\bis\b/.test(s)&&!/\b(broadcast|alert)\b/.test(s))return remiAskPack(remiAskActiveAnswer(q));
+  if(/\bschedule status\b|\bstatus of (?:the )?schedule\b|\bhow is the schedule\b|\bweek grid\b|\bschedule gaps\b/.test(s))return remiAskPack(remiAskSchedule());
+  if(/\bbackup status\b|\bstatus of (?:the )?backup\b|\bhow is backup\b|\bhow are (?:the )?drafts\b/.test(s))return remiAskPack(remiAskBackup());
+  if(/\bcompletes status\b|\bintake status\b|\bstatus of (?:the )?(?:completes|intakes)\b|\bhow are (?:the )?completes\b/.test(s))return remiAskPack(remiAskCompletes());
+  if(/\bcompliance status\b|\bsupervisory status\b|\bhow is compliance\b|\bstatus of compliance\b/.test(s))return remiAskPack(remiAskCompliance());
+  if(/\bbroadcast status\b|\bstatus of (?:the )?broadcast\b|\bis there a broadcast\b|\bany broadcast\b/.test(s))return remiAskPack(remiAskBroadcast());
+  return null;
+}
 function remiSecAnswer(q){
   if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
   if(typeof remiWiderAnswer==='function'){
     var widerFirst=remiWiderAnswer(q);
     if(widerFirst)return widerFirst;
+  }
+  if(typeof remiAskAnswer==='function'){
+    var asked=remiAskAnswer(q);
+    if(asked)return asked;
   }
   if(remiSecIsWeather(q))return remiSecWeather();
   var address=remiSecAddress(q);
