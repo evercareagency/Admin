@@ -97,7 +97,8 @@ function harness(route){
     'function sbCoord(v)',
     'function sbOrgId()',
     'function sbClientWriteBody(payload, isCreate)',
-    'async function sbMutateClient(method, pairs, body)',
+    'async function sbPatchClientHours(id, hours)',
+    'async function sbAdminUpdateClient(payload)',
     'async function sbRestMutate(method, table, pairs, body, prefer, refreshed)',
     'async function sbRestRpc(fnName, body)',
     'function sbFilterQuery(pairs)',
@@ -135,10 +136,15 @@ assert.strictEqual(hours.sbClientHoursValue({weekly_authorized_hours:-1}), undef
 const plain = hours.sbClientWriteBody({name:'Ada Cole', address:'1 Main', lat:'', lng:''}, false);
 assert.ok(!Object.prototype.hasOwnProperty.call(plain, 'weekly_authorized_hours'), 'update without the key omits it');
 const numbered = hours.sbClientWriteBody({name:'Ada Cole', address:'1 Main', lat:'1', lng:'2', weekly_authorized_hours:63}, false);
-assert.strictEqual(numbered.weekly_authorized_hours, 63);
+assert.ok(!Object.prototype.hasOwnProperty.call(numbered, 'weekly_authorized_hours'), 'name and address stay on their own body');
 assert.strictEqual(numbered.name, 'Ada Cole');
-const cleared = hours.sbClientWriteBody({name:'Ada Cole', address:'1 Main', weekly_authorized_hours:null}, false);
-assert.strictEqual(cleared.weekly_authorized_hours, null);
+const rpcSrc = extractFn(html, 'function sbClientHoursRpcBodies(payload)');
+assert.ok(rpcSrc.includes('p_weekly_authorized_hours'), 'create passes the locked RPC argument');
+assert.strictEqual(rpcSrc.split('p_weekly_authorized_hours').join('').indexOf('weekly_authorized_hours'), -1, 'no alternate RPC argument name');
+const patchSrc = extractFn(html, 'async function sbPatchClientHours(id, hours)');
+assert.ok(patchSrc.includes("sbRestMutate('PATCH','clients'"), 'edit patches clients');
+assert.ok(patchSrc.includes("['id','eq.'+id]"), 'edit patches id=eq.<uuid>');
+assert.ok(patchSrc.includes('weekly_authorized_hours:hours'), 'edit body is the locked column');
 
 const mappedSnake = hours.sbMapClient({id:'c1', name:'Ada', address:'1', is_active:true, weekly_authorized_hours:27, assignments:[]});
 assert.strictEqual(mappedSnake.weekly_authorized_hours, 27);
@@ -152,13 +158,13 @@ const desk = hours.sbClientDeskBody({firstName:'Ada', lastName:'Cole', address:'
 assert.ok(!Object.prototype.hasOwnProperty.call(desk, 'weekly_authorized_hours'), 'the base desk body stays the existing args');
 assert.ok(!Object.prototype.hasOwnProperty.call(desk, 'p_weekly_authorized_hours'));
 const bodies = hours.sbClientHoursRpcBodies({firstName:'Ada', lastName:'Cole', address:'1 Main', weekly_authorized_hours:63});
+assert.strictEqual(bodies.length, 2, 'optional argument, then the same call without it');
 assert.strictEqual(bodies[0].p_weekly_authorized_hours, 63);
 assert.strictEqual(bodies[0].p_first_name, 'Ada');
-assert.strictEqual(bodies[1].weekly_authorized_hours, 63);
+assert.ok(!Object.prototype.hasOwnProperty.call(bodies[0], 'weekly_authorized_hours'), 'RPC body does not use the column name');
 assert.ok(!Object.prototype.hasOwnProperty.call(bodies[1], 'p_weekly_authorized_hours'));
-assert.ok(!Object.prototype.hasOwnProperty.call(bodies[2], 'weekly_authorized_hours'));
-assert.ok(!Object.prototype.hasOwnProperty.call(bodies[2], 'p_weekly_authorized_hours'));
-assert.strictEqual(bodies[2].p_last_name, 'Cole');
+assert.ok(!Object.prototype.hasOwnProperty.call(bodies[1], 'weekly_authorized_hours'));
+assert.strictEqual(bodies[1].p_last_name, 'Cole');
 
 (async function(){
   const clientId = '11111111-1111-4111-8111-111111111111';
@@ -185,8 +191,9 @@ assert.strictEqual(bodies[2].p_last_name, 'Cole');
   assert.strictEqual(added.hoursOnWire, false, 'missing hours arg is not left on the wire');
   assert.strictEqual(added.id, clientId);
   const rpcCalls = missingRpc.calls.filter(function(c){return c.url.indexOf('admin_add_client')>0;});
-  assert.strictEqual(rpcCalls.length, 3, 'p_ key, field name, then the original args');
-  const lastRpc = JSON.parse(rpcCalls[2].init.body);
+  assert.strictEqual(rpcCalls.length, 2, 'p_weekly_authorized_hours, then the same callable without it');
+  assert.strictEqual(JSON.parse(rpcCalls[0].init.body).p_weekly_authorized_hours, 63);
+  const lastRpc = JSON.parse(rpcCalls[1].init.body);
   assert.strictEqual(lastRpc.p_first_name, 'Ada');
   assert.strictEqual(lastRpc.p_last_name, 'Cole');
   assert.strictEqual(lastRpc.p_home_address, '1 Main');
@@ -203,16 +210,34 @@ assert.strictEqual(bodies[2].p_last_name, 'Cole');
     }
     return {status:500, ok:false, raw:JSON.stringify({message:'unexpected'})};
   });
-  const updated = await column.box.sbMutateClient('PATCH', [['id','eq.'+clientId]], {
-    name:'Ada Cole', address:'9 Oak', lat:null, lng:null, weekly_authorized_hours:63
+  const updated = await column.box.sbAdminUpdateClient({
+    id:clientId, name:'Ada Cole', address:'9 Oak', lat:'', lng:'', weekly_authorized_hours:63
   });
-  assert.strictEqual(updated.ok, true, updated.error||'column retry');
-  assert.strictEqual(updated.hoursOmitted, true);
-  assert.strictEqual(column.calls.length, 2, 'column miss retries without the hours key');
-  const saved = JSON.parse(column.calls[1].init.body);
+  assert.strictEqual(updated.success, true, updated.error||'column miss still saves the client');
+  assert.strictEqual(column.calls.length, 2, 'name patch, then the hours column patch');
+  const saved = JSON.parse(column.calls[0].init.body);
   assert.strictEqual(saved.name, 'Ada Cole');
   assert.strictEqual(saved.address, '9 Oak');
   assert.ok(!Object.prototype.hasOwnProperty.call(saved, 'weekly_authorized_hours'));
+  assert.ok(column.calls[1].url.indexOf('/rest/v1/clients?')>0, column.calls[1].url);
+  assert.ok(decodeURIComponent(column.calls[1].url).indexOf('id=eq.'+clientId)>0, column.calls[1].url);
+  assert.deepStrictEqual(JSON.parse(column.calls[1].init.body), {weekly_authorized_hours:63});
+
+  const cleared = harness(function(url, init){
+    const body = JSON.parse(init.body||'{}');
+    if(init.method==='PATCH' && Object.keys(body).length===1 && Object.prototype.hasOwnProperty.call(body, 'weekly_authorized_hours')){
+      return {status:200, raw:JSON.stringify([Object.assign({id:clientId, name:'Ada Cole', address:'9 Oak'}, body)])};
+    }
+    if(init.method==='PATCH')return {status:200, raw:JSON.stringify([{id:clientId, name:'Ada Cole', address:'9 Oak'}])};
+    return {status:500, ok:false, raw:JSON.stringify({message:'unexpected'})};
+  });
+  const nulled = await cleared.box.sbAdminUpdateClient({
+    id:clientId, name:'Ada Cole', address:'9 Oak', lat:'', lng:'', weekly_authorized_hours:null
+  });
+  assert.strictEqual(nulled.success, true);
+  assert.strictEqual(nulled.data.weekly_authorized_hours, null);
+  const hoursCall = cleared.calls.filter(function(c){return Object.prototype.hasOwnProperty.call(JSON.parse(c.init.body||'{}'), 'weekly_authorized_hours');})[0];
+  assert.deepStrictEqual(JSON.parse(hoursCall.init.body), {weekly_authorized_hours:null});
 
   const live = harness(function(url, init){
     const body = JSON.parse(init.body||'{}');

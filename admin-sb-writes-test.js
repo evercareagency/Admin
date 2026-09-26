@@ -125,7 +125,7 @@ const names = [
   'function sbClientHoursColumnMissing(got)',
   'function sbClientHoursRpcMissing(got)',
   'function sbClientHoursRpcBodies(payload)',
-  'async function sbMutateClient(method, pairs, body)',
+  'async function sbPatchClientHours(id, hours)',
   'function sbClientWriteBody(payload, isCreate)',
   'function sbAssignedNames(payload)',
   'function sbClientDeskPayload(payload)',
