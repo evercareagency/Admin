@@ -152,7 +152,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(desk.build, '2026-09-25-remiwider1c');
+    assert.strictEqual(desk.build, '2026-09-25-remiask1');
     assert.strictEqual(desk.kb, false, 'desktop focus must not add login-kb');
     assert.strictEqual(desk.position, 'static', 'desktop login screen stays in normal flow');
     assert.strictEqual(desk.align, 'center', 'desktop login stays vertically centered');
