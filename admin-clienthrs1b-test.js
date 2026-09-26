@@ -63,6 +63,9 @@ assert.ok(askJs.includes('function remiAskSlotMarks'), 'Remi reads schedule mark
 assert.ok(askJs.includes('function remiAskIsMark') && askJs.includes('function remiAskIsPay'), 'mark and pay intents are separate');
 assert.ok(askJs.indexOf('if(/\\b(ready|held)\\b/.test(s)&&!/\\b(cover|shift)\\b/.test(s))') < 0, 'a name containing Ready does not open pay readiness');
 assert.ok(askJs.includes('if(/\\bschedule for\\b/.test(s)&&!remiAskIsMark(s))return true;'), 'schedule for does not swallow mark asks');
+const findBody = askJs.slice(askJs.indexOf('function remiAskSlotFindClient'), askJs.indexOf('function remiAskSlotDayOf'));
+assert.ok(findBody.indexOf('copilotMention') < 0 && findBody.indexOf('remiAskPersonHit') < 0, 'slot client match does not use any-token mention');
+assert.ok(findBody.indexOf('remiAskSlotExactClient') >= 0 && findBody.indexOf('remiAskSlotClientByFocus') >= 0, 'full name and focus beat a fuzzy hit');
 const askBody = askJs.slice(askJs.indexOf('function remiAskAnswer'));
 const markAt = askBody.indexOf('remiAskIsMark');
 const skipAt = askBody.indexOf('remiAskSkip');
@@ -560,32 +563,43 @@ async function phoneShots(){
       currentAdminRole = 'Admin';
       payReadyState = {week_start:'2026-09-21', rows:[]};
       var id = '55555555-5555-4555-8555-555555555555';
-      var days = {};
-      for(var n = 1; n <= 7; n++){
-        var on = schedAddDays('2026-09-28', n - 1);
-        var slots = [];
-        if(n === 3){
-          slots = [
-            {slot_key:'am', label:'Morning', hours:5, pattern_hours:5, aide_name:'Sara Cole', sort_order:0, mark:'worked', deep_link:{client_id:id, on_date:on, slot_key:'am'}},
-            {slot_key:'pm', label:'Afternoon', hours:4, pattern_hours:4, aide_name:'Kim Lee', sort_order:1, mark:'missed', deep_link:{client_id:id, on_date:on, slot_key:'pm'}},
-            {slot_key:'eve', label:'Evening', hours:4, pattern_hours:4, aide_name:'Moe Hart', sort_order:2, mark:'cover', cover_aide_name:'Moe Hart', deep_link:{client_id:id, on_date:on, slot_key:'eve'}}
-          ];
+      var heldId = '66666666-6666-4666-8666-666666666666';
+      function weekDays(clientId, wednesday){
+        var days = {};
+        for(var n = 1; n <= 7; n++){
+          var on = schedAddDays('2026-09-28', n - 1);
+          days[String(n)] = {on_date:on, weekday:n, slots: n === 3 ? wednesday(on, clientId) : []};
         }
-        days[String(n)] = {on_date:on, weekday:n, slots:slots};
+        return days;
       }
+      var readyDays = weekDays(id, function(on, clientId){
+        return [
+          {slot_key:'am', label:'Morning', hours:5, pattern_hours:5, aide_name:'Sara Cole', sort_order:0, mark:'worked', deep_link:{client_id:clientId, on_date:on, slot_key:'am'}},
+          {slot_key:'pm', label:'Afternoon', hours:4, pattern_hours:4, aide_name:'Kim Lee', sort_order:1, mark:'missed', deep_link:{client_id:clientId, on_date:on, slot_key:'pm'}},
+          {slot_key:'eve', label:'Evening', hours:4, pattern_hours:4, aide_name:'Moe Hart', sort_order:2, mark:'cover', cover_aide_name:'Moe Hart', deep_link:{client_id:clientId, on_date:on, slot_key:'eve'}}
+        ];
+      });
+      var heldDays = weekDays(heldId, function(){ return []; });
       schedApplySlotWeek({
         week_start:'2026-09-28',
-        clients:[{client_id:id, client_name:'payready1 Probe Ready', weekly_authorized_hours:40, days:days}]
+        clients:[
+          {client_id:heldId, client_name:'payready1 Probe Held', weekly_authorized_hours:40, days:heldDays},
+          {client_id:id, client_name:'payready1 Probe Ready', weekly_authorized_hours:40, days:readyDays}
+        ]
       });
       schedFocusDeepLink({client_id:id, on_date:'2026-09-30', slot_key:'am'});
       function text(q){
         var ans = copilotChatAnswer(q);
         return (ans && ans.text) || '';
       }
-      var named = text('What are the marks for payready1 Probe Ready on 09/30/2026?');
+      var named = text('marks for payready1 Probe Ready on 09/30/2026');
       var status = text('What is the schedule status for payready1 Probe Ready?');
       var scheduleFor = text('What are the marks on the schedule for payready1 Probe Ready on 09/30/2026?');
       var how = text('How is the schedule?');
+      var focusOnly = text('focused slot marks');
+      var sept = text('schedule marks for payready1 Probe Ready September 30');
+      var quoted = text('marks for client "payready1 Probe Ready" on 09/30/2026');
+      var heldAsk = text('marks for payready1 Probe Held on 09/30/2026');
       var readyMiss = text("who's Ready?");
       payReadyState = {week_start:'2026-09-21', rows:[
         {name:'Ada Cole', status:'ready', reason:'', reasonLabel:''},
@@ -601,6 +615,10 @@ async function phoneShots(){
         held: text("who's Held and why?"),
         both: text("who's Ready and who's Held?"),
         focus: text('What are the marks for the focused slot?'),
+        focusOnly: focusOnly,
+        sept: sept,
+        quoted: quoted,
+        heldAsk: heldAsk,
         onDate: schedSlotFocus && schedSlotFocus.on_date,
         slotKey: schedSlotFocus && schedSlotFocus.slot_key
       };
@@ -608,10 +626,22 @@ async function phoneShots(){
     assert.ok(marks.named.indexOf('pay readiness') < 0, 'named marks are not a pay miss: ' + marks.named);
     assert.strictEqual(marks.named.indexOf('YES.'), 0, marks.named);
     assert.ok(marks.named.indexOf('payready1 Probe Ready') >= 0, marks.named);
+    assert.ok(marks.named.indexOf('Probe Held') < 0, 'Ready ask must not pick Held: ' + marks.named);
+    assert.ok(marks.named.indexOf('see schedule marks') < 0, marks.named);
     assert.ok(marks.named.indexOf('09/30/2026') >= 0, marks.named);
     assert.ok(marks.named.indexOf('am Morning: Worked 5h') >= 0, marks.named);
     assert.ok(marks.named.indexOf('pm Afternoon: Missed 0h') >= 0, marks.named);
     assert.ok(marks.named.indexOf('Cover') >= 0, marks.named);
+    assert.ok(marks.focusOnly.indexOf('payready1 Probe Ready') >= 0, marks.focusOnly);
+    assert.ok(marks.focusOnly.indexOf('Name the client') < 0, marks.focusOnly);
+    assert.ok(marks.focusOnly.indexOf('Probe Held') < 0, marks.focusOnly);
+    assert.ok(marks.focusOnly.indexOf('Worked 5h') >= 0, marks.focusOnly);
+    assert.ok(marks.sept.indexOf('payready1 Probe Ready') >= 0 && marks.sept.indexOf('Worked 5h') >= 0, marks.sept);
+    assert.ok(marks.sept.indexOf('Name the date') < 0 && marks.sept.indexOf('Probe Held') < 0, marks.sept);
+    assert.ok(marks.quoted.indexOf('payready1 Probe Ready') >= 0 && marks.quoted.indexOf('Worked 5h') >= 0, marks.quoted);
+    assert.ok(marks.quoted.indexOf('Probe Held') < 0, marks.quoted);
+    assert.ok(marks.heldAsk.indexOf('payready1 Probe Held') >= 0, marks.heldAsk);
+    assert.ok(marks.heldAsk.indexOf('Probe Ready') < 0 && marks.heldAsk.indexOf('Worked 5h') < 0, marks.heldAsk);
     assert.ok(marks.status.indexOf('pay readiness') < 0, marks.status);
     assert.ok(marks.status.indexOf('Worked 5h') >= 0 && marks.status.indexOf('Missed 0h') >= 0 && marks.status.indexOf('Cover') >= 0, marks.status);
     assert.ok(marks.scheduleFor.indexOf('pay readiness') < 0 && marks.scheduleFor.indexOf('Worked 5h') >= 0, marks.scheduleFor);
@@ -631,7 +661,7 @@ async function phoneShots(){
       copilotChat = [];
       copilotShowChat();
       var input = document.getElementById('copilotChatInput');
-      if(input) input.value = 'What are the marks for payready1 Probe Ready on 09/30/2026?';
+      if(input) input.value = 'marks for payready1 Probe Ready on 09/30/2026';
       copilotChatSubmit({preventDefault: function(){}});
     });
     const thread = await page.evaluate(function(){
@@ -655,10 +685,13 @@ async function phoneShots(){
     assert.strictEqual(thread.viewH, 844);
     assert.strictEqual(thread.hidden, false);
     assert.strictEqual(thread.askSelected, 'true');
+    assert.ok(thread.text.indexOf('payready1 Probe Ready') >= 0, thread.text);
+    assert.ok(thread.text.indexOf('Probe Held') < 0, thread.text);
     assert.ok(thread.text.indexOf('am Morning: Worked 5h') >= 0, thread.text);
     assert.ok(thread.text.indexOf('pm Afternoon: Missed 0h') >= 0, thread.text);
     assert.ok(thread.text.indexOf('Cover') >= 0, thread.text);
     assert.ok(thread.text.indexOf('pay readiness') < 0, thread.text);
+    assert.ok(thread.text.indexOf('see schedule marks') < 0, thread.text);
     assert.ok(thread.sheetRight <= thread.viewW + 1, 'Remi stays inside the phone');
     assert.ok(thread.fabRight > thread.viewW - 120, 'Remi chip stays on the right');
     await page.screenshot({path: path.join(outDir, 'clienthrs1b-remi-marks-phone.png')});

@@ -9759,29 +9759,97 @@ function remiAskSlotFocusNow(){
   try{
     if(typeof schedSlotFocus!=='undefined'&&schedSlotFocus&&schedSlotFocus.client_id&&schedSlotFocus.on_date)return schedSlotFocus;
   }catch(e2){}
+  try{
+    if(typeof schedSlotSelected!=='undefined'&&schedSlotSelected&&schedSlotSelected.clientId&&schedSlotSelected.onDate){
+      return {client_id:String(schedSlotSelected.clientId), on_date:String(schedSlotSelected.onDate).slice(0,10), slot_key:''};
+    }
+  }catch(e3){}
   return null;
 }
-function remiAskSlotFindClient(q, rows){
+function remiAskSlotPhrase(hay, phrase){
+  if(!hay||!phrase)return false;
+  return (' '+hay+' ').indexOf(' '+phrase+' ')>=0;
+}
+function remiAskSlotNameTokens(name){
+  var skip={schedule:1,status:1,marks:1,mark:1,worked:1,missed:1,cover:1,client:1,clients:1,morning:1,afternoon:1,evening:1,focused:1,slot:1,slots:1,the:1,for:1,and:1,this:1,that:1};
+  return remiAskFold(name).split(' ').filter(function(t){return t.length>=3&&!skip[t];});
+}
+function remiAskSlotSameId(row, id){
+  if(!row||!id)return false;
+  var want=String(id).toLowerCase();
+  var have=String(row.id||row.client_id||row.clientId||'').toLowerCase();
+  return !!have&&have===want;
+}
+function remiAskSlotClientByFocus(rows, focus){
+  if(!focus||!focus.client_id)return null;
+  for(var i=0;i<rows.length;i++){
+    if(remiAskSlotSameId(rows[i], focus.client_id))return rows[i];
+  }
+  return null;
+}
+function remiAskSlotExactClient(fold, rows){
+  var best=null, bestLen=0;
+  for(var i=0;i<rows.length;i++){
+    var name=remiAskFold(rows[i]&&rows[i].name);
+    if(!name||!remiAskSlotPhrase(fold, name))continue;
+    if(name.length>bestLen){best=rows[i];bestLen=name.length;}
+  }
+  return best;
+}
+function remiAskSlotStrictClient(fold, rows, focus){
   var hits=[];
-  var i;
-  for(i=0;i<rows.length;i++){
-    if(rows[i]&&remiAskPersonHit(q, rows[i].name||''))hits.push(rows[i]);
+  for(var i=0;i<rows.length;i++){
+    var tokens=remiAskSlotNameTokens(rows[i]&&rows[i].name);
+    if(!tokens.length)continue;
+    var all=true;
+    for(var t=0;t<tokens.length;t++){
+      if(!remiAskHasWord(fold, tokens[t])){all=false;break;}
+    }
+    if(all)hits.push(rows[i]);
   }
   if(hits.length===1)return hits[0];
-  var words=remiAskFold(q).split(' ');
-  var loose=[];
-  var skip={schedule:1,status:1,marks:1,mark:1,worked:1,missed:1,cover:1,client:1,clients:1,morning:1,afternoon:1,evening:1,focused:1,slot:1,slots:1,ready:1,held:1};
-  for(i=0;i<rows.length;i++){
-    var parts=remiAskFold(rows[i]&&rows[i].name).split(' ');
-    for(var p=0;p<parts.length;p++){
-      var token=parts[p];
-      if(token.length<6||skip[token])continue;
-      if(words.indexOf(token)>=0){loose.push(rows[i]);break;}
+  if(hits.length>1&&focus){
+    for(var h=0;h<hits.length;h++){
+      if(remiAskSlotSameId(hits[h], focus.client_id))return hits[h];
     }
   }
-  if(loose.length===1)return loose[0];
-  if(hits.length)return hits[0];
   return null;
+}
+function remiAskSlotDistinctClient(fold, rows){
+  var count={}, owner={};
+  for(var i=0;i<rows.length;i++){
+    var seen={}, tokens=remiAskSlotNameTokens(rows[i]&&rows[i].name);
+    for(var t=0;t<tokens.length;t++){
+      var token=tokens[t];
+      if(seen[token])continue;
+      seen[token]=1;
+      count[token]=(count[token]||0)+1;
+      owner[token]=rows[i];
+    }
+  }
+  var hits=[], seenId={};
+  var keys=Object.keys(count);
+  for(var k=0;k<keys.length;k++){
+    var word=keys[k];
+    if(count[word]!==1||!remiAskHasWord(fold, word))continue;
+    var row=owner[word];
+    var id=String(row&&(row.id||row.client_id||row.clientId)||'');
+    if(seenId[id])continue;
+    seenId[id]=1;
+    hits.push(row);
+  }
+  if(hits.length===1)return hits[0];
+  return null;
+}
+function remiAskSlotFindClient(q, rows, focus){
+  var fold=remiAskFold(q);
+  var exact=remiAskSlotExactClient(fold, rows);
+  if(exact)return exact;
+  var strict=remiAskSlotStrictClient(fold, rows, focus);
+  if(strict)return strict;
+  var distinct=remiAskSlotDistinctClient(fold, rows);
+  if(distinct)return distinct;
+  return remiAskSlotClientByFocus(rows, focus);
 }
 function remiAskSlotDayOf(client, iso){
   var days=client&&client.days;
@@ -9854,13 +9922,7 @@ function remiAskSlotMarks(q, s){
   var rows=remiAskSlotRows();
   if(!rows.length)return remiAskMiss('schedule marks');
   var focus=remiAskSlotFocusNow();
-  var client=remiAskSlotFindClient(q, rows);
-  var i;
-  if(!client&&focus){
-    for(i=0;i<rows.length;i++){
-      if(String(rows[i].id)===String(focus.client_id)){client=rows[i];break;}
-    }
-  }
+  var client=remiAskSlotFindClient(q, rows, focus);
   if(!client)return 'Name the client. I can read schedule marks on this desk.';
   var iso=remiAskSlotDate(q);
   if(!iso&&focus&&String(focus.client_id)===String(client.id))iso=String(focus.on_date||'').slice(0,10);
