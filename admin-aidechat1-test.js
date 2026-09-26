@@ -47,6 +47,13 @@ assert.ok(html.includes("list:['admin_list_aide_office_threads']"), 'admin_list_
 assert.ok(html.includes("messages:['admin_list_aide_office_messages']"), 'admin_list_aide_office_messages');
 assert.ok(html.includes("send:['admin_send_aide_office_message']"), 'admin_send_aide_office_message');
 assert.ok(html.includes("clear:['admin_clear_aide_office_escalate']"), 'admin_clear_aide_office_escalate');
+assert.ok(html.includes("read:['admin_mark_aide_office_messages_read']"), 'admin_mark_aide_office_messages_read');
+assert.ok(html.includes("script:['admin_get_aide_chat_call_off_script']"), 'admin_get_aide_chat_call_off_script');
+assert.ok(html.includes("settingsGet:['admin_get_aide_chat_remi_settings']"), 'admin_get_aide_chat_remi_settings');
+assert.ok(html.includes("settingsSet:['admin_save_aide_chat_remi_settings']"), 'admin_save_aide_chat_remi_settings');
+assert.ok(html.includes("context:['admin_aide_chat_remi_context']"), 'admin_aide_chat_remi_context');
+assert.ok(html.includes('href="tel:+12163775991"'), 'call-off number is tap-to-call');
+assert.ok(!/sms:|mailto:/.test(chatJs), 'aide chat block does not open Messages or Mail');
 assert.ok(chatJs.includes('p_escalate_only'), 'list accepts p_escalate_only');
 assert.ok(chatJs.includes('p_limit:80'), 'messages accept p_limit');
 assert.ok(chatJs.includes('p_before'), 'messages accept p_before');
@@ -143,6 +150,17 @@ async function runBrowser(){
     });
     await page.click('#nav_aidechat');
     await page.waitForSelector('#aidechatOn', {visible:true});
+    await page.evaluate(async function(){
+      await aidechatOpen();
+      document.getElementById('aidechatOn').checked = true;
+      document.getElementById('aidechatStart').value = '14:00';
+      document.getElementById('aidechatEnd').value = '08:00';
+      await aidechatSettingsChanged();
+      window.scrollTo(0, 0);
+      var box = document.getElementById('aidechatSettings');
+      if(box)box.scrollIntoView({block:'start'});
+    });
+    await page.screenshot({path: path.join(shotDir, 'aidechat1-settings-phone.png')});
     await page.evaluate(async function(){
       await aidechatOpen();
       document.getElementById('aidechatOn').checked = true;
@@ -344,6 +362,29 @@ async function runBrowser(){
     assert.ok(/Coverage heads-up/.test(opened.banner), opened.banner);
     assert.ok(/Open · Urgent/.test(opened.banner));
     assert.ok(opened.bubbles.some(function(b){return b.who === 'Remi' && b.text.indexOf('(216) 377-5991') >= 0;}), JSON.stringify(opened.bubbles));
+    const phoneLink = await page.evaluate(function(){
+      var link = document.querySelector('#aidechatMessages .aidechat-bubble-remi a.aidechat-phone');
+      var rules = document.querySelector('#aidechatRules a.aidechat-phone');
+      var banner = document.querySelector('#aidechatUrgentBanner a.aidechat-phone');
+      var box = link ? link.getBoundingClientRect() : {height:0};
+      var hrefs = Array.prototype.map.call(document.querySelectorAll('#tab_aidechat a[href^="tel:"]'), function(a){return a.getAttribute('href');});
+      return {
+        href: link ? link.getAttribute('href') : '',
+        text: link ? link.textContent : '',
+        rulesHref: rules ? rules.getAttribute('href') : '',
+        rulesText: rules ? rules.textContent : '',
+        bannerText: banner ? banner.textContent : '',
+        height: box.height,
+        hrefs: hrefs
+      };
+    });
+    assert.strictEqual(phoneLink.href, 'tel:+12163775991');
+    assert.strictEqual(phoneLink.text, '(216) 377-5991');
+    assert.strictEqual(phoneLink.rulesHref, 'tel:+12163775991');
+    assert.strictEqual(phoneLink.rulesText, '(216) 377-5991');
+    assert.strictEqual(phoneLink.bannerText, '(216) 377-5991');
+    assert.ok(phoneLink.height >= 44, 'call-off number is tappable');
+    assert.ok(phoneLink.hrefs.every(function(h){return h === 'tel:+12163775991';}), phoneLink.hrefs.join(','));
     await page.type('#aidechatReply', 'I will have the scheduler call you.');
     await page.click('#aidechatSend');
     const replied = await page.evaluate(function(){
@@ -424,6 +465,11 @@ async function runBrowser(){
       aidechatSelectedId = ada ? ada.id : '';
       await aidechatClearUrgent();
       var cleared = calls.filter(function(c){return c.name === 'admin_clear_aide_office_escalate';});
+      var openedId = ada ? ada.id : '';
+      if(openedId)await aidechatOpenThread(openedId);
+      var read = calls.filter(function(c){return c.name === 'admin_mark_aide_office_messages_read';});
+      var script = calls.filter(function(c){return c.name === 'admin_get_aide_chat_call_off_script';});
+      var context = calls.filter(function(c){return c.name === 'admin_aide_chat_remi_context';});
       document.getElementById('aidechatOn').checked = false;
       await aidechatSettingsChanged();
       document.getElementById('aidechatEscalateOnly').checked = true;
@@ -441,6 +487,10 @@ async function runBrowser(){
         sent: sent.map(function(c){return c.body;}),
         cleared: cleared.map(function(c){return c.body;}),
         listed: listed.map(function(c){return c.body;}),
+        read: read.map(function(c){return c.body;}),
+        script: script.map(function(c){return c.body;}),
+        context: context.map(function(c){return c.body;}),
+        saved: calls.filter(function(c){return c.name === 'admin_save_aide_chat_remi_settings';}).map(function(c){return c.body;}),
         names: names,
         settings: {enabled: aidechatSettings.enabled, start: aidechatSettings.start_local, end: aidechatSettings.end_local},
         escalated: escalated,
@@ -462,6 +512,12 @@ async function runBrowser(){
     assert.ok(rpc.names.indexOf('admin_record_call_off') < 0, rpc.names.join(','));
     assert.ok(rpc.names.indexOf('set_thread_urgent') < 0);
     assert.ok(rpc.listed.some(function(b){return b.p_escalate_only === true;}));
+    assert.ok(rpc.read.length === 1 && rpc.read[0].p_thread_id && Object.keys(rpc.read[0]).join(',') === 'p_thread_id', JSON.stringify(rpc.read));
+    assert.ok(rpc.script.some(function(b){return Object.keys(b).length === 0;}), JSON.stringify(rpc.script));
+    assert.ok(rpc.context.some(function(b){return b.p_aide_id === 'ada-1' && Object.keys(b).join(',') === 'p_aide_id';}), JSON.stringify(rpc.context));
+    assert.ok(rpc.saved.some(function(b){
+      return b.p_enabled === false && b.p_start_local === '14:00' && b.p_end_local === '08:00' && b.p_timezone === 'America/New_York' && b.p_aide_id == null;
+    }), JSON.stringify(rpc.saved));
     assert.strictEqual(rpc.settings.enabled, false);
     assert.strictEqual(rpc.settings.start, '14:00');
     assert.strictEqual(rpc.settings.end, '08:00');
@@ -469,6 +525,56 @@ async function runBrowser(){
     assert.strictEqual(rpc.missing && rpc.missing.missing, true);
     assert.strictEqual(rpc.after, 'painted');
     assert.ok(/admin_list_aide_office_threads|Sign in|this phone/.test(rpc.note), rpc.note);
+
+    const facts = await page.evaluate(async function(){
+      aidechatRpcOff = {};
+      aidechatRpcPick = {};
+      aidechatScriptLoaded = false;
+      aidechatAceScript = '';
+      aidechatThreads = [];
+      aidechatSettings = {enabled:true, start_local:'14:00', end_local:'08:00', timezone:'America/New_York', source:'ace'};
+      readSbSession = function(){return {access_token:'office-jwt'};};
+      var seen = [];
+      sbRestRpc = async function(name, body){
+        seen.push({name:name, body:body||{}});
+        if(name === 'admin_aide_chat_remi_context'){
+          return {ok:true, data:{success:true, timesheet_submitted:false, pay_status:'held', held_reason:'missing signature', pay_submitted:true, signature_missing:true, services_empty:true}};
+        }
+        if(name === 'admin_get_aide_chat_call_off_script'){
+          return {ok:true, data:{script:'You are approved. Call (440) 555-0199.'}};
+        }
+        if(name === 'admin_send_aide_office_message')return {ok:true, data:{success:true, message:{body:body.p_body}}};
+        return {ok:false, status:404, error:'Could not find the function in the schema cache'};
+      };
+      allRecords = [{id:'ts-ada', empName:'Ada Cole', username:'ada', status:'submitted', is_active:true, days:{}}];
+      var now = new Date('2026-09-25T19:00:00Z');
+      var sheet = await aidechatIngestAideMessage({username:'ada', aideId:'ada-ctx', name:'Ada Cole', body:'did I submit my timesheet?', now:now});
+      var pay = await aidechatIngestAideMessage({username:'ada', aideId:'ada-ctx', name:'Ada Cole', body:'where is my direct deposit from Chase?', now:now});
+      var call = await aidechatIngestAideMessage({username:'zoe', aideId:'zoe-1', name:'Zoe Hart', body:'I need to call off today', now:now});
+      function remiAfter(thread, needle){
+        var msgs = thread && thread.messages || [];
+        var i;
+        for(i=0;i<msgs.length;i++){
+          if(msgs[i].sender==='aide' && String(msgs[i].body).indexOf(needle)>=0){
+            var next = msgs[i+1];
+            return next && next.sender==='remi' ? next.body : '';
+          }
+        }
+        return '';
+      }
+      return {
+        sheet: remiAfter(sheet, 'timesheet'),
+        pay: remiAfter(pay, 'deposit'),
+        call: remiAfter(call, 'call off'),
+        ctx: seen.filter(function(c){return c.name === 'admin_aide_chat_remi_context';}).map(function(c){return c.body;})
+      };
+    });
+    assert.strictEqual(facts.sheet, 'No. Your timesheet is not submitted.');
+    assert.ok(/Held/.test(facts.pay) && /missing signature/.test(facts.pay), facts.pay);
+    assert.ok(!/Chase|\$\d|deposit is|texted/i.test(facts.pay), facts.pay);
+    assert.strictEqual(facts.call, 'I can\'t approve a call-off. Please call the office at (216) 377-5991 so someone can help you right away. I\'ve also noted this for the scheduler.');
+    assert.ok(facts.call.indexOf('440') < 0 && !/\bapproved\b/i.test(facts.call), facts.call);
+    assert.ok(facts.ctx.every(function(b){return Object.keys(b).join(',') === 'p_aide_id';}), JSON.stringify(facts.ctx));
 
     const roles = await page.evaluate(async function(){
       currentAdminRole = 'Scheduler';

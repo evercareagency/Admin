@@ -42,7 +42,7 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
-<!-- aide office chat 2026-09-25 v=aidechat1 admin-build 2026-09-25-aidechat1. Admin and Scheduler only. More → Aide chat is the inbox of aide↔office threads, one thread per aide. Open a thread and reply as the office inside the app. Remi auto-reply is On/Off plus a window in America/New_York, for example 2:00 PM to 8:00 AM. When On and inside that window, Remi may answer that aide's own clear status look-ups from portal data only: timesheet submitted, missing signature, empty services that day, and pay Ready, Held, or submitted. Call-offs are never approved. Remi tells the aide to call the main office at (216) 377-5991, includes that number, and flags the thread Open and Urgent for Admin with a Coverage heads-up. Pay disputes stay on portal facts and never invent a deposit, a text, or a bank, and flag the office. Outside the window, or when Off, Remi does not reply. Office replies are human. Ace names when present: admin_list_aide_office_threads {p_escalate_only?}, admin_list_aide_office_messages {p_thread_id or p_aide_id, p_limit?, p_before?}, admin_send_aide_office_message {p_thread_id or p_aide_id, p_body}, admin_clear_aide_office_escalate {p_thread_id} clears the flag only and never approves a call-off. Every Remi call-off script uses exactly (216) 377-5991. A missing callable keeps the inbox on this phone. No SMS and no email send. No Auth reseal. Nurse does not get Remi and does not get this chat. Prior markers stay, including remiask1. -->
+<!-- aide office chat 2026-09-25 v=aidechat1 admin-build 2026-09-25-aidechat1. Admin and Scheduler only. More → Aide chat is the inbox of aide↔office threads, one thread per aide. Open a thread and reply as the office inside the app. Remi auto-reply is On/Off plus a window in America/New_York, for example 2:00 PM to 8:00 AM. When On and inside that window, Remi may answer that aide's own clear status look-ups from portal data only: timesheet submitted, missing signature, empty services that day, and pay Ready, Held, or submitted. Call-offs are never approved. Remi tells the aide to call the main office at (216) 377-5991, includes that number, and flags the thread Open and Urgent for Admin with a Coverage heads-up. Pay disputes stay on portal facts and never invent a deposit, a text, or a bank, and flag the office. Outside the window, or when Off, Remi does not reply. Office replies are human. Ace LIVE names: admin_list_aide_office_threads {p_escalate_only?}, admin_list_aide_office_messages {p_thread_id?, p_aide_id?, p_limit?, p_before?}, admin_send_aide_office_message {p_body, p_thread_id?, p_aide_id?}, admin_clear_aide_office_escalate {p_thread_id} clears the flag only and never approves a call-off, admin_mark_aide_office_messages_read {p_thread_id} when a thread opens, admin_get_aide_chat_call_off_script {}, admin_get_aide_chat_remi_settings {}, admin_save_aide_chat_remi_settings {p_enabled, p_start_local?, p_end_local?, p_timezone?}, admin_aide_chat_remi_context {p_aide_id}. Every Remi call-off script shows exactly (216) 377-5991 as tap-to-call. A missing callable keeps the inbox on this phone and does not invent a reply. No SMS and no email send. No Auth reseal. Nurse does not get Remi and does not get this chat. Prior markers stay, including remiask1. -->
 <meta name="admin-build" content="2026-09-25-aidechat1">
 <!-- remi ask lookups 2026-09-25 v=remiask1 admin-build 2026-09-25-remiask1. Admin and Scheduler only. Status look-ups answer in chat from lists already on this desk: Timesheets, Inservices, pay readiness, credentials, Coverage, Aides, clients, Schedule, Backup, Completes, Compliance, Broadcast, and login fails. The shape is YES or NO and the names, or a short status for a named aide or week. If that list is not loaded, Remi says it is not on this desk and does not invent it. Desk-word typos still match. These answers have no Confirm and do not text, email, or send. Who can cover stays the Tip 1 draft: Text, Assign, Share, and Call still wait for Confirm. Tell Friday stays for build and personal asks. Confirm stays on the existing text, email, and record drafts. No Auth reseal. No EVV, Sandata, or clock-in. No new Ace RPC. Remi stays the corner chip. Nurse does not get Remi. Prior markers stay, including remiwider1c. -->
 <meta name="admin-build" content="2026-09-25-remiask1">
@@ -467,6 +467,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_aidechat .aidechat-bubble-office{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
 #tab_aidechat .aidechat-bubble-remi{align-self:flex-start;background:#fff8e8;color:var(--navy);border:1px solid #f0d9a0;border-bottom-left-radius:4px;}
 #tab_aidechat .aidechat-who{display:block;font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;opacity:0.85;}
+#tab_aidechat a.aidechat-phone,.copilot-bubble a.aidechat-phone{color:inherit;font-weight:800;text-decoration:underline;display:inline-block;min-height:44px;line-height:44px;padding:0 4px;overflow-wrap:anywhere;}
 #tab_aidechat .aidechat-composer{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-width:100%;min-width:0;}
 #tab_aidechat .aidechat-composer .btn{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
 #tab_aidechat textarea{min-height:72px;}
@@ -2073,7 +2074,7 @@ Call (216) 377-5991 with any questions.</textarea>
               <label>Until <input type="time" id="aidechatEnd" value="08:00" onchange="aidechatSettingsChanged()"></label>
             </div>
             <p class="aidechat-window" id="aidechatWindowNote">2:00 PM → 8:00 AM · America/New_York. Remi auto-reply is off. A person replies.</p>
-            <p class="aidechat-rules" id="aidechatRules">Call-offs are never approved. Remi tells the aide to call (216) 377-5991. Pay uses Ready, Held, or submitted only.</p>
+            <p class="aidechat-rules" id="aidechatRules">Call-offs are never approved. Remi tells the aide to call <a class="aidechat-phone" href="tel:+12163775991">(216) 377-5991</a>. Pay uses Ready, Held, or submitted only.</p>
             <label class="aidechat-set-on" for="aidechatEscalateOnly">
               <input type="checkbox" id="aidechatEscalateOnly" onchange="aidechatRefresh()">
               <span>Urgent only</span>
@@ -7217,7 +7218,12 @@ function copilotChatAnswer(q){
 }
 function copilotChatHtml(text){
   var raw=typeof formatAdminDateCopy==='function'?formatAdminDateCopy(text):text;
-  return copilotEsc(raw).replace(/\n/g,'<br>');
+  var html=copilotEsc(raw).replace(/\n/g,'<br>');
+  if(typeof remiCalloffPhone==='function'){
+    var phone=copilotEsc(remiCalloffPhone());
+    html=html.split(phone).join('<a class="aidechat-phone" href="tel:+12163775991">'+phone+'</a>');
+  }
+  return html;
 }
 function copilotChatEnsureHello(){
   if(copilotChat.length)return;
@@ -7738,10 +7744,11 @@ function remiSecAdd(q){
 // v=aidechat1 aide↔office inbox. Admin and Scheduler only. One thread per aide.
 // Remi auto-reply is On plus the America/New_York window, or it stays quiet.
 // Call-offs are never approved. Pay is Ready, Held, or submitted from portal rows only.
-// Ace names: admin_list_aide_office_threads, admin_list_aide_office_messages,
-// admin_send_aide_office_message, admin_clear_aide_office_escalate.
-// Clear drops the flag only. It never approves a call-off.
-// A missing callable stays on this phone.
+// Ace LIVE: list {p_escalate_only?}, messages {p_thread_id?,p_aide_id?,p_limit?,p_before?},
+// send {p_body,p_thread_id?,p_aide_id?}, clear {p_thread_id} only,
+// read {p_thread_id} when a thread opens, script {}, settings get {},
+// settings save {p_enabled,p_start_local?,p_end_local?,p_timezone?}, context {p_aide_id}.
+// Clear never approves a call-off. A missing callable stays on this phone.
 // No SMS. No email. No Auth reseal. Nurse does not enter this chat.
 var AIDECHAT_MARKER='v=aidechat1';
 var AIDECHAT_OFFICE_PHONE=remiCalloffPhone();
@@ -7750,8 +7757,15 @@ var AIDECHAT_RPC={
   list:['admin_list_aide_office_threads'],
   messages:['admin_list_aide_office_messages'],
   send:['admin_send_aide_office_message'],
-  clear:['admin_clear_aide_office_escalate']
+  clear:['admin_clear_aide_office_escalate'],
+  read:['admin_mark_aide_office_messages_read'],
+  script:['admin_get_aide_chat_call_off_script'],
+  settingsGet:['admin_get_aide_chat_remi_settings'],
+  settingsSet:['admin_save_aide_chat_remi_settings'],
+  context:['admin_aide_chat_remi_context']
 };
+var aidechatAceScript='';
+var aidechatScriptLoaded=false;
 var AIDECHAT_SESSION_THREADS='evercare_aidechat1_threads';
 var AIDECHAT_SESSION_SETTINGS='evercare_aidechat1_settings';
 var aidechatThreads=[];
@@ -7936,6 +7950,16 @@ function aidechatGuard(text){
   return String(text||'').replace(/\$[\d,]+(?:\.\d{2})?/g,'').replace(/[ \t]{2,}/g,' ').trim();
 }
 function aidechatPayFacts(aide){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    var bits=[];
+    if(ctx.payStatus==='ready')bits.push('Ready');
+    else if(ctx.payStatus==='held')bits.push(ctx.payReason?('Held — '+ctx.payReason):'Held');
+    if(ctx.paySubmitted===true)bits.push('submitted');
+    else if(ctx.paySubmitted===false)bits.push('not submitted');
+    if(!bits.length)return '';
+    return 'Your pay on this desk: '+bits.join(', ')+'.';
+  }
   var row=aidechatPayFor(aide);
   if(!row)return '';
   var bits=[];
@@ -7954,6 +7978,12 @@ function aidechatPayFacts(aide){
   return 'Your pay on this desk: '+bits.join(', ')+'.';
 }
 function aidechatSubmittedAnswer(aide){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    if(ctx.submitted===true)return 'Yes. Your timesheet is submitted.';
+    if(ctx.submitted===false)return 'No. Your timesheet is not submitted.';
+    return 'I don\'t see your timesheet on this desk.';
+  }
   var sheets=aidechatSheetsFor(aide).filter(function(r){
     return String(r.status||'').toLowerCase()!=='backup';
   });
@@ -7968,6 +7998,12 @@ function aidechatSubmittedAnswer(aide){
   return 'Yes. Your timesheet is submitted.';
 }
 function aidechatSignatureAnswer(aide){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    if(ctx.signatureMissing===true)return 'Yes. A signature is missing on your timesheet.';
+    if(ctx.signatureMissing===false)return 'No. I don\'t see a missing signature on your timesheet.';
+    return 'I don\'t see a signature status for you on this desk.';
+  }
   var sheets=aidechatSheetsFor(aide);
   var pay=aidechatPayFor(aide);
   var missing=false;
@@ -8073,6 +8109,13 @@ function aidechatScheduleToday(aide, iso){
   return {loaded:true, names:names};
 }
 function aidechatServicesAnswer(aide, now){
+  var ctx=aidechatCtx(aide);
+  if(ctx){
+    if(ctx.servicesEmpty===true)return 'Yes. Services are empty on your timesheet that day.';
+    if(ctx.servicesEmpty===false)return 'No. Services are on your timesheet that day.';
+    if(ctx.scheduledWith)return 'No. You are scheduled today with '+ctx.scheduledWith+'.';
+    return 'I don\'t see today\'s services on this desk.';
+  }
   var iso=aidechatNyIso(now);
   if(!iso)return 'I don\'t see today\'s services on this desk.';
   var sheet=aidechatServicesFromSheet(aide, iso);
@@ -8086,13 +8129,115 @@ function aidechatServicesAnswer(aide, now){
   }
   return 'Yes. You have no services on the schedule today.';
 }
+function aidechatTri(v){
+  if(v==null||v==='')return null;
+  if(v===true||v===1)return true;
+  if(v===false||v===0)return false;
+  var s=String(v).toLowerCase();
+  if(s==='yes'||s==='true'||s==='submitted'||s==='present'||s==='ok')return true;
+  if(s==='no'||s==='false'||s==='not_submitted'||s==='missing')return false;
+  return null;
+}
+function aidechatPick(obj, keys){
+  if(!obj)return undefined;
+  var i;
+  for(i=0;i<keys.length;i++){
+    if(obj[keys[i]]!=null&&obj[keys[i]]!=='')return obj[keys[i]];
+  }
+  return undefined;
+}
+function aidechatContextFrom(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(Array.isArray(node))node=node[0]||null;
+  if(!node||typeof node!=='object')return null;
+  var bag=node.facts||node.context||node;
+  if(bag&&bag.facts&&typeof bag.facts==='object')bag=bag.facts;
+  var checks=bag.checks||bag.checklist||{};
+  var submitted=aidechatPick(bag, ['timesheet_submitted','submitted']);
+  if(submitted==null&&checks.submitted!=null)submitted=checks.submitted;
+  var sig=aidechatPick(bag, ['signature_missing','signature']);
+  if(sig==null&&checks.signature!=null)sig=checks.signature;
+  var servicesEmpty=aidechatPick(bag, ['services_empty']);
+  var services=aidechatPick(bag, ['services','services_today']);
+  var scheduled=aidechatPick(bag, ['scheduled_with','client_name','client_names']);
+  var payStatus=aidechatPick(bag, ['pay_status']);
+  var paySub=aidechatPick(bag, ['pay_submitted']);
+  if(paySub==null&&checks.pay_submitted!=null)paySub=checks.pay_submitted;
+  var payReason=aidechatPick(bag, ['held_reason','reason_label','reasonLabel']);
+  if(submitted==null&&sig==null&&servicesEmpty==null&&services==null&&scheduled==null&&payStatus==null&&paySub==null)return null;
+  var sigMissing=null;
+  if(sig!=null){
+    var sl=String(sig).toLowerCase();
+    if(sig===true||sl==='missing'||sl==='yes'||sl==='true')sigMissing=true;
+    else if(sig===false||sl==='present'||sl==='ok'||sl==='no'||sl==='false')sigMissing=false;
+  }
+  var empty=null;
+  if(servicesEmpty!=null)empty=aidechatTri(servicesEmpty);
+  else if(Array.isArray(services))empty=services.length===0;
+  var pay='';
+  if(payStatus!=null){
+    var ps=String(payStatus).toLowerCase();
+    if(ps==='ready')pay='ready';
+    else if(ps==='held'||ps==='hold')pay='held';
+  }
+  var names='';
+  if(Array.isArray(scheduled))names=scheduled.filter(Boolean).slice(0,4).join(', ');
+  else if(scheduled!=null)names=String(scheduled);
+  return {
+    loaded:true,
+    submitted:aidechatTri(submitted),
+    signatureMissing:sigMissing,
+    servicesEmpty:empty,
+    scheduledWith:aidechatSafeBit(names),
+    payStatus:pay,
+    paySubmitted:aidechatTri(paySub),
+    payReason:aidechatSafeBit(payReason||'')
+  };
+}
+function aidechatCtx(aide){
+  return aide&&aide.context&&aide.context.loaded?aide.context:null;
+}
+function aidechatScriptText(data){
+  if(typeof data==='string')return String(data).trim();
+  var node=data||{};
+  if(Array.isArray(node))node=node[0]||{};
+  if(node&&node.script==null&&node.call_off_script==null&&node.data)node=node.data;
+  return String(node.script||node.call_off_script||node.body||node.text||node.message||'').trim();
+}
+function aidechatCalloffText(){
+  return aidechatAceScript||remiCalloffReply();
+}
+async function aidechatLoadCalloffScript(){
+  if(aidechatScriptLoaded)return;
+  var got=await aidechatRpc('script', {});
+  if(got&&got.signedOut)return;
+  aidechatScriptLoaded=true;
+  if(!got||!got.ok)return;
+  var text=aidechatScriptText(got.data);
+  if(!text)return;
+  if(/\b(you are approved|you're approved|call-off is approved|approved the call-off|assigned a backup)\b/i.test(text))return;
+  text=remiLockCalloffLine(text);
+  if(text.indexOf(remiCalloffPhone())<0)return;
+  if(!/can'?t approve|cannot approve|never approve/i.test(text))text=remiCalloffReply();
+  aidechatAceScript=text;
+}
+async function aidechatLoadContext(aide){
+  var id=String(aide&&(aide.id||aide.aide_id)||'');
+  if(!id)return null;
+  var got=await aidechatRpc('context', {p_aide_id:id});
+  if(!got||!got.ok)return null;
+  return aidechatContextFrom(got.data);
+}
 function aidechatRemiDecide(text, aide, settings, now){
   var empty={text:'', urgent:false, reason:'', headsUp:''};
   if(!aidechatRemiOn(settings, now))return empty;
   var raw=String(text||'').trim();
   if(!raw)return empty;
   if(aidechatIsCalloff(raw)){
-    return {text:remiCalloffReply(), urgent:true, reason:'call_off', headsUp:'coverage'};
+    return {text:aidechatCalloffText(), urgent:true, reason:'call_off', headsUp:'coverage'};
   }
   if(aidechatOtherAide(aide, raw)&&aidechatIsStatusAsk(raw)){
     return {text:'I can only look up your own status.', urgent:false, reason:'', headsUp:''};
@@ -8388,6 +8533,10 @@ function aidechatPaintInbox(){
       +'</button>';
   }).join('');
 }
+function aidechatLinkPhones(escaped){
+  var phone=aidechatEsc(remiCalloffPhone());
+  return String(escaped||'').split(phone).join('<a class="aidechat-phone" href="tel:+12163775991">'+phone+'</a>');
+}
 function aidechatWho(sender){
   if(sender==='office')return 'Office';
   if(sender==='remi')return 'Remi';
@@ -8420,7 +8569,7 @@ function aidechatPaintThread(){
     var line=aidechatBannerText(thread);
     if(line){
       banner.hidden=false;
-      banner.innerHTML='<div>'+aidechatEsc(line)+'</div><button type="button" class="btn btn-ghost" id="aidechatClearUrgent" onclick="aidechatClearUrgent()">Clear urgent</button>';
+      banner.innerHTML='<div>'+aidechatLinkPhones(aidechatEsc(line))+'</div><button type="button" class="btn btn-ghost" id="aidechatClearUrgent" onclick="aidechatClearUrgent()">Clear urgent</button>';
     }else banner.hidden=true;
   }
   if(!box)return;
@@ -8431,7 +8580,7 @@ function aidechatPaintThread(){
   }
   box.innerHTML=msgs.map(function(m){
     var sender=m.sender==='office'||m.sender==='remi'?m.sender:'aide';
-    return '<div class="aidechat-bubble aidechat-bubble-'+sender+'"><span class="aidechat-who">'+aidechatWho(sender)+'</span>'+aidechatEsc(m.body)+'</div>';
+    return '<div class="aidechat-bubble aidechat-bubble-'+sender+'"><span class="aidechat-who">'+aidechatWho(sender)+'</span>'+aidechatLinkPhones(aidechatEsc(m.body))+'</div>';
   }).join('');
   try{box.scrollTop=box.scrollHeight;}catch(e){}
 }
@@ -8483,9 +8632,15 @@ function aidechatWireMessages(thread, before){
 }
 async function aidechatLoadSettings(){
   var gen=++aidechatSettingsGen;
-  var saved=aidechatReadSettings();
+  var got=await aidechatRpc('settingsGet', {});
   if(gen!==aidechatSettingsGen)return;
-  if(saved)aidechatSettings=saved;
+  if(got&&got.ok&&got.data){
+    aidechatSettings=aidechatMapSettings(got.data);
+  }else{
+    var saved=aidechatReadSettings();
+    if(saved)aidechatSettings=saved;
+    else if(got&&got.signedOut)aidechatSettings.source='signed-out';
+  }
   aidechatPaintSettings();
 }
 async function aidechatRefresh(){
@@ -8533,9 +8688,13 @@ async function aidechatMaybeRemi(thread, now){
   if(!msgs.length)return;
   var last=msgs[msgs.length-1];
   if(!last||last.sender!=='aide'||last.remi)return;
-  var decision=aidechatRemiDecide(last.body, aidechatAideOf(thread), aidechatSettings, now||new Date());
+  await aidechatLoadCalloffScript();
+  var aide=aidechatAideOf(thread);
+  var ctx=await aidechatLoadContext(aide);
+  if(ctx)aide.context=ctx;
+  var decision=aidechatRemiDecide(last.body, aide, aidechatSettings, now||new Date());
   if(!decision.text)return;
-  var reply=decision.reason==='call_off'?remiCalloffReply():decision.text;
+  var reply=decision.reason==='call_off'?aidechatCalloffText():decision.text;
   last.remi=true;
   thread.messages.push({
     id:aidechatId('m'),
@@ -8558,6 +8717,7 @@ async function aidechatOpenThread(id){
   var thread=aidechatFind(id);
   if(!thread)return;
   aidechatSelectedId=thread.id;
+  if(thread.id)await aidechatRpc('read', {p_thread_id:thread.id});
   var got=await aidechatRpc('messages', aidechatWireMessages(thread));
   if(got.ok){
     var msgs=aidechatMessagesFrom(got.data);
@@ -8665,9 +8825,21 @@ async function aidechatSettingsChanged(){
     timezone:'America/New_York',
     source:aidechatSettings.source||'desk'
   };
-  next.source='desk';
   aidechatSettings=next;
-  aidechatWriteSettings(aidechatSettings);
+  var got=await aidechatRpc('settingsSet', {
+    p_enabled:next.enabled,
+    p_start_local:next.start_local,
+    p_end_local:next.end_local,
+    p_timezone:'America/New_York'
+  });
+  if(got&&got.ok){
+    aidechatSettings=got.data?aidechatMapSettings(got.data):next;
+    aidechatSettings.source='ace';
+    aidechatSettings.timezone='America/New_York';
+  }else{
+    aidechatSettings.source=got&&got.signedOut?'signed-out':'desk';
+    aidechatWriteSettings(aidechatSettings);
+  }
   aidechatPaintSettings();
 }
 // v=remiask1 status look-ups. In-memory desk lists only. No Confirm. No send. No new Ace RPC.
