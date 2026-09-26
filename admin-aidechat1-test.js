@@ -52,6 +52,9 @@ assert.ok(html.includes("script:['admin_get_aide_chat_call_off_script']"), 'admi
 assert.ok(html.includes("settingsGet:['admin_get_aide_chat_remi_settings']"), 'admin_get_aide_chat_remi_settings');
 assert.ok(html.includes("settingsSet:['admin_save_aide_chat_remi_settings']"), 'admin_save_aide_chat_remi_settings');
 assert.ok(html.includes("context:['admin_aide_chat_remi_context']"), 'admin_aide_chat_remi_context');
+assert.ok(html.includes("contextOwn:['aide_chat_remi_context']"), 'aide_chat_remi_context fallback');
+assert.ok(chatJs.includes('from_remi:true'), 'from_remi only on a Remi line');
+assert.ok(!/p_from_remi|from_remi:/.test(chatJs.slice(chatJs.indexOf('function aidechatWireSend'), chatJs.indexOf('function aidechatWireMessages'))), 'send args stay the live shape');
 assert.ok(html.includes('href="tel:+12163775991"'), 'call-off number is tap-to-call');
 assert.ok(!/sms:|mailto:/.test(chatJs), 'aide chat block does not open Messages or Mail');
 assert.ok(chatJs.includes('p_escalate_only'), 'list accepts p_escalate_only');
@@ -504,7 +507,7 @@ async function runBrowser(){
     assert.ok(rpc.sent.some(function(b){
       return b.p_sender == null && String(b.p_body).indexOf('(216) 377-5991') >= 0 && !!b.p_thread_id && !b.p_aide_id;
     }), JSON.stringify(rpc.sent));
-    assert.ok(rpc.sent.every(function(b){return String(b.p_body).indexOf('(440)') < 0 && String(b.p_body).indexOf('555-') < 0;}));
+    assert.ok(rpc.sent.every(function(b){return String(b.p_body).indexOf('(440)') < 0 && String(b.p_body).indexOf('555-') < 0 && b.p_from_remi == null && b.from_remi == null;}));
     assert.ok(!rpc.sent.some(function(b){return /\bapproved\b/i.test(String(b.p_body));}));
     assert.strictEqual(rpc.escalated, true, 'call-off still flags the inbox');
     assert.strictEqual(rpc.flagCleared, true, 'clear drops the flag and does not approve');
@@ -566,6 +569,8 @@ async function runBrowser(){
         sheet: remiAfter(sheet, 'timesheet'),
         pay: remiAfter(pay, 'deposit'),
         call: remiAfter(call, 'call off'),
+        fromRemi: (sheet.messages||[]).some(function(m){return m.from_remi===true && m.sender==='remi';}),
+        own: seen.some(function(c){return c.name==='aide_chat_remi_context';}),
         ctx: seen.filter(function(c){return c.name === 'admin_aide_chat_remi_context';}).map(function(c){return c.body;})
       };
     });
@@ -575,6 +580,53 @@ async function runBrowser(){
     assert.strictEqual(facts.call, 'I can\'t approve a call-off. Please call the office at (216) 377-5991 so someone can help you right away. I\'ve also noted this for the scheduler.');
     assert.ok(facts.call.indexOf('440') < 0 && !/\bapproved\b/i.test(facts.call), facts.call);
     assert.ok(facts.ctx.every(function(b){return Object.keys(b).join(',') === 'p_aide_id';}), JSON.stringify(facts.ctx));
+    assert.strictEqual(facts.fromRemi, true, 'auto-reply is from_remi inside the window');
+    assert.strictEqual(facts.own, false, 'admin context answers, so the zero-arg callable stays idle');
+
+    const forced = await page.evaluate(async function(){
+      aidechatRpcOff = {};
+      aidechatRpcPick = {};
+      aidechatScriptLoaded = false;
+      aidechatAceScript = '';
+      aidechatThreads = [];
+      aidechatSettings = {enabled:true, start_local:'14:00', end_local:'08:00', timezone:'America/New_York', source:'ace'};
+      readSbSession = function(){return {access_token:'office-jwt'};};
+      var seen = [];
+      sbRestRpc = async function(name, body){
+        seen.push({name:name, body:body||{}});
+        if(name === 'admin_aide_chat_remi_context')return {ok:false, status:404, error:'Could not find the function public.admin_aide_chat_remi_context in the schema cache'};
+        if(name === 'aide_chat_remi_context')return {ok:true, data:{success:true, timesheet_submitted:true}};
+        if(name === 'admin_get_aide_chat_call_off_script')return {ok:true, data:{call_off_script:'I can\'t approve a call-off. Please call the office at (440) 555-0199 so someone can help you right away. I\'ve also noted this for the scheduler.'}};
+        if(name === 'admin_send_aide_office_message')return {ok:true, data:{success:true, message:{body:body.p_body}}};
+        return {ok:false, status:404, error:'Could not find the function in the schema cache'};
+      };
+      var now = new Date('2026-09-25T19:00:00Z');
+      var quiet = {enabled:false, start_local:'14:00', end_local:'08:00', timezone:'America/New_York'};
+      aidechatSettings = quiet;
+      var off = await aidechatIngestAideMessage({username:'ada', aideId:'ada-off', name:'Ada Cole', body:'I need to call off today', now:now});
+      aidechatSettings = {enabled:true, start_local:'14:00', end_local:'08:00', timezone:'America/New_York', source:'ace'};
+      var call = await aidechatIngestAideMessage({username:'bea', aideId:'bea-1', name:'Bea Lin', body:'I need to call off today', now:now});
+      var sheet = await aidechatIngestAideMessage({username:'cam', aideId:'cam-1', name:'Cam Brooks', body:'did I submit my timesheet?', now:now});
+      function remiBody(thread){
+        var msgs = thread && thread.messages || [];
+        var i;
+        for(i=msgs.length-1;i>=0;i--)if(msgs[i].sender==='remi')return msgs[i].body;
+        return '';
+      }
+      return {
+        offRemi: (off.messages||[]).some(function(m){return m.from_remi||m.sender==='remi';}),
+        call: remiBody(call),
+        sheet: remiBody(sheet),
+        own: seen.filter(function(c){return c.name==='aide_chat_remi_context';}).map(function(c){return c.body;}),
+        sent: seen.filter(function(c){return c.name==='admin_send_aide_office_message';}).map(function(c){return c.body;})
+      };
+    });
+    assert.strictEqual(forced.offRemi, false, 'Off means no from_remi reply');
+    assert.ok(forced.call.indexOf('(216) 377-5991') >= 0 && forced.call.indexOf('440') < 0 && forced.call.indexOf('555-0199') < 0, forced.call);
+    assert.ok(/noted this for the scheduler/.test(forced.call), forced.call);
+    assert.strictEqual(forced.sheet, 'Yes. Your timesheet is submitted.');
+    assert.ok(forced.own.length && forced.own.every(function(b){return Object.keys(b).length===0;}), JSON.stringify(forced.own));
+    assert.ok(forced.sent.every(function(b){return b.p_from_remi == null && b.from_remi == null;}));
 
     const roles = await page.evaluate(async function(){
       currentAdminRole = 'Scheduler';

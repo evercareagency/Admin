@@ -7744,6 +7744,8 @@ function remiSecAdd(q){
 // v=aidechat1 aide↔office inbox. Admin and Scheduler only. One thread per aide.
 // Remi auto-reply is On plus the America/New_York window, or it stays quiet.
 // Call-offs are never approved. Pay is Ready, Held, or submitted from portal rows only.
+// GHOST-AIDECHAT1-CONTRACT-v1. from_remi only while Remi is On and inside the window.
+// aide_chat_remi_context {} is the zero-arg fallback when admin_aide_chat_remi_context is missing.
 // Ace LIVE: list {p_escalate_only?}, messages {p_thread_id?,p_aide_id?,p_limit?,p_before?},
 // send {p_body,p_thread_id?,p_aide_id?}, clear {p_thread_id} only,
 // read {p_thread_id} when a thread opens, script {}, settings get {},
@@ -7762,7 +7764,8 @@ var AIDECHAT_RPC={
   script:['admin_get_aide_chat_call_off_script'],
   settingsGet:['admin_get_aide_chat_remi_settings'],
   settingsSet:['admin_save_aide_chat_remi_settings'],
-  context:['admin_aide_chat_remi_context']
+  context:['admin_aide_chat_remi_context'],
+  contextOwn:['aide_chat_remi_context']
 };
 var aidechatAceScript='';
 var aidechatScriptLoaded=false;
@@ -8218,18 +8221,21 @@ async function aidechatLoadCalloffScript(){
   if(!got||!got.ok)return;
   var text=aidechatScriptText(got.data);
   if(!text)return;
-  if(/\b(you are approved|you're approved|call-off is approved|approved the call-off|assigned a backup)\b/i.test(text))return;
   text=remiLockCalloffLine(text);
-  if(text.indexOf(remiCalloffPhone())<0)return;
-  if(!/can'?t approve|cannot approve|never approve/i.test(text))text=remiCalloffReply();
+  if(/\b(you are approved|you're approved|call-off is approved|approved the call-off|assigned a backup)\b/i.test(text))text=remiCalloffReply();
+  if(text.indexOf(remiCalloffPhone())<0)text=remiCalloffReply();
   aidechatAceScript=text;
 }
 async function aidechatLoadContext(aide){
   var id=String(aide&&(aide.id||aide.aide_id)||'');
-  if(!id)return null;
-  var got=await aidechatRpc('context', {p_aide_id:id});
-  if(!got||!got.ok)return null;
-  return aidechatContextFrom(got.data);
+  if(id){
+    var got=await aidechatRpc('context', {p_aide_id:id});
+    if(got&&got.ok)return aidechatContextFrom(got.data);
+    if(!(got&&got.missing))return null;
+  }
+  var own=await aidechatRpc('contextOwn', {});
+  if(own&&own.ok)return aidechatContextFrom(own.data);
+  return null;
 }
 function aidechatRemiDecide(text, aide, settings, now){
   var empty={text:'', urgent:false, reason:'', headsUp:''};
@@ -8312,7 +8318,8 @@ async function aidechatRpc(kind, body){
 function aidechatMapMessage(raw){
   raw=raw||{};
   var sender=String(raw.sender||raw.role||raw.from||'aide').toLowerCase();
-  if(sender==='remi'||sender==='assistant')sender='remi';
+  if(raw.from_remi===true||raw.from_remi==='true'||raw.from_remi==='t')sender='remi';
+  else if(sender==='remi'||sender==='assistant')sender='remi';
   else if(sender==='office'||sender==='admin'||sender==='scheduler'||sender==='staff')sender='office';
   else sender='aide';
   return {
@@ -8687,18 +8694,22 @@ async function aidechatMaybeRemi(thread, now){
   var msgs=thread.messages||[];
   if(!msgs.length)return;
   var last=msgs[msgs.length-1];
-  if(!last||last.sender!=='aide'||last.remi)return;
+  if(!last||last.sender!=='aide'||last.remi||last.from_remi)return;
+  var when=now||new Date();
+  if(!aidechatRemiOn(aidechatSettings, when))return;
   await aidechatLoadCalloffScript();
   var aide=aidechatAideOf(thread);
   var ctx=await aidechatLoadContext(aide);
   if(ctx)aide.context=ctx;
-  var decision=aidechatRemiDecide(last.body, aide, aidechatSettings, now||new Date());
+  var decision=aidechatRemiDecide(last.body, aide, aidechatSettings, when);
   if(!decision.text)return;
+  if(!aidechatRemiOn(aidechatSettings, when))return;
   var reply=decision.reason==='call_off'?aidechatCalloffText():decision.text;
   last.remi=true;
   thread.messages.push({
     id:aidechatId('m'),
     sender:'remi',
+    from_remi:true,
     body:reply,
     created_at:new Date().toISOString(),
     kind:decision.reason||'status'
