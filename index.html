@@ -7651,8 +7651,18 @@ function remiAskCanonToken(t){
     if(d<=limit&&d<bestD){bestD=d;best=c;ties=0;}
     else if(d===bestD&&d<=limit&&c!==best)ties=1;
   }
-  if(ties||!best)return t;
-  return best;
+  if(!ties&&best)return best;
+  if(t.length>=8){
+    var key=t.split('').sort().join('');
+    var hit='', n=0;
+    for(i=0;i<REMI_ASK_CANON.length;i++){
+      var word=REMI_ASK_CANON[i];
+      if(word.length!==t.length)continue;
+      if(word.split('').sort().join('')===key){hit=word;n++;}
+    }
+    if(n===1)return hit;
+  }
+  return t;
 }
 function remiAskFold(q){
   var raw=String(q||'').toLowerCase().replace(/['\u2019]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();

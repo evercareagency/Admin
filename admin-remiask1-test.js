@@ -155,6 +155,7 @@ async function runBrowser(){
       return {
         submitted: grab('are all timesheets submitted this week?'),
         typo: grab('are all timsheets submited this week'),
+        soft: grab('all timehstee turned in'),
         missing: grab('missing signature?'),
         correction: grab('who is in correction?'),
         status: grab('timesheet status for Ada Cole'),
@@ -196,6 +197,8 @@ async function runBrowser(){
     assert.ok(/^NO\./.test(planned.submitted.text) && /Cam Brooks/.test(planned.submitted.text) && /Ada Cole/.test(planned.submitted.text), planned.submitted.text);
     look(planned.typo, 'typo');
     assert.strictEqual(planned.typo.text, planned.submitted.text);
+    look(planned.soft, 'timehstee');
+    assert.strictEqual(planned.soft.text, planned.submitted.text, planned.soft.text);
     look(planned.missing, 'signature');
     assert.ok(/^NO\./.test(planned.missing.text) && /Ada Cole/.test(planned.missing.text), planned.missing.text);
     look(planned.correction, 'correction');
