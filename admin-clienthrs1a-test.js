@@ -28,6 +28,8 @@ assert.ok(html.includes('data-clienthrs1a="v=clienthrs1a"'), 'clienthrs1a string
 assert.ok(html.includes('admin-build 2026-09-26-clienthrs1a'), 'clienthrs1a build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1a">'), 'clienthrs1a meta');
 assert.ok(html.includes('<!-- weekly authorized hours 2026-09-26 v=clienthrs1a admin-build 2026-09-26-clienthrs1a'), 'clienthrs1a comment');
+assert.ok(html.includes('GHOST-CLIENTHRS1A-CONTRACT-v1'), 'clienthrs1a contract');
+assert.ok(html.includes('admin_add_client(p_case_manager_email, p_case_manager_name, p_first_name, p_home_address, p_last_name, p_phone, p_weekly_authorized_hours)'), 'live admin_add_client arguments');
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-26-clienthrs1a'), 'clienthrs1a is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidechat1">'), 'aidechat1 meta stays');
