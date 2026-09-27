@@ -28,7 +28,7 @@ assert.ok(html.includes('admin-build 2026-09-25-coverunlock1'), 'coverunlock1 bu
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coverunlock1">'), 'coverunlock1 meta');
 assert.ok(html.includes('<!-- coverage outcome unlock 2026-09-25 v=coverunlock1 admin-build 2026-09-25-coverunlock1'), 'coverunlock1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-proof1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-float-noshow1'), 'isdash1 is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1b"') < html.indexOf('content="2026-09-25-coverunlock1"'), 'coverunlock1 stays after payready1b');
 assert.ok(html.indexOf('content="2026-09-25-coverunlock1"') < html.indexOf('content="2026-09-25-payready1"'), 'payready1 stays after coverunlock1');
