@@ -240,6 +240,7 @@ async function runBrowser(){
       var actions = document.querySelector('.cover-simple-pick-actions').getBoundingClientRect();
       var all = document.getElementById('coverSimpleAll').getBoundingClientRect();
       var none = document.getElementById('coverSimpleNone').getBoundingClientRect();
+      var modal = document.querySelector('.cover-simple-modal').getBoundingClientRect();
       var rows = Array.prototype.slice.call(document.querySelectorAll('.cover-simple-aide'));
       var kimRow = rows.filter(function(row){return row.textContent.indexOf('Kim Lee') >= 0;})[0];
       return {
@@ -251,6 +252,11 @@ async function runBrowser(){
         sendDisabled: document.getElementById('coverSimpleSendBlast').disabled,
         actionsRight: actions.left >= count.right - 2,
         unselectRight: none.left >= all.right - 2,
+        noneW: none.width,
+        allW: all.width,
+        modalRight: modal.right,
+        noneRight: none.right,
+        clipped: none.right > modal.right + 1 || all.right > modal.right + 1 || none.width < 40,
         open: !document.getElementById('coverSimpleScrim').hidden,
         build: document.querySelector('meta[name="admin-build"]').content
       };
@@ -263,10 +269,11 @@ async function runBrowser(){
     assert.strictEqual(selected.sendDisabled, false);
     assert.strictEqual(selected.actionsRight, true, 'actions sit to the right of the count');
     assert.strictEqual(selected.unselectRight, true, 'Unselect all sits to the right of Select all active');
+    assert.strictEqual(selected.clipped, false, 'pick-bar labels stay inside the modal ' + JSON.stringify(selected));
     assert.strictEqual(selected.open, true);
     assert.strictEqual(selected.build, '2026-09-27-cover-unselect1');
     await shot(page, 'cover-unselect1-phone-20-selected.png');
-    await page.setViewport({width: 1280, height: 900, deviceScaleFactor: 2});
+    await page.setViewport({width: 1280, height: 900, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await shot(page, 'cover-unselect1-desktop-20-selected.png');
     await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     const blastsBefore = calls.filter(function(c){return c.rpc === 'admin_blast_cover_request';}).length;
@@ -311,7 +318,7 @@ async function runBrowser(){
       return c.rpc === 'admin_blast_cover_request' && (!c.body.p_aide_ids || !c.body.p_aide_ids.length);
     }), 'no blast with an empty aide list');
     await shot(page, 'cover-unselect1-phone-0-selected.png');
-    await page.setViewport({width: 1280, height: 900, deviceScaleFactor: 2});
+    await page.setViewport({width: 1280, height: 900, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await shot(page, 'cover-unselect1-desktop-0-selected.png');
     await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await page.evaluate(function(){
@@ -321,7 +328,7 @@ async function runBrowser(){
     });
     const phoneModal = await page.$('.cover-simple-modal');
     await phoneModal.screenshot({path: path.join(shotDir, 'cover-unselect1-phone-unselect-full.png')});
-    await page.setViewport({width: 1280, height: 900, deviceScaleFactor: 2});
+    await page.setViewport({width: 1280, height: 900, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     const deskModal = await page.$('.cover-simple-modal');
     await deskModal.screenshot({path: path.join(shotDir, 'cover-unselect1-desktop-unselect-full.png')});
     await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
@@ -332,7 +339,7 @@ async function runBrowser(){
       document.getElementById('coverSimpleSendBlast').scrollIntoView({block: 'center'});
     });
     await shot(page, 'cover-unselect1-phone-blast-ghosted.png');
-    await page.setViewport({width: 1280, height: 900, deviceScaleFactor: 2});
+    await page.setViewport({width: 1280, height: 900, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await page.evaluate(function(){
       document.getElementById('coverSimpleSendBlast').scrollIntoView({block: 'center'});
     });
