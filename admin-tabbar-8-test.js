@@ -23,7 +23,8 @@ assert.ok(html.includes('Move to More') && html.includes('Add to bar'), 'move an
 assert.ok(html.includes("return 'evercare_nav_tabs:'+part"), 'prefs key unchanged');
 assert.ok(html.includes('No SQL') && html.includes('No new RPC'), 'no SQL and no new RPC in the tip');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-hold-clear1'), 'first admin-build is hold-clear1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-langs1'), 'first admin-build is remi-langs1');
+assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after remi-langs1');
 assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
 assert.ok(html.indexOf('content="2026-09-27-sched-time-tap1"') < html.indexOf('content="2026-09-27-aide-text-chat1"'), 'aide-text-chat1 stays after sched-time-tap1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
