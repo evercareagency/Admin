@@ -59,6 +59,10 @@ const schedEnd = html.indexOf('// end remi sched1 v=remi-sched1');
 const schedSrc = html.slice(schedStart, schedEnd);
 assert.ok(schedSrc.includes('p_recurrence') && schedSrc.includes('p_interval_days') && schedSrc.includes('p_anchor_date') && schedSrc.includes('p_range_prefs'), 'sched create/update accepts biweekly fields');
 assert.ok(schedSrc.includes("payroll_report:'payroll_report'"), 'payroll_report kind');
+assert.ok(schedSrc.includes("out.anchor_date='2026-09-23'"), 'payroll anchor is Wed 09/23');
+assert.ok(!/out\.anchor_date='2026-09-24'/.test(schedSrc), 'payroll anchor is never Thu 09/24');
+assert.ok(src.includes("REMI_PAYROLL1_ANCHOR='2026-09-23'"), 'anchor constant');
+assert.ok(src.includes("REMI_PAYROLL1_NEXT='2026-10-07T12:00:00+00:00'"), 'next run constant');
 assert.ok(!/sbRestRpc\(\s*['"]list_due_remi_scheduled_jobs['"]/.test(schedSrc), 'list_due stays off the desk');
 
 const DOT = '\u00B7';
@@ -85,8 +89,8 @@ const REPORT = {
     job_key:'payroll_report',
     recurrence:'biweekly',
     schedule_label:LABEL,
-    next_run_at:'2026-10-08T12:00:00+00:00',
-    anchor_date:'2026-09-24',
+    next_run_at:'2026-10-07T12:00:00+00:00',
+    anchor_date:'2026-09-23',
     interval_days:14
   },
   aides:[
@@ -102,8 +106,8 @@ const REPORT = {
 };
 const PAY_JOB = {
   id:'pay1', title:'Payroll report', kind:'payroll_report', job_key:'payroll_report', is_on:true, weekday:'wed', local_time:'08:00',
-  recurrence:'biweekly', interval_days:14, anchor_date:'2026-09-24', sort_order:5,
-  schedule_label:LABEL, next_run_at:'2026-10-08T12:00:00+00:00'
+  recurrence:'biweekly', interval_days:14, anchor_date:'2026-09-23', sort_order:5,
+  schedule_label:LABEL, next_run_at:'2026-10-07T12:00:00+00:00'
 };
 
 function runSlice(){
@@ -117,9 +121,14 @@ function runSlice(){
   const sandbox = runSlice();
   assert.strictEqual(sandbox.REMI_PAYROLL1_MARKER, 'v=remi-payroll1');
   assert.strictEqual(sandbox.REMI_PAYROLL1_OFFICE, 'is_scheduler_office');
-  const next = sandbox.remiPayroll1FormatNext('2026-10-08T12:00:00+00:00');
-  assert.ok(next.indexOf('Thu') === 0, next);
-  assert.ok(next.indexOf('10/08/2026') >= 0, next);
+  assert.strictEqual(sandbox.REMI_PAYROLL1_ANCHOR, '2026-09-23');
+  const next = sandbox.remiPayroll1FormatNext('2026-10-07T12:00:00+00:00');
+  assert.ok(next.indexOf('Wed') === 0, next);
+  assert.ok(next.indexOf('10/07/2026') >= 0, next);
+  assert.ok(next.indexOf('10/08') < 0, next);
+  const coerced = sandbox.remiPayroll1NextText({next_run_at:'2026-10-08T12:00:00+00:00', next_run_label:'Thu 10/08/2026 8:00 AM ET', anchor_date:'2026-09-24'});
+  assert.ok(coerced.indexOf('Wed') === 0 && coerced.indexOf('10/07/2026') >= 0, coerced);
+  assert.strictEqual(sandbox.remiPayroll1AnchorIso('2026-09-24'), '2026-09-23');
   assert.ok(/8:00\s*AM/i.test(next), next);
   assert.ok(next.indexOf('ET') >= 0, next);
 
@@ -129,14 +138,14 @@ function runSlice(){
   assert.strictEqual(parsed.local_time, '08:00');
   assert.strictEqual(parsed.recurrence, 'biweekly');
   assert.strictEqual(parsed.interval_days, 14);
-  assert.strictEqual(parsed.anchor_date, '2026-09-24');
+  assert.strictEqual(parsed.anchor_date, '2026-09-23');
   assert.strictEqual(parsed.summary, LABEL);
   const body = sandbox.remiSched1CreateBody(parsed);
   assert.strictEqual(body.p_kind, 'payroll_report');
   assert.strictEqual(body.p_job_key, 'payroll_report');
   assert.strictEqual(body.p_recurrence, 'biweekly');
   assert.strictEqual(body.p_interval_days, 14);
-  assert.strictEqual(body.p_anchor_date, '2026-09-24');
+  assert.strictEqual(body.p_anchor_date, '2026-09-23');
   assert.strictEqual(body.p_weekday, 'wed');
   assert.strictEqual(body.p_local_time, '08:00');
   const weekly = sandbox.remiSched1Parse('Hey Remi \u2014 every Monday at 9 give me the missing hours report.');
@@ -172,8 +181,9 @@ function runSlice(){
   assert.ok(collapsed.indexOf('aria-expanded="false"') >= 0, 'collapsed by default');
   assert.ok(collapsed.indexOf('09/14/2026') >= 0 && collapsed.indexOf('09/27/2026') >= 0, 'MM/DD/YYYY range');
   assert.ok(collapsed.indexOf(LABEL) >= 0, 'biweekly label');
-  assert.ok(collapsed.indexOf('10/08/2026') >= 0, 'next run');
-  assert.ok(collapsed.indexOf('09/24/2026') >= 0, 'anchor');
+  assert.ok(collapsed.indexOf('Wed 10/07/2026') >= 0, 'next run');
+  assert.ok(collapsed.indexOf('Anchor pay day 09/23/2026') >= 0, 'anchor');
+  assert.ok(collapsed.indexOf('10/08/2026') < 0, 'next run is never Thu 10/08');
 
   sandbox.remiPayroll1Toggle('lina');
   sandbox.remiPayroll1Toggle('keisha');
@@ -192,7 +202,7 @@ function runSlice(){
     if(name==='admin_parse_remi_payroll_range')return {ok:true, data:{success:true, start_date:'2026-09-13', end_date:'2026-09-27', start_date_display:'09/13/2026', end_date_display:'09/27/2026'}};
     if(name==='admin_set_remi_payroll_range_prefs')return {ok:true, data:{success:true}};
     if(name==='admin_get_remi_payroll_report')return {ok:true, data:REPORT};
-    if(name==='admin_run_remi_payroll_report')return {ok:true, data:{success:true, report:REPORT, job:{next_run_at:'2026-10-08T12:00:00+00:00', schedule_label:LABEL}, rail_chip:{summary:'Payroll report ready', receipt_id:'rcpt-pay-1', open_label:'Open full proof \u2192'}, receipt:{id:'rcpt-pay-1', chip_summary:'Payroll report ready'}}};
+    if(name==='admin_run_remi_payroll_report')return {ok:true, data:{success:true, report:REPORT, job:{next_run_at:'2026-10-07T12:00:00+00:00', anchor_date:'2026-09-23', schedule_label:LABEL}, rail_chip:{summary:'Payroll report ready', receipt_id:'rcpt-pay-1', open_label:'Open full proof \u2192'}, receipt:{id:'rcpt-pay-1', chip_summary:'Payroll report ready'}}};
     if(name==='admin_export_remi_payroll_csv')return {ok:true, data:{csv_text:'aide,client,hours\nDevon,Helen Park,36.15\n', filename:'payroll.csv'}};
     if(name==='admin_export_remi_payroll_pdf')return {ok:true, data:{content_base64:PDF_B64, storage_path:'4f97f4d3-6635-4544-904c-6b06aa02d40b/other/pay.pdf', filename:'payroll.pdf'}};
     if(name==='admin_export_remi_payroll')return {ok:true, data:{csv_text:'both\n', filename:'both.csv', content_base64:PDF_B64, storage_path:'4f97f4d3-6635-4544-904c-6b06aa02d40b/other/both.pdf'}};
@@ -256,14 +266,21 @@ function runSlice(){
   assert.strictEqual(timed.ok, true);
   assert.strictEqual(rpc[0].body.p_recurrence, 'biweekly');
   assert.strictEqual(rpc[0].body.p_interval_days, 14);
-  assert.strictEqual(rpc[0].body.p_anchor_date, '2026-09-24');
+  assert.strictEqual(rpc[0].body.p_anchor_date, '2026-09-23');
+  sandbox.remiSched1Cache = [Object.assign({}, PAY_JOB, {anchor_date:'2026-09-24', next_run_at:'2026-10-08T12:00:00+00:00'})];
+  rpc.length = 0;
+  const staleSave = await sandbox.remiSched1SaveTime('pay1');
+  assert.strictEqual(staleSave.ok, true);
+  assert.strictEqual(rpc[0].body.p_anchor_date, '2026-09-23');
   assert.strictEqual(rpc[0].body.p_weekday, 'wed');
   assert.strictEqual(rpc[0].body.p_local_time, '08:00');
 
   const card = sandbox.remiSched1JobHtml(PAY_JOB);
   assert.ok(card.indexOf('Payroll report') >= 0, card);
   assert.ok(card.indexOf(LABEL) >= 0, card);
-  assert.ok(card.indexOf('10/08/2026') >= 0, card);
+  assert.ok(card.indexOf('Wed 10/07/2026') >= 0, card);
+  assert.ok(card.indexOf('09/23/2026') >= 0, card);
+  assert.ok(card.indexOf('10/08') < 0 && card.indexOf('09/24') < 0, card);
   assert.ok(card.indexOf('>On<') >= 0, card);
   assert.ok(!/hrs paid/i.test(card) && !/not paid/i.test(card));
 
@@ -381,8 +398,9 @@ async function runBrowser(){
     assert.strictEqual(schedView.selected, 'true');
     assert.ok(schedView.text.indexOf('Payroll report') >= 0, schedView.text);
     assert.ok(schedView.text.indexOf('Every other Wednesday') >= 0, schedView.text);
-    assert.ok(schedView.text.indexOf('10/08/2026') >= 0, schedView.text);
-    assert.ok(schedView.text.indexOf('09/24/2026') >= 0, schedView.text);
+    assert.ok(schedView.text.indexOf('Wed 10/07/2026') >= 0, schedView.text);
+    assert.ok(schedView.text.indexOf('09/23/2026') >= 0, schedView.text);
+    assert.ok(schedView.text.indexOf('10/08') < 0 && schedView.text.indexOf('09/24') < 0, schedView.text);
     assert.ok(!/hrs paid/i.test(schedView.text) && !/not paid/i.test(schedView.text), schedView.text);
     await page.screenshot({path:path.join(shotDir, 'remi-payroll1-phone-scheduled.png')});
 
@@ -470,6 +488,13 @@ async function runBrowser(){
     assert.ok(deskView.text.indexOf('36.15') >= 0, deskView.text);
     await desk.screenshot({path:path.join(shotDir, 'remi-payroll1-desktop-report.png')});
     await desk.evaluate(async function(){remiSched1Show(); await remiSched1Load();});
+    const deskSched = await desk.evaluate(function(){
+      return document.getElementById('copilotBody').innerText;
+    });
+    assert.ok(deskSched.indexOf('Every other Wednesday') >= 0, deskSched);
+    assert.ok(deskSched.indexOf('Wed 10/07/2026') >= 0, deskSched);
+    assert.ok(deskSched.indexOf('09/23/2026') >= 0, deskSched);
+    assert.ok(deskSched.indexOf('10/08') < 0 && deskSched.indexOf('09/24') < 0, deskSched);
     await desk.screenshot({path:path.join(shotDir, 'remi-payroll1-desktop-scheduled.png')});
     assert.ok(!errors.some(function(e){return /remiPayroll|SyntaxError/.test(e);}), errors.join('\n'));
     console.log('admin-remi-payroll1 browser ok');
