@@ -42,6 +42,12 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi scheduled jobs 2026-09-27 v=remi-sched1 admin-build 2026-09-27-remi-sched1. GHOST-REMI-SCHED1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Remi Scheduled stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Tabs are Radar, Ask, Notes, Rules, and Scheduled. Chat such as every Monday at 9 give me the missing hours report shows a New schedule chip with Confirm and Change time. Confirm posts admin_create_remi_scheduled_job with p_kind, p_title, p_weekday, p_local_time, optional p_job_key, p_summary, p_prompt_text, p_timezone, and p_is_on. The rail parses weekday and time. There is no admin_preview_remi_schedule_parse RPC. The Scheduled tab lists admin_list_remi_scheduled_jobs and paints title, schedule_label, and On/Off. Toggle and Change time post admin_update_remi_scheduled_job. Seeded defaults stay On in Ace and this desk does not re-seed them: Missing hours report Monday 9:00 AM ET, Hours nudge Friday noon, Manager digest Friday 2:00 PM ET. list_due_remi_scheduled_jobs is a processor stub only. This desk does not call it and does not add a Friday or Ace Grok runner. Office JWT via sbRestRpc. is_scheduler_office. Nurse does not get Remi writes. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-rules1, v=remi-notes-vis1, v=vapid1, v=clienthrs1d, v=remi-cm-email1, v=remiface1, and v=remi-notes1. -->
+<meta name="admin-build" content="2026-09-27-remi-sched1">
+<!-- remi rules 2026-09-27 v=remi-rules1 admin-build 2026-09-27-remi-rules1. GHOST-REMI-RULES1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Remi Rules stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. The Rules tab lists admin_list_remi_rules as On/Off cards with title and body. Add rule posts admin_create_remi_rule {p_title, p_body, p_is_on}. Toggle and edit post admin_update_remi_rule and prefer p_is_on over delete. On a call-off or cover answer, the rail paints chip_label from admin_list_active_remi_rules for On rules only. Rules are only saved remi_rules. This desk does not invent a rule from a joke. Office JWT via sbRestRpc. is_scheduler_office. Nurse does not get Remi writes. No Auth reseal. No Quo/SMS. Prior markers stay, including v=remi-notes-vis1, v=vapid1, v=clienthrs1d, v=remi-cm-email1, v=remiface1, and v=remi-notes1. -->
+<meta name="admin-build" content="2026-09-27-remi-rules1">
+<!-- remi notes desk 2026-09-27 v=remi-notes-vis1 admin-build 2026-09-27-remi-notes-vis1. GHOST-REMI-NOTES-VIS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Notes stays inside the Remi right rail: corner chip, phone sheet, and desktop right rail. No full-page Remi. Admin Notes has My notes and Scheduler notes. My notes types and Save posts remi_save_my_note {p_body} and lists remi_list_my_notes. Those notes are private. Scheduler never sees Admin My notes. No spy badge and no manager-can-see badge. Scheduler notes is Admin only: remi_list_scheduler_notes, and a reply posts remi_update_scheduler_note {p_note_id, p_body}. The rail paints author_display_name and updated_label or latest_update. Scheduler has My notes only and does not get a Scheduler notes tab. Scheduler sees their own notes and Admin updates on those notes. Optional thread is remi_list_my_note_thread {p_note_id}. Office JWT via sbRestRpc. is_scheduler_office. Nurse does not get Remi writes. The earlier v=remi-notes1 reminder list stays under the desk notes so Remind me still works on this phone. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=vapid1, v=clienthrs1d, v=remi-cm-email1, v=remiface1, and v=remi-notes1. -->
+<meta name="admin-build" content="2026-09-27-remi-notes-vis1">
 <!-- web push public key 2026-09-27 v=vapid1 admin-build 2026-09-27-vapid1. GHOST-VAPID1-CONTRACT-v1. Ace CALLABLE keys live. get_vapid_public_key returns configured true and a public vapidPublicKey. #notifVapid says web push can deliver when aides allow. Soft messaging only when configured is false. The notifications roster and a Remi nudge into Messages stay. Schedule-send, chat names, roster filters, and nudge kinds stay. No private key. No Auth reseal. No Quo/SMS. Remi stays the corner chip and the side rail. Phone-first. Prior markers stay, including v=clienthrs1d. -->
 <meta name="admin-build" content="2026-09-27-vapid1">
 <!-- client hours notifications 2026-09-27 v=clienthrs1d admin-build 2026-09-27-clienthrs1d. GHOST-CLIENTHRS1D-CONTRACT-v1. Ace CALLABLE. Extends aidechat1. More → Notifications is admin_list_aide_notification_roster {p_filter needs_attention|location_off|chat_off|all}. Each row shows remi_reminders, office_chat_push, timesheet_location_permission, has_active_subscription, and nudge_kinds. A Remi nudge posts admin_nudge_aide_notifications {p_aide_id, p_nudge_kind turn_on_location|turn_on_chat|turn_on_reminders} into that aide's Messages and queues push when allowed. No SMS. Aide chat schedule-send posts admin_schedule_aide_message {p_aide_id, p_body, p_scheduled_for or p_shortcut in_2_hours|in_1_hour|tomorrow_7am_et, p_deliver_channel in_app_messages}. The SMS later choice stays disabled. Queued rows use admin_list_scheduled_aide_messages, admin_edit_scheduled_aide_message, and admin_cancel_scheduled_aide_message. process_due_scheduled_aide_messages runs in the background and does not block the screen. Settings → Chat names uses admin_get_aide_chat_display_names and admin_save_aide_chat_display_names {p_remi, p_scheduler, p_admin}. Defaults are Remi AI, Jazmine (Scheduler), and Moe (Manager). Message lists use display_name. The office view shows the aide full name. get_vapid_public_key leaves Admin working when configured is false. 2026-09-27-vapid1 v=vapid1: Ace CALLABLE keys live. Remi stays the corner chip and the side rail. Phone-first. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=remi-cm-email1, v=remiface1, v=coverage-simple1, v=clienthrs1c, v=shift-slim1, v=aidechat1, and v=remi-notes1. -->
@@ -793,6 +799,8 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .copilot-tabs{display:flex;gap:8px;margin:0 0 8px;min-width:0;max-width:100%;}
 .copilot-tab{flex:1 1 0;min-width:0;min-height:48px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;touch-action:manipulation;cursor:pointer;}
 .copilot-tab[aria-selected="true"]{background:var(--teal);color:#fff;border-color:var(--teal);}
+#copilotSheet .copilot-tabs{flex-wrap:wrap;gap:6px;}
+#copilotSheet .copilot-tab{flex:1 1 30%;max-width:100%;font-size:0.78rem;line-height:1.15;padding:6px 8px;min-height:44px;white-space:nowrap;}
 .copilot-thread{display:flex;flex-direction:column;gap:8px;min-width:0;max-width:100%;padding-bottom:8px;}
 .copilot-bubble{max-width:100%;min-width:0;box-sizing:border-box;border-radius:14px;padding:12px 14px;overflow-wrap:anywhere;word-break:break-word;font-size:0.95rem;line-height:1.45;touch-action:manipulation;}
 .copilot-bubble-mo{align-self:flex-end;max-width:92%;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
@@ -902,6 +910,41 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #copilotSheet .picker-confirm{min-height:48px;border:0;border-radius:12px;background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;font-weight:800;font-size:0.95rem;cursor:pointer;touch-action:manipulation;}
 #copilotSheet .picker-preview{font-size:0.78rem;color:var(--muted);text-align:center;font-weight:600;margin:0;}
 #copilotSheet .picker-preview strong{color:var(--navy);}
+#remiNotesVisSched[hidden],#remiNotes1Keep[hidden]{display:none !important;}
+#copilotSheet .remi-vis,#copilotSheet .remi-rules,#copilotSheet .remi-sched{min-width:0;max-width:100%;}
+#copilotSheet .remi-vis-tabs{display:flex;gap:6px;margin:0 0 8px;}
+#copilotSheet .remi-vis-tabs button{flex:1;min-height:44px;border-radius:8px;border:0;background:#fff;color:#6b7a90;font-weight:800;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-vis-tabs button.on{background:var(--teal);color:#fff;}
+#copilotSheet .remi-vis-card,#copilotSheet .remi-rule,#copilotSheet .remi-job{border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px;background:#fff;min-width:0;}
+#copilotSheet .remi-vis-card.replying{border-color:var(--teal);background:#f3faf9;}
+#copilotSheet .remi-vis-meta{font-size:0.75rem;color:var(--muted);margin-bottom:4px;}
+#copilotSheet .remi-vis-meta strong{color:var(--navy);}
+#copilotSheet .remi-vis-card p,#copilotSheet .remi-rule p,#copilotSheet .remi-job p{font-size:0.85rem;line-height:1.4;margin:0;overflow-wrap:anywhere;}
+#copilotSheet .remi-vis-pill,#copilotSheet .remi-pack-chip{display:inline-block;margin:0 0 6px;font-size:0.72rem;font-weight:800;background:#eef2ff;color:#3b4cca;padding:4px 8px;border-radius:6px;}
+#copilotSheet .remi-vis-pill{background:#e8f4f4;color:#1e6060;margin-top:8px;}
+#copilotSheet .remi-vis-update{margin-top:8px;padding:8px;background:#e8f4f4;border-radius:8px;font-size:0.82rem;line-height:1.4;overflow-wrap:anywhere;}
+#copilotSheet .remi-vis-update strong{color:#1e6060;}
+#copilotSheet .remi-vis-hint{font-size:0.72rem;color:var(--muted);line-height:1.4;margin:8px 0 0;}
+#copilotSheet .remi-vis-row{display:flex;justify-content:flex-end;gap:8px;margin-top:8px;}
+#copilotSheet .remi-vis-row button,#copilotSheet .remi-pack-add,#copilotSheet .remi-linkish{width:auto;min-height:44px;border-radius:8px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-vis-row .go,#copilotSheet .remi-sched-actions .go{background:var(--teal);color:#fff;border:0;padding:8px 14px;}
+#copilotSheet .remi-vis-row .alt,#copilotSheet .remi-sched-actions .alt{background:#fff;color:var(--teal);border:1px solid var(--border);padding:8px 12px;}
+#copilotSheet textarea.remi-pack-text{min-height:72px;}
+#copilotSheet .remi-pack-add{display:block;width:100%;margin-top:4px;background:#fff;border:1px dashed #b8c6d6;color:var(--teal);padding:12px;}
+#copilotSheet .remi-rule .top,#copilotSheet .remi-job .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+#copilotSheet .remi-rule strong,#copilotSheet .remi-job strong{font-size:0.92rem;color:var(--navy);line-height:1.3;}
+#copilotSheet .remi-pack-on{width:auto;min-width:44px;max-width:72px;min-height:28px;padding:3px 8px;border-radius:6px;border:0;font-weight:800;font-size:0.68rem;font-family:'DM Sans',sans-serif;cursor:pointer;flex:0 0 auto;}
+#copilotSheet .remi-pack-on.is-on{background:#e6f7ed;color:#1e7a45;}
+#copilotSheet .remi-pack-on.is-off{background:#f3f4f6;color:#6b7a90;}
+#copilotSheet .remi-linkish{background:transparent;border:0;color:var(--teal);padding:8px 0;min-height:44px;}
+#copilotSheet .remi-sched-actions{display:flex;gap:8px;margin-top:8px;}
+#copilotSheet .remi-sched-actions button{flex:1;min-height:44px;border-radius:8px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-pack-form label{display:block;font-size:0.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin:8px 0 4px;}
+#copilotSheet .remi-pack-form .row{display:flex;gap:8px;margin-top:10px;}
+#copilotSheet .remi-pack-form .row button{flex:1;min-height:44px;border-radius:10px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;}
+#copilotSheet .remi-pack-form .row .go{background:var(--teal);color:#fff;border:0;}
+#copilotSheet .remi-pack-form .row .alt{background:#fff;color:#6b7a90;border:1px solid var(--border);}
+#remiNotes1Keep{margin-top:14px;padding-top:8px;border-top:1px dashed var(--border);}
 @media(max-width:899px){
   #copilotSheet{top:72px;border-radius:22px 22px 0 0;box-shadow:0 -16px 40px rgba(26,39,68,.28);}
 }
@@ -2720,7 +2763,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-cm-email1="v=remi-cm-email1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -2735,6 +2778,8 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabRadar" role="tab" aria-selected="true" onclick="copilotShowRadar()">Radar</button>
         <button type="button" class="copilot-tab" id="copilotTabAsk" role="tab" aria-selected="false" data-remichat="v=remichat1" onclick="copilotShowChat()">Ask</button>
         <button type="button" class="copilot-tab" id="copilotTabNotes" role="tab" aria-selected="false" data-reminotes1="v=remi-notes1" onclick="remiNotesShow()">Notes</button>
+        <button type="button" class="copilot-tab" id="copilotTabRules" role="tab" aria-selected="false" data-remi-rules1="v=remi-rules1" onclick="remiRules1Show()">Rules</button>
+        <button type="button" class="copilot-tab" id="copilotTabSched" role="tab" aria-selected="false" data-remi-sched1="v=remi-sched1" onclick="remiSched1Show()">Scheduled</button>
       </div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
@@ -7546,20 +7591,30 @@ function copilotClose(){
 function copilotSyncTabs(){
   var onAsk=copilotView==='chat';
   var onNotes=copilotView==='notes';
+  var onRules=copilotView==='rules';
+  var onSched=copilotView==='scheduled';
   var radar=copilotEl('copilotTabRadar');
   var ask=copilotEl('copilotTabAsk');
   var notes=copilotEl('copilotTabNotes');
+  var rules=copilotEl('copilotTabRules');
+  var sched=copilotEl('copilotTabSched');
   var dock=copilotEl('copilotComposer');
   var notesDock=copilotEl('remiNotesDock');
   var sheet=copilotEl('copilotSheet');
-  if(radar)radar.setAttribute('aria-selected', (!onAsk&&!onNotes)?'true':'false');
+  if(radar)radar.setAttribute('aria-selected', (!onAsk&&!onNotes&&!onRules&&!onSched)?'true':'false');
   if(ask)ask.setAttribute('aria-selected', onAsk?'true':'false');
   if(notes)notes.setAttribute('aria-selected', onNotes?'true':'false');
+  if(rules)rules.setAttribute('aria-selected', onRules?'true':'false');
+  if(sched)sched.setAttribute('aria-selected', onSched?'true':'false');
   if(dock)dock.hidden=!onAsk;
   if(notesDock)notesDock.hidden=!onNotes;
   if(sheet&&sheet.classList){
     if(onNotes)sheet.classList.add('is-notes');
     else sheet.classList.remove('is-notes');
+    if(onRules)sheet.classList.add('is-rules');
+    else sheet.classList.remove('is-rules');
+    if(onSched)sheet.classList.add('is-scheduled');
+    else sheet.classList.remove('is-scheduled');
   }
   if(!onNotes&&typeof remiNotesClosePicker==='function')remiNotesClosePicker();
 }
@@ -7573,7 +7628,7 @@ function copilotChatViewport(){
   if(!sheet)return;
   var vv=window.visualViewport;
   var phone=window.innerWidth<=520;
-  var chatting=(copilotView==='chat'||copilotView==='notes')&&!sheet.hidden&&phone&&vv;
+  var chatting=(copilotView==='chat'||copilotView==='notes'||copilotView==='rules'||copilotView==='scheduled')&&!sheet.hidden&&phone&&vv;
   if(!chatting){
     sheet.style.top='';
     sheet.style.height='';
@@ -7968,9 +8023,11 @@ function copilotPaintChat(){
   copilotChat.forEach(function(msg, idx){
     var mine=msg.role==='mo';
     html+='<div class="copilot-bubble '+(mine?'copilot-bubble-mo':'copilot-bubble-remi')+'">';
-    if(!mine&&msg.cm&&typeof remiCmHtml==='function')html+=remiCmHtml(msg.cm, idx);
-    else html+=copilotChatHtml(msg.text||'');
-    if(!mine&&msg.actions&&msg.actions.length){
+    var packChips=(!mine&&msg.ruleChips&&msg.ruleChips.length&&typeof remiRules1ChipsHtml==='function')?remiRules1ChipsHtml(msg.ruleChips):'';
+    if(!mine&&msg.sched&&typeof remiSched1BubbleHtml==='function')html+=packChips+remiSched1BubbleHtml(msg, idx);
+    else if(!mine&&msg.cm&&typeof remiCmHtml==='function')html+=packChips+remiCmHtml(msg.cm, idx);
+    else html+=packChips+copilotChatHtml(msg.text||'');
+    if(!mine&&!msg.sched&&msg.actions&&msg.actions.length){
       html+='<div class="copilot-actions'+(msg.actionsLayout==='row'?' copilot-actions-row':'')+'">';
       msg.actions.forEach(function(a, ai){
         html+='<button type="button" class="btn btn-teal" onclick="copilotChatAction('+idx+','+ai+')">'+copilotEsc(a.label)+'</button>';
@@ -8016,11 +8073,21 @@ function copilotChatSubmit(ev){
   if(input)input.value='';
   var noted=null;
   try{if(typeof remiNotesFromAsk==='function')noted=remiNotesFromAsk(q);}catch(eNotes){noted=null;}
-  var ans=(noted&&noted.answer)?noted.answer:copilotChatAnswer(q);
+  var ans=null;
+  if(noted&&noted.answer)ans=noted.answer;
+  else if(typeof remiSched1FromAsk==='function'){
+    try{ans=remiSched1FromAsk(q);}catch(eSched){ans=null;}
+  }
+  if(!ans)ans=copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
+  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false};
+  if(!ans.sched&&typeof remiRules1IsCoverContext==='function'&&remiRules1IsCoverContext(q, ans))bubble.ruleContext=true;
   copilotChat.push({role:'mo', text:q});
-  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null});
+  copilotChat.push(bubble);
   copilotPaintChat();
+  if(bubble.ruleContext&&typeof remiRules1LoadChips==='function'){
+    try{remiRules1LoadChips(copilotChat.length-1);}catch(eChips){}
+  }
   if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
   else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
   else if(ans.loadMail&&typeof remiWiderFetchMail==='function')remiWiderFetchMail(ans.shiftId, ans.mailFamily, ans.mailReason, ans.mailOther);
@@ -16306,7 +16373,12 @@ function remiNotesPaint(){
   var now=new Date();
   remiNotesLoad(now);
   var host=remiNotesEl('copilotBody');
-  if(host)host.innerHTML=remiNotesView==='done'?remiNotesDoneHtml(now):remiNotesOpenHtml(now);
+  if(host){
+    var vis='';
+    try{if(typeof remiNotesVis1Html==='function')vis=String(remiNotesVis1Html()||'');}catch(eVis){vis='';}
+    var keep=remiNotesView==='done'?remiNotesDoneHtml(now):remiNotesOpenHtml(now);
+    host.innerHTML=vis+'<div id="remiNotes1Keep"><div class="notes-head"><span class="ttl">Reminders</span><span class="cnt">on this phone</span></div>'+keep+'</div>';
+  }
   var composer=remiNotesEl('remiNotesComposer');
   var foot=remiNotesEl('remiNotesDoneFoot');
   if(composer)composer.hidden=remiNotesView==='done';
@@ -16317,6 +16389,7 @@ function remiNotesPaint(){
     else sheet.classList.remove('is-notes');
   }
   remiNotesSyncChips();
+  try{if(typeof remiNotesVis1Mount==='function')remiNotesVis1Mount();}catch(eMount){}
   if(typeof copilotHideConfirm==='function')copilotHideConfirm();
   if(typeof copilotSyncTabs==='function')copilotSyncTabs();
   if(typeof copilotChatBindViewport==='function')copilotChatBindViewport();
@@ -16336,6 +16409,7 @@ function remiNotesShow(){
   if(sheet)sheet.hidden=false;
   remiNotesView='open';
   remiNotesEditing='';
+  try{if(typeof remiNotesVis1ResetTab==='function')remiNotesVis1ResetTab();}catch(eVisTab){}
   remiNotesPaint();
 }
 function remiNotesShowDone(){
@@ -16549,6 +16623,825 @@ function remiNotesFromAsk(q, now){
   return {note:note, answer:{kind:'', text:text, actions:[], sec:true, note:'', actionsLayout:''}};
 }
 // end remi notes v=remi-notes1
+
+// remi notes vis1 v=remi-notes-vis1
+// Ace desk notes in the Remi rail. Office JWT via sbRestRpc. is_scheduler_office.
+// Nurse does not get these writes. Admin My notes stay private. No spy badge.
+var REMI_NOTES_VIS1_MARKER='v=remi-notes-vis1';
+var REMI_NOTES_VIS1_OFFICE='is_scheduler_office';
+var remiNotesVis1Which='my';
+var remiNotesVis1ThreadId='';
+var remiNotesVis1Error='';
+function remiNotesVis1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function remiNotesVis1OfficeOk(){
+  var role=remiNotesVis1Role();
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function remiNotesVis1IsAdmin(){
+  return remiNotesVis1Role()==='Admin';
+}
+function remiNotesVis1ResetTab(){
+  remiNotesVis1Which='my';
+  remiNotesVis1ThreadId='';
+}
+function remiNotesVis1El(id){
+  try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
+  return null;
+}
+function remiNotesVis1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof copilotEsc==='function')return copilotEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiNotesVis1SafeId(id){
+  return String(id||'').replace(/[^A-Za-z0-9-]/g,'');
+}
+function remiNotesVis1When(iso){
+  if(!iso)return '';
+  if(typeof formatDateTimeLabel==='function'){
+    var labeled=formatDateTimeLabel(iso);
+    if(labeled&&labeled!=='\u2014')return labeled;
+  }
+  if(typeof formatAdminDate==='function'){
+    var day=formatAdminDate(iso);
+    if(day)return day;
+  }
+  return '';
+}
+function remiNotesVis1Rows(data){
+  if(!data)return [];
+  if(Array.isArray(data))return data;
+  if(Array.isArray(data.notes))return data.notes;
+  if(data.note&&typeof data.note==='object')return [data.note];
+  return [];
+}
+async function remiNotesVis1Call(name, body){
+  if(typeof sbRestRpc!=='function')return {ok:false, error:'Office notes are not callable yet.'};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  if(!got||got.ok!==true)return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(got.data); if(un)node=un;}catch(eUn){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(eJson){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    return {ok:false, error:String(node.error||node.message||'Request failed.'), data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+async function remiNotesVis1Rpc(name, body){
+  if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi notes.'};
+  if((name==='remi_list_scheduler_notes'||name==='remi_update_scheduler_note')&&!remiNotesVis1IsAdmin()){
+    return {ok:false, forbidden:true, error:'Scheduler notes are admin only.'};
+  }
+  return remiNotesVis1Call(name, body);
+}
+function remiNotesVis1Updates(note){
+  var list=[];
+  if(note&&Array.isArray(note.updates))list=note.updates.filter(Boolean);
+  else if(note&&note.latest_update&&typeof note.latest_update==='object')list=[note.latest_update];
+  return list;
+}
+function remiNotesVis1CardHtml(note, mode, allowThread){
+  note=note||{};
+  var id=remiNotesVis1SafeId(note.id);
+  var who=mode==='my'?'You':String(note.author_display_name||'Scheduler');
+  var when=remiNotesVis1When(note.created_at||note.updated_at||'');
+  var updates=remiNotesVis1Updates(note);
+  var latest=note.latest_update&&typeof note.latest_update==='object'?note.latest_update:(updates.length?updates[updates.length-1]:null);
+  var pill=latest&&latest.updated_label?String(latest.updated_label):'';
+  var html='<div class="remi-vis-card'+(mode==='scheduler'?' replying':'')+'" data-note-id="'+remiNotesVis1Esc(id)+'">';
+  html+='<div class="remi-vis-meta"><strong>'+remiNotesVis1Esc(who)+'</strong>'+(when?' \u00B7 '+remiNotesVis1Esc(when):'')+'</div>';
+  html+='<p>'+remiNotesVis1Esc(note.body||'')+'</p>';
+  if(pill)html+='<span class="remi-vis-pill">'+remiNotesVis1Esc(pill)+'</span>';
+  updates.forEach(function(u){
+    var name=String(u.author_display_name||'');
+    html+='<div class="remi-vis-update"><strong>'+remiNotesVis1Esc(name?name+':':'Updated')+'</strong> '+remiNotesVis1Esc(u.body||'')+'</div>';
+  });
+  if(mode==='scheduler'&&id){
+    html+='<textarea class="remi-pack-text" id="remiVisReply_'+id+'" aria-label="Update note" placeholder="Update note"></textarea>';
+    html+='<div class="remi-vis-row"><button type="button" class="go" onclick="remiNotesVis1Update(\''+id+'\')">Update note</button></div>';
+  }
+  if(allowThread&&id)html+='<button type="button" class="remi-linkish" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
+  html+='</div>';
+  return html;
+}
+function remiNotesVis1Hint(){
+  var role=remiNotesVis1Role();
+  if(remiNotesVis1Which==='scheduler')return 'This tab only. Your My notes stay off her screen.';
+  if(role==='Scheduler')return 'Admin My notes never appear here.';
+  return 'Save \u2192 only on My notes. Scheduler never sees this tab.';
+}
+function remiNotesVis1PaneHtml(rows, err){
+  var mode=remiNotesVis1Which==='scheduler'?'scheduler':'my';
+  var html='';
+  if(remiNotesVis1ThreadId)html+='<button type="button" class="remi-linkish" onclick="remiNotesVis1CloseThread()">\u2190 Back</button>';
+  if(err)html+='<p class="remi-vis-hint">'+remiNotesVis1Esc(err)+'</p>';
+  if(!rows.length&&!err)html+='<p class="remi-vis-hint">No notes yet.</p>';
+  (rows||[]).forEach(function(note){
+    html+=remiNotesVis1CardHtml(note, mode, !remiNotesVis1ThreadId);
+  });
+  if(mode==='my'&&!remiNotesVis1ThreadId){
+    html+='<div class="remi-vis-card"><textarea id="remiNotesVisInput" class="remi-pack-text" maxlength="4000" placeholder="Type normally\u2026" aria-label="My note"></textarea>';
+    html+='<div class="remi-vis-row"><button type="button" class="go" id="remiNotesVisSave" onclick="remiNotesVis1Save()">Save</button></div></div>';
+  }
+  html+='<p class="remi-vis-hint" id="remiNotesVisHint">'+remiNotesVis1Esc(remiNotesVis1Hint())+'</p>';
+  return html;
+}
+function remiNotesVis1Html(){
+  var admin=remiNotesVis1IsAdmin();
+  var myOn=remiNotesVis1Which!=='scheduler'||!admin;
+  if(!admin)myOn=true;
+  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
+    +'<div class="remi-vis-tabs" role="tablist" aria-label="Notes">'
+    +'<button type="button" id="remiNotesVisMy" role="tab" class="'+(myOn?'on':'')+'" aria-selected="'+(myOn?'true':'false')+'" onclick="remiNotesVis1Tab(\'my\')">My notes</button>'
+    +'<button type="button" id="remiNotesVisSched" role="tab" class="'+(!myOn?'on':'')+'" aria-selected="'+(!myOn?'true':'false')+'"'+(admin?'':' hidden')+' onclick="remiNotesVis1Tab(\'scheduler\')">Scheduler notes</button>'
+    +'</div><div id="remiNotesVisPane">Loading notes\u2026</div></div>';
+}
+function remiNotesVis1PaintPane(rows, err){
+  var pane=remiNotesVis1El('remiNotesVisPane');
+  if(!pane)return;
+  pane.innerHTML=remiNotesVis1PaneHtml(rows||[], err||'');
+  var my=remiNotesVis1El('remiNotesVisMy');
+  var sc=remiNotesVis1El('remiNotesVisSched');
+  var onSched=remiNotesVis1Which==='scheduler'&&remiNotesVis1IsAdmin();
+  if(my&&my.classList){if(onSched)my.classList.remove('on');else my.classList.add('on');}
+  if(sc&&sc.classList){if(onSched)sc.classList.add('on');else sc.classList.remove('on');}
+  if(my&&my.setAttribute)my.setAttribute('aria-selected', onSched?'false':'true');
+  if(sc&&sc.setAttribute)sc.setAttribute('aria-selected', onSched?'true':'false');
+  var root=remiNotesVis1El('remiNotesVis1');
+  if(root&&root.setAttribute)root.setAttribute('data-tab', onSched?'scheduler_notes':'my_notes');
+}
+async function remiNotesVis1Load(){
+  if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true};
+  var got=null;
+  if(remiNotesVis1ThreadId){
+    got=await remiNotesVis1Rpc('remi_list_my_note_thread', {p_note_id:remiNotesVis1ThreadId});
+  }else if(remiNotesVis1Which==='scheduler'){
+    got=await remiNotesVis1Rpc('remi_list_scheduler_notes', {p_limit:50});
+  }else{
+    got=await remiNotesVis1Rpc('remi_list_my_notes', {p_limit:50});
+  }
+  if(!got||!got.ok){
+    remiNotesVis1Error=(got&&got.error)||'Could not load notes.';
+    remiNotesVis1PaintPane([], remiNotesVis1Error);
+    return got||{ok:false};
+  }
+  remiNotesVis1Error='';
+  remiNotesVis1PaintPane(remiNotesVis1Rows(got.data), '');
+  return got;
+}
+function remiNotesVis1Mount(){
+  if(!remiNotesVis1OfficeOk())return;
+  remiNotesVis1Load().catch(function(){});
+}
+function remiNotesVis1Tab(name){
+  if(name==='scheduler'&&!remiNotesVis1IsAdmin())return;
+  remiNotesVis1Which=name==='scheduler'?'scheduler':'my';
+  remiNotesVis1ThreadId='';
+  remiNotesVis1Load().catch(function(){});
+}
+function remiNotesVis1OpenThread(id){
+  if(!remiNotesVis1OfficeOk())return;
+  remiNotesVis1ThreadId=remiNotesVis1SafeId(id);
+  remiNotesVis1Load().catch(function(){});
+}
+function remiNotesVis1CloseThread(){
+  remiNotesVis1ThreadId='';
+  remiNotesVis1Load().catch(function(){});
+}
+async function remiNotesVis1Save(){
+  if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi notes.'};
+  var input=remiNotesVis1El('remiNotesVisInput');
+  var body=input?String(input.value||'').trim():'';
+  if(!body){
+    if(typeof showTempMsg==='function')showTempMsg('Type a note first.','var(--warn)');
+    return {ok:false, error:'Type a note first.'};
+  }
+  var got=await remiNotesVis1Rpc('remi_save_my_note', {p_body:body});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the note.','var(--warn)');
+    return got;
+  }
+  if(input)input.value='';
+  remiNotesVis1Which='my';
+  remiNotesVis1ThreadId='';
+  await remiNotesVis1Load();
+  return got;
+}
+async function remiNotesVis1Update(noteId){
+  if(!remiNotesVis1IsAdmin())return {ok:false, forbidden:true, error:'Scheduler notes are admin only.'};
+  var id=remiNotesVis1SafeId(noteId);
+  var input=remiNotesVis1El('remiVisReply_'+id);
+  var body=input?String(input.value||'').trim():'';
+  if(!body){
+    if(typeof showTempMsg==='function')showTempMsg('Type an update first.','var(--warn)');
+    return {ok:false, error:'Type an update first.'};
+  }
+  var got=await remiNotesVis1Rpc('remi_update_scheduler_note', {p_note_id:id, p_body:body});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not update the note.','var(--warn)');
+    return got;
+  }
+  await remiNotesVis1Load();
+  return got;
+}
+// end remi notes vis1 v=remi-notes-vis1
+
+// remi rules1 v=remi-rules1
+// Saved remi_rules only. Do not invent a rule from a joke. Office JWT via sbRestRpc. is_scheduler_office.
+var REMI_RULES1_MARKER='v=remi-rules1';
+var REMI_RULES1_OFFICE='is_scheduler_office';
+var remiRules1Cache=[];
+var remiRules1Mode='list';
+var remiRules1EditId='';
+var remiRules1Error='';
+function remiRules1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function remiRules1OfficeOk(){
+  var role=remiRules1Role();
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function remiRules1El(id){
+  try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
+  return null;
+}
+function remiRules1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof copilotEsc==='function')return copilotEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiRules1SafeId(id){
+  return String(id||'').replace(/[^A-Za-z0-9-]/g,'');
+}
+function remiRules1On(v){
+  return !(v===false||v==='false'||v===0||v==='0');
+}
+function remiRules1Rows(data){
+  if(!data)return [];
+  if(Array.isArray(data))return data;
+  if(Array.isArray(data.rules))return data.rules;
+  if(data.rule&&typeof data.rule==='object')return [data.rule];
+  return [];
+}
+function remiRules1Sort(list){
+  return (list||[]).slice().sort(function(a,b){
+    var ao=Number(a&&a.sort_order); if(!isFinite(ao))ao=0;
+    var bo=Number(b&&b.sort_order); if(!isFinite(bo))bo=0;
+    if(ao!==bo)return ao-bo;
+    var at=String(a&&a.title||''), bt=String(b&&b.title||'');
+    if(at<bt)return -1;
+    if(at>bt)return 1;
+    return 0;
+  });
+}
+function remiRules1ChipsFrom(rules){
+  var out=[];
+  (rules||[]).forEach(function(rule){
+    if(!rule||!remiRules1On(rule.is_on))return;
+    var chip=String(rule.chip_label||'').trim();
+    if(!chip){
+      var title=String(rule.title||'').trim();
+      if(title)chip='Using rule: '+title;
+    }
+    if(chip)out.push(chip);
+  });
+  return out;
+}
+function remiRules1ChipsHtml(labels){
+  var html='';
+  (labels||[]).forEach(function(label){
+    if(!label)return;
+    html+='<span class="remi-pack-chip">'+remiRules1Esc(label)+'</span>';
+  });
+  return html;
+}
+function remiRules1IsCoverContext(q, ans){
+  var s=String(q||'').toLowerCase();
+  if(/\bcall(?:ed)?[\s-]?offs?\b/.test(s))return true;
+  if(/\b(coverage|who can cover|open shifts?)\b/.test(s))return true;
+  if(/\bcover\b/.test(s))return true;
+  var kind=ans&&ans.kind?String(ans.kind):'';
+  return kind==='coverage_open';
+}
+async function remiRules1Call(name, body){
+  if(typeof sbRestRpc!=='function')return {ok:false, error:'Rules are not callable yet.'};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  if(!got||got.ok!==true)return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(got.data); if(un)node=un;}catch(eUn){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(eJson){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    return {ok:false, error:String(node.error||node.message||'Request failed.'), data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+async function remiRules1Rpc(name, body){
+  if(!remiRules1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi rules.'};
+  return remiRules1Call(name, body);
+}
+function remiRules1UpdateBody(id, fields){
+  fields=fields||{};
+  var body={p_id:id};
+  if(fields.title!=null)body.p_title=fields.title;
+  if(fields.body!=null)body.p_body=fields.body;
+  if(fields.is_on!=null)body.p_is_on=!!fields.is_on;
+  return body;
+}
+function remiRules1ListHtml(){
+  var rows=remiRules1Sort(remiRules1Cache);
+  var html='<div class="remi-rules" id="remiRules1" data-remi-rules1="'+REMI_RULES1_MARKER+'">';
+  html+='<p class="remi-vis-hint">Rules stick across days \u2014 edit anytime. Saved rules only.</p>';
+  if(remiRules1Error)html+='<p class="remi-vis-hint">'+remiRules1Esc(remiRules1Error)+'</p>';
+  if(!rows.length&&!remiRules1Error)html+='<p class="remi-vis-hint">No saved rules yet.</p>';
+  rows.forEach(function(rule){
+    var on=remiRules1On(rule.is_on);
+    var id=remiRules1SafeId(rule.id);
+    html+='<div class="remi-rule" data-rule-id="'+remiRules1Esc(id)+'"><div class="top"><strong>'+remiRules1Esc(rule.title||'Rule')+'</strong>';
+    html+='<button type="button" class="remi-pack-on '+(on?'is-on':'is-off')+'" aria-pressed="'+(on?'true':'false')+'" onclick="remiRules1Toggle(\''+id+'\','+(on?'true':'false')+')">'+(on?'On':'Off')+'</button></div>';
+    html+='<p>'+remiRules1Esc(rule.body||'')+'</p>';
+    html+='<button type="button" class="remi-linkish" onclick="remiRules1Edit(\''+id+'\')">Edit</button></div>';
+  });
+  html+='<button type="button" class="remi-pack-add" id="remiRules1Add" onclick="remiRules1Add()">+ Add rule</button></div>';
+  return html;
+}
+function remiRules1FormHtml(){
+  var editing=remiRules1Mode==='edit';
+  var rule=null;
+  if(editing){
+    for(var i=0;i<remiRules1Cache.length;i++){
+      if(String(remiRules1Cache[i].id)===String(remiRules1EditId))rule=remiRules1Cache[i];
+    }
+  }
+  var title=rule&&rule.title?rule.title:'';
+  var body=rule&&rule.body?rule.body:'';
+  var html='<div class="remi-rules remi-pack-form" id="remiRules1" data-remi-rules1="'+REMI_RULES1_MARKER+'">';
+  html+='<h3 style="margin:0;font-size:1rem;color:var(--navy);">'+(editing?'Edit rule':'Add rule')+'</h3>';
+  html+='<label for="remiRules1Title">Title</label>';
+  html+='<input id="remiRules1Title" type="text" maxlength="120" value="'+remiRules1Esc(title)+'" aria-label="Title">';
+  html+='<label for="remiRules1Body">What Remi should do</label>';
+  html+='<textarea id="remiRules1Body" class="remi-pack-text" maxlength="2000" aria-label="What Remi should do">'+remiRules1Esc(body)+'</textarea>';
+  html+='<p class="remi-vis-hint">Plain English. Remi uses this on future call-offs \u2014 not a joke diary.</p>';
+  html+='<div class="row"><button type="button" class="alt" onclick="remiRules1Cancel()">Cancel</button>';
+  html+='<button type="button" class="go" id="remiRules1Save" onclick="remiRules1Save()">Save rule</button></div></div>';
+  return html;
+}
+function remiRules1Html(){
+  if(remiRules1Mode==='add'||remiRules1Mode==='edit')return remiRules1FormHtml();
+  return remiRules1ListHtml();
+}
+function remiRules1Paint(){
+  var host=remiRules1El('copilotBody');
+  try{copilotView='rules';}catch(eView){}
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  var title=remiRules1El('copilotTitle');
+  if(title)title.textContent='Remi';
+  if(host)host.innerHTML=remiRules1Html();
+}
+function remiRules1Show(){
+  if(!remiRules1OfficeOk())return;
+  var sheet=remiRules1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  remiRules1Mode='list';
+  remiRules1Paint();
+  remiRules1Load().catch(function(){});
+}
+function remiRules1Add(){
+  if(!remiRules1OfficeOk())return;
+  remiRules1Mode='add';
+  remiRules1EditId='';
+  remiRules1Paint();
+}
+function remiRules1Edit(id){
+  if(!remiRules1OfficeOk())return;
+  remiRules1Mode='edit';
+  remiRules1EditId=remiRules1SafeId(id);
+  remiRules1Paint();
+}
+function remiRules1Cancel(){
+  remiRules1Mode='list';
+  remiRules1EditId='';
+  remiRules1Paint();
+}
+async function remiRules1Load(){
+  if(!remiRules1OfficeOk())return {ok:false, forbidden:true};
+  var got=await remiRules1Rpc('admin_list_remi_rules', {});
+  if(!got||!got.ok){
+    remiRules1Error=(got&&got.error)||'Could not load rules.';
+  }else{
+    remiRules1Error='';
+    remiRules1Cache=remiRules1Rows(got.data);
+  }
+  if(remiRules1Mode==='list'){
+    try{if(copilotView==='rules')remiRules1Paint();}catch(ePaint){remiRules1Paint();}
+  }
+  return got;
+}
+async function remiRules1Save(){
+  if(!remiRules1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi rules.'};
+  var titleEl=remiRules1El('remiRules1Title');
+  var bodyEl=remiRules1El('remiRules1Body');
+  var title=titleEl?String(titleEl.value||'').trim():'';
+  var body=bodyEl?String(bodyEl.value||'').trim():'';
+  if(!title||!body){
+    if(typeof showTempMsg==='function')showTempMsg('Add a title and what Remi should do.','var(--warn)');
+    return {ok:false, error:'Add a title and what Remi should do.'};
+  }
+  var got=null;
+  if(remiRules1Mode==='edit'&&remiRules1EditId){
+    got=await remiRules1Rpc('admin_update_remi_rule', remiRules1UpdateBody(remiRules1EditId, {title:title, body:body}));
+  }else{
+    got=await remiRules1Rpc('admin_create_remi_rule', {p_title:title, p_body:body, p_is_on:true});
+  }
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the rule.','var(--warn)');
+    return got;
+  }
+  remiRules1Mode='list';
+  remiRules1EditId='';
+  await remiRules1Load();
+  return got;
+}
+async function remiRules1Toggle(id, isOn){
+  if(!remiRules1OfficeOk())return {ok:false, forbidden:true};
+  var got=await remiRules1Rpc('admin_update_remi_rule', remiRules1UpdateBody(remiRules1SafeId(id), {is_on:!remiRules1On(isOn)}));
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not update the rule.','var(--warn)');
+    return got;
+  }
+  await remiRules1Load();
+  return got;
+}
+async function remiRules1LoadChips(idx){
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx])return;
+  var msg=copilotChat[idx];
+  if(!msg.ruleContext||msg.ruleChips)return;
+  if(!remiRules1OfficeOk()){msg.ruleChips=[];return;}
+  var got=await remiRules1Rpc('admin_list_active_remi_rules', {});
+  if(!got||!got.ok){msg.ruleChips=[];return;}
+  msg.ruleChips=remiRules1ChipsFrom(remiRules1Rows(got.data));
+  try{
+    if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();
+  }catch(ePaint){}
+}
+// end remi rules1 v=remi-rules1
+
+// remi sched1 v=remi-sched1
+// Clocks live in Supabase. list_due_remi_scheduled_jobs is a processor stub only. Do not call it from this rail. No Friday or Ace Grok runner.
+var REMI_SCHED1_MARKER='v=remi-sched1';
+var REMI_SCHED1_OFFICE='is_scheduler_office';
+var REMI_SCHED1_DAY_NAME={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
+var REMI_SCHED1_DAY_KEY={sunday:'sun',sun:'sun',monday:'mon',mon:'mon',tuesday:'tue',tues:'tue',tue:'tue',wednesday:'wed',wed:'wed',thursday:'thu',thurs:'thu',thur:'thu',thu:'thu',friday:'fri',fri:'fri',saturday:'sat',sat:'sat'};
+var REMI_SCHED1_JOB_KEY={missing_hours_report:'missing_hours_report',hours_nudge:'hours_nudge',manager_digest:'manager_digest'};
+var remiSched1Cache=[];
+var remiSched1EditId='';
+var remiSched1Error='';
+function remiSched1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function remiSched1OfficeOk(){
+  var role=remiSched1Role();
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function remiSched1El(id){
+  try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
+  return null;
+}
+function remiSched1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof copilotEsc==='function')return copilotEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiSched1SafeId(id){
+  return String(id||'').replace(/[^A-Za-z0-9-]/g,'');
+}
+function remiSched1On(v){
+  return !(v===false||v==='false'||v===0||v==='0');
+}
+function remiSched1ClockLabel(hhmm){
+  var m=String(hhmm||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return String(hhmm||'');
+  var h=parseInt(m[1],10);
+  var minute=parseInt(m[2],10);
+  if(h===24)h=0;
+  var ap=h<12?'AM':'PM';
+  var h12=h%12; if(h12===0)h12=12;
+  return h12+':'+(minute<10?'0':'')+minute+' '+ap;
+}
+function remiSched1ParseTime(low){
+  if(/\bmidnight\b/.test(low))return {hhmm:'00:00', label:'12:00 AM'};
+  if(/\bnoon\b/.test(low))return {hhmm:'12:00', label:'12:00 PM'};
+  var m=String(low||'').match(/\b(?:at|@)\s*(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)?\b/);
+  if(!m)return null;
+  var h=parseInt(m[1],10);
+  var minute=m[2]!=null&&m[2]!==''?parseInt(m[2],10):0;
+  if(!(h>=0&&h<=23)||!(minute>=0&&minute<=59))return null;
+  var ap=(m[3]||'').replace(/\./g,'').toLowerCase();
+  if(ap==='am'||ap==='pm'){
+    if(h<1||h>12)return null;
+    if(ap==='am')h=h===12?0:h;
+    else h=h===12?12:h+12;
+  }
+  var hh=h<10?'0'+h:String(h);
+  var mm=minute<10?'0'+minute:String(minute);
+  return {hhmm:hh+':'+mm, label:remiSched1ClockLabel(hh+':'+mm)};
+}
+function remiSched1CustomTitle(raw){
+  var s=String(raw||'').replace(/\s+/g,' ').trim();
+  var give=s.match(/\bgive me(?: the)?\s+(.+)$/i);
+  var bit=give?give[1]:s;
+  bit=bit.replace(/^(please\s+)?/i,'').replace(/^(hey\s+remi\s*[,\u2014-]?\s*)/i,'').trim();
+  bit=bit.replace(/[.?!]+$/,'').trim();
+  if(!bit)return 'Scheduled note';
+  if(bit.length>80)bit=bit.slice(0,80).trim();
+  return bit.charAt(0).toUpperCase()+bit.slice(1);
+}
+function remiSched1Parse(q){
+  var raw=String(q||'').replace(/\s+/g,' ').trim();
+  if(!raw)return null;
+  var low=raw.toLowerCase();
+  if(/\bremind me\b/.test(low))return null;
+  if(!/\b(every|each)\b/.test(low))return null;
+  var day=low.match(/\b(sunday|monday|tuesday|wednesday|thursday|friday|saturday|sun|mon|tues|tue|wed|thurs|thur|thu|fri|sat)\b/);
+  if(!day)return null;
+  var weekday=REMI_SCHED1_DAY_KEY[day[1]];
+  if(!weekday)return null;
+  var time=remiSched1ParseTime(low);
+  if(!time)return null;
+  var kind='custom';
+  var title='';
+  if(/missing[\s-]*hours/.test(low)){kind='missing_hours_report'; title='Missing hours report';}
+  else if(/hours[\s-]*nudge/.test(low)||(/\bnudge\b/.test(low)&&/\bhours\b/.test(low))){kind='hours_nudge'; title='Hours nudge (aides)';}
+  else if(/manager[\s-]*digest/.test(low)||/\bdigest\b/.test(low)){kind='manager_digest'; title='Manager digest';}
+  else title=remiSched1CustomTitle(raw);
+  var weekdayLabel=REMI_SCHED1_DAY_NAME[weekday];
+  return {
+    kind:kind,
+    title:title,
+    weekday:weekday,
+    weekday_label:weekdayLabel,
+    local_time:time.hhmm,
+    local_time_label:time.label,
+    prompt_text:raw,
+    timezone:'America/New_York',
+    summary:'Every '+weekdayLabel+' \u00B7 '+time.label+' ET \u00B7 posts in Remi rail'
+  };
+}
+function remiSched1FromAsk(q){
+  if(!remiSched1OfficeOk())return null;
+  var parsed=remiSched1Parse(q);
+  if(!parsed)return null;
+  var what='this';
+  if(parsed.kind==='missing_hours_report')what='your missing-hours report';
+  else if(parsed.kind==='hours_nudge')what='the hours nudge';
+  else if(parsed.kind==='manager_digest')what='the manager digest';
+  else what=parsed.title;
+  var text='Got it. I\u2019ll post '+what+' every '+parsed.weekday_label+' at '+parsed.local_time_label+' ET in this rail.';
+  return {sec:true, kind:'', text:text, actions:[], sched:{chip:'New schedule', draft:parsed, editing:false, sent:false, error:''}};
+}
+function remiSched1CreateBody(draft){
+  var d=draft||{};
+  var body={
+    p_kind:d.kind||'custom',
+    p_title:d.title||'Scheduled note',
+    p_weekday:d.weekday,
+    p_local_time:String(d.local_time||'').slice(0,5),
+    p_timezone:d.timezone||'America/New_York',
+    p_is_on:d.is_on===false?false:true,
+    p_summary:d.summary||'',
+    p_prompt_text:d.prompt_text||''
+  };
+  var key=REMI_SCHED1_JOB_KEY[body.p_kind];
+  if(key)body.p_job_key=key;
+  return body;
+}
+function remiSched1Rows(data){
+  if(!data)return [];
+  if(Array.isArray(data))return data;
+  if(Array.isArray(data.jobs))return data.jobs;
+  if(data.job&&typeof data.job==='object')return [data.job];
+  return [];
+}
+function remiSched1Summary(job){
+  job=job||{};
+  if(job.schedule_label)return String(job.schedule_label);
+  var day=job.weekday_label||REMI_SCHED1_DAY_NAME[job.weekday]||job.weekday||'';
+  var time=job.local_time_label||remiSched1ClockLabel(String(job.local_time||'').slice(0,5));
+  if(day&&time)return 'Every '+day+' \u00B7 '+time+' ET \u00B7 posts in Remi rail';
+  return '';
+}
+async function remiSched1Call(name, body){
+  if(typeof sbRestRpc!=='function')return {ok:false, error:'Scheduled jobs are not callable yet.'};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  if(!got||got.ok!==true)return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(got.data); if(un)node=un;}catch(eUn){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(eJson){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    return {ok:false, error:String(node.error||node.message||'Request failed.'), data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+async function remiSched1Rpc(name, body){
+  if(!remiSched1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi schedules.'};
+  return remiSched1Call(name, body);
+}
+function remiSched1BubbleHtml(msg, idx){
+  var sched=msg&&msg.sched?msg.sched:{};
+  var d=sched.draft||{};
+  var html='<span class="remi-pack-chip">'+remiSched1Esc(sched.chip||'New schedule')+'</span>'+remiSched1Esc(msg&&msg.text||'').replace(/\n/g,'<br>');
+  if(sched.editing){
+    html+='<div class="remi-pack-form"><label for="remiSched1Week">Weekday</label><select id="remiSched1Week" aria-label="Weekday">';
+    ['sun','mon','tue','wed','thu','fri','sat'].forEach(function(key){
+      html+='<option value="'+key+'"'+(d.weekday===key?' selected':'')+'>'+remiSched1Esc(REMI_SCHED1_DAY_NAME[key])+'</option>';
+    });
+    html+='</select><label for="remiSched1Clock">Time (ET)</label>';
+    html+='<input id="remiSched1Clock" type="time" value="'+remiSched1Esc(String(d.local_time||'09:00').slice(0,5))+'" aria-label="Time"></div>';
+  }
+  if(!sched.sent){
+    html+='<div class="remi-sched-actions">';
+    html+='<button type="button" class="go" id="remiSched1Confirm" onclick="remiSched1Confirm('+idx+')">Confirm</button>';
+    html+='<button type="button" class="alt" id="remiSched1Change" onclick="remiSched1Change('+idx+')">Change time</button>';
+    html+='</div>';
+  }
+  if(sched.error)html+='<p class="remi-vis-hint">'+remiSched1Esc(sched.error)+'</p>';
+  return html;
+}
+function remiSched1Change(idx){
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx]||!copilotChat[idx].sched)return;
+  if(copilotChat[idx].sched.sent)return;
+  copilotChat[idx].sched.editing=!copilotChat[idx].sched.editing;
+  if(typeof copilotPaintChat==='function')copilotPaintChat();
+}
+function remiSched1ReadDraft(idx){
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx]||!copilotChat[idx].sched)return null;
+  var msg=copilotChat[idx];
+  var d=msg.sched.draft||{};
+  if(msg.sched.editing){
+    var week=remiSched1El('remiSched1Week');
+    var clock=remiSched1El('remiSched1Clock');
+    if(week&&week.value&&REMI_SCHED1_DAY_NAME[week.value])d.weekday=week.value;
+    if(clock&&clock.value)d.local_time=String(clock.value).slice(0,5);
+    d.weekday_label=REMI_SCHED1_DAY_NAME[d.weekday]||d.weekday;
+    d.local_time_label=remiSched1ClockLabel(d.local_time);
+    d.summary='Every '+d.weekday_label+' \u00B7 '+d.local_time_label+' ET \u00B7 posts in Remi rail';
+    msg.sched.draft=d;
+  }
+  return d;
+}
+async function remiSched1Confirm(idx){
+  if(!remiSched1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi schedules.'};
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx]||!copilotChat[idx].sched||copilotChat[idx].sched.sent){
+    return {ok:false, error:'Nothing to confirm.'};
+  }
+  var msg=copilotChat[idx];
+  var draft=remiSched1ReadDraft(idx)||msg.sched.draft;
+  var got=await remiSched1Rpc('admin_create_remi_scheduled_job', remiSched1CreateBody(draft));
+  if(!got.ok){
+    msg.sched.error=got.error||'Could not save the schedule.';
+    try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint){}
+    return got;
+  }
+  msg.sched.sent=true;
+  msg.sched.editing=false;
+  msg.sched.error='';
+  var job=got.data&&(got.data.job||null);
+  var label=job&&job.schedule_label?job.schedule_label:((draft&&draft.summary)||'');
+  if(got.data&&got.data.confirm_chip)msg.sched.chip=String(got.data.confirm_chip);
+  copilotChat.push({role:'remi', text:'Saved on Scheduled'+(label?'. '+label:'')+'. You can turn it off there.', kind:'', actions:[], sec:true});
+  try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint2){}
+  return got;
+}
+function remiSched1WeekOptions(selected, id){
+  var html='<select id="'+id+'" aria-label="Weekday">';
+  ['sun','mon','tue','wed','thu','fri','sat'].forEach(function(key){
+    html+='<option value="'+key+'"'+(selected===key?' selected':'')+'>'+remiSched1Esc(REMI_SCHED1_DAY_NAME[key])+'</option>';
+  });
+  html+='</select>';
+  return html;
+}
+function remiSched1JobHtml(job){
+  job=job||{};
+  var on=remiSched1On(job.is_on);
+  var id=remiSched1SafeId(job.id);
+  var weekday=String(job.weekday||'');
+  if(weekday.length>3)weekday=REMI_SCHED1_DAY_KEY[weekday.toLowerCase()]||weekday.slice(0,3);
+  var html='<div class="remi-job" data-job-id="'+remiSched1Esc(id)+'"><div class="top"><strong>'+remiSched1Esc(job.title||'Scheduled')+'</strong>';
+  html+='<button type="button" class="remi-pack-on '+(on?'is-on':'is-off')+'" aria-pressed="'+(on?'true':'false')+'" onclick="remiSched1Toggle(\''+id+'\','+(on?'true':'false')+')">'+(on?'On':'Off')+'</button></div>';
+  html+='<p>'+remiSched1Esc(remiSched1Summary(job))+'</p>';
+  if(remiSched1EditId&&remiSched1EditId===id){
+    html+='<div class="remi-pack-form"><label for="remiSched1JobWeek">Weekday</label>'+remiSched1WeekOptions(weekday, 'remiSched1JobWeek');
+    html+='<label for="remiSched1JobClock">Time (ET)</label><input id="remiSched1JobClock" type="time" value="'+remiSched1Esc(String(job.local_time||'09:00').slice(0,5))+'" aria-label="Time">';
+    html+='<div class="row"><button type="button" class="alt" onclick="remiSched1CancelEdit()">Cancel</button>';
+    html+='<button type="button" class="go" onclick="remiSched1SaveTime(\''+id+'\')">Save time</button></div></div>';
+  }else if(id){
+    html+='<button type="button" class="remi-linkish" onclick="remiSched1BeginEdit(\''+id+'\')">Change time</button>';
+  }
+  html+='</div>';
+  return html;
+}
+function remiSched1ListHtml(){
+  var rows=remiSched1Cache.slice().sort(function(a,b){
+    var ao=Number(a&&a.sort_order); if(!isFinite(ao))ao=0;
+    var bo=Number(b&&b.sort_order); if(!isFinite(bo))bo=0;
+    return ao-bo;
+  });
+  var html='<div class="remi-sched" id="remiSched1" data-remi-sched1="'+REMI_SCHED1_MARKER+'">';
+  html+='<p class="remi-vis-hint">Clocks live in Ace. This desk does not re-seed them.</p>';
+  if(remiSched1Error)html+='<p class="remi-vis-hint">'+remiSched1Esc(remiSched1Error)+'</p>';
+  if(!rows.length&&!remiSched1Error)html+='<p class="remi-vis-hint">No scheduled jobs yet. Ask in Chat, then Confirm.</p>';
+  rows.forEach(function(job){html+=remiSched1JobHtml(job);});
+  html+='</div>';
+  return html;
+}
+function remiSched1Paint(){
+  var host=remiSched1El('copilotBody');
+  try{copilotView='scheduled';}catch(eView){}
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  var title=remiSched1El('copilotTitle');
+  if(title)title.textContent='Remi';
+  if(host)host.innerHTML=remiSched1ListHtml();
+}
+function remiSched1Show(){
+  if(!remiSched1OfficeOk())return;
+  var sheet=remiSched1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  remiSched1EditId='';
+  remiSched1Paint();
+  remiSched1Load().catch(function(){});
+}
+async function remiSched1Load(){
+  if(!remiSched1OfficeOk())return {ok:false, forbidden:true};
+  var got=await remiSched1Rpc('admin_list_remi_scheduled_jobs', {});
+  if(!got||!got.ok){
+    remiSched1Error=(got&&got.error)||'Could not load scheduled jobs.';
+  }else{
+    remiSched1Error='';
+    remiSched1Cache=remiSched1Rows(got.data);
+  }
+  try{if(copilotView==='scheduled')remiSched1Paint();}catch(ePaint){remiSched1Paint();}
+  return got;
+}
+async function remiSched1Toggle(id, isOn){
+  if(!remiSched1OfficeOk())return {ok:false, forbidden:true};
+  var got=await remiSched1Rpc('admin_update_remi_scheduled_job', {p_id:remiSched1SafeId(id), p_is_on:!remiSched1On(isOn)});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not update the schedule.','var(--warn)');
+    return got;
+  }
+  await remiSched1Load();
+  return got;
+}
+function remiSched1BeginEdit(id){
+  remiSched1EditId=remiSched1SafeId(id);
+  remiSched1Paint();
+}
+function remiSched1CancelEdit(){
+  remiSched1EditId='';
+  remiSched1Paint();
+}
+async function remiSched1SaveTime(id){
+  if(!remiSched1OfficeOk())return {ok:false, forbidden:true};
+  var week=remiSched1El('remiSched1JobWeek');
+  var clock=remiSched1El('remiSched1JobClock');
+  var body={p_id:remiSched1SafeId(id)};
+  if(week&&week.value)body.p_weekday=week.value;
+  if(clock&&clock.value)body.p_local_time=String(clock.value).slice(0,5);
+  var got=await remiSched1Rpc('admin_update_remi_scheduled_job', body);
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not change the time.','var(--warn)');
+    return got;
+  }
+  remiSched1EditId='';
+  await remiSched1Load();
+  return got;
+}
+// end remi sched1 v=remi-sched1
+
 
 function copyLink(inputId){
   const el=document.getElementById(inputId);

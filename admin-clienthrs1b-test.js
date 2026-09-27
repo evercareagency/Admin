@@ -17,7 +17,7 @@ assert.ok(html.includes('GHOST-CLIENTHRS1B-CONTRACT-v1'), 'clienthrs1b contract'
 assert.ok(html.includes("var CLIENTHRS1B_MARKER='v=clienthrs1b'"), 'clienthrs1b script marker');
 assert.ok(html.includes('CLIENTHRS'), 'CLIENTHRS marker string');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-vapid1'), 'shift-slim1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-sched1'), 'shift-slim1 is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1a">'), 'clienthrs1a meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidechat1">'), 'aidechat1 meta stays');
 assert.ok(html.indexOf('content="2026-09-26-clienthrs1b"') < html.indexOf('content="2026-09-26-clienthrs1a"'), 'clienthrs1a stays below clienthrs1b');
