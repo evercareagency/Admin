@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi payroll 2026-09-27 v=remi-payroll1 admin-build 2026-09-27-remi-payroll1. GHOST-REMI-PAYROLL1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi payroll stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Scheduled card is Payroll report On, every other Wednesday at 8:00 AM ET, payroll report in this rail, biweekly. Next run reads next_run_at 2026-10-08T12:00:00+00:00 as Thu 10/08/2026 8:00 AM ET. Anchor pay day is 09/24/2026, so 09/30/2026 is skipped. Chat such as run payroll, Sep 13–27, last week, and last 2 weeks posts admin_parse_remi_payroll_range {p_text}. Confirm posts admin_set_remi_payroll_range_prefs {p_start_date, p_end_date} and then admin_get_remi_payroll_report {p_start_date, p_end_date}. Default range is the last 14 days ET or the saved range prefs. Aides start collapsed. The summary line is Aide · Client · hours number only. Expand shows DATE, CLIENT, IN, OUT, HOURS from signed timesheets. Covers stay visible under each aide. Flag chips are missing only: Flag · missing and Flag · unsigned. Flag hours are excluded from paid totals. Tap a flag opens the timesheet deep_link. Chase stays in Aide chat. No Quo/SMS. Export CSV posts admin_export_remi_payroll_csv. Export PDF posts admin_export_remi_payroll_pdf with content_base64 and storage_path {org}/other/{uuid}.pdf under evercare-pdfs. Both posts admin_export_remi_payroll. Run posts admin_run_remi_payroll_report and paints the receipt rail chip. Create and update scheduled jobs accept p_recurrence biweekly, p_interval_days 14, p_anchor_date, and p_range_prefs. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. This tip does not depend on remi-ideas763. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
+<meta name="admin-build" content="2026-09-27-remi-payroll1">
 <!-- client insurance tint 2026-09-27 v=client-ins1 admin-build 2026-09-27-client-ins1. GHOST-CLIENT-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Add Client chip picker passes optional p_insurance_plan on admin_add_client and keeps p_weekly_authorized_hours. Catalog chips use admin_list_insurance_plans key, label, and color. Client list selects insurance_plan and tints the name and badge from the locked palette or insurance_color and insurance_label. Schedule week and slots paint insurance_plan, insurance_label, and insurance_color from list_schedule_week and list_schedule_week_slots. Edit uses admin_update_client_insurance or PATCH insurance_plan. Null and legacy plans stay muted. Locked palette: CareSource caresource #6B2D8B, Passport passport #E6B800, Anthem anthem #1E6BB8, Molina molina #C62828, Buckeye buckeye #1B8A3E. No Auth reseal. No Quo/SMS. Nurse writes 42501. Admin dates stay MM/DD/YYYY. Prior markers stay, including v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=clienthrs1d, v=clienthrs1c, v=clienthrs1b, v=clienthrs1a, v=sched1, v=remi-cm-email1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-client-ins1">
 <!-- remi ideas 763 2026-09-27 v=remi-ideas763 admin-build 2026-09-27-remi-ideas763. GHOST-REMI-IDEAS763-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Tap an open schedule cell and the rail calls admin_get_open_shift_why {p_open_shift_id} and admin_list_cover_attempts {p_open_shift_id, p_limit:3}. The card paints attempts with when_label, who_label, status, and detail. Status values are blasted, yes, no, ghost, dropped, and covered. Blast float pool calls admin_rank_float_pool_aides then the existing admin_blast_cover_request. coverage-simple1 blast and remi-float-noshow1 stay. Dismiss calls admin_dismiss_why_open. History stays. Bilingual preview calls admin_get_aide_preferred_language and admin_set_aide_preferred_language. The draft calls admin_draft_bilingual_cover_ask for an English source and a Spanish preview. Send SMS is a UI mock only: sms_send.implemented is false and sms_send.oos is true. No SMS provider. Send in Messages calls admin_send_bilingual_cover_in_messages into aidechat. Pay dispute calls admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply. Send calls admin_send_aide_office_message as Admin. No payroll writeback. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
@@ -1089,6 +1091,54 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .sched-chip.is-open-hole{background:#fff0e0;color:#b86e00;border:1px solid #f0c090;display:block;border-radius:7px;padding:5px 7px;font-size:11px;font-weight:700;line-height:1.25;margin-bottom:4px;}
 #copilotSheet .remi-proof-mini{display:block;width:100%;text-align:left;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--off);font-size:0.78rem;line-height:1.4;margin-bottom:8px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;min-height:44px;touch-action:manipulation;}
 #copilotSheet .remi-proof-mini strong{display:block;font-size:0.68rem;color:var(--muted);margin-bottom:4px;font-weight:700;}
+/* v=remi-payroll1 — payroll report inside the phone sheet and desktop right rail. */
+#copilotSheet .pay-report{min-width:0;max-width:100%;}
+#copilotSheet .pay-head h3{font-family:'Playfair Display',Georgia,serif;font-size:1.2rem;color:var(--navy);margin:0 0 4px;}
+#copilotSheet .pay-meta{font-size:0.78rem;color:var(--muted);line-height:1.4;margin:0 0 8px;}
+#copilotSheet .pay-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;}
+#copilotSheet .pay-badge{font-size:0.68rem;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);}
+#copilotSheet .pay-badge.is-job{background:#e8f6ee;border-color:#b7e0c5;color:#1e7a45;}
+#copilotSheet .pay-badge.is-flag{background:#fdecea;border-color:#f5c2c0;color:#b42318;}
+#copilotSheet .pay-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 10px;}
+#copilotSheet .pay-stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px;}
+#copilotSheet .pay-stat .lbl{font-size:0.6rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+#copilotSheet .pay-stat .val{font-size:1rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;}
+#copilotSheet .pay-stat.is-flag .val{color:#b42318;}
+#copilotSheet .pay-aide{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+#copilotSheet .pay-aide-h{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;background:#fafcfe;border-bottom:1px solid var(--border);font-weight:800;color:var(--navy);}
+#copilotSheet .pay-aide-h .tot{color:#1e7a45;font-variant-numeric:tabular-nums;}
+#copilotSheet .pay-sum{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:0;border-bottom:1px solid var(--border);background:#fff;text-align:left;font-family:'DM Sans',sans-serif;cursor:pointer;min-height:44px;touch-action:manipulation;}
+#copilotSheet .pay-sum .who{flex:1;min-width:0;font-size:0.86rem;font-weight:700;color:var(--navy);overflow-wrap:anywhere;}
+#copilotSheet .pay-sum .hint{font-size:0.68rem;font-weight:800;color:var(--teal);white-space:nowrap;}
+#copilotSheet .pay-chev{width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--off);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:800;flex:0 0 22px;}
+#copilotSheet .pay-aide.open .pay-chev{background:#e8f4f4;border-color:#b7d8d8;color:var(--teal);}
+#copilotSheet .pay-detail{display:none;}
+#copilotSheet .pay-aide.open .pay-detail{display:block;}
+#copilotSheet .pay-flags{display:flex;flex-direction:column;gap:6px;padding:0 12px 10px;}
+#copilotSheet .pay-aide.open .pay-flags{display:none;}
+#copilotSheet .pay-flag{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:10px;background:#fdecea;border:1px solid #f5c2c0;color:#b42318;font-size:0.75rem;line-height:1.35;font-family:'DM Sans',sans-serif;font-weight:650;cursor:pointer;min-height:44px;touch-action:manipulation;}
+#copilotSheet .pay-table-wrap{overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;}
+#copilotSheet table.pay-rows{width:100%;border-collapse:collapse;min-width:280px;}
+#copilotSheet table.pay-rows th{text-align:left;font-size:0.62rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid var(--border);background:#fafcfe;white-space:nowrap;}
+#copilotSheet table.pay-rows td{padding:8px;border-bottom:1px solid var(--border);font-size:0.75rem;color:var(--navy);vertical-align:top;}
+#copilotSheet table.pay-rows td.hrs,#copilotSheet table.pay-rows th.hrs{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;}
+#copilotSheet table.pay-rows tr.is-flag td{background:#fdecea;}
+#copilotSheet table.pay-rows tr.is-flag td{color:#b42318;}
+#copilotSheet table.pay-rows tr.is-cancel td{color:var(--muted);}
+#copilotSheet table.pay-rows tr.is-same td{background:#fff8e6;}
+#copilotSheet table.pay-rows .sub{display:block;font-size:0.68rem;font-weight:650;color:#9aa8bc;margin-top:2px;}
+#copilotSheet .pay-pill{display:inline-block;margin-left:4px;font-size:0.62rem;font-weight:800;padding:1px 6px;border-radius:999px;border:1px solid #f5c2c0;background:#fff;color:#b42318;}
+#copilotSheet .pay-covers{border-top:1px solid var(--border);background:#fbfcfe;}
+#copilotSheet .pay-covers-h{display:flex;justify-content:space-between;gap:8px;padding:8px 12px 2px;font-size:0.62rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+#copilotSheet .pay-covers-h span:last-child{letter-spacing:0;text-transform:none;font-weight:700;}
+#copilotSheet .pay-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 12px;background:#f3f5f8;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);}
+#copilotSheet .pay-foot strong{color:var(--navy);}
+#copilotSheet .pay-actions{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+#copilotSheet .pay-actions button{flex:1 1 30%;min-height:44px;border-radius:8px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .pay-actions .go{background:var(--teal);color:#fff;border:0;}
+#copilotSheet .pay-actions .alt{background:#fff;color:var(--teal);border:1px solid var(--border);}
+#copilotSheet .pay-next{margin:4px 0 0;font-size:0.78rem;font-weight:700;color:var(--navy);}
+#copilotSheet .pay-back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:6px;background:transparent;border:0;color:var(--teal);font-weight:800;font-family:'DM Sans',sans-serif;padding:0;cursor:pointer;touch-action:manipulation;}
 @media(max-width:899px){
   #copilotSheet{top:72px;border-radius:22px 22px 0 0;box-shadow:0 -16px 40px rgba(26,39,68,.28);}
 }
@@ -2923,7 +2973,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -7771,6 +7821,7 @@ function copilotSyncTabs(){
   var onRules=copilotView==='rules';
   var onSched=copilotView==='scheduled';
   var onProof=copilotView==='receipts';
+  var onPayroll=copilotView==='payroll';
   var radar=copilotEl('copilotTabRadar');
   var ask=copilotEl('copilotTabAsk');
   var notes=copilotEl('copilotTabNotes');
@@ -7780,7 +7831,7 @@ function copilotSyncTabs(){
   var dock=copilotEl('copilotComposer');
   var notesDock=copilotEl('remiNotesDock');
   var sheet=copilotEl('copilotSheet');
-  if(radar)radar.setAttribute('aria-selected', (!onAsk&&!onNotes&&!onRules&&!onSched&&!onProof)?'true':'false');
+  if(radar)radar.setAttribute('aria-selected', (!onAsk&&!onNotes&&!onRules&&!onSched&&!onProof&&!onPayroll)?'true':'false');
   if(ask)ask.setAttribute('aria-selected', onAsk?'true':'false');
   if(notes)notes.setAttribute('aria-selected', onNotes?'true':'false');
   if(rules)rules.setAttribute('aria-selected', onRules?'true':'false');
@@ -7797,6 +7848,8 @@ function copilotSyncTabs(){
     else sheet.classList.remove('is-scheduled');
     if(onProof)sheet.classList.add('is-receipts');
     else sheet.classList.remove('is-receipts');
+    if(onPayroll)sheet.classList.add('is-payroll');
+    else sheet.classList.remove('is-payroll');
   }
   if(!onNotes&&typeof remiNotesClosePicker==='function')remiNotesClosePicker();
 }
@@ -8207,6 +8260,7 @@ function copilotPaintChat(){
     html+='<div class="copilot-bubble '+(mine?'copilot-bubble-mo':'copilot-bubble-remi')+'">';
     var packChips=(!mine&&msg.ruleChips&&msg.ruleChips.length&&typeof remiRules1ChipsHtml==='function')?remiRules1ChipsHtml(msg.ruleChips):'';
     if(!mine&&msg.sched&&typeof remiSched1BubbleHtml==='function')html+=packChips+remiSched1BubbleHtml(msg, idx);
+    else if(!mine&&msg.payroll&&typeof remiPayroll1BubbleHtml==='function')html+=packChips+remiPayroll1BubbleHtml(msg, idx);
     else if(!mine&&msg.cm&&typeof remiCmHtml==='function')html+=packChips+remiCmHtml(msg.cm, idx);
     else html+=packChips+copilotChatHtml(msg.text||'')+((!mine&&msg.proof&&typeof remiProof1ChipHtml==='function')?remiProof1ChipHtml(msg.proof):'');
     if(!mine&&!msg.sched&&msg.actions&&msg.actions.length){
@@ -8263,9 +8317,12 @@ function copilotChatSubmit(ev){
   if(!ans&&typeof remiProof1FromAsk==='function'){
     try{ans=remiProof1FromAsk(q);}catch(eProof){ans=null;}
   }
+  if(!ans&&typeof remiPayroll1FromAsk==='function'){
+    try{ans=remiPayroll1FromAsk(q);}catch(ePay){ans=null;}
+  }
   if(!ans)ans=copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
-  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false, proof:ans.proof||null, proofQuery:ans.proofQuery||''};
+  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false, proof:ans.proof||null, proofQuery:ans.proofQuery||'', payroll:ans.payroll||null, payrollQuery:ans.payrollQuery||''};
   if(!ans.sched&&typeof remiRules1IsCoverContext==='function'&&remiRules1IsCoverContext(q, ans))bubble.ruleContext=true;
   copilotChat.push({role:'mo', text:q});
   copilotChat.push(bubble);
@@ -8275,6 +8332,9 @@ function copilotChatSubmit(ev){
   }
   if(bubble.proofQuery&&typeof remiProof1Lookup==='function'){
     try{remiProof1Lookup(copilotChat.length-1);}catch(eLook){}
+  }
+  if(bubble.payrollQuery&&typeof remiPayroll1Lookup==='function'){
+    try{remiPayroll1Lookup(copilotChat.length-1);}catch(ePayLook){}
   }
   if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
   else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
@@ -17343,7 +17403,7 @@ var REMI_SCHED1_MARKER='v=remi-sched1';
 var REMI_SCHED1_OFFICE='is_scheduler_office';
 var REMI_SCHED1_DAY_NAME={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 var REMI_SCHED1_DAY_KEY={sunday:'sun',sun:'sun',monday:'mon',mon:'mon',tuesday:'tue',tues:'tue',tue:'tue',wednesday:'wed',wed:'wed',thursday:'thu',thurs:'thu',thur:'thu',thu:'thu',friday:'fri',fri:'fri',saturday:'sat',sat:'sat'};
-var REMI_SCHED1_JOB_KEY={missing_hours_report:'missing_hours_report',hours_nudge:'hours_nudge',manager_digest:'manager_digest'};
+var REMI_SCHED1_JOB_KEY={missing_hours_report:'missing_hours_report',hours_nudge:'hours_nudge',manager_digest:'manager_digest',payroll_report:'payroll_report'};
 var remiSched1Cache=[];
 var remiSched1EditId='';
 var remiSched1Error='';
@@ -17426,9 +17486,12 @@ function remiSched1Parse(q){
   if(/missing[\s-]*hours/.test(low)){kind='missing_hours_report'; title='Missing hours report';}
   else if(/hours[\s-]*nudge/.test(low)||(/\bnudge\b/.test(low)&&/\bhours\b/.test(low))){kind='hours_nudge'; title='Hours nudge (aides)';}
   else if(/manager[\s-]*digest/.test(low)||/\bdigest\b/.test(low)){kind='manager_digest'; title='Manager digest';}
+  else if(/\bpayroll\b/.test(low)){kind='payroll_report'; title='Payroll report';}
   else title=remiSched1CustomTitle(raw);
   var weekdayLabel=REMI_SCHED1_DAY_NAME[weekday];
-  return {
+  var biweekly=/\bevery\s+other\b/.test(low)||/\bbiweekly\b/.test(low)||/\bevery\s+two\s+weeks\b/.test(low)||kind==='payroll_report';
+  var summary='Every '+weekdayLabel+' \u00B7 '+time.label+' ET \u00B7 posts in Remi rail';
+  var out={
     kind:kind,
     title:title,
     weekday:weekday,
@@ -17437,8 +17500,15 @@ function remiSched1Parse(q){
     local_time_label:time.label,
     prompt_text:raw,
     timezone:'America/New_York',
-    summary:'Every '+weekdayLabel+' \u00B7 '+time.label+' ET \u00B7 posts in Remi rail'
+    summary:summary
   };
+  if(biweekly){
+    out.recurrence='biweekly';
+    out.interval_days=14;
+    out.summary='Every other '+weekdayLabel+' \u00B7 '+time.label+' ET \u00B7 '+(kind==='payroll_report'?'payroll report in Remi rail':'posts in Remi rail');
+    if(kind==='payroll_report')out.anchor_date='2026-09-24';
+  }
+  return out;
 }
 function remiSched1FromAsk(q){
   if(!remiSched1OfficeOk())return null;
@@ -17448,8 +17518,10 @@ function remiSched1FromAsk(q){
   if(parsed.kind==='missing_hours_report')what='your missing-hours report';
   else if(parsed.kind==='hours_nudge')what='the hours nudge';
   else if(parsed.kind==='manager_digest')what='the manager digest';
+  else if(parsed.kind==='payroll_report')what='the payroll report';
   else what=parsed.title;
-  var text='Got it. I\u2019ll post '+what+' every '+parsed.weekday_label+' at '+parsed.local_time_label+' ET in this rail.';
+  var cadence=parsed.recurrence==='biweekly'?'every other ':'every ';
+  var text='Got it. I\u2019ll post '+what+' '+cadence+parsed.weekday_label+' at '+parsed.local_time_label+' ET in this rail.';
   return {sec:true, kind:'', text:text, actions:[], sched:{chip:'New schedule', draft:parsed, editing:false, sent:false, error:''}};
 }
 function remiSched1CreateBody(draft){
@@ -17466,6 +17538,10 @@ function remiSched1CreateBody(draft){
   };
   var key=REMI_SCHED1_JOB_KEY[body.p_kind];
   if(key)body.p_job_key=key;
+  if(d.recurrence)body.p_recurrence=d.recurrence;
+  if(d.interval_days)body.p_interval_days=Number(d.interval_days);
+  if(d.anchor_date)body.p_anchor_date=String(d.anchor_date).slice(0,10);
+  if(d.range_prefs&&typeof d.range_prefs==='object')body.p_range_prefs=d.range_prefs;
   return body;
 }
 function remiSched1Rows(data){
@@ -17480,7 +17556,10 @@ function remiSched1Summary(job){
   if(job.schedule_label)return String(job.schedule_label);
   var day=job.weekday_label||REMI_SCHED1_DAY_NAME[job.weekday]||job.weekday||'';
   var time=job.local_time_label||remiSched1ClockLabel(String(job.local_time||'').slice(0,5));
-  if(day&&time)return 'Every '+day+' \u00B7 '+time+' ET \u00B7 posts in Remi rail';
+  var payroll=job.kind==='payroll_report'||job.job_key==='payroll_report';
+  var every=(job.recurrence==='biweekly'||payroll)?'Every other ':'Every ';
+  var tail=payroll?'payroll report in Remi rail':'posts in Remi rail';
+  if(day&&time)return every+day+' \u00B7 '+time+' ET \u00B7 '+tail;
   return '';
 }
 async function remiSched1Call(name, body){
@@ -17542,7 +17621,9 @@ function remiSched1ReadDraft(idx){
     if(clock&&clock.value)d.local_time=String(clock.value).slice(0,5);
     d.weekday_label=REMI_SCHED1_DAY_NAME[d.weekday]||d.weekday;
     d.local_time_label=remiSched1ClockLabel(d.local_time);
-    d.summary='Every '+d.weekday_label+' \u00B7 '+d.local_time_label+' ET \u00B7 posts in Remi rail';
+    var every=(d.recurrence==='biweekly'||d.kind==='payroll_report')?'Every other ':'Every ';
+    var tail=d.kind==='payroll_report'?'payroll report in Remi rail':'posts in Remi rail';
+    d.summary=every+d.weekday_label+' \u00B7 '+d.local_time_label+' ET \u00B7 '+tail;
     msg.sched.draft=d;
   }
   return d;
@@ -17594,6 +17675,9 @@ function remiSched1JobHtml(job){
     html+='<button type="button" class="go" onclick="remiSched1SaveTime(\''+id+'\')">Save time</button></div></div>';
   }else if(id){
     html+='<button type="button" class="remi-linkish" onclick="remiSched1BeginEdit(\''+id+'\')">Change time</button>';
+  }
+  if(typeof remiPayroll1JobExtra==='function'){
+    try{html+=remiPayroll1JobExtra(job);}catch(ePay){}
   }
   html+='</div>';
   return html;
@@ -17666,6 +17750,17 @@ async function remiSched1SaveTime(id){
   var body={p_id:remiSched1SafeId(id)};
   if(week&&week.value)body.p_weekday=week.value;
   if(clock&&clock.value)body.p_local_time=String(clock.value).slice(0,5);
+  var cached=null;
+  for(var si=0;si<remiSched1Cache.length;si++){
+    if(remiSched1SafeId(remiSched1Cache[si]&&remiSched1Cache[si].id)===body.p_id){cached=remiSched1Cache[si];break;}
+  }
+  if(cached&&(cached.recurrence==='biweekly'||cached.kind==='payroll_report'||cached.job_key==='payroll_report')){
+    body.p_recurrence=cached.recurrence||'biweekly';
+    body.p_interval_days=cached.interval_days||14;
+    var anchor=cached.anchor_date||((cached.kind==='payroll_report'||cached.job_key==='payroll_report')?'2026-09-24':'');
+    if(anchor)body.p_anchor_date=String(anchor).slice(0,10);
+    if(cached.range_prefs&&typeof cached.range_prefs==='object')body.p_range_prefs=cached.range_prefs;
+  }
   var got=await remiSched1Rpc('admin_update_remi_scheduled_job', body);
   if(!got.ok){
     if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not change the time.','var(--warn)');
@@ -17676,6 +17771,639 @@ async function remiSched1SaveTime(id){
   return got;
 }
 // end remi sched1 v=remi-sched1
+
+// remi payroll1 v=remi-payroll1
+// MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only. No full-page Remi.
+// Nurse denied 42501. No Auth reseal. Chase stays in Aide chat.
+var REMI_PAYROLL1_MARKER='v=remi-payroll1';
+var REMI_PAYROLL1_OFFICE='is_scheduler_office';
+var REMI_PAYROLL1_ANCHOR='2026-09-24';
+var REMI_PAYROLL1_LABEL='Every other Wednesday \u00B7 8:00 AM ET \u00B7 payroll report in Remi rail';
+var remiPayroll1Report=null;
+var remiPayroll1Job=null;
+var remiPayroll1Start='';
+var remiPayroll1End='';
+var remiPayroll1Error='';
+var remiPayroll1Note='';
+var remiPayroll1OpenMap={};
+var remiPayroll1Chip=null;
+function remiPayroll1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function remiPayroll1OfficeOk(){
+  var role=remiPayroll1Role();
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function remiPayroll1El(id){
+  try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
+  return null;
+}
+function remiPayroll1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof copilotEsc==='function')return copilotEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiPayroll1Safe(id){
+  return String(id||'').replace(/[^A-Za-z0-9-]/g,'');
+}
+function remiPayroll1Clean(s){
+  return String(s==null?'':s).replace(/\bhrs\s+paid\b/ig,'').replace(/\bnot\s+paid\b/ig,'').replace(/[ \t]{2,}/g,' ').trim();
+}
+function remiPayroll1Hours(n){
+  if(n==null||n==='')return '';
+  var num=Number(n);
+  if(!isFinite(num))return '';
+  return (Math.round(num*100)/100).toFixed(2);
+}
+function remiPayroll1Mdy(iso){
+  var m=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m)return '';
+  return m[2]+'/'+m[3]+'/'+m[1];
+}
+function remiPayroll1DateLabel(iso){
+  var mdy=remiPayroll1Mdy(iso);
+  if(!mdy)return remiPayroll1Clean(iso);
+  var m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  try{
+    var d=new Date(Date.UTC(+m[1], +m[2]-1, +m[3], 16, 0, 0));
+    var wd=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short'}).format(d);
+    return wd+' '+mdy;
+  }catch(e){return mdy;}
+}
+function remiPayroll1FormatNext(iso){
+  var d=new Date(iso);
+  if(!isFinite(d.getTime()))return '';
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',year:'numeric',month:'2-digit',day:'2-digit',hour:'numeric',minute:'2-digit',hour12:true}).formatToParts(d);
+    var map={};
+    parts.forEach(function(p){if(p.type!=='literal')map[p.type]=p.value;});
+    var hour=map.hour||map.hour12||'';
+    var ap=String(map.dayPeriod||'').toUpperCase();
+    if(!map.month||!map.day||!map.year||!hour)return '';
+    return (map.weekday?map.weekday+' ':'')+map.month+'/'+map.day+'/'+map.year+' '+hour+':'+(map.minute||'00')+' '+ap+' ET';
+  }catch(e2){return '';}
+}
+function remiPayroll1IsPayrollJob(job){
+  job=job||{};
+  var kind=String(job.kind||job.job_key||'').toLowerCase();
+  if(kind==='payroll_report')return true;
+  return /\bpayroll\b/i.test(String(job.title||''));
+}
+async function remiPayroll1Rpc(name, body){
+  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.'};
+  if(typeof sbRestRpc!=='function')return {ok:false, error:'Payroll is not callable yet.'};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  var errText=String((got&&got.error)||'');
+  if(!got||got.ok!==true){
+    if((got&&(got.status===42501||got.status===403))||/42501|is_scheduler_office/.test(errText)){
+      return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.', status:got&&got.status};
+    }
+    return {ok:false, error:errText||'Request failed.', status:got&&got.status};
+  }
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(got.data); if(un)node=un;}catch(eUn){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(eJson){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    var why=String(node.error||node.message||'Request failed.');
+    if(/42501|is_scheduler_office/.test(why))return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.', data:node};
+    return {ok:false, error:why, data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+function remiPayroll1DateBody(){
+  var body={};
+  if(remiPayroll1Start)body.p_start_date=remiPayroll1Start;
+  if(remiPayroll1End)body.p_end_date=remiPayroll1End;
+  return body;
+}
+function remiPayroll1PickReport(data){
+  if(!data||typeof data!=='object')return null;
+  if(Array.isArray(data.aides)||data.stats)return data;
+  if(data.report&&typeof data.report==='object'&&(Array.isArray(data.report.aides)||data.report.stats))return data.report;
+  return null;
+}
+function remiPayroll1Apply(data, keepOpen){
+  data=data||{};
+  var report=remiPayroll1PickReport(data);
+  if(report){
+    remiPayroll1Report=report;
+    remiPayroll1Start=String(report.start_date||data.start_date||remiPayroll1Start||'').slice(0,10);
+    remiPayroll1End=String(report.end_date||data.end_date||remiPayroll1End||'').slice(0,10);
+  }
+  var job=data.job||(report&&report.job)||null;
+  if(job&&typeof job==='object')remiPayroll1Job=job;
+  if(!keepOpen)remiPayroll1OpenMap={};
+}
+function remiPayroll1RangeFrom(data){
+  data=data||{};
+  var node=data.range&&typeof data.range==='object'?data.range:data;
+  var start=String(node.start_date||node.p_start_date||node.start||'').slice(0,10);
+  var end=String(node.end_date||node.p_end_date||node.end||'').slice(0,10);
+  return {
+    start_date:start,
+    end_date:end,
+    start_date_display:node.start_date_display||node.start_display||remiPayroll1Mdy(start),
+    end_date_display:node.end_date_display||node.end_display||remiPayroll1Mdy(end)
+  };
+}
+function remiPayroll1IsRangeAsk(q){
+  var raw=String(q||'').replace(/\s+/g,' ').trim();
+  if(!raw)return false;
+  var low=raw.toLowerCase();
+  if(/\breceipts?\b/.test(low))return false;
+  if(typeof remiSched1Parse==='function'&&remiSched1Parse(raw))return false;
+  if(/\bpayroll\b/.test(low))return true;
+  if(/\blast\s+(?:2|two)\s+weeks\b/.test(low)||/\blast\s+week\b/.test(low))return true;
+  if(/\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s+\d{1,2}\s*[\u2013\u2014-]\s*\d{1,2}\b/.test(low))return true;
+  if(/\b\d{1,2}\/\d{1,2}(?:\/\d{2,4})?\s*[\u2013\u2014-]\s*\d{1,2}\/\d{1,2}\b/.test(low))return true;
+  return false;
+}
+function remiPayroll1FromAsk(q){
+  if(!remiPayroll1OfficeOk())return null;
+  if(!remiPayroll1IsRangeAsk(q))return null;
+  return {sec:true, kind:'', text:'Checking that payroll range.', actions:[], payrollQuery:String(q||'').trim(), payroll:{chip:'Payroll range', sent:false, draft:null, error:''}};
+}
+async function remiPayroll1Lookup(idx){
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx])return {ok:false};
+  var msg=copilotChat[idx];
+  var q=String(msg.payrollQuery||'').trim();
+  if(!q)return {ok:false};
+  var got=await remiPayroll1Rpc('admin_parse_remi_payroll_range', {p_text:q});
+  if(!msg.payroll)msg.payroll={chip:'Payroll range', sent:false, draft:null, error:''};
+  if(!got||!got.ok){
+    msg.payroll.error=(got&&got.error)||'Could not read that range.';
+    msg.text=msg.payroll.error;
+  }else{
+    var range=remiPayroll1RangeFrom(got.data);
+    msg.payroll.draft=range;
+    msg.payroll.error='';
+    var label=(range.start_date_display&&range.end_date_display)?(range.start_date_display+' \u2013 '+range.end_date_display):'the last 2 weeks';
+    msg.text='Payroll range '+label+'. Confirm to save it on the Scheduled payroll job and open the report.';
+  }
+  try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint){}
+  return got;
+}
+function remiPayroll1BubbleHtml(msg, idx){
+  var pay=msg&&msg.payroll?msg.payroll:{};
+  var d=pay.draft||{};
+  var html='<span class="remi-pack-chip">'+remiPayroll1Esc(pay.chip||'Payroll range')+'</span>'+remiPayroll1Esc(msg&&msg.text||'');
+  if(d.start_date_display||d.end_date_display){
+    html+='<p class="pay-next">'+remiPayroll1Esc((d.start_date_display||'')+' \u2013 '+(d.end_date_display||''))+'</p>';
+  }
+  if(!pay.sent&&d.start_date&&d.end_date){
+    html+='<div class="remi-sched-actions">';
+    html+='<button type="button" class="go" id="remiPayroll1Confirm" onclick="remiPayroll1Confirm('+idx+')">Confirm</button>';
+    html+='</div>';
+  }
+  if(pay.error)html+='<p class="remi-vis-hint">'+remiPayroll1Esc(pay.error)+'</p>';
+  return html;
+}
+async function remiPayroll1Confirm(idx){
+  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.'};
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx]||!copilotChat[idx].payroll)return {ok:false, error:'Nothing to confirm.'};
+  var msg=copilotChat[idx];
+  var d=msg.payroll.draft||{};
+  if(!d.start_date||!d.end_date)return {ok:false, error:'Missing range.'};
+  var prefs=await remiPayroll1Rpc('admin_set_remi_payroll_range_prefs', {p_start_date:d.start_date, p_end_date:d.end_date});
+  if(!prefs||!prefs.ok){
+    msg.payroll.error=(prefs&&prefs.error)||'Could not save that range.';
+    try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint){}
+    return prefs||{ok:false};
+  }
+  msg.payroll.sent=true;
+  msg.payroll.error='';
+  remiPayroll1Start=d.start_date;
+  remiPayroll1End=d.end_date;
+  var got=await remiPayroll1Rpc('admin_get_remi_payroll_report', {p_start_date:d.start_date, p_end_date:d.end_date});
+  if(!got||!got.ok){
+    msg.payroll.error=(got&&got.error)||'Could not open the payroll report.';
+    try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint2){}
+    return got||{ok:false};
+  }
+  remiPayroll1Error='';
+  remiPayroll1Apply(got.data, false);
+  remiPayroll1Paint();
+  return got;
+}
+function remiPayroll1SumHours(rows){
+  var total=0;
+  var any=false;
+  (rows||[]).forEach(function(row){
+    if(!row||row.is_flag||row.is_cancel||row.cancelled)return;
+    var n=Number(row.hours);
+    if(!isFinite(n))return;
+    any=true;
+    total+=n;
+  });
+  return any?total:null;
+}
+function remiPayroll1AideTotal(aide){
+  aide=aide||{};
+  if(aide.paid_hours!=null&&aide.paid_hours!=='')return remiPayroll1Hours(aide.paid_hours);
+  if(aide.subtotal!=null&&aide.subtotal!=='')return remiPayroll1Hours(aide.subtotal);
+  var a=remiPayroll1SumHours(aide.regulars);
+  var b=remiPayroll1SumHours(aide.covers);
+  if(a==null&&b==null)return '';
+  return remiPayroll1Hours((a||0)+(b||0));
+}
+function remiPayroll1SummaryLine(aide){
+  aide=aide||{};
+  var line=remiPayroll1Clean(aide.summary_line||'');
+  if(line)return line;
+  var name=remiPayroll1Clean(aide.aide_name||aide.name||'Aide');
+  var client=remiPayroll1Clean(aide.permanent_client_name||aide.client_name||'');
+  var hrs=aide.regular_hours!=null?remiPayroll1Hours(aide.regular_hours):'';
+  if(!hrs){
+    var sum=remiPayroll1SumHours(aide.regulars);
+    if(sum!=null)hrs=remiPayroll1Hours(sum);
+  }
+  var parts=[name];
+  if(client)parts.push(client);
+  if(hrs)parts.push(hrs);
+  return parts.join(' \u00B7 ');
+}
+function remiPayroll1Stats(report){
+  report=report||{};
+  var s=report.stats||{};
+  var aides=Array.isArray(report.aides)?report.aides:[];
+  var flags=0, covers=0, shifts=0, hours=0, anyHours=false;
+  aides.forEach(function(aide){
+    flags+=(aide.flags||[]).length;
+    (aide.covers||[]).forEach(function(row){
+      covers++;
+      if(row&&!row.is_flag){
+        shifts++;
+        var n=Number(row.hours);
+        if(isFinite(n)){hours+=n;anyHours=true;}
+      }
+    });
+    (aide.regulars||[]).forEach(function(row){
+      if(!row||row.is_flag||row.is_cancel||row.cancelled)return;
+      shifts++;
+      var n2=Number(row.hours);
+      if(isFinite(n2)){hours+=n2;anyHours=true;}
+    });
+  });
+  return {
+    aides:s.aides!=null?s.aides:aides.length,
+    paid_shifts:s.paid_shifts!=null?s.paid_shifts:shifts,
+    paid_hours:s.paid_hours!=null?remiPayroll1Hours(s.paid_hours):(anyHours?remiPayroll1Hours(hours):'0.00'),
+    covers:s.covers!=null?s.covers:covers,
+    flags:s.flags!=null?s.flags:flags
+  };
+}
+function remiPayroll1RowDate(row){
+  return row.date||row.on_date||'';
+}
+function remiPayroll1RowClient(row){
+  return remiPayroll1Clean(row.client_name||row.client||'');
+}
+function remiPayroll1RowIn(row){
+  var v=row['in']||row.in_label||row.time_in||'';
+  return v?remiPayroll1Clean(v):'\u2014';
+}
+function remiPayroll1RowOut(row){
+  var v=row.out||row.out_label||row.time_out||'';
+  return v?remiPayroll1Clean(v):'\u2014';
+}
+function remiPayroll1FlagLabel(row){
+  var label=remiPayroll1Clean(row.flag_label||'');
+  if(label)return label;
+  var why=String(row.missing_reason||row.reason||'').toLowerCase();
+  if(/unsigned|in\/out|signature/.test(why))return 'Flag \u00B7 unsigned';
+  return 'Flag \u00B7 missing';
+}
+function remiPayroll1RowsHtml(rows, cover){
+  var html='<div class="pay-table-wrap"><table class="pay-rows"><thead><tr><th>Date</th><th>Client</th><th>In</th><th>Out</th><th class="hrs">Hours</th></tr></thead><tbody>';
+  (rows||[]).forEach(function(row){
+    row=row||{};
+    var flag=!!row.is_flag;
+    var cancel=!!(row.is_cancel||row.cancelled);
+    var cls=flag?'is-flag':(cancel?'is-cancel':(row.same_day?'is-same':''));
+    var date=remiPayroll1DateLabel(remiPayroll1RowDate(row));
+    var slot=remiPayroll1Clean(row.slot_label||row.slot||row.scheduled||'');
+    var client=remiPayroll1RowClient(row);
+    var extra='';
+    if(cover){
+      var who=remiPayroll1Clean(row.covered_for||row.coveredFor||'');
+      if(who)extra='<span class="sub">covered for '+remiPayroll1Esc(who)+'</span>';
+    }else if(cancel){
+      extra='<span class="sub">'+remiPayroll1Esc(remiPayroll1Clean(row.cancel_note||'cancelled'))+'</span>';
+    }
+    var hours=flag||cancel?'\u2014':remiPayroll1Hours(row.hours);
+    if(!hours)hours='\u2014';
+    var link=row.deep_link&&typeof row.deep_link==='object'?row.deep_link:null;
+    var dateHtml=remiPayroll1Esc(date);
+    if(slot)dateHtml+='<span class="sub">'+remiPayroll1Esc(slot)+'</span>';
+    if(flag)dateHtml+='<span class="pay-pill">'+remiPayroll1Esc(remiPayroll1FlagLabel(row))+'</span>';
+    html+='<tr class="'+cls+'">';
+    if(flag&&link&&(link.timesheet_id||link.on_date)){
+      html+='<td><button type="button" class="pay-flag" onclick="'+remiPayroll1LinkCall(link)+'">'+dateHtml+'</button></td>';
+    }else html+='<td>'+dateHtml+'</td>';
+    html+='<td>'+remiPayroll1Esc(client)+extra+'</td>';
+    html+='<td>'+remiPayroll1Esc(flag||cancel?'\u2014':remiPayroll1RowIn(row))+'</td>';
+    html+='<td>'+remiPayroll1Esc(flag||cancel?'\u2014':remiPayroll1RowOut(row))+'</td>';
+    html+='<td class="hrs">'+remiPayroll1Esc(hours)+'</td></tr>';
+  });
+  html+='</tbody></table></div>';
+  return html;
+}
+function remiPayroll1LinkCall(link){
+  link=link||{};
+  return 'remiPayroll1OpenLink(\''+remiPayroll1Safe(link.timesheet_id||'')+'\',\''+remiPayroll1Safe(link.on_date||'')+'\')';
+}
+function remiPayroll1FlagChip(flag){
+  flag=flag||{};
+  var label=remiPayroll1FlagLabel(flag);
+  var when=remiPayroll1Mdy(flag.on_date||flag.date||(flag.deep_link&&flag.deep_link.on_date)||'');
+  var client=remiPayroll1RowClient(flag);
+  var why=remiPayroll1Clean(flag.missing_reason||flag.reason||'');
+  var bits=[label];
+  if(when)bits.push(when);
+  if(client)bits.push(client);
+  if(why)bits.push(why);
+  var link=flag.deep_link&&typeof flag.deep_link==='object'?flag.deep_link:{surface:'timesheets', timesheet_id:flag.timesheet_id||'', on_date:flag.on_date||flag.date||''};
+  return '<button type="button" class="pay-flag" data-pay-flag="1" onclick="'+remiPayroll1LinkCall(link)+'">'+remiPayroll1Esc(bits.join(' \u00B7 '))+'</button>';
+}
+function remiPayroll1AideHtml(aide, idx){
+  aide=aide||{};
+  var key=remiPayroll1Safe(aide.aide_id||aide.id||'')||('a'+idx);
+  var open=!!remiPayroll1OpenMap[key];
+  var name=remiPayroll1Clean(aide.aide_name||aide.name||'Aide');
+  var client=remiPayroll1Clean(aide.permanent_client_name||'');
+  var regulars=Array.isArray(aide.regulars)?aide.regulars:[];
+  var covers=Array.isArray(aide.covers)?aide.covers:[];
+  var flags=Array.isArray(aide.flags)?aide.flags:[];
+  var paidReg=0, flagN=flags.length, cancelN=0;
+  regulars.forEach(function(row){
+    if(!row)return;
+    if(row.is_flag)return;
+    if(row.is_cancel||row.cancelled){cancelN++;return;}
+    paidReg++;
+  });
+  var html='<section class="pay-aide'+(open?' open':'')+'" data-aide="'+remiPayroll1Esc(key)+'">';
+  html+='<div class="pay-aide-h"><span>'+remiPayroll1Esc(name)+'</span><span class="tot">'+remiPayroll1Esc(remiPayroll1AideTotal(aide))+'</span></div>';
+  html+='<button type="button" class="pay-sum" aria-expanded="'+(open?'true':'false')+'" onclick="remiPayroll1Toggle(\''+key+'\')">';
+  html+='<span class="pay-chev">'+(open?'\u25BC':'\u25B6')+'</span>';
+  html+='<span class="who">'+remiPayroll1Esc(remiPayroll1SummaryLine(aide))+'</span>';
+  html+='<span class="hint">'+(open?'tap to collapse':'tap to expand')+'</span></button>';
+  if(flags.length){
+    html+='<div class="pay-flags">';
+    flags.forEach(function(flag){html+=remiPayroll1FlagChip(flag);});
+    html+='</div>';
+  }
+  html+='<div class="pay-detail">'+remiPayroll1RowsHtml(regulars, false)+'</div>';
+  html+='<div class="pay-covers"><div class="pay-covers-h"><span>Covers</span><span>'+(covers.length?'always visible':'always visible \u00B7 none this period')+'</span></div>';
+  if(covers.length)html+=remiPayroll1RowsHtml(covers, true);
+  html+='</div>';
+  var foot=paidReg+' regular';
+  if(flagN)foot+=' \u00B7 '+flagN+' Flag';
+  if(cancelN)foot+=' \u00B7 '+cancelN+' cancel';
+  foot+=' \u00B7 '+covers.length+' cover';
+  if(client)foot+=' \u00B7 permanent '+client;
+  html+='<div class="pay-foot"><span>'+remiPayroll1Esc(foot)+'</span><strong>Subtotal '+remiPayroll1Esc(remiPayroll1AideTotal(aide))+'</strong></div>';
+  html+='</section>';
+  return html;
+}
+function remiPayroll1ReportHtml(){
+  var report=remiPayroll1Report||{};
+  var stats=remiPayroll1Stats(report);
+  var startDisp=report.start_date_display||remiPayroll1Mdy(remiPayroll1Start);
+  var endDisp=report.end_date_display||remiPayroll1Mdy(remiPayroll1End);
+  var range=(startDisp&&endDisp)?(startDisp+' \u2013 '+endDisp):'Last 2 weeks';
+  var job=remiPayroll1Job||report.job||{};
+  var schedule=remiPayroll1Clean(job.schedule_label||REMI_PAYROLL1_LABEL);
+  var next=job.next_run_label||job.next_run_display||'';
+  if(!next&&job.next_run_at)next=remiPayroll1FormatNext(job.next_run_at);
+  var aides=Array.isArray(report.aides)?report.aides:[];
+  var html='<div class="pay-report" id="remiPayroll1" data-remi-payroll1="'+REMI_PAYROLL1_MARKER+'">';
+  html+='<button type="button" class="pay-back" onclick="remiSched1Show()">Scheduled</button>';
+  html+='<div class="pay-head"><h3>Payroll report</h3>';
+  html+='<p class="pay-meta">'+remiPayroll1Esc(range)+' \u00B7 aides collapsed \u00B7 covers always on \u00B7 America/New_York</p></div>';
+  html+='<div class="pay-badges"><span class="pay-badge is-job">'+remiPayroll1Esc(schedule)+'</span>';
+  html+='<span class="pay-badge'+(Number(stats.flags)?' is-flag':'')+'">'+remiPayroll1Esc(String(stats.flags))+' Flags</span>';
+  html+='<span class="pay-badge">America/New_York</span></div>';
+  if(next)html+='<p class="pay-next">Next run '+remiPayroll1Esc(next)+'</p>';
+  if(job.anchor_date||REMI_PAYROLL1_ANCHOR){
+    var anchor=remiPayroll1Mdy(job.anchor_date||REMI_PAYROLL1_ANCHOR);
+    if(anchor)html+='<p class="remi-vis-hint">Anchor pay day '+remiPayroll1Esc(anchor)+' \u00B7 every 14 days</p>';
+  }
+  html+='<div class="pay-stats">';
+  html+='<div class="pay-stat"><div class="lbl">Aides</div><div class="val">'+remiPayroll1Esc(String(stats.aides))+'</div></div>';
+  html+='<div class="pay-stat"><div class="lbl">Paid shifts</div><div class="val">'+remiPayroll1Esc(String(stats.paid_shifts))+'</div></div>';
+  html+='<div class="pay-stat"><div class="lbl">Paid hours</div><div class="val">'+remiPayroll1Esc(String(stats.paid_hours))+'</div></div>';
+  html+='<div class="pay-stat"><div class="lbl">Covers</div><div class="val">'+remiPayroll1Esc(String(stats.covers))+'</div></div>';
+  html+='<div class="pay-stat is-flag"><div class="lbl">Flags</div><div class="val">'+remiPayroll1Esc(String(stats.flags))+'</div></div>';
+  html+='</div>';
+  if(remiPayroll1Error)html+='<p class="remi-vis-hint">'+remiPayroll1Esc(remiPayroll1Error)+'</p>';
+  if(remiPayroll1Note)html+='<p class="remi-vis-hint">'+remiPayroll1Esc(remiPayroll1Note)+'</p>';
+  if(remiPayroll1Chip&&remiPayroll1Chip.summary){
+    html+='<div class="remi-proof-chip" data-remi-payroll1="'+REMI_PAYROLL1_MARKER+'"><strong>Receipt</strong>'+remiPayroll1Esc(remiPayroll1Chip.summary);
+    if(remiPayroll1Chip.receipt_id)html+='<br><button type="button" class="remi-proof-open" onclick="remiProof1Open(\''+remiPayroll1Safe(remiPayroll1Chip.receipt_id)+'\')">'+remiPayroll1Esc(remiPayroll1Chip.open_label||'Open full proof \u2192')+'</button>';
+    html+='</div>';
+  }
+  html+='<div class="pay-actions">';
+  html+='<button type="button" class="go" id="remiPayroll1Run" onclick="remiPayroll1Run()">Run</button>';
+  html+='<button type="button" class="alt" id="remiPayroll1Csv" onclick="remiPayroll1Export(\'csv\')">CSV</button>';
+  html+='<button type="button" class="alt" id="remiPayroll1Pdf" onclick="remiPayroll1Export(\'pdf\')">PDF</button>';
+  html+='<button type="button" class="alt" id="remiPayroll1Both" onclick="remiPayroll1Export(\'both\')">Both</button>';
+  html+='</div>';
+  if(Number(stats.flags)){
+    html+='<div class="pay-actions"><button type="button" class="alt" id="remiPayroll1Chase" onclick="remiPayroll1Chase()">Aide chat</button></div>';
+  }
+  if(!aides.length&&!remiPayroll1Error)html+='<p class="remi-vis-hint">No aides in this range.</p>';
+  aides.forEach(function(aide, idx){html+=remiPayroll1AideHtml(aide, idx);});
+  html+='</div>';
+  return html;
+}
+function remiPayroll1Paint(){
+  var host=remiPayroll1El('copilotBody');
+  try{copilotView='payroll';}catch(eView){}
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  var title=remiPayroll1El('copilotTitle');
+  if(title)title.textContent='Remi';
+  var sheet=remiPayroll1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  if(host)host.innerHTML=remiPayroll1ReportHtml();
+}
+function remiPayroll1Toggle(key){
+  key=remiPayroll1Safe(key);
+  if(!key)return;
+  if(remiPayroll1OpenMap[key])delete remiPayroll1OpenMap[key];
+  else remiPayroll1OpenMap[key]=1;
+  remiPayroll1Paint();
+}
+function remiPayroll1OpenLink(timesheetId, onDate){
+  var link={surface:'timesheets', timesheet_id:remiPayroll1Safe(timesheetId), on_date:String(onDate||'')};
+  if(typeof showTab==='function')showTab('timesheets');
+  var id=link.timesheet_id;
+  if(id&&typeof viewRec==='function'&&typeof allRecords!=='undefined'&&allRecords){
+    var found=false;
+    for(var i=0;i<allRecords.length;i++){
+      if(String(allRecords[i]&&allRecords[i].id)===id){found=true;break;}
+    }
+    if(found)viewRec(id);
+  }
+  if(typeof copilotClose==='function')copilotClose();
+  var when=remiPayroll1Mdy(link.on_date);
+  if(!id&&when&&typeof showTempMsg==='function')showTempMsg('Timesheet '+when,'var(--teal)');
+}
+function remiPayroll1Chase(){
+  if(typeof copilotClose==='function')copilotClose();
+  if(typeof showTab==='function')showTab('aidechat');
+  if(typeof aidechatOpen==='function'){
+    try{aidechatOpen();}catch(eChat){}
+  }
+}
+async function remiPayroll1Load(){
+  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true};
+  var got=await remiPayroll1Rpc('admin_get_remi_payroll_report', remiPayroll1DateBody());
+  if(!got||!got.ok){
+    remiPayroll1Error=(got&&got.error)||'Could not load the payroll report.';
+  }else{
+    remiPayroll1Error='';
+    remiPayroll1Apply(got.data, false);
+  }
+  try{if(copilotView==='payroll')remiPayroll1Paint();}catch(ePaint){remiPayroll1Paint();}
+  return got;
+}
+function remiPayroll1Show(){
+  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true};
+  var sheet=remiPayroll1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  remiPayroll1Note='';
+  remiPayroll1Paint();
+  return remiPayroll1Load();
+}
+function remiPayroll1PostChip(data){
+  data=data||{};
+  var chip=data.rail_chip&&typeof data.rail_chip==='object'?data.rail_chip:(data.chip&&typeof data.chip==='object'?data.chip:null);
+  var receipt=data.receipt&&typeof data.receipt==='object'?data.receipt:null;
+  var summary='';
+  if(chip&&chip.summary)summary=String(chip.summary);
+  else if(chip&&chip.chip_summary)summary=String(chip.chip_summary);
+  else if(receipt&&receipt.chip_summary)summary=String(receipt.chip_summary);
+  var id='';
+  if(chip&&(chip.receipt_id||chip.id))id=String(chip.receipt_id||chip.id);
+  else if(receipt&&receipt.id)id=String(receipt.id);
+  var open=chip&&chip.open_label?String(chip.open_label):'Open full proof \u2192';
+  if(!summary&&!id)return null;
+  remiPayroll1Chip={summary:summary, receipt_id:id, open_label:open};
+  try{
+    if(typeof copilotChat!=='undefined'&&copilotChat){
+      var proof=id?{summary:summary, receipt_id:id, open_label:open}:null;
+      copilotChat.push({role:'remi', text:summary||'Payroll report is ready.', kind:'', actions:[], sec:true, proof:proof});
+    }
+  }catch(ePush){}
+  return remiPayroll1Chip;
+}
+async function remiPayroll1Run(){
+  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.'};
+  remiPayroll1Note='';
+  var got=await remiPayroll1Rpc('admin_run_remi_payroll_report', remiPayroll1DateBody());
+  if(!got||!got.ok){
+    remiPayroll1Error=(got&&got.error)||'Could not run the payroll report.';
+    remiPayroll1Paint();
+    return got||{ok:false};
+  }
+  remiPayroll1Error='';
+  var data=got.data||{};
+  if(remiPayroll1PickReport(data))remiPayroll1Apply(data, true);
+  if(data.job&&data.job.next_run_at)remiPayroll1Job=data.job;
+  remiPayroll1PostChip(data);
+  var next=data.job&&data.job.next_run_at?remiPayroll1FormatNext(data.job.next_run_at):'';
+  remiPayroll1Note=next?('Receipt posted. Next run '+next):'Receipt posted.';
+  remiPayroll1Paint();
+  return got;
+}
+function remiPayroll1DownloadText(text, name, type){
+  if(typeof downloadBlob!=='function'||typeof Blob!=='function')return {ok:true, skipped:true, filename:name};
+  downloadBlob(new Blob([text],{type:type||'text/csv;charset=utf-8'}), name);
+  return {ok:true, filename:name};
+}
+function remiPayroll1PdfBytes(b64){
+  var clean=String(b64||'').replace(/\s/g,'');
+  if(!clean||typeof atob!=='function')return null;
+  var bin=atob(clean);
+  var out=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i)&255;
+  return out;
+}
+function remiPayroll1IsPdf(bytes){
+  return !!(bytes&&bytes.length>=4&&bytes[0]===37&&bytes[1]===80&&bytes[2]===68&&bytes[3]===70);
+}
+async function remiPayroll1SavePdf(node){
+  node=node||{};
+  var pdf=node.pdf&&typeof node.pdf==='object'?node.pdf:node;
+  var b64=pdf.content_base64||node.content_base64||'';
+  var path=pdf.storage_path||node.storage_path||'';
+  var name=pdf.filename||node.pdf_filename||'payroll-report.pdf';
+  var bytes=b64?remiPayroll1PdfBytes(b64):null;
+  if(bytes&&typeof downloadBlob==='function'&&typeof Blob==='function'){
+    downloadBlob(new Blob([bytes],{type:'application/pdf'}), name);
+  }
+  if(path&&typeof sbSignPdfUrl==='function'){
+    try{
+      var signed=await sbSignPdfUrl(path);
+      if(signed&&signed.ok&&signed.url&&typeof window!=='undefined'&&window.open)window.open(signed.url,'_blank','noopener');
+    }catch(eSign){}
+  }
+  return {ok:!!(b64||path), pdf:remiPayroll1IsPdf(bytes), storage_path:path};
+}
+function remiPayroll1SaveCsv(node){
+  node=node||{};
+  var csv=node.csv&&typeof node.csv==='object'?node.csv:node;
+  var text=csv.csv_text||node.csv_text||'';
+  var name=csv.filename||node.csv_filename||node.filename||'payroll-report.csv';
+  if(!text)return {ok:false};
+  remiPayroll1DownloadText(text, name, 'text/csv;charset=utf-8');
+  return {ok:true, filename:name};
+}
+async function remiPayroll1Export(which){
+  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.'};
+  var kind=String(which||'both');
+  var name=kind==='csv'?'admin_export_remi_payroll_csv':(kind==='pdf'?'admin_export_remi_payroll_pdf':'admin_export_remi_payroll');
+  var got=await remiPayroll1Rpc(name, remiPayroll1DateBody());
+  if(!got||!got.ok){
+    remiPayroll1Error=(got&&got.error)||'Could not export the payroll report.';
+    remiPayroll1Paint();
+    return got||{ok:false};
+  }
+  var data=got.data||{};
+  var csvOk=false, pdfOk=false;
+  if(kind!=='pdf')csvOk=!!remiPayroll1SaveCsv(data).ok;
+  if(kind!=='csv')pdfOk=!!(await remiPayroll1SavePdf(data)).ok;
+  remiPayroll1Error='';
+  if(kind==='both')remiPayroll1Note=(csvOk&&pdfOk)?'CSV and PDF are ready.':(csvOk?'CSV is ready.':(pdfOk?'PDF is ready.':'Export returned no file.'));
+  else if(kind==='csv')remiPayroll1Note=csvOk?'CSV is ready.':'Export returned no CSV.';
+  else remiPayroll1Note=pdfOk?'PDF is ready.':'Export returned no PDF.';
+  remiPayroll1Paint();
+  return got;
+}
+function remiPayroll1JobExtra(job){
+  if(!remiPayroll1IsPayrollJob(job))return '';
+  job=job||{};
+  var next=job.next_run_label||job.next_run_display||'';
+  if(!next&&job.next_run_at)next=remiPayroll1FormatNext(job.next_run_at);
+  var anchor=remiPayroll1Mdy(job.anchor_date||'');
+  var html='';
+  if(next)html+='<p class="pay-next">Next run '+remiPayroll1Esc(next)+'</p>';
+  if(anchor)html+='<p class="remi-vis-hint">Anchor pay day '+remiPayroll1Esc(anchor)+' \u00B7 every '+(job.interval_days||14)+' days</p>';
+  html+='<div class="pay-actions">';
+  html+='<button type="button" class="go" id="remiPayroll1Open" onclick="remiPayroll1Show()">Open report</button>';
+  html+='<button type="button" class="alt" id="remiPayroll1Run" onclick="remiPayroll1Run()">Run</button>';
+  html+='</div>';
+  return html;
+}
+// end remi payroll1 v=remi-payroll1
 
 // remi proof1 v=remi-proof1
 // Receipts stay in this rail. Finalize is additive after admin_confirm_cover_send. Blast and confirm stay.
