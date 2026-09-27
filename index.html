@@ -42,6 +42,10 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi cm email 2026-09-27 v=remi-cm-email1 admin-build 2026-09-27-remi-cm-email1. GHOST-REMI-CM-EMAIL1-CONTRACT-v1. Ace NO SHIP. Remi Ask on the side rail drafts a case-manager email. Jasmine asks draft email for a client. Remi shows three chips: Declined service today/tomorrow, Declined backup, and Other. Declined backup uses admin_get_cover_refuse_template {}, admin_save_cover_refuse_template {p_subject,p_body}, and admin_preview_cover_refuse_email {p_open_shift_id}. Declined service and Other use admin_get_cover_client_skip_template {}, admin_save_cover_client_skip_template {p_body,p_subject}, and admin_preview_cover_client_skip_email {p_case_manager_name,p_client_name,p_service_date,p_reason_label}. Reason codes are personal, doctor, not_feeling_well, and other. Placeholders are {{greeting}} {{case_manager}} {{client}} {{date}} {{reason}} and optional {{case_manager_email}}. Greeting is the New York time of day and does not include the case manager name. To is case_manager_email from the client record. Dates people read are MM/DD/YYYY. Edit and Save write the org template. Copy copies the draft. Send is mailto to case_manager_email. Gmail send is later and out of scope. No new Ace RPC. No parallel template table. No Auth reseal. Remi stays the corner chip and the side rail (phone sheet, desktop right rail). No full-page Remi. Prior markers stay, including v=coverage-simple1, v=clienthrs1c, v=shift-slim1, and v=remi-notes1. -->
+<meta name="admin-build" content="2026-09-27-remi-cm-email1">
+<!-- remi face 2026-09-27 v=remiface1 admin-build 2026-09-27-remiface1. Locked Remi face is assets/remi-locked.png. Hair, normal eyes, no glow eyes, mint and blue digital. Every Admin Remi chip, rail, and face image uses that file. The corner chip stays. Nurse does not get Remi. No Auth reseal. Prior markers stay, including v=remi-cm-email1 and v=coverage-simple1. -->
+<meta name="admin-build" content="2026-09-27-remiface1">
 <!-- coverage simplify 2026-09-27 v=coverage-simple1 admin-build 2026-09-27-coverage-simple1. GHOST-COVERAGE-SIMPLE1-CONTRACT-v1. Ace CALLABLE. Coverage record stays admin_record_call_off and does not assign a covering aide. Who can cover on an open card sends one chat blast: admin_blast_cover_request(p_open_shift_id, p_aide_ids, p_address_mode area|full). That blast does not assign. An aide yes in Aide chat shows a Remi draft for Jasmine with the full street. Send is admin_confirm_cover_send(p_open_shift_id, p_backup_aide_id, p_slot_key, p_confirm_body optional). Send writes the chat, assigned_backup, and the Schedule day mark cover. A multi-slot day passes that board slot_key, for example pm. An unknown key passes default. Schedule shows Covered. Coverage does not ask for a manual Schedule step. The blast may stay Area only. The full street is on the confirm draft. cover1, coverpick, and refuse stay on the open-shift sheet. No SMS. No email. Remi stays the corner chip and the side rail. Phone-first. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=clienthrs1c, v=shift-slim1, v=isdash1b, v=clienthrs1b, and v=aidechat1. -->
 <meta name="admin-build" content="2026-09-27-coverage-simple1">
 <!-- schedule client hours 2026-09-27 v=clienthrs1c v=shift-slim1 admin-build 2026-09-27-clienthrs1c. UX pack v=shift-slim1. Multi-day Save is one upsert_schedule_slot_pattern_weekdays(p_client_id, p_weekdays int[] ISO 1=Mon…7=Sun, p_slot_key, p_usual_aide_id, p_hours, p_label, p_start_local, p_end_local, p_sort_order). Single-day edit stays upsert_schedule_slot_pattern. Day marks are missed|cover|on_hold via upsert_schedule_slot_day_mark; the UI does not write worked. Missed sends p_miss_reason client_declined|no_show|no_call|other and p_note when other. Covered shift is p_mark cover plus p_cover_aide_id. Per-slot On hold is p_mark on_hold. Hospital/ER client hold is upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date null=open, p_note, p_hold_id). End hold is clear_schedule_client_hold(p_hold_id, p_end_date). list_schedule_client_holds lists them. Week board stays list_schedule_week_slots and paints on_hold plus 0 hrs from the day mark or an active client hold (holds[], hold_*, miss_reason). Clear stays clear_schedule_slot_day_mark. Slim form: no Slot key, Label, or Order; Hours from Start–End; Edit shift | Add another; Su–Sa checks; desktop full-bleed week with the day drawer under the grid; phone week scrolls. Remi stays the side rail and corner chip. Dates are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=shift-slim1, v=isdash1b, v=isdash1, v=remi-notes1, and v=clienthrs1b. -->
@@ -667,12 +671,46 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_aidechat textarea{min-height:72px;}
 #copilotFab{position:fixed;z-index:150;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));width:72px;height:72px;min-height:72px;padding:0;border:0;border-radius:50%;background:transparent;color:#fff;font-family:'DM Sans',sans-serif;box-shadow:none;cursor:pointer;touch-action:manipulation;appearance:none;-webkit-appearance:none;overflow:visible;}
 #copilotFab[hidden]{display:none !important;}
-#copilotFab .remi-chip-face{display:block;width:72px;height:72px;border-radius:50%;object-fit:cover;background:transparent;box-shadow:0 8px 22px rgba(10,8,28,.45);pointer-events:none;}
+#copilotFab .remi-chip-face{display:block;width:72px;height:72px;border-radius:50%;object-fit:cover;background-color:transparent;background-image:url("assets/remi-locked.png?v=remiface1");background-size:cover;background-position:center;box-shadow:0 8px 22px rgba(10,8,28,.45);pointer-events:none;}
 #copilotFab .remi-chip-pill{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);background:rgba(16,10,36,.92);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.02em;line-height:1;border-radius:999px;padding:3px 8px;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.35);}
 #copilotSheet{position:fixed;z-index:160;inset:0;display:flex;flex-direction:column;background:var(--off);color:var(--navy);padding:max(10px,env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box;min-width:0;max-width:100%;overflow-x:hidden;touch-action:pan-y;}
 #copilotSheet[hidden]{display:none !important;}
 #copilotSheet .copilot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+#copilotSheet .copilot-id{display:flex;align-items:center;gap:8px;min-width:0;}
+#copilotSheet .remi-rail-face{width:40px;height:40px;min-width:40px;border-radius:50%;object-fit:cover;flex:0 0 40px;background-color:transparent;background-image:url("assets/remi-locked.png?v=remiface1");background-size:cover;background-position:center;}
+#copilotSheet .copilot-id h2{font-family:'DM Sans',sans-serif;font-size:1.25rem;font-weight:700;margin:0;line-height:1.1;}
+#copilotSheet .remi-rail-sub{margin:2px 0 0;font-size:0.75rem;font-weight:600;color:var(--muted);line-height:1.2;}
 #copilotSheet h2{font-family:'DM Sans',sans-serif;font-size:1.25rem;font-weight:700;margin:0;}
+/* v=remi-cm-email1 — Ask draft card. Phone-first. Side rail only. */
+.remi-cm{min-width:0;max-width:100%;}
+.remi-cm-label{font-size:0.72rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--teal-dark);margin:10px 0 6px;}
+.remi-cm-chips{display:flex;flex-direction:column;gap:8px;}
+.remi-cm-chip{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-height:48px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;touch-action:manipulation;}
+.remi-cm-chip strong{display:block;font-size:0.95rem;line-height:1.3;}
+.remi-cm-chip span{display:block;margin-top:2px;font-size:0.8rem;line-height:1.35;color:var(--muted);font-weight:600;}
+.remi-cm-chip.on{border-color:var(--teal);background:var(--teal-light);}
+.remi-cm-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px;min-width:0;max-width:100%;box-sizing:border-box;}
+.remi-cm-card.editing{border-color:var(--teal);}
+.remi-cm-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.remi-cm-pill{display:inline-flex;align-items:center;min-height:24px;padding:2px 8px;border-radius:999px;background:var(--teal-light);color:var(--teal-dark);font-size:0.68rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;}
+.remi-cm-card.editing .remi-cm-pill{background:#fff3e0;color:#9a3412;}
+.remi-cm-who{font-size:0.85rem;font-weight:700;color:var(--navy);min-width:0;}
+.remi-cm-saved{margin-left:auto;font-size:0.75rem;font-weight:700;color:var(--teal-dark);}
+.remi-cm-field{display:grid;grid-template-columns:4.6rem 1fr;gap:6px;align-items:start;padding:8px 0;border-top:1px solid var(--border);min-width:0;}
+.remi-cm-k{font-size:0.68rem;font-weight:800;letter-spacing:0.04em;color:var(--muted);padding-top:4px;}
+.remi-cm-v{font-size:0.9rem;line-height:1.4;color:var(--navy);white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;}
+.remi-cm-v small{display:block;color:var(--muted);font-size:0.75rem;font-weight:600;}
+#copilotSheet .remi-cm-v textarea,#copilotSheet textarea.remi-cm-other{min-height:72px;font-size:16px;width:100%;max-width:100%;}
+.remi-cm-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.remi-cm-actions .btn{flex:1 1 calc(50% - 8px);min-width:0;min-height:44px;justify-content:center;}
+.remi-cm-send{background:#fff;color:var(--navy);border:1px dashed var(--border);}
+.remi-cm-send:disabled{opacity:0.55;}
+.remi-cm-note{margin:8px 0 0;font-size:0.78rem;line-height:1.4;color:var(--muted);}
+.remi-cm-other{width:100%;max-width:100%;box-sizing:border-box;margin-top:6px;}
+@media(max-width:420px){
+  .remi-cm-field{grid-template-columns:1fr;}
+  .remi-cm-actions .btn{flex-basis:100%;}
+}
 #copilotBody{flex:1;min-height:0;min-width:0;max-width:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;overscroll-behavior-x:none;touch-action:pan-y;}
 .copilot-tabs{display:flex;gap:8px;margin:0 0 8px;min-width:0;max-width:100%;}
 .copilot-tab{flex:1 1 0;min-width:0;min-height:48px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;touch-action:manipulation;cursor:pointer;}
@@ -718,7 +756,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .copilot-quiet-times label{flex:1 1 9rem;min-width:0;max-width:100%;display:flex;flex-direction:column;gap:4px;font-size:0.85rem;font-weight:700;}
 #copilotSheet .copilot-quiet-times input{min-width:0;width:100%;max-width:100%;}
 @media(min-width:900px){
-  #copilotSheet{left:auto;width:min(440px,100%);box-shadow:-12px 0 30px rgba(26,39,68,.18);}
+  #copilotSheet{left:auto;right:0;width:min(440px,100vw);box-shadow:-12px 0 30px rgba(26,39,68,.18);}
 }
 /* v=remi-notes1 — Notes tab in the Remi phone sheet and desktop right rail. */
 #remiNotesDock[hidden],#remiNotesPicker[hidden],#remiNotesScrim[hidden],#remiNotesComposer[hidden],#remiNotesDoneFoot[hidden]{display:none !important;}
@@ -2501,10 +2539,16 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
     </div>
-    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-corner-chip.png?v=remi1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-cm-email1="v=remi-cm-email1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
-        <h2 id="copilotTitle">Remi</h2>
+        <div class="copilot-id">
+          <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
+          <div>
+            <h2 id="copilotTitle">Remi</h2>
+            <p class="remi-rail-sub">Side rail · not full page</p>
+          </div>
+        </div>
         <button type="button" class="btn btn-ghost" id="copilotCloseBtn" onclick="copilotClose()">Close</button>
       </div>
       <div class="copilot-tabs" role="tablist" aria-label="Remi">
@@ -7740,7 +7784,9 @@ function copilotPaintChat(){
   var html='<div class="copilot-thread" id="copilotThread" role="log" aria-live="polite">';
   copilotChat.forEach(function(msg, idx){
     var mine=msg.role==='mo';
-    html+='<div class="copilot-bubble '+(mine?'copilot-bubble-mo':'copilot-bubble-remi')+'">'+copilotChatHtml(msg.text||'');
+    html+='<div class="copilot-bubble '+(mine?'copilot-bubble-mo':'copilot-bubble-remi')+'">';
+    if(!mine&&msg.cm&&typeof remiCmHtml==='function')html+=remiCmHtml(msg.cm, idx);
+    else html+=copilotChatHtml(msg.text||'');
     if(!mine&&msg.actions&&msg.actions.length){
       html+='<div class="copilot-actions'+(msg.actionsLayout==='row'?' copilot-actions-row':'')+'">';
       msg.actions.forEach(function(a, ai){
@@ -7790,7 +7836,7 @@ function copilotChatSubmit(ev){
   var ans=(noted&&noted.answer)?noted.answer:copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
   copilotChat.push({role:'mo', text:q});
-  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||''});
+  copilotChat.push({role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null});
   copilotPaintChat();
   if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
   else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
@@ -7838,7 +7884,8 @@ function remiSecPack(text, extra){
     widerIntent:extra.widerIntent||'',
     mailFamily:extra.mailFamily||'',
     mailReason:extra.mailReason||'',
-    mailOther:extra.mailOther||''
+    mailOther:extra.mailOther||'',
+    cm:extra.cm||null
   };
 }
 function remiSecNorm(s){
@@ -10332,8 +10379,488 @@ function remiAskAnswer(q){
   if(/\bbroadcast status\b|\bstatus of (?:the )?broadcast\b|\bis there a broadcast\b|\bany broadcast\b/.test(s))return remiAskPack(remiAskBroadcast());
   return null;
 }
+// v=remi-cm-email1 side-rail CM email. Reuses cover refuse and client-skip template RPCs. No new Ace RPC.
+// v=remiface1 locked face is assets/remi-locked.png (normal eyes, no glow).
+var REMI_CM_EMAIL1_MARKER='v=remi-cm-email1';
+var REMIFACE1_MARKER='v=remiface1';
+var REMI_FACE_SRC='assets/remi-locked.png?v=remiface1';
+var REMI_CM_REASONS=[
+  {code:'personal', label:'Personal', fill:'personal reasons'},
+  {code:'doctor', label:'Doctor appointment', fill:'a doctor appointment'},
+  {code:'not_feeling_well', label:'Not feeling well', fill:'not feeling well'}
+];
+function remiCmEsc(s){
+  return (typeof copilotEsc==='function')?copilotEsc(s):String(s==null?'':s);
+}
+function remiCmEmailIsAsk(q){
+  var s=String(q||'').toLowerCase();
+  if(!/\be-?mail\b/.test(s))return false;
+  if(/\b(draft|write|compose)\b/.test(s))return true;
+  if(/\bcm email\b/.test(s))return true;
+  if(/\bcase[- ]manager email\b/.test(s)&&/\b(draft|write|for|about)\b/.test(s))return true;
+  return false;
+}
+function remiCmWho(q){
+  var s=String(q||'').replace(/[?.!]+$/,'');
+  var m=s.match(/\b(?:for|about)\s+(.+)$/i);
+  var who=m?String(m[1]||''):'';
+  who=who.replace(/\b(today|tomorrow|please|the|a|an|case manager|case-manager|email|e-mail|cm|draft)\b/ig,' ');
+  who=who.replace(/[^A-Za-z'\-\s]/g,' ').replace(/\s+/g,' ').trim();
+  return who;
+}
+function remiCmDisplayName(row){
+  if(!row)return '';
+  var name=String(row.name||row.clientName||'').trim();
+  if(!name)name=[row.firstName||row.first_name, row.lastName||row.last_name].filter(Boolean).join(' ').trim();
+  return name;
+}
+function remiCmHit(who, name){
+  if(typeof remiSecNameHit==='function')return remiSecNameHit(who, name);
+  var q=String(who||'').toLowerCase().trim();
+  var n=String(name||'').toLowerCase().trim();
+  if(!q||!n)return false;
+  return n===q||n.indexOf(q)>=0;
+}
+function remiCmFields(row){
+  row=row||{};
+  var cm=String(row.caseManagerName||row.case_manager_name||'').trim();
+  var email=String(row.caseManagerEmail||row.case_manager_email||'').trim();
+  if(row.case_manager&&typeof row.case_manager==='object'){
+    if(!cm)cm=String(row.case_manager.name||row.case_manager.case_manager_name||'').trim();
+    if(!email)email=String(row.case_manager.email||row.case_manager.case_manager_email||'').trim();
+  }
+  return {cm:cm, email:email};
+}
+function remiCmPool(){
+  var out=[];
+  function add(row){if(row&&remiCmDisplayName(row))out.push(row);}
+  var clients=[];
+  try{clients=(typeof allClients!=='undefined'&&allClients)?allClients:[];}catch(e){clients=[];}
+  clients.forEach(add);
+  var week=[];
+  try{week=(typeof schedWeekRows!=='undefined'&&schedWeekRows)?schedWeekRows:[];}catch(e2){week=[];}
+  week.forEach(add);
+  var shifts=[];
+  try{shifts=(typeof coverShifts!=='undefined'&&coverShifts)?coverShifts:[];}catch(e3){shifts=[];}
+  shifts.forEach(function(s){
+    if(!s)return;
+    add({
+      id:s.clientId||s.client_id||'',
+      name:s.clientName,
+      case_manager_name:s.caseManagerName||s.case_manager_name||'',
+      case_manager_email:s.caseManagerEmail||s.case_manager_email||'',
+      _shift:s
+    });
+  });
+  return out;
+}
+function remiCmMatch(who){
+  var hits=[];
+  var seen={};
+  remiCmPool().forEach(function(row){
+    var name=remiCmDisplayName(row);
+    var key=name.toLowerCase();
+    if(!name||seen[key])return;
+    if(remiCmHit(who, name)){seen[key]=1;hits.push(row);}
+  });
+  return hits;
+}
+function remiCmOpenShift(cm){
+  var list=[];
+  try{list=(typeof coverShifts!=='undefined'&&coverShifts)?coverShifts:[];}catch(e){list=[];}
+  var id=String(cm&&cm.clientId||'');
+  var name=String(cm&&cm.client||'').trim().toLowerCase();
+  for(var i=0;i<list.length;i++){
+    var s=list[i];
+    if(!s)continue;
+    if(id&&String(s.clientId||s.client_id||'')===id)return s;
+    if(name&&String(s.clientName||'').trim().toLowerCase()===name)return s;
+  }
+  return null;
+}
+function remiCmService(shift){
+  var iso='';
+  if(shift&&(shift.startsAt||shift.shift_start)){
+    iso=(typeof coverNyYmd==='function')?coverNyYmd(shift.startsAt||shift.shift_start):'';
+  }
+  if(!iso&&typeof coverNyYmd==='function')iso=coverNyYmd(new Date());
+  var shown=(typeof formatAdminDate==='function')?(formatAdminDate(iso)||''):'';
+  if(!shown&&iso&&String(iso).length>=10)shown=String(iso).slice(5,7)+'/'+String(iso).slice(8,10)+'/'+String(iso).slice(0,4);
+  return {iso:String(iso||''), shown:shown};
+}
+function remiCmClientPack(row){
+  var fields=remiCmFields(row);
+  var name=remiCmDisplayName(row);
+  var shift=row&&row._shift?row._shift:remiCmOpenShift({clientId:String(row&&(row.id||row.clientId||row.client_id)||''), client:name});
+  var when=remiCmService(shift);
+  return {
+    step:'picker',
+    client:name||'Client',
+    clientId:String(row&&(row.id||row.clientId||row.client_id)||(shift&&(shift.clientId||shift.client_id))||''),
+    cm:fields.cm,
+    email:fields.email,
+    serviceIso:when.iso,
+    serviceShown:when.shown,
+    shiftId:shift?String(shift.id||''):'',
+    family:'',
+    reasonCode:'',
+    reasonLabel:'',
+    reasonFill:'',
+    subject:'',
+    body:'',
+    greeting:'',
+    editing:false,
+    saved:false,
+    stub:false,
+    saveNote:''
+  };
+}
+function remiCmEmailAnswer(q){
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
+  if(!remiCmEmailIsAsk(q))return null;
+  var who=remiCmWho(q);
+  if(!who)return remiSecPack('Which client is this case-manager email for? Say draft email for the client name.', {sec:true});
+  var hits=remiCmMatch(who);
+  if(!hits.length)return remiSecPack('I do not have '+who+' loaded on this desk. Open Clients and ask again. Nothing was drafted.', {sec:true});
+  if(hits.length>1){
+    var names=hits.slice(0,4).map(remiCmDisplayName).join(', ');
+    return remiSecPack('More than one client matches. Say the full name. '+names, {sec:true});
+  }
+  var pack=remiCmClientPack(hits[0]);
+  var toBits=pack.cm||'case manager';
+  if(pack.email)toBits+=' \u00B7 '+pack.email;
+  var lead='Got it \u2014 CM email for '+pack.client+' (To: '+(pack.cm||'case manager')+' from client record). Which situation for '+pack.client+'? I will fill To from the client record ('+toBits+') and draft the email.';
+  pack.lead=lead;
+  return remiSecPack(lead, {sec:true, cm:pack});
+}
+function remiCmMsg(idx){
+  var msg=(typeof copilotChat!=='undefined'&&copilotChat)?copilotChat[idx]:null;
+  if(!msg||!msg.cm)return null;
+  return msg;
+}
+function remiCmLongDate(text, iso, shown){
+  if(!iso||!shown)return String(text||'');
+  var m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(!m)return String(text||'');
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var month=months[Number(m[2])-1];
+  if(!month)return String(text||'');
+  var day=String(Number(m[3]));
+  var long1=month+' '+day+', '+m[1];
+  var long2=month+' '+m[3]+', '+m[1];
+  return String(text||'').split(long1).join(shown).split(long2).join(shown);
+}
+function remiCmGreetingOnly(body, greet, cm){
+  var raw=String(body||'');
+  var g=String(greet||'');
+  if(!g)return raw;
+  var lines=raw.split('\n');
+  var first=lines[0]||'';
+  if(first.toLowerCase().indexOf(g.toLowerCase())!==0)return raw;
+  var rest=first.slice(g.length).trim();
+  var cmName=String(cm||'').trim();
+  if(rest&&cmName&&rest.toLowerCase().indexOf(cmName.toLowerCase())===0){
+    lines[0]=g;
+    return lines.join('\n');
+  }
+  return raw;
+}
+function remiCmCtx(cm){
+  var greet=cm.greeting||((typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning');
+  return {
+    greeting:greet,
+    case_manager:cm.cm||'',
+    cm:cm.cm||'',
+    client:cm.client||'',
+    date:cm.serviceShown||'',
+    email:cm.email||'',
+    case_manager_email:cm.email||'',
+    reason:cm.reasonFill||cm.reasonLabel||''
+  };
+}
+async function remiCmFetch(cm){
+  var family=cm.family==='refuse'?'refuse':'skip';
+  var reason=String(cm.reasonFill||cm.reasonLabel||'');
+  var shift=remiCmOpenShift(cm);
+  var mail=null;
+  var stub=false;
+  if(typeof coverRpc==='function'){
+    if(family==='skip'){
+      var preview=null;
+      try{
+        preview=await coverRpc('skipPreview', {
+          p_case_manager_name:String(cm.cm||''),
+          p_client_name:String(cm.client||''),
+          p_service_date:String(cm.serviceIso||''),
+          p_reason_label:reason
+        });
+      }catch(e1){preview=null;}
+      if(preview&&preview.ok&&typeof coverMailPayload==='function')mail=coverMailPayload(preview.data);
+      if(!mail){
+        var tmpl=null;
+        try{tmpl=await coverRpc('skipGet', (typeof coverTplGetBody==='function')?coverTplGetBody():{});}catch(e2){tmpl=null;}
+        if(tmpl&&tmpl.ok&&typeof coverMailPayload==='function')mail=coverMailPayload(tmpl.data);
+      }
+    }else{
+      var openId=shift&&typeof coverUuidOrNull==='function'?coverUuidOrNull(shift.id):'';
+      if(openId){
+        var prev=null;
+        try{prev=await coverRpc('preview', {p_open_shift_id:String(openId)});}catch(e3){prev=null;}
+        if(prev&&prev.ok&&typeof coverMailPayload==='function')mail=coverMailPayload(prev.data);
+      }
+      if(!mail){
+        var got=null;
+        try{got=await coverRpc('tplGet', (typeof coverTplGetBody==='function')?coverTplGetBody():{});}catch(e4){got=null;}
+        if(got&&got.ok&&typeof coverMailPayload==='function')mail=coverMailPayload(got.data);
+      }
+    }
+  }
+  if(!mail){
+    stub=true;
+    mail=family==='skip'
+      ?{subject:'Services not delivered today \u2014 {{client}} ({{date}})', body:(typeof COVER_CM_SKIP_DEFAULT!=='undefined'?COVER_CM_SKIP_DEFAULT:'{{greeting}}\n\n{{client}} {{date}} {{reason}}')}
+      :{subject:'Services not delivered today \u2014 {{client}} ({{date}})', body:(typeof COVER_CM_DEFAULT!=='undefined'?COVER_CM_DEFAULT:'{{greeting}}\n\n{{client}} {{date}}')};
+  }
+  var greet=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
+  var ctx=remiCmCtx(Object.assign({}, cm, {greeting:greet, reasonFill:reason}));
+  var subject=String(mail.subject||'');
+  var body=String(mail.body||'');
+  if(/\{\{/.test(subject+body)&&typeof coverFillCmTemplate==='function'){
+    subject=coverFillCmTemplate(subject, ctx);
+    body=coverFillCmTemplate(body, ctx);
+  }
+  if(typeof formatAdminDateCopy==='function'){
+    subject=formatAdminDateCopy(subject);
+    body=formatAdminDateCopy(body);
+  }
+  subject=remiCmLongDate(subject, cm.serviceIso, cm.serviceShown);
+  body=remiCmLongDate(body, cm.serviceIso, cm.serviceShown);
+  if(typeof coverEnsureGreeting==='function')body=coverEnsureGreeting(body);
+  body=remiCmGreetingOnly(body, greet, cm.cm);
+  var email=String(cm.email||mail.email||'');
+  return {subject:subject, body:body, greeting:greet, stub:stub, email:email};
+}
+function remiCmPlain(cm){
+  var who=cm.client||'this client';
+  if(cm.step==='picker')return cm.lead||('CM email for '+who+'. Choose declined service, declined backup, or other.');
+  if(cm.step==='reasons')return 'Declined service for '+who+'. Reason codes are personal, doctor, or not feeling well.';
+  if(cm.step==='other')return 'Other reason for '+who+'. Type it and I will finish the draft.';
+  if(cm.step==='loading')return 'Pulling the case-manager draft for '+who+'.';
+  var kind=cm.family==='refuse'?'Declined backup':'Declined service';
+  if(cm.reasonCode==='other')kind='Other';
+  return kind+' draft for '+who+'.\n'+(cm.subject||'')+'\n\n'+(cm.body||'');
+}
+async function remiCmBeginDraft(idx, cm){
+  var msg=remiCmMsg(idx);
+  if(!msg)return;
+  msg.cm=Object.assign({}, cm, {step:'loading', lead:'Pulling the case-manager draft\u2026'});
+  msg.text=remiCmPlain(msg.cm);
+  if(typeof copilotPaintChat==='function')copilotPaintChat();
+  var filled=null;
+  try{filled=await remiCmFetch(msg.cm);}catch(e){filled=null;}
+  msg=remiCmMsg(idx);
+  if(!msg)return;
+  var next=Object.assign({}, cm, filled||{}, {step:'draft', editing:false, saved:false});
+  if(filled&&filled.email)next.email=filled.email;
+  var picked=next.family==='refuse'?'Declined backup':'Declined service';
+  if(next.reasonCode==='other')picked='Other';
+  var why=next.reasonFill||next.reasonLabel||'';
+  next.lead='You picked '+picked+(why?' \u00B7 reason '+why:'')+'.';
+  msg.cm=next;
+  msg.text=remiCmPlain(next);
+  if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();
+}
+function remiCmPick(idx, kind){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  if(kind==='service'){
+    msg.cm=Object.assign({}, msg.cm, {step:'reasons', family:'skip', lead:'You picked Declined service today / tomorrow. Which reason?'});
+    msg.text=remiCmPlain(msg.cm);
+    if(typeof copilotPaintChat==='function')copilotPaintChat();
+    return;
+  }
+  if(kind==='backup'){
+    remiCmBeginDraft(idx, Object.assign({}, msg.cm, {family:'refuse', reasonCode:'', reasonLabel:'', reasonFill:''}));
+    return;
+  }
+  if(kind==='other'){
+    msg.cm=Object.assign({}, msg.cm, {step:'other', family:'skip', reasonCode:'other', lead:'You picked Other \u2014 type the reason and I will finish the draft.'});
+    msg.text=remiCmPlain(msg.cm);
+    if(typeof copilotPaintChat==='function')copilotPaintChat();
+  }
+}
+function remiCmReason(idx, code){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  var hit=null;
+  for(var i=0;i<REMI_CM_REASONS.length;i++){
+    if(REMI_CM_REASONS[i].code===code)hit=REMI_CM_REASONS[i];
+  }
+  if(!hit)return;
+  remiCmBeginDraft(idx, Object.assign({}, msg.cm, {family:'skip', reasonCode:hit.code, reasonLabel:hit.label, reasonFill:hit.fill}));
+}
+function remiCmFinishOther(idx){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  var el=null;
+  try{el=document.getElementById('remiCmOther');}catch(e){el=null;}
+  var typed=el?String(el.value||'').trim():'';
+  if(!typed){
+    if(typeof showTempMsg==='function')showTempMsg('Type the reason first.','var(--warn)');
+    return;
+  }
+  remiCmBeginDraft(idx, Object.assign({}, msg.cm, {family:'skip', reasonCode:'other', reasonLabel:typed, reasonFill:typed}));
+}
+function remiCmRead(idx){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  var sub=null;
+  var body=null;
+  try{sub=document.getElementById('remiCmSubject');}catch(e1){sub=null;}
+  try{body=document.getElementById('remiCmBody');}catch(e2){body=null;}
+  if(sub)msg.cm.subject=String(sub.value||'');
+  if(body)msg.cm.body=String(body.value||'');
+}
+function remiCmEdit(idx){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  if(msg.cm.editing)remiCmRead(idx);
+  msg.cm.editing=!msg.cm.editing;
+  msg.cm.step='draft';
+  if(typeof copilotPaintChat==='function')copilotPaintChat();
+}
+async function remiCmSave(idx){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  remiCmRead(idx);
+  var cm=msg.cm;
+  var ctx=remiCmCtx(cm);
+  var subject=(typeof coverUnfillCmTemplate==='function')?coverUnfillCmTemplate(cm.subject, ctx):String(cm.subject||'');
+  var body=(typeof coverUnfillCmTemplate==='function')?coverUnfillCmTemplate(cm.body, ctx):String(cm.body||'');
+  var got=null;
+  try{
+    if(cm.family==='refuse')got=await coverRpc('tplSave', (typeof coverTplSaveBody==='function')?coverTplSaveBody(subject, body):{p_subject:subject, p_body:body});
+    else got=await coverRpc('skipSave', (typeof coverSkipSaveBody==='function')?coverSkipSaveBody(subject, body):{p_subject:subject, p_body:body});
+  }catch(err){
+    got={ok:false, error:String(err&&err.message||err||'Could not save the template.')};
+  }
+  if(got&&got.ok){
+    cm.saved=true;
+    cm.saveNote='Saved as my template';
+    if(typeof showTempMsg==='function')showTempMsg('Saved as my template.','var(--success)');
+  }else if(got&&got.signedOut){
+    cm.saved=false;
+    cm.saveNote='Sign in to save this template. Nothing was stored on this phone.';
+    if(typeof showTempMsg==='function')showTempMsg(cm.saveNote,'var(--warn)');
+  }else if(got&&got.missing){
+    cm.saved=false;
+    cm.saveNote='That template is not live yet. Nothing was stored on this phone.';
+    if(typeof showTempMsg==='function')showTempMsg(cm.saveNote,'var(--warn)');
+  }else{
+    cm.saved=false;
+    cm.saveNote=(got&&got.error)||'The template was not saved.';
+    if(typeof showTempMsg==='function')showTempMsg(cm.saveNote,'var(--danger)');
+  }
+  msg.text=remiCmPlain(cm);
+  if(typeof copilotPaintChat==='function')copilotPaintChat();
+}
+function remiCmCopyFallback(text){
+  var area=document.createElement('textarea');
+  area.value=text;
+  area.setAttribute('readonly','');
+  area.style.position='fixed';
+  area.style.left='-9999px';
+  document.body.appendChild(area);
+  area.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(area);
+}
+function remiCmCopy(idx){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  remiCmRead(idx);
+  var text=String(msg.cm.subject||'')+'\n\n'+String(msg.cm.body||'');
+  function done(){if(typeof showTempMsg==='function')showTempMsg('Copied.','var(--success)');}
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){remiCmCopyFallback(text);done();});
+      return;
+    }
+  }catch(e){}
+  remiCmCopyFallback(text);
+  done();
+}
+function remiCmSend(idx){
+  var msg=remiCmMsg(idx);
+  if(!msg||!msg.cm)return;
+  remiCmRead(idx);
+  var email=String(msg.cm.email||'').trim();
+  if(!(typeof coverEmailOk==='function'?coverEmailOk(email):/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))){
+    if(typeof showTempMsg==='function')showTempMsg('Case manager email is not on file. Send stays off. Gmail is later.','var(--warn)');
+    return;
+  }
+  var href=(typeof coverMailHref==='function')?coverMailHref(email, msg.cm.subject, msg.cm.body):'';
+  if(!href){
+    if(typeof showTempMsg==='function')showTempMsg('Send stays off until the case manager email is on file.','var(--warn)');
+    return;
+  }
+  if(typeof coverGo==='function')coverGo(href);
+}
+function remiCmHtml(cm, idx){
+  cm=cm||{};
+  var html='<div class="remi-cm" data-remi-cm-email1="v=remi-cm-email1">';
+  html+=(typeof copilotChatHtml==='function')?copilotChatHtml(cm.lead||''):remiCmEsc(cm.lead||'');
+  if(cm.step==='picker'){
+    html+='<div class="remi-cm-label">Choose one</div><div class="remi-cm-chips">';
+    html+='<button type="button" class="remi-cm-chip" data-remi-cm="service" onclick="remiCmPick('+idx+',\'service\')"><strong>Declined service today / tomorrow</strong><span>Personal \u00B7 doctor appointment \u00B7 not feeling well</span></button>';
+    html+='<button type="button" class="remi-cm-chip" data-remi-cm="backup" onclick="remiCmPick('+idx+',\'backup\')"><strong>Declined backup</strong><span>Wait for regular aide next service day</span></button>';
+    html+='<button type="button" class="remi-cm-chip" data-remi-cm="other" onclick="remiCmPick('+idx+',\'other\')"><strong>Other</strong><span>You type the reason \u00B7 Remi finishes the draft</span></button>';
+    html+='</div>';
+  }else if(cm.step==='reasons'){
+    html+='<div class="remi-cm-label">Choose one</div><div class="remi-cm-chips">';
+    REMI_CM_REASONS.forEach(function(r){
+      html+='<button type="button" class="remi-cm-chip" data-reason-code="'+remiCmEsc(r.code)+'" onclick="remiCmReason('+idx+',\''+r.code+'\')"><strong>'+remiCmEsc(r.label)+'</strong><span>'+remiCmEsc(r.code)+'</span></button>';
+    });
+    html+='</div>';
+  }else if(cm.step==='other'){
+    html+='<div class="remi-cm-card"><div class="remi-cm-label">Your reason</div>';
+    html+='<textarea id="remiCmOther" class="remi-cm-other" maxlength="400" placeholder="Type the reason" aria-label="Your reason"></textarea>';
+    html+='<div class="remi-cm-actions"><button type="button" class="btn btn-teal" onclick="remiCmFinishOther('+idx+')">Finish draft</button></div></div>';
+  }else if(cm.step==='draft'){
+    var editing=!!cm.editing;
+    var emailOk=(typeof coverEmailOk==='function')?coverEmailOk(cm.email):false;
+    html+='<div class="remi-cm-card'+(editing?' editing':'')+'" data-reason-code="'+remiCmEsc(cm.reasonCode||'')+'" data-family="'+(cm.family==='refuse'?'refuse':'skip')+'">';
+    html+='<div class="remi-cm-head"><span class="remi-cm-pill">'+(editing?'Editing':'Draft')+'</span><span class="remi-cm-who">CM email \u00B7 '+remiCmEsc(cm.client||'')+'</span>';
+    if(cm.saved)html+='<span class="remi-cm-saved">\u2713 Saved as my template</span>';
+    html+='</div>';
+    html+='<div class="remi-cm-field"><div class="remi-cm-k">To</div><div class="remi-cm-v">'+remiCmEsc(cm.cm||'Case manager')+'<small>'+remiCmEsc(cm.email||'No case manager email on file')+' \u00B7 from client record</small></div></div>';
+    html+='<div class="remi-cm-field"><div class="remi-cm-k">Subject</div><div class="remi-cm-v">';
+    if(editing)html+='<textarea id="remiCmSubject" aria-label="Subject">'+remiCmEsc(cm.subject||'')+'</textarea>';
+    else html+=remiCmEsc(cm.subject||'');
+    html+='</div></div>';
+    html+='<div class="remi-cm-field"><div class="remi-cm-k">Body</div><div class="remi-cm-v">';
+    if(editing)html+='<textarea id="remiCmBody" aria-label="Body">'+remiCmEsc(cm.body||'')+'</textarea>';
+    else html+=remiCmEsc(cm.body||'');
+    html+='</div></div>';
+    html+='<div class="remi-cm-actions">';
+    html+='<button type="button" class="btn btn-ghost" onclick="remiCmEdit('+idx+')">'+(editing?'Done':'Edit')+'</button>';
+    html+='<button type="button" class="btn btn-teal" onclick="remiCmSave('+idx+')">Save</button>';
+    html+='<button type="button" class="btn btn-ghost" onclick="remiCmCopy('+idx+')">Copy</button>';
+    html+='<button type="button" class="btn remi-cm-send" onclick="remiCmSend('+idx+')"'+(emailOk?'':' disabled')+'>Send</button>';
+    html+='</div>';
+    html+='<p class="remi-cm-note"><strong>Copy</strong> + <strong>Save</strong> ready now. Save remembers the org template wording. <strong>Send</strong> is mailto to the case manager email. Gmail is later.</p>';
+    if(cm.saveNote&&!cm.saved)html+='<p class="remi-cm-note">'+remiCmEsc(cm.saveNote)+'</p>';
+    html+='</div>';
+  }
+  html+='</div>';
+  return html;
+}
 function remiSecAnswer(q){
   if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
+  if(typeof remiCmEmailAnswer==='function'){
+    var cmMail=remiCmEmailAnswer(q);
+    if(cmMail)return cmMail;
+  }
   if(typeof remiWiderAnswer==='function'){
     var widerFirst=remiWiderAnswer(q);
     if(widerFirst)return widerFirst;

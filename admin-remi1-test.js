@@ -32,7 +32,7 @@ const admin = html.slice(html.indexOf('id="adminScreen"'), nurseAt);
 assert.ok(admin.includes('aria-label="Remi"'), 'chip aria-label is Remi');
 assert.ok(admin.includes('class="remi-chip-pill">Remi</span>'), 'chip pill says Remi');
 assert.ok(admin.includes('id="copilotTitle">Remi</h2>'), 'sheet title is Remi');
-assert.ok(admin.includes('assets/remi-corner-chip.png?v=remi1'), 'chip face is the circular portrait');
+assert.ok(admin.includes('assets/remi-locked.png?v=remiface1'), 'chip face is the locked Remi portrait');
 assert.ok(admin.includes('data-layout-roles="Admin Scheduler"') && admin.includes('id="copilotFab"'), 'Remi is Admin and Scheduler');
 assert.ok(!admin.includes('>Co-pilot<'), 'Admin screen has no Co-pilot label');
 assert.ok(html.includes("title.textContent='Remi'"), 'radar paints the Remi title');
@@ -43,7 +43,7 @@ assert.ok(!script.includes('Co-pilot'), 'desk AI copy says Remi');
 assert.ok(script.includes('admin_log_copilot_choice') && script.includes('admin_list_radar_signals') && script.includes('admin_get_quiet_hours'), 'brain RPC names stay');
 assert.ok(!/reset_aide_temp_password|auth\.updateUser|admin_create_aide/.test(script.slice(0, script.indexOf('// Live Ace office RPCs'))), 'Remi desk does not reseal Auth');
 assert.ok(html.includes('#copilotFab .remi-chip-face') && html.includes('background:transparent'), 'chip face is the image, not a solid fill');
-assert.ok(fs.existsSync(path.join(__dirname, 'assets/remi-corner-chip.png')), 'chip png is in assets');
+assert.ok(fs.existsSync(path.join(__dirname, 'assets/remi-locked.png')), 'locked Remi png is in assets');
 
 function loadPuppeteer(){
   try{return require('puppeteer-core');}
@@ -146,7 +146,7 @@ async function runBrowser(){
     assert.ok(desk.viewW <= 400, 'phone width');
     assert.strictEqual(desk.label, 'Remi');
     assert.strictEqual(desk.pillText, 'Remi');
-    assert.ok(desk.src.indexOf('remi-corner-chip.png') >= 0, desk.src);
+    assert.ok(desk.src.indexOf('remi-locked.png') >= 0, desk.src);
     assert.strictEqual(desk.sheetHidden, true, 'desk does not auto-open Remi');
     assert.ok(desk.natural.w >= 64 && desk.natural.h >= 64, 'chip image loaded');
     assert.ok(inside(desk.fab, {left:0, top:0, right:desk.viewW, bottom:desk.viewH}), 'chip is on the phone');
@@ -168,17 +168,28 @@ async function runBrowser(){
         var p = ctx.getImageData(x, y, 1, 1).data;
         return {r:p[0], g:p[1], b:p[2], a:p[3]};
       }
-      var spots = [at(w/2, Math.round(h*0.18)), at(Math.round(w*0.22), Math.round(h*0.30)), at(Math.round(w*0.78), Math.round(h*0.42)), at(w/2, Math.round(h*0.78))];
+      var spots = [at(w/2, Math.round(h*0.42)), at(Math.round(w*0.42), Math.round(h*0.48)), at(Math.round(w*0.58), Math.round(h*0.48)), at(w/2, Math.round(h*0.62))];
       var white = 0;
-      var neon = 0;
+      var mint = 0;
+      var glow = 0;
       spots.forEach(function(p){
         if(p.a > 200 && p.r > 235 && p.g > 235 && p.b > 235)white++;
-        if(p.a > 200 && (p.b > 80 || p.r > 90) && !(p.r > 235 && p.g > 235 && p.b > 235))neon++;
+        if(p.a > 200 && p.g > 70 && p.b > 50 && p.g + 15 > p.r)mint++;
+        if(p.a > 200 && p.r > 220 && p.g > 220 && p.b > 200 && p.g > p.b)glow++;
       });
-      return {spots:spots, white:white, neon:neon};
+      var step = Math.max(4, Math.round(w / 40));
+      var mintPx = 0;
+      for(var y = 0; y < h; y += step){
+        for(var x = 0; x < w; x += step){
+          var q = at(x, y);
+          if(q.a > 200 && q.g > 80 && q.b > 50 && q.g > q.r)mintPx++;
+        }
+      }
+      return {spots:spots, white:white, mint:mint, glow:glow, mintPx:mintPx};
     });
     assert.strictEqual(pixels.white, 0, 'chip samples are not a white wipe ' + JSON.stringify(pixels.spots));
-    assert.ok(pixels.neon >= 3, 'chip keeps the neon city colors ' + JSON.stringify(pixels.spots));
+    assert.strictEqual(pixels.glow, 0, 'locked face has no glow eyes ' + JSON.stringify(pixels.spots));
+    assert.ok(pixels.mintPx > 8, 'locked face keeps mint digital color ' + pixels.mintPx);
     await page.screenshot({path: path.join(shotDir, 'remi1-desk-chip.png')});
 
     await page.click('#copilotFab');
