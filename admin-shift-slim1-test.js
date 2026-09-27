@@ -10,22 +10,30 @@ const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
 assert.ok(html.includes('v=shift-slim1'), 'shift-slim1 marker');
 assert.ok(html.includes('data-shift-slim1="v=shift-slim1"'), 'shift-slim1 data attr');
-assert.ok(html.includes('admin-build 2026-09-27-shift-slim1'), 'shift-slim1 build note');
-assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-shift-slim1">'), 'shift-slim1 meta');
+assert.ok(html.includes('admin-build 2026-09-27-clienthrs1c'), 'clienthrs1c build note');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-clienthrs1c">'), 'clienthrs1c meta');
+assert.ok(html.includes('<!-- schedule client hours 2026-09-27 v=clienthrs1c v=shift-slim1 admin-build 2026-09-27-clienthrs1c'), 'clienthrs1c comment keeps the UX pack name');
+assert.ok(html.includes('admin-build 2026-09-27-shift-slim1'), 'shift-slim1 build note stays');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-shift-slim1">'), 'shift-slim1 meta stays');
 assert.ok(html.includes('<!-- schedule slim edit 2026-09-27 v=shift-slim1 admin-build 2026-09-27-shift-slim1'), 'shift-slim1 comment');
+assert.ok(html.includes("var CLIENTHRS1C_MARKER='v=clienthrs1c'"), 'clienthrs1c script marker');
 assert.ok(html.includes("var SHIFT_SLIM1_MARKER='v=shift-slim1'"), 'shift-slim1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-shift-slim1'), 'first admin-build is shift-slim1');
-['2026-09-26-isdash1b','2026-09-26-isdash1','2026-09-26-remi-notes1','2026-09-26-clienthrs1b','2026-09-26-clienthrs1a'].forEach(function(meta){
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-clienthrs1c'), 'first admin-build is clienthrs1c');
+['2026-09-27-shift-slim1','2026-09-26-isdash1b','2026-09-26-isdash1','2026-09-26-remi-notes1','2026-09-26-clienthrs1b','2026-09-26-clienthrs1a'].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="'+meta+'">'), 'prior meta stays '+meta);
 });
+assert.ok(html.indexOf('content="2026-09-27-clienthrs1c"') < html.indexOf('content="2026-09-27-shift-slim1"'), 'shift-slim1 stays below clienthrs1c');
 assert.ok(html.indexOf('content="2026-09-27-shift-slim1"') < html.indexOf('content="2026-09-26-isdash1b"'), 'isdash1b stays below shift-slim1');
 assert.ok(html.includes('No full-page Remi'), 'no full-page Remi');
 assert.ok(html.includes('id="copilotFab"'), 'Remi corner chip stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page tab');
-assert.strictEqual(html.split('TODO(Ace shift-slim1 hospital hold)').length - 1, 1, 'one hospital-hold TODO');
-assert.ok(html.includes('upsert_schedule_hospital_hold(p_client_id uuid, p_start_date date, p_end_date date|null, p_note text)'), 'TODO names the Ace hold args');
-assert.ok(html.includes('end_schedule_hospital_hold(p_client_id uuid, p_end_date date)'), 'TODO names end hold');
+assert.ok(!html.includes('TODO(Ace shift-slim1 hospital hold)'), 'hospital hold TODO is replaced by the live callable');
+assert.ok(html.includes("sbRestRpc('upsert_schedule_slot_pattern_weekdays'"), 'multi-day save uses the weekdays callable');
+assert.ok(html.includes("sbRestRpc('upsert_schedule_client_hold'"), 'client hold callable');
+assert.ok(html.includes("sbRestRpc('clear_schedule_client_hold'"), 'end hold callable');
+assert.ok(html.includes("sbRestRpc('list_schedule_client_holds'"), 'list holds callable');
+assert.ok(html.includes('p_miss_reason'), 'missed reason arg');
 
 const form = html.slice(html.indexOf('id="schedSlotModeEdit"'), html.indexOf('class="sched-slim-keep"'));
 assert.ok(!form.includes('Slot key'), 'slot key is not on the slim form');
@@ -130,6 +138,7 @@ const sandbox = {
 vm.createContext(sandbox);
 vm.runInContext(schedSrc + '\n' + slotSrc, sandbox);
 
+assert.strictEqual(sandbox.CLIENTHRS1C_MARKER, 'v=clienthrs1c');
 assert.strictEqual(sandbox.SHIFT_SLIM1_MARKER, 'v=shift-slim1');
 assert.strictEqual(sandbox.schedHoursBetween('08:00:00', '17:00:00'), 9);
 assert.strictEqual(sandbox.schedHoursBetween('17:00', '21:00'), 4);
@@ -185,17 +194,33 @@ sandbox.schedSlotEditKey = '';
 sandbox.schedSlotEditWeekday = 0;
 rpc.length = 0;
 await sandbox.schedSaveSlotPattern();
-const saves = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_pattern'; });
-assert.strictEqual(saves.length, 4, 'one save fans out to the checked days');
-assert.deepStrictEqual(saves.map(function(c){ return c.body.p_weekday; }), [1, 2, 3, 4]);
-saves.forEach(function(c){
-  assert.strictEqual(c.body.p_hours, 9);
-  assert.strictEqual(c.body.p_start_local, '08:00:00');
-  assert.strictEqual(c.body.p_end_local, '17:00:00');
-  assert.strictEqual(c.body.p_label, 'Morning');
-  assert.strictEqual(c.body.p_slot_key, 's1');
-  assert.strictEqual(c.body.p_client_id, ada);
-});
+const fan = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_pattern'; });
+assert.strictEqual(fan.length, 0, 'multi-check save does not N-call the single upsert');
+const saves = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_pattern_weekdays'; });
+assert.strictEqual(saves.length, 1, 'one save is one weekdays call');
+assert.strictEqual(JSON.stringify(saves[0].body.p_weekdays), JSON.stringify([1, 2, 3, 4]));
+assert.strictEqual(saves[0].body.p_hours, 9);
+assert.strictEqual(saves[0].body.p_start_local, '08:00:00');
+assert.strictEqual(saves[0].body.p_end_local, '17:00:00');
+assert.strictEqual(saves[0].body.p_label, 'Morning');
+assert.strictEqual(saves[0].body.p_slot_key, 's1');
+assert.strictEqual(saves[0].body.p_client_id, ada);
+
+pressed[2] = false;
+pressed[3] = false;
+pressed[4] = false;
+sandbox.schedSlotFormMode = 'edit';
+sandbox.schedSlotEditKey = 's1';
+sandbox.schedSlotEditWeekday = 1;
+els.schedSlotKey.value = 's1';
+rpc.length = 0;
+await sandbox.schedSaveSlotPattern();
+const single = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_pattern'; });
+const again = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_pattern_weekdays'; });
+assert.strictEqual(again.length, 0, 'a one-day edit does not use the weekdays callable');
+assert.strictEqual(single.length, 1, 'a one-day edit uses the single upsert');
+assert.strictEqual(single[0].body.p_weekday, 1);
+assert.strictEqual(single[0].body.p_slot_key, 's1');
 
 function slot(on, mark, note){
   return {
@@ -248,22 +273,44 @@ sandbox.schedSlotSelected = {clientId: ada, onDate: '2026-09-07', weekday: 1};
 await sandbox.schedSaveMissed(ada, '2026-09-07', 'am');
 const miss = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_day_mark'; }).pop();
 assert.strictEqual(miss.body.p_mark, 'missed');
-assert.strictEqual(miss.body.p_note, 'Other: family asked');
+assert.strictEqual(miss.body.p_miss_reason, 'other');
+assert.strictEqual(miss.body.p_note, 'family asked');
 assert.strictEqual(miss.body.p_hours, 0);
+assert.ok(!rpc.some(function(c){ return c.body && c.body.p_mark === 'worked'; }), 'missed save does not write worked');
 
 els['schedHoldStart-am'] = {value: '09/10/2026'};
 els['schedHoldEnd-am'] = {value: ''};
 els['schedHoldNote-am'] = {value: 'ER'};
 sandbox.schedApplySlotWeek(holdWeek);
+const holdSlot = sandbox.schedFindSlotClient(ada).days['4'].slots[0];
+holdSlot.hold_id = '99999999-9999-4999-8999-999999999999';
+holdSlot.on_hold = true;
+rpc.length = 0;
+await sandbox.schedWriteHold(ada, '2026-09-10', 'am', false);
+const listed = rpc.filter(function(c){ return c.name === 'list_schedule_client_holds'; });
+const clientHold = rpc.filter(function(c){ return c.name === 'upsert_schedule_client_hold'; });
+const slotHold = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_day_mark'; });
+assert.ok(listed.length >= 1, 'save lists client holds');
+assert.strictEqual(listed[0].body.p_client_id, ada);
+assert.strictEqual(clientHold.length, 1, 'hospital hold is one client-hold upsert');
+assert.strictEqual(clientHold[0].body.p_start_date, '2026-09-10');
+assert.strictEqual(clientHold[0].body.p_end_date, null);
+assert.strictEqual(clientHold[0].body.p_note, 'ER');
+assert.strictEqual(clientHold[0].body.p_hold_id, holdSlot.hold_id);
+assert.strictEqual(slotHold.length, 1, 'the tapped slot is marked on_hold');
+assert.strictEqual(slotHold[0].body.p_mark, 'on_hold');
+assert.strictEqual(slotHold[0].body.p_hours, 0);
+assert.strictEqual(slotHold[0].body.p_slot_key, 'am');
+
+sandbox.schedApplySlotWeek(holdWeek);
+sandbox.schedFindSlotClient(ada).days['4'].slots[0].hold_id = holdSlot.hold_id;
 rpc.length = 0;
 await sandbox.schedWriteHold(ada, '2026-09-10', 'am', true);
-const holdWrites = rpc.filter(function(c){ return c.name === 'upsert_schedule_slot_day_mark'; });
-const holdClears = rpc.filter(function(c){ return c.name === 'clear_schedule_slot_day_mark'; });
-assert.ok(holdWrites.length >= 1, 'end hold still stores the range');
-assert.ok(holdWrites.every(function(c){ return c.body.p_mark === 'missed' && c.body.p_hours === 0 && String(c.body.p_note).indexOf('onhold|') === 0; }));
-assert.ok(String(holdWrites[0].body.p_note).indexOf('end=2026-09-10') >= 0, 'end hold fills the end date');
-assert.ok(holdClears.length >= 1, 'days after the end date resume');
-assert.ok(holdClears.every(function(c){ return c.body.p_on_date > '2026-09-10'; }));
+const ended = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
+assert.strictEqual(ended.length, 1, 'end hold clears the client hold');
+assert.strictEqual(ended[0].body.p_hold_id, holdSlot.hold_id);
+assert.strictEqual(ended[0].body.p_end_date, '2026-09-10');
+assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_slot_pattern'; }), 'end hold does not rewrite patterns');
 
 async function shots(){
   if(process.env.SKIP_BROWSER === '1')return;
@@ -358,7 +405,7 @@ async function shots(){
         sheetHidden: document.getElementById('copilotSheet').hidden
       };
     });
-    assert.strictEqual(phoneProbe.build, '2026-09-27-shift-slim1');
+    assert.strictEqual(phoneProbe.build, '2026-09-27-clienthrs1c');
     assert.strictEqual(phoneProbe.viewW, 390);
     assert.ok(phoneProbe.scroll > phoneProbe.client + 40, 'phone week scrolls');
     assert.strictEqual(phoneProbe.checks, 7);
@@ -391,11 +438,14 @@ async function shots(){
     await phone.screenshot({path: path.join(outDir, 'shift-slim1-marks-phone.png')});
     await phone.evaluate(function(adaId){
       var on = '2026-09-10';
-      var note = schedFormatHoldNote('2026-09-10', '', 'ER');
       var client = schedFindSlotClient(adaId);
-      client.days['4'].slots[0].mark = 'missed';
-      client.days['4'].slots[0].note = note;
+      client.days['4'].on_hold = true;
+      client.days['4'].hold_id = '99999999-9999-4999-8999-999999999999';
+      client.days['4'].slots[0].mark = 'on_hold';
+      client.days['4'].slots[0].on_hold = true;
+      client.days['4'].slots[0].hold_id = client.days['4'].hold_id;
       client.days['4'].slots[0].hours = 0;
+      client.holds = [{hold_id: client.days['4'].hold_id, start_date: '2026-09-10', end_date: '', note: 'ER', open_ended: true}];
       schedSelectSlotDay(adaId, on, 4, 'am');
       document.getElementById('schedScroll').scrollIntoView({block: 'start'});
     }, adaId);
