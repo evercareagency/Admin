@@ -17,7 +17,8 @@ assert.ok(html.includes("var CANCEL_SHIFT1_MARKER='cancel-shift1'"), 'cancel scr
 assert.ok(html.includes('GHOST-NOSVC-REASON-DRAFT1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-tabbar-8'), 'first admin-build is tabbar-8');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1'), 'first admin-build is remi-float-hide1');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
 assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
 assert.ok(html.indexOf('content="2026-09-27-cover-card-cancel1"') < html.indexOf('content="2026-09-27-nosvc-reason-draft1"'), 'nosvc-reason-draft1 stays after cover-card-cancel1');
 assert.ok(html.indexOf('content="2026-09-27-nosvc-reason-draft1"') < html.indexOf('content="2026-09-27-cover-unselect1"'), 'cover-unselect1 stays after nosvc-reason-draft1');
@@ -246,7 +247,7 @@ async function runBrowser(){
         fullPage: !!document.getElementById('tab_remi')
       };
     });
-    assert.strictEqual(personal.build, '2026-09-27-tabbar-8');
+    assert.strictEqual(personal.build, '2026-09-27-remi-float-hide1');
     assert.strictEqual(personal.marker, 'v=nosvc-reason-draft1');
     assert.ok(/Side rail/.test(personal.sub), personal.sub);
     assert.strictEqual(personal.kicker, 'After you talk to the client');

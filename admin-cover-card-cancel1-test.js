@@ -32,9 +32,10 @@ assert.ok(html.includes("var COVER_CARD_CANCEL1_MARKER='v=cover-card-cancel1'"),
 assert.ok(html.includes('GHOST-COVER-CARD-CANCEL1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-tabbar-8'), 'first admin-build is tabbar-8');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1'), 'first admin-build is remi-float-hide1');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
 assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
-['2026-09-27-nosvc-reason-draft1','2026-09-27-cover-unselect1','2026-09-27-remi-payroll1','2026-09-27-client-ins1','2026-09-27-remi-ideas763','2026-09-27-coverage-simple1','2026-09-27-clienthrs1c','2026-09-26-clienthrs1b','2026-09-25-aidechat1','2026-09-25-coverpick1','2026-09-25-cover1'].forEach(function(meta){
+['2026-09-27-remi-float-hide1','2026-09-27-tabbar-8','2026-09-27-nosvc-reason-draft1','2026-09-27-cover-unselect1','2026-09-27-remi-payroll1','2026-09-27-client-ins1','2026-09-27-remi-ideas763','2026-09-27-coverage-simple1','2026-09-27-clienthrs1c','2026-09-26-clienthrs1b','2026-09-25-aidechat1','2026-09-25-coverpick1','2026-09-25-cover1'].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="' + meta + '">'), 'prior meta stays ' + meta);
 });
 assert.ok(html.indexOf('content="2026-09-27-cover-card-cancel1"') < html.indexOf('content="2026-09-27-nosvc-reason-draft1"'), 'nosvc-reason-draft1 stays after this tip');
@@ -308,7 +309,7 @@ async function runBrowser(){
     assert.strictEqual(card.name, true);
     assert.strictEqual(card.date, '09/27/2026');
     assert.strictEqual(card.outcomeHidden, true);
-    assert.strictEqual(card.build, '2026-09-27-tabbar-8');
+    assert.strictEqual(card.build, '2026-09-27-remi-float-hide1');
     await page.screenshot({path: path.join(shotDir, 'cover-card-cancel1-phone-card.png'), fullPage: true});
     await page.setViewport({width: 1280, height: 800, isMobile: true, hasTouch: true, deviceScaleFactor: 1});
     await page.screenshot({path: path.join(shotDir, 'cover-card-cancel1-desktop-card.png'), fullPage: true});
