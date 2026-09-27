@@ -30,7 +30,7 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-isdash1">'
 assert.ok(html.includes('<!-- inservice compliance dashboard 2026-09-26 v=isdash1 admin-build 2026-09-26-isdash1'), 'isdash1 comment');
 assert.ok(html.includes("var ISDASH1_MARKER='v=isdash1'"), 'isdash1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-payroll1'), 'isdash1b is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-langs1'), 'isdash1b is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-remi-notes1">'), 'remi-notes1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1b">'), 'clienthrs1b meta stays');
 assert.ok(html.includes('v=remi-notes1') && html.includes('v=clienthrs1b'), 'prior markers stay');
