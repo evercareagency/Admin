@@ -13,7 +13,7 @@ assert.ok(html.includes('<!-- web push public key 2026-09-27 v=vapid1 admin-buil
 assert.ok(html.includes('Ace CALLABLE keys live'), 'Ace CALLABLE keys live');
 assert.ok(html.includes("var VAPID1_MARKER='v=vapid1'"), 'vapid1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-vapid1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-proof1'), 'first admin-build is vapid1');
 assert.ok(html.indexOf('content="2026-09-27-vapid1"') < html.indexOf('content="2026-09-27-clienthrs1d"'), 'clienthrs1d stays after this tip');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-clienthrs1d">'), 'clienthrs1d meta stays');
 assert.ok(html.includes('id="notifVapid"'), 'vapid banner');
@@ -96,7 +96,7 @@ async function runBrowser(){
         prior: CLIENTHRS1D_MARKER
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-vapid1');
+    assert.strictEqual(boot.first, '2026-09-27-remi-proof1');
     assert.strictEqual(boot.marker, 'v=vapid1');
     assert.strictEqual(boot.prior, 'v=clienthrs1d');
 
