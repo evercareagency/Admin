@@ -12,7 +12,7 @@ assert.ok(html.includes('data-clienthrs1d="v=clienthrs1d"'), 'clienthrs1d data a
 assert.ok(html.includes('<!-- client hours notifications 2026-09-27 v=clienthrs1d admin-build 2026-09-27-clienthrs1d'), 'clienthrs1d comment');
 assert.ok(html.includes("var CLIENTHRS1D_MARKER='v=clienthrs1d'"), 'clienthrs1d script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-cover-card-cancel1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-tabbar-8'), 'first admin-build is vapid1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-clienthrs1d">'), 'clienthrs1d meta stays');
 assert.ok(html.indexOf('content="2026-09-27-clienthrs1d"') < html.indexOf('content="2026-09-27-remi-cm-email1"'), 'remi-cm-email1 stays after this tip');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-cm-email1">'), 'remi-cm-email1 meta stays');
@@ -121,9 +121,9 @@ async function runBrowser(){
         chip: document.querySelector('#copilotFab img').getAttribute('src')
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-cover-card-cancel1');
-    assert.strictEqual(boot.second, '2026-09-27-nosvc-reason-draft1');
-    assert.strictEqual(boot.third, '2026-09-27-cover-unselect1');
+    assert.strictEqual(boot.first, '2026-09-27-tabbar-8');
+    assert.strictEqual(boot.second, '2026-09-27-cover-card-cancel1');
+    assert.strictEqual(boot.third, '2026-09-27-nosvc-reason-draft1');
     assert.strictEqual(boot.marker, 'v=clienthrs1d');
     assert.ok(boot.chip.indexOf('remi-locked.png') >= 0, boot.chip);
 

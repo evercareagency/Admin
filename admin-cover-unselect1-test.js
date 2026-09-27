@@ -33,7 +33,8 @@ assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callab
 assert.ok(html.includes('No SQL'), 'no SQL');
 assert.ok(html.includes('No Quo/SMS') && html.includes('No Auth reseal'), 'hard rules');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-cover-card-cancel1'), 'first admin-build is cover-card-cancel1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-tabbar-8'), 'first admin-build is tabbar-8');
+assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
 assert.ok(html.indexOf('content="2026-09-27-cover-card-cancel1"') < html.indexOf('content="2026-09-27-nosvc-reason-draft1"'), 'nosvc-reason-draft1 stays after cover-card-cancel1');
 assert.ok(html.indexOf('content="2026-09-27-nosvc-reason-draft1"') < html.indexOf('content="2026-09-27-cover-unselect1"'), 'cover-unselect1 stays after nosvc-reason-draft1');
 assert.ok(html.indexOf('content="2026-09-27-cover-unselect1"') < html.indexOf('content="2026-09-27-remi-payroll1"'), 'payroll stays after cover-unselect1');
@@ -273,7 +274,7 @@ async function runBrowser(){
     assert.strictEqual(selected.unselectRight, true, 'Unselect all sits to the right of Select all active');
     assert.strictEqual(selected.clipped, false, 'pick-bar labels stay inside the modal ' + JSON.stringify(selected));
     assert.strictEqual(selected.open, true);
-    assert.strictEqual(selected.build, '2026-09-27-cover-card-cancel1');
+    assert.strictEqual(selected.build, '2026-09-27-tabbar-8');
     await shot(page, 'cover-unselect1-phone-20-selected.png');
     await page.setViewport({width: 1280, height: 900, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await shot(page, 'cover-unselect1-desktop-20-selected.png');

@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- tab bar cap 8 2026-09-27 v=tabbar-8 admin-build 2026-09-27-tabbar-8. GHOST-TABBAR-8-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Bottom nav shows up to 8 primary tabs plus More. More stays pinned on the right and still lists the remaining tabs plus Edit tabs. Edit tabs selects and orders up to 8 on the bar. Cap copy is Up to 8 on the bar and Bar full (8/8). A 9th pin is blocked until one moves to More. MAX_BAR_TABS is 8. The previous bar was 5 slots with More pinned (4 primary). Prefs stay the same localStorage evercare_nav_tabs {v:1, slots} keyed by the signed-in admin id or email. Empty storage still opens on the layoutA1 set. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi rail is unchanged. Dates people read are MM/DD/YYYY. Prior markers stay, including v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=navedit1, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-27-tabbar-8">
 <!-- cover card cancel 2026-09-27 v=cover-card-cancel1 admin-build 2026-09-27-cover-card-cancel1. GHOST-COVER-CARD-CANCEL1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Coverage open-shift card actions are Who can cover, Text client, and Cancel on the card itself. Cancel does not open Member-called or the no-service detail panel. Cancel posts admin_cancel_noservice_shift {p_client_id, p_service_date MM/DD/YYYY, p_open_shift_id, p_reason_code optional}. A blank reason stays the server personal default. On cancelled true or next close_panel the card is dismissed and Schedule refreshes from deep_link. Reuse only. No new SQL. No second cancel RPC. No Auth reseal. No Quo/SMS. Remi rail is N/A for this card. Who can cover, Text client, coverage-simple1 blast, cover-unselect1, and nosvc-reason-draft1 + cancel-shift1 stay. Do not touch remi-float-hide1 or remi-langs1. Dates people read are MM/DD/YYYY. Prior markers stay, including v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=clienthrs1d, v=clienthrs1c, v=remi-cm-email1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-cover-card-cancel1">
 <!-- nosvc reason draft 2026-09-27 v=nosvc-reason-draft1 cancel-shift1 admin-build 2026-09-27-nosvc-reason-draft1. GHOST-NOSVC-REASON-DRAFT1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Side rail After you talk to the client / Member called / no service today. On every reason chip change (Personal, Doctor appointment, Not feeling well, Other) this desk calls admin_preview_noservice_cm_draft with p_client_id, p_service_date as MM/DD/YYYY, p_reason_code, and p_reason_other when Other. It paints subject and body from that response. chips[] selected is the live chip. It does not cache the first preview. {{reason}} follows the chip. Cancel shift is the far-right white outline of the five outcomes and calls admin_cancel_noservice_shift with p_client_id, p_service_date, optional p_open_shift_id, and p_reason_code. On cancelled true or next close_panel the Member-called panel closes and Schedule refreshes from deep_link. Mailto To is case_manager_email. Gmail send is later and out of scope. No Quo/SMS. No Auth reseal. Nurse is denied (42501 / is_scheduler_office). admin_preview_cover_client_skip_email, admin_get_cover_client_skip_template, admin_record_client_skip, admin_cover_outcome, and upsert_schedule_slot_day_mark stay unchanged. Do not touch aide-text-chat1 or remi-langs1. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=eca-copilot1, v=covercomms1, v=remi-cm-email1, and v=coverage-simple1. -->
@@ -441,12 +443,17 @@ textarea{resize:vertical;min-height:80px;}
 #adminScreen .bottom-tab{position:relative;flex:1 1 0;min-width:0;appearance:none;-webkit-appearance:none;border:0;border-left:0;border-radius:0;background:transparent;color:var(--navy);font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.62rem;line-height:1.15;letter-spacing:-0.01em;min-height:58px;padding:6px 2px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;white-space:normal;overflow-wrap:anywhere;text-align:center;}
 #adminScreen .bottom-tab .nav-badge{margin-left:0;position:absolute;top:4px;right:4px;}
 #adminScreen .bottom-tab .ni{font-size:1.05rem;width:auto;line-height:1;}
-#adminScreen .bottom-tab.active{background:var(--teal-light);color:var(--teal-dark);}
+#adminScreen .bottom-tab.active{background:var(--teal-light);color:var(--teal-dark);box-shadow:inset 0 2px 0 var(--teal);}
 #adminScreen .bottom-tab[hidden]{display:none !important;}
+/* v=tabbar-8 — 8 primary tabs + More. Tighten labels so nine slots stay on screen. */
+#adminScreen .bottom-nav.is-tight .bottom-tab{font-size:8px;letter-spacing:-0.05em;padding:3px 0 4px;line-height:1.05;gap:1px;white-space:nowrap;overflow:hidden;}
+#adminScreen .bottom-nav.is-tight .bottom-tab .ni{font-size:14px;}
 #adminScreen .main-content{margin-left:0;padding:16px 14px calc(78px + env(safe-area-inset-bottom,0px));}
 @media(min-width:900px){
   #adminScreen .main-content{margin-left:auto;margin-right:auto;padding:22px 28px calc(78px + env(safe-area-inset-bottom,0px));max-width:1100px;}
   #adminScreen .bottom-tab{font-size:0.78rem;min-height:64px;flex-direction:row;gap:6px;}
+  #adminScreen .bottom-nav.is-tight .bottom-tab{flex-direction:column;font-size:11px;letter-spacing:-0.03em;gap:2px;min-height:64px;padding:6px 1px;white-space:nowrap;}
+  #adminScreen .bottom-nav.is-tight .bottom-tab .ni{font-size:15px;}
 }
 #tab_timesheets .stats-grid.stats-slim{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;}
 #tab_timesheets .ts-sheet{display:none;}
@@ -521,21 +528,34 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .nav-edit-actions{display:flex;gap:8px;margin-bottom:12px;}
 .nav-edit-actions .btn{flex:1;min-height:48px;justify-content:center;font-size:1rem;font-weight:700;border-radius:12px;}
 .nav-edit-hint{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
-.nav-edit-label{font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
-.nav-edit-bottom{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.nav-edit-cap{margin:0 0 12px;background:var(--teal-light);border:1px solid #b7d9d9;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--teal-dark);font-weight:600;line-height:1.4;}
+.nav-edit-cap-chip{display:inline-block;margin-top:6px;background:#fff;border:1px solid var(--teal);color:var(--teal-dark);font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;}
+.nav-edit-cap-chip.is-full{border-color:var(--teal-dark);}
+.nav-edit-label{display:flex;justify-content:space-between;align-items:center;font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
+.nav-edit-count{color:var(--teal-dark);background:var(--teal-light);padding:2px 8px;border-radius:999px;letter-spacing:0;text-transform:none;font-weight:800;}
+.nav-edit-bottom{display:flex;flex-direction:row;flex-wrap:nowrap;gap:0;margin-bottom:14px;max-width:100%;min-width:0;}
+.nav-edit-rows{flex:1 1 auto;min-width:0;width:100%;display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
 .nav-edit-slot,.nav-edit-choice{font-family:'DM Sans',sans-serif;color:var(--navy);touch-action:manipulation;user-select:none;-webkit-user-select:none;}
-.nav-edit-slot{flex:1 1 4.75rem;min-width:4.75rem;max-width:100%;box-sizing:border-box;min-height:72px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-weight:700;font-size:0.62rem;line-height:1.15;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;text-align:center;overflow-wrap:anywhere;}
-.nav-edit-slot .ni{font-size:1.05rem;line-height:1;}
-.nav-edit-slot .nav-edit-name{display:block;max-width:100%;overflow-wrap:anywhere;white-space:normal;}
-.nav-edit-slot.is-lock{cursor:default;background:#f4f7fb;color:var(--muted);border-style:dashed;}
-.nav-edit-pin{display:block;font-size:0.56rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--teal-dark);}
-.nav-edit-slot.is-picked,.nav-edit-choice.is-picked{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);box-shadow:0 0 0 2px var(--teal);}
-.nav-edit-slot.is-fresh,.nav-edit-choice.is-fresh{border-color:var(--teal);background:var(--teal-light);box-shadow:0 0 0 2px var(--teal);}
-.nav-edit-pool{display:flex;flex-direction:column;gap:8px;max-width:100%;min-width:0;}
-.nav-edit-choice{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:48px;display:flex;flex-direction:row;align-items:center;gap:10px;text-align:left;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-weight:700;font-size:0.95rem;cursor:pointer;overflow-wrap:anywhere;}
-.nav-edit-choice .ni{font-size:1.05rem;width:1.45rem;text-align:center;flex-shrink:0;}
+.nav-edit-slot{width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:48px;border:0;border-bottom:1px solid var(--border);border-radius:0;background:#fff;font-weight:700;font-size:0.95rem;line-height:1.2;padding:10px 12px;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;cursor:pointer;text-align:left;}
+.nav-edit-slot:last-child{border-bottom:0;}
+.nav-edit-slot .ni{font-size:15px;line-height:1;width:22px;text-align:center;flex-shrink:0;}
+.nav-edit-slot .nav-edit-name{display:block;flex:1;min-width:0;text-align:left;white-space:normal;}
+.nav-edit-handle{color:#b0bccf;font-size:16px;flex-shrink:0;width:16px;}
+.nav-edit-act{margin-left:auto;font-family:inherit;font-size:11px;font-weight:700;border-radius:7px;padding:5px 8px;border:1px solid var(--border);background:var(--off);color:var(--muted);cursor:pointer;flex-shrink:0;}
+.nav-edit-act.is-off{color:var(--warn);border-color:#f0c9a0;background:#fff7ee;}
+.nav-edit-act.is-add{color:var(--teal-dark);border-color:#b7d9d9;background:var(--teal-light);}
+.nav-edit-act.is-disabled,.nav-edit-act:disabled{opacity:.45;text-decoration:line-through;pointer-events:none;cursor:default;}
+.nav-edit-slot.is-lock{cursor:default;background:#f4f7fb;color:var(--muted);}
+.nav-edit-pin{display:block;font-size:0.56rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--teal-dark);margin-left:auto;}
+.nav-edit-slot.is-picked,.nav-edit-choice.is-picked{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);box-shadow:inset 3px 0 0 var(--teal);}
+.nav-edit-slot.is-fresh,.nav-edit-choice.is-fresh{border-color:var(--teal);background:var(--teal-light);box-shadow:inset 3px 0 0 var(--teal);}
+.nav-edit-pool{display:flex;flex-direction:column;gap:0;max-width:100%;min-width:0;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.nav-edit-choice{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:48px;display:flex;flex-direction:row;align-items:center;gap:10px;text-align:left;background:#fff;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:10px 12px;font-weight:700;font-size:0.95rem;cursor:pointer;}
+.nav-edit-choice:last-child{border-bottom:0;}
+.nav-edit-choice .ni{font-size:15px;width:22px;text-align:center;flex-shrink:0;}
+.nav-edit-choice .nav-edit-name{flex:1;min-width:0;}
 @media(min-width:900px){
-  .nav-edit-slot{font-size:0.72rem;min-height:76px;flex-direction:column;}
+  .nav-edit-slot,.nav-edit-choice{font-size:0.95rem;min-height:48px;flex-direction:row;}
 }
 .bak-cards{display:flex;flex-direction:column;gap:10px;}
 .bak-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;}
@@ -2073,7 +2093,7 @@ bindLoginKeyboard();
         </div>
       </div>
     </header>
-    <nav class="bottom-nav" aria-label="Admin">
+    <nav class="bottom-nav" aria-label="Admin" data-tabbar-8="v=tabbar-8">
       <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
@@ -2150,16 +2170,17 @@ bindLoginKeyboard();
         </div>
         <div id="navEditPanel" class="nav-edit" hidden>
           <div class="nav-edit-inner">
-            <h2 class="nav-edit-title">Edit tabs</h2>
+            <h2 class="nav-edit-title">Customize bar</h2>
             <div class="nav-edit-actions">
               <button type="button" class="btn btn-ghost" id="navEditCancel" onclick="navEditCancel()">Cancel</button>
               <button type="button" class="btn btn-teal" id="navEditDone" onclick="navEditSave()">Save</button>
             </div>
-            <p id="navEditHint" class="nav-edit-hint" aria-live="polite">Tap a bottom tab, then tap what should replace it. More stays on the right.</p>
-            <div class="nav-edit-label">Bottom</div>
-            <div id="navEditBottom" class="nav-edit-bottom" role="list" aria-label="Bottom tabs"></div>
-            <div class="nav-edit-label">In More</div>
-            <div id="navEditPool" class="nav-edit-pool" role="list" aria-label="More items"></div>
+            <p id="navEditCap" class="nav-edit-cap" role="status">Up to <strong>8</strong> on the bar. Up to 8 tabs on the bottom bar · rest stay in More. <span id="navEditCapChip" class="nav-edit-cap-chip">4/8</span></p>
+            <p id="navEditHint" class="nav-edit-hint" aria-live="polite">Up to 8 on the bar. Tap a bottom tab, then tap what should replace it. More stays on the right.</p>
+            <div class="nav-edit-label">On the bar <span id="navEditBottomCount" class="nav-edit-count">4/8</span></div>
+            <div id="navEditBottom" class="nav-edit-bottom" role="list" aria-label="On the bar"></div>
+            <div class="nav-edit-label">In More <span class="nav-edit-count">overflow</span></div>
+            <div id="navEditPool" class="nav-edit-pool" role="list" aria-label="In More"></div>
           </div>
         </div>
         <div class="more-list" id="moreList">
@@ -4485,13 +4506,14 @@ var NAV_EDIT_META={
   coverage:{label:'Coverage',icon:'🗺️',short:''},
   clients:{label:'Clients',icon:'🏠',short:''},
   nurse:{label:'Nurse',icon:'🩺',short:''},
-  inservices:{label:'Inservices',icon:'📚',short:''},
+  inservices:{label:'Inservices',icon:'📚',short:'',tight:'In-svc'},
   broadcast:{label:'Broadcast Alert',icon:'📢',short:'Broadcast'},
   links:{label:'Links',icon:'🔗',short:''},
   activity:{label:'Activity Log',icon:'📜',short:'Activity'},
   aidechat:{label:'Aide chat',icon:'💬',short:'Chat'},
   notifications:{label:'Notifications',icon:'🔔',short:'Alerts'}
 };
+var MAX_BAR_TABS=8;
 var navEditDraft=null;
 var navEditPick='';
 var navEditNote='';
@@ -4518,8 +4540,9 @@ function navEditRoleOk(tab){
 function navEditSanitize(slots){
   var used={};
   var out=[];
+  var cap=(typeof MAX_BAR_TABS==='number'&&MAX_BAR_TABS>0)?MAX_BAR_TABS:8;
   function push(id){
-    if(out.length>=4)return;
+    if(out.length>=cap)return;
     id=String(id||'');
     if(!id||used[id]||id==='more'||id==='settings')return;
     if(!navEditRoleOk(id))return;
@@ -4527,9 +4550,18 @@ function navEditSanitize(slots){
     out.push(id);
   }
   (slots||[]).forEach(push);
-  navEditDefaults().forEach(push);
-  navEditCatalog().forEach(push);
-  return out.slice(0,4);
+  var floor=navEditDefaults().length;
+  if(out.length<floor){
+    navEditDefaults().forEach(function(id){
+      if(out.length>=floor)return;
+      push(id);
+    });
+    navEditCatalog().forEach(function(id){
+      if(out.length>=floor)return;
+      push(id);
+    });
+  }
+  return out.slice(0, cap);
 }
 function navEditPool(slots){
   var on={};
@@ -4618,10 +4650,12 @@ function navEditIsBottom(tab){
   if(navEditCatalog().indexOf(tab)>=0)return 'more';
   return null;
 }
-function navEditSetLabel(el, id, bottom){
+function navEditSetLabel(el, id, bottom, crowded){
   var meta=NAV_EDIT_META[id];
   if(!el||!meta)return;
-  var text=(bottom&&meta.short)?meta.short:meta.label;
+  var text=meta.label;
+  if(bottom&&crowded&&meta.tight)text=meta.tight;
+  else if(bottom&&meta.short)text=meta.short;
   var icon=el.querySelector?el.querySelector('.ni'):null;
   var node=icon?icon.nextSibling:null;
   while(node&&node.nodeType!==3)node=node.nextSibling;
@@ -4641,6 +4675,9 @@ function navEditApply(){
   var account=list.querySelector('.more-account');
   var more=document.getElementById('nav_more');
   var slots=navEditCurrent();
+  var crowded=slots.length>=6;
+  if(crowded)bottom.classList.add('is-tight');
+  else bottom.classList.remove('is-tight');
   var on={};
   slots.forEach(function(id){on[id]=1;});
   slots.forEach(function(id){
@@ -4648,7 +4685,7 @@ function navEditApply(){
     if(!el)return;
     el.classList.add('nav-item','bottom-tab');
     el.classList.remove('more-row');
-    navEditSetLabel(el, id, true);
+    navEditSetLabel(el, id, true, crowded);
     bottom.insertBefore(el, more||null);
   });
   if(more){
@@ -4683,25 +4720,56 @@ function navEditApply(){
     if(pnav)pnav.classList.add('active');
   }
 }
-function navEditChoice(id, where){
+function navEditChoice(id, where, opts){
+  opts=opts||{};
   var meta=NAV_EDIT_META[id]||{label:id,icon:'•',short:''};
-  var btn=document.createElement('button');
-  btn.type='button';
+  var btn=document.createElement('div');
+  btn.setAttribute('role','listitem');
   var cls=where==='bottom'?'nav-edit-slot':'nav-edit-choice';
   if(navEditPick===id)cls+=' is-picked';
   if(navEditFresh[id])cls+=' is-fresh';
   btn.className=cls;
   btn.setAttribute('data-nav-id', id);
   btn.setAttribute('aria-pressed', navEditPick===id?'true':'false');
+  var handle=document.createElement('span');
+  handle.className='nav-edit-handle';
+  handle.setAttribute('aria-hidden','true');
+  handle.textContent='⠿';
   var icon=document.createElement('span');
   icon.className='ni';
   icon.textContent=meta.icon||'';
   var name=document.createElement('span');
   name.className='nav-edit-name';
-  name.textContent=(where==='bottom'&&meta.short)?meta.short:meta.label;
+  name.textContent=meta.label;
+  var act=document.createElement('button');
+  act.type='button';
+  var off=where==='bottom';
+  var blocked=off?!!opts.floor:!!opts.full;
+  act.className='nav-edit-act '+(off?'is-off':'is-add')+(blocked?' is-disabled':'');
+  act.setAttribute('data-nav-act', off?'off':'add');
+  act.textContent=off?'Move to More':'Add to bar';
+  if(blocked){
+    act.disabled=true;
+    act.setAttribute('aria-disabled','true');
+    act.title=off?'Swap a tab to change the first four.':'Bar full (8/8)';
+  }
+  btn.appendChild(handle);
   btn.appendChild(icon);
   btn.appendChild(name);
+  btn.appendChild(act);
   return btn;
+}
+function navEditPaintCap(n){
+  var chip=document.getElementById('navEditCapChip');
+  var count=document.getElementById('navEditBottomCount');
+  var full=n>=MAX_BAR_TABS;
+  var chipText=full?('Bar full ('+MAX_BAR_TABS+'/'+MAX_BAR_TABS+')'):(n+'/'+MAX_BAR_TABS);
+  if(chip){
+    chip.textContent=chipText;
+    if(full)chip.classList.add('is-full');
+    else chip.classList.remove('is-full');
+  }
+  if(count)count.textContent=n+'/'+MAX_BAR_TABS;
 }
 function navEditRender(){
   var hint=document.getElementById('navEditHint');
@@ -4710,14 +4778,19 @@ function navEditRender(){
   if(hint){
     hint.textContent=navEditNote||(navEditPick
       ?((NAV_EDIT_META[navEditPick]&&NAV_EDIT_META[navEditPick].label)||navEditPick)+' selected. Tap another tab to swap. Save keeps this. Cancel restores the previous tabs.'
-      :'Tap a bottom tab, then tap what should replace it. You can drag too. More stays on the right. Save keeps this. Cancel restores the previous tabs.');
+      :'Up to 8 on the bar. Tap a bottom tab, then tap what should replace it. You can drag too. More stays on the right. Save keeps this. Cancel restores the previous tabs.');
   }
   if(!bottom||!pool)return;
   var slots=navEditSanitize(navEditDraft||navEditRead());
   navEditDraft=slots.slice();
+  navEditPaintCap(slots.length);
+  var full=slots.length>=MAX_BAR_TABS;
+  var floor=slots.length<=navEditDefaults().length;
   bottom.textContent='';
   pool.textContent='';
-  slots.forEach(function(id){bottom.appendChild(navEditChoice(id,'bottom'));});
+  var rows=document.createElement('div');
+  rows.className='nav-edit-rows';
+  slots.forEach(function(id){rows.appendChild(navEditChoice(id,'bottom',{floor:floor,full:full}));});
   var lock=document.createElement('div');
   lock.className='nav-edit-slot is-lock';
   lock.setAttribute('aria-label','More, pinned');
@@ -4733,8 +4806,9 @@ function navEditRender(){
   lock.appendChild(lockIcon);
   lock.appendChild(lockName);
   lock.appendChild(pin);
-  bottom.appendChild(lock);
-  navEditPool(slots).forEach(function(id){pool.appendChild(navEditChoice(id,'pool'));});
+  rows.appendChild(lock);
+  bottom.appendChild(rows);
+  navEditPool(slots).forEach(function(id){pool.appendChild(navEditChoice(id,'pool',{full:full}));});
 }
 function navEditPlaceSheet(){
   var panel=document.getElementById('navEditPanel');
@@ -4785,6 +4859,41 @@ function navEditSave(){
   navEditClose();
   navEditApply();
 }
+function navEditMoveOff(id){
+  if(!id)return;
+  if(!navEditDraft)navEditDraft=navEditRead().slice();
+  var floor=navEditDefaults().length;
+  if(navEditDraft.length<=floor){
+    navEditNote='The bar keeps '+floor+' tabs. Tap one, then tap another to swap. Up to 8 on the bar.';
+    navEditRender();
+    return;
+  }
+  var next=navEditDraft.filter(function(x){return x!==id;});
+  navEditDraft=navEditSanitize(next);
+  navEditPick='';
+  var label=(NAV_EDIT_META[id]&&NAV_EDIT_META[id].label)||id;
+  navEditNote=label+' moved to More. Up to 8 on the bar. Save keeps this. Cancel restores the previous tabs.';
+  navEditFresh={};
+  navEditFresh[id]=1;
+  navEditRender();
+}
+function navEditAddToBar(id){
+  if(!id||!navEditRoleOk(id))return;
+  if(!navEditDraft)navEditDraft=navEditRead().slice();
+  if(navEditDraft.indexOf(id)>=0)return;
+  if(navEditDraft.length>=MAX_BAR_TABS){
+    navEditNote='Bar full ('+MAX_BAR_TABS+'/'+MAX_BAR_TABS+'). Move one to More before adding another.';
+    navEditRender();
+    return;
+  }
+  navEditDraft=navEditSanitize(navEditDraft.concat([id]));
+  navEditPick='';
+  var label=(NAV_EDIT_META[id]&&NAV_EDIT_META[id].label)||id;
+  navEditNote=label+' added to the bar. Up to 8 on the bar. Save keeps this. Cancel restores the previous tabs.';
+  navEditFresh={};
+  navEditFresh[id]=1;
+  navEditRender();
+}
 function navEditTap(id){
   if(!id||id==='more'||id==='settings')return;
   if(!navEditDraft)navEditDraft=navEditRead().slice();
@@ -4819,11 +4928,22 @@ function navEditEnsureBound(){
   panel.setAttribute('data-nav-bound','1');
   panel.addEventListener('click', function(ev){
     if(navEditIgnoreClick){navEditIgnoreClick=false;return;}
+    var act=ev.target&&ev.target.closest?ev.target.closest('[data-nav-act]'):null;
+    if(act){
+      ev.preventDefault();
+      ev.stopPropagation();
+      var row=act.closest?act.closest('[data-nav-id]'):null;
+      var actId=row?row.getAttribute('data-nav-id'):'';
+      if(act.getAttribute('data-nav-act')==='off')navEditMoveOff(actId);
+      else navEditAddToBar(actId);
+      return;
+    }
     var btn=ev.target&&ev.target.closest?ev.target.closest('[data-nav-id]'):null;
     if(!btn)return;
     navEditTap(btn.getAttribute('data-nav-id'));
   });
   panel.addEventListener('pointerdown', function(ev){
+    if(ev.target&&ev.target.closest&&ev.target.closest('[data-nav-act]'))return;
     var btn=ev.target&&ev.target.closest?ev.target.closest('[data-nav-id]'):null;
     if(!btn)return;
     navEditDrag={id:btn.getAttribute('data-nav-id'),x:ev.clientX,y:ev.clientY,moved:false,el:btn};
