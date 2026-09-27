@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- client insurance tint 2026-09-27 v=client-ins1 admin-build 2026-09-27-client-ins1. GHOST-CLIENT-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Add Client chip picker passes optional p_insurance_plan on admin_add_client and keeps p_weekly_authorized_hours. Catalog chips use admin_list_insurance_plans key, label, and color. Client list selects insurance_plan and tints the name and badge from the locked palette or insurance_color and insurance_label. Schedule week and slots paint insurance_plan, insurance_label, and insurance_color from list_schedule_week and list_schedule_week_slots. Edit uses admin_update_client_insurance or PATCH insurance_plan. Null and legacy plans stay muted. Locked palette: CareSource caresource #6B2D8B, Passport passport #E6B800, Anthem anthem #1E6BB8, Molina molina #C62828, Buckeye buckeye #1B8A3E. No Auth reseal. No Quo/SMS. Nurse writes 42501. Admin dates stay MM/DD/YYYY. Prior markers stay, including v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=clienthrs1d, v=clienthrs1c, v=clienthrs1b, v=clienthrs1a, v=sched1, v=remi-cm-email1, and v=remiface1. -->
+<meta name="admin-build" content="2026-09-27-client-ins1">
 <!-- remi ideas 763 2026-09-27 v=remi-ideas763 admin-build 2026-09-27-remi-ideas763. GHOST-REMI-IDEAS763-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Tap an open schedule cell and the rail calls admin_get_open_shift_why {p_open_shift_id} and admin_list_cover_attempts {p_open_shift_id, p_limit:3}. The card paints attempts with when_label, who_label, status, and detail. Status values are blasted, yes, no, ghost, dropped, and covered. Blast float pool calls admin_rank_float_pool_aides then the existing admin_blast_cover_request. coverage-simple1 blast and remi-float-noshow1 stay. Dismiss calls admin_dismiss_why_open. History stays. Bilingual preview calls admin_get_aide_preferred_language and admin_set_aide_preferred_language. The draft calls admin_draft_bilingual_cover_ask for an English source and a Spanish preview. Send SMS is a UI mock only: sms_send.implemented is false and sms_send.oos is true. No SMS provider. Send in Messages calls admin_send_bilingual_cover_in_messages into aidechat. Pay dispute calls admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply. Send calls admin_send_aide_office_message as Admin. No payroll writeback. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
 <meta name="admin-build" content="2026-09-27-remi-ideas763">
 <!-- remi float noshow 2026-09-27 v=remi-float-noshow1 admin-build 2026-09-27-remi-float-noshow1. GHOST-REMI-FLOAT-NOSHOW1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Cover blast Confirm in this rail calls admin_rank_float_pool_aides {p_open_shift_id} and paints float_pool with a Float tag plus rest with rank, name, same_day_yes_30d, miles, and is_float. Confirm blast on an open hole still posts admin_blast_cover_request {p_open_shift_id, p_aide_ids, p_address_mode} with the chosen aide ids. coverage-simple1, admin_rank_backup_aides, and admin_confirm_cover_send stay. No-show cards poll admin_list_due_noshow_rescues {p_limit:20}. Grace is 20 minutes unless org_settings remi_noshow_grace_minutes.minutes says otherwise. Never auto-blast. Confirm posts admin_confirm_noshow_rescue {p_rescue_id} so Ace float-ranks and excludes the assigned aide. Dismiss posts admin_dismiss_noshow_rescue {p_rescue_id}. Pending, dismissed, and blasted stay stored so Confirm is not spammed. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Ignore remi-ideas763 and 03-why-open in this marker. Prior markers stay, including v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=vapid1, v=clienthrs1d, v=remi-cm-email1, and v=remiface1. -->
@@ -141,7 +143,7 @@
 <script>if(performance.setResourceTimingBufferSize)performance.setResourceTimingBufferSize(500);</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;}
+:root{--teal:#2a7f7f;--teal-dark:#1e6060;--teal-light:#e8f4f4;--navy:#1a2744;--off:#f5f8fc;--border:#dce4ef;--text:#1e2a3a;--muted:#6b7a90;--danger:#c0392b;--success:#27ae60;--warn:#e67e22;--caresource:#6B2D8B;--passport:#E6B800;--anthem:#1E6BB8;--molina:#C62828;--buckeye:#1B8A3E;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;width:100%;max-width:100%;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;touch-action:pan-y;}
 body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);width:100%;max-width:100%;overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;touch-action:pan-y;}
@@ -250,7 +252,7 @@ textarea{resize:vertical;min-height:80px;}
 .sched-scroll{max-height:640px;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain;border:1px solid var(--border);border-radius:10px;background:#fff;position:relative;}
 .sched-grid{width:max-content;min-width:max(100%,52rem);border-collapse:separate;border-spacing:0;font-size:0.78rem;}
 .sched-grid th{position:sticky;top:0;z-index:2;background:var(--navy);color:#fff;padding:8px 6px;font-weight:600;text-align:center;min-width:7.6rem;box-shadow:0 1px 0 rgba(0,0,0,.15);white-space:nowrap;}
-.sched-grid th.sched-client-h,.sched-grid td.sched-name{position:sticky;left:0;min-width:148px;text-align:left;}
+.sched-grid th.sched-client-h,.sched-grid td.sched-name{position:sticky;left:0;min-width:188px;text-align:left;}
 .sched-grid th.sched-client-h{z-index:3;}
 .sched-grid td.sched-name{z-index:1;background:#fff;font-weight:600;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;}
 .sched-grid tr.is-jump td.sched-name{background:#e8f4f4;}
@@ -359,7 +361,7 @@ textarea{resize:vertical;min-height:80px;}
   #adminScreen .main-content:has(#tab_schedule.active){max-width:none;width:100%;}
   #tab_schedule.is-fullweek .sched-grid{width:100%;min-width:100%;table-layout:fixed;}
   #tab_schedule.is-fullweek .sched-grid th,#tab_schedule.is-fullweek .sched-grid td.sched-slot{min-width:0;}
-  #tab_schedule.is-fullweek .sched-grid th.sched-client-h,#tab_schedule.is-fullweek .sched-grid td.sched-name{width:148px;}
+  #tab_schedule.is-fullweek .sched-grid th.sched-client-h,#tab_schedule.is-fullweek .sched-grid td.sched-name{width:210px;min-width:210px;}
 }
 .cal-legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.75rem;color:var(--muted);margin:0 0 10px;line-height:1.3;}
 .cal-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
@@ -643,6 +645,42 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(max-width:420px){
   #clientModal .modal{padding:16px 14px 18px;}
   #clientModal .client-hrs{padding:12px;}
+}
+/* v=client-ins1 — insurance chips, list tint, schedule name tint. Phone-first. */
+.ins-caresource{--ins-color:var(--caresource);--ins-ink:var(--caresource);--ins-bg:#f6eef9;--ins-line:#d4b8e4;}
+.ins-passport{--ins-color:var(--passport);--ins-ink:#9a7a00;--ins-bg:#fff8e0;--ins-line:#f0d66a;}
+.ins-anthem{--ins-color:var(--anthem);--ins-ink:var(--anthem);--ins-bg:#eef5fb;--ins-line:#a8c8e8;}
+.ins-molina{--ins-color:var(--molina);--ins-ink:var(--molina);--ins-bg:#fceeee;--ins-line:#e8b0b0;}
+.ins-buckeye{--ins-color:var(--buckeye);--ins-ink:var(--buckeye);--ins-bg:#eef8f1;--ins-line:#9fd4b0;}
+.ins-none{--ins-color:#c5ceda;--ins-ink:var(--muted);--ins-bg:var(--off);--ins-line:var(--border);}
+.ins-legend{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:8px 12px;margin:0 0 10px;font-size:12px;max-width:100%;min-width:0;}
+.ins-legend strong{color:var(--navy);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.ins-leg{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--ins-ink);min-height:28px;}
+.ins-leg .dot,.ins-chip .dot,.ins-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--ins-color);flex-shrink:0;}
+.ins-leg .dot{width:10px;height:10px;}
+.ins-chips{display:flex;flex-wrap:wrap;gap:8px;max-width:100%;}
+.ins-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;}
+.ins-chip.is-on{border-color:var(--ins-color);color:var(--ins-ink);background:var(--ins-bg);}
+.ins-selected{margin-top:8px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.4;}
+.ins-pill{display:inline-flex;align-items:center;gap:6px;background:var(--ins-color);color:#fff;font-weight:700;font-size:11px;padding:4px 10px;border-radius:999px;min-height:28px;}
+.ins-pill .dot{width:7px;height:7px;border-radius:50%;background:#fff;flex-shrink:0;}
+.ins-name{display:flex;align-items:center;gap:8px;min-width:0;color:var(--ins-ink,var(--navy));font-weight:700;}
+.ins-bar{width:8px;height:28px;border-radius:4px;background:var(--ins-color,#c5ceda);flex-shrink:0;}
+.ins-text{min-width:0;overflow-wrap:anywhere;}
+.ins-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--ins-line,var(--border));background:var(--ins-bg,var(--off));color:var(--ins-ink,var(--muted));max-width:100%;}
+.ins-client-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px;min-width:0;}
+#clientsContainer .aide-card h4.ins-name{margin:0;font-size:1rem;}
+#tab_clients .aide-card{align-items:flex-start;}
+#clientModal .client-ins{max-width:100%;min-width:0;margin-bottom:14px;}
+#clientModal .client-ins .field{margin-bottom:0;}
+.sched-name .ins-name{font-size:.92rem;}
+.sched-name .ins-badge{margin-top:2px;}
+.sched-chip.ins-tint{box-shadow:inset 3px 0 0 var(--ins-color);}
+.sched-client-name.ins-caresource,.sched-client-name.ins-passport,.sched-client-name.ins-anthem,.sched-client-name.ins-molina,.sched-client-name.ins-buckeye{color:var(--ins-ink);}
+@media(max-width:768px){
+  .ins-legend{padding:8px 10px;}
+  #tab_clients .page-hdr{flex-wrap:wrap;}
+  #tab_clients .page-hdr .btn{min-height:44px;}
 }
 /* v=aidechat1 — Aide↔office inbox. Admin and Scheduler. Phone cards. No SMS. No email. */
 #tab_aidechat{max-width:100%;min-width:0;padding-bottom:12px;}
@@ -2309,13 +2347,21 @@ bindLoginKeyboard();
       </div>
 
       <!-- CLIENTS TAB -->
-      <div class="tab-panel" id="tab_clients">
+      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1">
         <div class="page-hdr">
           <div><h1>Clients</h1><p>Manage client addresses and assign aides for location verification</p></div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
+        </div>
+        <div class="ins-legend" id="clientInsLegend" data-client-ins1="v=client-ins1" aria-label="Insurance">
+          <strong>Insurance</strong>
+          <span class="ins-leg ins-caresource"><span class="dot"></span>CareSource</span>
+          <span class="ins-leg ins-passport"><span class="dot"></span>Passport</span>
+          <span class="ins-leg ins-anthem"><span class="dot"></span>Anthem</span>
+          <span class="ins-leg ins-molina"><span class="dot"></span>Molina</span>
+          <span class="ins-leg ins-buckeye"><span class="dot"></span>Buckeye</span>
         </div>
         <div class="card">
           <div class="search-bar"><input type="text" id="clientSearch" placeholder="&#128269; Search clients..." oninput="paintClients()"></div>
@@ -2390,7 +2436,7 @@ bindLoginKeyboard();
       </div>
 
       <!-- SCHEDULE TAB (Admin + Scheduler edit). Usual week is set once; a cell is an exception for that date. -->
-      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1">
+      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1" data-client-ins1="v=client-ins1">
         <div class="page-hdr">
           <div>
             <h1>Schedule</h1>
@@ -2418,6 +2464,14 @@ bindLoginKeyboard();
             <button class="btn btn-ghost btn-sm" type="button" id="schedFilterCalloff" aria-pressed="false" onclick="schedSetFilter('calloff')">Call-offs</button>
             <button class="btn btn-ghost btn-sm" type="button" id="schedFilterHold" aria-pressed="false" onclick="schedSetFilter('hold')">On hold</button>
           </div>
+        </div>
+        <div class="ins-legend" id="schedInsLegend" data-client-ins1="v=client-ins1" aria-label="Insurance">
+          <strong>Insurance</strong>
+          <span class="ins-leg ins-caresource"><span class="dot"></span>CareSource</span>
+          <span class="ins-leg ins-passport"><span class="dot"></span>Passport</span>
+          <span class="ins-leg ins-anthem"><span class="dot"></span>Anthem</span>
+          <span class="ins-leg ins-molina"><span class="dot"></span>Molina</span>
+          <span class="ins-leg ins-buckeye"><span class="dot"></span>Buckeye</span>
         </div>
         <div class="cal-legend" id="schedLegend" hidden aria-label="Calendar mark legend">
           <span><i class="lg-assumed" aria-hidden="true"></i> Unmarked = assumed worked</span>
@@ -3560,6 +3614,20 @@ Call (216) 377-5991 with any questions.</textarea>
     <div class="field"><label for="clientCmName">Case manager name</label><input type="text" id="clientCmName" placeholder="Pat Lee" autocomplete="name"></div>
     <div class="field"><label for="clientCmEmail">Case manager email</label><input type="email" id="clientCmEmail" inputmode="email" autocomplete="email" placeholder="pat@example.com"></div>
     <div class="field"><label for="clientPhone">Phone</label><input type="tel" id="clientPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
+    <div class="client-ins" id="clientInsField" data-client-ins1="v=client-ins1">
+      <div class="field">
+        <label id="clientInsLabel">Insurance</label>
+        <input type="hidden" id="clientInsurancePlan" value="" data-mode="add">
+        <div class="ins-chips" id="clientInsChips" role="listbox" aria-labelledby="clientInsLabel">
+          <button type="button" class="ins-chip ins-caresource" data-ins="caresource" style="--ins-color:#6B2D8B" onclick="clientInsPick('caresource')"><span class="dot"></span>CareSource</button>
+          <button type="button" class="ins-chip ins-passport" data-ins="passport" style="--ins-color:#E6B800" onclick="clientInsPick('passport')"><span class="dot"></span>Passport</button>
+          <button type="button" class="ins-chip ins-anthem" data-ins="anthem" style="--ins-color:#1E6BB8" onclick="clientInsPick('anthem')"><span class="dot"></span>Anthem</button>
+          <button type="button" class="ins-chip ins-molina" data-ins="molina" style="--ins-color:#C62828" onclick="clientInsPick('molina')"><span class="dot"></span>Molina</button>
+          <button type="button" class="ins-chip ins-buckeye" data-ins="buckeye" style="--ins-color:#1B8A3E" onclick="clientInsPick('buckeye')"><span class="dot"></span>Buckeye</button>
+        </div>
+        <div class="ins-selected" id="clientInsSelected">Optional. Blank is fine for an older client.</div>
+      </div>
+    </div>
     <div class="field" style="margin-bottom:14px">
       <button class="btn btn-ghost" onclick="geocodeClientAddress()">&#128205; Verify Address & Get GPS Coordinates</button>
       <p id="geocodeResult" style="font-size:0.76rem;color:var(--muted);margin-top:6px"></p>
@@ -12875,6 +12943,31 @@ function schedNormalizeKind(kind){
   if(k==='call_off'||k==='cover'||k==='hours_override'||k==='aide_override'||k==='clear')return k;
   return '';
 }
+function schedInsPack(row){
+  var raw=row||{};
+  var key=String(raw.insurance_plan!=null?raw.insurance_plan:(raw.insurancePlan!=null?raw.insurancePlan:'')).trim().toLowerCase();
+  var locked={
+    caresource:{label:'CareSource',color:'#6B2D8B'},
+    passport:{label:'Passport',color:'#E6B800'},
+    anthem:{label:'Anthem',color:'#1E6BB8'},
+    molina:{label:'Molina',color:'#C62828'},
+    buckeye:{label:'Buckeye',color:'#1B8A3E'}
+  };
+  var known=locked[key]||null;
+  if(!known)return {plan:'',label:'',color:'',cls:''};
+  var label=String(raw.insurance_label||raw.insuranceLabel||'').trim()||known.label;
+  var colorIn=String(raw.insurance_color||raw.insuranceColor||'').trim();
+  var color=known.color;
+  if(/^#[0-9A-Fa-f]{6}$/.test(colorIn))color=colorIn.toUpperCase()===known.color.toUpperCase()?known.color:colorIn;
+  return {plan:key,label:label,color:color,cls:'ins-'+key};
+}
+function schedInsNameHtml(name, pack){
+  var safe=schedEsc(name);
+  if(!pack||!pack.cls)return safe;
+  var style=' style="--ins-color:'+schedAttr(pack.color)+'"';
+  var badge=pack.label?'<span class="ins-badge '+pack.cls+'"'+style+'><span class="dot"></span>'+schedEsc(pack.label)+'</span>':'';
+  return '<span class="ins-name '+pack.cls+'"'+style+'><span class="ins-bar"></span><span class="ins-text">'+safe+'</span></span>'+badge;
+}
 function schedApplyWeek(data){
   var usual=[];
   var exceptions=[];
@@ -12893,7 +12986,8 @@ function schedApplyWeek(data){
     var clientId=schedPick(c,['client_id','clientId','id']);
     if(!clientId||seen[clientId])return;
     seen[clientId]=true;
-    rows.push({id:String(clientId), name:String(c.client_name||c.clientName||c.name||'Client')});
+    var ins=schedInsPack(c);
+    rows.push({id:String(clientId), name:String(c.client_name||c.clientName||c.name||'Client'), insurance_plan:ins.plan, insurance_label:ins.label, insurance_color:ins.color});
     var days=c.days&&typeof c.days==='object'?c.days:{};
     for(var wd=1;wd<=7;wd++){
       var day=days[String(wd)];
@@ -13285,7 +13379,7 @@ function schedPaint(){
     var name=String(client.name||client.clientName||'Client');
     var jump=schedJumpId&&schedJumpId===id?' is-jump':'';
     html+='<tr id="sched-row-'+schedAttr(id)+'" data-name="'+schedAttr(name)+'" class="'+jump.trim()+'">';
-    html+='<td class="sched-name">'+schedEsc(name)+'</td>';
+    html+='<td class="sched-name">'+schedInsNameHtml(name, schedInsPack(client))+'</td>';
     row.cells.forEach(function(cell){
       var text=cell.state==='open'?'Open':schedCellText(cell);
       var ariaDate=schedPretty(cell.date);
@@ -14033,9 +14127,13 @@ function schedApplySlotWeek(data){
     });
     weekHours=0;
     for(var wh=1;wh<=7;wh++)weekHours+=Number(days[String(wh)].day_hours)||0;
+    var ins=schedInsPack(c);
     rows.push({
       id:String(clientId),
       name:String(c.client_name||c.clientName||c.name||'Client'),
+      insurance_plan:ins.plan,
+      insurance_label:ins.label,
+      insurance_color:ins.color,
       weekly_authorized_hours:schedNum(c.weekly_authorized_hours!=null?c.weekly_authorized_hours:c.weeklyAuthorizedHours),
       week_hours:Math.round(weekHours*100)/100,
       holds:holds,
@@ -14043,7 +14141,7 @@ function schedApplySlotWeek(data){
     });
   });
   schedSlotClients=rows;
-  schedWeekRows=rows.map(function(c){return {id:c.id, name:c.name};});
+  schedWeekRows=rows.map(function(c){return {id:c.id, name:c.name, insurance_plan:c.insurance_plan||'', insurance_label:c.insurance_label||'', insurance_color:c.insurance_color||''};});
   schedUseWeekRows=true;
   schedUsual=[];
   schedExceptions=[];
@@ -14166,9 +14264,12 @@ function schedEnsureSlotSelection(){
     }
   }
 }
-function schedChipHtml(slot, index){
+function schedChipHtml(slot, index, client){
+  var pack=client?schedInsPack(client):null;
+  var tint=pack&&pack.cls?(' '+pack.cls+' ins-tint'):'';
+  var style=pack&&pack.color?(' style="--ins-color:'+schedAttr(pack.color)+'"'):'';
   if(schedSlotIsHold(slot)){
-    return '<span class="sched-chip is-hold">On hold<span class="chip-sub">paused · 0 hrs</span></span>';
+    return '<span class="sched-chip is-hold'+tint+'"'+style+'>On hold<span class="chip-sub">paused · 0 hrs</span></span>';
   }
   var toward=schedSlotToward(slot);
   var who=slot.mark==='cover'&&(slot.cover_aide_name||slot.cover_aide_id)
@@ -14181,7 +14282,7 @@ function schedChipHtml(slot, index){
     cls+=' is-assumed';
     if(index>0)cls+=' is-pm';
   }
-  return '<span class="'+cls+'">'+schedEsc(who)+' <span class="hrs">'+schedEsc(schedHoursShort(toward)||'0')+'h</span></span>';
+  return '<span class="'+cls+tint+'"'+style+'>'+schedEsc(who)+' <span class="hrs">'+schedEsc(schedHoursShort(toward)||'0')+'h</span></span>';
 }
 function schedPaintSlotGrid(){
   var week=schedEnsureWeek();
@@ -14226,7 +14327,7 @@ function schedPaintSlotGrid(){
     var jump=schedJumpId&&String(schedJumpId)===String(client.id)?' is-jump':'';
     var auth=schedAuthText(client.weekly_authorized_hours);
     html+='<tr id="sched-row-'+schedAttr(client.id)+'" class="'+jump.trim()+'">';
-    html+='<td class="sched-name"><div class="sched-name-stack">'+schedEsc(client.name);
+    html+='<td class="sched-name"><div class="sched-name-stack">'+schedInsNameHtml(client.name, schedInsPack(client));
     if(auth)html+='<span class="sched-auth-badge">'+schedEsc(auth)+'</span>';
     html+='</div></td>';
     for(var wd=1;wd<=7;wd++){
@@ -14241,7 +14342,7 @@ function schedPaintSlotGrid(){
         inner='<span class="sched-dash">—</span>';
       }else{
         inner='<span class="sched-chip-stack">';
-        day.slots.forEach(function(slot, idx){inner+=schedChipHtml(slot, idx);});
+        day.slots.forEach(function(slot, idx){inner+=schedChipHtml(slot, idx, client);});
         inner+='</span><span class="sched-day-total">'+schedEsc(schedHoursShort(day.day_hours)||'0')+'h</span>';
       }
       var aria=client.name+' '+SCHED_DAYS[wd-1]+' '+day.on_date;
@@ -14456,7 +14557,16 @@ function schedPaintSlotDetail(){
   var client=sel?schedFindSlotClient(sel.clientId):null;
   var day=client&&sel?client.days[String(sel.weekday)]:null;
   var nameEl=schedEl('schedSlotClientName');
-  if(nameEl)nameEl.textContent=client?client.name:'Day';
+  if(nameEl){
+    var pack=client?schedInsPack(client):null;
+    if(pack&&pack.cls){
+      nameEl.className='sched-client-name '+pack.cls;
+      nameEl.innerHTML=schedInsNameHtml(client.name, pack);
+    }else{
+      nameEl.className='sched-client-name';
+      nameEl.textContent=client?client.name:'Day';
+    }
+  }
   var authEl=schedEl('schedSlotAuth');
   if(authEl){
     var auth=client?schedAuthText(client.weekly_authorized_hours):'';
@@ -19897,6 +20007,14 @@ function sbMapClient(row){
     mapped.weekly_authorized_hours=typeof n==='number'?n:null;
     mapped.weeklyAuthorizedHours=mapped.weekly_authorized_hours;
   }
+  if(row&&(Object.prototype.hasOwnProperty.call(row,'insurance_plan')||Object.prototype.hasOwnProperty.call(row,'insurancePlan')||Object.prototype.hasOwnProperty.call(row,'insurance_label')||Object.prototype.hasOwnProperty.call(row,'insuranceLabel')||Object.prototype.hasOwnProperty.call(row,'insurance_color')||Object.prototype.hasOwnProperty.call(row,'insuranceColor'))){
+    if(typeof clientInsPack==='function'){
+      var ip=clientInsPack(row);
+      mapped.insurance_plan=ip.plan||null;
+      mapped.insurance_label=ip.label||null;
+      mapped.insurance_color=ip.color||null;
+    }
+  }
   return mapped;
 }
 function sbMapTimesheet(row){
@@ -20028,7 +20146,7 @@ async function sbRestGet(table, pairs, refreshed){
   return {ok:true,data:data,status:res.status};
 }
 var SB_AIDE_SELECT='id,username,full_name,email,joined_at,location_status,last_seen_at,must_change_password,is_active,profile_id,legacy_sheet_row,assignments:assignments(id,is_active,client:clients(id,name,legacy_id,is_active))';
-var SB_CLIENT_SELECT='id,legacy_id,name,address,lat,lng,is_active,weekly_authorized_hours,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
+var SB_CLIENT_SELECT='id,legacy_id,name,address,lat,lng,is_active,weekly_authorized_hours,insurance_plan,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
 async function sbApiList(payload){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
   var action=payload&&payload.action;
@@ -20066,13 +20184,23 @@ async function sbApiList(payload){
     if(action==='get_clients'){
       var hoursState=sbClientHoursState();
       var clientSelect=hoursState.col===false?String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours',''):SB_CLIENT_SELECT;
+      if(typeof sbClientInsState==='function'&&sbClientInsState().col===false)clientSelect=String(clientSelect).replace(',insurance_plan','');
       var clientPairs=[['select',clientSelect]];
       if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
       clientPairs.push(['order','name.asc']);
       var clients=await sbRestGet('clients', clientPairs);
       if(!clients.ok && hoursState.col!==false && sbClientHoursColumnMissing(clients)){
         hoursState.col=false;
-        clientPairs[0]=['select', String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours','')];
+        var dropped=String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours','');
+        if(typeof sbClientInsState==='function'&&sbClientInsState().col===false)dropped=dropped.replace(',insurance_plan','');
+        clientPairs[0]=['select', dropped];
+        clients=await sbRestGet('clients', clientPairs);
+      }
+      if(!clients.ok && typeof sbClientInsColumnMissing==='function' && sbClientInsColumnMissing(clients)){
+        if(typeof sbClientInsState==='function')sbClientInsState().col=false;
+        var insSelect=String(SB_CLIENT_SELECT).replace(',insurance_plan','');
+        if(sbClientHoursState().col===false)insSelect=insSelect.replace(',weekly_authorized_hours','');
+        clientPairs[0]=['select', insSelect];
         clients=await sbRestGet('clients', clientPairs);
       }
       if(!clients.ok)return {success:false,error:clients.error||'clients',httpStatus:clients.status||0};
@@ -21709,6 +21837,65 @@ async function sbPatchClientHours(id, hours){
   if(got&&got.ok)sbClientHoursState().col=true;
   return got;
 }
+function sbClientInsState(){
+  if(!sbClientInsState.box)sbClientInsState.box={col:null};
+  return sbClientInsState.box;
+}
+function sbClientInsPlan(payload){
+  if(!payload)return undefined;
+  var has=Object.prototype.hasOwnProperty.call(payload,'insurance_plan')||Object.prototype.hasOwnProperty.call(payload,'insurancePlan')||Object.prototype.hasOwnProperty.call(payload,'p_insurance_plan');
+  if(!has)return undefined;
+  var raw=Object.prototype.hasOwnProperty.call(payload,'insurance_plan')?payload.insurance_plan:(Object.prototype.hasOwnProperty.call(payload,'insurancePlan')?payload.insurancePlan:payload.p_insurance_plan);
+  if(raw==null||(typeof raw==='string'&&raw.trim()===''))return null;
+  var pack=typeof clientInsPack==='function'?clientInsPack({insurance_plan:raw}):null;
+  if(!pack||!pack.plan)return undefined;
+  return pack.plan;
+}
+function sbClientInsColumnMissing(got){
+  if(!got||got.ok)return false;
+  var err=String(got.error||got.message||'');
+  if(!/insurance_plan/i.test(err))return false;
+  return /42703|PGRST204|does not exist|schema cache|could not find/i.test(err);
+}
+function sbClientInsRpcMissing(got){
+  if(!got)return true;
+  var msg=String(got.error||got.message||'');
+  var code=String((got.data&&got.data.code)||'');
+  if(code==='42501'||got.status===42501||/\b42501\b/.test(msg))return false;
+  if(got.ok){
+    var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
+    var err=typeof sbRpcError==='function'?(sbRpcError(node)||''):'';
+    if(!err)return false;
+    return /PGRST202|could not find the function/i.test(err);
+  }
+  if(got.status===404||code==='PGRST202')return true;
+  return /PGRST202|could not find the function/i.test(msg);
+}
+function sbClientInsDenied(got, err){
+  var code=String((got&&got.data&&got.data.code)||'');
+  var msg=String(err||(got&&got.error)||'');
+  return code==='42501'||(got&&got.status===42501)||/\b42501\b/.test(msg);
+}
+async function sbUpdateClientInsurance(id, plan){
+  var got=await sbRestRpc('admin_update_client_insurance', {p_client_id:String(id), p_insurance_plan:plan});
+  if(sbClientInsDenied(got))return {ok:false, error:(got&&got.error)||'Insurance update is not allowed for this sign-in.', status:42501};
+  if(got&&got.ok){
+    var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
+    var err=typeof sbRpcError==='function'?(sbRpcError(node)||''):'';
+    if(sbClientInsDenied(got, err))return {ok:false, error:err||'Insurance update is not allowed for this sign-in.', status:42501};
+    if(!err)return {ok:true, via:'rpc', data:node};
+    if(!sbClientInsRpcMissing({ok:false, error:err, status:got.status, data:got.data}))return {ok:false, error:err, status:got.status||0};
+  }else if(got&&!sbClientInsRpcMissing(got)){
+    return {ok:false, error:(got&&got.error)||'Could not update insurance.', status:got.status||0};
+  }
+  if(sbClientInsState().col===false)return {ok:true, skipped:true, data:null};
+  var patched=await sbRestMutate('PATCH','clients',[['id','eq.'+String(id)]],{insurance_plan:plan},'return=representation');
+  if(!patched.ok && sbClientInsColumnMissing(patched)){
+    sbClientInsState().col=false;
+    return {ok:true, skipped:true, data:null};
+  }
+  return patched;
+}
 function sbClientWriteBody(payload, isCreate){
   var body={
     name:String((payload&&payload.name)||'').trim(),
@@ -21756,6 +21943,17 @@ async function sbTrySaveClientDesk(payload){
   var desk=sbClientDeskPayload(payload);
   if(!desk.has)return {skipped:true};
   var bodies=sbClientHoursRpcBodies(payload);
+  if(typeof sbClientInsPlan==='function'){
+    var insPlan=sbClientInsPlan(payload);
+    if(typeof insPlan==='string'){
+      var withIns=bodies.map(function(b){
+        var next=Object.assign({}, b);
+        next.p_insurance_plan=insPlan;
+        return next;
+      });
+      bodies=withIns.concat(bodies);
+    }
+  }
   var got=null;
   var used=null;
   var i;
@@ -21829,6 +22027,20 @@ async function sbAdminUpdateClient(payload){
       if(prow)row=Object.assign({}, row, prow);
     }else if(patched&&patched.ok===false){
       return {success:false, error:patched.error||'Could not save weekly authorized hours.', httpStatus:patched.status||0};
+    }
+  }
+  if(typeof sbClientInsPlan==='function'&&typeof sbUpdateClientInsurance==='function'){
+    var insPlan=sbClientInsPlan(payload);
+    if(insPlan!==undefined){
+      var insGot=await sbUpdateClientInsurance(String(row.id||id), insPlan);
+      if(insGot&&insGot.ok&&insGot.data&&!insGot.skipped){
+        var inode=typeof sbRpcNode==='function'?sbRpcNode(insGot.data):insGot.data;
+        var irow=typeof sbFirstRow==='function'?sbFirstRow(inode):null;
+        if(!irow&&inode&&typeof inode==='object'&&!Array.isArray(inode))irow=inode;
+        if(irow)row=Object.assign({}, row, irow);
+      }else if(insGot&&insGot.ok===false){
+        return {success:false, error:insGot.error||'Could not save insurance.', httpStatus:insGot.status||0};
+      }
     }
   }
   var names=sbAssignedNames(payload);
@@ -27104,9 +27316,10 @@ function paintClients(){
   container.innerHTML=list.map(c=>{
     const aideCount=(c.assignedAides||[]).length;
     const hasGPS=c.lat&&c.lng;
-    return `<div class="aide-card">
+    const head=typeof clientInsCardHead==='function'?clientInsCardHead(c):('<h4>'+(c.name||'')+'</h4>');
+    return `<div class="aide-card" data-client-ins1="v=client-ins1">
       <div>
-        <h4>${c.name}</h4>
+        ${head}
         <p>&#128205; ${c.address||'No address set'} ${hasGPS?'<span style="color:var(--success)">&#10003; GPS Verified</span>':'<span style="color:var(--warn)">&#9888; GPS Not Set</span>'}</p>
         <p style="margin-top:3px">${aideCount} aide${aideCount!==1?'s':''} assigned</p>
       </div>
@@ -27160,6 +27373,114 @@ function clientSetNameFields(first, last, full){
   if(nameEl)nameEl.value=String(full||[first,last].filter(Boolean).join(' ')||'').trim();
 }
 var CLIENTHRS_MARKER='v=clienthrs1a';
+var CLIENT_INS1_MARKER='v=client-ins1';
+var CLIENT_INS_PLANS=[
+  {key:'caresource',label:'CareSource',color:'#6B2D8B'},
+  {key:'passport',label:'Passport',color:'#E6B800'},
+  {key:'anthem',label:'Anthem',color:'#1E6BB8'},
+  {key:'molina',label:'Molina',color:'#C62828'},
+  {key:'buckeye',label:'Buckeye',color:'#1B8A3E'}
+];
+var clientInsCatalog=null;
+function clientInsPack(row){
+  var raw=row||{};
+  var key=String(raw.insurance_plan!=null?raw.insurance_plan:(raw.insurancePlan!=null?raw.insurancePlan:'')).trim().toLowerCase();
+  var known=null;
+  for(var i=0;i<CLIENT_INS_PLANS.length;i++){
+    if(CLIENT_INS_PLANS[i].key===key){known=CLIENT_INS_PLANS[i];break;}
+  }
+  if(!known)return {plan:'',label:'',color:'',cls:''};
+  var label=String(raw.insurance_label||raw.insuranceLabel||'').trim()||known.label;
+  var colorIn=String(raw.insurance_color||raw.insuranceColor||'').trim();
+  var color=known.color;
+  if(/^#[0-9A-Fa-f]{6}$/.test(colorIn))color=colorIn.toUpperCase()===known.color.toUpperCase()?known.color:colorIn;
+  return {plan:key,label:label,color:color,cls:'ins-'+key};
+}
+function clientInsEsc(s){
+  if(typeof escapeHtml==='function')return escapeHtml(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function clientInsCardHead(c){
+  var pack=clientInsPack(c||{});
+  var name=clientInsEsc((c&&c.name)||'');
+  if(!pack.cls){
+    return '<div class="ins-client-head"><h4 class="ins-name ins-none"><span class="ins-bar"></span><span class="ins-text">'+name+'</span></h4><span class="ins-badge ins-none">No plan</span></div>';
+  }
+  var style=' style="--ins-color:'+pack.color+'"';
+  return '<div class="ins-client-head"><h4 class="ins-name '+pack.cls+'"'+style+'><span class="ins-bar"></span><span class="ins-text">'+name+'</span></h4><span class="ins-badge '+pack.cls+'"'+style+'><span class="dot"></span>'+clientInsEsc(pack.label)+'</span></div>';
+}
+function clientInsPlans(){
+  return (clientInsCatalog&&clientInsCatalog.length)?clientInsCatalog:CLIENT_INS_PLANS;
+}
+function clientInsPaintChips(selected){
+  var box=document.getElementById('clientInsChips');
+  if(!box)return;
+  var key=clientInsPack({insurance_plan:selected}).plan;
+  box.innerHTML=clientInsPlans().map(function(p){
+    var on=p.key===key;
+    return '<button type="button" class="ins-chip ins-'+p.key+(on?' is-on':'')+'" role="option" aria-selected="'+(on?'true':'false')+'" data-ins="'+p.key+'" style="--ins-color:'+p.color+'" onclick="clientInsPick(\''+p.key+'\')"><span class="dot"></span>'+clientInsEsc(p.label)+'</button>';
+  }).join('');
+  var note=document.getElementById('clientInsSelected');
+  if(!note)return;
+  var plan=null;
+  clientInsPlans().forEach(function(p){if(p.key===key)plan=p;});
+  if(!plan){
+    note.textContent='Optional. Blank is fine for an older client.';
+    return;
+  }
+  note.innerHTML='Selected <span class="ins-pill ins-'+plan.key+'" style="--ins-color:'+plan.color+'"><span class="dot"></span>'+clientInsEsc(plan.label)+'</span>';
+}
+function clientInsPick(key){
+  var el=document.getElementById('clientInsurancePlan');
+  var next=clientInsPack({insurance_plan:key}).plan;
+  var cur=el?clientInsPack({insurance_plan:el.value}).plan:'';
+  if(next&&next===cur)next='';
+  if(el)el.value=next;
+  clientInsPaintChips(next);
+}
+function clientInsOpen(mode, plan){
+  var el=document.getElementById('clientInsurancePlan');
+  var key=clientInsPack({insurance_plan:plan}).plan;
+  if(el){
+    el.value=key;
+    el.dataset.mode=mode==='edit'?'edit':'add';
+  }
+  clientInsPaintChips(key);
+  if(typeof clientInsLoadPlans!=='function')return;
+  clientInsLoadPlans().then(function(plans){
+    clientInsCatalog=plans;
+    var current=el?clientInsPack({insurance_plan:el.value}).plan:key;
+    clientInsPaintChips(current);
+  });
+}
+function clientInsRead(){
+  var el=document.getElementById('clientInsurancePlan');
+  if(!el)return {omit:true};
+  var key=clientInsPack({insurance_plan:el.value}).plan;
+  if(key)return {value:key};
+  if(el.dataset.mode==='edit')return {value:null};
+  return {omit:true};
+}
+async function clientInsLoadPlans(){
+  var fallback=CLIENT_INS_PLANS.slice();
+  if(typeof sbRestRpc!=='function')return fallback;
+  try{
+    var got=await sbRestRpc('admin_list_insurance_plans', {});
+    if(!got||got.ok!==true)return fallback;
+    var node=typeof sbRpcNode==='function'?sbRpcNode(got.data):got.data;
+    var plans=node&&node.plans;
+    if(!Array.isArray(plans)&&node&&node.data&&Array.isArray(node.data.plans))plans=node.data.plans;
+    if(!Array.isArray(plans))return fallback;
+    var out=[];
+    plans.forEach(function(p){
+      if(!p)return;
+      var pack=clientInsPack({insurance_plan:p.key||p.insurance_plan, insurance_label:p.label||p.insurance_label, insurance_color:p.color||p.insurance_color});
+      if(!pack.plan)return;
+      out.push({key:pack.plan, label:pack.label, color:pack.color});
+    });
+    return out.length?out:fallback;
+  }catch(e){return fallback;}
+}
 function clientHoursFill(c){
   var el=document.getElementById('clientWeeklyHours');
   if(!el)return;
@@ -27193,6 +27514,7 @@ function showAddClientModal(){
   document.getElementById('geocodeResult').dataset.lat='';
   document.getElementById('geocodeResult').dataset.lng='';
   clientHoursFill(null);
+  clientInsOpen('add','');
   loadAidesForAssignment([]);
   openModal('clientModal');
 }
@@ -27211,6 +27533,7 @@ function editClient(id){
   const phoneEl=document.getElementById('clientPhone');
   if(phoneEl)phoneEl.value=c.phone||'';
   clientHoursFill(c);
+  clientInsOpen('edit', c.insurance_plan||c.insurancePlan||'');
   const geo=document.getElementById('geocodeResult');
   if(c.lat&&c.lng){
     geo.textContent='&#10003; GPS: '+c.lat+', '+c.lng;
@@ -27265,6 +27588,7 @@ async function saveClient(){
   const lng=geo.dataset.lng||'';
   const assignedAides=Array.from(document.querySelectorAll('.assign-aide-cb:checked')).map(cb=>cb.value);
   const hours=clientHoursRead();
+  const ins=clientInsRead();
 
   if(!firstName||!lastName||!address){showTempMsg('Please fill in first name, last name, and home address.','var(--danger)');return;}
   if(hours.invalid){showTempMsg('Weekly authorized hours must be 0 or more.','var(--danger)');return;}
@@ -27273,6 +27597,7 @@ async function saveClient(){
   const payload={action,name,address,lat,lng,assignedAides,firstName,lastName,caseManagerName,caseManagerEmail,phone};
   if(typeof hours.value==='number')payload.weekly_authorized_hours=hours.value;
   else if(id&&hours.known)payload.weekly_authorized_hours=null;
+  if(!ins.omit)payload.insurance_plan=ins.value;
   if(id)payload.id=id;
 
   try{
