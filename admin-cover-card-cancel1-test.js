@@ -32,7 +32,8 @@ assert.ok(html.includes("var COVER_CARD_CANCEL1_MARKER='v=cover-card-cancel1'"),
 assert.ok(html.includes('GHOST-COVER-CARD-CANCEL1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-sched-time-tap1'), 'first admin-build is sched-time-tap1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-clear1'), 'first admin-build is hold-clear1');
+assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
 assert.ok(html.indexOf('content="2026-09-27-sched-time-tap1"') < html.indexOf('content="2026-09-27-aide-text-chat1"'), 'aide-text-chat1 stays after sched-time-tap1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
 assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
@@ -312,7 +313,7 @@ async function runBrowser(){
     assert.strictEqual(card.name, true);
     assert.strictEqual(card.date, '09/27/2026');
     assert.strictEqual(card.outcomeHidden, true);
-    assert.strictEqual(card.build, '2026-09-27-sched-time-tap1');
+    assert.strictEqual(card.build, '2026-09-27-hold-clear1');
     await page.screenshot({path: path.join(shotDir, 'cover-card-cancel1-phone-card.png'), fullPage: true});
     await page.setViewport({width: 1280, height: 800, isMobile: true, hasTouch: true, deviceScaleFactor: 1});
     await page.screenshot({path: path.join(shotDir, 'cover-card-cancel1-desktop-card.png'), fullPage: true});
