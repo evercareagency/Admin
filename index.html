@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
-<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. This tip does not auto-clear Bowlax's open hold from 10/03/2026. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
+<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. This tip does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, End hold and Save hold name the target hold id in the banner and list the others. After End hold, any remaining active hold stays on screen with its Start, End, and Note so the next End hold is intentional. One hold still ends with p_end_date. This tip does not delete live holds and does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-27-hold-autosave1">
 <!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1b: the left Aide Office name list is a fixed-height column with its own scrollbar (overflow-y: auto). A long roster does not stretch the Messages page. The thread panel and Schedule a Remi message stay fixed in view and do not scroll away with the roster. Option 2 one-box scroll stays: the message box scrolls and Schedule a Remi stays pinned in the thread panel. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-msg-dense1">
@@ -424,6 +424,10 @@ textarea{resize:vertical;min-height:80px;}
 .drawer-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .drawer-title{font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--teal-dark);}
 .hold-banner{background:#f6f1ff;border:1px solid #ddd0f5;border-radius:10px;padding:10px 12px;font-size:.82rem;line-height:1.45;margin:8px 0;}
+.hold-banner .hold-id{font-weight:700;word-break:break-all;}
+.hold-banner .hold-stack{list-style:none;margin:8px 0 0;padding:0;}
+.hold-banner .hold-stack li{padding:6px 0;border-top:1px solid #ddd0f5;}
+.hold-banner .hold-pick{width:100%;text-align:left;min-height:44px;white-space:normal;}
 .sched-chip.is-assumed{background:var(--teal-light);color:var(--teal-dark);}
 .sched-chip.is-hold{background:#f3eefe;color:#5b4b8a;border:1px dashed #b7a6e0;white-space:normal;}
 .sched-chip.is-hold .chip-sub{display:block;font-size:10px;font-weight:600;}
@@ -16025,6 +16029,7 @@ var schedClientHoldEnding=false;
 var schedClientHoldEnded=null;
 var schedPatternSaveLock=false;
 var schedHoldAutosave1Fired=0;
+var schedHoldTargetId='';
 var SCHEDULE_SLOT_DEEP_LINK_SHAPE={client_id:'', on_date:'', slot_key:''};
 var schedSlotMode=false;
 var schedSlotClients=[];
@@ -16862,12 +16867,118 @@ function schedCoverFollowHtml(slot, client, day){
   html+='<button type="button" class="btn btn-teal" data-slot-action="save-cover"'+attrs+'>Save mark</button></div>';
   return html;
 }
+function schedActiveHolds(client){
+  var out=[];
+  var list=client&&client.holds||[];
+  for(var i=0;i<list.length;i++){
+    var h=list[i];
+    if(!h||h.is_active===false)continue;
+    if(!h.hold_id&&!h.start_date)continue;
+    out.push(h);
+  }
+  return out;
+}
+function schedOverlayClientHolds(client){
+  if(!client)return;
+  schedActiveHolds(client).forEach(function(h){
+    for(var hd=1;hd<=7;hd++){
+      var dayRow=client.days[String(hd)];
+      if(!dayRow||!schedDateInHold(dayRow.on_date, h))continue;
+      dayRow.on_hold=true;
+      if(!dayRow.hold_id)dayRow.hold_id=h.hold_id;
+      if(!dayRow.hold_start)dayRow.hold_start=h.start_date;
+      if(!dayRow.hold_end)dayRow.hold_end=h.end_date;
+      if(!dayRow.hold_note&&h.note)dayRow.hold_note=h.note;
+      (dayRow.slots||[]).forEach(function(s){
+        s.on_hold=true;
+        if(!s.hold_id)s.hold_id=h.hold_id;
+        if(!s.hold_start)s.hold_start=h.start_date;
+        if(!s.hold_end)s.hold_end=h.end_date;
+        if(!s.hold_note&&h.note)s.hold_note=h.note;
+      });
+      var again=0;
+      (dayRow.slots||[]).forEach(function(s){again+=Number(schedSlotToward(s))||0;});
+      dayRow.day_hours=Math.round(again*100)/100;
+    }
+  });
+  var week=0;
+  for(var wh=1;wh<=7;wh++)week+=Number(client.days[String(wh)]&&client.days[String(wh)].day_hours)||0;
+  client.week_hours=Math.round(week*100)/100;
+}
+function schedFindActiveHold(client, id){
+  if(!id)return null;
+  var list=schedActiveHolds(client);
+  for(var i=0;i<list.length;i++){
+    if(String(list[i].hold_id)===String(id))return list[i];
+  }
+  return null;
+}
+function schedHoldView(h){
+  if(!h)return {id:'', start:'', end:'', note:''};
+  if(h.hold_id==null&&h.start_date==null)return {id:String(h.id||''), start:h.start||'', end:h.end||'', note:h.note||''};
+  return {id:String(h.hold_id||''), start:h.start_date||'', end:h.end_date||'', note:h.note||''};
+}
+function schedPickHoldTarget(slot, client, day){
+  var pinned=schedFindActiveHold(client, schedHoldTargetId);
+  if(pinned)return schedHoldView(pinned);
+  var fromSlot=schedHoldForSlot(slot, client, day);
+  if(fromSlot&&fromSlot.id){
+    var known=schedFindActiveHold(client, fromSlot.id);
+    if(known)return schedHoldView(known);
+    return fromSlot;
+  }
+  var on=day&&day.on_date;
+  var active=schedActiveHolds(client);
+  for(var i=0;i<active.length;i++){
+    if(schedDateInHold(on, active[i]))return schedHoldView(active[i]);
+  }
+  if(active.length===1)return schedHoldView(active[0]);
+  return fromSlot||{id:'', start:'', end:'', note:''};
+}
+function schedHoldRangeLabel(h){
+  var start=h.start_date||h.start||'';
+  var end=h.end_date||h.end||'';
+  var a=start?schedPretty(start):'';
+  var b=end?schedPretty(end):'open';
+  return (a||'—')+'–'+b;
+}
+function schedHoldStackListHtml(client, targetId, attrs){
+  var active=schedActiveHolds(client);
+  if(active.length<2)return '';
+  var html='<ul class="hold-stack">';
+  for(var i=0;i<active.length;i++){
+    var h=active[i];
+    var mine=targetId&&String(h.hold_id)===String(targetId);
+    var note=h.note?(' · '+schedEsc(h.note)):'';
+    var idBit=h.hold_id?(' · hold <span class="hold-id">'+schedEsc(h.hold_id)+'</span>'):'';
+    var range=schedEsc(schedHoldRangeLabel(h));
+    html+='<li'+(mine?' class="is-target"':'')+'>';
+    if(!mine&&h.hold_id){
+      html+='<button type="button" class="btn btn-ghost hold-pick" data-slot-action="pick-hold" data-hold-id="'+schedAttr(h.hold_id)+'"'+attrs+'>Also active · '+range+note+idBit+'</button>';
+    }else{
+      html+=(mine?'This End hold · ':'Also active · ')+range+note+idBit;
+    }
+    html+='</li>';
+  }
+  html+='</ul>';
+  return html;
+}
+function schedHoldBannerHtml(client, target, attrs){
+  var id=target&&target.id?String(target.id):'';
+  var html='<div class="hold-banner" data-hold-autosave1="'+HOLD_AUTOSAVE1_MARKER+'"><strong>Hospital / ER hold.</strong> ';
+  if(id)html+='End hold / Save hold targets hold <span class="hold-id">'+schedEsc(id)+'</span>. ';
+  html+='Start required · End optional (open-ended) · Note for office. Held days count <strong>0 hrs</strong>.';
+  html+=schedHoldStackListHtml(client, id, attrs||'');
+  html+='</div>';
+  return html;
+}
 function schedHoldFollowHtml(slot, client, day){
-  var hold=schedHoldForSlot(slot, client, day);
+  var hold=schedPickHoldTarget(slot, client, day);
+  if(hold.id)schedHoldTargetId=String(hold.id);
   var startVal=hold.start?schedPretty(hold.start):schedPretty(day.on_date);
   var endVal=hold.end?schedPretty(hold.end):'';
   var attrs=' data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'"';
-  var html='<div class="mark-follow is-hold" data-hold-clear1="'+HOLD_CLEAR1_MARKER+'"><div class="follow-title">On hold</div><div class="sched-two">';
+  var html='<div class="mark-follow is-hold" data-hold-clear1="'+HOLD_CLEAR1_MARKER+'" data-hold-autosave1="'+HOLD_AUTOSAVE1_MARKER+'"><div class="follow-title">On hold</div><div class="sched-two">';
   html+='<div class="field"><label for="schedHoldStart-'+schedAttr(slot.slot_key)+'">Start</label><input id="schedHoldStart-'+schedAttr(slot.slot_key)+'" type="text" inputmode="numeric" placeholder="MM/DD/YYYY" aria-label="Hold start date" value="'+schedAttr(startVal)+'"></div>';
   html+='<div class="field"><label for="schedHoldEnd-'+schedAttr(slot.slot_key)+'">End</label><input id="schedHoldEnd-'+schedAttr(slot.slot_key)+'" type="text" inputmode="numeric" placeholder="Open-ended" aria-label="Hold end date" value="'+schedAttr(endVal)+'"></div>';
   html+='</div>';
@@ -16925,6 +17036,11 @@ function schedBindSlotCards(){
     else if(action==='save-cover')schedSaveCover(clientId, onDate, key);
     else if(action==='save-hold')schedWriteHold(clientId, onDate, key, false);
     else if(action==='end-hold')schedWriteHold(clientId, onDate, key, true);
+    else if(action==='pick-hold'){
+      schedHoldTargetId=String(btn.getAttribute('data-hold-id')||'');
+      schedSlotMarkOpen='hold:'+schedNormSlotKey(key);
+      schedPaintSlotDetail();
+    }
     else if(action==='clear'){
       if(schedClearIsHold(clientId, onDate, key))schedClearHold(clientId, onDate, key);
       else schedClearSlotMark(clientId, onDate, key);
@@ -17043,8 +17159,15 @@ function schedPaintSlotDetail(){
   }
   var anyHold=false;
   day.slots.forEach(function(slot){if(schedSlotIsHold(slot))anyHold=true;});
-  if(anyHold){
-    html+='<div class="hold-banner"><strong>Hospital / ER hold.</strong> Start required · End optional (open-ended) · Note for office. Held days count <strong>0 hrs</strong>.</div>';
+  var bannerSlot=day.slots[0]||{slot_key:''};
+  if(String(schedSlotMarkOpen||'').indexOf('hold:')===0){
+    var openKey=schedNormSlotKey(schedSlotMarkOpen.slice(5));
+    day.slots.forEach(function(slot){if(slot.slot_key===openKey)bannerSlot=slot;});
+  }
+  var bannerTarget=schedPickHoldTarget(bannerSlot, client, day);
+  var bannerAttrs=' data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(bannerSlot.slot_key||'')+'"';
+  if(anyHold||schedActiveHolds(client).length>1||(bannerTarget.id&&String(schedSlotMarkOpen||'').indexOf('hold:')===0)){
+    html+=schedHoldBannerHtml(client, bannerTarget, bannerAttrs);
   }
   day.slots.forEach(function(slot){html+=schedSlotCardHtml(slot, client, day, can);});
   cards.innerHTML=html;
@@ -17822,7 +17945,8 @@ async function schedWriteHold(clientId, onDate, slotKey, ending){
   if(!(await schedOfficeReady()))return;
   await schedRefreshClientHolds(clientId);
   client=schedFindSlotClient(clientId)||client;
-  var holdId=schedHoldIdFor(client, start, key)||schedHoldIdFor(client, onDate, key);
+  var pinned=schedFindActiveHold(client, schedHoldTargetId);
+  var holdId=pinned?String(pinned.hold_id):(schedHoldIdFor(client, start, key)||schedHoldIdFor(client, onDate, key));
   schedSaving=true;
   try{
     var got;
@@ -17857,7 +17981,33 @@ async function schedWriteHold(clientId, onDate, slotKey, ending){
     schedSlotMarkOpen='hold:'+key;
     schedSlotFocus={client_id:String(clientId), on_date:String(onDate), slot_key:key};
     if(typeof logActivity==='function')logActivity(ending?'Ended schedule hospital hold':'Saved schedule hospital hold');
-    schedToast(ending?'Hold ended. The pattern resumes after '+endRaw+'.':(end?'Hold saved.':'Hold saved. Open-ended until End hold.'),'var(--success)');
+    if(ending){
+      var endedId=String(holdId);
+      await schedReloadWeek();
+      var listed=await schedRefreshClientHolds(clientId);
+      client=schedFindSlotClient(clientId)||client;
+      var pool=listed==null?(client&&client.holds||[]):listed;
+      var left=[];
+      for(var li=0;li<pool.length;li++){
+        if(!pool[li]||pool[li].is_active===false)continue;
+        if(String(pool[li].hold_id)===endedId)continue;
+        left.push(pool[li]);
+      }
+      if(left.length){
+        if(client&&listed)client.holds=pool;
+        schedOverlayClientHolds(client);
+        schedHoldTargetId=String(left[0].hold_id||'');
+        schedSlotMarkOpen='hold:'+key;
+        schedToast('Hold ended. Another active hold remains.','var(--warn)');
+        schedPaint();
+      }else{
+        schedHoldTargetId='';
+        schedToast('Hold ended. The pattern resumes after '+endRaw+'.','var(--success)');
+      }
+      schedSlotFormStamp='';
+      return;
+    }
+    schedToast(end?'Hold saved.':'Hold saved. Open-ended until End hold.','var(--success)');
     schedSlotFormStamp='';
     await schedReloadWeek();
   }finally{
@@ -17933,6 +18083,7 @@ function schedResetHoldForm(slotKey){
   if(endEl)endEl.value='';
   if(noteEl)noteEl.value='';
   if(String(schedSlotMarkOpen||'').indexOf('hold:')===0)schedSlotMarkOpen='';
+  schedHoldTargetId='';
 }
 function schedReleaseHoldSlot(slot){
   if(!slot)return;
