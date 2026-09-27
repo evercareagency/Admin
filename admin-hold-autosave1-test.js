@@ -340,6 +340,7 @@ function slot(on, key, extra){
     {hold_id: holdB, start_date: '2026-10-03', end_date: '', note: 'ER', open_ended: true, is_active: true}
   ];
   let listedHolds = stackHolds.slice();
+  let staleWeek = true;
   sandbox.sbRestRpc = function(name, body){
     rpc.push({name: name, body: body});
     if(name === 'list_schedule_client_holds')return Promise.resolve({ok: true, data: {holds: listedHolds}});
@@ -348,9 +349,10 @@ function slot(on, key, extra){
       return Promise.resolve({ok: true, data: {ok: true}});
     }
     if(name === 'list_schedule_week_slots' || name === 'list_schedule_week'){
+      var weekHolds = (staleWeek ? stackHolds : listedHolds).map(function(h){ return Object.assign({}, h); });
       return Promise.resolve({ok: true, data: {
         week_start: '2026-09-21',
-        clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: listedHolds, days: stackDays}]
+        clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: weekHolds, days: stackDays}]
       }});
     }
     return Promise.resolve({ok: true, data: {ok: true}});
@@ -363,8 +365,9 @@ function slot(on, key, extra){
   });
   sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
   sandbox.schedPaint();
-  assert.ok(els.schedSlotCards.innerHTML.includes(holdA), 'banner names the hold that End hold will change');
+  assert.ok(els.schedSlotCards.innerHTML.includes('targets hold <span class="hold-id">' + holdA), 'banner names the hold that End hold will change');
   assert.ok(els.schedSlotCards.innerHTML.includes(holdB), 'the other active hold is listed before End hold');
+  assert.ok(els.schedSlotCards.innerHTML.includes('also ends every other active hold'), 'the banner says End hold clears the stack');
   assert.ok(els.schedSlotCards.innerHTML.includes('10/03/2026'), 'the open hold shows its start');
   assert.ok(els.schedSlotCards.innerHTML.includes('open'), 'the open hold is labeled open');
   assert.ok(els.schedBody.innerHTML.includes('On hold'), 'the overlapping hospital week still paints On hold');
@@ -375,19 +378,46 @@ function slot(on, key, extra){
   toasts.length = 0;
   await sandbox.schedWriteHold(ada, '2026-09-21', 's1', true);
   const endedStack = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
-  assert.strictEqual(endedStack.length, 1, 'End hold ends one hold');
+  assert.strictEqual(endedStack.length, 2, 'End hold ends the target and the stacked open hold');
   assert.strictEqual(endedStack[0].body.p_hold_id, holdA);
+  assert.strictEqual(endedStack[1].body.p_hold_id, holdB);
   assert.strictEqual(endedStack[0].body.p_end_date, '2026-09-28');
+  assert.strictEqual(endedStack[1].body.p_end_date, '2026-09-28', 'the leftover open hold gets the same end date');
   assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_client_hold'; }), 'End hold does not invent a hold');
-  assert.ok(toasts.indexOf('Hold ended. Another active hold remains.') >= 0, 'a remaining hold is not silent');
-  assert.strictEqual(sandbox.schedHoldTargetId, holdB);
-  assert.strictEqual(sandbox.schedSlotMarkOpen, 'hold:s1', 'On hold stays selected for the remaining hold');
-  assert.ok(els.schedSlotCards.innerHTML.includes('targets hold <span class="hold-id">' + holdB), 'banner names the remaining hold');
-  assert.ok(els.schedSlotCards.innerHTML.includes('value="10/03/2026"'), 'remaining hold start stays on the form');
-  assert.ok(els.schedSlotCards.innerHTML.includes('>ER<') || els.schedSlotCards.innerHTML.includes('ER</textarea>') || els.schedSlotCards.innerHTML.includes('>ER</textarea>'), 'remaining hold note stays on screen');
+  assert.ok(toasts.indexOf('Hold ended. The pattern resumes after 09/28/2026.') >= 0, 'one End hold finishes the client');
+  assert.ok(toasts.indexOf('Hold ended. Another active hold remains.') < 0, 'End hold does not leave a second hold to end');
+  assert.notStrictEqual(sandbox.schedHoldTargetId, holdB);
+  const stamped = sandbox.schedFindSlotClient(ada);
+  const stampedB = (stamped.holds || []).filter(function(h){ return h.hold_id === holdB; })[0];
+  assert.ok(stampedB, 'the ended open hold stays a row with an end date');
+  assert.strictEqual(stampedB.end_date, '2026-09-28');
+  assert.strictEqual(stampedB.is_active, false, 'a start after the end date does not stay active');
+  assert.ok(!els.schedSlotCards.innerHTML.includes(holdB), 'the open leftover is not still the End hold target');
+  assert.ok(!els.schedSlotCards.innerHTML.includes('value="10/03/2026"'), 'the leftover start is not left on the form');
   rpc.length = 0;
   await sandbox.schedSaveSlotPattern();
-  assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_client_hold' || c.name === 'clear_schedule_client_hold'; }), 'Save week does not co-fire or delete the remaining hold');
+  assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_client_hold' || c.name === 'clear_schedule_client_hold'; }), 'Save week does not co-fire or delete a hold');
+  const laterDays = emptyDays('2026-10-05');
+  laterDays['1'].slots = [slot('2026-10-05', 's1')];
+  sandbox.schedFilterHold = true;
+  sandbox.schedApplySlotWeek({
+    week_start: '2026-10-05',
+    clients: [{
+      client_id: ada,
+      client_name: 'Bowlax Abib',
+      weekly_authorized_hours: 60,
+      holds: [
+        {hold_id: holdA, start_date: '2026-09-21', end_date: '2026-09-28', note: 'Hospital', is_active: true},
+        {hold_id: holdB, start_date: '2026-10-03', end_date: '2026-09-28', note: 'ER', is_active: true}
+      ],
+      days: laterDays
+    }]
+  });
+  sandbox.schedPaint();
+  assert.ok(!els.schedBody.innerHTML.includes('Bowlax'), 'On hold filter skips later weeks after every hold was ended');
+  assert.ok(!els.schedBody.innerHTML.includes('On hold'), 'an ended stack does not paint a later week');
+  sandbox.schedFilterHold = false;
+  staleWeek = false;
 
   listedHolds = [stackHolds[0]];
   sandbox.schedHoldTargetId = '';
@@ -406,6 +436,25 @@ function slot(on, key, extra){
   assert.strictEqual(rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; })[0].body.p_end_date, '2026-09-21');
   assert.ok(toasts.indexOf('Hold ended. The pattern resumes after 09/21/2026.') >= 0, 'one hold still uses the end-date chrome');
   assert.ok(toasts.indexOf('Hold ended. Another active hold remains.') < 0, 'one hold does not pretend another remains');
+
+  const clearDays = emptyDays('2026-09-21');
+  clearDays['1'].slots = [slot('2026-09-21', 's1', {hours: 0, on_hold: true, hold_id: holdA, hold_start: '2026-09-21', hold_end: '2026-09-28', mark: 'on_hold'})];
+  listedHolds = stackHolds.map(function(h){ return Object.assign({}, h); });
+  staleWeek = false;
+  sandbox.schedHoldTargetId = '';
+  sandbox.schedFilterHold = false;
+  sandbox.schedApplySlotWeek({
+    week_start: '2026-09-21',
+    clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: listedHolds.slice(), days: clearDays}]
+  });
+  sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
+  rpc.length = 0;
+  await sandbox.schedClearHold(ada, '2026-09-21', 's1');
+  const soft = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
+  assert.strictEqual(soft.length, 1, 'Clear soft-clears only the targeted hold');
+  assert.strictEqual(soft[0].body.p_hold_id, holdA);
+  assert.ok(!Object.prototype.hasOwnProperty.call(soft[0].body, 'p_end_date'), 'Clear omits p_end_date');
+  assert.ok(listedHolds.some(function(h){ return h.hold_id === holdB; }), 'Clear leaves the other active hold');
 
   await shots();
   console.log('admin-hold-autosave1-test ok');
@@ -683,23 +732,58 @@ async function shots(){
     });
     await phone.screenshot({path: path.join(outDir, 'hold-autosave1-phone-stacked-before-end.png')});
     await phone.evaluate(function(){
+      var start = document.getElementById('schedHoldStart-s1');
+      var end = document.getElementById('schedHoldEnd-s1');
+      var note = document.getElementById('schedHoldNote-s1');
+      if(start)start.value = '09/21/2026';
+      if(end)end.value = '09/28/2026';
+      if(note)note.value = 'Hospital';
       var btn = document.querySelector('[data-slot-action="end-hold"]');
       btn.scrollIntoView({block: 'center'});
       btn.click();
     });
     await phone.waitForFunction(function(holdB){
-      var banner = document.querySelector('.hold-banner');
-      var start = document.getElementById('schedHoldStart-s1');
-      return banner && banner.innerText.indexOf(holdB) >= 0 && start && start.value === '10/03/2026' && document.body.innerText.indexOf('Another active hold remains') >= 0;
+      var calls = window.__calls.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
+      var text = document.body.innerText;
+      return calls.length === 2 && calls[0].body.p_end_date === '2026-09-28' && calls[1].body.p_hold_id === holdB && calls[1].body.p_end_date === '2026-09-28' && text.indexOf('The pattern resumes after') >= 0 && text.indexOf('Another active hold remains') < 0;
     }, {}, holdB);
-    await phone.evaluate(function(){
-      var banner = document.querySelector('.hold-banner');
-      if(!banner)return;
-      banner.scrollIntoView({block: 'start', inline: 'nearest'});
-      var top = banner.getBoundingClientRect().top;
-      if(top < 64 || top > 120)window.scrollBy(0, top - 72);
+    await phone.evaluate(function(holdA, holdB, adaId){
+      schedFilterHold = true;
+      var days = {};
+      var start = new Date('2026-10-05T12:00:00Z');
+      for(var wd = 1; wd <= 7; wd++){
+        var dt = new Date(start.getTime());
+        dt.setUTCDate(start.getUTCDate() + wd - 1);
+        var iso = dt.toISOString().slice(0, 10);
+        days[String(wd)] = {
+          weekday: wd,
+          on_date: iso,
+          day_hours: wd === 1 ? 10 : 0,
+          slots: wd === 1 ? [{slot_key: 's1', hours: 10, aide_name: 'Amina Hassan'}] : []
+        };
+      }
+      schedApplySlotWeek({
+        week_start: '2026-10-05',
+        clients: [{
+          client_id: adaId,
+          client_name: 'Bowlax Abib',
+          weekly_authorized_hours: 60,
+          holds: [
+            {hold_id: holdA, start_date: '2026-09-21', end_date: '2026-09-28', note: 'Hospital', is_active: true},
+            {hold_id: holdB, start_date: '2026-10-03', end_date: '2026-09-28', note: 'ER', is_active: true}
+          ],
+          days: days
+        }]
+      });
+      schedPaint();
+      var btn = document.getElementById('schedFilterHold');
+      if(btn)btn.scrollIntoView({block: 'start', inline: 'nearest'});
+    }, holdA, holdB, ada);
+    await phone.waitForFunction(function(){
+      var body = document.getElementById('schedBody');
+      return body && body.innerText.indexOf('Bowlax') < 0 && body.innerText.indexOf('On hold') < 0;
     });
-    await phone.screenshot({path: path.join(outDir, 'hold-autosave1-phone-stacked-remaining.png')});
+    await phone.screenshot({path: path.join(outDir, 'hold-autosave1-phone-end-clears-stacked.png')});
     console.log('hold-autosave1 phone shots ok');
   } finally {
     await browser.close();
