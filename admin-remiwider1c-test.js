@@ -170,7 +170,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(gate.build, '2026-09-27-vapid1');
+    assert.strictEqual(gate.build, '2026-09-27-remi-sched1');
     assert.strictEqual(gate.hidden, false);
     assert.strictEqual(gate.aide, '');
     assert.ok(/Not yet writes nothing/.test(gate.note), gate.note);

@@ -2816,9 +2816,9 @@ Call (216) 377-5991 with any questions.</textarea>
           <div>
             <div class="lbl">Time</div>
             <div class="val">
-              <input id="remiNotesHour" class="remi-time-part" type="text" inputmode="numeric" maxlength="2" aria-label="Hour" value="9" oninput="remiNotesPickPreview()">
+              <input id="remiNotesHour" class="remi-time-part" type="text" inputmode="numeric" maxlength="2" aria-label="Hour" value="9" onfocus="this.select()" oninput="remiNotesPickPreview()">
               <span>:</span>
-              <input id="remiNotesMin" class="remi-time-part" type="text" inputmode="numeric" maxlength="2" aria-label="Minute" value="00" oninput="remiNotesPickPreview()">
+              <input id="remiNotesMin" class="remi-time-part" type="text" inputmode="numeric" maxlength="2" aria-label="Minute" value="00" onfocus="this.select()" oninput="remiNotesPickPreview()">
             </div>
           </div>
           <div class="ampm">
@@ -16626,7 +16626,7 @@ function remiNotesFromAsk(q, now){
 
 // remi notes vis1 v=remi-notes-vis1
 // Ace desk notes in the Remi rail. Office JWT via sbRestRpc. is_scheduler_office.
-// Nurse does not get these writes. Admin My notes stay private. No spy badge.
+// Nurse does not get these writes. Admin My notes stay private. No visibility badge.
 var REMI_NOTES_VIS1_MARKER='v=remi-notes-vis1';
 var REMI_NOTES_VIS1_OFFICE='is_scheduler_office';
 var remiNotesVis1Which='my';

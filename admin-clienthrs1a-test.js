@@ -346,7 +346,7 @@ async function runBrowser(){
         aidesText: (aides && (aides.innerText || aides.textContent)) || ''
       };
     });
-    assert.strictEqual(placed.build, '2026-09-27-vapid1');
+    assert.strictEqual(placed.build, '2026-09-27-remi-sched1');
     assert.strictEqual(placed.marker, 'v=clienthrs1a');
     assert.strictEqual(placed.title, 'Add Client');
     assert.strictEqual(placed.label, 'Weekly authorized hours (hrs/week)');

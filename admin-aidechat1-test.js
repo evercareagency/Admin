@@ -141,8 +141,8 @@ async function runBrowser(){
         ask: typeof REMI_ASK_MARKER === 'string' ? REMI_ASK_MARKER : ''
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-vapid1');
-    assert.strictEqual(boot.second, '2026-09-27-clienthrs1d');
+    assert.strictEqual(boot.first, '2026-09-27-remi-sched1');
+    assert.strictEqual(boot.second, '2026-09-27-remi-rules1');
     assert.strictEqual(boot.marker, 'v=aidechat1');
     assert.strictEqual(boot.ask, 'v=remiask1');
 

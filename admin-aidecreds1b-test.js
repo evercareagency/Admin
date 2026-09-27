@@ -217,7 +217,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(empty.hidden, false, 'Admin sees credentials on an empty rollup');
-    assert.strictEqual(empty.build, '2026-09-27-vapid1');
+    assert.strictEqual(empty.build, '2026-09-27-remi-sched1');
     assert.ok(empty.text.includes('No credential records yet'), empty.text);
     assert.ok(empty.text.includes('Add credential'), empty.text);
     assert.ok(empty.text.includes('Probe QA Test') && empty.text.includes('QA CoverAide'), empty.text);

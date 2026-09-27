@@ -50,7 +50,8 @@ assert.ok(src.includes('does not re-seed'), 'empty desk does not invent seeded c
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|mossier/.test(src), 'no Auth reseal');
 assert.ok(!/\bQuo\b|twilio|send_sms/.test(src), 'no Quo or SMS');
 assert.ok(src.includes('Nurse cannot use Remi schedules'), 'nurse writes refused');
-assert.ok(!/new Function|grok.*runner|functions\.invoke/i.test(src), 'no Grok clock runner');
+assert.ok(src.includes('No Friday or Ace Grok runner'), 'clocks stay in Supabase');
+assert.ok(!/new Function|functions\.invoke/.test(src), 'no clock runner');
 
 const ASK = 'Hey Remi \u2014 every Monday at 9 give me the missing hours report.';
 const JOBS = [

@@ -137,7 +137,7 @@ async function runBrowser(){
     assert.strictEqual(boot.sheetHidden, true, 'Remi sheet stays closed on login');
     assert.strictEqual(boot.adminActive, false, 'login is the desk, not a Remi takeover');
     assert.strictEqual(boot.fabVisible, false, 'Remi chip stays off the login screen');
-    assert.strictEqual(boot.build, '2026-09-27-vapid1');
+    assert.strictEqual(boot.build, '2026-09-27-remi-sched1');
 
     await page.evaluate(function(ids){
       localStorage.clear();

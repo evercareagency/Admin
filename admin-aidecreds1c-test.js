@@ -240,7 +240,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(after.build, '2026-09-27-vapid1');
+    assert.strictEqual(after.build, '2026-09-27-remi-sched1');
     assert.strictEqual(after.banner, '⚠ 2 credentials need attention');
     assert.strictEqual(after.cover, '✓ All current', after.cover);
     assert.ok(after.probe.indexOf('Expiring') >= 0 && after.probe.indexOf('1 overdue') >= 0, after.probe);

@@ -436,7 +436,7 @@ async function phoneShots(){
         detail: !document.getElementById('schedSlotDetail').hidden
       };
     });
-    assert.strictEqual(week.build, '2026-09-27-vapid1');
+    assert.strictEqual(week.build, '2026-09-27-remi-sched1');
     assert.strictEqual(week.viewW, 390);
     assert.ok(week.chips >= 2, 'two chips on the week board ' + week.chips);
     assert.ok(week.stack.indexOf('Sara') >= 0 && week.stack.indexOf('Kim') >= 0, 'stacked Sara and Kim ' + week.stack);

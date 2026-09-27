@@ -357,6 +357,7 @@ async function runBrowser(){
     assert.strictEqual(reply.p_body, 'No — she said 11 AM. Update the blast to 11.');
 
     const schedRole = await page.evaluate(async function(){
+      window.__rpc = [];
       currentAdminRole = 'Scheduler';
       remiNotesVis1ResetTab();
       remiNotesShow();

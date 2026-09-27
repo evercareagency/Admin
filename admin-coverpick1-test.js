@@ -271,7 +271,7 @@ async function runBrowser(){
         clientWidth: document.documentElement.clientWidth
       };
     });
-    assert.strictEqual(ranked.build, '2026-09-27-vapid1');
+    assert.strictEqual(ranked.build, '2026-09-27-remi-sched1');
     assert.strictEqual(ranked.marker, 'v=coverpick1');
     assert.ok(ranked.rankTop < ranked.btnTop, 'ranked list stays above Pick another aide');
     assert.strictEqual(ranked.rosterHidden, true, 'full roster stays closed until opened');

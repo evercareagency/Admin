@@ -121,9 +121,9 @@ async function runBrowser(){
         chip: document.querySelector('#copilotFab img').getAttribute('src')
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-vapid1');
-    assert.strictEqual(boot.second, '2026-09-27-clienthrs1d');
-    assert.strictEqual(boot.third, '2026-09-27-remi-cm-email1');
+    assert.strictEqual(boot.first, '2026-09-27-remi-sched1');
+    assert.strictEqual(boot.second, '2026-09-27-remi-rules1');
+    assert.strictEqual(boot.third, '2026-09-27-remi-notes-vis1');
     assert.strictEqual(boot.marker, 'v=clienthrs1d');
     assert.ok(boot.chip.indexOf('remi-locked.png') >= 0, boot.chip);
 

@@ -96,7 +96,7 @@ async function runBrowser(){
         prior: CLIENTHRS1D_MARKER
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-vapid1');
+    assert.strictEqual(boot.first, '2026-09-27-remi-sched1');
     assert.strictEqual(boot.marker, 'v=vapid1');
     assert.strictEqual(boot.prior, 'v=clienthrs1d');
 

@@ -133,7 +133,7 @@ async function runBrowser(){
         onScreen: r.left >= 0 && r.right <= window.innerWidth + 1 && r.bottom <= window.innerHeight + 1
       };
     });
-    assert.strictEqual(chip.build, '2026-09-27-vapid1');
+    assert.strictEqual(chip.build, '2026-09-27-remi-sched1');
     assert.strictEqual(chip.marker, 'v=remiask1');
     assert.strictEqual(chip.sheetHidden, true);
     assert.strictEqual(chip.label, 'Remi');

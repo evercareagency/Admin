@@ -355,7 +355,7 @@ async function runBrowser(){
         fabTop: fabBox.top
       };
     }, heldCsv, readyOnlyCsv);
-    assert.strictEqual(phone.build, '2026-09-27-vapid1');
+    assert.strictEqual(phone.build, '2026-09-27-remi-sched1');
     assert.strictEqual(phone.marker, 'v=payready1d');
     assert.strictEqual(phone.prior, 'v=payready1c');
     assert.ok(phone.viewW >= 380 && phone.viewW <= 400, 'phone width '+phone.viewW);

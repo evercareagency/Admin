@@ -405,7 +405,7 @@ async function shots(){
         sheetHidden: document.getElementById('copilotSheet').hidden
       };
     });
-    assert.strictEqual(phoneProbe.build, '2026-09-27-vapid1');
+    assert.strictEqual(phoneProbe.build, '2026-09-27-remi-sched1');
     assert.strictEqual(phoneProbe.viewW, 390);
     assert.ok(phoneProbe.scroll > phoneProbe.client + 40, 'phone week scrolls');
     assert.strictEqual(phoneProbe.checks, 7);

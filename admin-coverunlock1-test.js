@@ -251,7 +251,7 @@ async function runBrowser(){
     }
 
     const opened = await measure('opened');
-    assert.strictEqual(opened.build, '2026-09-27-vapid1');
+    assert.strictEqual(opened.build, '2026-09-27-remi-sched1');
     assert.strictEqual(opened.marker, 'v=coverunlock1');
     assert.strictEqual(opened.contacted, false, 'opened without text or call');
     assert.ok(opened.note.indexOf('optional') >= 0, opened.note);

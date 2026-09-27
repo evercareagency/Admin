@@ -62,12 +62,12 @@ function runSlice(){
 (async function unit(){
   const sandbox = runSlice();
   assert.strictEqual(sandbox.REMI_RULES1_MARKER, 'v=remi-rules1');
-  const chips = sandbox.remiRules1ChipsFrom(FIX);
+  const chips = Array.from(sandbox.remiRules1ChipsFrom(FIX));
   assert.deepStrictEqual(chips, ['Using rule: Bowlax cover order', 'Using rule: Quiet hours']);
   assert.ok(chips.join(' ').indexOf('Devon') < 0, 'off rules stay off the chip');
-  const titled = sandbox.remiRules1ChipsFrom([{id:'r9', title:'Skip vacation aides', body:'Skip them.', is_on:true}]);
+  const titled = Array.from(sandbox.remiRules1ChipsFrom([{id:'r9', title:'Skip vacation aides', body:'Skip them.', is_on:true}]));
   assert.deepStrictEqual(titled, ['Using rule: Skip vacation aides']);
-  assert.deepStrictEqual(sandbox.remiRules1ChipsFrom([]), []);
+  assert.deepStrictEqual(Array.from(sandbox.remiRules1ChipsFrom([])), []);
   assert.strictEqual(sandbox.remiRules1IsCoverContext('Maria called off Bowlax tomorrow 9–1.', {}), true);
   assert.strictEqual(sandbox.remiRules1IsCoverContext('who can cover Bowlax', {kind:'coverage_open'}), true);
   assert.strictEqual(sandbox.remiRules1IsCoverContext('tell me a joke about the weather', {}), false);
@@ -313,8 +313,9 @@ async function runBrowser(){
     const chip = await page.evaluate(function(){
       return document.getElementById('copilotBody').innerText;
     });
-    assert.ok(chip.indexOf('Using rule: Bowlax cover order') >= 0, chip);
     assert.ok(chip.indexOf('Using rule: Quiet hours') >= 0, chip);
+    assert.ok(chip.indexOf('Using rule: Skip vacation aides') >= 0, chip);
+    assert.ok(chip.indexOf('Using rule: Bowlax cover order') < 0, 'off rules stay off the chip '+chip);
 
     const desk = await browser.newPage();
     await desk.setViewport({width:1280, height:800, isMobile:false, hasTouch:false, deviceScaleFactor:1});
