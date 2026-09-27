@@ -13,7 +13,7 @@ assert.ok(html.includes('admin-build 2026-09-25-aidechat1'), 'aidechat1 build no
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidechat1">'), 'aidechat1 meta');
 assert.ok(html.includes('<!-- aide office chat 2026-09-25 v=aidechat1 admin-build 2026-09-25-aidechat1'), 'aidechat1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-text-chat1'), 'isdash1b is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-sched-time-tap1'), 'isdash1b is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiask1">'), 'remiask1 meta stays');
 assert.ok(html.indexOf('content="2026-09-25-aidechat1"') < html.indexOf('content="2026-09-25-remiask1"'), 'remiask1 stays on the next meta');
 assert.ok(html.indexOf('content="2026-09-25-remiask1"') < html.indexOf('content="2026-09-25-remiwider1c"'), 'remiwider1c stays after remiask1');
@@ -138,13 +138,15 @@ async function runBrowser(){
         first: document.querySelector('meta[name="admin-build"]').content,
         second: metas[1] ? metas[1].content : '',
         third: metas[2] ? metas[2].content : '',
+        fourth: metas[3] ? metas[3].content : '',
         marker: AIDECHAT_MARKER,
         ask: typeof REMI_ASK_MARKER === 'string' ? REMI_ASK_MARKER : ''
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-aide-text-chat1');
-    assert.strictEqual(boot.second, '2026-09-27-remi-float-hide1');
-    assert.strictEqual(boot.third, '2026-09-27-tabbar-8');
+    assert.strictEqual(boot.first, '2026-09-27-sched-time-tap1');
+    assert.strictEqual(boot.second, '2026-09-27-aide-text-chat1');
+    assert.strictEqual(boot.third, '2026-09-27-remi-float-hide1');
+    assert.strictEqual(boot.fourth, '2026-09-27-tabbar-8');
     assert.strictEqual(boot.marker, 'v=aidechat1');
     assert.strictEqual(boot.ask, 'v=remiask1');
 

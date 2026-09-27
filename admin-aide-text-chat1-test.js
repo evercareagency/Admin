@@ -17,7 +17,8 @@ assert.ok(html.includes("var AIDE_TEXT_CHAT1_MARKER='v=aide-text-chat1'"), 'scri
 assert.ok(html.includes('GHOST-AIDE-TEXT-CHAT1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-text-chat1'), 'first admin-build is aide-text-chat1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-sched-time-tap1'), 'first admin-build is sched-time-tap1');
+assert.ok(html.indexOf('content="2026-09-27-sched-time-tap1"') < html.indexOf('content="2026-09-27-aide-text-chat1"'), 'aide-text-chat1 stays after sched-time-tap1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
 assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
 assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
