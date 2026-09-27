@@ -30,10 +30,11 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-isdash1">'
 assert.ok(html.includes('<!-- inservice compliance dashboard 2026-09-26 v=isdash1 admin-build 2026-09-26-isdash1'), 'isdash1 comment');
 assert.ok(html.includes("var ISDASH1_MARKER='v=isdash1'"), 'isdash1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-26-isdash1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-26-isdash1b'), 'isdash1b is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-remi-notes1">'), 'remi-notes1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1b">'), 'clienthrs1b meta stays');
 assert.ok(html.includes('v=remi-notes1') && html.includes('v=clienthrs1b'), 'prior markers stay');
+assert.ok(html.indexOf('content="2026-09-26-isdash1b"') < html.indexOf('content="2026-09-26-isdash1"'), 'isdash1 stays below isdash1b');
 assert.ok(html.indexOf('content="2026-09-26-isdash1"') < html.indexOf('content="2026-09-26-remi-notes1"'), 'remi-notes1 stays below isdash1');
 assert.ok(html.indexOf('content="2026-09-26-remi-notes1"') < html.indexOf('content="2026-09-26-clienthrs1b"'), 'clienthrs1b stays below remi-notes1');
 
@@ -53,15 +54,16 @@ const viewCert = extractFn(html, 'function viewISCert(rowIndex)');
 const printCert = extractFn(html, 'function printISCert(rowIndex)');
 const reminder = extractFn(html, 'async function sendISReminder(rowIndexOrUsername,name)');
 
-assert.ok(!loadIS.includes('get_assigned_topic'), 'compliance grid does not read assignments');
+assert.ok(loadIS.includes("apiGetCached('get_assigned_topic',null,force===true)"), 'compliance loads every assignment, not SELECT TOPIC');
 assert.ok(!loadIS.includes('sbAssignTopicQuery'), 'compliance list does not take SELECT TOPIC');
 assert.ok(!loadIS.includes('assignTopicSel'), 'compliance list does not read the dropdown');
 assert.ok(!loadIS.includes('sbDisplayedAssignment'), 'compliance list does not use the assign-target helper');
-assert.ok(!loadIS.includes('isAideOnCurrentISAssignment'), 'not completed is not assignment-scoped');
-assert.ok(!loadIS.includes('isComplianceAssignmentViews'), 'compliance does not walk assignment rows');
+assert.ok(!loadIS.includes('isAideOnCurrentISAssignment'), 'scope check is the compliance helper');
+assert.ok(loadIS.includes('isComplianceAssignmentViews'), 'compliance walks every assignment row');
+assert.ok(loadIS.includes('isAideInComplianceAssignment'), 'not completed follows assignment scope');
 assert.ok(!/topic_id/.test(loadIS), 'compliance list does not add a topic_id filter');
-assert.ok(loadIS.includes('aides.forEach')&&loadIS.includes('topics.forEach'), 'compliance is every aide × every catalog topic');
-assert.ok(loadIS.includes('row.isCompleted=!!completion||isISCompletedRecord(completion)'), 'Active result marks Completed; otherwise Not Completed');
+assert.ok(loadIS.includes('aides.forEach')&&loadIS.includes('topics.forEach'), 'compliance still walks every aide × every catalog topic');
+assert.ok(loadIS.includes('row.isCompleted=!!completion||isISCompletedRecord(completion)'), 'Active result marks Completed');
 assert.ok(loadIS.includes('Completed results stay here after Clear Assignment'), 'clear keeps completed rows');
 assert.strictEqual((html.match(/\n    id:\d+, title:"/g)||[]).length, 12, 'SELECT TOPIC catalog is 12 topics');
 
@@ -172,6 +174,10 @@ const src = [
   extractFn(html, 'function sbDisplayedAssignment(data)'),
   extractFn(html, 'function syncIsAssignChecksFromAssignment(data)'),
   extractFn(html, 'function isAideOnCurrentISAssignment(assignView, username)'),
+  extractFn(html, 'function isComplianceAssignmentViews(data)'),
+  extractFn(html, 'function isComplianceAssignmentForTopic(list, topicId)'),
+  extractFn(html, 'function isAideInComplianceAssignment(assign, username)'),
+  extractFn(html, 'function isCompliancePairKey(username, topicId)'),
   loadIS,
   onChange,
   refresh
@@ -185,16 +191,17 @@ function rowKey(row){
 (async function(){
   await sandbox.loadISCompliance(true);
   const keys = Array.prototype.map.call(sandbox._rendered, rowKey).sort();
-  assert.strictEqual(sandbox._rendered.length, usersPayload.data.length*topics.length, 'row count is aides × catalog topics');
   assert.deepStrictEqual(keys, [
     'asha|1|done',
-    'asha|2|open',
     'pat|1|open',
-    'pat|2|open'
-  ], 'every aide × every catalog topic; topic 2 is Not Completed even though asha is not assigned');
-  assert.ok(!keys.some(function(k){return k.indexOf('|5|')>=0;}), 'a result outside the catalog does not add a row');
+    'pat|2|open',
+    'pat|5|done'
+  ], 'Completed is every Active result; Not Completed only when the aide is in that topic scope');
+  assert.ok(!keys.some(function(k){return k==='asha|2|open';}), 'asha is outside topic 2 SELECTED, so that Not Completed cell is omitted');
   assert.ok(!sandbox._rendered.some(function(r){return r.id==='r-arch';}), 'archived results stay off the dashboard');
-  assert.strictEqual(calls.filter(function(c){return c.kind==='get' && c.action==='get_assigned_topic';}).length, 0, 'compliance load does not fetch assignments');
+  const assignGets = calls.filter(function(c){return c.kind==='get' && c.action==='get_assigned_topic';});
+  assert.strictEqual(assignGets.length, 1, 'compliance loads assignments once');
+  assert.ok(!assignGets[0].extra || assignGets[0].extra.topicId==null, 'assignment fetch is org-wide, not SELECT TOPIC');
   assert.strictEqual(calls.filter(function(c){return c.kind==='get' && c.action==='get_users';}).length, 1, 'compliance uses the active aide list');
   assert.strictEqual(calls.filter(function(c){return c.kind==='post' && c.action==='get_inservices';}).length, 1);
 
@@ -213,8 +220,10 @@ function rowKey(row){
   els.assignTopicSel.value = '9';
   await sandbox.loadISCompliance(true);
   assert.deepStrictEqual(Array.prototype.map.call(sandbox._rendered, rowKey).sort(), keys, 'a later refresh still ignores SELECT TOPIC');
-  assert.strictEqual(calls.filter(function(c){return c.kind==='get' && c.action==='get_assigned_topic';}).length, 0, 'refresh still ignores SELECT TOPIC and assignments');
-  assert.strictEqual(sandbox._rendered.length, usersPayload.data.length*topics.length, 'refresh keeps the full grid');
+  const refreshAssign = calls.filter(function(c){return c.kind==='get' && c.action==='get_assigned_topic';});
+  assert.strictEqual(refreshAssign.length, 1, 'refresh reloads org-wide assignments');
+  assert.ok(!refreshAssign[0].extra || refreshAssign[0].extra.topicId==null, 'refresh does not pass SELECT TOPIC');
+  assert.strictEqual(sandbox._rendered.length, keys.length, 'refresh keeps the scoped grid');
 
   console.log('admin-isdash1-test: ok');
 })().catch(function(err){
