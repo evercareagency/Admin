@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi job receipts 2026-09-27 v=remi-proof1 admin-build 2026-09-27-remi-proof1. GHOST-REMI-PROOF1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Remi receipts stay the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. After admin_confirm_cover_send the rail also posts admin_finalize_remi_cover_receipt. That call is additive. admin_blast_cover_request and admin_confirm_cover_send stay. The rail paints rail_chip and chip_summary with Open full proof, then admin_get_remi_receipt. Receipts and Recent receipts list admin_list_remi_receipts and paint list_summary, finished_label, and status. Chat such as show me the Bowlax receipt posts admin_find_remi_receipt. Lighter Sent rows can post admin_record_remi_job_receipt when a scheduled job finishes. Probe seed a0a0e41d-6cdd-4ad0-ad11-ba44b3f31513 stays usable through find, get, and list. Office JWT via sbRestRpc. is_scheduler_office. Nurse does not get Remi writes. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=vapid1, v=clienthrs1d, v=remi-cm-email1, and v=remiface1. -->
+<meta name="admin-build" content="2026-09-27-remi-proof1">
 <!-- remi scheduled jobs 2026-09-27 v=remi-sched1 admin-build 2026-09-27-remi-sched1. GHOST-REMI-SCHED1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Remi Scheduled stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Tabs are Radar, Ask, Notes, Rules, and Scheduled. Chat such as every Monday at 9 give me the missing hours report shows a New schedule chip with Confirm and Change time. Confirm posts admin_create_remi_scheduled_job with p_kind, p_title, p_weekday, p_local_time, optional p_job_key, p_summary, p_prompt_text, p_timezone, and p_is_on. The rail parses weekday and time. There is no admin_preview_remi_schedule_parse RPC. The Scheduled tab lists admin_list_remi_scheduled_jobs and paints title, schedule_label, and On/Off. Toggle and Change time post admin_update_remi_scheduled_job. Seeded defaults stay On in Ace and this desk does not re-seed them: Missing hours report Monday 9:00 AM ET, Hours nudge Friday noon, Manager digest Friday 2:00 PM ET. list_due_remi_scheduled_jobs is a processor stub only. This desk does not call it and does not add a Friday or Ace Grok runner. Office JWT via sbRestRpc. is_scheduler_office. Nurse does not get Remi writes. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-rules1, v=remi-notes-vis1, v=vapid1, v=clienthrs1d, v=remi-cm-email1, v=remiface1, and v=remi-notes1. -->
 <meta name="admin-build" content="2026-09-27-remi-sched1">
 <!-- remi rules 2026-09-27 v=remi-rules1 admin-build 2026-09-27-remi-rules1. GHOST-REMI-RULES1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Remi Rules stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. The Rules tab lists admin_list_remi_rules as On/Off cards with title and body. Add rule posts admin_create_remi_rule {p_title, p_body, p_is_on}. Toggle and edit post admin_update_remi_rule and prefer p_is_on over delete. On a call-off or cover answer, the rail paints chip_label from admin_list_active_remi_rules for On rules only. Rules are only saved remi_rules. This desk does not invent a rule from a joke. Office JWT via sbRestRpc. is_scheduler_office. Nurse does not get Remi writes. No Auth reseal. No Quo/SMS. Prior markers stay, including v=remi-notes-vis1, v=vapid1, v=clienthrs1d, v=remi-cm-email1, v=remiface1, and v=remi-notes1. -->
@@ -945,6 +947,25 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #copilotSheet .remi-pack-form .row .go{background:var(--teal);color:#fff;border:0;}
 #copilotSheet .remi-pack-form .row .alt{background:#fff;color:#6b7a90;border:1px solid var(--border);}
 #remiNotes1Keep{margin-top:14px;padding-top:8px;border-top:1px dashed var(--border);}
+#copilotSheet .remi-proof{min-width:0;max-width:100%;}
+#copilotSheet .remi-proof h3{font-size:0.95rem;color:var(--navy);margin:0 0 8px;}
+#copilotSheet .remi-proof-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;min-width:0;}
+#copilotSheet .remi-proof-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+#copilotSheet .remi-proof-top h3{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;margin:0;color:var(--navy);}
+#copilotSheet .remi-proof-status{font-size:0.68rem;font-weight:800;background:#e6f7ed;color:#1e7a45;padding:4px 8px;border-radius:6px;flex:0 0 auto;}
+#copilotSheet .remi-proof-status.is-sent{background:#eef2ff;color:#3b4cca;}
+#copilotSheet .remi-proof-sub{font-size:0.82rem;color:var(--muted);margin:8px 0 0;line-height:1.4;}
+#copilotSheet .remi-proof-row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:0.82rem;}
+#copilotSheet .remi-proof-row span{color:var(--muted);}
+#copilotSheet .remi-proof-row strong{color:var(--navy);}
+#copilotSheet .remi-proof-steps{margin-top:10px;}
+#copilotSheet .remi-proof-step{display:flex;gap:8px;margin-top:8px;font-size:0.78rem;line-height:1.4;}
+#copilotSheet .remi-proof-dot{width:10px;height:10px;border-radius:50%;background:var(--teal);margin-top:4px;flex:0 0 10px;}
+#copilotSheet .remi-proof-chip{margin-top:8px;background:#fff;border:1px solid var(--teal);border-radius:10px;padding:10px;font-size:0.78rem;line-height:1.4;}
+#copilotSheet .remi-proof-chip strong{display:block;color:var(--navy);margin-bottom:4px;}
+#copilotSheet .remi-proof-open,#copilotSheet .remi-proof-back{display:inline-flex;align-items:center;min-height:44px;margin-top:4px;background:transparent;border:0;color:var(--teal);font-weight:800;font-family:'DM Sans',sans-serif;padding:0;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-proof-mini{display:block;width:100%;text-align:left;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--off);font-size:0.78rem;line-height:1.4;margin-bottom:8px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;min-height:44px;touch-action:manipulation;}
+#copilotSheet .remi-proof-mini strong{display:block;font-size:0.68rem;color:var(--muted);margin-bottom:4px;font-weight:700;}
 @media(max-width:899px){
   #copilotSheet{top:72px;border-radius:22px 22px 0 0;box-shadow:0 -16px 40px rgba(26,39,68,.28);}
 }
@@ -2763,7 +2784,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -2780,6 +2801,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabNotes" role="tab" aria-selected="false" data-reminotes1="v=remi-notes1" onclick="remiNotesShow()">Notes</button>
         <button type="button" class="copilot-tab" id="copilotTabRules" role="tab" aria-selected="false" data-remi-rules1="v=remi-rules1" onclick="remiRules1Show()">Rules</button>
         <button type="button" class="copilot-tab" id="copilotTabSched" role="tab" aria-selected="false" data-remi-sched1="v=remi-sched1" onclick="remiSched1Show()">Scheduled</button>
+        <button type="button" class="copilot-tab" id="copilotTabProof" role="tab" aria-selected="false" data-remi-proof1="v=remi-proof1" onclick="remiProof1Show()">Receipts</button>
       </div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
@@ -7593,19 +7615,22 @@ function copilotSyncTabs(){
   var onNotes=copilotView==='notes';
   var onRules=copilotView==='rules';
   var onSched=copilotView==='scheduled';
+  var onProof=copilotView==='receipts';
   var radar=copilotEl('copilotTabRadar');
   var ask=copilotEl('copilotTabAsk');
   var notes=copilotEl('copilotTabNotes');
   var rules=copilotEl('copilotTabRules');
   var sched=copilotEl('copilotTabSched');
+  var proof=copilotEl('copilotTabProof');
   var dock=copilotEl('copilotComposer');
   var notesDock=copilotEl('remiNotesDock');
   var sheet=copilotEl('copilotSheet');
-  if(radar)radar.setAttribute('aria-selected', (!onAsk&&!onNotes&&!onRules&&!onSched)?'true':'false');
+  if(radar)radar.setAttribute('aria-selected', (!onAsk&&!onNotes&&!onRules&&!onSched&&!onProof)?'true':'false');
   if(ask)ask.setAttribute('aria-selected', onAsk?'true':'false');
   if(notes)notes.setAttribute('aria-selected', onNotes?'true':'false');
   if(rules)rules.setAttribute('aria-selected', onRules?'true':'false');
   if(sched)sched.setAttribute('aria-selected', onSched?'true':'false');
+  if(proof)proof.setAttribute('aria-selected', onProof?'true':'false');
   if(dock)dock.hidden=!onAsk;
   if(notesDock)notesDock.hidden=!onNotes;
   if(sheet&&sheet.classList){
@@ -7615,6 +7640,8 @@ function copilotSyncTabs(){
     else sheet.classList.remove('is-rules');
     if(onSched)sheet.classList.add('is-scheduled');
     else sheet.classList.remove('is-scheduled');
+    if(onProof)sheet.classList.add('is-receipts');
+    else sheet.classList.remove('is-receipts');
   }
   if(!onNotes&&typeof remiNotesClosePicker==='function')remiNotesClosePicker();
 }
@@ -7628,7 +7655,7 @@ function copilotChatViewport(){
   if(!sheet)return;
   var vv=window.visualViewport;
   var phone=window.innerWidth<=520;
-  var chatting=(copilotView==='chat'||copilotView==='notes'||copilotView==='rules'||copilotView==='scheduled')&&!sheet.hidden&&phone&&vv;
+  var chatting=(copilotView==='chat'||copilotView==='notes'||copilotView==='rules'||copilotView==='scheduled'||copilotView==='receipts')&&!sheet.hidden&&phone&&vv;
   if(!chatting){
     sheet.style.top='';
     sheet.style.height='';
@@ -8026,7 +8053,7 @@ function copilotPaintChat(){
     var packChips=(!mine&&msg.ruleChips&&msg.ruleChips.length&&typeof remiRules1ChipsHtml==='function')?remiRules1ChipsHtml(msg.ruleChips):'';
     if(!mine&&msg.sched&&typeof remiSched1BubbleHtml==='function')html+=packChips+remiSched1BubbleHtml(msg, idx);
     else if(!mine&&msg.cm&&typeof remiCmHtml==='function')html+=packChips+remiCmHtml(msg.cm, idx);
-    else html+=packChips+copilotChatHtml(msg.text||'');
+    else html+=packChips+copilotChatHtml(msg.text||'')+((!mine&&msg.proof&&typeof remiProof1ChipHtml==='function')?remiProof1ChipHtml(msg.proof):'');
     if(!mine&&!msg.sched&&msg.actions&&msg.actions.length){
       html+='<div class="copilot-actions'+(msg.actionsLayout==='row'?' copilot-actions-row':'')+'">';
       msg.actions.forEach(function(a, ai){
@@ -8078,15 +8105,21 @@ function copilotChatSubmit(ev){
   else if(typeof remiSched1FromAsk==='function'){
     try{ans=remiSched1FromAsk(q);}catch(eSched){ans=null;}
   }
+  if(!ans&&typeof remiProof1FromAsk==='function'){
+    try{ans=remiProof1FromAsk(q);}catch(eProof){ans=null;}
+  }
   if(!ans)ans=copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
-  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false};
+  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false, proof:ans.proof||null, proofQuery:ans.proofQuery||''};
   if(!ans.sched&&typeof remiRules1IsCoverContext==='function'&&remiRules1IsCoverContext(q, ans))bubble.ruleContext=true;
   copilotChat.push({role:'mo', text:q});
   copilotChat.push(bubble);
   copilotPaintChat();
   if(bubble.ruleContext&&typeof remiRules1LoadChips==='function'){
     try{remiRules1LoadChips(copilotChat.length-1);}catch(eChips){}
+  }
+  if(bubble.proofQuery&&typeof remiProof1Lookup==='function'){
+    try{remiProof1Lookup(copilotChat.length-1);}catch(eLook){}
   }
   if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
   else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
@@ -15915,6 +15948,9 @@ async function coverSimpleConfirmSend(){
   if(banner){banner.hidden=false;banner.textContent=line;}
   if(typeof showTempMsg==='function')showTempMsg(line,'var(--success)');
   coverSimpleHideDraft();
+  try{
+    if(typeof remiProof1AfterCover==='function')remiProof1AfterCover(ctx.open_shift_id, ctx);
+  }catch(eProof){}
   if(clientId&&onDate){
     try{schedPendingDeepLink={client_id:clientId, on_date:onDate, slot_key:slotKey};}catch(e){}
   }
@@ -17441,6 +17477,292 @@ async function remiSched1SaveTime(id){
   return got;
 }
 // end remi sched1 v=remi-sched1
+
+// remi proof1 v=remi-proof1
+// Receipts stay in this rail. Finalize is additive after admin_confirm_cover_send. Blast and confirm stay.
+var REMI_PROOF1_MARKER='v=remi-proof1';
+var REMI_PROOF1_OFFICE='is_scheduler_office';
+var remiProof1Cache=[];
+var remiProof1Error='';
+var remiProof1OpenId='';
+function remiProof1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function remiProof1OfficeOk(){
+  var role=remiProof1Role();
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function remiProof1El(id){
+  try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
+  return null;
+}
+function remiProof1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof copilotEsc==='function')return copilotEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiProof1SafeId(id){
+  return String(id||'').replace(/[^A-Za-z0-9-]/g,'');
+}
+function remiProof1IsReceiptAsk(q){
+  return /\breceipts?\b/i.test(String(q||''));
+}
+async function remiProof1Call(name, body){
+  if(typeof sbRestRpc!=='function')return {ok:false, error:'Receipts are not callable yet.'};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  if(!got||got.ok!==true)return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(got.data); if(un)node=un;}catch(eUn){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(eJson){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    return {ok:false, error:String(node.error||node.message||'Request failed.'), data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+async function remiProof1Rpc(name, body){
+  if(!remiProof1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi receipts.'};
+  return remiProof1Call(name, body);
+}
+function remiProof1Rows(data){
+  if(!data)return [];
+  if(Array.isArray(data))return data;
+  if(Array.isArray(data.receipts))return data.receipts;
+  if(data.receipt&&typeof data.receipt==='object')return [data.receipt];
+  return [];
+}
+function remiProof1One(data){
+  if(!data)return null;
+  if(data.receipt&&typeof data.receipt==='object')return data.receipt;
+  if(data.best&&typeof data.best==='object')return data.best;
+  var rows=remiProof1Rows(data);
+  return rows.length?rows[0]:null;
+}
+function remiProof1CountLabel(n, one, many){
+  var num=Number(n);
+  if(!isFinite(num))return '';
+  return num+' '+(num===1?one:many);
+}
+function remiProof1StatusClass(status){
+  return String(status||'').toLowerCase()==='sent'?' is-sent':'';
+}
+function remiProof1DoneText(receipt){
+  receipt=receipt||{};
+  var client=String(receipt.client_name||'').trim();
+  var who=String(receipt.assigned_aide_name||'').trim().split(/\s+/)[0];
+  if(client&&who)return 'Done \u2014 '+client+' is Covered with '+who+'.';
+  if(client)return 'Done \u2014 '+client+' is Covered.';
+  return 'Done \u2014 coverage is Covered.';
+}
+function remiProof1ChipFrom(data){
+  data=data||{};
+  var receipt=remiProof1One(data);
+  var chip=data.rail_chip&&typeof data.rail_chip==='object'?data.rail_chip:null;
+  var summary=chip&&chip.summary?String(chip.summary):(receipt&&receipt.chip_summary?String(receipt.chip_summary):'');
+  var id=chip&&chip.receipt_id?chip.receipt_id:(receipt&&receipt.id?receipt.id:'');
+  var open=chip&&chip.open_label?String(chip.open_label):'Open full proof \u2192';
+  if(!summary&&!id)return null;
+  return {summary:summary, receipt_id:id, open_label:open, receipt:receipt};
+}
+function remiProof1ChipHtml(proof){
+  proof=proof||{};
+  var id=remiProof1SafeId(proof.receipt_id);
+  var html='<div class="remi-proof-chip" data-remi-proof1="'+REMI_PROOF1_MARKER+'"><strong>Receipt</strong>';
+  html+=remiProof1Esc(proof.summary||'');
+  if(id)html+='<br><button type="button" class="remi-proof-open" id="remiProof1Open" onclick="remiProof1Open(\''+id+'\')">'+remiProof1Esc(proof.open_label||'Open full proof \u2192')+'</button>';
+  html+='</div>';
+  return html;
+}
+function remiProof1StepText(step){
+  step=step||{};
+  var when=String(step.at_label||'').trim();
+  var label=String(step.label||'').trim();
+  if(when&&label)return when+' \u2014 '+label;
+  return when||label;
+}
+function remiProof1CardHtml(receipt){
+  receipt=receipt||{};
+  var status=String(receipt.status||'');
+  var blasted=remiProof1CountLabel(receipt.blasted_count, 'aide', 'aides');
+  var said=receipt.said_yes_count==null?'':String(receipt.said_yes_count);
+  var html='<div class="remi-proof-card" data-remi-proof1="'+REMI_PROOF1_MARKER+'">';
+  html+='<div class="remi-proof-top"><h3>'+remiProof1Esc(receipt.title||'Coverage receipt')+'</h3>';
+  if(status)html+='<span class="remi-proof-status'+remiProof1StatusClass(status)+'">'+remiProof1Esc(status)+'</span>';
+  html+='</div>';
+  if(receipt.subtitle)html+='<p class="remi-proof-sub">'+remiProof1Esc(receipt.subtitle)+'</p>';
+  if(blasted)html+='<div class="remi-proof-row"><span>Blasted</span><strong>'+remiProof1Esc(blasted)+'</strong></div>';
+  if(said!=='')html+='<div class="remi-proof-row"><span>Said yes</span><strong>'+remiProof1Esc(said)+'</strong></div>';
+  if(receipt.assigned_aide_name)html+='<div class="remi-proof-row"><span>Assigned</span><strong>'+remiProof1Esc(receipt.assigned_aide_name)+'</strong></div>';
+  if(receipt.finished_label)html+='<div class="remi-proof-row"><span>Finished</span><strong>'+remiProof1Esc(receipt.finished_label)+'</strong></div>';
+  var steps=Array.isArray(receipt.timeline)?receipt.timeline:[];
+  if(steps.length){
+    html+='<div class="remi-proof-steps">';
+    steps.forEach(function(step){
+      var line=remiProof1StepText(step);
+      if(!line)return;
+      html+='<div class="remi-proof-step"><div class="remi-proof-dot"></div><div>'+remiProof1Esc(line)+'</div></div>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  return html;
+}
+function remiProof1MiniHtml(row){
+  row=row||{};
+  var id=remiProof1SafeId(row.id);
+  var head=[String(row.finished_label||'').trim(), String(row.status||'').trim()].filter(Boolean).join(' \u00B7 ');
+  var html='<button type="button" class="remi-proof-mini" data-receipt-id="'+remiProof1Esc(id)+'" onclick="remiProof1Open(\''+id+'\')">';
+  html+='<strong>'+remiProof1Esc(head||'Receipt')+'</strong>'+remiProof1Esc(row.list_summary||row.title||'');
+  html+='</button>';
+  return html;
+}
+function remiProof1ListHtml(){
+  var html='<div class="remi-proof" id="remiProof1" data-remi-proof1="'+REMI_PROOF1_MARKER+'">';
+  html+='<h3>Recent receipts</h3>';
+  if(remiProof1Error)html+='<p class="remi-vis-hint">'+remiProof1Esc(remiProof1Error)+'</p>';
+  if(!remiProof1Cache.length&&!remiProof1Error)html+='<p class="remi-vis-hint">No receipts yet. A cover confirm posts one here.</p>';
+  remiProof1Cache.forEach(function(row){html+=remiProof1MiniHtml(row);});
+  html+='</div>';
+  return html;
+}
+function remiProof1PaintList(){
+  var host=remiProof1El('copilotBody');
+  try{copilotView='receipts';}catch(eView){}
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  var title=remiProof1El('copilotTitle');
+  if(title)title.textContent='Remi';
+  if(host)host.innerHTML=remiProof1ListHtml();
+}
+function remiProof1PaintCard(receipt){
+  var host=remiProof1El('copilotBody');
+  try{copilotView='receipts';}catch(eView){}
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  var title=remiProof1El('copilotTitle');
+  if(title)title.textContent='Remi';
+  if(!host)return;
+  host.innerHTML='<div class="remi-proof" id="remiProof1Card" data-remi-proof1="'+REMI_PROOF1_MARKER+'"><button type="button" class="remi-proof-back" onclick="remiProof1Show()">Recent receipts</button>'+remiProof1CardHtml(receipt)+'</div>';
+}
+function remiProof1Show(){
+  if(!remiProof1OfficeOk())return;
+  var sheet=remiProof1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  remiProof1OpenId='';
+  remiProof1PaintList();
+  remiProof1Load().catch(function(){});
+}
+async function remiProof1Load(){
+  if(!remiProof1OfficeOk())return {ok:false, forbidden:true};
+  var got=await remiProof1Rpc('admin_list_remi_receipts', {p_limit:20});
+  if(!got||!got.ok){
+    remiProof1Error=(got&&got.error)||'Could not load receipts.';
+  }else{
+    remiProof1Error='';
+    remiProof1Cache=remiProof1Rows(got.data);
+  }
+  try{if(copilotView==='receipts'&&!remiProof1OpenId)remiProof1PaintList();}catch(ePaint){if(!remiProof1OpenId)remiProof1PaintList();}
+  return got;
+}
+async function remiProof1Open(id){
+  if(!remiProof1OfficeOk())return {ok:false, forbidden:true};
+  var safe=remiProof1SafeId(id);
+  if(!safe)return {ok:false, error:'Missing receipt.'};
+  remiProof1OpenId=safe;
+  var sheet=remiProof1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  var got=await remiProof1Rpc('admin_get_remi_receipt', {p_id:safe});
+  if(!got||!got.ok){
+    remiProof1Error=(got&&got.error)||'Could not open that receipt.';
+    remiProof1OpenId='';
+    remiProof1PaintList();
+    return got||{ok:false};
+  }
+  remiProof1Error='';
+  remiProof1PaintCard(remiProof1One(got.data)||{});
+  return got;
+}
+function remiProof1FromAsk(q){
+  if(!remiProof1OfficeOk())return null;
+  if(!remiProof1IsReceiptAsk(q))return null;
+  return {sec:true, kind:'', text:'Looking up that receipt.', actions:[], proofQuery:String(q||'').trim()};
+}
+function remiProof1PostChip(data){
+  var proof=remiProof1ChipFrom(data);
+  if(!proof)return;
+  var receipt=proof.receipt||remiProof1One(data);
+  var text=remiProof1DoneText(receipt);
+  try{
+    if(typeof copilotChat==='undefined'||!copilotChat)return;
+    var sheet=remiProof1El('copilotSheet');
+    if(sheet)sheet.hidden=false;
+    copilotChat.push({role:'remi', text:text, kind:'', actions:[], sec:true, proof:proof});
+    if(typeof copilotPaintChat==='function')copilotPaintChat();
+  }catch(ePost){}
+}
+async function remiProof1AfterCover(openShiftId, ctx){
+  if(!remiProof1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi receipts.'};
+  var id=String(openShiftId||'').trim();
+  if(!id)return {ok:false, error:'No open shift.'};
+  var body={p_open_shift_id:id};
+  var ids=ctx&&ctx.said_yes_aide_ids;
+  if(Array.isArray(ids)&&ids.length){
+    body.p_said_yes_aide_ids=ids.map(function(item){return String(item||'');}).filter(Boolean);
+  }
+  var got=await remiProof1Rpc('admin_finalize_remi_cover_receipt', body);
+  if(got&&got.ok)remiProof1PostChip(got.data);
+  return got;
+}
+async function remiProof1Lookup(idx){
+  if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx])return {ok:false};
+  var msg=copilotChat[idx];
+  var q=String(msg.proofQuery||'').trim();
+  if(!q)return {ok:false};
+  var got=await remiProof1Rpc('admin_find_remi_receipt', {p_query:q, p_limit:10});
+  if(!got||!got.ok){
+    msg.text=(got&&got.error)||'Could not find that receipt.';
+    msg.proof=null;
+  }else{
+    var proof=remiProof1ChipFrom(got.data);
+    var rows=remiProof1Rows(got.data);
+    msg.proof=proof;
+    msg.text=proof?'Here\u2019s that receipt.':'No receipt matched that.';
+    if(rows.length>1&&proof){
+      msg.text+=' '+rows.length+' matches.';
+    }
+  }
+  try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint){}
+  return got;
+}
+async function remiProof1RecordJob(job){
+  if(!remiProof1OfficeOk())return {ok:false, forbidden:true};
+  job=job||{};
+  var body={
+    p_kind:job.kind||job.p_kind||'custom',
+    p_title:job.title||job.p_title||'Scheduled note',
+    p_status:job.status||job.p_status||'Sent'
+  };
+  var sub=job.subtitle||job.p_subtitle;
+  var chip=job.chip_summary||job.p_chip_summary;
+  var list=job.list_summary||job.p_list_summary;
+  var timeline=job.timeline||job.p_timeline;
+  var finished=job.finished_at||job.p_finished_at;
+  if(sub)body.p_subtitle=sub;
+  if(chip)body.p_chip_summary=chip;
+  if(list)body.p_list_summary=list;
+  if(timeline)body.p_timeline=timeline;
+  if(finished)body.p_finished_at=finished;
+  if(job.blasted_count!=null)body.p_blasted_count=job.blasted_count;
+  if(job.said_yes_count!=null)body.p_said_yes_count=job.said_yes_count;
+  return remiProof1Rpc('admin_record_remi_job_receipt', body);
+}
+// end remi proof1 v=remi-proof1
 
 
 function copyLink(inputId){

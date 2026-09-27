@@ -16,7 +16,7 @@ assert.ok(html.includes('<!-- remi face 2026-09-27 v=remiface1 admin-build 2026-
 assert.ok(html.includes("var REMI_CM_EMAIL1_MARKER='v=remi-cm-email1'"), 'remi-cm-email1 script marker');
 assert.ok(html.includes("var REMIFACE1_MARKER='v=remiface1'"), 'remiface1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-sched1'), 'first admin-build is remi-cm-email1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-proof1'), 'first admin-build is remi-cm-email1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remiface1">'), 'remiface1 meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-coverage-simple1">'), 'coverage-simple1 meta stays');
 assert.ok(html.includes('v=coverage-simple1'), 'coverage-simple1 marker stays');
