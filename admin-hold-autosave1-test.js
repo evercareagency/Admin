@@ -491,8 +491,12 @@ async function shots(){
     assert.ok(saved.who.indexOf('Bowlax') >= 0, saved.who);
     assert.ok(saved.when.indexOf('09/21/2026') >= 0, saved.when);
     await phone.evaluate(function(){
-      var card = document.querySelector('.sched-slot-card.is-assumed') || document.querySelector('.sched-slot-card');
-      if(card)card.scrollIntoView({block: 'center'});
+      var mark = document.querySelector('.sched-mark.is-assumed');
+      var card = mark ? mark.closest('.sched-slot-card') : document.querySelector('.sched-slot-card');
+      if(!card)return;
+      card.scrollIntoView({block: 'start', inline: 'nearest'});
+      var top = card.getBoundingClientRect().top;
+      if(top < 64 || top > 120)window.scrollBy(0, top - 72);
     });
     await phone.screenshot({path: path.join(outDir, 'hold-autosave1-phone-save-week-assumed.png')});
 
@@ -535,8 +539,12 @@ async function shots(){
     assert.ok(held.banner.indexOf('Hospital') >= 0, held.banner);
     assert.ok(held.chip.indexOf('0 hrs') >= 0, held.chip);
     await phone.evaluate(function(){
-      var card = document.querySelector('.sched-slot-card.is-hold');
-      if(card)card.scrollIntoView({block: 'center'});
+      var mark = document.querySelector('.sched-mark.is-hold');
+      var card = mark ? mark.closest('.sched-slot-card') : document.querySelector('.sched-slot-card.is-hold');
+      if(!card)return;
+      card.scrollIntoView({block: 'start', inline: 'nearest'});
+      var top = card.getBoundingClientRect().top;
+      if(top < 64 || top > 120)window.scrollBy(0, top - 72);
     });
     await phone.screenshot({path: path.join(outDir, 'hold-autosave1-phone-save-hold.png')});
     console.log('hold-autosave1 phone shots ok');
