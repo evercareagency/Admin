@@ -32,7 +32,7 @@ assert.ok(html.includes("var ISDASH1B_MARKER='v=isdash1b'"), 'isdash1b script ma
 assert.ok(html.includes('v=isdash1'), 'isdash1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-isdash1">'), 'isdash1 meta stays');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-float-noshow1'), 'isdash1b is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-ideas763'), 'isdash1b is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-26-isdash1b"') < html.indexOf('content="2026-09-26-isdash1"'), 'isdash1 stays below isdash1b');
 assert.ok(!html.includes('evercare_is_compliance_hidden'), 'no localStorage compliance hide');
 assert.ok(!html.includes('admin_hide_inservice_compliance'), 'no new Ace hide RPC');

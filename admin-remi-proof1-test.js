@@ -18,7 +18,7 @@ assert.ok(html.includes("var REMI_PROOF1_MARKER='v=remi-proof1'"), 'remi-proof1 
 assert.ok(html.includes(DEMO), 'probe seed stays documented');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-float-noshow1'), 'first admin-build is remi-proof1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-ideas763'), 'first admin-build is remi-proof1');
 assert.ok(html.indexOf('content="2026-09-27-remi-proof1"') < html.indexOf('content="2026-09-27-remi-sched1"'), 'sched follows proof');
 assert.ok(html.indexOf('content="2026-09-27-remi-sched1"') < html.indexOf('content="2026-09-27-remi-rules1"'), 'rules follows sched');
 assert.ok(html.indexOf('content="2026-09-27-remi-rules1"') < html.indexOf('content="2026-09-27-remi-notes-vis1"'), 'notes vis follows rules');

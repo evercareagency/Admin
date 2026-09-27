@@ -29,7 +29,7 @@ assert.ok(html.includes('admin-build 2026-09-25-payready1d'), 'payready1d build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1d">'), 'payready1d meta');
 assert.ok(html.includes('<!-- admin pay readiness export ready-list defense 2026-09-25 v=payready1d admin-build 2026-09-25-payready1d'), 'payready1d comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-float-noshow1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-ideas763'), 'isdash1 is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1d"') < html.indexOf('content="2026-09-25-payready1c"'), 'payready1c stays after payready1d');
 assert.ok(html.indexOf('content="2026-09-25-payready1c"') < html.indexOf('content="2026-09-25-payready1b"'), 'payready1b stays after payready1c');
