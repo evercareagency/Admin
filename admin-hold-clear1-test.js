@@ -19,16 +19,17 @@ assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callab
 assert.ok(html.includes('Patch none'), 'no SQL patch in the tip');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/hold-clear1-v1.sql')), 'no hold-clear1 SQL file');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-clear1'), 'first admin-build is hold-clear1');
-assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after this tip');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-langs1'), 'first admin-build is remi-langs1');
+assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after remi-langs1');
+assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
 assert.ok(html.indexOf('content="2026-09-27-sched-time-tap1"') < html.indexOf('content="2026-09-27-aide-text-chat1"'), 'aide-text-chat1 stays after sched-time-tap1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
 assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
 assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
-['2026-09-27-sched-time-tap1','2026-09-27-aide-text-chat1','2026-09-27-remi-float-hide1','2026-09-27-tabbar-8','2026-09-27-cover-card-cancel1','2026-09-27-nosvc-reason-draft1','2026-09-27-cover-unselect1','2026-09-27-clienthrs1c','2026-09-27-shift-slim1','2026-09-26-clienthrs1b','2026-09-25-aidechat1'].forEach(function(meta){
+['2026-09-27-remi-langs1','2026-09-27-sched-time-tap1','2026-09-27-aide-text-chat1','2026-09-27-remi-float-hide1','2026-09-27-tabbar-8','2026-09-27-cover-card-cancel1','2026-09-27-nosvc-reason-draft1','2026-09-27-cover-unselect1','2026-09-27-clienthrs1c','2026-09-27-shift-slim1','2026-09-26-clienthrs1b','2026-09-25-aidechat1'].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="' + meta + '">'), 'prior meta stays ' + meta);
 });
-['v=sched-time-tap1','v=aide-text-chat1','v=remi-float-hide1','v=tabbar-8','v=cover-card-cancel1','v=clienthrs1c','v=shift-slim1','v=remi-payroll1','v=coverage-simple1'].forEach(function(mark){
+['v=remi-langs1','v=sched-time-tap1','v=aide-text-chat1','v=remi-float-hide1','v=tabbar-8','v=cover-card-cancel1','v=clienthrs1c','v=shift-slim1','v=remi-payroll1','v=coverage-simple1'].forEach(function(mark){
   assert.ok(html.includes(mark), 'prior marker stays ' + mark);
 });
 assert.ok(html.includes('id="copilotFab"'), 'Remi corner chip stays');
@@ -433,7 +434,7 @@ async function shots(){
         sheet: document.getElementById('copilotSheet').hidden
       };
     });
-    assert.strictEqual(selected.build, '2026-09-27-hold-clear1');
+    assert.strictEqual(selected.build, '2026-09-27-remi-langs1');
     assert.strictEqual(selected.role, 'Scheduler');
     assert.strictEqual(selected.who, 'Jaz');
     assert.strictEqual(selected.selected, true);

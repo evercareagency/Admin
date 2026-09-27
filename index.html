@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi langs 2026-09-27 v=remi-langs1 admin-build 2026-09-27-remi-langs1. GHOST-REMI-LANGS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Preferred language picker has 7 English labels in Friday order: English, Spanish, Arabic, Swahili, Chinese, Russian, Ukrainian. No Somali. The list comes from admin_list_aide_preferred_languages. Set posts admin_set_aide_preferred_language. Get posts admin_get_aide_preferred_language. Blank or null reads as en. Canonical codes are en, es, ar, sw, zh, ru, and uk. Somali and so raise 22023. Admin chrome stays English. Remi cover-ask preview and the Messages body use the aide preferred language from admin_draft_bilingual_cover_ask. Send SMS is a UI mock only. sms_send.implemented is false and sms_send.oos is true. Prefer Send in Messages, which posts admin_send_bilingual_cover_in_messages and returns sms_sent false. No SMS provider call. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. No Quo/SMS. ideas763 Why-open, pay dispute, and the ES bilingual path stay. HARD wire: after every successful admin_set_aide_preferred_language the rail drops the previous draft and re-calls admin_draft_bilingual_cover_ask. Cover-ask and Messages paint preview_body, translated_body, or ui_body only. When target_language is not en, english_draft and source_body are not painted. paint stays preview_body. admin_language stays en. Prior markers stay, including v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
+<meta name="admin-build" content="2026-09-27-remi-langs1">
 <!-- schedule hold clear 2026-09-27 v=hold-clear1 admin-build 2026-09-27-hold-clear1. GHOST-HOLD-CLEAR1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Mo LIVE bug. Patch none. Reuse clienthrs1c RPCs. Schedule day detail, On hold selected: Clear under Save hold / End hold was a no-op. Clear with a hold_id posts clear_schedule_client_hold {p_hold_id} and omits p_end_date so Ace sets is_active false. When the day used p_mark on_hold, Clear also posts clear_schedule_slot_day_mark {p_client_id, p_on_date, p_slot_key} for each affected slot. Clear always empties Start, End, and Note, unselects On hold, hides the follow panel, and refreshes the week and day so hold chips leave and hours resume. A draft that was never saved resets locally only and still clears on screen. End hold stays clear_schedule_client_hold {p_hold_id, p_end_date} only. shift-slim1 look stays. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, schedule, remi-*, or aides-info1. Dates people read are MM/DD/YYYY. Prior markers stay, including v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=clienthrs1c, and v=shift-slim1. -->
 <meta name="admin-build" content="2026-09-27-hold-clear1">
 <!-- schedule time tap 2026-09-27 v=sched-time-tap1 admin-build 2026-09-27-sched-time-tap1. GHOST-SCHED-TIME-TAP1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. Schedule Edit shift Start and End: the entire field box opens the time picker. Each box is at least 48px tall and the full width of its field column. A click on the box calls input[type=time].showPicker(). If showPicker is missing, the box focuses the time input and clicks it. Add another uses the same Start and End controls. Hours still come from start–end. Save, Cancel, weekday checks, and the aide select stay as they are. shift-slim1 look stays. No transparent overlay on only the right 24px. No pointer-events none that leaves a tiny real input. The clock icon does not need a second tap. Remi is N/A. No Auth reseal. No Quo/SMS. Do not touch remi or aides-info1. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=shift-slim1, v=clienthrs1c, and v=clienthrs1b. -->
@@ -1187,6 +1189,45 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .sched-chip.is-open-hole{background:#fff0e0;color:#b86e00;border:1px solid #f0c090;display:block;border-radius:7px;padding:5px 7px;font-size:11px;font-weight:700;line-height:1.25;margin-bottom:4px;}
 #copilotSheet .remi-proof-mini{display:block;width:100%;text-align:left;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--off);font-size:0.78rem;line-height:1.4;margin-bottom:8px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;min-height:44px;touch-action:manipulation;}
 #copilotSheet .remi-proof-mini strong{display:block;font-size:0.68rem;color:var(--muted);margin-bottom:4px;font-weight:700;}
+/* v=remi-langs1 — preferred language picker and cover-ask preview. Phone sheet and desktop right rail. */
+#remiLangsHost[hidden],#remiLangsAideCard[hidden],#remiLangsMsgCard[hidden]{display:none !important;}
+#remiLangsHost{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;margin:0 0 8px;min-width:0;max-width:100%;}
+#copilotSheet:has(#remiLangsHost:not([hidden])) #copilotComposer,
+#copilotSheet:has(#remiLangsHost:not([hidden])) #copilotBody{display:none !important;}
+#copilotSheet .remi-langs{display:flex;flex-direction:column;gap:10px;min-width:0;max-width:100%;}
+#copilotSheet .remi-langs-bubble{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;color:#1e2a3a;min-width:0;max-width:100%;box-sizing:border-box;}
+#copilotSheet .remi-langs-chip,.remi-langs-card .remi-langs-chip{display:inline-block;font-size:10px;font-weight:700;background:#e8f0f8;color:var(--navy);padding:3px 7px;border-radius:5px;margin:0 0 6px;}
+#copilotSheet .remi-langs-pick-select,.remi-langs-card .remi-langs-pick-select{margin:8px 0;}
+#copilotSheet .remi-langs-pick-select label,#remiLangsSelectSlot label{display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+#copilotSheet .remi-langs-pick-select select,#remiLangsSelectSlot select{width:100%;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:16px;font-family:inherit;background:#fff;color:var(--navy);min-height:44px;}
+#copilotSheet .remi-langs-note,.remi-langs-card .remi-langs-note{font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.45;}
+#copilotSheet .remi-langs-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+#copilotSheet .remi-langs-btns button{flex:1 1 120px;min-height:44px;border-radius:8px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;touch-action:manipulation;padding:9px 12px;}
+#copilotSheet .remi-langs-go{background:var(--teal);color:#fff;border:0;}
+#copilotSheet .remi-langs-alt{background:#fff;border:1px solid var(--border);color:var(--teal);opacity:.55;}
+#copilotSheet .remi-langs-sms{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;}
+#copilotSheet .remi-langs-langtag{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1e6060;margin-bottom:6px;}
+#copilotSheet .remi-langs-to{font-size:11px;color:var(--muted);margin-bottom:6px;}
+#copilotSheet .remi-langs-to strong{color:var(--navy);}
+#copilotSheet .remi-langs-body,.remi-langs-msg .remi-langs-out{font-size:14px;line-height:1.55;color:#1e2a3a;background:var(--off);border-radius:8px;padding:12px;border:1px dashed #b8dcdc;white-space:pre-wrap;overflow-wrap:anywhere;}
+#copilotSheet .remi-langs-body.is-rtl,.remi-langs-msg .remi-langs-out.is-rtl{direction:rtl;text-align:right;}
+#copilotSheet .remi-langs-en{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.4;}
+#copilotSheet .remi-langs-en strong{color:var(--navy);}
+.remi-langs-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;max-width:420px;margin:0 0 14px;}
+.remi-langs-who{font-size:11px;font-weight:700;background:#e8f4f4;color:#1e6060;padding:5px 9px;border-radius:8px;display:inline-block;margin-bottom:10px;}
+.remi-langs-h{font-family:'Playfair Display',Georgia,serif;font-size:22px;color:var(--navy);margin:0 0 4px;}
+.remi-langs-sub{font-size:13px;color:var(--muted);margin:0 0 14px;line-height:1.4;}
+.remi-langs-card-inner h3{font-size:15px;color:var(--navy);margin:0 0 4px;}
+.remi-langs-meta{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.remi-langs-msg{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;max-width:560px;margin:0 0 14px;}
+.remi-langs-thread{border:1px solid var(--border);border-radius:12px;background:#fff;overflow:hidden;}
+.remi-langs-thread-h{padding:14px 16px;border-bottom:1px solid var(--border);}
+.remi-langs-thread-h h3{font-size:16px;color:var(--navy);font-family:'Playfair Display',Georgia,serif;margin:0;}
+.remi-langs-thread-h .meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.remi-langs-msgs{padding:14px 16px;background:var(--off);}
+.remi-langs-out{max-width:88%;margin-left:auto;background:#e8f4f4;border:1px solid var(--border);border-radius:12px 12px 4px 12px;padding:10px 12px;font-size:13px;line-height:1.45;}
+.remi-langs-out .who{font-size:11px;font-weight:700;color:#1e6060;margin-bottom:3px;}
+.remi-langs-out .t{font-size:10px;color:var(--muted);margin-top:4px;}
 /* v=remi-payroll1 — payroll report inside the phone sheet and desktop right rail. */
 #copilotSheet .pay-report{min-width:0;max-width:100%;}
 #copilotSheet .pay-head h3{font-family:'Playfair Display',Georgia,serif;font-size:1.2rem;color:var(--navy);margin:0 0 4px;}
@@ -2454,6 +2495,17 @@ bindLoginKeyboard();
             <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Add aide</button>
           </div>
         </div>
+        <section id="remiLangsAideCard" class="remi-langs-card" hidden data-remi-langs1="v=remi-langs1" aria-label="Preferred language">
+          <span class="remi-langs-who" id="remiLangsWho">Admin · English</span>
+          <h2 class="remi-langs-h">Aide settings</h2>
+          <p class="remi-langs-sub">Preferred language for Remi cover-ask drafts. Admin UI stays English. List from <code>admin_list_aide_preferred_languages</code>.</p>
+          <div class="remi-langs-card-inner">
+            <h3 id="remiLangsAideName">Aide</h3>
+            <div class="remi-langs-meta" id="remiLangsAideMeta">Aide · org EverCare</div>
+            <div id="remiLangsSelectSlot"></div>
+            <p class="remi-langs-note">English labels only. No Somali. Set → <code>admin_set_aide_preferred_language</code> · marker <strong>remi-langs1</strong>.</p>
+          </div>
+        </section>
         <div class="ts-desk" id="aideDesk" role="tablist" aria-label="Aides list">
           <button type="button" class="on" data-aide-desk="active" role="tab" aria-selected="true" onclick="setAideDesk('active')">Active</button>
           <button type="button" data-aide-desk="deleted" role="tab" aria-selected="false" onclick="setAideDesk('deleted')">Recently deleted</button>
@@ -2980,6 +3032,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
 
       <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1">
+        <section id="remiLangsMsgCard" class="remi-langs-msg" hidden data-remi-langs1="v=remi-langs1" aria-label="Cover ask preview"></section>
         <div id="aidechatInboxView">
           <div class="page-hdr">
             <div>
@@ -3082,7 +3135,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -3105,6 +3158,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
       <div id="remiFloatHost" hidden data-remi-float-noshow1="v=remi-float-noshow1" aria-live="polite"></div>
       <div id="remiIdeasHost" hidden data-remi-ideas763="v=remi-ideas763" aria-live="polite"></div>
+      <div id="remiLangsHost" hidden data-remi-langs1="v=remi-langs1" aria-live="polite"></div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
       <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" data-remiwider1="v=remiwider1" data-remiwider1b="v=remiwider1b" data-remiask1="v=remiask1" onsubmit="return copilotChatSubmit(event)">
@@ -21607,12 +21661,23 @@ function remiIdeas763WhyHtml(){
   html+='</div>';
   return html;
 }
+function remiIdeas763CoverText(draft){
+  draft=draft||remiIdeas763Draft||{};
+  var lang=remiIdeas763NormLang(draft.target_language||remiIdeas763Lang);
+  var preview=String(draft.preview_body==null?'':draft.preview_body).trim();
+  var translated=String(draft.translated_body==null?'':draft.translated_body).trim();
+  var ui=String(draft.ui_body==null?'':draft.ui_body).trim();
+  var text=preview||translated||ui;
+  if(text)return text;
+  if(lang==='en')return String(draft.english_draft||draft.source_body||remiIdeas763English||'').trim();
+  return '';
+}
 function remiIdeas763BilingualHtml(){
   var aide=remiIdeas763Aide||{};
   var draft=remiIdeas763Draft||{};
   var lang=remiIdeas763NormLang(draft.target_language||remiIdeas763Lang);
   var english=remiIdeas763English||draft.english_draft||'';
-  var preview=draft.translated_body||draft.preview_body||'';
+  var preview=remiIdeas763CoverText(draft);
   var phone=String(draft.phone||aide.phone||'').trim();
   var name=aide.name||draft.aide_name||'Aide';
   var html='<div class="remi-i763-bubble" data-remi-ideas763="'+REMI_IDEAS763_MARKER+'">';
@@ -21877,12 +21942,16 @@ async function remiIdeas763DraftAsk(){
   var id=String(aide.id||aide.aide_id||'').trim();
   if(!id)return {ok:false, error:'Missing aide.'};
   if(!remiIdeas763English)remiIdeas763English=remiIdeas763DefaultEnglish();
+  remiIdeas763Draft=null;
   var got=await remiIdeas763Rpc('admin_draft_bilingual_cover_ask', remiIdeas763DraftBody(id, remiIdeas763English, remiIdeas763ShiftId, remiIdeas763Lang));
   if(got&&got.ok){
     remiIdeas763Draft=got.data||{};
     if(remiIdeas763Draft.english_draft)remiIdeas763English=String(remiIdeas763Draft.english_draft);
     if(remiIdeas763Draft.target_language)remiIdeas763Lang=remiIdeas763NormLang(remiIdeas763Draft.target_language);
     remiIdeas763Draft.sms_send=remiIdeas763SmsSend();
+    remiIdeas763Draft.admin_language='en';
+    var paint=String(remiIdeas763Draft.paint||'');
+    if(paint!=='preview_body'&&paint!=='translated_body'&&paint!=='ui_body')remiIdeas763Draft.paint='preview_body';
   }
   remiIdeas763Mode='bilingual';
   remiIdeas763Reveal('Bilingual preview');
@@ -21919,7 +21988,7 @@ async function remiIdeas763SendInMessages(){
   var aide=remiIdeas763Aide||{};
   var id=String(aide.id||aide.aide_id||'').trim();
   var draft=remiIdeas763Draft||{};
-  var text=String(draft.translated_body||draft.preview_body||'').trim();
+  var text=remiIdeas763CoverText(draft);
   if(!id||!text)return {ok:false, error:'Missing translated message.'};
   var got=await remiIdeas763Rpc('admin_send_bilingual_cover_in_messages', remiIdeas763MessagesBody(id, text, remiIdeas763ShiftId, remiIdeas763English, remiIdeas763Lang));
   if(!got||got.ok!==true){
@@ -22099,6 +22168,672 @@ function remiIdeas763Install(){
 }
 try{remiIdeas763Install();}catch(eIdeas763){}
 // end remi ideas763 v=remi-ideas763
+
+// remi langs1 v=remi-langs1
+// MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only.
+// Picker: admin_list_aide_preferred_languages. English labels. Friday order.
+// English, Spanish, Arabic, Swahili, Chinese, Russian, Ukrainian. No Somali.
+// Get: admin_get_aide_preferred_language. Blank or null reads as en.
+// Set: admin_set_aide_preferred_language. Canonical en|es|ar|sw|zh|ru|uk.
+// Somali and so raise 22023. Unknown raises 22023.
+// Draft: admin_draft_bilingual_cover_ask. Admin chrome stays English.
+// Preview and Messages body use the aide preferred language.
+// sms_send.implemented=false and sms_send.oos=true. Send SMS is a UI mock only.
+// Send in Messages: admin_send_bilingual_cover_in_messages. sms_sent false.
+// is_scheduler_office. Nurse denied 42501. Dates people read are MM/DD/YYYY.
+// ideas763 Why-open, pay dispute, and ES bilingual stay. No Auth reseal. No SMS provider.
+// HARD wire: after every successful admin_set_aide_preferred_language, drop the previous draft and re-call admin_draft_bilingual_cover_ask.
+// Paint preview_body, then translated_body, then ui_body. Never paint english_draft or source_body when target_language is not en.
+// paint stays preview_body. admin_language stays en.
+var REMI_LANGS1_MARKER='v=remi-langs1';
+var REMI_LANGS1_OFFICE='is_scheduler_office';
+var REMI_LANGS1_ORDER=['en','es','ar','sw','zh','ru','uk'];
+var REMI_LANGS1_LABELS={en:'English',es:'Spanish',ar:'Arabic',sw:'Swahili',zh:'Chinese',ru:'Russian',uk:'Ukrainian'};
+var REMI_LANGS1_SMS_SEND={implemented:false, oos:true, note:'Ghost Send SMS button = draft/preview only until a provider exists. Prefer Send in Messages.'};
+var remiLangs1Mode='';
+var remiLangs1Aide=null;
+var remiLangs1Lang='en';
+var remiLangs1Languages=[];
+var remiLangs1English='';
+var remiLangs1DraftRow=null;
+var remiLangs1ShiftId='';
+var remiLangs1SmsAck='';
+var remiLangs1Busy=false;
+function remiLangs1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function remiLangs1OfficeOk(){
+  var role=remiLangs1Role();
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function remiLangs1El(id){
+  try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
+  return null;
+}
+function remiLangs1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof copilotEsc==='function')return copilotEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiLangs1SmsSend(){
+  return {implemented:false, oos:true, note:REMI_LANGS1_SMS_SEND.note};
+}
+function remiLangs1Rejected(code){
+  var s=String(code==null?'':code).trim().toLowerCase().replace(/_/g,'-');
+  if(!s)return false;
+  var base=s.split('-')[0];
+  if(base==='so'||s==='somali'||s==='som'||s.indexOf('somali')>=0)return true;
+  return false;
+}
+function remiLangs1Canonical(code){
+  var s=String(code==null?'':code).trim().toLowerCase().replace(/_/g,'-');
+  if(!s)return 'en';
+  if(remiLangs1Rejected(s))return null;
+  var base=s.split('-')[0];
+  var map={
+    en:'en', english:'en',
+    es:'es', spanish:'es', espanol:'es', 'espa\u00f1ol':'es',
+    ar:'ar', arabic:'ar',
+    sw:'sw', swahili:'sw', kiswahili:'sw',
+    zh:'zh', chinese:'zh', mandarin:'zh', 'zh-cn':'zh', 'zh-hans':'zh', 'zh-sg':'zh',
+    ru:'ru', russian:'ru',
+    uk:'uk', ukrainian:'uk'
+  };
+  if(map[s])return map[s];
+  if(map[base])return map[base];
+  return null;
+}
+function remiLangs1Fallback(){
+  return REMI_LANGS1_ORDER.map(function(code){
+    return {code:code, label:REMI_LANGS1_LABELS[code]};
+  });
+}
+function remiLangs1LanguagesFrom(data){
+  var rows=[];
+  if(data&&Array.isArray(data.languages))rows=data.languages;
+  else if(Array.isArray(data))rows=data;
+  var allowed={};
+  var saw=false;
+  rows.forEach(function(row){
+    if(!row)return;
+    saw=true;
+    var code=remiLangs1Canonical(row.code||row.language||row.lang);
+    if(!code)return;
+    allowed[code]=1;
+  });
+  var order=REMI_LANGS1_ORDER.filter(function(code){
+    if(!saw)return true;
+    return !!allowed[code];
+  });
+  if(!order.length)order=REMI_LANGS1_ORDER.slice();
+  return order.map(function(code){
+    return {code:code, label:REMI_LANGS1_LABELS[code]};
+  });
+}
+function remiLangs1Label(code){
+  var canon=remiLangs1Canonical(code)||'en';
+  return REMI_LANGS1_LABELS[canon]||'English';
+}
+function remiLangs1Mdy(iso){
+  var s=String(iso==null?'':iso).trim();
+  var us=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(us){
+    var mm=String(Number(us[1]));
+    var dd=String(Number(us[2]));
+    if(mm.length<2)mm='0'+mm;
+    if(dd.length<2)dd='0'+dd;
+    return mm+'/'+dd+'/'+us[3];
+  }
+  var t=/^\d{4}-\d{2}-\d{2}$/.test(s)?Date.parse(s+'T16:00:00Z'):Date.parse(s);
+  if(!isFinite(t))return '';
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(t));
+    var m='',d='',y='';
+    parts.forEach(function(p){
+      if(p.type==='month')m=p.value;
+      if(p.type==='day')d=p.value;
+      if(p.type==='year')y=p.value;
+    });
+    if(m&&d&&y)return m+'/'+d+'/'+y;
+  }catch(e){}
+  return '';
+}
+function remiLangs1First(name){
+  var s=String(name||'').trim();
+  if(!s)return '';
+  return s.split(/\s+/)[0];
+}
+function remiLangs1Who(){
+  var role=remiLangs1Role()||'Admin';
+  var raw='';
+  try{raw=String(currentAdminUsername||currentAdminName||'');}catch(e){raw='';}
+  var nice=raw.split('@')[0].replace(/[._-]+/g,' ').trim();
+  if(nice)nice=nice.charAt(0).toUpperCase()+nice.slice(1);
+  return (nice?nice+' \u00b7 ':'')+role+' \u00b7 English';
+}
+function remiLangs1DefaultEnglish(){
+  var aide=remiLangs1Aide||{};
+  var who=remiLangs1First(aide.name)||'there';
+  var client=aide.client_name||'this shift';
+  var when=aide.window_label||'';
+  var tail=String(client)+(when?' '+when:'');
+  return 'Hi '+who+' \u2014 can you cover '+tail+'? Reply Yes or No.';
+}
+async function remiLangs1Rpc(name, body){
+  if(!remiLangs1OfficeOk())return {ok:false, forbidden:true, status:42501, error:'Nurse cannot use Remi.'};
+  if(typeof sbRestRpc!=='function')return {ok:false, error:'Not callable yet.'};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  var errText=String((got&&got.error)||'');
+  if(!got||got.ok!==true){
+    if(/22023/.test(errText)||(got&&got.status===22023))return {ok:false, status:22023, error:errText||'Language is not allowed.'};
+    if((got&&(got.status===42501||got.status===403))||/42501|is_scheduler_office/.test(errText)){
+      return {ok:false, forbidden:true, status:42501, error:'Nurse cannot use Remi.'};
+    }
+    return {ok:false, error:errText||'Request failed.', status:got&&got.status};
+  }
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(got.data); if(un)node=un;}catch(eUn){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(eJson){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    var why=String(node.error||node.message||'Request failed.');
+    if(/22023/.test(why))return {ok:false, status:22023, error:why, data:node};
+    if(/42501|is_scheduler_office/.test(why))return {ok:false, forbidden:true, status:42501, error:'Nurse cannot use Remi.', data:node};
+    return {ok:false, error:why, data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+function remiLangs1Toast(text, tone){
+  if(typeof showTempMsg==='function')showTempMsg(text, tone||'var(--success)');
+}
+function remiLangs1ListBody(){
+  return {};
+}
+function remiLangs1GetBody(aideId){
+  return {p_aide_id:String(aideId||'')};
+}
+function remiLangs1SetBody(aideId, language){
+  return {p_aide_id:String(aideId||''), p_language:remiLangs1Canonical(language)||''};
+}
+function remiLangs1DraftBody(aideId, english, openShiftId, lang){
+  var body={p_aide_id:String(aideId||''), p_target_lang:remiLangs1Canonical(lang||remiLangs1Lang)||'en'};
+  if(english)body.p_english_body=String(english);
+  if(openShiftId)body.p_open_shift_id=String(openShiftId);
+  return body;
+}
+function remiLangs1MessagesBody(aideId, translated, openShiftId, english, lang){
+  var body={
+    p_aide_id:String(aideId||''),
+    p_body:String(translated||''),
+    p_target_lang:remiLangs1Canonical(lang||remiLangs1Lang)||'en'
+  };
+  if(openShiftId)body.p_open_shift_id=String(openShiftId);
+  if(english)body.p_english_body=String(english);
+  return body;
+}
+function remiLangs1OptionsHtml(selected){
+  var rows=remiLangs1Languages&&remiLangs1Languages.length?remiLangs1Languages:remiLangs1Fallback();
+  var html='';
+  rows.forEach(function(row){
+    if(!row)return;
+    var code=remiLangs1Canonical(row.code);
+    if(!code)return;
+    var label=REMI_LANGS1_LABELS[code];
+    if(!label)return;
+    html+='<option value="'+remiLangs1Esc(code)+'"'+(code===selected?' selected':'')+'>'+remiLangs1Esc(label)+'</option>';
+  });
+  return html;
+}
+function remiLangs1SelectHtml(id){
+  var lang=remiLangs1Canonical(remiLangs1Lang)||'en';
+  return '<label for="'+remiLangs1Esc(id)+'">Preferred language</label>'
+    +'<select id="'+remiLangs1Esc(id)+'" data-langs-select="1" aria-label="Preferred language" data-remi-langs1="'+REMI_LANGS1_MARKER+'">'
+    +remiLangs1OptionsHtml(lang)
+    +'</select>';
+}
+function remiLangs1PickerHtml(){
+  var lang=remiLangs1Canonical(remiLangs1Lang)||'en';
+  var label=remiLangs1Label(lang);
+  var html='<div class="remi-langs-bubble" data-remi-langs1="'+REMI_LANGS1_MARKER+'">';
+  html+='<span class="remi-langs-chip">Preferred language</span>';
+  html+='<div class="remi-langs-pick-select">'+remiLangs1SelectHtml('remiLangsRailSelect')+'</div>';
+  html+='<div>Saved as <strong>'+remiLangs1Esc(label)+'</strong> (<code>'+remiLangs1Esc(lang)+'</code>). Drafts will preview in aide language; chrome stays English.</div>';
+  html+='<p class="remi-langs-note">English labels only. No Somali. Set \u2192 <code>admin_set_aide_preferred_language</code> \u00b7 marker <strong>remi-langs1</strong>.</p>';
+  html+='<div class="remi-langs-btns"><button type="button" class="remi-langs-go" data-langs-act="draft">Preview cover ask</button></div>';
+  html+='</div>';
+  return html;
+}
+function remiLangs1SealDraft(row){
+  row=row||{};
+  row.admin_language='en';
+  row.paint='preview_body';
+  row.sms_send=remiLangs1SmsSend();
+  return row;
+}
+function remiLangs1CoverText(draft){
+  draft=draft||remiLangs1DraftRow||{};
+  var lang=remiLangs1Canonical(draft.target_language||remiLangs1Lang)||'en';
+  var preview=String(draft.preview_body==null?'':draft.preview_body).trim();
+  var translated=String(draft.translated_body==null?'':draft.translated_body).trim();
+  var ui=String(draft.ui_body==null?'':draft.ui_body).trim();
+  var text=preview||translated||ui;
+  if(lang!=='en')return text;
+  if(text)return text;
+  return String(remiLangs1English||draft.english_draft||draft.source_body||'').trim();
+}
+function remiLangs1DraftHtml(){
+  var aide=remiLangs1Aide||{};
+  var draft=remiLangs1DraftRow||{};
+  var lang=remiLangs1Canonical(draft.target_language||remiLangs1Lang)||'en';
+  var label=remiLangs1Label(lang);
+  var preview=remiLangs1CoverText(draft);
+  var name=aide.name||draft.aide_name||'Aide';
+  var rtl=lang==='ar'?' is-rtl':'';
+  var html='<div class="remi-langs-bubble" data-remi-langs1="'+REMI_LANGS1_MARKER+'" data-paint="preview_body">';
+  html+='<span class="remi-langs-chip">Cover ask \u00b7 '+remiLangs1Esc(label)+'</span>';
+  html+='<div>'+remiLangs1Esc(remiLangs1First(name)||name)+' prefers '+remiLangs1Esc(label)+'. Draft below is the Remi preview. Admin UI stays English.</div>';
+  html+='<div class="remi-langs-pick-select">'+remiLangs1SelectHtml('remiLangsRailSelect')+'</div>';
+  html+='<div class="remi-langs-sms"><div class="remi-langs-langtag">Target \u00b7 '+remiLangs1Esc(label)+' ('+remiLangs1Esc(lang)+')</div>';
+  html+='<div class="remi-langs-to">To <strong>'+remiLangs1Esc(name)+'</strong> \u00b7 Messages (not SMS)</div>';
+  html+='<div class="remi-langs-body'+rtl+'" data-paint="preview_body">'+remiLangs1Esc(preview||'Draft will show here.')+'</div>';
+  html+='<div class="remi-langs-btns"><button type="button" class="remi-langs-go" data-langs-act="messages">Send in Messages</button>';
+  html+='<button type="button" class="remi-langs-alt" data-langs-act="sms" data-sms-oos="true" aria-describedby="remiLangsSmsNote">Send SMS</button></div>';
+  html+='<p class="remi-langs-note" id="remiLangsSmsNote">Send SMS is a UI mock only (<code>sms_send.oos=true</code>). Prefer Send in Messages \u2192 <code>admin_send_bilingual_cover_in_messages</code>.'+(remiLangs1SmsAck?' '+remiLangs1Esc(remiLangs1SmsAck):'')+'</p>';
+  html+='</div></div>';
+  return html;
+}
+function remiLangs1MsgHtml(){
+  var aide=remiLangs1Aide||{};
+  var draft=remiLangs1DraftRow||{};
+  var lang=remiLangs1Canonical(draft.target_language||remiLangs1Lang)||'en';
+  var label=remiLangs1Label(lang);
+  var preview=remiLangs1CoverText(draft);
+  var name=aide.name||'Aide';
+  var rtl=lang==='ar'?' is-rtl':'';
+  var html='<span class="remi-langs-who">'+remiLangs1Esc(remiLangs1Who())+'</span>';
+  html+='<h2 class="remi-langs-h">Messages</h2>';
+  html+='<p class="remi-langs-sub">Thread with '+remiLangs1Esc(name)+' \u00b7 preferred language '+remiLangs1Esc(label)+'. Admin chrome English; outbound cover ask drafted in '+remiLangs1Esc(label)+'.</p>';
+  html+='<div class="remi-langs-thread"><div class="remi-langs-thread-h"><h3>'+remiLangs1Esc(name)+'</h3>';
+  html+='<div class="meta">Preferred: '+remiLangs1Esc(label)+' \u00b7 Send in Messages (SMS OOS)</div></div>';
+  html+='<div class="remi-langs-msgs"><div class="remi-langs-out'+rtl+'"><div class="who">Office \u00b7 Remi draft</div>';
+  html+=remiLangs1Esc(preview||'');
+  html+='<div class="t">preview \u00b7 not SMS</div></div></div></div>';
+  return html;
+}
+function remiLangs1PaintPage(){
+  var card=remiLangs1El('remiLangsAideCard');
+  var msg=remiLangs1El('remiLangsMsgCard');
+  var aide=remiLangs1Aide||{};
+  var showCard=!!(remiLangs1Mode&&remiLangs1OfficeOk());
+  if(card){
+    card.hidden=!showCard;
+    var who=remiLangs1El('remiLangsWho');
+    if(who)who.textContent=remiLangs1Who();
+    var name=remiLangs1El('remiLangsAideName');
+    if(name)name.textContent=aide.name||'Aide';
+    var meta=remiLangs1El('remiLangsAideMeta');
+    if(meta)meta.textContent='Aide'+(aide.phone?' \u00b7 phone on file':'')+' \u00b7 org EverCare';
+    var slot=remiLangs1El('remiLangsSelectSlot');
+    if(slot)slot.innerHTML=remiLangs1SelectHtml('remiLangsSelect');
+  }
+  if(msg){
+    var showMsg=remiLangs1Mode==='draft'&&remiLangs1OfficeOk();
+    msg.hidden=!showMsg;
+    if(showMsg)msg.innerHTML=remiLangs1MsgHtml();
+    else msg.innerHTML='';
+  }
+}
+function remiLangs1Paint(){
+  var host=remiLangs1El('remiLangsHost');
+  var html='';
+  if(remiLangs1OfficeOk()){
+    if(remiLangs1Mode==='picker')html=remiLangs1PickerHtml();
+    else if(remiLangs1Mode==='draft')html=remiLangs1DraftHtml();
+  }
+  remiLangs1PaintPage();
+  if(!host)return html;
+  host.innerHTML=html?'<div class="remi-langs" data-remi-langs1="'+REMI_LANGS1_MARKER+'">'+html+'</div>':'';
+  host.hidden=!html;
+  return html;
+}
+function remiLangs1Reveal(sub){
+  if(!remiLangs1OfficeOk())return;
+  var sheet=remiLangs1El('copilotSheet');
+  if(sheet)sheet.hidden=false;
+  try{
+    if(typeof document!=='undefined'&&document&&document.querySelector){
+      var el=document.querySelector('#copilotSheet .remi-rail-sub');
+      if(el){
+        if(!remiLangs1Reveal.base)remiLangs1Reveal.base=el.textContent||'Side rail \u00b7 not full page';
+        el.textContent=sub||remiLangs1Reveal.base;
+      }
+    }
+  }catch(e){}
+}
+function remiLangs1ReadLang(data){
+  data=data||{};
+  var raw=data.preferred_language;
+  if(raw==null||String(raw).trim()==='')raw=data.language;
+  if(raw==null||String(raw).trim()==='')raw=data.target_language;
+  if(raw==null||String(raw).trim()==='')return 'en';
+  return remiLangs1Canonical(raw)||'en';
+}
+async function remiLangs1LoadList(){
+  var got=await remiLangs1Rpc('admin_list_aide_preferred_languages', remiLangs1ListBody());
+  if(got&&got.ok)remiLangs1Languages=remiLangs1LanguagesFrom(got.data);
+  else if(!remiLangs1Languages.length)remiLangs1Languages=remiLangs1Fallback();
+  return got;
+}
+async function remiLangs1LoadLang(aideId){
+  var id=String(aideId||'').trim();
+  if(!id)return {ok:false, error:'Missing aide.'};
+  var got=await remiLangs1Rpc('admin_get_aide_preferred_language', remiLangs1GetBody(id));
+  if(got&&got.ok){
+    var data=got.data||{};
+    remiLangs1Lang=remiLangs1ReadLang(data);
+    if(data.phone&&remiLangs1Aide)remiLangs1Aide.phone=String(data.phone);
+    if(data.language_label&&remiLangs1Aide)remiLangs1Aide.language_label=remiLangs1Label(remiLangs1Lang);
+    try{if(typeof remiIdeas763Lang!=='undefined')remiIdeas763Lang=remiLangs1Lang;}catch(eLang){}
+  }
+  return got;
+}
+async function remiLangs1Set(language){
+  if(!remiLangs1OfficeOk())return {ok:false, forbidden:true, status:42501};
+  var aide=remiLangs1Aide||{};
+  var id=String(aide.id||aide.aide_id||'').trim();
+  if(!id)return {ok:false, error:'Missing aide.'};
+  if(remiLangs1Rejected(language)||!remiLangs1Canonical(language)){
+    remiLangs1Toast('That language is not on the picker.', 'var(--danger)');
+    return {ok:false, status:22023, error:'Language is not allowed.'};
+  }
+  var lang=remiLangs1Canonical(language);
+  var got=await remiLangs1Rpc('admin_set_aide_preferred_language', remiLangs1SetBody(id, lang));
+  if(!got||got.ok!==true){
+    remiLangs1Toast((got&&got.error)||'Could not save the aide language.', 'var(--danger)');
+    return got||{ok:false};
+  }
+  remiLangs1Lang=lang;
+  try{if(typeof remiIdeas763Lang!=='undefined')remiIdeas763Lang=lang;}catch(eSet){}
+  remiLangs1DraftRow=null;
+  var drafted=await remiLangs1Draft();
+  if(!drafted||drafted.ok!==true)return drafted||{ok:false};
+  return got;
+}
+async function remiLangs1OnPick(code){
+  var set=await remiLangs1Set(code);
+  if(!set||set.ok!==true){
+    remiLangs1Paint();
+    return set;
+  }
+  remiLangs1Toast('Saved as '+remiLangs1Label(remiLangs1Lang)+'.', 'var(--success)');
+  return set;
+}
+async function remiLangs1Draft(){
+  if(!remiLangs1OfficeOk())return {ok:false, forbidden:true, status:42501};
+  var aide=remiLangs1Aide||{};
+  var id=String(aide.id||aide.aide_id||'').trim();
+  if(!id)return {ok:false, error:'Missing aide.'};
+  if(!remiLangs1English)remiLangs1English=remiLangs1DefaultEnglish();
+  if(!remiLangs1Languages.length)remiLangs1Languages=remiLangs1Fallback();
+  remiLangs1DraftRow=null;
+  var got=await remiLangs1Rpc('admin_draft_bilingual_cover_ask', remiLangs1DraftBody(id, remiLangs1English, remiLangs1ShiftId, remiLangs1Lang));
+  if(got&&got.ok){
+    remiLangs1DraftRow=remiLangs1SealDraft(got.data||{});
+    if(remiLangs1DraftRow.english_draft)remiLangs1English=String(remiLangs1DraftRow.english_draft);
+    if(remiLangs1DraftRow.target_language){
+      var next=remiLangs1Canonical(remiLangs1DraftRow.target_language);
+      if(next)remiLangs1Lang=next;
+    }
+  }
+  remiLangs1Mode='draft';
+  remiLangs1Reveal('Right rail \u00b7 Cover ask');
+  try{if(typeof remiIdeas763Paint==='function'&&remiIdeas763Mode==='bilingual')remiIdeas763Paint();}catch(ePaint){}
+  remiLangs1Paint();
+  return got||{ok:false};
+}
+async function remiLangs1ShowPicker(aide){
+  if(!remiLangs1OfficeOk())return {ok:false, forbidden:true, status:42501};
+  aide=aide||{};
+  var id=String(aide.id||aide.aide_id||'').trim();
+  if(!id)return {ok:false, error:'Missing aide.'};
+  remiLangs1Aide={
+    id:id,
+    name:String(aide.name||aide.username||'Aide'),
+    phone:String(aide.phone||''),
+    client_name:String(aide.client_name||''),
+    window_label:String(aide.window_label||'')
+  };
+  remiLangs1Mode='picker';
+  remiLangs1SmsAck='';
+  if(!remiLangs1Languages.length)remiLangs1Languages=remiLangs1Fallback();
+  remiLangs1Reveal('Right rail \u00b7 Admin English');
+  remiLangs1Paint();
+  await remiLangs1LoadList();
+  await remiLangs1LoadLang(id);
+  remiLangs1Paint();
+  return {ok:true, language:remiLangs1Lang, languages:remiLangs1Languages};
+}
+async function remiLangs1ShowDraft(aide, english, openShiftId){
+  if(!remiLangs1OfficeOk())return {ok:false, forbidden:true, status:42501};
+  aide=aide||remiLangs1Aide||{};
+  var id=String(aide.id||aide.aide_id||(remiLangs1Aide&&remiLangs1Aide.id)||'').trim();
+  if(!id)return {ok:false, error:'Missing aide.'};
+  remiLangs1Aide={
+    id:id,
+    name:String(aide.name||(remiLangs1Aide&&remiLangs1Aide.name)||'Aide'),
+    phone:String(aide.phone||(remiLangs1Aide&&remiLangs1Aide.phone)||''),
+    client_name:String(aide.client_name||(remiLangs1Aide&&remiLangs1Aide.client_name)||''),
+    window_label:String(aide.window_label||(remiLangs1Aide&&remiLangs1Aide.window_label)||'')
+  };
+  if(english)remiLangs1English=String(english);
+  if(openShiftId)remiLangs1ShiftId=String(openShiftId);
+  remiLangs1SmsAck='';
+  if(!remiLangs1Languages.length)await remiLangs1LoadList();
+  if(!remiLangs1Languages.length)remiLangs1Languages=remiLangs1Fallback();
+  await remiLangs1LoadLang(id);
+  return remiLangs1Draft();
+}
+function remiLangs1SendSms(){
+  remiLangs1SmsAck='SMS stays out of scope.';
+  if(remiLangs1DraftRow)remiLangs1DraftRow.sms_send=remiLangs1SmsSend();
+  remiLangs1Paint();
+  return {ok:true, sent:false, sms_sent:false, sms_send:remiLangs1SmsSend()};
+}
+async function remiLangs1SendInMessages(){
+  if(!remiLangs1OfficeOk())return {ok:false, forbidden:true, status:42501};
+  var aide=remiLangs1Aide||{};
+  var id=String(aide.id||aide.aide_id||'').trim();
+  var draft=remiLangs1DraftRow||{};
+  var text=remiLangs1CoverText(draft);
+  if(!id||!text)return {ok:false, error:'Missing translated message.'};
+  var got=await remiLangs1Rpc('admin_send_bilingual_cover_in_messages', remiLangs1MessagesBody(id, text, remiLangs1ShiftId, remiLangs1English, remiLangs1Lang));
+  if(!got||got.ok!==true){
+    remiLangs1Toast((got&&got.error)||'Could not send in Messages.', 'var(--danger)');
+    return got||{ok:false};
+  }
+  remiLangs1Toast('Sent in Messages. No SMS was sent.', 'var(--success)');
+  return {ok:true, sms_sent:false, data:got.data};
+}
+function remiLangs1OpenFromThread(){
+  var thread=null;
+  try{thread=(typeof aidechatFind==='function')?aidechatFind(aidechatSelectedId):null;}catch(e){thread=null;}
+  if(!thread)return remiLangs1ShowPicker(remiLangs1Aide||{});
+  return remiLangs1ShowPicker({
+    id:thread.aide_id||thread.aideId||'',
+    name:thread.name||'',
+    phone:thread.phone||''
+  });
+}
+function remiLangs1DecorateAides(){
+  if(typeof document==='undefined'||!document||!document.querySelectorAll)return;
+  var cards=document.querySelectorAll('#tab_aides .aide-row-card');
+  for(var i=0;i<cards.length;i++){
+    var card=cards[i];
+    if(card.querySelector('[data-langs-open]'))continue;
+    var sub=card.querySelector('.aide-row-sub');
+    var un=sub?String(sub.textContent||'').replace(/^@/,'').trim():'';
+    var nameEl=card.querySelector('.aide-row-top strong');
+    var name=nameEl?String(nameEl.textContent||'').trim():un;
+    var row=null;
+    try{if(typeof aideLookup!=='undefined'&&un)row=aideLookup[un.toLowerCase()];}catch(eRow){row=null;}
+    var id=row&&(row.id||row.aide_id||row.user_id)||un;
+    var btn=document.createElement('button');
+    btn.type='button';
+    btn.className='btn btn-ghost';
+    btn.setAttribute('data-langs-open','1');
+    btn.setAttribute('data-aide-id', String(id||''));
+    btn.setAttribute('data-aide-name', name);
+    btn.textContent='Preferred language';
+    btn.addEventListener('click', function(ev){
+      var b=ev.currentTarget;
+      remiLangs1ShowPicker({id:b.getAttribute('data-aide-id'), name:b.getAttribute('data-aide-name')});
+    });
+    var actions=card.querySelector('.actions')||card;
+    actions.appendChild(btn);
+  }
+}
+async function remiLangs1AdoptIdeas(){
+  var aide={};
+  try{aide=remiIdeas763Aide||{};}catch(eA){aide={};}
+  var id=String(aide.id||aide.aide_id||'').trim();
+  if(!id)return {ok:false, error:'Missing aide.'};
+  remiLangs1Aide={
+    id:id,
+    name:String(aide.name||'Aide'),
+    phone:String(aide.phone||''),
+    client_name:String(aide.client_name||''),
+    window_label:String(aide.window_label||'')
+  };
+  try{
+    if(typeof remiIdeas763Lang!=='undefined'){
+      var canon=remiLangs1Canonical(remiIdeas763Lang);
+      if(canon)remiLangs1Lang=canon;
+    }
+    if(typeof remiIdeas763English!=='undefined'&&remiIdeas763English)remiLangs1English=String(remiIdeas763English);
+    if(typeof remiIdeas763ShiftId!=='undefined'&&remiIdeas763ShiftId)remiLangs1ShiftId=String(remiIdeas763ShiftId);
+    if(typeof remiIdeas763Draft!=='undefined'&&remiIdeas763Draft){
+      remiLangs1DraftRow=remiLangs1SealDraft(remiIdeas763Draft);
+    }
+  }catch(eCopy){}
+  if(!remiLangs1Languages.length)remiLangs1Languages=remiLangs1Fallback();
+  remiLangs1Mode='draft';
+  remiLangs1Reveal('Right rail \u00b7 Cover ask');
+  try{if(typeof remiIdeas763Paint==='function')remiIdeas763Paint();}catch(eP){}
+  remiLangs1Paint();
+  return {ok:true};
+}
+function remiLangs1Bind(){
+  if(typeof document==='undefined'||!document||!document.addEventListener)return;
+  if(remiLangs1Bind.done)return;
+  remiLangs1Bind.done=true;
+  document.addEventListener('change', function(ev){
+    var t=ev.target;
+    if(!t||!t.getAttribute||t.getAttribute('data-langs-select')!=='1')return;
+    remiLangs1OnPick(t.value);
+  });
+  document.addEventListener('click', function(ev){
+    var t=ev.target&&ev.target.closest?ev.target.closest('[data-langs-act]'):null;
+    if(!t)return;
+    var act=t.getAttribute('data-langs-act');
+    if(act==='sms')remiLangs1SendSms();
+    else if(act==='messages')remiLangs1SendInMessages();
+    else if(act==='draft')remiLangs1Draft();
+  });
+}
+function remiLangs1Install(){
+  if(remiLangs1Install.done)return;
+  remiLangs1Install.done=true;
+  if(!remiLangs1Languages.length)remiLangs1Languages=remiLangs1Fallback();
+  remiLangs1Bind();
+  if(typeof remiIdeas763NormLang==='function'&&!remiIdeas763NormLang.__langs1){
+    var prevNorm=remiIdeas763NormLang;
+    var wrappedNorm=function(code){
+      if(remiLangs1Rejected(code))return prevNorm(code);
+      var canon=remiLangs1Canonical(code);
+      if(canon)return canon;
+      return prevNorm(code);
+    };
+    wrappedNorm.__langs1=1;
+    remiIdeas763NormLang=wrappedNorm;
+  }
+  if(typeof remiIdeas763SetLang==='function'&&!remiIdeas763SetLang.__langs1){
+    var prevSet=remiIdeas763SetLang;
+    var wrappedSet=async function(language){
+      if(remiLangs1Rejected(language)||!remiLangs1Canonical(language)){
+        return {ok:false, status:22023, error:'Language is not allowed.'};
+      }
+      var out=await prevSet.apply(this, arguments);
+      if(out&&out.ok===true){
+        remiLangs1DraftRow=null;
+        try{
+          var canon=remiLangs1Canonical(typeof remiIdeas763Lang!=='undefined'?remiIdeas763Lang:language);
+          if(canon)remiLangs1Lang=canon;
+          if(typeof remiIdeas763Draft!=='undefined'&&remiIdeas763Draft){
+            remiLangs1DraftRow=remiLangs1SealDraft(remiIdeas763Draft);
+          }
+          if(remiLangs1Mode)remiLangs1Paint();
+        }catch(eSync){}
+      }
+      return out;
+    };
+    wrappedSet.__langs1=1;
+    remiIdeas763SetLang=wrappedSet;
+  }
+  if(typeof remiIdeas763OpenBilingual==='function'&&!remiIdeas763OpenBilingual.__langs1){
+    var prevOpen=remiIdeas763OpenBilingual;
+    var wrappedOpen=async function(aide, english){
+      remiLangs1Mode='draft';
+      var out=await prevOpen.apply(this, arguments);
+      try{await remiLangs1AdoptIdeas();}catch(eAd){}
+      return out;
+    };
+    wrappedOpen.__langs1=1;
+    remiIdeas763OpenBilingual=wrappedOpen;
+  }
+  if(typeof remiIdeas763Paint==='function'&&!remiIdeas763Paint.__langs1){
+    var prevPaint=remiIdeas763Paint;
+    var wrappedPaint=function(){
+      if(remiLangs1Mode&&remiIdeas763Mode==='bilingual'){
+        var keep=remiIdeas763Mode;
+        remiIdeas763Mode='';
+        var html=prevPaint();
+        remiIdeas763Mode=keep;
+        return html;
+      }
+      return prevPaint();
+    };
+    wrappedPaint.__langs1=1;
+    remiIdeas763Paint=wrappedPaint;
+  }
+  if(typeof renderAides==='function'&&!renderAides.__langs1){
+    var prevRender=renderAides;
+    var wrappedRender=async function(){
+      var out=await prevRender.apply(this, arguments);
+      try{remiLangs1DecorateAides();}catch(eDec){}
+      return out;
+    };
+    wrappedRender.__langs1=1;
+    renderAides=wrappedRender;
+  }
+  if(typeof copilotClose==='function'&&!copilotClose.__langs1){
+    var prevClose=copilotClose;
+    var wrappedClose=function(){
+      remiLangs1Mode='';
+      try{remiLangs1Paint();}catch(eClose){}
+      return prevClose.apply(this, arguments);
+    };
+    wrappedClose.__langs1=1;
+    copilotClose=wrappedClose;
+  }
+}
+try{remiLangs1Install();}catch(eLangs1){}
+// end remi langs1 v=remi-langs1
 
 
 function copyLink(inputId){
