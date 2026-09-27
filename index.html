@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- aide office visible 2026-09-27 v=aide-office-vis1 admin-build 2026-09-27-aide-office-vis1. GHOST-AIDE-OFFICE-VIS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Aide Office messages show for Admin and Scheduler with a Messages unread badge and Remi notify. Not silent. Same aidechat1 thread. Poll admin_get_aide_office_unread_badge for the Messages tab badge and the Remi corner chip (unread_threads / unread_messages). deep_link_base is admin/messages. Poll admin_list_due_aide_office_alerts for Remi right-rail cards, kind aide_office_unread. Open thread uses deep_link admin/messages?aide_id=. Preview is the latest aide body, not a Remi auto-reply. admin_list_aide_office_threads paints has_unread, unread, and preview_from_aide, unread first. After a caregiver send, the toast follows notify.channels remi_rail and messages_badge. notify.push is false. No staff push table. Ack is admin_mark_aide_office_messages_read(p_thread_id) and the badge and alerts drop. Admin and Scheduler both see the org-wide list. Nurse is denied (42501). Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Remi Notes is a different surface. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=aidechat1, and v=remiface1. -->
+<meta name="admin-build" content="2026-09-27-aide-office-vis1">
 <!-- remi langs 2026-09-27 v=remi-langs1 admin-build 2026-09-27-remi-langs1. GHOST-REMI-LANGS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Preferred language picker has 7 English labels in Friday order: English, Spanish, Arabic, Swahili, Chinese, Russian, Ukrainian. No Somali. The list comes from admin_list_aide_preferred_languages. Set posts admin_set_aide_preferred_language. Get posts admin_get_aide_preferred_language. Blank or null reads as en. Canonical codes are en, es, ar, sw, zh, ru, and uk. Somali and so raise 22023. Admin chrome stays English. Remi cover-ask preview and the Messages body use the aide preferred language from admin_draft_bilingual_cover_ask. Send SMS is a UI mock only. sms_send.implemented is false and sms_send.oos is true. Prefer Send in Messages, which posts admin_send_bilingual_cover_in_messages and returns sms_sent false. No SMS provider call. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. No Quo/SMS. ideas763 Why-open, pay dispute, and the ES bilingual path stay. HARD wire: after every successful admin_set_aide_preferred_language the rail drops the previous draft and re-calls admin_draft_bilingual_cover_ask. Cover-ask and Messages paint preview_body, translated_body, or ui_body only. When target_language is not en, english_draft and source_body are not painted. paint stays preview_body. admin_language stays en. Prior markers stay, including v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
 <meta name="admin-build" content="2026-09-27-remi-langs1">
 <!-- schedule hold clear 2026-09-27 v=hold-clear1 admin-build 2026-09-27-hold-clear1. GHOST-HOLD-CLEAR1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Mo LIVE bug. Patch none. Reuse clienthrs1c RPCs. Schedule day detail, On hold selected: Clear under Save hold / End hold was a no-op. Clear with a hold_id posts clear_schedule_client_hold {p_hold_id} and omits p_end_date so Ace sets is_active false. When the day used p_mark on_hold, Clear also posts clear_schedule_slot_day_mark {p_client_id, p_on_date, p_slot_key} for each affected slot. Clear always empties Start, End, and Note, unselects On hold, hides the follow panel, and refreshes the week and day so hold chips leave and hours resume. A draft that was never saved resets locally only and still clears on screen. End hold stays clear_schedule_client_hold {p_hold_id, p_end_date} only. shift-slim1 look stays. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, schedule, remi-*, or aides-info1. Dates people read are MM/DD/YYYY. Prior markers stay, including v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=clienthrs1c, and v=shift-slim1. -->
@@ -803,6 +805,44 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
   #tab_aidechat.is-thread #aidechatThreadView{min-width:0;}
   #tab_aidechat.is-thread #aidechatBack{display:none;}
 }
+/* v=aide-office-vis1 — Messages unread badge, Remi corner chip, right-rail cards. Phone-first. */
+#tab_aidechat .aidechat-card{display:flex;gap:10px;align-items:flex-start;}
+#tab_aidechat .aide-office-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7ec8c8,#2a7f7f);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#tab_aidechat .aide-office-main{flex:1;min-width:0;text-align:left;}
+#tab_aidechat .aide-office-meta{display:block;margin-top:4px;font-size:10px;color:var(--muted);line-height:1.35;}
+#tab_aidechat .aide-office-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);flex-shrink:0;margin-top:6px;}
+#tab_aidechat .aidechat-card.is-unread{border-color:#f0b4ae;background:#fff8f7;border-left-color:#f0b4ae;box-shadow:0 0 0 1px rgba(192,57,43,.08);}
+#tab_aidechat .aidechat-card.is-unread .aidechat-preview{color:var(--navy);}
+#tab_aidechat .aidechat-card.is-unread .aidechat-preview strong{color:var(--navy);font-weight:700;}
+.aide-office-who{font-size:10px;font-weight:700;padding:4px 8px;border-radius:999px;flex-shrink:0;line-height:1.2;white-space:nowrap;}
+.aide-office-who.is-admin{background:#e8f4f4;color:#1e6060;}
+.aide-office-who.is-scheduler{background:#fff0e0;color:#b86e00;}
+.aide-office-who[hidden]{display:none !important;}
+#copilotFab .aide-office-rb{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--danger);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid #fff;z-index:2;line-height:1;}
+#copilotFab .aide-office-rb.is-on{display:flex;}
+#copilotSheet .copilot-id{position:relative;}
+#copilotSheet .aide-office-rail-badge{position:absolute;top:-4px;left:24px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--danger);color:#fff;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid #fff;line-height:1;}
+#copilotSheet .aide-office-rail-badge.is-on{display:flex;}
+#aideOfficeRail[hidden]{display:none !important;}
+#aideOfficeRail{margin:0 0 8px;min-width:0;max-width:100%;}
+.aide-office-bubble{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;color:var(--navy);}
+.aide-office-chip2{display:inline-block;font-size:10px;font-weight:700;background:#fdecea;color:var(--danger);padding:3px 7px;border-radius:5px;margin-bottom:6px;}
+.aide-office-msg{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px;margin-top:8px;}
+.aide-office-msg .from{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:3px;}
+.aide-office-msg .body{font-size:13px;color:#1e2a3a;}
+.aide-office-msg .when{font-size:10px;color:var(--muted);margin-top:4px;}
+.aide-office-open{display:block;width:100%;text-align:center;font-size:12px;font-weight:700;padding:10px;border-radius:8px;background:var(--teal);color:#fff;margin-top:10px;border:0;min-height:44px;font-family:'DM Sans',sans-serif;cursor:pointer;touch-action:manipulation;}
+.aide-office-note{font-size:11px;color:var(--muted);line-height:1.4;margin:8px 0 0;}
+.aide-office-railhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;}
+.aide-office-railhead strong{font-size:14px;color:var(--navy);}
+.aide-office-new{font-size:10px;font-weight:800;background:#fdecea;color:var(--danger);padding:3px 8px;border-radius:999px;}
+.aide-office-toast{position:fixed;z-index:155;left:12px;right:12px;top:68px;max-width:420px;margin:0 auto;background:#1a2744;color:#fff;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.4;box-shadow:0 8px 24px rgba(0,0,0,.25);pointer-events:none;}
+.aide-office-toast .t{font-weight:700;font-size:11px;color:#a8d4d4;margin-bottom:2px;}
+.aide-office-toast[hidden]{display:none !important;}
+.aide-office-peek{margin:0 0 10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;}
+.aide-office-peek[hidden]{display:none !important;}
+.aide-office-peek strong{display:block;font-size:12px;color:var(--navy);margin-bottom:6px;}
+.aide-office-peek .chip{display:inline-block;font-size:10px;font-weight:700;padding:4px 7px;border-radius:6px;border:1px solid #f0c090;background:#fff0e0;color:#b86e00;}
 /* v=clienthrs1d — Notifications roster, schedule-send, chat names. Phone-first. No SMS. */
 #tab_notifications{max-width:100%;min-width:0;}
 #tab_notifications[hidden]{display:none !important;}
@@ -2161,6 +2201,7 @@ bindLoginKeyboard();
   <div class="admin-layout layout-a1">
     <header class="shell-top">
       <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px"><img src="data:image/jpeg;base64,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" style="width:36px;height:36px;object-fit:cover;border-radius:50%;flex-shrink:0"><div><h2>EverCare</h2><p>Admin Portal</p></div></div>
+      <span class="aide-office-who" id="aideOfficeWho" data-aide-office-vis1="v=aide-office-vis1" hidden></span>
       <div class="avatar-slot">
         <button type="button" class="avatar-btn" id="avatarMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu" onclick="layoutA1ToggleAvatar(event)">A</button>
         <div class="avatar-menu" id="avatarMenu" role="menu" hidden onclick="event.stopPropagation()">
@@ -2174,7 +2215,7 @@ bindLoginKeyboard();
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('backups')" id="nav_backups" aria-label="Backup"><span class="ni">☁️</span> Backup</button>
-      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('more')" id="nav_more" aria-label="More"><span class="ni">☰</span> More</button>
+      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('more')" id="nav_more" aria-label="More"><span class="ni">☰</span> More <span class="nav-badge" id="aideOfficeMoreBadge" hidden>0</span></button>
     </nav>
     <div class="main-content">
 
@@ -2262,7 +2303,7 @@ bindLoginKeyboard();
         <div class="more-list" id="moreList">
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('coverage')" id="nav_coverage"><span class="ni">🗺️</span> Coverage</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d" onclick="showTab('notifications')" id="nav_notifications"><span class="ni">🔔</span> Notifications</button>
-          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" onclick="showTab('aidechat')" id="nav_aidechat"><span class="ni">💬</span> Aide chat</button>
+          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('nurse')" id="nav_nurse" aria-label="Nurse"><span class="ni">🩺</span> Nurse <span class="nav-badge" id="nav_nurse_badge" hidden>0</span></button>
           <button type="button" class="nav-item more-row" id="nav_completes" aria-label="Completed intakes" aria-hidden="true" onclick="showTab('completes')"><span class="ni">📄</span> Completed intakes</button>
@@ -2288,6 +2329,7 @@ bindLoginKeyboard();
             </div>
             <button type="button" class="btn btn-teal" id="coverIntakeOpen" onclick="coverShowIntake()">Record call-off</button>
           </div>
+          <div id="aideOfficeCoverPeek" class="aide-office-peek" data-aide-office-vis1="v=aide-office-vis1" hidden></div>
           <p class="cover-note" id="coverSourceNote">Open shifts from call-offs. Clients and aides use the same lists as Schedule.</p>
           <div id="coverSimpleBanner" class="cover-simple-banner" hidden></div>
           <div class="cover-stats" id="coverStats" aria-label="Coverage counts">
@@ -3031,15 +3073,18 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="notif-note">Nudge = Remi posts in that aide’s Messages (and push if they already allow). Not SMS.</p>
       </div>
 
-      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1">
+      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1">
         <section id="remiLangsMsgCard" class="remi-langs-msg" hidden data-remi-langs1="v=remi-langs1" aria-label="Cover ask preview"></section>
         <div id="aidechatInboxView">
           <div class="page-hdr">
             <div>
-              <h1>Aide chat</h1>
-              <p>One thread per aide. Office replies stay in the app.</p>
+              <h1>Messages</h1>
+              <p>Aide Office. One thread per aide. Unread shows here and on Remi.</p>
             </div>
           </div>
+          <p class="aidechat-note" id="aidechatSourceNote">Aide message callables are not on this desk yet. Threads stay on this phone until admin_list_aide_office_threads answers. Nothing here sends a text or an email.</p>
+          <div id="aidechatList" class="aidechat-list" aria-label="Aide threads"></div>
+          <div id="aidechatEmpty" class="empty-state"><p>No aide threads yet.</p></div>
           <section class="aidechat-settings" id="aidechatSettings" aria-label="Remi auto-reply">
             <div class="aidechat-set-row">
               <span id="aidechatSetLabel">Remi auto-reply</span>
@@ -3059,9 +3104,6 @@ Call (216) 377-5991 with any questions.</textarea>
               <span>Urgent only</span>
             </label>
           </section>
-          <p class="aidechat-note" id="aidechatSourceNote">Aide message callables are not on this desk yet. Threads stay on this phone until admin_list_aide_office_threads answers. Nothing here sends a text or an email.</p>
-          <div id="aidechatList" class="aidechat-list" aria-label="Aide threads"></div>
-          <div id="aidechatEmpty" class="empty-state"><p>No aide threads yet.</p></div>
         </div>
         <div id="aidechatThreadView" hidden>
           <button type="button" class="btn btn-ghost aidechat-back" id="aidechatBack" onclick="aidechatShowInbox()">Back to inbox</button>
@@ -3134,11 +3176,13 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
     </div>
-    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
+    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
+          <span class="aide-office-rail-badge" id="aideOfficeRailBadge" hidden>0</span>
           <div>
             <h2 id="copilotTitle">Remi</h2>
             <p class="remi-rail-sub">Side rail · not full page</p>
@@ -3156,6 +3200,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabPayroll" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" onclick="remiPayroll1Show()">Payroll</button>
         <button type="button" class="copilot-tab" id="copilotTabCover" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" onclick="remiFloatHide1ShowCoverage()">Coverage</button>
       </div>
+      <div id="aideOfficeRail" hidden data-aide-office-vis1="v=aide-office-vis1" aria-live="polite" aria-label="Aide Office"></div>
       <div id="remiFloatHost" hidden data-remi-float-noshow1="v=remi-float-noshow1" aria-live="polite"></div>
       <div id="remiIdeasHost" hidden data-remi-ideas763="v=remi-ideas763" aria-live="polite"></div>
       <div id="remiLangsHost" hidden data-remi-langs1="v=remi-langs1" aria-live="polite"></div>
@@ -4609,7 +4654,7 @@ var NAV_EDIT_META={
   broadcast:{label:'Broadcast Alert',icon:'📢',short:'Broadcast'},
   links:{label:'Links',icon:'🔗',short:''},
   activity:{label:'Activity Log',icon:'📜',short:'Activity'},
-  aidechat:{label:'Aide chat',icon:'💬',short:'Chat'},
+  aidechat:{label:'Messages',icon:'💬',short:'Messages'},
   notifications:{label:'Notifications',icon:'🔔',short:'Alerts'}
 };
 var MAX_BAR_TABS=8;
@@ -9896,10 +9941,22 @@ function aidechatPaintInbox(){
   if(!rows.length){list.innerHTML='';return;}
   list.innerHTML=rows.map(function(t){
     var urgent=t.urgent?' is-urgent':'';
+    var unread=!!(t.has_unread||Number(t.unread)>0);
     var flag=t.urgent?'1':'0';
-    return '<button type="button" class="aidechat-card'+urgent+'" data-aidechat-thread="'+aidechatEsc(t.id)+'" data-aidechat-urgent="'+flag+'">'
+    var previewSrc=String(t.preview_from_aide||t.last_message||'');
+    var preview=aidechatPreview(previewSrc)||'No messages yet';
+    var previewHtml=unread?'<strong>'+aidechatEsc(preview)+'</strong>':aidechatEsc(preview);
+    var when=typeof aideOfficeVis1When==='function'?aideOfficeVis1When(t.last_message_at||t.last_at):'';
+    var meta='Aide Office'+(when?' · '+when:'')+' · '+(unread?'unread':'read');
+    var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(t.name||t.username):'';
+    return '<button type="button" class="aidechat-card'+(unread?' is-unread':'')+urgent+'" data-aidechat-thread="'+aidechatEsc(t.id)+'" data-aidechat-urgent="'+flag+'" data-aide-office-unread="'+(unread?'1':'0')+'" data-aide-office-vis1="v=aide-office-vis1">'
+      +'<span class="aide-office-av" aria-hidden="true">'+aidechatEsc(initials)+'</span>'
+      +'<span class="aide-office-main">'
       +'<span class="aidechat-card-top"><strong>'+aidechatEsc(t.name||t.username||'Aide')+'</strong><span class="aidechat-chips">'+aidechatChips(t)+'</span></span>'
-      +'<span class="aidechat-preview">'+aidechatEsc(aidechatPreview(t.last_message)||'No messages yet')+'</span>'
+      +'<span class="aidechat-preview">'+previewHtml+'</span>'
+      +'<span class="aide-office-meta">'+aidechatEsc(meta)+'</span>'
+      +'</span>'
+      +(unread?'<span class="aide-office-dot" aria-label="unread"></span>':'')
       +'</button>';
   }).join('');
 }
@@ -10254,6 +10311,609 @@ async function aidechatSettingsChanged(){
   }
   aidechatPaintSettings();
 }
+// aide office vis1 v=aide-office-vis1
+// MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO.
+// Badge: admin_get_aide_office_unread_badge. Rail: admin_list_due_aide_office_alerts.
+// Threads stay admin_list_aide_office_threads. Ack: admin_mark_aide_office_messages_read.
+// notify.push is false. In-app Remi rail + Messages badge is the notify. No staff push table.
+// is_scheduler_office. Nurse denied 42501. Remi Notes is not this surface. Same aidechat1 thread.
+var AIDE_OFFICE_VIS1_MARKER='v=aide-office-vis1';
+var AIDE_OFFICE_VIS1_DEEP='admin/messages';
+var aideOfficeVis1Badge={unread_threads:0, unread_messages:0, deep_link_base:AIDE_OFFICE_VIS1_DEEP};
+var aideOfficeVis1Alerts=[];
+var aideOfficeVis1Seen={};
+var aideOfficeVis1ToastOn=false;
+var aideOfficeVis1Timer=0;
+var aideOfficeVis1Polling=false;
+var aideOfficeVis1Stopped=false;
+var aideOfficeVis1Acked='';
+function aideOfficeVis1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function aideOfficeVis1OfficeOk(){
+  var role=aideOfficeVis1Role();
+  return role==='Admin'||role==='Scheduler';
+}
+function aideOfficeVis1Esc(s){
+  var raw=String(s==null?'':s);
+  if(typeof aidechatEsc==='function')return aidechatEsc(raw);
+  return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function aideOfficeVis1Initials(name){
+  var parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length)return 'A';
+  if(parts.length===1){
+    var word=parts[0];
+    var first=word.charAt(0).toUpperCase();
+    var rest=word.slice(1);
+    var consonant=rest.match(/[bcdfghjklmnpqrstvwxyz]/i);
+    var second=consonant?consonant[0].toUpperCase():(word.charAt(1)||'').toUpperCase();
+    return first+second||'A';
+  }
+  return (parts[0].charAt(0)+parts[parts.length-1].charAt(0)).toUpperCase();
+}
+function aideOfficeVis1Date(iso){
+  var t=Date.parse(iso==null?'':iso);
+  if(!isFinite(t))return '';
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(t));
+    var m='',d='',y='';
+    parts.forEach(function(p){
+      if(p.type==='month')m=p.value;
+      if(p.type==='day')d=p.value;
+      if(p.type==='year')y=p.value;
+    });
+    if(m&&d&&y)return m+'/'+d+'/'+y;
+  }catch(e){}
+  return '';
+}
+function aideOfficeVis1When(iso){
+  var t=Date.parse(iso==null?'':iso);
+  if(!isFinite(t))return '';
+  var diff=Date.now()-t;
+  if(diff<0)diff=0;
+  if(diff<60*1000)return 'just now';
+  if(diff<60*60*1000)return Math.max(1,Math.round(diff/60000))+'m';
+  if(diff<36*60*60*1000){
+    var today=aideOfficeVis1Date(new Date().toISOString());
+    var day=aideOfficeVis1Date(iso);
+    if(day&&today&&day!==today)return 'yesterday';
+    if(diff<24*60*60*1000)return Math.max(1,Math.round(diff/3600000))+'h';
+    return 'yesterday';
+  }
+  return aideOfficeVis1Date(iso);
+}
+function aideOfficeVis1WhoLabel(){
+  var role=aideOfficeVis1Role();
+  var user='';
+  try{user=String(currentAdminUsername||'');}catch(e){user='';}
+  var key=user.toLowerCase();
+  var first='';
+  if(role==='Admin'&&(!key||key==='admin'||key.indexOf('admin@')===0||key==='moe'||key.indexOf('moe')===0))first='Moe';
+  else if(role==='Scheduler'&&(!key||key==='scheduler'||key.indexOf('scheduler@')===0||key.indexOf('jaz')===0||key.indexOf('jasmine')===0))first='Jasmine';
+  else{
+    first=user.split('@')[0].split(/[.\s_-]/)[0];
+    if(first)first=first.charAt(0).toUpperCase()+first.slice(1);
+  }
+  if(!first)first=role||'Office';
+  return first+' · '+role;
+}
+function aideOfficeVis1PaintWho(){
+  var el=document.getElementById('aideOfficeWho');
+  if(!el)return;
+  if(!aideOfficeVis1OfficeOk()){el.hidden=true;el.textContent='';return;}
+  el.hidden=false;
+  el.textContent=aideOfficeVis1WhoLabel();
+  el.classList.toggle('is-admin', aideOfficeVis1Role()==='Admin');
+  el.classList.toggle('is-scheduler', aideOfficeVis1Role()==='Scheduler');
+}
+function aideOfficeVis1Count(badge){
+  badge=badge||{};
+  var threads=Number(badge.unread_threads);
+  var messages=Number(badge.unread_messages);
+  if(!isFinite(threads)||threads<0)threads=0;
+  if(!isFinite(messages)||messages<0)messages=0;
+  if(threads>0)return threads;
+  return messages;
+}
+function aideOfficeVis1SetCount(el, n){
+  if(!el)return;
+  n=Number(n)||0;
+  if(n>0){
+    el.textContent=n>99?'99+':String(n);
+    el.classList.add('is-on');
+    el.hidden=false;
+    el.removeAttribute('hidden');
+  }else{
+    el.textContent='0';
+    el.classList.remove('is-on');
+    el.hidden=true;
+  }
+}
+function aideOfficeVis1PaintBadges(){
+  var n=aideOfficeVis1OfficeOk()?aideOfficeVis1Count(aideOfficeVis1Badge):0;
+  aideOfficeVis1SetCount(document.getElementById('aideOfficeMsgBadge'), n);
+  aideOfficeVis1SetCount(document.getElementById('aideOfficeChipBadge'), n);
+  aideOfficeVis1SetCount(document.getElementById('aideOfficeRailBadge'), n);
+  var msg=document.getElementById('nav_aidechat');
+  var onBar=!!(msg&&msg.classList&&msg.classList.contains('bottom-tab'));
+  aideOfficeVis1SetCount(document.getElementById('aideOfficeMoreBadge'), onBar?0:n);
+  var fab=document.getElementById('copilotFab');
+  if(fab)fab.setAttribute('aria-label', n>0?('Remi, '+n+' unread Aide Office'):'Remi');
+  var nav=document.getElementById('nav_aidechat');
+  if(nav)nav.setAttribute('aria-label', n>0?('Messages, '+n+' unread'):'Messages');
+}
+function aideOfficeVis1UnreadOf(raw){
+  raw=raw||{};
+  var n=raw.unread_from_aide;
+  if(n==null)n=raw.unread_from_aide_count;
+  if(n==null)n=raw.unread_count;
+  if(n==null&&typeof raw.unread==='number')n=raw.unread;
+  n=Number(n);
+  if(!isFinite(n)||n<0)n=0;
+  var flag=raw.has_unread===true||raw.has_unread==='true'||raw.has_unread==='t'||raw.unread===true||raw.unread==='true'||n>0;
+  if(flag&&n<1)n=1;
+  if(!flag)n=0;
+  return {flag:!!flag, n:n};
+}
+function aideOfficeVis1DecorateThread(t, raw){
+  t=t||{};
+  raw=raw||{};
+  var u=aideOfficeVis1UnreadOf(raw);
+  t.has_unread=u.flag;
+  t.unread=u.n;
+  var preview=String(raw.preview_from_aide||'').trim();
+  if(!preview&&u.flag&&Array.isArray(t.messages)){
+    var i;
+    for(i=t.messages.length-1;i>=0;i--){
+      var m=t.messages[i];
+      if(m&&m.sender==='aide'&&m.body){preview=String(m.body).trim();break;}
+    }
+  }
+  t.preview_from_aide=preview;
+  t.deep_link=String(raw.deep_link||'');
+  t.last_message_at=String(raw.last_message_at||raw.last_at||t.last_at||'');
+  if(raw.escalate_active===true||raw.escalate===true)t.urgent=true;
+  return t;
+}
+function aideOfficeVis1Sort(rows){
+  return (rows||[]).slice().sort(function(a,b){
+    var ua=a&&(a.has_unread||Number(a.unread)>0)?1:0;
+    var ub=b&&(b.has_unread||Number(b.unread)>0)?1:0;
+    if(ua!==ub)return ub-ua;
+    var ca=Number(a&&a.unread)||0;
+    var cb=Number(b&&b.unread)||0;
+    if(ca!==cb)return cb-ca;
+    if(!!(a&&a.urgent)!==!!(b&&b.urgent))return a.urgent?-1:1;
+    var at=String((a&&(a.last_message_at||a.last_at))||'');
+    var bt=String((b&&(b.last_message_at||b.last_at))||'');
+    return bt.localeCompare(at);
+  });
+}
+function aideOfficeVis1Node(data){
+  var node=data;
+  if(typeof sbRpcNode==='function'){
+    try{var un=sbRpcNode(data); if(un)node=un;}catch(e){}
+  }
+  if(typeof node==='string'){try{node=JSON.parse(node);}catch(e2){}}
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
+  return node||{};
+}
+async function aideOfficeVis1Rpc(name, body){
+  if(!aideOfficeVis1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Aide Office.'};
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function')return {ok:false, missing:true};
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token)return {ok:false, signedOut:true};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  var errText=String((got&&got.error)||'');
+  if(!got||got.ok!==true){
+    if((got&&(got.status===42501||got.status===403))||/42501|is_scheduler_office/.test(errText)){
+      return {ok:false, forbidden:true, status:42501, error:'Nurse cannot use Aide Office.'};
+    }
+    return {ok:false, error:errText||'Request failed.', status:got&&got.status};
+  }
+  var node=aideOfficeVis1Node(got.data);
+  if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
+    var why=String(node.error||node.message||'Request failed.');
+    if(/42501|is_scheduler_office/.test(why))return {ok:false, forbidden:true, status:42501, error:'Nurse cannot use Aide Office.', data:node};
+    return {ok:false, error:why, data:node};
+  }
+  return {ok:true, data:node||{}};
+}
+function aideOfficeVis1MapAlert(raw){
+  raw=raw||{};
+  var aideId=String(raw.aide_id||'');
+  var link=String(raw.deep_link||'');
+  if(!link&&aideId)link=AIDE_OFFICE_VIS1_DEEP+'?aide_id='+encodeURIComponent(aideId);
+  return {
+    kind:'aide_office_unread',
+    thread_id:String(raw.thread_id||''),
+    aide_id:aideId,
+    aide_name:String(raw.aide_name||raw.name||'Aide'),
+    aide_username:String(raw.aide_username||raw.username||''),
+    preview:String(raw.preview||raw.preview_from_aide||'').trim(),
+    unread_from_aide_count:Number(raw.unread_from_aide_count||raw.unread_from_aide||raw.unread||1)||1,
+    escalate_active:!!(raw.escalate_active||raw.escalate),
+    escalate_kind:String(raw.escalate_kind||''),
+    deep_link:link,
+    at:String(raw.last_message_at||raw.created_at||raw.at||'')
+  };
+}
+function aideOfficeVis1AlertsFrom(data){
+  var node=data||{};
+  var list=Array.isArray(node)?node:(Array.isArray(node.alerts)?node.alerts:(Array.isArray(node.rows)?node.rows:[]));
+  return list.map(aideOfficeVis1MapAlert).filter(function(a){return a&&(a.thread_id||a.aide_id||a.preview);});
+}
+function aideOfficeVis1ApplyBadge(data){
+  data=data||{};
+  var threads=Number(data.unread_threads);
+  var messages=Number(data.unread_messages);
+  if(!isFinite(threads)||threads<0)threads=0;
+  if(!isFinite(messages)||messages<0)messages=0;
+  aideOfficeVis1Badge={
+    unread_threads:threads,
+    unread_messages:messages,
+    deep_link_base:String(data.deep_link_base||AIDE_OFFICE_VIS1_DEEP)
+  };
+  aideOfficeVis1PaintBadges();
+}
+function aideOfficeVis1ToastLine(alert){
+  alert=alert||{};
+  var name=String(alert.aide_name||'An aide');
+  var first=name.split(/\s+/)[0]||name;
+  var preview=String(alert.preview||'').trim();
+  if(preview)return first+' replied in Office chat — “'+preview+'”';
+  return name+' · Office chat reply';
+}
+function aideOfficeVis1ShowToast(text){
+  var el=document.getElementById('aideOfficeToast');
+  var body=document.getElementById('aideOfficeToastBody');
+  if(!el||!body)return;
+  if(!text){el.hidden=true;return;}
+  body.textContent=text;
+  el.hidden=false;
+  clearTimeout(aideOfficeVis1ShowToast._t);
+  aideOfficeVis1ShowToast._t=setTimeout(function(){el.hidden=true;}, 8000);
+}
+function aideOfficeVis1Channels(notify){
+  var n=notify||{};
+  var channels=Array.isArray(n.channels)?n.channels.slice():['remi_rail','messages_badge'];
+  return {channels:channels, push:false, staff_push_table:false};
+}
+function aideOfficeVis1OnCaregiverNotify(payload){
+  payload=payload||{};
+  var gate=aideOfficeVis1Channels(payload.notify||{channels:['remi_rail','messages_badge'], push:false, staff_push_table:false});
+  var channels=gate.channels;
+  var wants=channels.indexOf('remi_rail')>=0||channels.indexOf('messages_badge')>=0;
+  if(!wants||!aideOfficeVis1OfficeOk())return gate;
+  var alert={
+    aide_name:payload.aide_name||payload.name||'',
+    preview:payload.preview||payload.body||'',
+    deep_link:payload.deep_link||''
+  };
+  aideOfficeVis1ShowToast(aideOfficeVis1ToastLine(alert));
+  if(!aideOfficeVis1Polling)aideOfficeVis1Poll({toast:false});
+  return gate;
+}
+function aideOfficeVis1CardHtml(alert){
+  var when=aideOfficeVis1When(alert.at)||'just now';
+  var name=alert.aide_name||'Aide';
+  var first=name.split(/\s+/)[0]||name;
+  return '<div class="aide-office-bubble" data-aide-office-vis1="'+AIDE_OFFICE_VIS1_MARKER+'">'
+    +'<span class="aide-office-chip2">Unread · Aide Office</span>'
+    +'<div>'+aideOfficeVis1Esc(first)+' replied to your Office message. Thread opens in Remi — not buried.</div>'
+    +'<div class="aide-office-msg"><div class="from">'+aideOfficeVis1Esc(name)+'</div>'
+    +'<div class="body">'+aideOfficeVis1Esc(alert.preview||'')+'</div>'
+    +'<div class="when">'+aideOfficeVis1Esc(when)+' · in-app badge</div></div>'
+    +'<button type="button" class="aide-office-open" data-aide-office-open="1" data-aide-office-thread="'+aideOfficeVis1Esc(alert.thread_id)+'" data-aide-office-aide="'+aideOfficeVis1Esc(alert.aide_id)+'" data-aide-office-link="'+aideOfficeVis1Esc(alert.deep_link)+'">Open thread</button>'
+    +'</div>';
+}
+function aideOfficeVis1PaintRail(){
+  var host=document.getElementById('aideOfficeRail');
+  var peek=document.getElementById('aideOfficeCoverPeek');
+  var alerts=aideOfficeVis1OfficeOk()?(aideOfficeVis1Alerts||[]):[];
+  if(aideOfficeVis1Acked){
+    alerts=alerts.filter(function(a){return String(a.thread_id||'')!==aideOfficeVis1Acked && String(a.aide_id||'')!==aideOfficeVis1Acked;});
+  }
+  if(host){
+    if(!alerts.length){host.innerHTML='';host.hidden=true;}
+    else{
+      var html='<div class="aide-office-railhead"><strong>Remi · Aide Office</strong><span class="aide-office-new">NEW</span></div>';
+      alerts.forEach(function(a){html+=aideOfficeVis1CardHtml(a);});
+      html+='<p class="aide-office-note">Scheduler + Admin both get Remi/chat notify. Same Office channel — not silent.</p>';
+      host.innerHTML=html;
+      host.hidden=false;
+    }
+  }
+  if(peek){
+    if(!alerts.length){peek.innerHTML='';peek.hidden=true;}
+    else{
+      var n=alerts.length;
+      peek.innerHTML='<strong>Aide Office</strong><span class="chip">'+n+' Aide Office '+(n===1?'reply':'replies')+'</span>';
+      peek.hidden=false;
+    }
+  }
+  var sub=document.querySelector('#copilotSheet .remi-rail-sub');
+  if(sub){
+    if(!aideOfficeVis1PaintRail.base)aideOfficeVis1PaintRail.base=sub.getAttribute('data-aide-office-base')||sub.textContent||'Side rail · not full page';
+    if(!sub.getAttribute('data-aide-office-base'))sub.setAttribute('data-aide-office-base', aideOfficeVis1PaintRail.base);
+    if(alerts.length&&aideOfficeVis1OfficeOk())sub.textContent='Aide Office · notify';
+    else if(sub.textContent==='Aide Office · notify')sub.textContent=aideOfficeVis1PaintRail.base;
+  }
+}
+function aideOfficeVis1BindRail(){
+  var host=document.getElementById('aideOfficeRail');
+  if(!host||host.getAttribute('data-bound')==='1')return;
+  host.setAttribute('data-bound','1');
+  host.addEventListener('click', function(ev){
+    var btn=ev.target&&ev.target.closest?ev.target.closest('[data-aide-office-open]'):null;
+    if(!btn||!host.contains(btn))return;
+    aideOfficeVis1OpenAlert({
+      thread_id:btn.getAttribute('data-aide-office-thread')||'',
+      aide_id:btn.getAttribute('data-aide-office-aide')||'',
+      deep_link:btn.getAttribute('data-aide-office-link')||''
+    });
+  });
+}
+function aideOfficeVis1SyncThreads(alerts){
+  if(typeof aidechatThreads==='undefined'||!aidechatThreads)return;
+  var byThread={};
+  var byAide={};
+  (alerts||[]).forEach(function(a){
+    if(a.thread_id)byThread[a.thread_id]=a;
+    if(a.aide_id)byAide[a.aide_id]=a;
+  });
+  aidechatThreads.forEach(function(t){
+    if(!t)return;
+    if(aideOfficeVis1Acked&&(String(t.id)===aideOfficeVis1Acked||String(t.aide_id)===aideOfficeVis1Acked)){
+      t.has_unread=false;
+      t.unread=0;
+      return;
+    }
+    var hit=byThread[t.id]||byAide[t.aide_id];
+    if(hit){
+      t.has_unread=true;
+      t.unread=Number(hit.unread_from_aide_count)||1;
+      if(hit.preview)t.preview_from_aide=hit.preview;
+      if(hit.deep_link)t.deep_link=hit.deep_link;
+      if(hit.at&&!t.last_message_at)t.last_message_at=hit.at;
+    }
+  });
+  var panel=document.getElementById('tab_aidechat');
+  if(panel&&panel.classList.contains('active')&&typeof aidechatView!=='undefined'&&aidechatView!=='thread'&&typeof aidechatPaintInbox==='function')aidechatPaintInbox();
+}
+function aideOfficeVis1Notice(alerts, opts){
+  opts=opts||{};
+  if(opts.toast===false)return;
+  var fresh=null;
+  var i;
+  for(i=0;i<alerts.length;i++){
+    var key=String(alerts[i].thread_id||alerts[i].aide_id||alerts[i].preview||i);
+    if(!aideOfficeVis1Seen[key]){
+      aideOfficeVis1Seen[key]=1;
+      if(!fresh)fresh=alerts[i];
+    }
+  }
+  if(!aideOfficeVis1ToastOn){
+    aideOfficeVis1ToastOn=true;
+    if(fresh)aideOfficeVis1OnCaregiverNotify({
+      notify:{channels:['remi_rail','messages_badge'], push:false, staff_push_table:false},
+      aide_name:fresh.aide_name,
+      preview:fresh.preview,
+      deep_link:fresh.deep_link
+    });
+    return;
+  }
+  if(fresh)aideOfficeVis1OnCaregiverNotify({
+    notify:{channels:['remi_rail','messages_badge'], push:false, staff_push_table:false},
+    aide_name:fresh.aide_name,
+    preview:fresh.preview,
+    deep_link:fresh.deep_link
+  });
+}
+async function aideOfficeVis1Poll(opts){
+  opts=opts||{};
+  if(!aideOfficeVis1OfficeOk()){
+    aideOfficeVis1ClearUi();
+    return {ok:false, forbidden:true};
+  }
+  if(aideOfficeVis1Polling)return {ok:false, busy:true};
+  aideOfficeVis1Polling=true;
+  try{
+    var badge=await aideOfficeVis1Rpc('admin_get_aide_office_unread_badge', {});
+    if(badge&&badge.forbidden){
+      aideOfficeVis1Stop();
+      aideOfficeVis1ClearUi();
+      return badge;
+    }
+    if(badge&&badge.ok)aideOfficeVis1ApplyBadge(badge.data);
+    var due=await aideOfficeVis1Rpc('admin_list_due_aide_office_alerts', {p_limit:20});
+    if(due&&due.forbidden){
+      aideOfficeVis1Stop();
+      aideOfficeVis1ClearUi();
+      return due;
+    }
+    if(due&&due.ok){
+      var alerts=aideOfficeVis1AlertsFrom(due.data);
+      if(aideOfficeVis1Acked){
+        var ack=aideOfficeVis1Acked;
+        alerts=alerts.filter(function(a){return String(a.thread_id||'')!==ack && String(a.aide_id||'')!==ack;});
+        aideOfficeVis1Acked='';
+      }
+      aideOfficeVis1Alerts=alerts;
+      if(due.data&&due.data.deep_link_base)aideOfficeVis1Badge.deep_link_base=String(due.data.deep_link_base);
+      aideOfficeVis1SyncThreads(alerts);
+      aideOfficeVis1PaintRail();
+      if(opts.toast!==false)aideOfficeVis1Notice(alerts, {toast:true});
+    }else{
+      aideOfficeVis1PaintRail();
+    }
+    aideOfficeVis1PaintWho();
+    return {ok:true, badge:aideOfficeVis1Badge, alerts:aideOfficeVis1Alerts};
+  }finally{
+    aideOfficeVis1Polling=false;
+  }
+}
+function aideOfficeVis1Stop(){
+  aideOfficeVis1Stopped=true;
+  if(aideOfficeVis1Timer){
+    clearInterval(aideOfficeVis1Timer);
+    aideOfficeVis1Timer=0;
+  }
+}
+function aideOfficeVis1ClearUi(){
+  aideOfficeVis1Badge={unread_threads:0, unread_messages:0, deep_link_base:AIDE_OFFICE_VIS1_DEEP};
+  aideOfficeVis1Alerts=[];
+  aideOfficeVis1PaintBadges();
+  aideOfficeVis1PaintRail();
+  aideOfficeVis1ShowToast('');
+  var who=document.getElementById('aideOfficeWho');
+  if(who)who.hidden=true;
+}
+async function aideOfficeVis1AfterRead(id){
+  var thread=typeof aidechatFind==='function'?aidechatFind(id):null;
+  var tid=String((thread&&thread.id)||id||'');
+  var aid=String((thread&&thread.aide_id)||'');
+  aideOfficeVis1Acked=tid||aid;
+  if(thread){thread.has_unread=false;thread.unread=0;}
+  aideOfficeVis1Alerts=(aideOfficeVis1Alerts||[]).filter(function(a){
+    return String(a.thread_id||'')!==tid && String(a.aide_id||'')!==aid;
+  });
+  var leftThreads=0;
+  var leftMessages=0;
+  (typeof aidechatThreads!=='undefined'?aidechatThreads:[]).forEach(function(t){
+    if(t&&(t.has_unread||Number(t.unread)>0)){
+      leftThreads+=1;
+      leftMessages+=Number(t.unread)||1;
+    }
+  });
+  aideOfficeVis1Badge.unread_threads=leftThreads;
+  aideOfficeVis1Badge.unread_messages=leftMessages;
+  aideOfficeVis1PaintBadges();
+  aideOfficeVis1PaintRail();
+  if(typeof aidechatPaintInbox==='function')aidechatPaintInbox();
+  var got=await aideOfficeVis1Poll({toast:false});
+  if(!got||got.ok!==true)aideOfficeVis1ApplyBadge(aideOfficeVis1Badge);
+  return got;
+}
+async function aideOfficeVis1OpenAide(aideId, threadId){
+  if(!aideOfficeVis1OfficeOk())return;
+  if(typeof showTab==='function')showTab('aidechat');
+  if(typeof aidechatOpen==='function'){
+    try{await aidechatOpen();}catch(e){}
+  }
+  var thread=null;
+  if(threadId&&typeof aidechatFind==='function')thread=aidechatFind(threadId);
+  if(!thread&&aideId&&typeof aidechatFindByAide==='function')thread=aidechatFindByAide({id:aideId, aide_id:aideId});
+  if(!thread&&typeof aidechatThreads!=='undefined'){
+    var i;
+    for(i=0;i<(aidechatThreads||[]).length;i++){
+      var t=aidechatThreads[i];
+      if(threadId&&String(t.id)===String(threadId)){thread=t;break;}
+      if(aideId&&String(t.aide_id)===String(aideId)){thread=t;break;}
+    }
+  }
+  if(thread&&typeof aidechatOpenThread==='function')await aidechatOpenThread(thread.id);
+}
+function aideOfficeVis1OpenAlert(alert){
+  alert=alert||{};
+  var aideId=String(alert.aide_id||'');
+  var link=String(alert.deep_link||'');
+  var m=link.match(/[?&]aide_id=([^&]+)/);
+  if(m){
+    try{aideId=decodeURIComponent(m[1]);}catch(e){aideId=m[1];}
+  }
+  return aideOfficeVis1OpenAide(aideId, alert.thread_id||'');
+}
+function aideOfficeVis1QueryAide(){
+  var search='';
+  try{search=String(location.search||'');}catch(e){search='';}
+  var m=search.match(/[?&]aide_id=([^&]+)/);
+  if(!m)return '';
+  try{return decodeURIComponent(m[1]);}catch(e2){return m[1];}
+}
+function aideOfficeVis1Boot(){
+  if(!aideOfficeVis1OfficeOk()){
+    aideOfficeVis1ClearUi();
+    return;
+  }
+  aideOfficeVis1Stopped=false;
+  aideOfficeVis1BindRail();
+  aideOfficeVis1PaintWho();
+  aideOfficeVis1PaintBadges();
+  var aideId=aideOfficeVis1QueryAide();
+  aideOfficeVis1Poll({toast:true}).then(function(){
+    if(aideId)aideOfficeVis1OpenAide(aideId, '');
+  });
+  if(!aideOfficeVis1Timer){
+    aideOfficeVis1Timer=setInterval(function(){
+      if(aideOfficeVis1Stopped||!aideOfficeVis1OfficeOk())return;
+      aideOfficeVis1Poll({toast:true});
+    }, 20000);
+  }
+}
+function aideOfficeVis1Install(){
+  if(aideOfficeVis1Install.done)return;
+  aideOfficeVis1Install.done=true;
+  if(typeof aidechatMapThread==='function'&&!aidechatMapThread.__aideOffice){
+    var prevMap=aidechatMapThread;
+    var wrappedMap=function(raw){
+      return aideOfficeVis1DecorateThread(prevMap(raw), raw);
+    };
+    wrappedMap.__aideOffice=1;
+    aidechatMapThread=wrappedMap;
+  }
+  if(typeof aidechatSorted==='function'&&!aidechatSorted.__aideOffice){
+    var prevSort=aidechatSorted;
+    var wrappedSort=function(){return aideOfficeVis1Sort(prevSort());};
+    wrappedSort.__aideOffice=1;
+    aidechatSorted=wrappedSort;
+  }
+  if(typeof aidechatOpenThread==='function'&&!aidechatOpenThread.__aideOffice){
+    var prevOpen=aidechatOpenThread;
+    var wrappedOpen=async function(id){
+      var out=await prevOpen.apply(this, arguments);
+      try{await aideOfficeVis1AfterRead(id);}catch(e){}
+      return out;
+    };
+    wrappedOpen.__aideOffice=1;
+    aidechatOpenThread=wrappedOpen;
+  }
+  if(typeof openPortalHome==='function'&&!openPortalHome.__aideOffice){
+    var prevHome=openPortalHome;
+    var wrappedHome=function(){
+      var out=prevHome.apply(this, arguments);
+      try{aideOfficeVis1Boot();}catch(e){}
+      return out;
+    };
+    wrappedHome.__aideOffice=1;
+    openPortalHome=wrappedHome;
+  }
+  if(typeof adminLogout==='function'&&!adminLogout.__aideOffice){
+    var prevOut=adminLogout;
+    var wrappedOut=function(){
+      try{aideOfficeVis1Stop();aideOfficeVis1ClearUi();}catch(e){}
+      return prevOut.apply(this, arguments);
+    };
+    wrappedOut.__aideOffice=1;
+    adminLogout=wrappedOut;
+  }
+  if(typeof copilotOpenRadar==='function'&&!copilotOpenRadar.__aideOffice){
+    var prevRadar=copilotOpenRadar;
+    var wrappedRadar=async function(){
+      var out=await prevRadar.apply(this, arguments);
+      try{aideOfficeVis1PaintRail();}catch(e){}
+      return out;
+    };
+    wrappedRadar.__aideOffice=1;
+    copilotOpenRadar=wrappedRadar;
+  }
+}
+aideOfficeVis1Install();
+// end aide office vis1 v=aide-office-vis1
 // v=aide-text-chat1 Text this aide opens Aide chat. Phone is not required. Compose does not send.
 var AIDE_TEXT_CHAT1_MARKER='v=aide-text-chat1';
 var AIDE_TEXT_CHAT1_CAREGIVER='caregiver/messages';

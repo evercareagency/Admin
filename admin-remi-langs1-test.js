@@ -24,8 +24,9 @@ assert.ok(html.includes('id="copilotFab"'), 'corner chip stays');
 assert.ok(html.includes('id="copilotSheet"'), 'phone sheet stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-langs1'), 'first admin-build is remi-langs1');
-assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after this tip');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-office-vis1'), 'first admin-build is aide-office-vis1');
+assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-remi-langs1"'), 'remi-langs1 stays after aide-office-vis1');
+assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after remi-langs1');
 assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
 assert.ok(html.indexOf('content="2026-09-27-sched-time-tap1"') < html.indexOf('content="2026-09-27-aide-text-chat1"'), 'aide-text-chat1 stays after sched-time-tap1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
@@ -550,7 +551,7 @@ async function runBrowser(){
         width: Math.round(box.width)
       };
     });
-    assert.strictEqual(phonePick.first, '2026-09-27-remi-langs1');
+    assert.strictEqual(phonePick.first, '2026-09-27-aide-office-vis1');
     assert.strictEqual(phonePick.fullPage, false);
     assert.strictEqual(phonePick.hidden, false);
     assert.deepStrictEqual(phonePick.labels, LABELS);

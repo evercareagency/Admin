@@ -17,8 +17,8 @@ assert.ok(html.includes("var CANCEL_SHIFT1_MARKER='cancel-shift1'"), 'cancel scr
 assert.ok(html.includes('GHOST-NOSVC-REASON-DRAFT1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-langs1'), 'first admin-build is remi-langs1');
-assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after remi-langs1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aide-office-vis1'), 'first admin-build is aide-office-vis1');
+assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after aide-office-vis1');
 assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
 assert.ok(html.indexOf('content="2026-09-27-sched-time-tap1"') < html.indexOf('content="2026-09-27-aide-text-chat1"'), 'aide-text-chat1 stays after sched-time-tap1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
@@ -251,7 +251,7 @@ async function runBrowser(){
         fullPage: !!document.getElementById('tab_remi')
       };
     });
-    assert.strictEqual(personal.build, '2026-09-27-remi-langs1');
+    assert.strictEqual(personal.build, '2026-09-27-aide-office-vis1');
     assert.strictEqual(personal.marker, 'v=nosvc-reason-draft1');
     assert.ok(/Side rail/.test(personal.sub), personal.sub);
     assert.strictEqual(personal.kicker, 'After you talk to the client');
