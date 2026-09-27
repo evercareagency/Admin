@@ -21,7 +21,8 @@ assert.ok(html.includes('function remiChat1IsSmallTalk'), 'small-talk detector')
 assert.ok(html.includes('function remiChat1Talk'), 'conversational reply');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/remi-chat1-v1.sql')), 'no SQL patch');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-chat1'), 'first admin-build is remi-chat1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'first admin-build is aide-notif-search1');
+assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-hold-client1"') < html.indexOf('content="2026-09-27-aides-info1"'), 'aides-info1 stays after hold-client1');
 assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
@@ -130,7 +131,7 @@ async function runBrowser(){
         fullPage: !!document.getElementById('tab_remi')
       };
     });
-    assert.strictEqual(boot.build, '2026-09-27-remi-chat1');
+    assert.strictEqual(boot.build, '2026-09-27-aide-notif-search1');
     assert.strictEqual(boot.marker, 'v=remi-chat1');
     assert.strictEqual(boot.sheetHidden, true, 'sheet stays closed until opened');
     assert.strictEqual(boot.placeholder, 'Ask or just chat...');

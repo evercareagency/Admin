@@ -31,7 +31,8 @@ assert.ok(html.includes('<!-- weekly authorized hours 2026-09-26 v=clienthrs1a a
 assert.ok(html.includes('GHOST-CLIENTHRS1A-CONTRACT-v1'), 'clienthrs1a contract');
 assert.ok(html.includes('admin_add_client(p_case_manager_email, p_case_manager_name, p_first_name, p_home_address, p_last_name, p_phone, p_weekly_authorized_hours)'), 'live admin_add_client arguments');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidechat1">'), 'aidechat1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiask1">'), 'remiask1 meta stays');
@@ -347,7 +348,7 @@ async function runBrowser(){
         aidesText: (aides && (aides.innerText || aides.textContent)) || ''
       };
     });
-    assert.strictEqual(placed.build, '2026-09-27-remi-chat1');
+    assert.strictEqual(placed.build, '2026-09-27-aide-notif-search1');
     assert.strictEqual(placed.marker, 'v=clienthrs1a');
     assert.strictEqual(placed.title, 'Add Client');
     assert.strictEqual(placed.label, 'Weekly authorized hours (hrs/week)');
