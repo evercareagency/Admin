@@ -15,7 +15,7 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-rules
 assert.ok(html.includes('<!-- remi rules 2026-09-27 v=remi-rules1 admin-build 2026-09-27-remi-rules1'), 'remi-rules1 comment');
 assert.ok(html.includes("var REMI_RULES1_MARKER='v=remi-rules1'"), 'remi-rules1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-sched-time-tap1'), 'first admin-build is remi-proof1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-hold-clear1'), 'first admin-build is remi-proof1');
 assert.ok(html.indexOf('content="2026-09-27-remi-proof1"') < html.indexOf('content="2026-09-27-remi-sched1"'), 'sched meta follows proof');
 assert.ok(html.indexOf('content="2026-09-27-remi-sched1"') < html.indexOf('content="2026-09-27-remi-rules1"'), 'this meta is under sched');
 assert.ok(html.indexOf('content="2026-09-27-remi-rules1"') < html.indexOf('content="2026-09-27-remi-notes-vis1"'), 'notes vis stays after rules');
