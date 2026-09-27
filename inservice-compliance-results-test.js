@@ -154,8 +154,10 @@ assert.ok(commitDel.includes('sbAdminUnassignInserviceAide(topicId, username, ar
 assert.ok(!/postArchiveAction|delete_inservice_result|archive_inservice_result|inservice_results|inservice_topic_assignment|apiPost\(/.test(deleteRes+deleteAssign+commitDel), 'dashboard delete has no second path');
 assert.ok(!/clear_assigned_topic/.test(deleteAssign+commitDel), 'one aide delete must not clear the whole topic');
 assert.ok(onAssign.includes('aide_usernames null = all aides'), 'null assignment means every aide');
-assert.ok(loadIS.includes('isAideOnCurrentISAssignment'), 'not completed rows follow the assignment list');
-assert.ok(loadIS.includes('!isISCompletedRecord(completion)&&!isAideOnCurrentISAssignment'), 'completed rows stay when that aide is off the list');
+assert.ok(!loadIS.includes('isAideOnCurrentISAssignment'), 'compliance grid is not assignment-scoped');
+assert.ok(!loadIS.includes('isComplianceAssignmentViews'), 'compliance grid does not walk assignment rows');
+assert.ok(loadIS.includes('topics.forEach'), 'compliance is every aide × every catalog topic');
+assert.ok(loadIS.includes('row.isCompleted=!!completion||isISCompletedRecord(completion)'), 'Active result marks the pair Completed');
 assert.ok(html.includes('v=isdel1'), 'isdel1 marker');
 assert.ok(html.includes('v=isclear1'), 'isclear1 marker');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build isclear1');
