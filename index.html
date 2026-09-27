@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- remi float hide 2026-09-27 v=remi-float-hide1 admin-build 2026-09-27-remi-float-hide1. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Hide the Float pool from Receipts and Coverage confirm. Do not move Float elsewhere. Coverage confirm calls admin_rank_float_pool_aides {p_open_shift_id} and paints ranked as Ranked · same-day yes / 30d and rest as Rest of list with rank, name, same_day_yes_30d, and miles. is_float is always false. No Float chip or tag. float_pool is ignored and stays []. hide_float_ui is true. Confirm blast on an open hole still posts admin_blast_cover_request {p_open_shift_id, p_aide_ids, p_address_mode}. coverage-simple1 stays. Receipts and Payroll have no Float block so the payroll card and the Receipts, Payroll, and Coverage tabs stay clear. No-show still polls admin_list_due_noshow_rescues, Confirm posts admin_confirm_noshow_rescue, and Dismiss posts admin_dismiss_noshow_rescue. Confirm is kept. Float UI wording is stripped. Never auto-blast. patches/remi-float-noshow1-v1.sql stays. This tip only supersedes the Float UI paint. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. No Quo/SMS. Prior markers stay, including v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
+<meta name="admin-build" content="2026-09-27-remi-float-hide1">
 <!-- tab bar cap 8 2026-09-27 v=tabbar-8 admin-build 2026-09-27-tabbar-8. GHOST-TABBAR-8-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Bottom nav shows up to 8 primary tabs plus More. More stays pinned on the right and still lists the remaining tabs plus Edit tabs. Edit tabs selects and orders up to 8 on the bar. Cap copy is Up to 8 on the bar and Bar full (8/8). A 9th pin is blocked until one moves to More. MAX_BAR_TABS is 8. The previous bar was 5 slots with More pinned (4 primary). Prefs stay the same localStorage evercare_nav_tabs {v:1, slots} keyed by the signed-in admin id or email. Empty storage still opens on the layoutA1 set. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi rail is unchanged. Dates people read are MM/DD/YYYY. Prior markers stay, including v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=navedit1, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-27-tabbar-8">
 <!-- cover card cancel 2026-09-27 v=cover-card-cancel1 admin-build 2026-09-27-cover-card-cancel1. GHOST-COVER-CARD-CANCEL1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Coverage open-shift card actions are Who can cover, Text client, and Cancel on the card itself. Cancel does not open Member-called or the no-service detail panel. Cancel posts admin_cancel_noservice_shift {p_client_id, p_service_date MM/DD/YYYY, p_open_shift_id, p_reason_code optional}. A blank reason stays the server personal default. On cancelled true or next close_panel the card is dismissed and Schedule refreshes from deep_link. Reuse only. No new SQL. No second cancel RPC. No Auth reseal. No Quo/SMS. Remi rail is N/A for this card. Who can cover, Text client, coverage-simple1 blast, cover-unselect1, and nosvc-reason-draft1 + cancel-shift1 stay. Do not touch remi-float-hide1 or remi-langs1. Dates people read are MM/DD/YYYY. Prior markers stay, including v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=clienthrs1d, v=clienthrs1c, v=remi-cm-email1, and v=remiface1. -->
@@ -1098,6 +1100,16 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #copilotSheet .remi-fn-alt{background:#fff;border:1px solid var(--border);color:var(--teal);}
 #copilotSheet .remi-fn-dismiss{background:#fff;border:1px solid var(--border);color:var(--muted);}
 #copilotSheet .remi-fn-note{font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.4;}
+/* v=remi-float-hide1 — no Float pool chip or tag. Ranked and rest only. Receipts keep the payroll card. */
+#copilotSheet .remi-fn-chip.is-open{background:#e8f0f8;color:var(--navy);}
+#copilotSheet .remi-fn-chip.is-pay{background:#e8f6ee;color:#1e7a45;}
+#copilotSheet .remi-fn-gone{font-size:11px;color:#9aa8bc;font-style:italic;padding:8px 10px;border:1px dashed #d0d8e4;border-radius:8px;background:#fafbfc;margin-top:4px;line-height:1.4;overflow-wrap:anywhere;}
+#remiFloatHideGlance{display:flex;flex-direction:column;gap:10px;margin-top:10px;min-width:0;max-width:100%;}
+#remiFloatHideGlance .remi-hide-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0 10px;}
+#remiFloatHideGlance .remi-hide-stat{background:var(--off);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;min-width:0;}
+#remiFloatHideGlance .remi-hide-stat .lbl{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+#remiFloatHideGlance .remi-hide-stat .val{font-size:16px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;}
+#copilotSheet #remiFloatHideOpen{display:block;width:100%;min-height:44px;text-align:center;font-size:12px;font-weight:700;padding:10px 12px;border-radius:8px;background:var(--teal);color:#fff;border:0;font-family:'DM Sans',sans-serif;cursor:pointer;touch-action:manipulation;}
 /* v=remi-ideas763 — Why open, bilingual preview, and pay dispute evidence. Phone sheet and desktop right rail. */
 #remiIdeasHost[hidden]{display:none !important;}
 #remiIdeasHost{flex:0 0 auto;min-height:0;max-height:calc(100dvh - 210px);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;margin:0 0 8px;min-width:0;max-width:100%;}
@@ -3039,7 +3051,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -3057,6 +3069,8 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabRules" role="tab" aria-selected="false" data-remi-rules1="v=remi-rules1" onclick="remiRules1Show()">Rules</button>
         <button type="button" class="copilot-tab" id="copilotTabSched" role="tab" aria-selected="false" data-remi-sched1="v=remi-sched1" onclick="remiSched1Show()">Scheduled</button>
         <button type="button" class="copilot-tab" id="copilotTabProof" role="tab" aria-selected="false" data-remi-proof1="v=remi-proof1" onclick="remiProof1Show()">Receipts</button>
+        <button type="button" class="copilot-tab" id="copilotTabPayroll" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" onclick="remiPayroll1Show()">Payroll</button>
+        <button type="button" class="copilot-tab" id="copilotTabCover" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" onclick="remiFloatHide1ShowCoverage()">Coverage</button>
       </div>
       <div id="remiFloatHost" hidden data-remi-float-noshow1="v=remi-float-noshow1" aria-live="polite"></div>
       <div id="remiIdeasHost" hidden data-remi-ideas763="v=remi-ideas763" aria-live="polite"></div>
@@ -20366,6 +20380,317 @@ function remiFloat1Install(){
 try{remiFloat1Install();}catch(eInstall){}
 // end remi float noshow1 v=remi-float-noshow1
 
+// remi float hide1 v=remi-float-hide1
+// MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only.
+// Supersedes Float UI paint only. remi-float-noshow1 RPCs stay.
+// Coverage: ranked + rest. float_pool ignored. hide_float_ui true. is_float always false.
+// Open-hole blast stays admin_blast_cover_request. Never auto-blast.
+var REMI_FLOAT_HIDE1_MARKER='v=remi-float-hide1';
+var REMI_FLOAT_HIDE1_OFFICE='is_scheduler_office';
+function remiFloatHide1Copy(row){
+  var copy={};
+  if(row&&typeof row==='object'){
+    for(var k in row){
+      if(Object.prototype.hasOwnProperty.call(row,k))copy[k]=row[k];
+    }
+  }
+  copy.is_float=false;
+  return copy;
+}
+function remiFloatHide1Split(data){
+  data=data||{};
+  var ranked=[];
+  var rest=[];
+  if(Array.isArray(data.ranked))ranked=data.ranked.map(remiFloatHide1Copy);
+  if(Array.isArray(data.rest))rest=data.rest.map(remiFloatHide1Copy);
+  if(!ranked.length&&!rest.length&&Array.isArray(data.aides)){
+    data.aides.forEach(function(row){
+      if(!row||typeof row!=='object')return;
+      if(Number(row.same_day_yes_30d)>0)ranked.push(remiFloatHide1Copy(row));
+      else rest.push(remiFloatHide1Copy(row));
+    });
+  }
+  if(!ranked.length&&Array.isArray(data.float_pool)){
+    data.float_pool.forEach(function(row){
+      if(row&&typeof row==='object')ranked.push(remiFloatHide1Copy(row));
+    });
+  }
+  return {ranked:ranked, rest:rest, hide_float_ui:true, float_pool:[]};
+}
+function remiFloatHide1Intro(){
+  var text=typeof remiFloat1Intro==='function'?remiFloat1Intro():'';
+  var from='I ranked aides who usually pick up same-day holes first.';
+  var to='Ranked aides who usually pick up same-day holes first \u2014 no separate Float pool block.';
+  if(text.indexOf(from)>=0)return text.replace(from, to);
+  if(!text)return 'Ranked aides who usually pick up same-day holes first \u2014 no separate Float pool block.';
+  return text+' '+to;
+}
+function remiFloatHide1Band(rows, band, label){
+  if(!rows||!rows.length)return '';
+  var html='<div class="remi-fn-label">'+remiFloat1Esc(label)+'</div>';
+  rows.forEach(function(row){html+=remiFloat1AideHtml(row, band, remiFloat1Editing);});
+  return html;
+}
+function remiFloatHide1Num(v){
+  var n=Number(v);
+  if(!isFinite(n))return '';
+  var s=(Math.round(n*100)/100).toFixed(2);
+  return s.replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+}
+function remiFloatHide1Esc(s){
+  if(typeof remiFloat1Esc==='function')return remiFloat1Esc(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function remiFloatHide1NextLine(){
+  var iso='2026-10-07T12:00:00+00:00';
+  try{
+    if(typeof remiPayroll1Job!=='undefined'&&remiPayroll1Job&&remiPayroll1Job.next_run_at)iso=String(remiPayroll1Job.next_run_at);
+    else if(typeof REMI_PAYROLL1_NEXT!=='undefined'&&REMI_PAYROLL1_NEXT)iso=String(REMI_PAYROLL1_NEXT);
+  }catch(eIso){}
+  var text='';
+  if(typeof remiPayroll1FormatNext==='function')text=remiPayroll1FormatNext(iso);
+  if(!text)return 'Next run \u00b7 Wed 10/07/2026 \u00b7 8:00 AM ET';
+  return 'Next run \u00b7 '+text.replace(/(\d{2}\/\d{2}\/\d{4})\s+/,'$1 \u00b7 ');
+}
+function remiFloatHide1Stats(){
+  var out={aides:'\u2014', hours:'\u2014', covers:'\u2014', range:'Last 2 weeks'};
+  try{
+    if(typeof remiPayroll1Report!=='undefined'&&remiPayroll1Report&&typeof remiPayroll1Stats==='function'){
+      var s=remiPayroll1Stats(remiPayroll1Report);
+      if(s.aides!=null&&s.aides!=='')out.aides=String(s.aides);
+      var hours=remiFloatHide1Num(s.paid_hours);
+      if(hours)out.hours=hours;
+      if(s.covers!=null&&s.covers!=='')out.covers=String(s.covers);
+      var start=remiPayroll1Report.start_date_display||'';
+      var end=remiPayroll1Report.end_date_display||'';
+      if(!start&&typeof remiPayroll1Mdy==='function')start=remiPayroll1Mdy(remiPayroll1Start||remiPayroll1Report.start_date);
+      if(!end&&typeof remiPayroll1Mdy==='function')end=remiPayroll1Mdy(remiPayroll1End||remiPayroll1Report.end_date);
+      if(start&&end)out.range=start+' \u2013 '+end;
+    }
+  }catch(eStats){}
+  return out;
+}
+function remiFloatHide1ReceiptHtml(){
+  var rows=[];
+  try{if(typeof remiProof1Cache!=='undefined'&&remiProof1Cache)rows=remiProof1Cache;}catch(eRows){rows=[];}
+  if(!rows||!rows.length)return '';
+  var row=rows[0]||{};
+  var text=row.chip_summary||row.list_summary||row.title||'';
+  if(!text)return '';
+  return '<div class="remi-fn-bubble" data-remi-float-hide1="'+REMI_FLOAT_HIDE1_MARKER+'"><span class="remi-fn-chip">Receipt</span>'+remiFloatHide1Esc(text)+'</div>';
+}
+function remiFloatHide1GlanceHtml(){
+  var s=remiFloatHide1Stats();
+  var html=remiFloatHide1ReceiptHtml();
+  html+='<div class="remi-fn-card remi-hide-pay" data-remi-float-hide1="'+REMI_FLOAT_HIDE1_MARKER+'">';
+  html+='<span class="remi-fn-chip is-pay">Payroll</span>';
+  html+='<h3>Wed payroll ready</h3>';
+  html+='<p>'+remiFloatHide1Esc(s.range)+' \u00b7 last 2 weeks by who worked \u00b7 covers on row</p>';
+  html+='<div class="remi-hide-stats">';
+  html+='<div class="remi-hide-stat"><div class="lbl">Aides</div><div class="val">'+remiFloatHide1Esc(s.aides)+'</div></div>';
+  html+='<div class="remi-hide-stat"><div class="lbl">Hours</div><div class="val">'+remiFloatHide1Esc(s.hours)+'</div></div>';
+  html+='<div class="remi-hide-stat"><div class="lbl">Covers</div><div class="val">'+remiFloatHide1Esc(s.covers)+'</div></div>';
+  html+='</div>';
+  html+='<button type="button" id="remiFloatHideOpen" onclick="remiPayroll1Show()">Open full report</button>';
+  html+='</div>';
+  html+='<p class="remi-fn-note">'+remiFloatHide1Esc(remiFloatHide1NextLine())+'</p>';
+  html+='<div class="remi-fn-gone">Float pool block removed from this rail \u2014 Coverage still ranks aides on open shifts.</div>';
+  return html;
+}
+function remiFloatHide1MountGlance(){
+  var host=null;
+  try{host=document.getElementById('copilotBody');}catch(eHost){host=null;}
+  if(!host)return '';
+  var old=document.getElementById('remiFloatHideGlance');
+  if(old&&old.parentNode)old.parentNode.removeChild(old);
+  var view='';
+  try{view=String(copilotView||'');}catch(eView){view='';}
+  if(view!=='receipts')return '';
+  var wrap=document.createElement('div');
+  wrap.id='remiFloatHideGlance';
+  wrap.setAttribute('data-remi-float-hide1', REMI_FLOAT_HIDE1_MARKER);
+  wrap.innerHTML=remiFloatHide1GlanceHtml();
+  if(host.firstChild)host.insertBefore(wrap, host.firstChild);
+  else host.appendChild(wrap);
+  remiFloatHide1EnsurePayroll();
+  return wrap.innerHTML;
+}
+function remiFloatHide1EnsurePayroll(){
+  if(remiFloatHide1EnsurePayroll.started)return;
+  if(typeof remiPayroll1Load!=='function')return;
+  if(typeof remiPayroll1OfficeOk==='function'&&!remiPayroll1OfficeOk())return;
+  try{if(typeof remiPayroll1Report!=='undefined'&&remiPayroll1Report)return;}catch(eHas){}
+  remiFloatHide1EnsurePayroll.started=true;
+  remiPayroll1Load().then(function(){
+    try{if(String(copilotView||'')==='receipts')remiFloatHide1MountGlance();}catch(eMount){}
+  }).catch(function(){});
+}
+function remiFloatHide1Sub(){
+  var host=null;
+  try{host=document.getElementById('remiFloatHost');}catch(eHost){host=null;}
+  if(host&&/data-remi-rescue=/.test(host.innerHTML||''))return;
+  var el=null;
+  try{el=document.querySelector('#copilotSheet .remi-rail-sub');}catch(eEl){el=null;}
+  if(!el)return;
+  var view='';
+  try{view=String(copilotView||'');}catch(eView){view='';}
+  if(view==='receipts')el.textContent='Receipts \u00b7 confirm';
+  else if(view==='coverage')el.textContent='Coverage \u00b7 confirm';
+}
+function remiFloatHide1ShowCoverage(){
+  if(typeof remiFloat1OfficeOk==='function'&&!remiFloat1OfficeOk())return {ok:false, forbidden:true};
+  try{copilotView='coverage';}catch(eView){}
+  var sheet=null;
+  try{sheet=document.getElementById('copilotSheet');}catch(eSheet){sheet=null;}
+  if(sheet)sheet.hidden=false;
+  var body=null;
+  try{body=document.getElementById('copilotBody');}catch(eBody){body=null;}
+  if(body)body.innerHTML='';
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  if(remiFloat1Rank){
+    if(typeof remiFloat1Paint==='function')remiFloat1Paint();
+    return {ok:true, cached:true};
+  }
+  var open=typeof remiFloat1DeskOpen==='function'?remiFloat1DeskOpen():null;
+  if(open&&typeof remiFloat1OnOpenHole==='function'){
+    remiFloat1OnOpenHole(open);
+    return {ok:true, loading:true};
+  }
+  if(typeof remiFloat1Paint==='function')remiFloat1Paint();
+  return {ok:true, empty:true};
+}
+remiFloat1Bands=function(data){
+  var split=remiFloatHide1Split(data);
+  return {float_pool:split.ranked, rest:split.rest, ranked:split.ranked, hide_float_ui:true, float_count:0};
+};
+remiFloat1AideHtml=function(row, band, interactive){
+  row=row||{};
+  var id=remiFloat1AideId(row);
+  var picked=!interactive||!id||!!remiFloat1Picked[id];
+  var rank=row.rank==null||row.rank===''?'':String(row.rank);
+  var name=row.name||'Aide';
+  var isRest=band==='rest';
+  var inner='<span class="remi-fn-rank'+(isRest?' is-rest':'')+'">'+remiFloat1Esc(rank)+'</span>'
+    +'<span class="remi-fn-who"><span class="remi-fn-name">'+remiFloat1Esc(name)+'</span><span class="remi-fn-meta">'+remiFloat1Esc(remiFloat1Meta(row))+'</span></span>';
+  var cls='remi-fn-aide'+(picked?'':' is-off');
+  if(interactive&&id){
+    return '<button type="button" class="'+cls+'" data-remi-float-act="pick" data-remi-float-id="'+remiFloat1Esc(id)+'" aria-pressed="'+(picked?'true':'false')+'">'+inner+'</button>';
+  }
+  return '<div class="'+cls+'">'+inner+'</div>';
+};
+remiFloat1FloatHtml=function(){
+  var view='';
+  try{view=String(copilotView||'');}catch(eView){view='';}
+  if(view==='receipts'||view==='payroll')return '';
+  if(!remiFloat1Rank)return '';
+  if(remiFloat1Status(remiFloat1FloatKey(remiFloat1ShiftId))==='blasted')return '';
+  var split=remiFloatHide1Split(remiFloat1Rank);
+  var assigned=remiFloat1Rank.assigned_aide_id;
+  var ranked=remiFloat1DropAssignee(split.ranked, assigned);
+  var rest=remiFloat1DropAssignee(split.rest, assigned);
+  if(!ranked.length&&!rest.length)return '';
+  var html='<div class="remi-fn-bubble" data-remi-float-hide1="'+REMI_FLOAT_HIDE1_MARKER+'">';
+  html+='<span class="remi-fn-chip is-open">Open shift</span>';
+  html+='<p class="remi-fn-copy">'+remiFloat1Esc(remiFloatHide1Intro())+'</p>';
+  html+=remiFloatHide1Band(ranked, 'ranked', 'Ranked \u00b7 same-day yes / 30d');
+  html+=remiFloatHide1Band(rest, 'rest', 'Rest of list');
+  html+='<div class="remi-fn-btns">';
+  html+='<button type="button" class="remi-fn-go" id="remiFloat1Blast" data-remi-float-act="blast">Confirm blast</button>';
+  html+='<button type="button" class="remi-fn-alt" id="remiFloat1Edit" data-remi-float-act="edit" aria-pressed="'+(remiFloat1Editing?'true':'false')+'">Edit list</button>';
+  html+='</div>';
+  html+='<p class="remi-fn-note">Coverage still ranks aides. Float pool UI removed from Remi.</p>';
+  html+='</div>';
+  html+='<div class="remi-fn-gone">No \u201cFloat pool\u201d chip \u00b7 no Float tags on aides \u00b7 rail stays short so Payroll / Receipts tabs stay usable.</div>';
+  return html;
+};
+remiFloat1NoshowAides=function(card){
+  card=card||{};
+  var rows=[];
+  if(Array.isArray(card.ranked)&&card.ranked.length)rows=card.ranked.slice();
+  else if(Array.isArray(card.suggested_aides)&&card.suggested_aides.length)rows=card.suggested_aides.slice();
+  else if(Array.isArray(card.aides)&&card.aides.length)rows=card.aides.slice();
+  else if(Array.isArray(card.float_pool))rows=card.float_pool.slice();
+  var clean=[];
+  rows.forEach(function(row){if(row&&typeof row==='object')clean.push(remiFloatHide1Copy(row));});
+  var assigned=card.assigned_aide_id||card.assignee_id||'';
+  return remiFloat1DropAssignee(clean, assigned).slice(0, 6);
+};
+remiFloat1NoshowHtml=function(card){
+  card=card||{};
+  var id=String(card.id||card.rescue_id||'').trim();
+  if(!id)return '';
+  var local=remiFloat1Status(id);
+  if(local==='dismissed'||local==='blasted')return '';
+  if(String(card.status||'pending').toLowerCase()!=='pending')return '';
+  var who=remiFloat1First(card.assigned_aide_name||card.assignee_name||card.aide_name||'');
+  var grace=remiFloat1CardGrace(card);
+  var client=card.client_name||'This shift';
+  var win=remiFloat1Window(card.shift_start, card.shift_end)||String(card.when_label||'');
+  var html='<div class="remi-fn-bubble" data-remi-float-hide1="'+REMI_FLOAT_HIDE1_MARKER+'" data-remi-rescue="'+remiFloat1Esc(id)+'">';
+  html+='<span class="remi-fn-chip is-alert">Confirm</span>';
+  html+='<div class="remi-fn-card">';
+  html+='<h3>'+remiFloat1Esc(who+' no reply '+grace+' min past start')+'</h3>';
+  html+='<p>'+remiFloat1Esc(client+(win?' '+win:'')+' \u00b7 start backup blast?')+'</p>';
+  var aides=remiFloat1NoshowAides(card);
+  if(aides.length){
+    html+='<div class="remi-fn-label">Ranked \u00b7 same-day yes / 30d</div>';
+    aides.forEach(function(row){
+      var yes=Number(row&&row.same_day_yes_30d);
+      html+=remiFloat1AideHtml(row, (isFinite(yes)&&yes>0)?'ranked':'rest', false);
+    });
+  }
+  html+='<div class="remi-fn-btns">';
+  html+='<button type="button" class="remi-fn-go" data-remi-float-act="confirm" data-remi-float-id="'+remiFloat1Esc(id)+'">Confirm</button>';
+  html+='<button type="button" class="remi-fn-dismiss" data-remi-float-act="dismiss" data-remi-float-id="'+remiFloat1Esc(id)+'">Dismiss</button>';
+  html+='</div>';
+  html+='<p class="remi-fn-note">Won\u2019t re-blast '+remiFloat1Esc(who)+' \u00b7 no Float pool UI \u00b7 remi-float-hide1 \u00b7 you stay in control</p>';
+  html+='</div></div>';
+  return html;
+};
+function remiFloatHide1Install(){
+  if(remiFloatHide1Install.done)return;
+  remiFloatHide1Install.done=true;
+  if(typeof copilotSyncTabs==='function'&&!copilotSyncTabs.__remiFloatHide){
+    var prevSync=copilotSyncTabs;
+    var wrappedSync=function(){
+      var out=prevSync.apply(this, arguments);
+      try{
+        var view='';
+        try{view=String(copilotView||'');}catch(eView){view='';}
+        var pay=document.getElementById('copilotTabPayroll');
+        var cov=document.getElementById('copilotTabCover');
+        var radar=document.getElementById('copilotTabRadar');
+        if(pay)pay.setAttribute('aria-selected', view==='payroll'?'true':'false');
+        if(cov)cov.setAttribute('aria-selected', view==='coverage'?'true':'false');
+        if(view==='coverage'&&radar)radar.setAttribute('aria-selected','false');
+        var sheet=document.getElementById('copilotSheet');
+        if(sheet&&sheet.classList){
+          if(view==='coverage')sheet.classList.add('is-coverage');
+          else sheet.classList.remove('is-coverage');
+        }
+        if(typeof remiFloat1Paint==='function')remiFloat1Paint();
+        if(view==='receipts')remiFloatHide1MountGlance();
+        remiFloatHide1Sub();
+      }catch(eSync){}
+      return out;
+    };
+    wrappedSync.__remiFloatHide=1;
+    copilotSyncTabs=wrappedSync;
+  }
+  if(typeof remiProof1PaintList==='function'&&!remiProof1PaintList.__remiFloatHide){
+    var prevList=remiProof1PaintList;
+    var wrappedList=function(){
+      var out=prevList.apply(this, arguments);
+      try{remiFloatHide1MountGlance();}catch(eList){}
+      return out;
+    };
+    wrappedList.__remiFloatHide=1;
+    remiProof1PaintList=wrappedList;
+  }
+}
+try{remiFloatHide1Install();}catch(eHideInstall){}
+// end remi float hide1 v=remi-float-hide1
 
 // remi ideas763 v=remi-ideas763
 // MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only.
@@ -20643,6 +20968,7 @@ function remiIdeas763FloatIds(data){
   data=data||{};
   var assigned=String(data.assigned_aide_id||'').trim();
   var rows=Array.isArray(data.float_pool)?data.float_pool.slice():[];
+  if(!rows.length&&Array.isArray(data.ranked))rows=data.ranked.slice();
   if(!rows.length&&Array.isArray(data.aides)){
     data.aides.forEach(function(row){
       if(row&&(row.is_float===true||Number(row.same_day_yes_30d)>0))rows.push(row);

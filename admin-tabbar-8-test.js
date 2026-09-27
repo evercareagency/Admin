@@ -23,8 +23,9 @@ assert.ok(html.includes('Move to More') && html.includes('Add to bar'), 'move an
 assert.ok(html.includes("return 'evercare_nav_tabs:'+part"), 'prefs key unchanged');
 assert.ok(html.includes('No SQL') && html.includes('No new RPC'), 'no SQL and no new RPC in the tip');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-tabbar-8'), 'first admin-build is tabbar-8');
-assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after this tip');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-float-hide1'), 'first admin-build is remi-float-hide1');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
+assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
 assert.ok(html.indexOf('content="2026-09-27-cover-card-cancel1"') < html.indexOf('content="2026-09-27-nosvc-reason-draft1"'), 'nosvc-reason-draft1 stays after cover-card-cancel1');
 assert.ok(html.indexOf('content="2026-09-27-nosvc-reason-draft1"') < html.indexOf('content="2026-09-27-cover-unselect1"'), 'cover-unselect1 stays after nosvc-reason-draft1');
 assert.ok(html.indexOf('content="2026-09-27-cover-unselect1"') < html.indexOf('content="2026-09-27-remi-payroll1"'), 'payroll stays after cover-unselect1');
