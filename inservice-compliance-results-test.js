@@ -154,9 +154,10 @@ assert.ok(commitDel.includes('sbAdminUnassignInserviceAide(topicId, username, ar
 assert.ok(!/postArchiveAction|delete_inservice_result|archive_inservice_result|inservice_results|inservice_topic_assignment|apiPost\(/.test(deleteRes+deleteAssign+commitDel), 'dashboard delete has no second path');
 assert.ok(!/clear_assigned_topic/.test(deleteAssign+commitDel), 'one aide delete must not clear the whole topic');
 assert.ok(onAssign.includes('aide_usernames null = all aides'), 'null assignment means every aide');
-assert.ok(!loadIS.includes('isAideOnCurrentISAssignment'), 'compliance grid is not assignment-scoped');
-assert.ok(!loadIS.includes('isComplianceAssignmentViews'), 'compliance grid does not walk assignment rows');
-assert.ok(loadIS.includes('topics.forEach'), 'compliance is every aide × every catalog topic');
+assert.ok(!loadIS.includes('isAideOnCurrentISAssignment'), 'compliance scope uses the compliance helper');
+assert.ok(loadIS.includes('isComplianceAssignmentViews'), 'compliance walks every assignment row');
+assert.ok(loadIS.includes('isAideInComplianceAssignment'), 'Not Completed follows assignment scope');
+assert.ok(loadIS.includes('topics.forEach'), 'compliance still walks every aide × every catalog topic');
 assert.ok(loadIS.includes('row.isCompleted=!!completion||isISCompletedRecord(completion)'), 'Active result marks the pair Completed');
 assert.ok(html.includes('v=isdel1'), 'isdel1 marker');
 assert.ok(html.includes('v=isclear1'), 'isclear1 marker');
@@ -291,6 +292,7 @@ assert.strictEqual(sandbox.formatISScoreBanner(completed), 'Score: 9/10 (90%)');
 assert.strictEqual(sandbox.formatISCompletedDate(sandbox.certDateFromRecord(completed)), '08/02/2026');
 
 const pending = sandbox.hydrateISComplianceRow({}, {username:'aide2', name:'Pat Pending'}, {id:1, title:'Diabetes', shortTitle:'Diabetes Complications'});
+pending.inAssignmentScope=true;
 assert.strictEqual(pending.isCompleted, false);
 assert.strictEqual(sandbox.formatISScoreColumn(pending), '—');
 

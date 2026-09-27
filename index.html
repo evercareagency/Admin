@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- inservice compliance delete scope 2026-09-26 v=isdash1b admin-build 2026-09-26-isdash1b. Full matrix restored: every active aide × every SELECT TOPIC catalog topic. Completed when an Active inservice_results row exists, otherwise Not Completed. The cell stays after unassign as catalog-only Not Completed. Delete stays POST /rest/v1/rpc/admin_unassign_inservice_aide and is enabled only when that assignment scopes the aide (aide_usernames null = all aides, else the username is in the list) or the row is Completed. Not Completed sends p_archive_active_result false. Completed sends true and never hard-deletes inservice_results. removed true with mode was_selected or was_all toasts success and refreshes; the same aide×topic cell remains Not Completed with Delete disabled once the aide is outside scope. mode no_assignment_row or removed false does not toast success. Catalog-only Not Completed disables Delete with title Not assigned — nothing to remove. No localStorage hide and no new Ace RPC. SELECT TOPIC stays assign-only. Prior markers stay, including v=isdash1. -->
+<meta name="admin-build" content="2026-09-26-isdash1b">
 <!-- inservice compliance dashboard 2026-09-26 v=isdash1 admin-build 2026-09-26-isdash1. Compliance is every active aide × every topic in the SELECT TOPIC catalog (INSERVICES), Completed and Not Completed. A pair is Completed when an Active inservice_results row exists; otherwise Not Completed. An inservice_topic_assignment row is not required to show the row. SELECT TOPIC only chooses the topic for Assign to All Aides, Assign to selected, and Clear Assignment. Changing SELECT TOPIC does not re-fetch or filter the Compliance table. Delete, View Cert, Print Cert, and Send Reminder use the row topic. No new Ace RPC. Prior markers stay, including v=remi-notes1 and v=clienthrs1b. -->
 <meta name="admin-build" content="2026-09-26-isdash1">
 <!-- remi notes 2026-09-26 v=remi-notes1 admin-build 2026-09-26-remi-notes1. Admin and Scheduler only. Notes sits beside Radar and Ask in the Remi panel. Open notes have an empty checkbox; checking moves the note to Recently done. Edit changes the text. Composer chips are 30 min, 1 hour, and Tomorrow (next America/New_York day at 9:00 AM), plus Pick date and time for any calendar day and clock. Ask phrasing also works: remind me in 30 mins, remind me in an hour, remind me tomorrow at 9am, remind me Monday at 3:25pm, and US dates like 09/28 at 3:25pm. Those parse into a note plus remind_at in America/New_York. Display is weekday and time, or MM/DD when the year differs, like the mocks. Recently done keeps a note 7 days, then auto-deletes. Recover returns it to Open. Storage is localStorage evercare_remi_notes: keyed by the signed-in username or email. No SMS, no push, no Quo. No new Ace RPC. No Auth reseal. No Supabase table. Remi stays the phone sheet and the desktop right rail. No full-page Remi. Nurse does not get Notes. Prior markers stay, including 2026-09-26-clienthrs1b. -->
@@ -2157,9 +2159,9 @@ bindLoginKeyboard();
         </div>
 
         <!-- COMPLIANCE DASHBOARD -->
-        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1">
+        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b">
           <div class="card-title"><span class="ico">&#9989;</span> Compliance Dashboard</div>
-          <p class="is-compliance-note">Every aide and every topic. Completed and Not Completed. Select Topic only chooses what Assign and Clear apply to.</p>
+          <p class="is-compliance-note">Every aide and every topic. Completed if there is a result, otherwise Not Completed. Delete works only when that topic is assigned to the aide, or the row is Completed. Select Topic only chooses what Assign and Clear apply to.</p>
           <div id="isComplianceScroll" style="overflow-x:auto">
             <table class="data-table" id="isComplianceTable">
               <thead><tr><th>Aide Name</th><th>Topic</th><th>Status</th><th>Completed</th><th>Score</th><th>Actions</th></tr></thead>
@@ -15195,7 +15197,14 @@ async function sbAdminUnassignInserviceAide(topicId, username, archiveActiveResu
       return {success:false,error:'Could not remove this assignment.',results_hard_deleted:true};
     }
   }
-  return {success:true,results_hard_deleted:false};
+  var mode=row&&row.mode!=null?String(row.mode):'';
+  var removed=!!(row&&row.removed===true);
+  var archivedCount=0;
+  if(row&&row.archived_count!=null&&row.archived_count!==''){
+    var archivedN=Number(row.archived_count);
+    if(!isNaN(archivedN))archivedCount=archivedN;
+  }
+  return {success:true,results_hard_deleted:false,removed:removed,mode:mode,archived_count:archivedCount};
 }
 async function sbInserviceDispatch(payload){
   var action=payload&&payload.action;
@@ -19849,6 +19858,7 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 
 // ─── INSERVICE ADMIN ────────────────────────────────────
 var ISDASH1_MARKER='v=isdash1';
+var ISDASH1B_MARKER='v=isdash1b';
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
 let isAssignTopicTouched=false;
@@ -20365,10 +20375,12 @@ function isCompletedActionsHtml(i){
     +'</div>';
 }
 function isPendingActionsHtml(i){
-  return '<div class="actions is-compliance-actions">'
-    +'<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>'
-    +'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISAssignment('+i+')">Delete</button>'
-    +'</div>';
+  const row=isComplianceRows[i]||{};
+  const remind='<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>';
+  const del=row.inAssignmentScope===true
+    ?'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISAssignment('+i+')">Delete</button>'
+    :'<button type="button" class="btn btn-sm" disabled title="Not assigned — nothing to remove" style="background:#fde8e8;color:var(--danger)">Delete</button>';
+  return '<div class="actions is-compliance-actions">'+remind+del+'</div>';
 }
 function isAideOnCurrentISAssignment(assignView, username){
   // aide_usernames null = all aides; an array = only those usernames.
@@ -20418,6 +20430,40 @@ function renderISComplianceTable(rows){
   }).join('');
 }
 
+function isComplianceAssignmentViews(data){
+  if(!data||data.success===false)return [];
+  if(Array.isArray(data.assignments))return data.assignments.filter(Boolean);
+  if(data.topicId!=null&&String(data.topicId).trim()!==''){
+    return [{topicId:data.topicId,aideUsernames:data.aideUsernames,assignAll:data.assignAll===true}];
+  }
+  return [];
+}
+function isComplianceAssignmentForTopic(list, topicId){
+  var want=String(topicId);
+  var hit=null;
+  for(var i=0;i<(list||[]).length;i++){
+    var row=list[i];
+    if(row&&String(row.topicId)===want)hit=row;
+  }
+  return hit;
+}
+function isAideInComplianceAssignment(assign, username){
+  // No assignment row means catalog-only. aide_usernames null = all aides.
+  if(!assign)return false;
+  if(assign.assignAll===true)return true;
+  var names=assign.aideUsernames;
+  if(names==null)return true;
+  if(!Array.isArray(names))return false;
+  var key=String(username||'').trim().toLowerCase();
+  if(!key)return false;
+  for(var i=0;i<names.length;i++){
+    if(String(names[i]||'').trim().toLowerCase()===key)return true;
+  }
+  return false;
+}
+function isCompliancePairKey(username, topicId){
+  return String(username||'').trim().toLowerCase()+'|'+String(topicId==null?'':topicId);
+}
 async function loadISCompliance(force){
   const tbody=document.getElementById('isComplianceBody');
   const empty=document.getElementById('isComplianceEmpty');
@@ -20425,12 +20471,13 @@ async function loadISCompliance(force){
   tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
 
   try{
-    const [usersData, isData]=await Promise.all([
+    const [usersData, isData, assignData]=await Promise.all([
       apiGetCached('get_users',null,force===true),
-      apiPost({action:'get_inservices'}) // no includeArchived — Ace skips Status=Archived
+      apiPost({action:'get_inservices'}), // no includeArchived — Ace skips Status=Archived
+      apiGetCached('get_assigned_topic',null,force===true)
     ]);
     if(evercareSbEnabled()){
-      const sbFail=(usersData&&usersData.success===false&&(usersData.error||usersData.message))||(isData&&isData.success===false&&(isData.error||isData.message));
+      const sbFail=(usersData&&usersData.success===false&&(usersData.error||usersData.message))||(isData&&isData.success===false&&(isData.error||isData.message))||(assignData&&assignData.success===false&&(assignData.error||assignData.message));
       if(sbFail){
         if(empty)empty.style.display='none';
         isComplianceRows=[];
@@ -20443,13 +20490,16 @@ async function loadISCompliance(force){
       return String(c&&(c.status||c.Status)||'').toLowerCase()!=='archived';
     });
     const topics=Array.isArray(INSERVICES)?INSERVICES:[];
+    const assignments=isComplianceAssignmentViews(assignData);
     const rows=[];
     aides.forEach(function(a){
       topics.forEach(function(topic){
         const completion=findISCompletion(completions,a.username,topic.id);
         const row=hydrateISComplianceRow(completion||{},a,topic);
-        // Active result for this pair = Completed. No assignment row is required.
+        // Active result for this pair = Completed. Every catalog pair is still painted.
         row.isCompleted=!!completion||isISCompletedRecord(completion);
+        const scope=isComplianceAssignmentForTopic(assignments, topic.id);
+        row.inAssignmentScope=isAideInComplianceAssignment(scope, a.username);
         rows.push(row);
       });
     });
@@ -20524,6 +20574,10 @@ function confirmDeleteISAssignment(rowIndex){
     showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
     return;
   }
+  if(row.inAssignmentScope!==true){
+    showTempMsg('Not assigned — nothing to remove.','var(--danger)');
+    return;
+  }
   showSharedConfirm('Are you sure?',function(){deleteISAssignment(rowIndex);},'Yes, delete');
 }
 
@@ -20535,7 +20589,10 @@ async function deleteISAssignment(rowIndex){
 
 async function commitISComplianceDelete(rowIndex, archiveActiveResult){
   const row=isComplianceRows[rowIndex];
-  if(!row)return;
+  if(!row){
+    showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
+    return;
+  }
   const username=String(row.username||'').trim();
   const topicId=isComplianceDeleteTopicId(row);
   if(!username||!topicId){
@@ -20543,13 +20600,26 @@ async function commitISComplianceDelete(rowIndex, archiveActiveResult){
     return;
   }
   const data=await sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult===true);
-  if(data&&data.success){
+  if(!data||data.success===false){
+    showTempMsg(String((data&&(data.error||data.message))||'Could not remove this assignment.'),'var(--danger)');
+    return;
+  }
+  const mode=String(data.mode||'');
+  const removed=data.removed===true&&(mode==='was_selected'||mode==='was_all');
+  if(removed){
     cacheInvalidate('get_assigned_topic');
     showTempMsg(archiveActiveResult===true?'Removed from this topic. This result was archived.':'Removed from this topic. Completed results are kept.','var(--success)');
     await renderInservices(true);
     return;
   }
-  showTempMsg(String((data&&(data.error||data.message))||'Could not remove this assignment.'),'var(--danger)');
+  const archivedN=Number(data.archived_count);
+  if(archiveActiveResult===true&&!isNaN(archivedN)&&archivedN>0){
+    cacheInvalidate('get_assigned_topic');
+    showTempMsg('This result was archived.','var(--teal)');
+    await renderInservices(true);
+    return;
+  }
+  showTempMsg('Not assigned — nothing to remove.','var(--danger)');
 }
 
 function buildLocalISQuestions(row){
