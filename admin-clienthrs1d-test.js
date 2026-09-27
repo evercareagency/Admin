@@ -12,7 +12,8 @@ assert.ok(html.includes('data-clienthrs1d="v=clienthrs1d"'), 'clienthrs1d data a
 assert.ok(html.includes('<!-- client hours notifications 2026-09-27 v=clienthrs1d admin-build 2026-09-27-clienthrs1d'), 'clienthrs1d comment');
 assert.ok(html.includes("var CLIENTHRS1D_MARKER='v=clienthrs1d'"), 'clienthrs1d script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-msg-dense1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-autosave1'), 'first admin-build is hold-autosave1');
+assert.ok(html.indexOf('content="2026-09-27-hold-autosave1"') < html.indexOf('content="2026-09-27-msg-dense1"'), '2026-09-27-msg-dense1 stays after hold-autosave1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
@@ -136,7 +137,7 @@ async function runBrowser(){
         chip: document.querySelector('#copilotFab img').getAttribute('src')
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-msg-dense1');
+    assert.strictEqual(boot.first, '2026-09-27-hold-autosave1');
     assert.strictEqual(boot.second, '2026-09-27-aide-notif-search1');
     assert.strictEqual(boot.third, '2026-09-27-remi-chat1');
     assert.strictEqual(boot.fourth, '2026-09-27-hold-client1');
@@ -148,8 +149,8 @@ async function runBrowser(){
     assert.strictEqual(boot.tenth, '2026-09-27-sched-time-tap1');
     assert.strictEqual(boot.eleventh, '2026-09-27-aide-text-chat1');
     assert.strictEqual(boot.twelfth, '2026-09-27-remi-float-hide1');
-    assert.strictEqual(boot.thirteenth, '2026-09-27-tabbar-8');
-    assert.strictEqual(boot.fourteenth, '2026-09-27-cover-card-cancel1');
+    assert.strictEqual(boot.thirteenth, '2026-09-27-hold-autosave1');
+    assert.strictEqual(boot.fourteenth, '2026-09-27-tabbar-8');
     assert.strictEqual(boot.marker, 'v=clienthrs1d');
     assert.ok(boot.chip.indexOf('remi-locked.png') >= 0, boot.chip);
 

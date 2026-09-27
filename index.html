@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
+<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. This tip does not auto-clear Bowlax's open hold from 10/03/2026. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
+<meta name="admin-build" content="2026-09-27-hold-autosave1">
 <!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1b: the left Aide Office name list is a fixed-height column with its own scrollbar (overflow-y: auto). A long roster does not stretch the Messages page. The thread panel and Schedule a Remi message stay fixed in view and do not scroll away with the roster. Option 2 one-box scroll stays: the message box scrolls and Schedule a Remi stays pinned in the thread panel. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-msg-dense1">
 <!-- aide notif search 2026-09-27 v=aide-notif-search1 admin-build 2026-09-27-aide-notif-search1. GHOST-AIDE-NOTIF-SEARCH1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. More → Notifications (#tab_notifications, clienthrs1d) has a search field above the filter chips (Needs attention, All aides, Location off, Chat off). Search matches aide name and username / @handle, case-insensitive, and a leading @ is optional. Filters still call admin_list_aide_notification_roster {p_filter}. Search only narrows the painted rows from that response. Switching a filter chip keeps the search text and re-applies it after paint. An empty search shows the full filtered roster. No matches say No aides match that search. Same spirit as coverRosterSearch and aideCredSearch. No p_search. Nudge buttons stay. No Auth reseal. No Quo/SMS. Remi is unchanged. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=clienthrs1d, v=vapid1, v=aidechat1, and v=remiface1. -->
@@ -2793,7 +2795,7 @@ bindLoginKeyboard();
       </div>
 
       <!-- SCHEDULE TAB (Admin + Scheduler edit). Usual week is set once; a cell is an exception for that date. -->
-      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1" data-client-ins1="v=client-ins1" data-sched-time-tap1="v=sched-time-tap1" data-hold-client1="v=hold-client1">
+      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1" data-client-ins1="v=client-ins1" data-sched-time-tap1="v=sched-time-tap1" data-hold-client1="v=hold-client1" data-hold-autosave1="v=hold-autosave1">
         <div class="page-hdr">
           <div>
             <h1>Schedule</h1>
@@ -2950,7 +2952,7 @@ bindLoginKeyboard();
                 <input type="number" id="schedSlotSort" step="1">
               </div>
               <div class="sched-slot-ctrls">
-                <button class="btn btn-teal" type="button" id="schedSlotSavePattern" onclick="schedSaveSlotPattern()">Save</button>
+                <button class="btn btn-teal" type="button" id="schedSlotSavePattern" data-hold-autosave1="v=hold-autosave1" onclick="schedSaveSlotPattern()">Save</button>
                 <button class="btn btn-ghost" type="button" onclick="schedCloseSlotPattern()">Cancel</button>
                 <button class="btn btn-ghost" type="button" id="schedSlotRemovePattern" onclick="schedRemoveEditingPattern()">Remove shift</button>
               </div>
@@ -16015,11 +16017,14 @@ var SHIFT_SLIM1_MARKER='v=shift-slim1';
 var SCHED_TIME_TAP1_MARKER='v=sched-time-tap1';
 var HOLD_CLEAR1_MARKER='v=hold-clear1';
 var HOLD_CLIENT1_MARKER='v=hold-client1';
+var HOLD_AUTOSAVE1_MARKER='v=hold-autosave1';
 var schedHoldClient1=false;
 var schedClientHoldOpen=false;
 var schedClientHoldDismissed=false;
 var schedClientHoldEnding=false;
 var schedClientHoldEnded=null;
+var schedPatternSaveLock=false;
+var schedHoldAutosave1Fired=0;
 var SCHEDULE_SLOT_DEEP_LINK_SHAPE={client_id:'', on_date:'', slot_key:''};
 var schedSlotMode=false;
 var schedSlotClients=[];
@@ -17519,6 +17524,48 @@ function schedRemoveEditingPattern(){
   if(!clientId||!key){schedToast('Open a shift to remove it.','var(--warn)');return;}
   schedDeleteSlotPattern(clientId, wd, key);
 }
+// hold-autosave1: Save week / Add shift / Edit pattern never read hold drafts and never write holds.
+function schedHoldAutosave1Node(got){
+  var node=got&&got.data!=null?got.data:got;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(Array.isArray(node)&&node.length)node=node[0];
+  if(node&&typeof node==='object'&&node.data&&typeof node.data==='object'&&!Array.isArray(node.data)){
+    var inner=node.data;
+    if(inner.marker||inner.v||inner.holds_written!=null)node=inner;
+  }
+  if(!node||typeof node!=='object'||Array.isArray(node))return null;
+  return node;
+}
+function schedHoldAutosave1Violation(got, firedBefore){
+  if(schedHoldAutosave1Fired!==firedBefore)return 'Save week must not create a hold.';
+  var node=schedHoldAutosave1Node(got);
+  if(!node)return '';
+  var marker=String(node.marker||'');
+  var ver=String(node.v||'');
+  if(marker==='hold-autosave1'||ver==='hold-autosave1'||node.holds_written!=null){
+    if(node.holds_written!==false)return 'Save week reported a hold write.';
+  }
+  return '';
+}
+function schedPatternSaveRpc(name, body){
+  if(body&&body.p_mark==='on_hold'){
+    schedHoldAutosave1Fired++;
+    return Promise.resolve({ok:false, error:'Save week does not mark on hold.'});
+  }
+  if(name==='upsert_schedule_slot_pattern_weekdays')return sbRestRpc('upsert_schedule_slot_pattern_weekdays', body);
+  if(name==='upsert_schedule_slot_pattern')return sbRestRpc('upsert_schedule_slot_pattern', body);
+  if(name==='delete_schedule_slot_pattern')return sbRestRpc('delete_schedule_slot_pattern', body);
+  schedHoldAutosave1Fired++;
+  return Promise.resolve({ok:false, error:'Save week does not create a hold.'});
+}
+function schedDisarmHoldDraft(slotKey){
+  var open=String(schedSlotMarkOpen||'');
+  if(open.indexOf('hold:')===0&&typeof schedResetHoldForm==='function')schedResetHoldForm(open.slice(5));
+  if(slotKey&&typeof schedResetHoldForm==='function')schedResetHoldForm(slotKey);
+  if(String(schedSlotMarkOpen||'').indexOf('hold:')===0)schedSlotMarkOpen='';
+}
 async function schedSaveSlotPattern(){
   if(schedSaving)return;
   if(!schedCanEdit()){schedDeny();return;}
@@ -17568,25 +17615,45 @@ async function schedSaveSlotPattern(){
     p_sort_order:useSort
   };
   schedSaving=true;
+  schedPatternSaveLock=true;
+  var firedBefore=schedHoldAutosave1Fired;
   try{
     var got;
     if(days.length>1){
       patternBody.p_weekdays=days;
-      got=await sbRestRpc('upsert_schedule_slot_pattern_weekdays', patternBody);
+      got=await schedPatternSaveRpc('upsert_schedule_slot_pattern_weekdays', patternBody);
     }else{
       patternBody.p_weekday=days[0];
-      got=await sbRestRpc('upsert_schedule_slot_pattern', patternBody);
+      got=await schedPatternSaveRpc('upsert_schedule_slot_pattern', patternBody);
     }
     if(!got||got.ok!==true){
       schedToast((got&&got.error)||'Could not save the shift.','var(--danger)');
       return;
     }
+    var holdBlock=schedHoldAutosave1Violation(got, firedBefore);
+    if(holdBlock){
+      schedToast(holdBlock,'var(--danger)');
+      schedDisarmHoldDraft(key);
+      await schedReloadWeek();
+      return;
+    }
     if(!adding&&fromChecks.length&&editWd&&editKey&&days.indexOf(editWd)<0){
-      await sbRestRpc('delete_schedule_slot_pattern',{
+      var removed=await schedPatternSaveRpc('delete_schedule_slot_pattern',{
         p_client_id:clientId,
         p_weekday:editWd,
         p_slot_key:editKey
       });
+      if(!removed||removed.ok!==true){
+        schedToast((removed&&removed.error)||'Could not update the weekday.','var(--danger)');
+        return;
+      }
+    }
+    holdBlock=schedHoldAutosave1Violation(got, firedBefore);
+    if(holdBlock){
+      schedToast(holdBlock,'var(--danger)');
+      schedDisarmHoldDraft(key);
+      await schedReloadWeek();
+      return;
     }
     if(typeof logActivity==='function')logActivity('Saved schedule slot pattern');
     schedToast(days.length>1?'Shift saved on '+days.length+' days.':'Shift saved.','var(--success)');
@@ -17596,8 +17663,10 @@ async function schedSaveSlotPattern(){
     schedSlotDrawerClosed=false;
     var first=days[0];
     schedSlotSelected={clientId:clientId, onDate:schedAddDays(schedEnsureWeek(), first===7?6:first-1), weekday:first};
+    schedDisarmHoldDraft(key);
     await schedReloadWeek();
   }finally{
+    schedPatternSaveLock=false;
     schedSaving=false;
   }
 }
@@ -17626,6 +17695,10 @@ async function schedDeleteSlotPattern(clientId, weekday, slotKey){
   }
 }
 async function schedPostDayMark(clientId, onDate, slotKey, mark, extra){
+  if(mark==='on_hold'&&schedPatternSaveLock){
+    schedHoldAutosave1Fired++;
+    return {ok:false, error:'Save week does not mark on hold.'};
+  }
   var key=schedNormSlotKey(slotKey);
   if(mark==='worked')return {ok:false, error:'Unmarked shifts stay assumed worked.'};
   if(mark!=='missed'&&mark!=='cover'&&mark!=='on_hold')return {ok:false, error:'Mark must be missed, cover, or on_hold.'};
@@ -17724,6 +17797,10 @@ function schedHoldIdFor(client, onDate, slotKey){
 }
 // clienthrs1c hospital hold: upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date, p_note, p_hold_id) and clear_schedule_client_hold(p_hold_id, p_end_date). The tapped slot is also p_mark on_hold. list_schedule_client_holds fills holds[].
 async function schedWriteHold(clientId, onDate, slotKey, ending){
+  if(schedPatternSaveLock){
+    schedHoldAutosave1Fired++;
+    return;
+  }
   if(schedSaving)return;
   if(!schedCanEdit()){schedDeny();return;}
   var key=schedNormSlotKey(slotKey);
@@ -17888,6 +17965,8 @@ function schedApplyHoldClearLocal(client, holdId, onDate, slotKey){
         tied=(s.hold_id&&String(s.hold_id)===String(holdId))||(s.mark==='on_hold'&&(!s.hold_id||String(s.hold_id)===String(holdId)))||(dayTied&&s.on_hold);
       }else if(day.on_date===on&&s.mark==='on_hold'){
         tied=true;
+      }else if(!holdId&&day.on_date===on&&String(s.slot_key)===String(slotKey)&&!s.hold_id&&!s.on_hold&&schedParseHoldNote(s.note)){
+        tied=true;
       }
       if(tied)schedReleaseHoldSlot(s);
     });
@@ -17914,7 +17993,10 @@ async function schedClearHold(clientId, onDate, slotKey){
   var key=schedNormSlotKey(slotKey);
   if(!clientId||!onDate||!key)return;
   var client=schedFindSlotClient(clientId);
+  var found=schedFindDaySlot(clientId, onDate, key);
+  var shown=found&&found.slot?schedHoldForSlot(found.slot, client, found.day):null;
   var holdId=client?schedHoldIdFor(client, onDate, key):'';
+  if(!holdId&&shown&&shown.id)holdId=String(shown.id);
   var marks=schedHoldMarkSlots(client, holdId, onDate);
   if(holdId||marks.length){
     if(!(await schedOfficeReady()))return;
