@@ -167,8 +167,11 @@ function keysOf(rows){
 (async function(){
   await sandbox.loadISCompliance(true);
   const keys = keysOf(sandbox._rendered);
-  assert.deepStrictEqual(keys, ['asha|2|done', 'moe|2|open', 'moe|3|open'], 'Depression Not Completed is moe only; asha Completed stays');
-  assert.ok(!keys.some(function(k){return k.indexOf('asha|3')===0;}), 'asha × Depression is catalog-only and omitted');
+  assert.strictEqual(keys.length, users.data.length*topics.length, 'full aide × catalog matrix');
+  assert.deepStrictEqual(keys, ['asha|2|done', 'asha|3|open', 'moe|2|open', 'moe|3|open'], 'every aide × every catalog topic stays on the grid');
+  const ashaDep = sandbox._rendered.find(function(r){return r.username==='asha' && String(r.topicId)==='3';});
+  assert.strictEqual(ashaDep.isCompleted, false);
+  assert.strictEqual(ashaDep.inAssignmentScope, false, 'asha × Depression is catalog-only but still painted');
   const assignGet = calls.filter(function(c){return c.action==='get_assigned_topic';});
   assert.strictEqual(assignGet.length, 1);
   assert.strictEqual(assignGet[0].extra, null, 'assignment query is not SELECT TOPIC');
@@ -211,8 +214,14 @@ function keysOf(rows){
   calls.length = 0;
   await sandbox.loadISCompliance(true);
   const after = keysOf(sandbox._rendered);
-  assert.deepStrictEqual(after, ['asha|2|done', 'moe|2|open'], 'moe × Depression leaves after unassign');
-  assert.ok(!after.some(function(k){return k==='moe|3|open';}));
+  assert.deepStrictEqual(after, ['asha|2|done', 'asha|3|open', 'moe|2|open', 'moe|3|open'], 'moe × Depression stays after unassign');
+  const moeDepAfter = sandbox._rendered.find(function(r){return r.username==='moe' && String(r.topicId)==='3';});
+  assert.strictEqual(moeDepAfter.isCompleted, false, 'the cell is still Not Completed');
+  assert.strictEqual(moeDepAfter.inAssignmentScope, false, 'Delete is no longer in assignment scope');
+  sandbox.isComplianceRows = sandbox._rendered.slice();
+  const stayedHtml = sandbox.isPendingActionsHtml(sandbox.isComplianceRows.indexOf(moeDepAfter));
+  assert.ok(stayedHtml.includes('disabled'), 'catalog-only Delete is disabled after unassign');
+  assert.ok(!stayedHtml.includes('confirmDeleteISAssignment'), 'catalog-only Delete does not confirm');
 
   const asha = sandbox._rendered.find(function(r){return r.username==='asha' && String(r.topicId)==='2';});
   sandbox.isComplianceRows = sandbox._rendered.slice();
@@ -234,8 +243,10 @@ function keysOf(rows){
   results = {success:true, data:[]};
   await sandbox.loadISCompliance(true);
   const afterArchive = keysOf(sandbox._rendered);
-  assert.deepStrictEqual(afterArchive, ['moe|2|open'], 'Completed delete does not leave an asha Not Completed twin');
-  assert.ok(!afterArchive.some(function(k){return k.indexOf('asha|')===0;}));
+  assert.deepStrictEqual(afterArchive, ['asha|2|open', 'asha|3|open', 'moe|2|open', 'moe|3|open'], 'archive returns the pair to the full matrix');
+  const ashaAfter = sandbox._rendered.find(function(r){return r.username==='asha' && String(r.topicId)==='2';});
+  assert.strictEqual(ashaAfter.isCompleted, false, 'archived result is no longer Completed');
+  assert.strictEqual(ashaAfter.inAssignmentScope, false, 'unassign leaves catalog-only Not Completed, not a working Delete');
 
   sandbox.isComplianceRows = [{username:'moe', topicId:'3', isCompleted:false}];
   sandbox.sbAdminUnassignInserviceAide = async function(){

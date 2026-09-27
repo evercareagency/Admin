@@ -191,13 +191,18 @@ function rowKey(row){
 (async function(){
   await sandbox.loadISCompliance(true);
   const keys = Array.prototype.map.call(sandbox._rendered, rowKey).sort();
+  assert.strictEqual(sandbox._rendered.length, usersPayload.data.length*topics.length, 'row count is aides × catalog topics');
   assert.deepStrictEqual(keys, [
     'asha|1|done',
+    'asha|2|open',
     'pat|1|open',
-    'pat|2|open',
-    'pat|5|done'
-  ], 'Completed is every Active result; Not Completed only when the aide is in that topic scope');
-  assert.ok(!keys.some(function(k){return k==='asha|2|open';}), 'asha is outside topic 2 SELECTED, so that Not Completed cell is omitted');
+    'pat|2|open'
+  ], 'every aide × every catalog topic; Active result is Completed, otherwise Not Completed');
+  assert.ok(!keys.some(function(k){return k.indexOf('|5|')>=0;}), 'a result outside the catalog does not add a row');
+  const ashaOpen = Array.prototype.find.call(sandbox._rendered, function(r){return r.username==='asha' && String(r.topicId)==='2';});
+  const patOpen = Array.prototype.find.call(sandbox._rendered, function(r){return r.username==='pat' && String(r.topicId)==='2';});
+  assert.strictEqual(ashaOpen.inAssignmentScope, false, 'asha is outside topic 2 SELECTED, so Delete is not in scope');
+  assert.strictEqual(patOpen.inAssignmentScope, true, 'pat is inside topic 2 SELECTED');
   assert.ok(!sandbox._rendered.some(function(r){return r.id==='r-arch';}), 'archived results stay off the dashboard');
   const assignGets = calls.filter(function(c){return c.kind==='get' && c.action==='get_assigned_topic';});
   assert.strictEqual(assignGets.length, 1, 'compliance loads assignments once');

@@ -292,6 +292,7 @@ assert.strictEqual(sandbox.formatISScoreBanner(completed), 'Score: 9/10 (90%)');
 assert.strictEqual(sandbox.formatISCompletedDate(sandbox.certDateFromRecord(completed)), '08/02/2026');
 
 const pending = sandbox.hydrateISComplianceRow({}, {username:'aide2', name:'Pat Pending'}, {id:1, title:'Diabetes', shortTitle:'Diabetes Complications'});
+pending.inAssignmentScope=true;
 assert.strictEqual(pending.isCompleted, false);
 assert.strictEqual(sandbox.formatISScoreColumn(pending), '—');
 
