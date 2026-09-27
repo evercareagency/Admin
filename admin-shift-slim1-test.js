@@ -19,7 +19,7 @@ assert.ok(html.includes('<!-- schedule slim edit 2026-09-27 v=shift-slim1 admin-
 assert.ok(html.includes("var CLIENTHRS1C_MARKER='v=clienthrs1c'"), 'clienthrs1c script marker');
 assert.ok(html.includes("var SHIFT_SLIM1_MARKER='v=shift-slim1'"), 'shift-slim1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aides-info1'), 'first admin-build is clienthrs1c');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-client1'), 'first admin-build is clienthrs1c');
 ['2026-09-27-shift-slim1','2026-09-26-isdash1b','2026-09-26-isdash1','2026-09-26-remi-notes1','2026-09-26-clienthrs1b','2026-09-26-clienthrs1a'].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="'+meta+'">'), 'prior meta stays '+meta);
 });
@@ -44,7 +44,8 @@ assert.ok(form.includes('aria-label="Sunday"') && form.includes('aria-label="Sat
 assert.ok(form.includes('>Edit shift<') && form.includes('>Add another<'), 'form pills');
 assert.ok(form.includes('id="schedSlotHoursView"') && form.includes('readonly'), 'hours are read-only');
 assert.ok(form.includes('id="schedSlotHoursNote"'), 'from start–end note');
-assert.ok(html.includes('On hold (paused · 0 hrs)'), 'hold legend');
+assert.ok(html.includes('On hold (client · no hours needed)'), 'hold legend');
+assert.ok(html.includes('paused · 0 hrs'), 'slot hold chip still says paused · 0 hrs');
 assert.ok(html.includes('#tab_schedule.is-fullweek .sched-layout{flex-direction:column'), 'desktop drawer does not sit beside the grid');
 
 const schedStart = html.indexOf('// admin schedule v=sched1');
@@ -405,7 +406,7 @@ async function shots(){
         sheetHidden: document.getElementById('copilotSheet').hidden
       };
     });
-    assert.strictEqual(phoneProbe.build, '2026-09-27-aides-info1');
+    assert.strictEqual(phoneProbe.build, '2026-09-27-hold-client1');
     assert.strictEqual(phoneProbe.viewW, 390);
     assert.ok(phoneProbe.scroll > phoneProbe.client + 40, 'phone week scrolls');
     assert.strictEqual(phoneProbe.checks, 7);

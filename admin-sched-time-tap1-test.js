@@ -34,7 +34,8 @@ assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callab
 assert.ok(html.includes('Do not squash-merge'), 'do not squash-merge');
 assert.ok(html.includes('Pure Admin UI. No SQL. No new RPC.'), 'no SQL and no new RPC');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aides-info1'), 'first admin-build is aides-info1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-hold-client1'), 'first admin-build is hold-client1');
+assert.ok(html.indexOf('content="2026-09-27-hold-client1"') < html.indexOf('content="2026-09-27-aides-info1"'), 'aides-info1 stays after hold-client1');
 assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after aide-office-vis1');
@@ -272,7 +273,7 @@ async function runBrowser(){
         })
       };
     });
-    assert.strictEqual(box.build, '2026-09-27-aides-info1');
+    assert.strictEqual(box.build, '2026-09-27-hold-client1');
     assert.strictEqual(box.marker, 'v=sched-time-tap1');
     assert.ok(box.search.indexOf('v=sched-time-tap1') >= 0, box.search);
     assert.ok(box.startH >= 48 && box.endH >= 48, 'height ' + box.startH + '/' + box.endH);
