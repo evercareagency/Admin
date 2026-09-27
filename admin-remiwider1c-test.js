@@ -13,7 +13,9 @@ assert.ok(html.includes('admin-build 2026-09-25-remiwider1c'), 'remiwider1c buil
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiwider1c">'), 'remiwider1c meta');
 assert.ok(html.includes('<!-- remi wider tip 1c 2026-09-25 v=remiwider1c admin-build 2026-09-25-remiwider1c'), 'remiwider1c comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aide-notif-search1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-msg-dense1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-25-remiwider1c"') < html.indexOf('content="2026-09-25-remiwider1b"'), 'remiwider1b stays after remiwider1c');
@@ -172,7 +174,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(gate.build, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(gate.build, '2026-09-27-msg-dense1');
     assert.strictEqual(gate.hidden, false);
     assert.strictEqual(gate.aide, '');
     assert.ok(/Not yet writes nothing/.test(gate.note), gate.note);

@@ -20,7 +20,9 @@ assert.ok(html.includes('id="copilotFab"'), 'corner chip stays');
 assert.ok(html.includes('id="copilotSheet"'), 'phone sheet stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'first admin-build is remi-payroll1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'first admin-build is remi-payroll1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-remi-payroll1"') < html.indexOf('content="2026-09-27-remi-ideas763"'), 'ideas763 stays after this tip');
@@ -394,7 +396,7 @@ async function runBrowser(){
         first: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(schedView.first, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(schedView.first, '2026-09-27-msg-dense1');
     assert.strictEqual(schedView.fullPage, false);
     assert.strictEqual(schedView.hidden, false);
     assert.strictEqual(schedView.selected, 'true');

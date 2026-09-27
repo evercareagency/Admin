@@ -17,7 +17,9 @@ assert.ok(html.includes('GHOST-CLIENTHRS1B-CONTRACT-v1'), 'clienthrs1b contract'
 assert.ok(html.includes("var CLIENTHRS1B_MARKER='v=clienthrs1b'"), 'clienthrs1b script marker');
 assert.ok(html.includes('CLIENTHRS'), 'CLIENTHRS marker string');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'shift-slim1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'shift-slim1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1a">'), 'clienthrs1a meta stays');
@@ -438,7 +440,7 @@ async function phoneShots(){
         detail: !document.getElementById('schedSlotDetail').hidden
       };
     });
-    assert.strictEqual(week.build, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(week.build, '2026-09-27-msg-dense1');
     assert.strictEqual(week.viewW, 390);
     assert.ok(week.chips >= 2, 'two chips on the week board ' + week.chips);
     assert.ok(week.stack.indexOf('Sara') >= 0 && week.stack.indexOf('Kim') >= 0, 'stacked Sara and Kim ' + week.stack);

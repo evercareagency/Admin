@@ -16,7 +16,9 @@ assert.ok(html.includes('<!-- remi face 2026-09-27 v=remiface1 admin-build 2026-
 assert.ok(html.includes("var REMI_CM_EMAIL1_MARKER='v=remi-cm-email1'"), 'remi-cm-email1 script marker');
 assert.ok(html.includes("var REMIFACE1_MARKER='v=remiface1'"), 'remiface1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'first admin-build is remi-cm-email1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'first admin-build is remi-cm-email1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remiface1">'), 'remiface1 meta');

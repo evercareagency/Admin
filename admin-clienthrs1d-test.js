@@ -12,7 +12,9 @@ assert.ok(html.includes('data-clienthrs1d="v=clienthrs1d"'), 'clienthrs1d data a
 assert.ok(html.includes('<!-- client hours notifications 2026-09-27 v=clienthrs1d admin-build 2026-09-27-clienthrs1d'), 'clienthrs1d comment');
 assert.ok(html.includes("var CLIENTHRS1D_MARKER='v=clienthrs1d'"), 'clienthrs1d script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aide-notif-search1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-msg-dense1'), 'first admin-build is vapid1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-clienthrs1d">'), 'clienthrs1d meta stays');
@@ -128,22 +130,26 @@ async function runBrowser(){
         tenth: metas[9] ? metas[9].content : '',
         eleventh: metas[10] ? metas[10].content : '',
         twelfth: metas[11] ? metas[11].content : '',
+        thirteenth: metas[12] ? metas[12].content : '',
+        fourteenth: metas[13] ? metas[13].content : '',
         marker: CLIENTHRS1D_MARKER,
         chip: document.querySelector('#copilotFab img').getAttribute('src')
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-aide-notif-search1');
-    assert.strictEqual(boot.second, '2026-09-27-remi-chat1');
-    assert.strictEqual(boot.third, '2026-09-27-hold-client1');
-    assert.strictEqual(boot.fourth, '2026-09-27-aides-info1');
-    assert.strictEqual(boot.fifth, '2026-09-27-login-toast1');
-    assert.strictEqual(boot.sixth, '2026-09-27-aide-office-vis1');
-    assert.strictEqual(boot.seventh, '2026-09-27-remi-langs1');
-    assert.strictEqual(boot.eighth, '2026-09-27-hold-clear1');
-    assert.strictEqual(boot.ninth, '2026-09-27-sched-time-tap1');
-    assert.strictEqual(boot.tenth, '2026-09-27-aide-text-chat1');
-    assert.strictEqual(boot.eleventh, '2026-09-27-remi-float-hide1');
-    assert.strictEqual(boot.twelfth, '2026-09-27-tabbar-8');
+    assert.strictEqual(boot.first, '2026-09-27-msg-dense1');
+    assert.strictEqual(boot.second, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(boot.third, '2026-09-27-remi-chat1');
+    assert.strictEqual(boot.fourth, '2026-09-27-hold-client1');
+    assert.strictEqual(boot.fifth, '2026-09-27-aides-info1');
+    assert.strictEqual(boot.sixth, '2026-09-27-login-toast1');
+    assert.strictEqual(boot.seventh, '2026-09-27-aide-office-vis1');
+    assert.strictEqual(boot.eighth, '2026-09-27-remi-langs1');
+    assert.strictEqual(boot.ninth, '2026-09-27-hold-clear1');
+    assert.strictEqual(boot.tenth, '2026-09-27-sched-time-tap1');
+    assert.strictEqual(boot.eleventh, '2026-09-27-aide-text-chat1');
+    assert.strictEqual(boot.twelfth, '2026-09-27-remi-float-hide1');
+    assert.strictEqual(boot.thirteenth, '2026-09-27-tabbar-8');
+    assert.strictEqual(boot.fourteenth, '2026-09-27-cover-card-cancel1');
     assert.strictEqual(boot.marker, 'v=clienthrs1d');
     assert.ok(boot.chip.indexOf('remi-locked.png') >= 0, boot.chip);
 

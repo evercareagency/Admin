@@ -13,7 +13,9 @@ assert.ok(html.includes('<!-- web push public key 2026-09-27 v=vapid1 admin-buil
 assert.ok(html.includes('Ace CALLABLE keys live'), 'Ace CALLABLE keys live');
 assert.ok(html.includes("var VAPID1_MARKER='v=vapid1'"), 'vapid1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'first admin-build is vapid1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-vapid1"') < html.indexOf('content="2026-09-27-clienthrs1d"'), 'clienthrs1d stays after this tip');
@@ -98,7 +100,7 @@ async function runBrowser(){
         prior: CLIENTHRS1D_MARKER
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(boot.first, '2026-09-27-msg-dense1');
     assert.strictEqual(boot.marker, 'v=vapid1');
     assert.strictEqual(boot.prior, 'v=clienthrs1d');
 
