@@ -15,7 +15,7 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-remi-notes
 assert.ok(html.includes('<!-- remi notes 2026-09-26 v=remi-notes1 admin-build 2026-09-26-remi-notes1'), 'remi-notes1 comment');
 assert.ok(html.includes("var REMI_NOTES1_MARKER='v=remi-notes1'"), 'remi-notes1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-coverage-simple1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-cm-email1'), 'isdash1 is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1b">'), 'clienthrs1b meta stays');
 assert.ok(html.indexOf('content="2026-09-26-remi-notes1"') < html.indexOf('content="2026-09-26-clienthrs1b"'), 'clienthrs1b stays below remi-notes1');
 assert.ok(html.indexOf('content="2026-09-26-clienthrs1b"') < html.indexOf('content="2026-09-26-clienthrs1a"'), 'clienthrs1a stays below clienthrs1b');

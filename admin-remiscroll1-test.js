@@ -26,12 +26,12 @@ assert.ok(!/reset_aide_temp_password|auth\.updateUser|rotate password|admin_crea
 
 assert.ok(/html\{[^}]*overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;touch-action:pan-y/.test(html), 'html locks horizontal overscroll');
 assert.ok(/body\{[^}]*overflow-x:hidden;overflow-x:clip;overscroll-behavior-x:none;touch-action:pan-y/.test(html), 'body locks horizontal overscroll');
-assert.ok(html.includes('.sched-scroll,.nav-edit-bottom,.ts-sheet,.table-wrap,#tab_coverage .cover-list,.card > [style*="overflow-x:auto"]{overflow-x:auto;'), 'local scrollers keep overflow-x auto');
+assert.ok(html.includes('.sched-scroll,.nav-edit-bottom,.ts-sheet,.table-wrap,#tab_coverage .cover-list,#isComplianceScroll,.card > [style*="overflow-x:auto"]{overflow-x:auto;'), 'local scrollers keep overflow-x auto');
 assert.ok(html.includes('touch-action:pan-x pan-y;overscroll-behavior-x:contain'), 'local scrollers keep pan-x');
 assert.ok(html.includes('.side-nav{flex:none;flex-direction:row;overflow-x:auto;overflow-y:hidden;') && html.includes('touch-action:pan-x pan-y;overscroll-behavior-x:contain'), 'phone side nav keeps pan-x');
 assert.ok(!html.includes('#tab_schedule .sched-scroll{max-width:calc(100vw'), 'schedule scroller is not sized from 100vw');
 assert.ok(html.includes('class="remi-chip-pill">Remi</span>'), 'Remi chip label stays');
-assert.ok(html.includes('assets/remi-corner-chip.png?v=remi1'), 'Remi chip face stays');
+assert.ok(html.includes('assets/remi-locked.png?v=remiface1'), 'Remi chip face stays the locked portrait');
 
 function loadPuppeteer(){
   try{return require('puppeteer-core');}
@@ -204,14 +204,17 @@ async function runBrowser(){
         var p = ctx.getImageData(x, y, 1, 1).data;
         return {r:p[0], g:p[1], b:p[2], a:p[3]};
       }
-      var spots = [at(w/2, Math.round(h*0.18)), at(Math.round(w*0.22), Math.round(h*0.30)), at(Math.round(w*0.78), Math.round(h*0.42))];
-      var neon = 0;
-      spots.forEach(function(p){
-        if(p.a > 200 && (p.b > 80 || p.r > 90) && !(p.r > 235 && p.g > 235 && p.b > 235))neon++;
-      });
-      return {neon:neon, spots:spots};
+      var step = Math.max(4, Math.round(w / 40));
+      var mint = 0;
+      for(var y = 0; y < h; y += step){
+        for(var x = 0; x < w; x += step){
+          var q = at(x, y);
+          if(q.a > 200 && q.g > 80 && q.b > 50 && q.g > q.r)mint++;
+        }
+      }
+      return {mint:mint};
     });
-    assert.ok(pixels.neon >= 2, 'Remi chip keeps neon colors '+JSON.stringify(pixels.spots));
+    assert.ok(pixels.mint > 8, 'Remi chip keeps the locked mint face '+pixels.mint);
 
     await page.evaluate(function(){
       window.scrollTo(0, 0);
