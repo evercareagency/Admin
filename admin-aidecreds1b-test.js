@@ -12,7 +12,7 @@ assert.ok(html.includes('data-aidecreds1b="v=aidecreds1b"'), 'aidecreds1b string
 assert.ok(html.includes('admin-build 2026-09-25-aidecreds1b'), 'aidecreds1b build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1b">'), 'aidecreds1b meta');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-login-toast1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aides-info1'), 'isdash1 is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1d">'), 'payready1d meta stays');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1b"'), 'aidecreds1b stays after payready1');
@@ -24,7 +24,7 @@ assert.ok(html.indexOf('content="2026-09-25-aidecreds1b"') < html.indexOf('conte
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1"') < html.indexOf('content="2026-09-25-remidate1"'), 'remidate1 stays after aidecreds1');
 assert.ok(html.includes('v=remidate1') && html.includes('v=ncipdf1') && html.includes('v=aidecreds1'), 'prior markers stay');
 
-const note = html.slice(html.indexOf('v=aidecreds1b'), html.indexOf('<!-- aide credentials 2026-09-25 v=aidecreds1'));
+const note = html.slice(html.indexOf('<!-- aide credentials empty add 2026-09-25 v=aidecreds1b'), html.indexOf('<!-- aide credentials 2026-09-25 v=aidecreds1 admin-build'));
 assert.ok(/Add credential/.test(note), 'note names Add credential');
 assert.ok(/admin_upsert_aide_credential/.test(note), 'note keeps the upsert callable');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser|rotate password/.test(note), 'aidecreds1b note does not reseal Auth');
@@ -217,7 +217,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(empty.hidden, false, 'Admin sees credentials on an empty rollup');
-    assert.strictEqual(empty.build, '2026-09-27-login-toast1');
+    assert.strictEqual(empty.build, '2026-09-27-aides-info1');
     assert.ok(empty.text.includes('No credential records yet'), empty.text);
     assert.ok(empty.text.includes('Add credential'), empty.text);
     assert.ok(empty.text.includes('Probe QA Test') && empty.text.includes('QA CoverAide'), empty.text);

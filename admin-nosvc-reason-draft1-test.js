@@ -17,7 +17,8 @@ assert.ok(html.includes("var CANCEL_SHIFT1_MARKER='cancel-shift1'"), 'cancel scr
 assert.ok(html.includes('GHOST-NOSVC-REASON-DRAFT1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-login-toast1'), 'first admin-build is login-toast1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aides-info1'), 'first admin-build is aides-info1');
+assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after aide-office-vis1');
 assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
@@ -252,7 +253,7 @@ async function runBrowser(){
         fullPage: !!document.getElementById('tab_remi')
       };
     });
-    assert.strictEqual(personal.build, '2026-09-27-login-toast1');
+    assert.strictEqual(personal.build, '2026-09-27-aides-info1');
     assert.strictEqual(personal.marker, 'v=nosvc-reason-draft1');
     assert.ok(/Side rail/.test(personal.sub), personal.sub);
     assert.strictEqual(personal.kicker, 'After you talk to the client');

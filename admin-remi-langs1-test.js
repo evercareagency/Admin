@@ -24,7 +24,8 @@ assert.ok(html.includes('id="copilotFab"'), 'corner chip stays');
 assert.ok(html.includes('id="copilotSheet"'), 'phone sheet stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-login-toast1'), 'first admin-build is login-toast1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aides-info1'), 'first admin-build is aides-info1');
+assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-remi-langs1"'), 'remi-langs1 stays after aide-office-vis1');
 assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after remi-langs1');
@@ -552,7 +553,7 @@ async function runBrowser(){
         width: Math.round(box.width)
       };
     });
-    assert.strictEqual(phonePick.first, '2026-09-27-login-toast1');
+    assert.strictEqual(phonePick.first, '2026-09-27-aides-info1');
     assert.strictEqual(phonePick.fullPage, false);
     assert.strictEqual(phonePick.hidden, false);
     assert.deepStrictEqual(phonePick.labels, LABELS);

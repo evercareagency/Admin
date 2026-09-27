@@ -19,7 +19,8 @@ assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callab
 assert.ok(html.includes('Patch none'), 'no SQL patch in the tip');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/hold-clear1-v1.sql')), 'no hold-clear1 SQL file');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-login-toast1'), 'first admin-build is login-toast1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aides-info1'), 'first admin-build is aides-info1');
+assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after aide-office-vis1');
 assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after this tip');
@@ -435,7 +436,7 @@ async function shots(){
         sheet: document.getElementById('copilotSheet').hidden
       };
     });
-    assert.strictEqual(selected.build, '2026-09-27-login-toast1');
+    assert.strictEqual(selected.build, '2026-09-27-aides-info1');
     assert.strictEqual(selected.role, 'Scheduler');
     assert.strictEqual(selected.who, 'Jaz');
     assert.strictEqual(selected.selected, true);
