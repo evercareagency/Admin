@@ -39,8 +39,8 @@ assert.ok(catalog.includes('coverage'), 'Coverage is in the Edit tabs catalog');
 assert.ok(html.includes("coverage:{label:'Coverage'"), 'Coverage has a picker label');
 const defaults = extractFn(html, 'function navEditDefaults()');
 assert.ok(!defaults.includes('coverage'), 'Coverage is not forced onto the default bar');
-assert.ok(html.includes('flex-wrap:wrap') && html.includes('.nav-edit-bottom{display:flex;flex-wrap:wrap'), 'edit picker wraps');
-assert.ok(html.includes('.nav-edit-bottom{') && html.includes('overflow-x:auto'), 'edit picker can scroll sideways');
+assert.ok(html.includes('.nav-edit-rows{flex:1 1 auto') && html.includes('flex-direction:column'), 'edit list stacks so every tab stays reachable');
+assert.ok(html.includes('#navEditPanel{') && html.includes('overflow:auto'), 'edit sheet scrolls on the phone');
 
 const paint = extractFn(html, 'function copilotPaintQuiet(host)');
 assert.ok(paint.includes('id="copilotQuietOn"'), 'quiet hours On control stays');
