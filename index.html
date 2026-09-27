@@ -42,6 +42,10 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- schedule client hours 2026-09-27 v=clienthrs1c v=shift-slim1 admin-build 2026-09-27-clienthrs1c. UX pack v=shift-slim1. Multi-day Save is one upsert_schedule_slot_pattern_weekdays(p_client_id, p_weekdays int[] ISO 1=Mon…7=Sun, p_slot_key, p_usual_aide_id, p_hours, p_label, p_start_local, p_end_local, p_sort_order). Single-day edit stays upsert_schedule_slot_pattern. Day marks are missed|cover|on_hold via upsert_schedule_slot_day_mark; the UI does not write worked. Missed sends p_miss_reason client_declined|no_show|no_call|other and p_note when other. Covered shift is p_mark cover plus p_cover_aide_id. Per-slot On hold is p_mark on_hold. Hospital/ER client hold is upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date null=open, p_note, p_hold_id). End hold is clear_schedule_client_hold(p_hold_id, p_end_date). list_schedule_client_holds lists them. Week board stays list_schedule_week_slots and paints on_hold plus 0 hrs from the day mark or an active client hold (holds[], hold_*, miss_reason). Clear stays clear_schedule_slot_day_mark. Slim form: no Slot key, Label, or Order; Hours from Start–End; Edit shift | Add another; Su–Sa checks; desktop full-bleed week with the day drawer under the grid; phone week scrolls. Remi stays the side rail and corner chip. Dates are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=shift-slim1, v=isdash1b, v=isdash1, v=remi-notes1, and v=clienthrs1b. -->
+<meta name="admin-build" content="2026-09-27-clienthrs1c">
+<!-- schedule slim edit 2026-09-27 v=shift-slim1 admin-build 2026-09-27-shift-slim1. Slim Edit/Add: no Slot key, Label, or Order on the form. Hours are read-only from Start–End (from start–end). Pills are Edit shift | Add another. Add another is a second shift for the same client and the same day. Weekday dropdown is Su–Sa checks. One Save on several checked weekdays is upsert_schedule_slot_pattern_weekdays in v=clienthrs1c; a single day still uses upsert_schedule_slot_pattern. Desktop week is full-bleed Mon–Sun and the day detail is a drawer under the grid. Phone week scrolls sideways and the day panel is tappable under it. Day marks drop Worked. Unmarked is assumed worked. Three buttons: Missed | Covered shift | On hold. Missed stores the reason in p_note via upsert_schedule_slot_day_mark p_mark missed. Covered shift is p_mark cover plus p_cover_aide_id. On hold is Hospital/ER Start · End (open-ended ok) · Note, chips On hold / paused · 0 hrs, and End hold fills the end date so the pattern resumes. Hospital/ER On hold is the live client-hold callable in v=clienthrs1c. Remi stays the side rail and corner chip. No full-page Remi. Dates are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=isdash1b, v=isdash1, v=remi-notes1, and v=clienthrs1b. -->
+<meta name="admin-build" content="2026-09-27-shift-slim1">
 <!-- inservice compliance delete scope 2026-09-26 v=isdash1b admin-build 2026-09-26-isdash1b. Full matrix restored: every active aide × every SELECT TOPIC catalog topic. Completed when an Active inservice_results row exists, otherwise Not Completed. The cell stays after unassign as catalog-only Not Completed. Delete stays POST /rest/v1/rpc/admin_unassign_inservice_aide and is enabled only when that assignment scopes the aide (aide_usernames null = all aides, else the username is in the list) or the row is Completed. Not Completed sends p_archive_active_result false. Completed sends true and never hard-deletes inservice_results. removed true with mode was_selected or was_all toasts success and refreshes; the same aide×topic cell remains Not Completed with Delete disabled once the aide is outside scope. mode no_assignment_row or removed false does not toast success. Catalog-only Not Completed disables Delete with title Not assigned — nothing to remove. No localStorage hide and no new Ace RPC. SELECT TOPIC stays assign-only. Prior markers stay, including v=isdash1. -->
 <meta name="admin-build" content="2026-09-26-isdash1b">
 <!-- inservice compliance dashboard 2026-09-26 v=isdash1 admin-build 2026-09-26-isdash1. Compliance is every active aide × every topic in the SELECT TOPIC catalog (INSERVICES), Completed and Not Completed. A pair is Completed when an Active inservice_results row exists; otherwise Not Completed. An inservice_topic_assignment row is not required to show the row. SELECT TOPIC only chooses the topic for Assign to All Aides, Assign to selected, and Clear Assignment. Changing SELECT TOPIC does not re-fetch or filter the Compliance table. Delete, View Cert, Print Cert, and Send Reminder use the row topic. No new Ace RPC. Prior markers stay, including v=remi-notes1 and v=clienthrs1b. -->
@@ -325,6 +329,55 @@ textarea{resize:vertical;min-height:80px;}
   #tab_schedule .page-hdr{align-items:flex-start;}
   #tab_schedule .sched-detail-top{flex-direction:column;}
 }
+/* v=shift-slim1 — full-bleed week, drawer below, slim form, three day marks. Phone keeps the sideways week scroller. */
+#tab_schedule.is-fullweek .sched-layout{flex-direction:column;align-items:stretch;}
+#tab_schedule.is-fullweek .sched-main{width:100%;max-width:100%;flex:none;}
+#tab_schedule.is-fullweek .sched-slot-detail{width:100%;max-width:none;position:relative;top:auto;}
+@media(min-width:901px){
+  #adminScreen .main-content:has(#tab_schedule.active){max-width:none;width:100%;}
+  #tab_schedule.is-fullweek .sched-grid{width:100%;min-width:100%;table-layout:fixed;}
+  #tab_schedule.is-fullweek .sched-grid th,#tab_schedule.is-fullweek .sched-grid td.sched-slot{min-width:0;}
+  #tab_schedule.is-fullweek .sched-grid th.sched-client-h,#tab_schedule.is-fullweek .sched-grid td.sched-name{width:148px;}
+}
+.cal-legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.75rem;color:var(--muted);margin:0 0 10px;line-height:1.3;}
+.cal-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+.lg-assumed{background:var(--teal-light);border:1px solid var(--teal);}
+.lg-miss{background:#fde8e6;border:1px solid #c0392b;}
+.lg-cover{background:#fff4e8;border:1px solid #e67e22;}
+.lg-hold{background:#f3eefe;border:1px dashed #7c6bb5;}
+.sched-slim-keep{display:none !important;}
+.mode-pills{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}
+.mode-pills button{min-height:44px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;}
+.mode-pills button.on{border-color:var(--teal);color:var(--teal-dark);background:var(--teal-light);}
+.day-checks{display:flex;flex-wrap:wrap;gap:6px;}
+.day-chip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:44px;min-height:44px;padding:4px 2px;border:1.5px solid var(--border);border-radius:12px;background:#fff;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;}
+.day-chip .circle{width:18px;height:18px;border-radius:50%;border:2px solid #c5d0dc;background:#fff;position:relative;box-sizing:border-box;}
+.day-chip.on{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);}
+.day-chip.on .circle{border-color:var(--teal);background:var(--teal);}
+.day-chip.on .circle:after{content:'';position:absolute;left:5px;top:1px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+.field-hint,.hours-note{font-size:.75rem;color:var(--muted);margin:0 0 8px;line-height:1.4;}
+.auto-hours{background:var(--off);color:var(--navy);font-weight:700;}
+.shift-summary{background:var(--off);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:8px 0;font-size:.84rem;line-height:1.4;}
+.shift-summary .label{font-size:.7rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+.drawer-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.drawer-title{font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--teal-dark);}
+.hold-banner{background:#f6f1ff;border:1px solid #ddd0f5;border-radius:10px;padding:10px 12px;font-size:.82rem;line-height:1.45;margin:8px 0;}
+.sched-chip.is-assumed{background:var(--teal-light);color:var(--teal-dark);}
+.sched-chip.is-hold{background:#f3eefe;color:#5b4b8a;border:1px dashed #b7a6e0;white-space:normal;}
+.sched-chip.is-hold .chip-sub{display:block;font-size:10px;font-weight:600;}
+.sched-slot-card.is-hold{border-color:#d9cef2;background:#fcfaff;}
+.sched-slot-card.is-assumed{border-color:#d5ebe8;background:#f7fcfb;}
+.sched-mark.is-hold{background:#f3eefe;color:#5b4b8a;}
+.sched-mark.is-assumed{background:#e8f4f4;color:var(--teal-dark);}
+.sched-slot-ctrls .btn.is-on-hold{border-color:#7c6bb5;background:#f3eefe;color:#5b4b8a;}
+.mark-actions .btn{flex:1 1 calc(33% - 8px);}
+.mark-follow{margin-top:10px;padding:10px;border-radius:8px;background:#fff;border:1px dashed var(--border);}
+.mark-follow.is-miss{border-color:#f0c4bc;}
+.mark-follow.is-cover{border-color:#f0d7b8;}
+.mark-follow.is-hold{border-color:#d9cef2;background:#fcfaff;}
+.mark-follow .follow-title{font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px;}
+.pill-oe{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#5b4b8a;background:#f3eefe;border-radius:999px;padding:2px 8px;margin-right:6px;}
+#tab_schedule .mark-actions .btn{flex:1 1 calc(33% - 8px);min-height:44px;}
 .card{background:white;border:1px solid var(--border);border-radius:16px;padding:18px 16px;margin-bottom:16px;box-shadow:0 8px 24px rgba(26,39,68,0.06);}
 .cg-reset-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
 #cgResetOk{word-break:break-word;overflow-wrap:anywhere;line-height:1.45;font-size:0.95rem;font-weight:700;}
@@ -1980,7 +2033,7 @@ bindLoginKeyboard();
       </div>
 
       <!-- SCHEDULE TAB (Admin + Scheduler edit). Usual week is set once; a cell is an exception for that date. -->
-      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b">
+      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1">
         <div class="page-hdr">
           <div>
             <h1>Schedule</h1>
@@ -2005,7 +2058,14 @@ bindLoginKeyboard();
             <button class="btn btn-ghost btn-sm" type="button" id="schedFilterAll" aria-pressed="true" onclick="schedSetFilter('all')">All</button>
             <button class="btn btn-ghost btn-sm" type="button" id="schedFilterOpen" aria-pressed="false" onclick="schedSetFilter('open')">Open</button>
             <button class="btn btn-ghost btn-sm" type="button" id="schedFilterCalloff" aria-pressed="false" onclick="schedSetFilter('calloff')">Call-offs</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="schedFilterHold" aria-pressed="false" onclick="schedSetFilter('hold')">On hold</button>
           </div>
+        </div>
+        <div class="cal-legend" id="schedLegend" hidden aria-label="Calendar mark legend">
+          <span><i class="lg-assumed" aria-hidden="true"></i> Unmarked = assumed worked</span>
+          <span><i class="lg-miss" aria-hidden="true"></i> Missed</span>
+          <span><i class="lg-cover" aria-hidden="true"></i> Covered shift</span>
+          <span><i class="lg-hold" aria-hidden="true"></i> On hold (paused · 0 hrs)</span>
         </div>
         <p class="sched-source" id="schedSourceNote"></p>
         <div class="sched-layout">
@@ -2057,7 +2117,11 @@ bindLoginKeyboard();
               <button class="btn btn-ghost" type="button" id="schedCloseBtn" onclick="schedClosePanel()">Close</button>
             </div>
           </aside>
-          <aside class="sched-panel sched-slot-detail" id="schedSlotDetail" hidden aria-label="Day detail">
+          <aside class="sched-panel sched-slot-detail" id="schedSlotDetail" hidden aria-label="Day detail drawer">
+            <div class="drawer-bar">
+              <div class="drawer-title">Day detail</div>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="schedCloseSlotDrawer()">Close</button>
+            </div>
             <div class="sched-detail-top">
               <div>
                 <div class="sched-client-name" id="schedSlotClientName">Day</div>
@@ -2072,39 +2136,56 @@ bindLoginKeyboard();
             <div class="sched-week-stat" id="schedSlotWeekStat" hidden></div>
             <div class="sched-day-sum" id="schedSlotDaySum">Tap a day on the week board.</div>
             <div id="schedSlotCards"></div>
-            <p class="sched-slot-foot">Both aides fill this client’s same weekly authorized hours. Unmarked, worked, and cover count the shift hours. Missed counts as zero. Remi reads these marks from the side rail.</p>
-            <div class="sched-pattern" id="schedSlotPattern" hidden>
-              <h3 id="schedSlotPatternTitle">Add shift</h3>
+            <div class="mode-pills" role="tablist" aria-label="Shift form mode">
+              <button type="button" class="on" id="schedSlotModeEdit" onclick="schedSetSlotFormMode('edit')">Edit shift</button>
+              <button type="button" id="schedSlotModeAdd" onclick="schedSetSlotFormMode('add')">Add another</button>
+            </div>
+            <div class="shift-summary" id="schedSlotShiftSummary" hidden></div>
+            <div class="sched-pattern" id="schedSlotPattern">
+              <h3 id="schedSlotPatternTitle">Edit shift</h3>
               <div class="field"><label for="schedSlotClient">Client</label><select id="schedSlotClient"></select></div>
-              <div class="sched-two">
-                <div class="field"><label for="schedSlotWeekday">Weekday</label>
-                  <select id="schedSlotWeekday">
-                    <option value="1">Monday</option>
-                    <option value="2">Tuesday</option>
-                    <option value="3">Wednesday</option>
-                    <option value="4">Thursday</option>
-                    <option value="5">Friday</option>
-                    <option value="6">Saturday</option>
-                    <option value="7">Sunday</option>
-                  </select>
+              <div class="field">
+                <label id="schedSlotDaysLabel">Days this week</label>
+                <div class="day-checks" id="schedSlotDays" role="group" aria-labelledby="schedSlotDaysLabel">
+                  <button type="button" class="day-chip" data-wd="7" aria-pressed="false" aria-label="Sunday"><span class="circle" aria-hidden="true"></span><span class="abbr">Su</span></button>
+                  <button type="button" class="day-chip" data-wd="1" aria-pressed="false" aria-label="Monday"><span class="circle" aria-hidden="true"></span><span class="abbr">Mo</span></button>
+                  <button type="button" class="day-chip" data-wd="2" aria-pressed="false" aria-label="Tuesday"><span class="circle" aria-hidden="true"></span><span class="abbr">Tu</span></button>
+                  <button type="button" class="day-chip" data-wd="3" aria-pressed="false" aria-label="Wednesday"><span class="circle" aria-hidden="true"></span><span class="abbr">We</span></button>
+                  <button type="button" class="day-chip" data-wd="4" aria-pressed="false" aria-label="Thursday"><span class="circle" aria-hidden="true"></span><span class="abbr">Th</span></button>
+                  <button type="button" class="day-chip" data-wd="5" aria-pressed="false" aria-label="Friday"><span class="circle" aria-hidden="true"></span><span class="abbr">Fr</span></button>
+                  <button type="button" class="day-chip" data-wd="6" aria-pressed="false" aria-label="Saturday"><span class="circle" aria-hidden="true"></span><span class="abbr">Sa</span></button>
                 </div>
-                <div class="field"><label for="schedSlotKey">Slot key</label><input type="text" id="schedSlotKey" maxlength="32" autocapitalize="off" autocomplete="off" placeholder="am"></div>
               </div>
-              <div class="field"><label for="schedSlotLabel">Label</label><input type="text" id="schedSlotLabel" placeholder="Morning" autocomplete="off"></div>
+              <p class="field-hint" id="schedSlotDaysHint">One Save creates this shift on every checked day</p>
               <div class="sched-two">
                 <div class="field"><label for="schedSlotStart">Start</label><input type="time" id="schedSlotStart"></div>
                 <div class="field"><label for="schedSlotEnd">End</label><input type="time" id="schedSlotEnd"></div>
               </div>
               <div class="field"><label for="schedSlotAide">Usual aide</label><select id="schedSlotAide"></select></div>
-              <div class="sched-two">
-                <div class="field"><label for="schedSlotHours">Hours</label><input type="number" id="schedSlotHours" min="0" max="24" step="0.25" inputmode="decimal" placeholder="5"></div>
-                <div class="field"><label for="schedSlotSort">Order</label><input type="number" id="schedSlotSort" step="1" inputmode="numeric" placeholder="0"></div>
+              <div class="field"><label for="schedSlotHoursView">Hours</label><input id="schedSlotHoursView" class="auto-hours" type="text" value="" readonly aria-readonly="true"></div>
+              <p class="hours-note" id="schedSlotHoursNote">from start–end</p>
+              <div class="sched-slim-keep" aria-hidden="true">
+                <select id="schedSlotWeekday">
+                  <option value="1">Monday</option>
+                  <option value="2">Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                  <option value="7">Sunday</option>
+                </select>
+                <input type="text" id="schedSlotKey" maxlength="32" autocomplete="off">
+                <input type="text" id="schedSlotLabel" autocomplete="off">
+                <input type="number" id="schedSlotHours" min="0" max="24" step="0.25">
+                <input type="number" id="schedSlotSort" step="1">
               </div>
               <div class="sched-slot-ctrls">
-                <button class="btn btn-teal" type="button" id="schedSlotSavePattern" onclick="schedSaveSlotPattern()">Save shift</button>
+                <button class="btn btn-teal" type="button" id="schedSlotSavePattern" onclick="schedSaveSlotPattern()">Save</button>
                 <button class="btn btn-ghost" type="button" onclick="schedCloseSlotPattern()">Cancel</button>
+                <button class="btn btn-ghost" type="button" id="schedSlotRemovePattern" onclick="schedRemoveEditingPattern()">Remove shift</button>
               </div>
             </div>
+            <p class="sched-slot-foot">Unmarked = assumed worked. Three buttons: Missed, Covered shift, On hold. Hours come from start–end. Remi stays the side rail and the corner chip.</p>
           </aside>
         </div>
       </div>
@@ -10018,6 +10099,7 @@ function remiAskMarkLabel(mark){
   if(mark==='worked')return 'Worked';
   if(mark==='missed')return 'Missed';
   if(mark==='cover')return 'Cover';
+  if(mark==='on_hold')return 'On hold';
   return 'Unmarked';
 }
 function remiAskSlotLine(slot){
@@ -10989,6 +11071,7 @@ var schedUseWeekRows=false;
 var schedLoadError='';
 var schedFilterOpen=false;
 var schedFilterCalloff=false;
+var schedFilterHold=false;
 var schedEditor=null;
 var schedJumpId='';
 var schedSaving=false;
@@ -11451,6 +11534,7 @@ function schedShiftWeek(delta){
 function schedSetFilter(which){
   schedFilterOpen=which==='open';
   schedFilterCalloff=which==='calloff';
+  schedFilterHold=which==='hold';
   schedSyncFilters();
   schedPaint();
 }
@@ -11458,10 +11542,12 @@ function schedSyncFilters(){
   var all=schedEl('schedFilterAll');
   var open=schedEl('schedFilterOpen');
   var call=schedEl('schedFilterCalloff');
-  var mode=schedFilterOpen?'open':schedFilterCalloff?'calloff':'all';
+  var hold=schedEl('schedFilterHold');
+  var mode=schedFilterHold?'hold':schedFilterOpen?'open':schedFilterCalloff?'calloff':'all';
   if(all)all.setAttribute('aria-pressed', mode==='all'?'true':'false');
   if(open)open.setAttribute('aria-pressed', mode==='open'?'true':'false');
   if(call)call.setAttribute('aria-pressed', mode==='calloff'?'true':'false');
+  if(hold)hold.setAttribute('aria-pressed', mode==='hold'?'true':'false');
 }
 function schedHasPatterns(){
   return schedUsual.length>0||schedExceptions.length>0;
@@ -11923,6 +12009,8 @@ async function schedDeleteUsual(){
 // CLIENTHRS v=clienthrs1b. Ace CALLABLE list_schedule_week_slots.
 // Remi stays the right-side rail. Deep link focuses Schedule. No full-page Remi.
 var CLIENTHRS1B_MARKER='v=clienthrs1b';
+var CLIENTHRS1C_MARKER='v=clienthrs1c';
+var SHIFT_SLIM1_MARKER='v=shift-slim1';
 var SCHEDULE_SLOT_DEEP_LINK_SHAPE={client_id:'', on_date:'', slot_key:''};
 var schedSlotMode=false;
 var schedSlotClients=[];
@@ -11930,6 +12018,15 @@ var schedSlotSelected=null;
 var schedSlotFocus=null;
 var schedSlotView='week';
 var schedSlotCoverKey='';
+var schedSlotFormMode='edit';
+var schedSlotAddAnother=false;
+var schedSlotEditKey='';
+var schedSlotEditWeekday=0;
+var schedSlotFormStamp='';
+var schedSlotMarkOpen='';
+var schedSlotDrawerClosed=false;
+var SCHED_MISS_REASONS=['Client declined service','No-show','No call','Other'];
+var SCHED_MISS_CODES={'Client declined service':'client_declined','No-show':'no_show','No call':'no_call','Other':'other'};
 var schedPendingDeepLink=null;
 var schedFocusBusy=false;
 var schedLoadWeekSingle=schedLoadWeek;
@@ -11994,11 +12091,129 @@ function schedSlotPatternHours(slot){
   if(slot.hours!=null)return Number(slot.hours)||0;
   return 0;
 }
+function schedMinutes(t){
+  var m=String(t||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return null;
+  return Number(m[1])*60+Number(m[2]);
+}
+function schedHoursBetween(start, end){
+  var a=schedMinutes(start);
+  var b=schedMinutes(end);
+  if(a==null||b==null)return null;
+  var diff=b-a;
+  if(diff<=0)diff+=24*60;
+  if(diff<=0||diff>24*60)return null;
+  return Math.round((diff/60)*100)/100;
+}
+function schedClockAmPm(t){
+  var m=String(t||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return '';
+  var h=Number(m[1]);
+  var ap=h>=12?'PM':'AM';
+  var h12=h%12;
+  if(h12===0)h12=12;
+  return h12+(m[2]==='00'?'':':'+m[2])+ap;
+}
+function schedAutoLabel(start){
+  var mins=schedMinutes(start);
+  if(mins==null)return '';
+  if(mins<12*60)return 'Morning';
+  if(mins<17*60)return 'Afternoon';
+  return 'Evening';
+}
+function schedParseUsDate(v){
+  var s=String(v||'').trim();
+  if(!s)return '';
+  var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(iso)return iso[1]+'-'+iso[2]+'-'+iso[3];
+  var us=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!us)return '';
+  var month=Number(us[1]);
+  var day=Number(us[2]);
+  if(month<1||month>12||day<1||day>31)return '';
+  var mm=String(month);
+  var dd=String(day);
+  if(mm.length<2)mm='0'+mm;
+  if(dd.length<2)dd='0'+dd;
+  return us[3]+'-'+mm+'-'+dd;
+}
+function schedFormatHoldNote(startIso, endIso, text){
+  var clean=String(text||'').replace(/\|/g,'/').replace(/\s+/g,' ').trim();
+  return 'onhold|start='+(startIso||'')+'|end='+(endIso||'')+'|text='+clean;
+}
+function schedParseHoldNote(note){
+  var s=String(note||'');
+  if(s.indexOf('onhold|')!==0)return null;
+  var start='';
+  var end='';
+  var text='';
+  s.split('|').slice(1).forEach(function(part){
+    var i=part.indexOf('=');
+    if(i<0)return;
+    var k=part.slice(0,i);
+    var v=part.slice(i+1);
+    if(k==='start')start=v;
+    else if(k==='end')end=v;
+    else if(k==='text')text=v;
+  });
+  return {start:start, end:end, text:text};
+}
+function schedMissReasonLabel(code){
+  var c=String(code||'').trim().toLowerCase();
+  if(c==='client_declined')return 'Client declined service';
+  if(c==='no_show')return 'No-show';
+  if(c==='no_call')return 'No call';
+  if(c==='other')return 'Other';
+  return '';
+}
+function schedSlotIsHold(slot){
+  if(!slot)return false;
+  if(slot.mark==='on_hold'||slot.on_hold===true)return true;
+  if(slot.hold_id)return true;
+  return !!schedParseHoldNote(slot.note);
+}
+function schedDateInHold(iso, hold){
+  var on=schedDateOnly(iso);
+  if(!hold||!on)return false;
+  var start=schedDateOnly(hold.start_date||hold.startDate||hold.hold_start);
+  if(!start||on<start)return false;
+  var end=schedDateOnly(hold.end_date||hold.endDate||hold.hold_end);
+  if(end&&on>end)return false;
+  if(hold.is_active===false)return false;
+  return true;
+}
+function schedNormHold(raw){
+  if(!raw||typeof raw!=='object')return null;
+  var id=String(raw.hold_id||raw.holdId||raw.id||'').trim();
+  var start=schedDateOnly(raw.start_date||raw.startDate||raw.hold_start||raw.holdStart);
+  var end=schedDateOnly(raw.end_date||raw.endDate||raw.hold_end||raw.holdEnd);
+  if(!id&&!start)return null;
+  var note=raw.note!=null?raw.note:(raw.hold_note!=null?raw.hold_note:raw.holdNote);
+  return {
+    hold_id:id,
+    start_date:start,
+    end_date:end,
+    note:note==null?'':String(note),
+    open_ended:raw.open_ended===true||!end,
+    is_active:raw.is_active!==false&&raw.isActive!==false
+  };
+}
+function schedMissedParts(note, reasonCode){
+  var fromCode=schedMissReasonLabel(reasonCode);
+  var s=String(note||'').trim();
+  if(fromCode==='Other')return {reason:'Other', note:s.replace(/^Other:\s*/,'')};
+  if(fromCode)return {reason:fromCode, note:''};
+  if(s.indexOf('Other: ')===0)return {reason:'Other', note:s.slice(7)};
+  if(SCHED_MISS_REASONS.indexOf(s)>=0&&s!=='Other')return {reason:s, note:''};
+  if(!s)return {reason:'Client declined service', note:''};
+  return {reason:'Other', note:s};
+}
 function schedSlotToward(slot){
   if(!slot)return 0;
+  if(schedSlotIsHold(slot))return 0;
   var pattern=schedSlotPatternHours(slot);
   var mark=slot.mark||'';
-  if(mark==='missed')return 0;
+  if(mark==='missed'||mark==='on_hold')return 0;
   if(mark==='worked'||mark==='cover'){
     if(slot.pattern_hours!=null&&slot.hours!=null&&Number(slot.hours)!==Number(slot.pattern_hours))return Number(slot.hours)||0;
     return pattern;
@@ -12011,7 +12226,7 @@ function schedNormSlot(raw, clientId, onDate){
   var key=schedNormSlotKey(raw.slot_key||raw.slotKey);
   if(!key)return null;
   var mark=String(raw.mark||'').trim().toLowerCase();
-  if(mark!=='worked'&&mark!=='missed'&&mark!=='cover')mark='';
+  if(mark!=='worked'&&mark!=='missed'&&mark!=='cover'&&mark!=='on_hold')mark='';
   var link=raw.deep_link&&typeof raw.deep_link==='object'?raw.deep_link:null;
   if(!link||!link.client_id){
     link={client_id:String(clientId), on_date:String(onDate), slot_key:key};
@@ -12036,8 +12251,15 @@ function schedNormSlot(raw, clientId, onDate){
     cover_aide_id:String(raw.cover_aide_id||raw.coverAideId||''),
     cover_aide_name:String(raw.cover_aide_name||raw.coverAideName||''),
     note:raw.note==null?'':String(raw.note),
+    miss_reason:String(raw.miss_reason||raw.missReason||'').trim().toLowerCase(),
+    on_hold:raw.on_hold===true||raw.on_hold==='true'||mark==='on_hold',
+    hold_id:String(raw.hold_id||raw.holdId||''),
+    hold_start:schedDateOnly(raw.hold_start||raw.holdStart)||'',
+    hold_end:schedDateOnly(raw.hold_end||raw.holdEnd)||'',
+    hold_note:raw.hold_note==null&&raw.holdNote==null?'':String(raw.hold_note!=null?raw.hold_note:raw.holdNote),
     deep_link:link
   };
+  if(!slot.on_hold&&(slot.hold_id||schedParseHoldNote(slot.note)))slot.on_hold=true;
   schedRememberAide(slot.usual_aide_id, slot.aide_name);
   schedRememberAide(slot.cover_aide_id, slot.cover_aide_name);
   return slot;
@@ -12097,17 +12319,70 @@ function schedApplySlotWeek(data){
         if(a.slot_key>b.slot_key)return 1;
         return 0;
       });
-      var dayHours=0;
+      var dayHold=schedNormHold(raw)||{hold_id:'', start_date:'', end_date:'', note:'', open_ended:true, is_active:true};
+    var dayOnHold=!!(raw&&(raw.on_hold===true||raw.on_hold==='true'||dayHold.hold_id));
+    if(dayOnHold){
+      slots.forEach(function(s){
+        s.on_hold=true;
+        if(!s.hold_id)s.hold_id=dayHold.hold_id;
+        if(!s.hold_start)s.hold_start=dayHold.start_date;
+        if(!s.hold_end)s.hold_end=dayHold.end_date;
+        if(!s.hold_note&&dayHold.note)s.hold_note=dayHold.note;
+      });
+    }
+    var dayHours=0;
       slots.forEach(function(s){dayHours+=Number(schedSlotToward(s))||0;});
       dayHours=Math.round(dayHours*100)/100;
       weekHours+=dayHours;
-      days[String(wd)]={on_date:onDate, weekday:wd, day_hours:dayHours, slots:slots};
+      days[String(wd)]={
+        on_date:onDate,
+        weekday:wd,
+        day_hours:dayHours,
+        slots:slots,
+        on_hold:dayOnHold,
+        hold_id:dayHold.hold_id,
+        hold_start:dayHold.start_date,
+        hold_end:dayHold.end_date,
+        hold_note:dayHold.note
+      };
     }
+    var holds=[];
+    if(c.holds&&Array.isArray(c.holds)){
+      c.holds.forEach(function(h){
+        var norm=schedNormHold(h);
+        if(norm)holds.push(norm);
+      });
+    }
+    holds.forEach(function(h){
+      if(h.is_active===false)return;
+      for(var hd=1;hd<=7;hd++){
+        var dayRow=days[String(hd)];
+        if(!dayRow||!schedDateInHold(dayRow.on_date, h))continue;
+        dayRow.on_hold=true;
+        if(!dayRow.hold_id)dayRow.hold_id=h.hold_id;
+        if(!dayRow.hold_start)dayRow.hold_start=h.start_date;
+        if(!dayRow.hold_end)dayRow.hold_end=h.end_date;
+        if(!dayRow.hold_note&&h.note)dayRow.hold_note=h.note;
+        (dayRow.slots||[]).forEach(function(s){
+          s.on_hold=true;
+          if(!s.hold_id)s.hold_id=h.hold_id;
+          if(!s.hold_start)s.hold_start=h.start_date;
+          if(!s.hold_end)s.hold_end=h.end_date;
+          if(!s.hold_note&&h.note)s.hold_note=h.note;
+        });
+        var again=0;
+        (dayRow.slots||[]).forEach(function(s){again+=Number(schedSlotToward(s))||0;});
+        dayRow.day_hours=Math.round(again*100)/100;
+      }
+    });
+    weekHours=0;
+    for(var wh=1;wh<=7;wh++)weekHours+=Number(days[String(wh)].day_hours)||0;
     rows.push({
       id:String(clientId),
       name:String(c.client_name||c.clientName||c.name||'Client'),
       weekly_authorized_hours:schedNum(c.weekly_authorized_hours!=null?c.weekly_authorized_hours:c.weeklyAuthorizedHours),
       week_hours:Math.round(weekHours*100)/100,
+      holds:holds,
       days:days
     });
   });
@@ -12181,29 +12456,39 @@ function schedSyncSlotChrome(on){
   var intro=schedEl('schedIntro');
   if(intro){
     intro.textContent=on
-      ?'A day cell stacks each shift. Tap a day to mark worked, missed, or cover. Hours share one weekly bucket.'
+      ?'Unmarked = assumed worked. Mark Missed, Covered shift, or On hold. Hours share one weekly bucket.'
       :'Clients down the side, Monday–Sunday across. The usual week stays put. A cell change is an exception for that date.';
   }
   var add=schedEl('schedAddUsualBtn');
   if(add)add.textContent=on?'Add shift':'Edit usual pattern';
   var call=schedEl('schedFilterCalloff');
   if(call)call.textContent=on?'Missed':'Call-offs';
+  var hold=schedEl('schedFilterHold');
+  if(hold)hold.hidden=!on;
+  var legend=schedEl('schedLegend');
+  if(legend)legend.hidden=!on;
   var emptyBtn=schedEl('schedEmptyAdd');
   if(emptyBtn)emptyBtn.textContent=on?'No shifts yet — Add a shift':'No patterns yet — Add usual pattern';
+  schedClass(schedEl('tab_schedule'), 'is-fullweek', !!on);
 }
 function schedSlotRowVisible(client){
   var openOn=!!schedFilterOpen;
   var callOn=!!schedFilterCalloff;
-  if(!openOn&&!callOn)return true;
+  var holdOn=!!schedFilterHold;
+  if(!openOn&&!callOn&&!holdOn)return true;
   for(var wd=1;wd<=7;wd++){
     var day=client.days[String(wd)];
     var slots=day&&day.slots?day.slots:[];
     var open=!slots.length;
     var missed=false;
-    for(var i=0;i<slots.length;i++){if(slots[i].mark==='missed')missed=true;}
-    if(openOn&&callOn&&(open||missed))return true;
-    if(openOn&&!callOn&&open)return true;
-    if(callOn&&!openOn&&missed)return true;
+    var held=false;
+    for(var i=0;i<slots.length;i++){
+      if(schedSlotIsHold(slots[i]))held=true;
+      else if(slots[i].mark==='missed')missed=true;
+    }
+    if(openOn&&open)return true;
+    if(callOn&&missed)return true;
+    if(holdOn&&held)return true;
   }
   return false;
 }
@@ -12226,6 +12511,9 @@ function schedEnsureSlotSelection(){
   }
 }
 function schedChipHtml(slot, index){
+  if(schedSlotIsHold(slot)){
+    return '<span class="sched-chip is-hold">On hold<span class="chip-sub">paused · 0 hrs</span></span>';
+  }
   var toward=schedSlotToward(slot);
   var who=slot.mark==='cover'&&(slot.cover_aide_name||slot.cover_aide_id)
     ?schedShortAide(slot.cover_aide_name, slot.cover_aide_id)
@@ -12233,7 +12521,10 @@ function schedChipHtml(slot, index){
   var cls='sched-chip';
   if(slot.mark==='missed')cls+=' is-missed';
   else if(slot.mark==='cover')cls+=' is-cover';
-  else if(index>0)cls+=' is-pm';
+  else{
+    cls+=' is-assumed';
+    if(index>0)cls+=' is-pm';
+  }
   return '<span class="'+cls+'">'+schedEsc(who)+' <span class="hrs">'+schedEsc(schedHoursShort(toward)||'0')+'h</span></span>';
 }
 function schedPaintSlotGrid(){
@@ -12312,10 +12603,17 @@ function schedSlotRange(slot){
   if(a)return label+' · '+a;
   return label;
 }
+function schedAideActive(a){
+  if(!a)return false;
+  if(a.isActive===false||a.is_active===false)return false;
+  if(a.deactivated_at||a.deactivatedAt)return false;
+  return true;
+}
 function schedAideOptionsHtml(selected, blankLabel){
   var html='<option value="">'+schedEsc(blankLabel||'Select aide')+'</option>';
   var seen={};
   schedAideRosters().forEach(function(a){
+    if(!schedAideActive(a))return;
     var val=a.id!=null&&String(a.id)!==''?String(a.id):String(a.username||'');
     if(!val||seen[val])return;
     seen[val]=true;
@@ -12326,6 +12624,136 @@ function schedAideOptionsHtml(selected, blankLabel){
     html+='<option value="'+schedAttr(selected)+'">'+schedEsc(schedAideLabel(selected)||String(selected))+'</option>';
   }
   return html;
+}
+function schedSlotFollow(slot){
+  var key=slot&&slot.slot_key||'';
+  if(schedSlotMarkOpen===('missed:'+key))return 'missed';
+  if(schedSlotMarkOpen===('cover:'+key))return 'cover';
+  if(schedSlotMarkOpen===('hold:'+key))return 'hold';
+  if(schedSlotIsHold(slot))return 'hold';
+  if(slot&&slot.mark==='missed')return 'missed';
+  if(slot&&slot.mark==='cover')return 'cover';
+  return '';
+}
+function schedHoldForSlot(slot, client, day){
+  var legacy=schedParseHoldNote(slot&&slot.note);
+  var fromSlot=slot&&(slot.hold_id||slot.hold_start||slot.mark==='on_hold'||slot.on_hold);
+  if(fromSlot){
+    return {
+      id:String(slot.hold_id||''),
+      start:slot.hold_start||(legacy&&legacy.start)||'',
+      end:slot.hold_end||(legacy&&legacy.end)||'',
+      note:slot.hold_note||(legacy&&legacy.text)||''
+    };
+  }
+  if(day&&(day.hold_id||day.on_hold||day.hold_start)){
+    return {id:String(day.hold_id||''), start:day.hold_start||'', end:day.hold_end||'', note:day.hold_note||''};
+  }
+  if(legacy)return {id:'', start:legacy.start, end:legacy.end, note:legacy.text};
+  var on=day&&day.on_date;
+  var holds=client&&client.holds||[];
+  for(var i=0;i<holds.length;i++){
+    if(schedDateInHold(on, holds[i])){
+      return {id:holds[i].hold_id, start:holds[i].start_date, end:holds[i].end_date, note:holds[i].note};
+    }
+  }
+  return {id:'', start:'', end:'', note:''};
+}
+function schedSlotTimeLine(slot){
+  var label=slot.label||(slot.sort_order>0?'Evening':'Morning');
+  var a=schedClock(slot.start_local);
+  var b=schedClock(slot.end_local);
+  var hrs=schedHoursShort(schedSlotPatternHours(slot))||'0';
+  var clock=(a&&b)?(a+' – '+b):(a||'');
+  if(schedSlotIsHold(slot)&&clock)clock='was '+clock;
+  var bits=[label];
+  if(clock)bits.push(clock);
+  bits.push(hrs+'h');
+  return bits.join(' · ');
+}
+function schedSlotCardHtml(slot, client, day, can){
+  var follow=schedSlotFollow(slot);
+  var held=schedSlotIsHold(slot)||follow==='hold';
+  var toward=schedSlotToward(slot);
+  var cardCls='sched-slot-card';
+  if(held)cardCls+=' is-hold';
+  else if(slot.mark==='missed')cardCls+=' is-missed';
+  else if(slot.mark==='worked')cardCls+=' is-worked';
+  else if(slot.mark==='cover')cardCls+=' is-cover';
+  else cardCls+=' is-assumed';
+  if(schedSlotFocus&&schedSlotFocus.slot_key===slot.slot_key&&schedSlotFocus.on_date===day.on_date&&String(schedSlotFocus.client_id)===String(client.id))cardCls+=' is-focus';
+  var usual=schedShortAide(slot.aide_name, slot.usual_aide_id);
+  var coverName=slot.mark==='cover'?schedShortAide(slot.cover_aide_name, slot.cover_aide_id):'';
+  var aideLine='Usual aide · '+usual+(held?' · paused':'');
+  var badge='<span class="sched-mark is-assumed">Assumed worked</span>';
+  if(held)badge='<span class="sched-mark is-hold">⏸ On hold</span>';
+  else if(slot.mark==='missed')badge='<span class="sched-mark is-miss">✕ Missed</span>';
+  else if(slot.mark==='cover')badge='<span class="sched-mark is-cover">↻ Covered'+(coverName?' · '+schedEsc(coverName):'')+'</span>';
+  var link=slot.deep_link||{client_id:client.id, on_date:day.on_date, slot_key:slot.slot_key};
+  var attrs=' data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-weekday="'+day.weekday+'" data-slot-key="'+schedAttr(slot.slot_key)+'"';
+  var html='<article class="'+cardCls+'" id="sched-slot-'+schedAttr(client.id)+'-'+schedAttr(slot.slot_key)+'" data-clienthrs1b="v=clienthrs1b" data-shift-slim1="v=shift-slim1" data-deep-link="'+schedAttr(JSON.stringify({client_id:link.client_id, on_date:link.on_date, slot_key:link.slot_key}))+'">';
+  html+='<div class="sched-slot-head"><div><div class="sched-slot-time">'+schedEsc(schedSlotTimeLine(slot))+'</div><div class="sched-slot-aide">'+schedEsc(aideLine)+'</div></div>';
+  html+='<div>'+badge+' <span class="sched-hrs-pill">'+schedEsc(held?'0':(schedHoursShort(toward)||'0'))+' hrs</span></div></div>';
+  if(can){
+    html+='<div class="sched-slot-ctrls mark-actions" role="group" aria-label="Mark this shift">';
+    html+='<button type="button" class="btn btn-ghost'+(follow==='missed'?' is-on-miss':'')+'" data-slot-action="missed"'+attrs+'>✕ Missed</button>';
+    html+='<button type="button" class="btn btn-ghost'+(follow==='cover'?' is-on-cover':'')+'" data-slot-action="cover"'+attrs+'>Covered shift</button>';
+    html+='<button type="button" class="btn btn-ghost'+(follow==='hold'?' is-on-hold':'')+'" data-slot-action="hold"'+attrs+'>⏸ On hold</button>';
+    html+='</div>';
+    if(follow==='missed')html+=schedMissedFollowHtml(slot, client, day);
+    else if(follow==='cover')html+=schedCoverFollowHtml(slot, client, day);
+    else if(follow==='hold')html+=schedHoldFollowHtml(slot, client, day);
+    if(slot.mark||held)html+='<div class="sched-slot-ctrls"><button type="button" class="btn btn-ghost" data-slot-action="clear"'+attrs+'>Clear</button></div>';
+  }
+  html+='</article>';
+  return html;
+}
+function schedMissedFollowHtml(slot, client, day){
+  var parts=schedMissedParts(slot.mark==='missed'&&!schedSlotIsHold(slot)?slot.note:'', slot.miss_reason);
+  var attrs=' data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'"';
+  var html='<div class="mark-follow is-miss"><div class="follow-title">Missed reason</div>';
+  html+='<div class="field"><label for="schedMissReason-'+schedAttr(slot.slot_key)+'">Reason</label>';
+  html+='<select id="schedMissReason-'+schedAttr(slot.slot_key)+'" data-slot-key="'+schedAttr(slot.slot_key)+'" aria-label="Missed reason" onchange="schedToggleMissNote(this)">';
+  SCHED_MISS_REASONS.forEach(function(reason){
+    html+='<option value="'+schedAttr(reason)+'"'+(parts.reason===reason?' selected':'')+'>'+schedEsc(reason)+'</option>';
+  });
+  html+='</select></div>';
+  html+='<div class="field" id="schedMissNoteWrap-'+schedAttr(slot.slot_key)+'"'+(parts.reason==='Other'?'':' hidden')+'><label for="schedMissNote-'+schedAttr(slot.slot_key)+'">Note</label>';
+  html+='<textarea id="schedMissNote-'+schedAttr(slot.slot_key)+'" aria-label="Missed other note">'+schedEsc(parts.note||'')+'</textarea></div>';
+  html+='<p class="field-hint">Other shows the note. Also: Client declined service · No-show · No call</p>';
+  html+='<button type="button" class="btn btn-teal" data-slot-action="save-miss"'+attrs+'>Save mark</button></div>';
+  return html;
+}
+function schedCoverFollowHtml(slot, client, day){
+  var attrs=' data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'"';
+  var html='<div class="mark-follow is-cover"><div class="follow-title">Who covered</div>';
+  html+='<div class="field"><label for="schedCoverAide-'+schedAttr(slot.slot_key)+'">Active aide</label>';
+  html+='<select id="schedCoverAide-'+schedAttr(slot.slot_key)+'" aria-label="Covering aide">'+schedAideOptionsHtml(slot.cover_aide_id, 'Select covering aide…')+'</select></div>';
+  html+='<p class="field-hint">Active aides only · the usual aide stays on the pattern</p>';
+  html+='<button type="button" class="btn btn-teal" data-slot-action="save-cover"'+attrs+'>Save mark</button></div>';
+  return html;
+}
+function schedHoldFollowHtml(slot, client, day){
+  var hold=schedHoldForSlot(slot, client, day);
+  var startVal=hold.start?schedPretty(hold.start):schedPretty(day.on_date);
+  var endVal=hold.end?schedPretty(hold.end):'';
+  var attrs=' data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'"';
+  var html='<div class="mark-follow is-hold"><div class="follow-title">On hold</div><div class="sched-two">';
+  html+='<div class="field"><label for="schedHoldStart-'+schedAttr(slot.slot_key)+'">Start</label><input id="schedHoldStart-'+schedAttr(slot.slot_key)+'" type="text" inputmode="numeric" placeholder="MM/DD/YYYY" aria-label="Hold start date" value="'+schedAttr(startVal)+'"></div>';
+  html+='<div class="field"><label for="schedHoldEnd-'+schedAttr(slot.slot_key)+'">End</label><input id="schedHoldEnd-'+schedAttr(slot.slot_key)+'" type="text" inputmode="numeric" placeholder="Open-ended" aria-label="Hold end date" value="'+schedAttr(endVal)+'"></div>';
+  html+='</div>';
+  if(!endVal)html+='<p class="open-ended"><span class="pill-oe">Open-ended</span> No end date · stays paused</p>';
+  html+='<div class="field"><label for="schedHoldNote-'+schedAttr(slot.slot_key)+'">Note</label><textarea id="schedHoldNote-'+schedAttr(slot.slot_key)+'" aria-label="Hold note">'+schedEsc(hold.note||'')+'</textarea></div>';
+  html+='<p class="field-hint">Hospital / ER hold · start required · end optional · note for office</p>';
+  html+='<div class="sched-slot-ctrls"><button type="button" class="btn btn-teal" data-slot-action="save-hold"'+attrs+'>Save hold</button>';
+  html+='<button type="button" class="btn btn-ghost" data-slot-action="end-hold"'+attrs+'>End hold…</button></div></div>';
+  return html;
+}
+function schedToggleMissNote(sel){
+  if(!sel)return;
+  var key=sel.getAttribute('data-slot-key')||'';
+  var wrap=schedEl('schedMissNoteWrap-'+key);
+  if(wrap)wrap.hidden=sel.value!=='Other';
 }
 function schedBindSlotCards(){
   var box=schedEl('schedSlotCards');
@@ -12346,9 +12774,14 @@ function schedBindSlotCards(){
     var onDate=btn.getAttribute('data-date');
     var key=btn.getAttribute('data-slot-key');
     var weekday=Number(btn.getAttribute('data-weekday'));
-    if(action==='worked'||action==='missed')schedMarkSlot(clientId, onDate, key, action);
-    else if(action==='cover')schedToggleCover(key);
+    if(action==='missed'||action==='cover'||action==='hold'){
+      schedSlotMarkOpen=action+':'+schedNormSlotKey(key);
+      schedPaintSlotDetail();
+      if(action==='hold')schedRefreshClientHolds(clientId).then(function(){schedPaintSlotDetail();});
+    }else if(action==='save-miss')schedSaveMissed(clientId, onDate, key);
     else if(action==='save-cover')schedSaveCover(clientId, onDate, key);
+    else if(action==='save-hold')schedWriteHold(clientId, onDate, key, false);
+    else if(action==='end-hold')schedWriteHold(clientId, onDate, key, true);
     else if(action==='clear')schedClearSlotMark(clientId, onDate, key);
     else if(action==='edit')schedEditSlotPattern(clientId, weekday, key);
     else if(action==='delete')schedDeleteSlotPattern(clientId, weekday, key);
@@ -12357,7 +12790,7 @@ function schedBindSlotCards(){
 function schedPaintSlotDetail(){
   var panel=schedEl('schedSlotDetail');
   if(!panel)return;
-  if(!schedSlotMode||!schedSlotClients.length){
+  if(!schedSlotMode||!schedSlotClients.length||schedSlotDrawerClosed){
     panel.hidden=true;
     return;
   }
@@ -12383,10 +12816,10 @@ function schedPaintSlotDetail(){
       var cap=schedHoursShort(client.weekly_authorized_hours)||'0';
       var pct=Number(client.weekly_authorized_hours)>0?Math.max(0, Math.min(100, (Number(client.week_hours)||0)/Number(client.weekly_authorized_hours)*100)):0;
       stat.hidden=false;
-      stat.innerHTML='<div class="nums">'+schedEsc(delivered)+' of '+schedEsc(cap)+' <span>delivered this week</span></div><div class="sched-hrs-bar"><i style="width:'+pct+'%"></i></div>';
+      stat.innerHTML='<div class="nums">'+schedEsc(delivered)+' <span>hrs toward this week</span></div><div class="sched-hrs-bar"><i style="width:'+pct+'%"></i></div>';
     }else if(client){
       stat.hidden=false;
-      stat.innerHTML='<div class="nums">'+schedEsc(schedHoursShort(client.week_hours)||'0')+' <span>hrs delivered this week</span></div>';
+      stat.innerHTML='<div class="nums">'+schedEsc(schedHoursShort(client.week_hours)||'0')+' <span>hrs toward this week</span></div>';
     }else stat.hidden=true;
   }
   var sum=schedEl('schedSlotDaySum');
@@ -12403,8 +12836,9 @@ function schedPaintSlotDetail(){
       :schedShortAide(slot.aide_name, slot.usual_aide_id);
     bits.push(who+' '+ (schedHoursShort(schedSlotToward(slot))||'0'));
   });
-  var bucket=client.weekly_authorized_hours!=null?schedHoursShort(client.weekly_authorized_hours):'';
-  var dayLine='This day: '+(schedHoursShort(day.day_hours)||'0')+' hrs toward '+client.name+(bucket?('\'s '+bucket+' hrs'):'\'s weekly bucket');
+  var dayLine=(schedHoursShort(day.day_hours)||'0')+' hrs';
+  if(day.slots.length===1)dayLine='1 shift · '+dayLine;
+  else if(day.slots.length)dayLine=day.slots.length+' shifts · '+dayLine;
   if(bits.length)dayLine+=' ('+bits.join(' + ')+')';
   if(!day.slots.length)dayLine='No shifts on this day.';
   if(sum)sum.textContent=dayLine;
@@ -12412,50 +12846,17 @@ function schedPaintSlotDetail(){
   schedBindSlotCards();
   var can=schedCanEdit();
   var html='';
-  day.slots.forEach(function(slot){
-    var toward=schedSlotToward(slot);
-    var pattern=schedSlotPatternHours(slot);
-    var cardCls='sched-slot-card';
-    if(slot.mark==='missed')cardCls+=' is-missed';
-    else if(slot.mark==='worked')cardCls+=' is-worked';
-    else if(slot.mark==='cover')cardCls+=' is-cover';
-    if(schedSlotFocus&&schedSlotFocus.slot_key===slot.slot_key&&schedSlotFocus.on_date===day.on_date&&String(schedSlotFocus.client_id)===String(client.id))cardCls+=' is-focus';
-    var aide=slot.mark==='cover'&&(slot.cover_aide_name||slot.cover_aide_id)
-      ?schedShortAide(slot.cover_aide_name, slot.cover_aide_id)
-      :schedShortAide(slot.aide_name, slot.usual_aide_id);
-    var badge='';
-    if(slot.mark==='missed')badge='<span class="sched-mark is-miss">✕ Missed / no-show</span>';
-    else if(slot.mark==='worked')badge='<span class="sched-mark is-ok">✓ Worked</span>';
-    else if(slot.mark==='cover')badge='<span class="sched-mark is-cover">Cover</span>';
-    var link=slot.deep_link||{client_id:client.id, on_date:day.on_date, slot_key:slot.slot_key};
-    html+='<article class="'+cardCls+'" id="sched-slot-'+schedAttr(client.id)+'-'+schedAttr(slot.slot_key)+'" data-clienthrs1b="v=clienthrs1b" data-deep-link="'+schedAttr(JSON.stringify({client_id:link.client_id, on_date:link.on_date, slot_key:link.slot_key}))+'">';
-    html+='<div class="sched-slot-head"><div><div class="sched-slot-time">'+schedEsc(schedSlotRange(slot))+'</div><div class="sched-slot-aide">'+schedEsc(aide)+'</div></div>';
-    html+='<div>'+badge+' <span class="sched-hrs-pill">'+schedEsc(schedHoursShort(toward)||'0')+' hrs</span></div></div>';
-    if(can){
-      html+='<div class="sched-slot-ctrls">';
-      html+='<button type="button" class="btn btn-ghost'+(slot.mark==='worked'?' is-on-ok':'')+'" data-slot-action="worked" data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'">✓ Worked</button>';
-      html+='<button type="button" class="btn btn-ghost'+(slot.mark==='missed'?' is-on-miss':'')+'" data-slot-action="missed" data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'">✕ Missed</button>';
-      html+='<button type="button" class="btn btn-ghost'+(slot.mark==='cover'?' is-on-cover':'')+'" data-slot-action="cover" data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'">Swap cover</button>';
-      if(slot.mark)html+='<button type="button" class="btn btn-ghost" data-slot-action="clear" data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'">Clear mark</button>';
-      html+='<button type="button" class="btn btn-ghost" data-slot-action="edit" data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-weekday="'+day.weekday+'" data-slot-key="'+schedAttr(slot.slot_key)+'">Edit shift</button>';
-      html+='<button type="button" class="btn btn-ghost" data-slot-action="delete" data-client="'+schedAttr(client.id)+'" data-weekday="'+day.weekday+'" data-slot-key="'+schedAttr(slot.slot_key)+'">Remove shift</button>';
-      html+='</div>';
-    }
-    var showCover=can&&(slot.mark==='missed'||slot.mark==='cover'||schedSlotCoverKey===slot.slot_key);
-    if(showCover){
-      html+='<div class="sched-cover-box"><strong>Cover</strong>';
-      html+='<div class="field"><label for="schedCoverAide-'+schedAttr(slot.slot_key)+'">Cover aide</label><select id="schedCoverAide-'+schedAttr(slot.slot_key)+'">'+schedAideOptionsHtml(slot.cover_aide_id, 'Choose aide')+'</select></div>';
-      html+='<div class="sched-cover-split">';
-      html+='<div class="field"><label for="schedCoverHours-'+schedAttr(slot.slot_key)+'">Hours</label><input type="number" id="schedCoverHours-'+schedAttr(slot.slot_key)+'" min="0" max="24" step="0.25" inputmode="decimal" placeholder="'+schedAttr(schedHoursShort(pattern))+'" value="'+(slot.mark==='cover'&&slot.hours!=null&&slot.pattern_hours!=null&&Number(slot.hours)!==Number(slot.pattern_hours)?schedAttr(String(slot.hours)):'')+'"></div>';
-      html+='<div class="field"><label for="schedCoverNote-'+schedAttr(slot.slot_key)+'">Note</label><input type="text" id="schedCoverNote-'+schedAttr(slot.slot_key)+'" value="'+schedAttr(slot.note||'')+'"></div>';
-      html+='</div>';
-      html+='<button type="button" class="btn btn-teal" data-slot-action="save-cover" data-client="'+schedAttr(client.id)+'" data-date="'+schedAttr(day.on_date)+'" data-slot-key="'+schedAttr(slot.slot_key)+'">Save cover</button>';
-      if(slot.mark==='missed'&&!slot.cover_aide_id)html+='<p class="sched-cover-note">no cover (−'+schedEsc(schedHoursShort(pattern)||'0')+' hrs)</p>';
-      html+='</div>';
-    }
-    html+='</article>';
-  });
+  if(day.slots.length){
+    html+='<p class="field-hint"><strong>Three buttons:</strong> Missed · Covered shift · On hold. No Worked — unmarked stays assumed worked.</p>';
+  }
+  var anyHold=false;
+  day.slots.forEach(function(slot){if(schedSlotIsHold(slot))anyHold=true;});
+  if(anyHold){
+    html+='<div class="hold-banner"><strong>Hospital / ER hold.</strong> Start required · End optional (open-ended) · Note for office. Held days count <strong>0 hrs</strong>.</div>';
+  }
+  day.slots.forEach(function(slot){html+=schedSlotCardHtml(slot, client, day, can);});
   cards.innerHTML=html;
+  schedRefreshSlimForm(client, day);
 }
 function schedPaintSlots(){
   var old=schedEl('schedPanel');
@@ -12549,6 +12950,7 @@ schedJumpClient=function(){
   if(!schedSlotRowVisible(match)){
     schedFilterOpen=false;
     schedFilterCalloff=false;
+    schedFilterHold=false;
     schedSyncFilters();
   }
   schedPaint();
@@ -12557,14 +12959,20 @@ schedJumpClient=function(){
 };
 function schedSelectSlotDay(clientId, iso, weekday, slotKey){
   if(!clientId||!iso)return;
+  schedSlotDrawerClosed=false;
+  schedSlotFormStamp='';
   schedSlotSelected={clientId:String(clientId), onDate:String(iso), weekday:Number(weekday)||schedWeekdayFromIso(iso)};
   if(slotKey){
     schedSlotFocus={client_id:String(clientId), on_date:String(iso), slot_key:schedNormSlotKey(slotKey)};
+    schedSlotEditKey=schedSlotFocus.slot_key;
+    schedSlotFormMode='edit';
+    schedSlotAddAnother=false;
   }
   schedPaintSlots();
 }
 function schedShiftSlotDay(delta){
   if(!schedSlotSelected)return;
+  schedSlotFormStamp='';
   var next=schedAddDays(schedSlotSelected.onDate, Number(delta)||0);
   var week=schedIsoDate(schedMondayOf(schedParseIso(next)));
   schedSlotSelected={clientId:schedSlotSelected.clientId, onDate:next, weekday:schedWeekdayFromIso(next)};
@@ -12580,11 +12988,196 @@ function schedToggleCover(slotKey){
   schedSlotCoverKey=schedSlotCoverKey===key?'':key;
   schedPaintSlotDetail();
 }
+function schedReadDayChecks(){
+  var box=schedEl('schedSlotDays');
+  if(!box||!box.querySelectorAll)return [];
+  var out=[];
+  var btns=box.querySelectorAll('[data-wd]');
+  for(var i=0;i<btns.length;i++){
+    var on=btns[i].getAttribute('aria-pressed')==='true';
+    if(on)out.push(Number(btns[i].getAttribute('data-wd')));
+  }
+  return out;
+}
+function schedSetDayChecks(days){
+  var box=schedEl('schedSlotDays');
+  if(!box||!box.querySelectorAll)return;
+  var set={};
+  (days||[]).forEach(function(d){set[Number(d)]=true;});
+  var btns=box.querySelectorAll('[data-wd]');
+  for(var i=0;i<btns.length;i++){
+    var wd=Number(btns[i].getAttribute('data-wd'));
+    var on=!!set[wd];
+    btns[i].setAttribute('aria-pressed', on?'true':'false');
+    schedClass(btns[i], 'on', on);
+  }
+  var sel=schedEl('schedSlotWeekday');
+  if(sel&&days&&days.length)sel.value=String(days[0]);
+}
+function schedBindDayChecks(){
+  var box=schedEl('schedSlotDays');
+  if(!box)return;
+  if(box.dataset){
+    if(box.dataset.bound==='1')return;
+    box.dataset.bound='1';
+  }else if(box._daysBound)return;
+  else box._daysBound=true;
+  if(!box.addEventListener)return;
+  box.addEventListener('click', function(ev){
+    var t=ev&&ev.target;
+    var btn=t&&t.closest?t.closest('[data-wd]'):null;
+    if(!btn)return;
+    var on=btn.getAttribute('aria-pressed')==='true';
+    btn.setAttribute('aria-pressed', on?'false':'true');
+    schedClass(btn, 'on', !on);
+    var days=schedReadDayChecks();
+    var sel=schedEl('schedSlotWeekday');
+    if(sel&&days.length)sel.value=String(days[0]);
+    schedSyncDayHint();
+  });
+}
+function schedBindAutoHours(){
+  ['schedSlotStart','schedSlotEnd'].forEach(function(id){
+    var el=schedEl(id);
+    if(!el)return;
+    if(el.dataset){
+      if(el.dataset.hoursBound==='1')return;
+      el.dataset.hoursBound='1';
+    }else if(el._hoursBound)return;
+    else el._hoursBound=true;
+    if(!el.addEventListener)return;
+    el.addEventListener('input', schedSyncAutoHours);
+    el.addEventListener('change', schedSyncAutoHours);
+  });
+}
+function schedSyncAutoHours(){
+  var start=schedTimeOrNull((schedEl('schedSlotStart')||{}).value);
+  var end=schedTimeOrNull((schedEl('schedSlotEnd')||{}).value);
+  var hrs=schedHoursBetween(start, end);
+  var view=schedEl('schedSlotHoursView');
+  var note=schedEl('schedSlotHoursNote');
+  var hidden=schedEl('schedSlotHours');
+  if(hrs==null){
+    if(view)view.value='';
+    if(note)note.textContent='from start–end';
+    return;
+  }
+  var shown=schedHoursShort(hrs);
+  if(view)view.value=shown+' hrs';
+  if(hidden)hidden.value=String(hrs);
+  if(note)note.textContent='from start–end · '+schedClockAmPm(start)+'–'+schedClockAmPm(end)+' → '+shown+' hrs';
+}
+function schedSyncModePills(){
+  var edit=schedEl('schedSlotModeEdit');
+  var add=schedEl('schedSlotModeAdd');
+  schedClass(edit, 'on', schedSlotFormMode!=='add');
+  schedClass(add, 'on', schedSlotFormMode==='add');
+  if(edit)edit.setAttribute('aria-pressed', schedSlotFormMode!=='add'?'true':'false');
+  if(add)add.setAttribute('aria-pressed', schedSlotFormMode==='add'?'true':'false');
+}
+function schedDayName(wd){
+  if(Number(wd)===7)return 'Sunday';
+  return SCHED_DAYS[Number(wd)-1]||'';
+}
+function schedSyncDayHint(){
+  var el=schedEl('schedSlotDaysHint');
+  if(!el)return;
+  var days=schedReadDayChecks();
+  var name=days.length?schedDayName(days[0]):'';
+  if(schedSlotFormMode==='add'&&schedSlotAddAnother){
+    el.textContent='Add another = same day'+(name?' · '+name+' stays checked':'');
+    return;
+  }
+  if(schedSlotFormMode==='edit'){
+    el.textContent='Edit one day'+(name?' · '+name+' checked':'')+' · uncheck / check to move or copy';
+    return;
+  }
+  if(days.length>1)el.textContent='Creates '+days.length+' shifts this week';
+  else el.textContent='One Save creates this shift on every checked day';
+}
+function schedPaintShiftSummary(){
+  var box=schedEl('schedSlotShiftSummary');
+  if(!box)return;
+  if(!(schedSlotFormMode==='add'&&schedSlotAddAnother)||!schedSlotSelected){
+    box.hidden=true;
+    box.innerHTML='';
+    return;
+  }
+  var client=schedFindSlotClient(schedSlotSelected.clientId);
+  var day=client&&client.days[String(schedSlotSelected.weekday)];
+  var slots=day&&day.slots?day.slots:[];
+  if(!slots.length){box.hidden=true;box.innerHTML='';return;}
+  var lines=slots.map(function(slot, i){
+    var who=schedShortAide(slot.aide_name, slot.usual_aide_id);
+    var a=schedClock(slot.start_local);
+    var b=schedClock(slot.end_local);
+    var hrs=schedHoursShort(schedSlotPatternHours(slot));
+    return '<div class="line">'+schedEsc(who)+(a&&b?(' · '+a+' – '+b):'')+'</div><div class="sub">'+schedEsc(hrs?hrs+' hrs · from start–end':'from start–end')+'</div>';
+  }).join('');
+  box.hidden=false;
+  box.innerHTML='<div class="label">Shift 1 · kept</div>'+lines;
+}
+function schedNextSlotKeyForDays(clientId, weekdays, prefer){
+  var used={};
+  (weekdays||[]).forEach(function(wd){
+    var client=schedFindSlotClient(clientId);
+    var day=client&&client.days[String(wd)];
+    if(day&&day.slots)day.slots.forEach(function(s){used[s.slot_key]=true;});
+  });
+  var want=schedNormSlotKey(prefer);
+  if(want&&!used[want])return want;
+  var n=1;
+  while(used['s'+n])n++;
+  return 's'+n;
+}
+function schedNextSlotKey(clientId, weekday, prefer){
+  var used={};
+  var client=schedFindSlotClient(clientId);
+  var day=client&&client.days[String(weekday)];
+  if(day&&day.slots)day.slots.forEach(function(s){used[s.slot_key]=true;});
+  var want=schedNormSlotKey(prefer);
+  if(want&&!used[want])return want;
+  var n=1;
+  while(used['s'+n])n++;
+  return 's'+n;
+}
+function schedNextSort(clientId, weekday){
+  var max=0;
+  var client=schedFindSlotClient(clientId);
+  var day=client&&client.days[String(weekday)];
+  if(day&&day.slots)day.slots.forEach(function(s){if(Number(s.sort_order)>=max)max=Number(s.sort_order)+1;});
+  return max;
+}
+function schedRefreshSlimForm(client, day){
+  schedBindDayChecks();
+  schedBindAutoHours();
+  var slot=null;
+  if(schedSlotFormMode!=='add'&&day&&day.slots){
+    var key=schedSlotEditKey||(schedSlotFocus&&String(schedSlotFocus.client_id)===String(client.id)&&schedSlotFocus.on_date===day.on_date?schedSlotFocus.slot_key:'')||'';
+    if(key){
+      for(var i=0;i<day.slots.length;i++)if(day.slots[i].slot_key===key)slot=day.slots[i];
+    }
+    if(!slot&&day.slots.length)slot=day.slots[0];
+  }
+  var stamp=(client?client.id:'')+'|'+(day?day.on_date:'')+'|'+schedSlotFormMode+'|'+(schedSlotAddAnother?1:0)+'|'+(slot?slot.slot_key:'');
+  if(stamp===schedSlotFormStamp){
+    schedSyncModePills();
+    schedSyncDayHint();
+    return;
+  }
+  schedSlotFormStamp=stamp;
+  schedFillSlotPatternForm(slot, client&&client.id, day&&day.weekday);
+}
 function schedFillSlotPatternForm(slot, clientId, weekday){
   var box=schedEl('schedSlotPattern');
   if(box)box.hidden=false;
+  var adding=schedSlotFormMode==='add'||!slot;
+  if(slot&&schedSlotFormMode!=='add'){
+    schedSlotEditKey=slot.slot_key;
+    schedSlotEditWeekday=Number(weekday)||0;
+  }
   var title=schedEl('schedSlotPatternTitle');
-  if(title)title.textContent=slot?'Edit shift':'Add shift';
+  if(title)title.textContent=schedSlotAddAnother?'Shift 2 · Add another':(slot&&schedSlotFormMode!=='add'?'Edit shift':'Add shift');
   var sel=schedEl('schedSlotClient');
   if(sel){
     var html='';
@@ -12594,35 +13187,71 @@ function schedFillSlotPatternForm(slot, clientId, weekday){
     sel.innerHTML=html||'<option value="">No clients</option>';
     sel.value=String(clientId||(schedSlotSelected&&schedSlotSelected.clientId)||(schedSlotClients[0]&&schedSlotClients[0].id)||'');
   }
+  var wd=Number(weekday||(schedSlotSelected&&schedSlotSelected.weekday)||1);
   var day=schedEl('schedSlotWeekday');
-  if(day)day.value=String(weekday||(schedSlotSelected&&schedSlotSelected.weekday)||1);
+  if(day)day.value=String(wd);
+  schedSetDayChecks([wd]);
   var keyEl=schedEl('schedSlotKey');
-  if(keyEl)keyEl.value=slot?slot.slot_key:'';
+  if(keyEl)keyEl.value=slot&&schedSlotFormMode!=='add'?slot.slot_key:'';
   var label=schedEl('schedSlotLabel');
-  if(label)label.value=slot&&slot.label?slot.label:'';
+  if(label)label.value=slot&&schedSlotFormMode!=='add'&&slot.label?slot.label:'';
   var start=schedEl('schedSlotStart');
-  if(start)start.value=slot?schedTimeInput(slot.start_local):'';
+  if(start)start.value=slot&&schedSlotFormMode!=='add'?schedTimeInput(slot.start_local):'';
   var end=schedEl('schedSlotEnd');
-  if(end)end.value=slot?schedTimeInput(slot.end_local):'';
+  if(end)end.value=slot&&schedSlotFormMode!=='add'?schedTimeInput(slot.end_local):'';
   var aide=schedEl('schedSlotAide');
   if(aide){
-    aide.innerHTML=schedAideOptionsHtml(slot&&slot.usual_aide_id, 'No usual aide');
-    aide.value=slot&&slot.usual_aide_id?String(slot.usual_aide_id):'';
+    aide.innerHTML=schedAideOptionsHtml(slot&&schedSlotFormMode!=='add'&&slot.usual_aide_id, 'No usual aide');
+    aide.value=slot&&schedSlotFormMode!=='add'&&slot.usual_aide_id?String(slot.usual_aide_id):'';
   }
   var hours=schedEl('schedSlotHours');
-  if(hours)hours.value=slot&&slot.pattern_hours!=null?String(slot.pattern_hours):(slot&&slot.hours!=null?String(slot.hours):'');
+  if(hours)hours.value=slot&&schedSlotFormMode!=='add'&&slot.pattern_hours!=null?String(slot.pattern_hours):(slot&&schedSlotFormMode!=='add'&&slot.hours!=null?String(slot.hours):'');
   var sort=schedEl('schedSlotSort');
-  if(sort)sort.value=slot?String(slot.sort_order||0):'0';
+  if(sort)sort.value=slot&&schedSlotFormMode!=='add'?String(slot.sort_order||0):'';
+  var remove=schedEl('schedSlotRemovePattern');
+  if(remove)remove.hidden=!!adding;
+  schedSyncAutoHours();
+  schedSyncModePills();
+  schedSyncDayHint();
+  schedPaintShiftSummary();
+}
+function schedSetSlotFormMode(mode){
+  schedSlotFormMode=mode==='add'?'add':'edit';
+  schedSlotAddAnother=mode==='add';
+  if(mode==='add'){
+    schedSlotEditKey='';
+    schedSlotEditWeekday=0;
+  }
+  schedSlotFormStamp='';
+  schedSlotDrawerClosed=false;
+  schedPaintSlotDetail();
+  var box=schedEl('schedSlotPattern');
+  if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest', inline:'nearest'});
 }
 function schedOpenSlotPattern(){
   if(!schedCanEdit()){schedDeny();return;}
-  schedFillSlotPatternForm(null);
+  schedSlotDrawerClosed=false;
+  schedSlotFormMode='add';
+  schedSlotAddAnother=false;
+  schedSlotEditKey='';
+  schedSlotEditWeekday=0;
+  schedSlotFormStamp='';
+  var panel=schedEl('schedSlotDetail');
+  if(panel)panel.hidden=false;
+  schedPaintSlots();
   var box=schedEl('schedSlotPattern');
-  if(box&&box.scrollIntoView)box.scrollIntoView({block:'center', inline:'nearest'});
+  if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest', inline:'nearest'});
 }
 function schedCloseSlotPattern(){
-  var box=schedEl('schedSlotPattern');
-  if(box)box.hidden=true;
+  schedSlotFormMode='edit';
+  schedSlotAddAnother=false;
+  schedSlotFormStamp='';
+  schedPaintSlotDetail();
+}
+function schedCloseSlotDrawer(){
+  schedSlotDrawerClosed=true;
+  var panel=schedEl('schedSlotDetail');
+  if(panel)panel.hidden=true;
 }
 function schedEditSlotPattern(clientId, weekday, slotKey){
   if(!schedCanEdit()){schedDeny();return;}
@@ -12636,17 +13265,36 @@ function schedEditSlotPattern(clientId, weekday, slotKey){
     }
   }
   if(!slot){schedToast('That shift is not on this day.','var(--warn)');return;}
+  schedSlotDrawerClosed=false;
+  schedSlotFormMode='edit';
+  schedSlotAddAnother=false;
+  schedSlotEditKey=slot.slot_key;
+  schedSlotEditWeekday=Number(weekday);
+  schedSlotFormStamp='';
   schedSlotSelected={clientId:String(clientId), onDate:day.on_date, weekday:Number(weekday)};
-  schedFillSlotPatternForm(slot, clientId, weekday);
+  schedPaintSlotDetail();
   var box=schedEl('schedSlotPattern');
-  if(box&&box.scrollIntoView)box.scrollIntoView({block:'center', inline:'nearest'});
+  if(box&&box.scrollIntoView)box.scrollIntoView({block:'nearest', inline:'nearest'});
+}
+function schedRemoveEditingPattern(){
+  var clientId=String((schedEl('schedSlotClient')||{}).value||'').trim();
+  var wd=Number(schedSlotEditWeekday||(schedEl('schedSlotWeekday')||{}).value||0);
+  var key=schedSlotEditKey||schedNormSlotKey((schedEl('schedSlotKey')||{}).value);
+  if(!clientId||!key){schedToast('Open a shift to remove it.','var(--warn)');return;}
+  schedDeleteSlotPattern(clientId, wd, key);
 }
 async function schedSaveSlotPattern(){
   if(schedSaving)return;
   if(!schedCanEdit()){schedDeny();return;}
   var clientId=String((schedEl('schedSlotClient')||{}).value||'').trim();
-  var weekday=Number((schedEl('schedSlotWeekday')||{}).value||0);
-  var key=schedNormSlotKey((schedEl('schedSlotKey')||{}).value);
+  var fromChecks=schedReadDayChecks();
+  var days=fromChecks.slice();
+  if(!days.length){
+    var wd=Number((schedEl('schedSlotWeekday')||{}).value||0);
+    if(wd>=1&&wd<=7)days=[wd];
+  }
+  days=days.filter(function(d,i){return d>=1&&d<=7&&days.indexOf(d)===i;});
+  var explicitKey=schedNormSlotKey((schedEl('schedSlotKey')||{}).value);
   var label=String((schedEl('schedSlotLabel')||{}).value||'').trim();
   var start=schedTimeOrNull((schedEl('schedSlotStart')||{}).value);
   var end=schedTimeOrNull((schedEl('schedSlotEnd')||{}).value);
@@ -12654,40 +13302,64 @@ async function schedSaveSlotPattern(){
   var hoursRaw=String((schedEl('schedSlotHours')||{}).value||'').trim();
   var sortRaw=String((schedEl('schedSlotSort')||{}).value||'').trim();
   if(!clientId){schedToast('Choose a client.','var(--warn)');return;}
-  if(!(weekday>=1&&weekday<=7)){schedToast('Choose a weekday.','var(--warn)');return;}
-  if(!key){schedToast('Slot key uses letters, numbers, _ or - (1–32).','var(--warn)');return;}
-  var hours=hoursRaw===''?0:Number(hoursRaw);
-  if(!isFinite(hours)||hours<0||hours>24){schedToast('Enter hours from 0 to 24.','var(--warn)');return;}
-  var sort=sortRaw===''?0:Number(sortRaw);
-  if(!isFinite(sort))sort=0;
+  if(!days.length){schedToast('Check at least one day.','var(--warn)');return;}
+  var hours=schedHoursBetween(start, end);
+  if(hours==null)hours=hoursRaw===''?null:Number(hoursRaw);
+  if(hours==null||!isFinite(hours)||hours<0||hours>24){schedToast('Set a start and end. Hours come from that range.','var(--warn)');return;}
+  if(!label)label=schedAutoLabel(start);
+  var sort=sortRaw===''?null:Number(sortRaw);
+  if(sort!=null&&!isFinite(sort))sort=null;
   if(!(await schedOfficeReady()))return;
   var aideId=null;
   if(aideToken){
     aideId=await schedOfficeAideId(aideToken);
     if(!aideId){schedToast('Pick an aide from the office list.','var(--warn)');return;}
   }
+  var adding=schedSlotFormMode==='add'||!explicitKey;
+  var editWd=Number(schedSlotEditWeekday)||0;
+  var editKey=schedSlotEditKey||explicitKey;
+  var key=explicitKey||(!adding?editKey:'');
+  if(adding||!key)key=schedNextSlotKeyForDays(clientId, days, explicitKey||editKey);
+  var useSort=sort!=null?Math.round(sort):schedNextSort(clientId, days[0]);
+  var patternBody={
+    p_client_id:clientId,
+    p_slot_key:key,
+    p_usual_aide_id:aideId,
+    p_hours:Math.round(hours*100)/100,
+    p_label:label||null,
+    p_start_local:start,
+    p_end_local:end,
+    p_sort_order:useSort
+  };
   schedSaving=true;
   try{
-    var got=await sbRestRpc('upsert_schedule_slot_pattern',{
-      p_client_id:clientId,
-      p_weekday:weekday,
-      p_slot_key:key,
-      p_usual_aide_id:aideId,
-      p_hours:Math.round(hours*100)/100,
-      p_label:label||null,
-      p_start_local:start,
-      p_end_local:end,
-      p_sort_order:Math.round(sort)
-    });
+    var got;
+    if(days.length>1){
+      patternBody.p_weekdays=days;
+      got=await sbRestRpc('upsert_schedule_slot_pattern_weekdays', patternBody);
+    }else{
+      patternBody.p_weekday=days[0];
+      got=await sbRestRpc('upsert_schedule_slot_pattern', patternBody);
+    }
     if(!got||got.ok!==true){
       schedToast((got&&got.error)||'Could not save the shift.','var(--danger)');
       return;
     }
+    if(!adding&&fromChecks.length&&editWd&&editKey&&days.indexOf(editWd)<0){
+      await sbRestRpc('delete_schedule_slot_pattern',{
+        p_client_id:clientId,
+        p_weekday:editWd,
+        p_slot_key:editKey
+      });
+    }
     if(typeof logActivity==='function')logActivity('Saved schedule slot pattern');
-    schedToast('Shift saved.','var(--success)');
-    schedCloseSlotPattern();
-    var onDate=schedAddDays(schedEnsureWeek(), weekday-1);
-    schedSlotSelected={clientId:clientId, onDate:onDate, weekday:weekday};
+    schedToast(days.length>1?'Shift saved on '+days.length+' days.':'Shift saved.','var(--success)');
+    schedSlotFormMode='edit';
+    schedSlotAddAnother=false;
+    schedSlotFormStamp='';
+    schedSlotDrawerClosed=false;
+    var first=days[0];
+    schedSlotSelected={clientId:clientId, onDate:schedAddDays(schedEnsureWeek(), first===7?6:first-1), weekday:first};
     await schedReloadWeek();
   }finally{
     schedSaving=false;
@@ -12717,14 +13389,13 @@ async function schedDeleteSlotPattern(clientId, weekday, slotKey){
     schedSaving=false;
   }
 }
-async function schedMarkSlot(clientId, onDate, slotKey, mark, extra){
-  if(schedSaving)return;
-  if(!schedCanEdit()){schedDeny();return;}
+async function schedPostDayMark(clientId, onDate, slotKey, mark, extra){
   var key=schedNormSlotKey(slotKey);
-  if(mark!=='worked'&&mark!=='missed'&&mark!=='cover')return;
-  if(!clientId||!onDate||!key)return;
-  if(!(await schedOfficeReady()))return;
+  if(mark==='worked')return {ok:false, error:'Unmarked shifts stay assumed worked.'};
+  if(mark!=='missed'&&mark!=='cover'&&mark!=='on_hold')return {ok:false, error:'Mark must be missed, cover, or on_hold.'};
+  if(!clientId||!onDate||!key)return {ok:false, error:'Missing shift.'};
   var hours=extra&&extra.hours!=null?extra.hours:null;
+  var miss=mark==='missed'&&extra&&extra.miss?String(extra.miss):null;
   var body={
     p_client_id:String(clientId),
     p_on_date:String(onDate),
@@ -12732,11 +13403,22 @@ async function schedMarkSlot(clientId, onDate, slotKey, mark, extra){
     p_mark:mark,
     p_cover_aide_id:mark==='cover'&&extra&&extra.cover?extra.cover:null,
     p_note:extra&&extra.note?extra.note:null,
-    p_hours:hours
+    p_hours:hours,
+    p_miss_reason:miss
   };
+  return await sbRestRpc('upsert_schedule_slot_day_mark', body);
+}
+async function schedMarkSlot(clientId, onDate, slotKey, mark, extra){
+  if(schedSaving)return;
+  if(!schedCanEdit()){schedDeny();return;}
+  var key=schedNormSlotKey(slotKey);
+  if(mark==='worked'){schedToast('Unmarked shifts stay assumed worked.','var(--warn)');return;}
+  if(mark!=='missed'&&mark!=='cover'&&mark!=='on_hold')return;
+  if(!clientId||!onDate||!key)return;
+  if(!(await schedOfficeReady()))return;
   schedSaving=true;
   try{
-    var got=await sbRestRpc('upsert_schedule_slot_day_mark', body);
+    var got=await schedPostDayMark(clientId, onDate, key, mark, extra);
     if(!got||got.ok!==true){
       schedToast((got&&got.error)||'Could not save the mark.','var(--danger)');
       return;
@@ -12749,8 +13431,121 @@ async function schedMarkSlot(clientId, onDate, slotKey, mark, extra){
       slot_key:schedNormSlotKey(link&&link.slot_key)||key
     };
     schedSlotCoverKey='';
+    schedSlotMarkOpen='';
     if(typeof logActivity==='function')logActivity('Marked schedule slot '+mark);
-    schedToast(mark==='missed'?'Marked missed.':mark==='cover'?'Cover saved.':'Marked worked.','var(--success)');
+    schedToast(mark==='missed'?'Marked missed.':mark==='cover'?'Covered shift saved.':mark==='on_hold'?'Shift marked on hold.':'Mark saved.','var(--success)');
+    await schedReloadWeek();
+  }finally{
+    schedSaving=false;
+  }
+}
+async function schedSaveMissed(clientId, onDate, slotKey){
+  var key=schedNormSlotKey(slotKey);
+  var reason=String((schedEl('schedMissReason-'+key)||{}).value||'Client declined service');
+  var extra=String((schedEl('schedMissNote-'+key)||{}).value||'').trim();
+  var code=SCHED_MISS_CODES[reason]||'client_declined';
+  if(code==='other'&&!extra){schedToast('Add a note for Other.','var(--warn)');return;}
+  var note=code==='other'?extra:null;
+  schedSlotMarkOpen='missed:'+key;
+  await schedMarkSlot(clientId, onDate, key, 'missed', {note:note, hours:0, miss:code});
+}
+async function schedRefreshClientHolds(clientId){
+  if(typeof sbRestRpc!=='function'||!clientId)return null;
+  var got=await sbRestRpc('list_schedule_client_holds',{
+    p_client_id:String(clientId),
+    p_include_inactive:false
+  });
+  if(!got||got.ok!==true)return null;
+  var data=got.data&&typeof got.data==='object'?got.data:{};
+  var raw=Array.isArray(data.holds)?data.holds:(Array.isArray(got.data)?got.data:[]);
+  var holds=[];
+  raw.forEach(function(h){
+    var norm=schedNormHold(h);
+    if(norm)holds.push(norm);
+  });
+  var client=schedFindSlotClient(clientId);
+  if(client)client.holds=holds;
+  return holds;
+}
+function schedHoldIdFor(client, onDate, slotKey){
+  if(!client)return '';
+  var key=schedNormSlotKey(slotKey);
+  var on=schedDateOnly(onDate);
+  for(var wd=1;wd<=7;wd++){
+    var day=client.days[String(wd)];
+    if(!day||day.on_date!==on)continue;
+    var slots=day.slots||[];
+    for(var i=0;i<slots.length;i++){
+      if((!key||slots[i].slot_key===key)&&slots[i].hold_id)return String(slots[i].hold_id);
+    }
+    if(day.hold_id)return String(day.hold_id);
+  }
+  var holds=client.holds||[];
+  for(var h=0;h<holds.length;h++){
+    if(holds[h].hold_id&&schedDateInHold(on, holds[h]))return String(holds[h].hold_id);
+  }
+  return '';
+}
+// clienthrs1c hospital hold: upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date, p_note, p_hold_id) and clear_schedule_client_hold(p_hold_id, p_end_date). The tapped slot is also p_mark on_hold. list_schedule_client_holds fills holds[].
+async function schedWriteHold(clientId, onDate, slotKey, ending){
+  if(schedSaving)return;
+  if(!schedCanEdit()){schedDeny();return;}
+  var key=schedNormSlotKey(slotKey);
+  var startRaw=String((schedEl('schedHoldStart-'+key)||{}).value||'').trim();
+  var endEl=schedEl('schedHoldEnd-'+key);
+  var endRaw=String(endEl&&endEl.value||'').trim();
+  var text=String((schedEl('schedHoldNote-'+key)||{}).value||'').trim();
+  var start=schedParseUsDate(startRaw)||schedDateOnly(onDate);
+  if(ending&&!endRaw){
+    endRaw=schedPretty(onDate);
+    if(endEl)endEl.value=endRaw;
+  }
+  var end=endRaw?schedParseUsDate(endRaw):'';
+  if(!start){schedToast('Hold start uses MM/DD/YYYY.','var(--warn)');return;}
+  if(endRaw&&!end){schedToast('Hold end uses MM/DD/YYYY, or leave it open.','var(--warn)');return;}
+  if(end&&end<start){schedToast('Hold end is after the start.','var(--warn)');return;}
+  var client=schedFindSlotClient(clientId);
+  if(!client){schedToast('That client is not on this week.','var(--warn)');return;}
+  if(!(await schedOfficeReady()))return;
+  await schedRefreshClientHolds(clientId);
+  client=schedFindSlotClient(clientId)||client;
+  var holdId=schedHoldIdFor(client, start, key)||schedHoldIdFor(client, onDate, key);
+  schedSaving=true;
+  try{
+    var got;
+    if(ending){
+      if(!holdId){schedToast('No hospital hold to end.','var(--warn)');return;}
+      got=await sbRestRpc('clear_schedule_client_hold',{
+        p_hold_id:holdId,
+        p_end_date:end||schedDateOnly(onDate)
+      });
+      if(!got||got.ok!==true){
+        schedToast((got&&got.error)||'Could not end the hold.','var(--danger)');
+        return;
+      }
+    }else{
+      got=await sbRestRpc('upsert_schedule_client_hold',{
+        p_client_id:String(clientId),
+        p_start_date:start,
+        p_end_date:end||null,
+        p_note:text||null,
+        p_hold_id:holdId||null
+      });
+      if(!got||got.ok!==true){
+        schedToast((got&&got.error)||'Could not save the hold.','var(--danger)');
+        return;
+      }
+      var marked=await schedPostDayMark(clientId, onDate, key, 'on_hold', {hours:0, note:text||null});
+      if(!marked||marked.ok!==true){
+        schedToast((marked&&marked.error)||'Could not mark the shift on hold.','var(--danger)');
+        return;
+      }
+    }
+    schedSlotMarkOpen='hold:'+key;
+    schedSlotFocus={client_id:String(clientId), on_date:String(onDate), slot_key:key};
+    if(typeof logActivity==='function')logActivity(ending?'Ended schedule hospital hold':'Saved schedule hospital hold');
+    schedToast(ending?'Hold ended. The pattern resumes after '+endRaw+'.':(end?'Hold saved.':'Hold saved. Open-ended until End hold.'),'var(--success)');
+    schedSlotFormStamp='';
     await schedReloadWeek();
   }finally{
     schedSaving=false;
