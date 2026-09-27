@@ -12,7 +12,7 @@ assert.ok(html.includes('data-aidecreds1c="v=aidecreds1c"'), 'aidecreds1c string
 assert.ok(html.includes('admin-build 2026-09-25-aidecreds1c'), 'aidecreds1c build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1c">'), 'aidecreds1c meta');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-login-toast1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aides-info1'), 'isdash1 is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1d">'), 'payready1d meta stays');
 assert.ok(html.indexOf('content="2026-09-25-remisec1"') < html.indexOf('content="2026-09-25-payready1d"'), 'payready1d stays after remisec1');
 assert.ok(html.indexOf('content="2026-09-25-payready1"') < html.indexOf('content="2026-09-25-aidecreds1c"'), 'aidecreds1c stays after payready1');
@@ -22,7 +22,7 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1c"') < html.indexOf('content="2026-09-25-aidecreds1b"'), 'aidecreds1b stays after aidecreds1c');
 assert.ok(html.indexOf('content="2026-09-25-aidecreds1b"') < html.indexOf('content="2026-09-25-aidecreds1"'), 'aidecreds1 stays after aidecreds1b');
 
-const note = html.slice(html.indexOf('v=aidecreds1c'), html.indexOf('<!-- aide credentials empty add'));
+const note = html.slice(html.indexOf('<!-- aide credentials current chip 2026-09-25 v=aidecreds1c'), html.indexOf('<!-- aide credentials empty add'));
 assert.ok(/All current/.test(note) && /admin_list_aide_credentials/.test(note), 'note names the chip and the per-aide list');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|auth\.updateUser|rotate password/.test(note), 'aidecreds1c note does not reseal Auth');
 assert.ok(html.includes('function aideCredFillBareChips('), 'bare aides with rows get chips');
@@ -240,7 +240,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(after.build, '2026-09-27-login-toast1');
+    assert.strictEqual(after.build, '2026-09-27-aides-info1');
     assert.strictEqual(after.banner, '⚠ 2 credentials need attention');
     assert.strictEqual(after.cover, '✓ All current', after.cover);
     assert.ok(after.probe.indexOf('Expiring') >= 0 && after.probe.indexOf('1 overdue') >= 0, after.probe);

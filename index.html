@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
+<!-- aides info cards 2026-09-27 v=aides-info1 admin-build 2026-09-27-aides-info1. GHOST-AIDES-INFO1-CONTRACT-v1. Ace CALLABLE. Mo LOOK LOCKED option 1 info cards. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Contract bullets: • Replace bare Aides cards with info cards matching mock 01-info-cards (name plus initials, phone plus ONE lang chip preferred_language_label uppercased en|es|ar|sw|zh|ru|uk, client chips, next status). • Call admin_list_aides_info() NOT admin_list_aides for card paint. • Paint next green, open blue, warn amber. When creds_due is set show Creds due MM/DD/YYYY. • The ⋯ sheet is View profile to deep_link, Reset through the existing reset_aide_temp_password and never vs mossier, Delete through admin_deactivate_aide. • Recently deleted tab sends p_include_deleted true. • Admin, Scheduler, and Nurse read (is_org_admin). Nurse write is N/A. Remi is N/A for this marker. • Do not break aide-soft-delete, remi-langs1, aidecreds1, schedule, clienthrs, cover-card-cancel1, or nosvc. • No Auth, no mossier, no Quo, no SMS. Additive only. Mobile-first. Dates people read are MM/DD/YYYY. Remi stays the side rail only where it is already present. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=aidadel1, v=aidecreds1, v=aidecreds1b, and v=aidecreds1c. -->
+<meta name="admin-build" content="2026-09-27-aides-info1">
 <!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, nurse alerts, and nurse client writes stay /exec. Broadcast Alert is Ace RPCs as of v=bcast1 (get_active_broadcast / send_broadcast / clear_broadcast); rollback keeps local broadcast_msg — no Sheets /exec for Broadcast. Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
 <!-- sb archive §3.3/§4.3 2026-09-24 v=sbcut1b PATCH is_active=false select id,is_active single() default trash is Archive, not hard DELETE -->
@@ -1375,6 +1377,40 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .aide-row-meta{font-size:0.78rem;color:var(--muted);margin-bottom:10px;line-height:1.35;}
 #tab_aides .aide-row-card .actions{display:flex;flex-wrap:wrap;gap:8px;}
 #tab_aides .aide-row-card .actions .btn{min-height:44px;flex:1 1 auto;justify-content:center;}
+
+/* v=aides-info1 — Mo LOOK LOCKED option 1 info cards. Phone first. */
+#aideInfoSheet[hidden]{display:none !important;}
+#tab_aides .aide-info-cards{display:flex;flex-direction:column;gap:12px;max-width:480px;}
+#tab_aides article.aide-info-card{display:block;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 6px 16px rgba(26,39,68,0.05);}
+#tab_aides article.aide-info-card .aide-info-top{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:12px;}
+.aide-info-avatar{width:48px;height:48px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem;letter-spacing:0.02em;flex:0 0 48px;}
+.aide-info-body{flex:1;min-width:0;padding-top:2px;}
+.aide-info-name-row{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;justify-content:space-between;gap:8px;}
+.aide-info-name{flex:1;min-width:0;font-size:1.05rem;font-weight:700;color:var(--navy);line-height:1.25;overflow-wrap:anywhere;padding-top:8px;}
+.aide-info-contact{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.aide-info-phone{font-size:0.95rem;color:#5c6b82;font-weight:500;}
+.aide-info-lang{display:inline-flex;align-items:center;justify-content:center;min-height:22px;padding:0 8px;border-radius:999px;background:#e8f4f4;color:#1e6060;font-size:0.72rem;font-weight:700;letter-spacing:0.04em;}
+.aide-info-clients{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.aide-info-client{display:inline-flex;align-items:center;min-height:26px;padding:2px 10px;border-radius:999px;background:#f5f8fc;border:1px solid var(--border);color:var(--navy);font-size:0.78rem;font-weight:600;}
+.aide-info-next{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:0.88rem;font-weight:700;line-height:1.3;}
+.aide-info-next::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:0 0 8px;}
+.aide-info-next.is-next{color:#1e8f4e;}
+.aide-info-next.is-open{color:#1E6BB8;}
+.aide-info-next.is-warn{color:#b7791f;}
+.aide-info-creds{margin-top:4px;color:#8a6a12;font-size:0.84rem;font-weight:700;}
+#tab_aides article.aide-info-card .aide-info-name-row .aide-info-more{position:static;flex:0 0 44px;width:44px;min-width:44px;max-width:44px;height:44px;padding:0;margin:0;border:0;background:transparent;color:var(--navy);font-size:1.45rem;line-height:44px;text-align:center;cursor:pointer;border-radius:12px;font-family:'DM Sans',sans-serif;}
+.aide-info-more:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.aide-info-back{position:fixed;z-index:160;inset:0;background:rgba(26,39,68,.45);}
+.aide-info-sheet{position:fixed;z-index:170;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom,0px));background:#fff;border-radius:18px 18px 0 0;padding:8px 16px 16px;box-shadow:0 -12px 40px rgba(26,39,68,.18);max-height:min(78vh,640px);overflow:auto;box-sizing:border-box;}
+.aide-info-grab{width:40px;height:4px;border-radius:999px;background:#d5dbe6;margin:6px auto 10px;}
+.aide-info-sheet h2{font-family:'DM Sans',sans-serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin:0 0 8px;}
+.aide-info-act,.aide-info-cancel{display:flex;align-items:center;width:100%;min-height:48px;padding:12px 4px;border:0;border-bottom:1px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;text-align:left;cursor:pointer;}
+.aide-info-act.danger{color:var(--danger);}
+.aide-info-cancel{border-bottom:0;justify-content:center;color:var(--muted);}
+@media(min-width:900px){
+  #tab_aides .aide-info-cards{max-width:520px;}
+  .aide-info-sheet{left:50%;right:auto;width:min(440px,calc(100% - 32px));transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));border-radius:18px;}
+}
 @media(min-width:900px){
   #tab_aides .aide-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
@@ -2530,7 +2566,7 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1">
         <div class="page-hdr">
           <div><h1>Aides</h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
@@ -2564,6 +2600,15 @@ bindLoginKeyboard();
           <div id="aideCredDetail" hidden></div>
         </div>
         <div id="aidesContainer"><p style="color:var(--muted)">Loading...</p></div>
+        <div id="aideInfoSheet" data-aides-info1="v=aides-info1" hidden role="dialog" aria-modal="true" aria-labelledby="aideInfoSheetTitle">
+          <div class="aide-info-back" onclick="aidesInfo1CloseSheet()"></div>
+          <div class="aide-info-sheet">
+            <div class="aide-info-grab" aria-hidden="true"></div>
+            <h2 id="aideInfoSheetTitle">Aide</h2>
+            <div id="aideInfoSheetActions"></div>
+            <button type="button" class="aide-info-cancel" onclick="aidesInfo1CloseSheet()">Cancel</button>
+          </div>
+        </div>
         <div id="aideCredSheet" hidden role="dialog" aria-modal="true" aria-labelledby="aideCredSheetTitle">
           <div class="aide-cred-back" onclick="aideCredCloseSheet()"></div>
           <div class="aide-cred-sheet">
@@ -27586,10 +27631,322 @@ function findLoadedAide(username){
   return null;
 }
 
+
+// v=aides-info1 Mo LOOK LOCKED option 1 info cards. Card paint calls admin_list_aides_info only.
+var AIDES_INFO1_MARKER='v=aides-info1';
+var AIDES_INFO1_LANGS={en:1,es:1,ar:1,sw:1,zh:1,ru:1,uk:1};
+var AIDES_INFO1_AVATARS=['#2a7f7f','#1a2744','#1E6BB8','#1e6060'];
+var aidesInfo1ByKey={};
+var aidesInfo1Current=null;
+function aidesInfo1Unwrap(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return null;}
+  }
+  if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object'&&!Array.isArray(node[0])){
+    var one=node[0];
+    if(Array.isArray(one.aides)||Array.isArray(one.rows)||one.success!=null||one.ok!=null)node=one;
+  }
+  return node;
+}
+function aidesInfo1Looks(row){
+  if(!row||typeof row!=='object')return false;
+  return row.preferred_language_label!=null||row.preferred_language!=null||row.phone!=null||row.creds_due!=null||row.credentials_due!=null||row.deep_link!=null||row.next_status!=null||row.next_label!=null||row.next_text!=null||row.initials!=null||Array.isArray(row.clients)||Array.isArray(row.client_chips)||Array.isArray(row.assigned_clients);
+}
+function aidesInfo1Recognized(data){
+  var node=aidesInfo1Unwrap(data);
+  if(Array.isArray(node)){
+    if(node.length&&aidesInfo1Looks(node[0]))return {rows:node};
+    return null;
+  }
+  if(!node||typeof node!=='object')return null;
+  if(node.ok===false||node.success===false)return null;
+  if(Array.isArray(node.aides))return {rows:node.aides};
+  if(Array.isArray(node.rows)&&(node.rows.length===0||aidesInfo1Looks(node.rows[0])))return {rows:node.rows};
+  if(Array.isArray(node.data)&&node.data.length&&aidesInfo1Looks(node.data[0]))return {rows:node.data};
+  return null;
+}
+async function aidesInfo1Fetch(includeDeleted){
+  if(typeof sbRestRpc!=='function')return {fallback:true};
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {fallback:true};
+  var got;
+  try{
+    got=await sbRestRpc('admin_list_aides_info', {p_include_deleted:!!includeDeleted});
+  }catch(e){
+    return {fallback:true};
+  }
+  if(!got||got.ok===false)return {fallback:true};
+  var known=aidesInfo1Recognized(got.data);
+  if(!known)return {fallback:true};
+  return {success:true, rows:known.rows||[]};
+}
+function aidesInfo1Name(row){
+  return String((row&&(row.full_name||row.fullName||row.name||row.display_name))||'').trim()||'Aide';
+}
+function aidesInfo1Initials(row){
+  var given=String((row&&row.initials)||'').trim();
+  if(given&&/^[A-Za-z]{1,3}$/.test(given))return given.toUpperCase();
+  var parts=aidesInfo1Name(row).split(/\s+/).filter(Boolean);
+  if(!parts.length)return 'A';
+  if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
+  return (parts[0].charAt(0)+parts[parts.length-1].charAt(0)).toUpperCase();
+}
+function aidesInfo1Phone(row){
+  var raw=(row&&(row.phone||row.phone_e164||row.mobile||row.phone_display))||'';
+  var shown='';
+  if(typeof formatUSPhoneDisplay==='function')shown=formatUSPhoneDisplay(raw);
+  if(shown)return shown;
+  return String(raw||'').trim();
+}
+function aidesInfo1Lang(row){
+  var raw=row?row.preferred_language_label:null;
+  if(raw==null||String(raw).trim()==='')raw=row?row.preferred_language:null;
+  if(Array.isArray(raw))raw=raw.length?raw[0]:'';
+  var code=String(raw||'').trim().toLowerCase();
+  if(!AIDES_INFO1_LANGS[code])return '';
+  return code.toUpperCase();
+}
+function aidesInfo1Clients(row){
+  var raw=row&&(row.clients||row.client_chips||row.client_names||row.assigned_clients||row.assignedClients)||[];
+  if(typeof raw==='string')raw=raw.split(',');
+  if(!Array.isArray(raw))return [];
+  var out=[];
+  raw.forEach(function(item){
+    var name='';
+    if(typeof item==='string')name=item.trim();
+    else if(item&&typeof item==='object')name=String(item.name||item.label||item.client_name||item.full_name||'').trim();
+    if(name&&out.indexOf(name)<0)out.push(name);
+  });
+  return out;
+}
+function aidesInfo1Tone(raw){
+  var s=String(raw||'').trim().toLowerCase();
+  if(s==='next'||s==='green')return 'next';
+  if(s==='open'||s==='blue')return 'open';
+  if(s==='warn'||s==='warning'||s==='amber')return 'warn';
+  return '';
+}
+function aidesInfo1Next(row){
+  var status='';
+  var label='';
+  if(row&&row.next&&typeof row.next==='object'){
+    status=row.next.status||row.next.tone||row.next.kind||'';
+    label=row.next.label||row.next.text||'';
+  }else if(row&&typeof row.next==='string'){
+    status=row.next;
+  }
+  if(!status&&row)status=row.next_status||row.next_tone||'';
+  if(!label&&row)label=row.next_label||row.next_text||'';
+  var tone=aidesInfo1Tone(status)||aidesInfo1Tone(label);
+  if(!tone)return null;
+  if(!label){
+    if(tone==='next')label='Next';
+    else if(tone==='open')label='Open';
+    else label='Warn';
+  }
+  if(typeof formatAdminDateCopy==='function')label=formatAdminDateCopy(label);
+  return {tone:tone, label:String(label)};
+}
+function aidesInfo1Creds(row){
+  var raw=row?row.creds_due:null;
+  if(raw==null||raw==='')raw=row?row.credentials_due:null;
+  if(raw==null||raw==='')return '';
+  var shown='';
+  if(typeof formatAdminDate==='function')shown=formatAdminDate(raw);
+  if(!shown&&typeof formatAdminDateCopy==='function')shown=formatAdminDateCopy(String(raw));
+  if(!shown||/\d{4}-\d{2}-\d{2}/.test(shown))return '';
+  return 'Creds due '+shown;
+}
+function aidesInfo1AsUser(row){
+  var clients=aidesInfo1Clients(row).map(function(name){return {name:name};});
+  var stamp=(row&&(row.deactivated_at||row.deactivatedAt))||'';
+  var active=!(row&&(row.is_active===false||row.isActive===false))&&!stamp;
+  var link=row&&row.deep_link&&typeof row.deep_link==='object'?row.deep_link:(row&&typeof row.deep_link==='string'?row.deep_link:null);
+  return {
+    id:String((row&&(row.id||row.aide_id||row.p_aide_id))||''),
+    username:String((row&&row.username)||'').trim(),
+    name:aidesInfo1Name(row),
+    fullName:aidesInfo1Name(row),
+    initials:aidesInfo1Initials(row),
+    phone:aidesInfo1Phone(row),
+    preferred_language_label:aidesInfo1Lang(row),
+    isActive:active,
+    is_active:active,
+    deactivated_at:stamp||null,
+    deactivatedAt:stamp||'',
+    assignedClients:clients,
+    mustChangePassword:!!(row&&row.must_change_password),
+    deep_link:link,
+    _raw:row||{}
+  };
+}
+function aidesInfo1Keep(row, desk){
+  var user=aidesInfo1AsUser(row);
+  var signaled=row&&(row.is_active!=null||row.isActive!=null||row.deactivated_at!=null||row.deactivatedAt!=null);
+  if(!signaled)return !!(user.username||user.id||user.name);
+  if(!user.username){
+    if(desk==='deleted')return user.isActive===false||!!user.deactivated_at;
+    return user.isActive!==false&&!user.deactivated_at;
+  }
+  if(typeof aideOnDesk==='function')return aideOnDesk(user, desk);
+  return desk==='deleted'?user.isActive===false:user.isActive!==false;
+}
+function aidesInfo1Key(user){
+  var un=String(user&&user.username||'').trim().toLowerCase();
+  if(un)return un;
+  return 'id:'+String(user&&user.id||'');
+}
+function aidesInfo1AvatarColor(name){
+  var s=String(name||'');
+  var n=0;
+  for(var i=0;i<s.length;i++)n=(n+s.charCodeAt(i))%AIDES_INFO1_AVATARS.length;
+  return AIDES_INFO1_AVATARS[n];
+}
+function aidesInfo1CardHtml(user){
+  var esc=typeof escapeHtml==='function'?escapeHtml:function(s){return String(s==null?'':s);};
+  var attr=typeof escapeAttr==='function'?escapeAttr:esc;
+  var key=aidesInfo1Key(user);
+  var phone=user.phone?('<span class="aide-info-phone">'+esc(user.phone)+'</span>'):'';
+  var lang=user.preferred_language_label?('<span class="aide-info-lang">'+esc(user.preferred_language_label)+'</span>'):'';
+  var contact=(phone||lang)?('<div class="aide-info-contact">'+phone+lang+'</div>'):'';
+  var clients=(user.assignedClients||[]).map(function(c){
+    return '<span class="aide-info-client">'+esc(c.name||'')+'</span>';
+  }).join('');
+  var clientHtml=clients?('<div class="aide-info-clients">'+clients+'</div>'):'';
+  var next=aidesInfo1Next(user._raw||{});
+  var nextHtml=next?('<div class="aide-info-next is-'+next.tone+'">'+esc(next.label)+'</div>'):'';
+  var creds=aidesInfo1Creds(user._raw||{});
+  var credsHtml=creds?('<div class="aide-info-creds">'+esc(creds)+'</div>'):'';
+  return '<article class="aide-info-card" data-aides-info1="v=aides-info1" data-aide-user="'+attr(user.username||'')+'" data-aide-id="'+attr(user.id||'')+'">'
+    +'<div class="aide-info-top">'
+    +'<div class="aide-info-avatar" style="background:'+aidesInfo1AvatarColor(user.name)+'" aria-hidden="true">'+esc(user.initials||'A')+'</div>'
+    +'<div class="aide-info-body">'
+    +'<div class="aide-info-name-row"><div class="aide-info-name">'+esc(user.name)+'</div>'
+    +'<button type="button" class="aide-info-more" aria-label="Actions for '+attr(user.name)+'" onclick="aidesInfo1OpenSheet(\''+attr(key)+'\')">\u22ef</button></div>'
+    +contact+clientHtml+nextHtml+credsHtml
+    +'</div></div></article>';
+}
+function aidesInfo1Follow(link){
+  if(!link){
+    if(typeof showTempMsg==='function')showTempMsg('No profile link on this aide.','var(--warn)');
+    return;
+  }
+  if(typeof link==='string'){
+    var named=String(link).replace(/^#/,'').trim().toLowerCase();
+    if(named&&typeof showTab==='function'&&document.getElementById('tab_'+named)){
+      showTab(named);
+      return;
+    }
+    if(typeof showTempMsg==='function')showTempMsg('No profile link on this aide.','var(--warn)');
+    return;
+  }
+  if(typeof link!=='object')return;
+  var clientId=link.client_id||link.clientId||'';
+  var onDate=link.on_date||link.onDate||'';
+  if(clientId&&onDate){
+    try{schedPendingDeepLink={client_id:String(clientId), on_date:String(onDate).slice(0,10), slot_key:String(link.slot_key||link.slotKey||'default')};}catch(e){}
+    if(typeof showTab==='function')showTab('schedule');
+    return;
+  }
+  var surface=String(link.surface||link.tab||link.screen||'').trim().toLowerCase();
+  var map={timesheet:'timesheets',timesheets:'timesheets',schedule:'schedule',coverage:'coverage',clients:'clients',aides:'aides',aidechat:'aidechat',messages:'aidechat'};
+  var tab=map[surface]||'';
+  if(tab&&typeof showTab==='function'&&document.getElementById('tab_'+tab)){
+    showTab(tab);
+    return;
+  }
+  if(typeof showTempMsg==='function')showTempMsg('No profile link on this aide.','var(--warn)');
+}
+function aidesInfo1CloseSheet(){
+  var sheet=document.getElementById('aideInfoSheet');
+  if(sheet)sheet.hidden=true;
+  aidesInfo1Current=null;
+}
+function aidesInfo1OpenSheet(key){
+  var row=aidesInfo1ByKey[String(key||'')];
+  if(!row)return;
+  aidesInfo1Current=row;
+  var title=document.getElementById('aideInfoSheetTitle');
+  if(title)title.textContent=row.name||'Aide';
+  var box=document.getElementById('aideInfoSheetActions');
+  var can=typeof canManageAides==='function'&&canManageAides();
+  var deleted=(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  var html='<button type="button" class="aide-info-act" onclick="aidesInfo1ViewProfile()">View profile</button>';
+  if(can&&!deleted&&row.username){
+    html+='<button type="button" class="aide-info-act" onclick="aidesInfo1Reset()">Reset temp password</button>';
+    html+='<button type="button" class="aide-info-act danger" onclick="aidesInfo1Delete()">Delete</button>';
+  }else if(can&&deleted&&row.username){
+    html+='<button type="button" class="aide-info-act" onclick="aidesInfo1Restore()">Restore</button>';
+  }
+  if(box)box.innerHTML=html;
+  var sheet=document.getElementById('aideInfoSheet');
+  if(sheet)sheet.hidden=false;
+}
+function aidesInfo1ViewProfile(){
+  var row=aidesInfo1Current;
+  var link=row&&row.deep_link;
+  aidesInfo1CloseSheet();
+  aidesInfo1Follow(link);
+}
+function aidesInfo1Reset(){
+  var row=aidesInfo1Current;
+  var un=row&&row.username?String(row.username):'';
+  aidesInfo1CloseSheet();
+  if(!un)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof confirmResetAideTempPassword==='function')confirmResetAideTempPassword(un);
+}
+function aidesInfo1Delete(){
+  var row=aidesInfo1Current;
+  var un=row&&row.username?String(row.username):'';
+  aidesInfo1CloseSheet();
+  if(!un)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof confirmSoftDeleteAide==='function')confirmSoftDeleteAide(un);
+}
+function aidesInfo1Restore(){
+  var row=aidesInfo1Current;
+  var un=row&&row.username?String(row.username):'';
+  aidesInfo1CloseSheet();
+  if(!un)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof confirmRestoreAide==='function')confirmRestoreAide(un);
+}
+async function aidesInfo1TryPaint(container, force){
+  if(!container)return false;
+  var includeDeleted=(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  if(force===true){
+    container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
+  }
+  var listed=await aidesInfo1Fetch(includeDeleted);
+  if(!listed||!listed.success)return false;
+  var desk=includeDeleted?'deleted':'active';
+  var users=(listed.rows||[]).filter(function(row){return aidesInfo1Keep(row, desk);}).map(aidesInfo1AsUser);
+  aidesInfo1ByKey={};
+  users.forEach(function(user){aidesInfo1ByKey[aidesInfo1Key(user)]=user;});
+  if(typeof rememberAideRows==='function')rememberAideRows(users);
+  if(desk!=='deleted'){
+    try{loadedAidesList=users.filter(function(u){return u.username;});}catch(e){}
+    try{if(typeof allAidesForAssign!=='undefined')allAidesForAssign=loadedAidesList.slice();}catch(e2){}
+  }
+  if(!users.length){
+    container.innerHTML=typeof aideEmptyHtml==='function'?aideEmptyHtml():'';
+  }else{
+    container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+users.map(aidesInfo1CardHtml).join('')+'</div>';
+  }
+  if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
+  return true;
+}
+// end v=aides-info1
+
 async function renderAides(force){
   const container=document.getElementById('aidesContainer');
   if(!container)return;
   syncAideManageButtons();
+  if(typeof aidesInfo1TryPaint==='function'){
+    var aidesInfoPainted=await aidesInfo1TryPaint(container, force);
+    if(aidesInfoPainted)return;
+  }
   const cacheName=aideDesk==='deleted'?'get_users:deleted':'get_users';
   if(force===true||!cacheGet(cacheName)){
     container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';

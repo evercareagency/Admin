@@ -33,7 +33,8 @@ assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callab
 assert.ok(html.includes('No SQL'), 'no SQL');
 assert.ok(html.includes('No Quo/SMS') && html.includes('No Auth reseal'), 'hard rules');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-login-toast1'), 'first admin-build is login-toast1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aides-info1'), 'first admin-build is aides-info1');
+assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after aide-office-vis1');
 assert.ok(html.indexOf('content="2026-09-27-hold-clear1"') < html.indexOf('content="2026-09-27-sched-time-tap1"'), 'sched-time-tap1 stays after hold-clear1');
@@ -280,7 +281,7 @@ async function runBrowser(){
     assert.strictEqual(selected.unselectRight, true, 'Unselect all sits to the right of Select all active');
     assert.strictEqual(selected.clipped, false, 'pick-bar labels stay inside the modal ' + JSON.stringify(selected));
     assert.strictEqual(selected.open, true);
-    assert.strictEqual(selected.build, '2026-09-27-login-toast1');
+    assert.strictEqual(selected.build, '2026-09-27-aides-info1');
     await shot(page, 'cover-unselect1-phone-20-selected.png');
     await page.setViewport({width: 1280, height: 900, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await shot(page, 'cover-unselect1-desktop-20-selected.png');

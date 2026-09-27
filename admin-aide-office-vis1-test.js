@@ -17,7 +17,8 @@ assert.ok(html.includes("var AIDE_OFFICE_VIS1_MARKER='v=aide-office-vis1'"), 'sc
 assert.ok(html.includes('GHOST-AIDE-OFFICE-VIS1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-login-toast1'), 'first admin-build is login-toast1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aides-info1'), 'first admin-build is aides-info1');
+assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-remi-langs1"'), 'remi-langs1 stays after aide-office-vis1');
 assert.ok(html.indexOf('content="2026-09-27-remi-langs1"') < html.indexOf('content="2026-09-27-hold-clear1"'), 'hold-clear1 stays after remi-langs1');
