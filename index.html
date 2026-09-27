@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- nosvc reason draft 2026-09-27 v=nosvc-reason-draft1 cancel-shift1 admin-build 2026-09-27-nosvc-reason-draft1. GHOST-NOSVC-REASON-DRAFT1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Side rail After you talk to the client / Member called / no service today. On every reason chip change (Personal, Doctor appointment, Not feeling well, Other) this desk calls admin_preview_noservice_cm_draft with p_client_id, p_service_date as MM/DD/YYYY, p_reason_code, and p_reason_other when Other. It paints subject and body from that response. chips[] selected is the live chip. It does not cache the first preview. {{reason}} follows the chip. Cancel shift is the far-right white outline of the five outcomes and calls admin_cancel_noservice_shift with p_client_id, p_service_date, optional p_open_shift_id, and p_reason_code. On cancelled true or next close_panel the Member-called panel closes and Schedule refreshes from deep_link. Mailto To is case_manager_email. Gmail send is later and out of scope. No Quo/SMS. No Auth reseal. Nurse is denied (42501 / is_scheduler_office). admin_preview_cover_client_skip_email, admin_get_cover_client_skip_template, admin_record_client_skip, admin_cover_outcome, and upsert_schedule_slot_day_mark stay unchanged. Do not touch aide-text-chat1 or remi-langs1. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=eca-copilot1, v=covercomms1, v=remi-cm-email1, and v=coverage-simple1. -->
+<meta name="admin-build" content="2026-09-27-nosvc-reason-draft1">
 <!-- cover unselect 2026-09-27 v=cover-unselect1 admin-build 2026-09-27-cover-unselect1. GHOST-COVER-UNSELECT1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Pure Admin UI. No SQL patch. No new RPC. Who can cover pick-bar shows N selected on the left and Select all active beside Unselect all on the right. Unselect all clears the client Set and every checkbox, paints 0 selected, and leaves the modal open. It does not send a blast. Empty selection disables and ghosts Send chat blast and never calls admin_blast_cover_request with an empty p_aide_ids. A non-empty selection still posts the existing admin_blast_cover_request with p_open_shift_id, p_aide_ids, and p_address_mode from that Set. Select all active still selects active aides only and excludes called-off. In-service assign keeps Clear selection. Any other Admin bulk Select all this tip touches ships with Unselect all beside it. No Auth reseal. No Quo/SMS. Remi rail is N/A. Do not touch remi-float-hide1. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
 <meta name="admin-build" content="2026-09-27-cover-unselect1">
 <!-- remi payroll 2026-09-27 v=remi-payroll1 admin-build 2026-09-27-remi-payroll1. GHOST-REMI-PAYROLL1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi payroll stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Scheduled card is Payroll report On, every other Wednesday at 8:00 AM ET, payroll report in this rail, biweekly. Next run reads next_run_at 2026-10-07T12:00:00+00:00 as Wed 10/07/2026 8:00 AM ET. Anchor pay day is Wed 09/23/2026, so 09/30/2026 is skipped. Chat such as run payroll, Sep 13–27, last week, and last 2 weeks posts admin_parse_remi_payroll_range {p_text}. Confirm posts admin_set_remi_payroll_range_prefs {p_start_date, p_end_date} and then admin_get_remi_payroll_report {p_start_date, p_end_date}. Default range is the last 14 days ET or the saved range prefs. Aides start collapsed. The summary line is Aide · Client · hours number only. Expand shows DATE, CLIENT, IN, OUT, HOURS from signed timesheets. Covers stay visible under each aide. Flag chips are missing only: Flag · missing and Flag · unsigned. Flag hours are excluded from paid totals. Tap a flag opens the timesheet deep_link. Chase stays in Aide chat. No Quo/SMS. Export CSV posts admin_export_remi_payroll_csv. Export PDF posts admin_export_remi_payroll_pdf with content_base64 and storage_path {org}/other/{uuid}.pdf under evercare-pdfs. Both posts admin_export_remi_payroll. Run posts admin_run_remi_payroll_report and paints the receipt rail chip. Create and update scheduled jobs accept p_recurrence biweekly, p_interval_days 14, p_anchor_date, and p_range_prefs. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. This tip does not depend on remi-ideas763. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
@@ -843,6 +845,33 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .remi-cm-send:disabled{opacity:0.55;}
 .remi-cm-note{margin:8px 0 0;font-size:0.78rem;line-height:1.4;color:var(--muted);}
 .remi-cm-other{width:100%;max-width:100%;box-sizing:border-box;margin-top:6px;}
+/* v=nosvc-reason-draft1 + cancel-shift1 — reason chips and Cancel shift in the side rail. */
+.nosvc{min-width:0;max-width:100%;margin-top:8px;}
+.nosvc-kicker{font-size:0.72rem;font-weight:800;letter-spacing:0.03em;text-transform:uppercase;color:var(--teal-dark);}
+.nosvc-lead{margin:4px 0 0;font-size:0.92rem;font-weight:700;color:var(--navy);line-height:1.35;}
+.nosvc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+#copilotSheet .nosvc-chip{width:auto;max-width:100%;min-height:44px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .nosvc-chip.on{background:#e8f4f4;border-color:#2a7f7f;color:#1e6060;box-shadow:0 0 0 1px rgba(42,127,127,.25);}
+.nosvc-other{margin:0 0 8px;}
+#copilotSheet .nosvc-other input{min-height:48px;}
+.nosvc-draft{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;min-width:0;max-width:100%;box-sizing:border-box;}
+.nosvc-draft-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.nosvc-pill{display:inline-flex;align-items:center;min-height:22px;padding:2px 8px;border-radius:999px;background:#e8f4f4;color:#1e6060;font-size:0.68rem;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;}
+.nosvc-who{font-size:0.82rem;font-weight:700;color:var(--navy);min-width:0;}
+.nosvc-field{display:grid;grid-template-columns:4.2rem 1fr;gap:6px;padding:7px 0;border-top:1px solid var(--border);min-width:0;}
+.nosvc-k{font-size:0.68rem;font-weight:800;letter-spacing:0.04em;color:var(--muted);padding-top:2px;}
+.nosvc-v{font-size:0.88rem;line-height:1.4;color:var(--navy);white-space:pre-wrap;overflow-wrap:anywhere;min-width:0;}
+.nosvc-v small{display:block;color:var(--muted);font-size:0.75rem;font-weight:600;}
+.nosvc-hl{background:#d9f5e5;padding:0 2px;border-radius:3px;font-weight:700;}
+.nosvc-outcomes{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+#copilotSheet .nosvc-outcomes .btn{width:auto;flex:1 1 6.6rem;min-height:44px;justify-content:center;padding:8px 10px;font-size:0.78rem;}
+#copilotSheet .nosvc-outcomes .nosvc-cancel{background:#fff;color:var(--navy);border:1.5px solid var(--border);}
+.nosvc-note{margin:8px 0 0;font-size:0.78rem;line-height:1.4;color:var(--muted);}
+.nosvc-toast{margin-top:8px;background:#fde8e6;border:1px solid #f0c4bc;color:#8b1e14;border-radius:8px;padding:8px 10px;font-size:0.78rem;font-weight:700;line-height:1.4;}
+@media(max-width:420px){
+  .nosvc-field{grid-template-columns:1fr;}
+  #copilotSheet .nosvc-outcomes .btn{flex:1 1 calc(50% - 6px);}
+}
 @media(max-width:420px){
   .remi-cm-field{grid-template-columns:1fr;}
   .remi-cm-actions .btn{flex-basis:100%;}
@@ -2275,7 +2304,7 @@ bindLoginKeyboard();
               </div>
               <div class="field" id="coverSkipOtherWrap" hidden>
                 <label for="coverSkipOther">Other reason</label>
-                <input type="text" id="coverSkipOther" autocomplete="off" placeholder="Short reason">
+                <input type="text" id="coverSkipOther" autocomplete="off" placeholder="Short reason" oninput="nosvcCoverOtherInput()">
               </div>
               <div class="cover-actions">
                 <button type="button" class="btn btn-warn" id="coverSkipConfirm" onclick="coverConfirmSkip()">Confirm no service today</button>
@@ -2983,7 +3012,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -4895,10 +4924,12 @@ var COVER_RPC={
   skipGet:['admin_get_cover_client_skip_template'],
   skipSave:['admin_save_cover_client_skip_template'],
   skipPreview:['admin_preview_cover_client_skip_email'],
-  skipRecord:['admin_record_client_skip']
+  skipRecord:['admin_record_client_skip'],
+  nosvcPreview:['admin_preview_noservice_cm_draft'],
+  nosvcCancel:['admin_cancel_noservice_shift']
 };
-var coverRpcPick={record:'',list:'',rank:'',outcome:'',tplGet:'',tplSave:'',preview:'',skipGet:'',skipSave:'',skipPreview:'',skipRecord:''};
-var coverRpcOff={record:false,list:false,rank:false,outcome:false,tplGet:false,tplSave:false,preview:false,skipGet:false,skipSave:false,skipPreview:false,skipRecord:false};
+var coverRpcPick={record:'',list:'',rank:'',outcome:'',tplGet:'',tplSave:'',preview:'',skipGet:'',skipSave:'',skipPreview:'',skipRecord:'',nosvcPreview:'',nosvcCancel:''};
+var coverRpcOff={record:false,list:false,rank:false,outcome:false,tplGet:false,tplSave:false,preview:false,skipGet:false,skipSave:false,skipPreview:false,skipRecord:false,nosvcPreview:false,nosvcCancel:false};
 var coverShifts=[];
 var coverListGen=0;
 var coverSource='local';
@@ -6866,6 +6897,7 @@ function coverPickSkipReason(reason){
   var other=null;
   try{other=document.getElementById('coverSkipOtherWrap');}catch(e2){other=null;}
   if(other)other.hidden=coverSkipReason!=='Other';
+  if(coverSkipReason&&typeof nosvcCoverReasonChanged==='function')nosvcCoverReasonChanged();
 }
 function coverShowSkip(){
   var shift=coverFind(coverSelectedId);
@@ -7030,6 +7062,16 @@ function coverAwaiting(){
   coverAskStatus('awaiting_client', 'Still deciding');
 }
 function coverCancelShift(){
+  var skipBox=null;
+  var mail=null;
+  try{skipBox=document.getElementById('coverSkipReason');}catch(e){skipBox=null;}
+  try{mail=document.getElementById('coverRefuseMail');}catch(e2){mail=null;}
+  var skipOpen=!!(skipBox&&!skipBox.hidden);
+  var skipMail=coverCmFamily==='skip'&&!!(mail&&!mail.hidden);
+  if((skipOpen||skipMail)&&typeof nosvcCancelFromCover==='function'){
+    nosvcCancelFromCover();
+    return;
+  }
   coverApplyOutcome('cancelled');
 }
 function coverReopen(){
@@ -8273,6 +8315,7 @@ function copilotPaintChat(){
     else if(!mine&&msg.payroll&&typeof remiPayroll1BubbleHtml==='function')html+=packChips+remiPayroll1BubbleHtml(msg, idx);
     else if(!mine&&msg.cm&&typeof remiCmHtml==='function')html+=packChips+remiCmHtml(msg.cm, idx);
     else html+=packChips+copilotChatHtml(msg.text||'')+((!mine&&msg.proof&&typeof remiProof1ChipHtml==='function')?remiProof1ChipHtml(msg.proof):'');
+    if(!mine&&msg.nosvc&&typeof nosvcHtml==='function')html+=nosvcHtml(msg.nosvc, idx);
     if(!mine&&!msg.sched&&msg.actions&&msg.actions.length){
       html+='<div class="copilot-actions'+(msg.actionsLayout==='row'?' copilot-actions-row':'')+'">';
       msg.actions.forEach(function(a, ai){
@@ -8332,7 +8375,7 @@ function copilotChatSubmit(ev){
   }
   if(!ans)ans=copilotChatAnswer(q);
   if(ans.kind)copilotAskId=ans.kind;
-  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false, proof:ans.proof||null, proofQuery:ans.proofQuery||'', payroll:ans.payroll||null, payrollQuery:ans.payrollQuery||''};
+  var bubble={role:'remi', text:ans.text, kind:ans.kind||'', actions:ans.actions||[], wx:ans.wx||'', note:ans.note||'', sec:!!ans.sec, actionsLayout:ans.actionsLayout||'', widerShift:ans.shiftId||'', cm:ans.cm||null, sched:ans.sched||null, ruleContext:false, proof:ans.proof||null, proofQuery:ans.proofQuery||'', payroll:ans.payroll||null, payrollQuery:ans.payrollQuery||'', nosvc:ans.nosvc||null};
   if(!ans.sched&&typeof remiRules1IsCoverContext==='function'&&remiRules1IsCoverContext(q, ans))bubble.ruleContext=true;
   copilotChat.push({role:'mo', text:q});
   copilotChat.push(bubble);
@@ -8346,7 +8389,8 @@ function copilotChatSubmit(ev){
   if(bubble.payrollQuery&&typeof remiPayroll1Lookup==='function'){
     try{remiPayroll1Lookup(copilotChat.length-1);}catch(ePayLook){}
   }
-  if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
+  if(ans.nosvc&&typeof nosvcFetch==='function')nosvcFetch(copilotChat.length-1);
+  else if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
   else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
   else if(ans.loadMail&&typeof remiWiderFetchMail==='function')remiWiderFetchMail(ans.shiftId, ans.mailFamily, ans.mailReason, ans.mailOther);
   return false;
@@ -8393,7 +8437,8 @@ function remiSecPack(text, extra){
     mailFamily:extra.mailFamily||'',
     mailReason:extra.mailReason||'',
     mailOther:extra.mailOther||'',
-    cm:extra.cm||null
+    cm:extra.cm||null,
+    nosvc:extra.nosvc||null
   };
 }
 function remiSecNorm(s){
@@ -12120,10 +12165,12 @@ function remiWiderSay(pack){
     note:pack.note||'',
     sec:true,
     actionsLayout:pack.actionsLayout||'',
-    widerShift:pack.shiftId||''
+    widerShift:pack.shiftId||'',
+    nosvc:pack.nosvc||null
   });
   if(typeof copilotPending!=='undefined'&&copilotPending)return;
   if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();
+  if(pack.nosvc&&typeof nosvcFetch==='function')nosvcFetch(copilotChat.length-1);
 }
 function remiWiderNorm(q){
   return String(q||'').toLowerCase().replace(/[-_/]+/g,' ').replace(/[^a-z0-9'\u2019\s]/g,' ').replace(/\s+/g,' ').trim();
@@ -12444,6 +12491,596 @@ function remiWiderFilledMail(shift, family, reasonLabel){
   if(typeof coverEnsureGreeting==='function')body=coverEnsureGreeting(body);
   return {subject:subject, body:body, email:String(snap.email||'')};
 }
+// v=nosvc-reason-draft1 + cancel-shift1. Side rail only. Re-call the draft on every chip. Do not cache the first preview.
+var NOSVC_REASON_DRAFT1_MARKER='v=nosvc-reason-draft1';
+var CANCEL_SHIFT1_MARKER='cancel-shift1';
+var NOSVC_REASON_ROWS=[
+  {code:'personal', label:'Personal'},
+  {code:'doctor', label:'Doctor appointment'},
+  {code:'not_feeling_well', label:'Not feeling well'},
+  {code:'other', label:'Other'}
+];
+var nosvcCoverGen=0;
+var nosvcCoverOtherTimer=0;
+function nosvcEsc(s){
+  if(typeof copilotEsc==='function')return copilotEsc(s);
+  if(typeof coverEsc==='function')return coverEsc(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function nosvcOfficeOk(){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  return role!=='Nurse';
+}
+function nosvcDenied(got){
+  if(!got)return false;
+  var err=String(got.error||got.message||'');
+  if(got.status===42501||got.status===403||got.forbidden)return true;
+  return /42501|is_scheduler_office|permission denied/i.test(err);
+}
+function nosvcCodeFromLabel(label){
+  var s=String(label||'').toLowerCase().trim();
+  if(s==='personal'||s==='personal reasons')return 'personal';
+  if(s.indexOf('doctor')>=0)return 'doctor';
+  if(s.indexOf('feeling')>=0||s==='sick'||s==='not feeling well')return 'not_feeling_well';
+  if(s==='other')return 'other';
+  return '';
+}
+function nosvcLabel(code, other){
+  if(code==='doctor')return 'Doctor appointment';
+  if(code==='not_feeling_well')return 'Not feeling well';
+  if(code==='other'){
+    var typed=String(other||'').trim();
+    return typed||'Other';
+  }
+  return 'Personal';
+}
+function nosvcDefaultChips(code){
+  return NOSVC_REASON_ROWS.map(function(row){
+    return {code:row.code, label:row.label, selected:row.code===code};
+  });
+}
+function nosvcServiceShown(shift){
+  var iso='';
+  if(shift&&(shift.startsAt||shift.shift_start||shift.on_date)){
+    var raw=shift.startsAt||shift.shift_start||shift.on_date;
+    if(typeof coverNyYmd==='function'&&raw&&String(raw).indexOf('T')>=0)iso=coverNyYmd(raw);
+    else if(/^\d{4}-\d{2}-\d{2}/.test(String(raw||'')))iso=String(raw).slice(0,10);
+    else if(typeof coverNyYmd==='function')iso=coverNyYmd(raw);
+  }
+  if(!iso&&typeof coverNyYmd==='function')iso=coverNyYmd(new Date());
+  var shown=(typeof formatAdminDate==='function')?(formatAdminDate(iso)||''):'';
+  if(!shown&&iso&&String(iso).length>=10)shown=String(iso).slice(5,7)+'/'+String(iso).slice(8,10)+'/'+String(iso).slice(0,4);
+  return {iso:String(iso||''), shown:String(shown||'')};
+}
+function nosvcStateFromShift(shift, reasonLabel, reasonOther){
+  shift=shift||{};
+  var code=nosvcCodeFromLabel(reasonLabel)||'personal';
+  var when=nosvcServiceShown(shift);
+  var cm=String(shift.caseManagerName||shift.case_manager_name||'').trim();
+  var email=String(shift.caseManagerEmail||shift.case_manager_email||'').trim();
+  var rec=null;
+  try{rec=(typeof coverClientRecord==='function')?coverClientRecord(shift):null;}catch(e){rec=null;}
+  if(rec){
+    if(!cm)cm=String(rec.case_manager_name||rec.caseManagerName||'').trim();
+    if(!email)email=String(rec.case_manager_email||rec.caseManagerEmail||'').trim();
+  }
+  var clientId=String(shift.clientId||shift.client_id||(rec&&rec.id)||'');
+  var openId='';
+  try{if(typeof coverUuidOrNull==='function'&&coverUuidOrNull(shift.id))openId=String(shift.id);}catch(e2){openId='';}
+  return {
+    shiftId:String(shift.id||''),
+    clientId:clientId,
+    client:String(shift.clientName||shift.client_name||(rec&&(rec.name||rec.clientName))||'').trim(),
+    cm:cm,
+    email:email,
+    serviceIso:when.iso,
+    serviceShown:when.shown,
+    openShiftId:openId,
+    slotKey:String(shift.slot_key||shift.slotKey||'default'),
+    reasonCode:code,
+    reasonOther:code==='other'?String(reasonOther||'').trim():'',
+    reasonLabel:nosvcLabel(code, reasonOther),
+    subject:'',
+    body:'',
+    chips:nosvcDefaultChips(code),
+    gen:0,
+    closed:false,
+    held:false,
+    note:'',
+    stub:false,
+    fromRpc:false,
+    pending:false,
+    refreshed:false,
+    chipChanged:false
+  };
+}
+function nosvcPreviewBody(n){
+  var body={
+    p_client_id:String(n.clientId||''),
+    p_service_date:String(n.serviceShown||''),
+    p_reason_code:String(n.reasonCode||'personal')
+  };
+  if(n.cm)body.p_case_manager_name=String(n.cm);
+  if(n.client)body.p_client_name=String(n.client);
+  if(n.reasonCode==='other')body.p_reason_other=String(n.reasonOther||'');
+  return body;
+}
+function nosvcCancelBody(n){
+  var body={
+    p_client_id:String(n.clientId||''),
+    p_service_date:String(n.serviceShown||''),
+    p_slot_key:String(n.slotKey||'default'),
+    p_reason_code:String(n.reasonCode||'personal')
+  };
+  if(n.openShiftId)body.p_open_shift_id=String(n.openShiftId);
+  if(n.reasonCode==='other')body.p_reason_other=String(n.reasonOther||'');
+  return body;
+}
+function nosvcApplyPreview(n, data){
+  var node=data||{};
+  var code=String(node.reason_code||n.reasonCode||'personal');
+  var other=n.reasonCode==='other'?String(n.reasonOther||''):'';
+  var label=String(node.reason_label||nosvcLabel(code, other));
+  n.reasonCode=code;
+  n.reasonLabel=label;
+  n.subject=String(node.subject||'');
+  n.body=String(node.body||'');
+  if(/\{\{reason\}\}/.test(n.subject)||/\{\{reason\}\}/.test(n.body)){
+    n.subject=n.subject.split('{{reason}}').join(label);
+    n.body=n.body.split('{{reason}}').join(label);
+  }
+  if(node.case_manager_email)n.email=String(node.case_manager_email);
+  if(node.case_manager_name)n.cm=String(node.case_manager_name);
+  if(node.service_date_display)n.serviceShown=String(node.service_date_display);
+  if(Array.isArray(node.chips)&&node.chips.length){
+    n.chips=node.chips.map(function(chip){
+      return {code:String(chip.code||''), label:String(chip.label||chip.code||''), selected:!!chip.selected};
+    });
+  }else n.chips=nosvcDefaultChips(code);
+  var any=false;
+  for(var i=0;i<n.chips.length;i++)if(n.chips[i].selected)any=true;
+  if(!any)n.chips=nosvcDefaultChips(code);
+  n.stub=false;
+  n.fromRpc=true;
+  if(n.chipChanged)n.refreshed=true;
+}
+function nosvcLocalDraft(n){
+  var label=nosvcLabel(n.reasonCode, n.reasonOther);
+  var greet=(typeof coverNyGreeting==='function')?coverNyGreeting():'Good morning';
+  var snap={
+    greeting:greet,
+    case_manager:n.cm||'',
+    cm:n.cm||'',
+    client:n.client||'',
+    date:n.serviceShown||'',
+    email:n.email||'',
+    case_manager_email:n.email||'',
+    reason:label
+  };
+  var subject='Services not delivered today \u2014 {{client}} ({{date}})';
+  var body=(typeof COVER_CM_SKIP_DEFAULT!=='undefined')?COVER_CM_SKIP_DEFAULT:'{{greeting}}\n\n{{client}} {{date}} due to {{reason}}';
+  if(typeof coverFillCmTemplate==='function'){
+    subject=coverFillCmTemplate(subject, snap);
+    body=coverFillCmTemplate(body, snap);
+  }else{
+    subject=subject.split('{{client}}').join(n.client||'').split('{{date}}').join(n.serviceShown||'');
+    body=body.split('{{reason}}').join(label);
+  }
+  if(typeof formatAdminDateCopy==='function'){
+    subject=formatAdminDateCopy(subject);
+    body=formatAdminDateCopy(body);
+  }
+  if(typeof coverEnsureGreeting==='function')body=coverEnsureGreeting(body);
+  n.subject=subject;
+  n.body=body;
+  n.reasonLabel=label;
+  n.chips=nosvcDefaultChips(n.reasonCode);
+  n.stub=true;
+  n.fromRpc=false;
+  if(n.chipChanged)n.refreshed=true;
+}
+function nosvcBodyHtml(n){
+  var label=String(n.reasonLabel||'');
+  var html=nosvcEsc(n.body||'');
+  if(label){
+    var safe=nosvcEsc(label);
+    if(safe)html=html.split(safe).join('<span class="nosvc-hl">'+safe+'</span>');
+  }
+  return html;
+}
+function nosvcPaintLive(idx){
+  if(typeof copilotView!=='undefined'&&copilotView==='chat'&&typeof copilotPaintChat==='function')copilotPaintChat();
+}
+function nosvcMsg(idx){
+  var msg=(typeof copilotChat!=='undefined'&&copilotChat)?copilotChat[idx]:null;
+  if(!msg||!msg.nosvc)return null;
+  return msg;
+}
+async function nosvcFetch(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed)return;
+  var n=msg.nosvc;
+  var gen=(n.gen||0)+1;
+  n.gen=gen;
+  n.pending=true;
+  var snapCode=String(n.reasonCode||'personal');
+  var snapOther=String(n.reasonOther||'');
+  if(!nosvcOfficeOk()){
+    n.pending=false;
+    n.note='Nurse cannot preview this draft (42501).';
+    nosvcLocalDraft(n);
+    nosvcPaintLive(idx);
+    return;
+  }
+  var clientOk=null;
+  try{clientOk=(typeof coverUuidOrNull==='function')?coverUuidOrNull(n.clientId):n.clientId;}catch(e){clientOk=null;}
+  if(!clientOk){
+    n.pending=false;
+    n.note='This client is not an office id yet. The draft still follows the chip on this phone.';
+    nosvcLocalDraft(n);
+    nosvcPaintLive(idx);
+    return;
+  }
+  n.clientId=String(clientOk);
+  var req=nosvcPreviewBody(n);
+  var got=null;
+  try{got=await coverRpc('nosvcPreview', req);}
+  catch(err){got={ok:false, error:String(err&&err.message||err||'Could not preview the draft.')};}
+  msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed||msg.nosvc.gen!==gen)return;
+  if(String(msg.nosvc.reasonCode||'')!==snapCode)return;
+  if(snapCode==='other'&&String(msg.nosvc.reasonOther||'')!==snapOther)return;
+  n=msg.nosvc;
+  n.pending=false;
+  if(nosvcDenied(got)){
+    n.note='Nurse cannot preview this draft (42501).';
+    nosvcLocalDraft(n);
+  }else if(got&&got.ok&&got.data){
+    nosvcApplyPreview(n, got.data);
+    n.note='';
+  }else{
+    nosvcLocalDraft(n);
+    n.note=(got&&got.signedOut)?'Sign in to refresh the draft.':(got&&got.missing)?'Preview is not callable yet. The chip still updates this draft.':String((got&&got.error)||'');
+  }
+  nosvcPaintLive(idx);
+}
+function nosvcPick(idx, code){
+  var msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed)return;
+  var n=msg.nosvc;
+  code=String(code||'');
+  if(!nosvcCodeFromLabel(code)&&code!=='personal'&&code!=='doctor'&&code!=='not_feeling_well'&&code!=='other')return;
+  n.reasonCode=code;
+  if(code!=='other')n.reasonOther='';
+  n.reasonLabel=nosvcLabel(code, n.reasonOther);
+  n.chips=nosvcDefaultChips(code);
+  n.subject='';
+  n.body='';
+  n.fromRpc=false;
+  n.pending=true;
+  n.chipChanged=true;
+  n.stub=false;
+  nosvcPaintLive(idx);
+  nosvcFetch(idx);
+}
+function nosvcOtherInput(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed)return;
+  var el=null;
+  try{el=document.getElementById('nosvcOther'+idx);}catch(e){el=null;}
+  msg.nosvc.reasonOther=el?String(el.value||'').trim():'';
+  msg.nosvc.reasonLabel=nosvcLabel('other', msg.nosvc.reasonOther);
+  msg.nosvc.chipChanged=true;
+  if(msg.nosvc.otherTimer)clearTimeout(msg.nosvc.otherTimer);
+  msg.nosvc.otherTimer=setTimeout(function(){
+    var live=nosvcMsg(idx);
+    if(!live||live.nosvc.closed)return;
+    live.nosvc.subject='';
+    live.nosvc.body='';
+    live.nosvc.fromRpc=false;
+    live.nosvc.pending=true;
+    nosvcFetch(idx);
+  }, 280);
+}
+function nosvcHtml(n, idx){
+  n=n||{};
+  if(n.closed){
+    return '<div class="nosvc nosvc-closed" id="nosvc-'+idx+'" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1"><div class="nosvc-toast">'+nosvcEsc(n.note||'Cancelled. The no-service panel is closed.')+'</div></div>';
+  }
+  var chips=n.chips&&n.chips.length?n.chips:nosvcDefaultChips(n.reasonCode||'personal');
+  var html='<div class="nosvc" id="nosvc-'+idx+'" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-reason-code="'+nosvcEsc(n.reasonCode||'')+'">';
+  html+='<div class="nosvc-kicker">After you talk to the client</div>';
+  html+='<p class="nosvc-lead">Member called \u00B7 no service today</p>';
+  html+='<div class="nosvc-chips" role="group" aria-label="Reason chips">';
+  chips.forEach(function(chip){
+    var on=!!chip.selected||chip.code===n.reasonCode;
+    html+='<button type="button" class="nosvc-chip'+(on?' on':'')+'" data-reason-code="'+nosvcEsc(chip.code)+'" aria-pressed="'+(on?'true':'false')+'" onclick="nosvcPick('+idx+',\''+nosvcEsc(chip.code)+'\')">'+nosvcEsc(chip.label||chip.code)+'</button>';
+  });
+  html+='</div>';
+  if(n.reasonCode==='other'){
+    html+='<div class="nosvc-other"><input id="nosvcOther'+idx+'" type="text" maxlength="200" placeholder="Type the reason" aria-label="Other reason" value="'+nosvcEsc(n.reasonOther||'')+'" oninput="nosvcOtherInput('+idx+')"></div>';
+  }
+  var who=n.client||'Client';
+  html+='<div class="nosvc-draft" aria-label="CM email draft">';
+  html+='<div class="nosvc-draft-head"><span class="nosvc-pill">Draft</span><span class="nosvc-who">CM email \u00B7 '+nosvcEsc(who)+(n.refreshed?' \u00B7 refreshed':'')+'</span></div>';
+  html+='<div class="nosvc-field"><div class="nosvc-k">To</div><div class="nosvc-v">'+nosvcEsc(n.cm||'Case manager')+'<small>'+nosvcEsc(n.email||'No case manager email on file')+'</small></div></div>';
+  html+='<div class="nosvc-field"><div class="nosvc-k">Subject</div><div class="nosvc-v" data-nosvc="subject">'+(n.pending||!n.subject?'Loading the case-manager draft\u2026':nosvcEsc(n.subject))+'</div></div>';
+  html+='<div class="nosvc-field"><div class="nosvc-k">Body</div><div class="nosvc-v" data-nosvc="body">'+(n.pending||!n.body?'Loading the case-manager draft\u2026':nosvcBodyHtml(n))+'</div></div>';
+  html+='</div>';
+  html+='<div class="nosvc-outcomes" aria-label="Five outcomes">';
+  html+='<button type="button" class="btn btn-teal" onclick="nosvcSave('+idx+')">Save skip</button>';
+  html+='<button type="button" class="btn btn-teal" onclick="nosvcCopy('+idx+')">Copy</button>';
+  html+='<button type="button" class="btn btn-teal" onclick="nosvcSend('+idx+')">Send later</button>';
+  html+='<button type="button" class="btn btn-teal" onclick="nosvcHold('+idx+')">Hold</button>';
+  html+='<button type="button" class="btn btn-ghost nosvc-cancel" onclick="nosvcCancel('+idx+')">Cancel shift</button>';
+  html+='</div>';
+  if(n.note)html+='<p class="'+(n.held?'nosvc-note':'nosvc-note')+'">'+nosvcEsc(n.note)+'</p>';
+  html+='<p class="nosvc-note">Send later opens Mail to the case manager email. Gmail send is later.</p>';
+  html+='</div>';
+  return html;
+}
+function nosvcCopyFallback(text){
+  var area=document.createElement('textarea');
+  area.value=text;
+  area.setAttribute('readonly','');
+  area.style.position='fixed';
+  area.style.left='-9999px';
+  document.body.appendChild(area);
+  area.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(area);
+}
+function nosvcCopy(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg)return;
+  var text=String(msg.nosvc.subject||'')+'\n\n'+String(msg.nosvc.body||'');
+  function done(){if(typeof showTempMsg==='function')showTempMsg('Copied.','var(--success)');}
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){nosvcCopyFallback(text);done();});
+      return;
+    }
+  }catch(e){}
+  nosvcCopyFallback(text);
+  done();
+}
+function nosvcSend(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg)return;
+  var email=String(msg.nosvc.email||'').trim();
+  var href=(typeof coverMailHref==='function')?coverMailHref(email, msg.nosvc.subject, msg.nosvc.body):'';
+  if(!href){
+    if(typeof showTempMsg==='function')showTempMsg('Case manager email is not on file. Send later stays off. Gmail is later.','var(--warn)');
+    return;
+  }
+  if(typeof coverGo==='function')coverGo(href);
+}
+function nosvcHold(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed)return;
+  msg.nosvc.held=true;
+  msg.nosvc.note='Held. Nothing was sent or cancelled.';
+  if(typeof showTempMsg==='function')showTempMsg(msg.nosvc.note,'var(--teal)');
+  nosvcPaintLive(idx);
+}
+async function nosvcSave(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed)return;
+  var n=msg.nosvc;
+  if(n.reasonCode==='other'){
+    var typed=null;
+    try{typed=document.getElementById('nosvcOther'+idx);}catch(e0){typed=null;}
+    if(typed)n.reasonOther=String(typed.value||'').trim();
+  }
+  var shift=(typeof coverFind==='function')?coverFind(n.shiftId):null;
+  if(!shift){
+    if(typeof showTempMsg==='function')showTempMsg('That open cover is not on the desk. Nothing was saved.','var(--warn)');
+    return;
+  }
+  if(!nosvcOfficeOk()){
+    n.note='Nurse cannot record no service (42501).';
+    if(typeof showTempMsg==='function')showTempMsg(n.note,'var(--danger)');
+    nosvcPaintLive(idx);
+    return;
+  }
+  var savedReason=coverSkipReason;
+  var savedFamily=coverCmFamily;
+  var otherEl=null;
+  try{otherEl=document.getElementById('coverSkipOther');}catch(e1){otherEl=null;}
+  var savedOther=otherEl?otherEl.value:'';
+  coverCmFamily='skip';
+  coverSkipReason=n.reasonCode==='other'?'Other':(n.reasonLabel||'Personal');
+  if(otherEl)otherEl.value=n.reasonCode==='other'?String(n.reasonOther||''):'';
+  var got=null;
+  try{got=await coverRpc('skipRecord', (typeof coverRecordSkipBody==='function')?coverRecordSkipBody(shift):{});}
+  catch(err){got={ok:false, error:String(err&&err.message||err||'Could not save the skip.')};}
+  coverSkipReason=savedReason;
+  coverCmFamily=savedFamily;
+  if(otherEl)otherEl.value=savedOther;
+  if(got&&got.ok){
+    n.note='Skip saved. Send later opens Mail. Gmail send is later.';
+    if(typeof showTempMsg==='function')showTempMsg('Member called \u00B7 no service today is saved. Mail stays a draft.','var(--success)');
+  }else if(nosvcDenied(got)){
+    n.note='Nurse cannot record no service (42501).';
+    if(typeof showTempMsg==='function')showTempMsg(n.note,'var(--danger)');
+  }else{
+    n.note=(got&&got.signedOut)?'Sign in to save the skip.':(got&&got.missing)?'admin_record_client_skip is not live yet. Nothing was saved.':String((got&&got.error)||'Could not save the skip.');
+    if(typeof showTempMsg==='function')showTempMsg(n.note,'var(--warn)');
+  }
+  nosvcPaintLive(idx);
+}
+function nosvcAfterCancel(data){
+  data=data||{};
+  var note=String(data.note||'Cancelled. The no-service panel is closed. Schedule refreshed.');
+  try{
+    if(typeof coverHideRefuseDraft==='function')coverHideRefuseDraft();
+    else if(typeof coverHideSkipReason==='function')coverHideSkipReason();
+  }catch(e){}
+  try{if(typeof coverShow==='function')coverShow('list');}catch(e2){}
+  try{coverSelectedId='';}catch(e3){}
+  var ids=[];
+  if(Array.isArray(data.cancelled_open_shift_ids))ids=ids.concat(data.cancelled_open_shift_ids);
+  if(data.open_shift_id)ids.push(data.open_shift_id);
+  for(var i=0;i<ids.length;i++){
+    var shift=(typeof coverFind==='function')?coverFind(ids[i]):null;
+    if(shift)shift.status='cancelled';
+  }
+  try{
+    for(var m=0;m<(copilotChat||[]).length;m++){
+      if(copilotChat[m]&&copilotChat[m].nosvc){
+        copilotChat[m].nosvc.closed=true;
+        copilotChat[m].nosvc.note=note;
+      }
+    }
+  }catch(e4){}
+  var link=null;
+  if(data.deep_link&&typeof data.deep_link==='object')link=data.deep_link;
+  else if(data.day_mark&&data.day_mark.deep_link)link=data.day_mark.deep_link;
+  if(link&&link.client_id){
+    try{
+      schedPendingDeepLink={
+        client_id:String(link.client_id),
+        on_date:String(link.on_date||data.on_date||'').slice(0,10),
+        slot_key:String(link.slot_key||data.slot_key||'default')
+      };
+    }catch(e5){}
+  }
+  if(typeof showTempMsg==='function')showTempMsg(note,'var(--success)');
+  if(typeof copilotPaintChat==='function'&&typeof copilotView!=='undefined'&&copilotView==='chat')copilotPaintChat();
+  if(typeof showTab==='function')showTab('schedule');
+  if(typeof copilotClose==='function')copilotClose();
+}
+async function nosvcRunCancel(n){
+  if(!n)return {ok:false};
+  if(n.reasonCode==='other')n.reasonLabel=nosvcLabel('other', n.reasonOther);
+  if(!n.reasonCode)n.reasonCode='personal';
+  if(!nosvcOfficeOk()){
+    if(typeof showTempMsg==='function')showTempMsg('Nurse cannot cancel this shift (42501).','var(--danger)');
+    return {ok:false, forbidden:true, status:42501};
+  }
+  var clientOk=null;
+  try{clientOk=(typeof coverUuidOrNull==='function')?coverUuidOrNull(n.clientId):n.clientId;}catch(e){clientOk=null;}
+  if(!clientOk){
+    if(typeof showTempMsg==='function')showTempMsg('This client is not an office id yet. Nothing was cancelled.','var(--warn)');
+    return {ok:false};
+  }
+  n.clientId=String(clientOk);
+  if(n.cancelling)return {ok:false};
+  n.cancelling=true;
+  var got=null;
+  try{got=await coverRpc('nosvcCancel', nosvcCancelBody(n));}
+  catch(err){got={ok:false, error:String(err&&err.message||err||'Could not cancel the shift.')};}
+  n.cancelling=false;
+  if(nosvcDenied(got)){
+    if(typeof showTempMsg==='function')showTempMsg('Nurse cannot cancel this shift (42501).','var(--danger)');
+    return got;
+  }
+  if(!got||got.ok===false||got.missing||got.signedOut){
+    var why=(got&&got.signedOut)?'Sign in to cancel this shift.':(got&&got.missing)?'Cancel shift is not callable yet. Nothing was changed.':String((got&&got.error)||'Could not cancel the shift. Nothing was changed.');
+    if(typeof showTempMsg==='function')showTempMsg(why,'var(--danger)');
+    return got||{ok:false};
+  }
+  var data=got.data||{};
+  var cancelled=data.cancelled===true||data.cancelled==='true';
+  var close=String(data.next||'')==='close_panel';
+  if(!cancelled&&!close){
+    if(typeof showTempMsg==='function')showTempMsg('Cancel shift did not mark the schedule. The panel stays open.','var(--warn)');
+    return got;
+  }
+  nosvcAfterCancel(data);
+  return got;
+}
+async function nosvcCancel(idx){
+  var msg=nosvcMsg(idx);
+  if(!msg||msg.nosvc.closed)return;
+  if(msg.nosvc.reasonCode==='other'){
+    var el=null;
+    try{el=document.getElementById('nosvcOther'+idx);}catch(e){el=null;}
+    if(el)msg.nosvc.reasonOther=String(el.value||'').trim();
+  }
+  await nosvcRunCancel(msg.nosvc);
+}
+async function nosvcCancelFromCover(){
+  var shift=(typeof coverFind==='function')?coverFind(coverSelectedId):null;
+  if(!shift){
+    if(typeof showTempMsg==='function')showTempMsg('That shift is not on the desk. Nothing was cancelled.','var(--warn)');
+    return;
+  }
+  var label=(typeof coverSkipReasonLabel==='function')?coverSkipReasonLabel():'';
+  var other=(typeof coverSkipOtherText==='function')?coverSkipOtherText():'';
+  var n=nosvcStateFromShift(shift, label||'Personal', other);
+  if(!n.reasonCode)n.reasonCode='personal';
+  await nosvcRunCancel(n);
+}
+async function nosvcCoverReasonChanged(){
+  var shift=(typeof coverFind==='function')?coverFind(coverSelectedId):null;
+  if(!shift)return;
+  var label=(typeof coverSkipReasonLabel==='function')?coverSkipReasonLabel():'';
+  if(!label)return;
+  var other=(typeof coverSkipOtherText==='function')?coverSkipOtherText():'';
+  var code=(typeof coverSkipReasonCode==='function')?coverSkipReasonCode(coverSkipReason):nosvcCodeFromLabel(label);
+  if(!code)code=nosvcCodeFromLabel(label)||'personal';
+  var gen=++nosvcCoverGen;
+  var n=nosvcStateFromShift(shift, label, other);
+  n.reasonCode=code;
+  n.chipChanged=true;
+  var box=null;
+  var note=null;
+  var sub=null;
+  var ta=null;
+  try{box=document.getElementById('coverRefuseMail');}catch(e){box=null;}
+  try{note=document.getElementById('coverCmNote');}catch(e2){note=null;}
+  try{sub=document.getElementById('coverCmSubject');}catch(e3){sub=null;}
+  try{ta=document.getElementById('coverCmDraft');}catch(e4){ta=null;}
+  coverCmFamily='skip';
+  if(typeof coverSyncRefuseGate==='function')coverSyncRefuseGate(shift, 'skip');
+  if(box)box.hidden=false;
+  if(sub)sub.value='';
+  if(ta)ta.value='';
+  if(note)note.textContent='Loading the case-manager draft for this reason\u2026';
+  if(!nosvcOfficeOk()){
+    if(note)note.textContent='Nurse cannot preview this draft (42501).';
+    return;
+  }
+  var got=null;
+  var clientOk=null;
+  try{clientOk=(typeof coverUuidOrNull==='function')?coverUuidOrNull(n.clientId):n.clientId;}catch(e5){clientOk=null;}
+  if(clientOk&&typeof coverRpc==='function'){
+    n.clientId=String(clientOk);
+    try{got=await coverRpc('nosvcPreview', nosvcPreviewBody(n));}
+    catch(err){got={ok:false, error:String(err&&err.message||err||'')};}
+  }
+  if(gen!==nosvcCoverGen)return;
+  if(nosvcDenied(got)){
+    if(note)note.textContent='Nurse cannot preview this draft (42501).';
+    return;
+  }
+  if(got&&got.ok&&got.data)nosvcApplyPreview(n, got.data);
+  else nosvcLocalDraft(n);
+  if(sub)sub.value=n.subject||'';
+  if(ta)ta.value=n.body||'';
+  try{coverCmSnap=(typeof coverCmContext==='function')?coverCmContext(shift):{};}catch(e6){coverCmSnap={};}
+  if(coverCmSnap){
+    if(n.email)coverCmSnap.email=coverCmSnap.case_manager_email=n.email;
+    if(n.cm)coverCmSnap.cm=coverCmSnap.case_manager=n.cm;
+    if(n.reasonLabel)coverCmSnap.reason=n.reasonLabel;
+    if(n.client)coverCmSnap.client=n.client;
+    if(n.serviceShown)coverCmSnap.date=n.serviceShown;
+  }
+  if(typeof coverSyncCmMail==='function')coverSyncCmMail();
+  if(note){
+    note.textContent=n.fromRpc
+      ?'Draft follows this reason. Open in Mail uses the case manager email. Gmail send is later.'
+      :'Draft follows this chip on this phone. Open in Mail uses the case manager email. Gmail send is later.';
+  }
+}
+function nosvcCoverOtherInput(){
+  if(nosvcCoverOtherTimer)clearTimeout(nosvcCoverOtherTimer);
+  nosvcCoverOtherTimer=setTimeout(function(){
+    if(String(coverSkipReason||'')==='Other')nosvcCoverReasonChanged();
+  }, 280);
+}
 function remiWiderDraftPack(shift, family, reason, other, mail){
   var shown=mail||remiWiderFilledMail(shift, family, family==='skip'?(reason==='Other'&&other?other:reason):'');
   var who=shift.clientName||'this client';
@@ -12488,15 +13125,20 @@ function remiWiderDraftPack(shift, family, reason, other, mail){
     body:shown.body||'',
     missing:mailMissing
   });
+  var nosvcPack=null;
+  if(family==='skip'&&typeof nosvcStateFromShift==='function'){
+    try{nosvcPack=nosvcStateFromShift(shift, reason||'Personal', other||'');}catch(eNs){nosvcPack=null;}
+  }
   return remiSecPack(summary, {
     kind:'coverage_open',
     shiftId:String(shift.id||''),
-    loadMail:!mail,
+    loadMail:!mail&&!nosvcPack,
     mailFamily:family,
     mailReason:reason||'',
     mailOther:other||'',
     note:'Nothing is recorded or sent until you confirm.',
-    actions:actions
+    actions:actions,
+    nosvc:nosvcPack
   });
 }
 function remiWiderShiftAnswer(q, intent){
@@ -12535,11 +13177,14 @@ function remiWiderDraftAnswer(q, intent){
           summary:'Member called \u00B7 no service today \u2014 '+who+'. Pick a reason before this is recorded.'
         });
       }
+      var nosvcAsk=null;
+      try{nosvcAsk=nosvcStateFromShift(shift, 'Personal', '');}catch(eAsk){nosvcAsk=null;}
       return remiSecPack('Member called \u00B7 no service today stays one cover \u2014 '+who+'. Which reason: Personal, Doctor appointment, Not feeling well, or Other?\n\n'+(preview.subject||'')+'\n\n'+(preview.body||''), {
         kind:'coverage_open',
         shiftId:String(shift.id||''),
         note:'Nothing is recorded or sent until you confirm.',
-        actions:reasonActions
+        actions:reasonActions,
+        nosvc:nosvcAsk
       });
     }
     var other=reason==='Other'?remiWiderSkipOther(q):'';

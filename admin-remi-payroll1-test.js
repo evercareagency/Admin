@@ -20,7 +20,7 @@ assert.ok(html.includes('id="copilotFab"'), 'corner chip stays');
 assert.ok(html.includes('id="copilotSheet"'), 'phone sheet stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-cover-unselect1'), 'first admin-build is remi-payroll1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-nosvc-reason-draft1'), 'first admin-build is remi-payroll1');
 assert.ok(html.indexOf('content="2026-09-27-remi-payroll1"') < html.indexOf('content="2026-09-27-remi-ideas763"'), 'ideas763 stays after this tip');
 assert.ok(html.indexOf('content="2026-09-27-remi-ideas763"') < html.indexOf('content="2026-09-27-remi-float-noshow1"'), 'float stays after ideas763');
 assert.ok(html.indexOf('content="2026-09-27-remi-float-noshow1"') < html.indexOf('content="2026-09-27-remi-proof1"'), 'proof stays');
@@ -392,7 +392,7 @@ async function runBrowser(){
         first: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(schedView.first, '2026-09-27-cover-unselect1');
+    assert.strictEqual(schedView.first, '2026-09-27-nosvc-reason-draft1');
     assert.strictEqual(schedView.fullPage, false);
     assert.strictEqual(schedView.hidden, false);
     assert.strictEqual(schedView.selected, 'true');
