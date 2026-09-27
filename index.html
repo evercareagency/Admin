@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- coverage simplify 2026-09-27 v=coverage-simple1 admin-build 2026-09-27-coverage-simple1. GHOST-COVERAGE-SIMPLE1-CONTRACT-v1. Ace CALLABLE. Coverage record stays admin_record_call_off and does not assign a covering aide. Who can cover on an open card sends one chat blast: admin_blast_cover_request(p_open_shift_id, p_aide_ids, p_address_mode area|full). That blast does not assign. An aide yes in Aide chat shows a Remi draft for Jasmine with the full street. Send is admin_confirm_cover_send(p_open_shift_id, p_backup_aide_id, p_slot_key, p_confirm_body optional). Send writes the chat, assigned_backup, and the Schedule day mark cover. A multi-slot day passes that board slot_key, for example pm. An unknown key passes default. Schedule shows Covered. Coverage does not ask for a manual Schedule step. The blast may stay Area only. The full street is on the confirm draft. cover1, coverpick, and refuse stay on the open-shift sheet. No SMS. No email. Remi stays the corner chip and the side rail. Phone-first. Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=clienthrs1c, v=shift-slim1, v=isdash1b, v=clienthrs1b, and v=aidechat1. -->
+<meta name="admin-build" content="2026-09-27-coverage-simple1">
 <!-- schedule client hours 2026-09-27 v=clienthrs1c v=shift-slim1 admin-build 2026-09-27-clienthrs1c. UX pack v=shift-slim1. Multi-day Save is one upsert_schedule_slot_pattern_weekdays(p_client_id, p_weekdays int[] ISO 1=Mon…7=Sun, p_slot_key, p_usual_aide_id, p_hours, p_label, p_start_local, p_end_local, p_sort_order). Single-day edit stays upsert_schedule_slot_pattern. Day marks are missed|cover|on_hold via upsert_schedule_slot_day_mark; the UI does not write worked. Missed sends p_miss_reason client_declined|no_show|no_call|other and p_note when other. Covered shift is p_mark cover plus p_cover_aide_id. Per-slot On hold is p_mark on_hold. Hospital/ER client hold is upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date null=open, p_note, p_hold_id). End hold is clear_schedule_client_hold(p_hold_id, p_end_date). list_schedule_client_holds lists them. Week board stays list_schedule_week_slots and paints on_hold plus 0 hrs from the day mark or an active client hold (holds[], hold_*, miss_reason). Clear stays clear_schedule_slot_day_mark. Slim form: no Slot key, Label, or Order; Hours from Start–End; Edit shift | Add another; Su–Sa checks; desktop full-bleed week with the day drawer under the grid; phone week scrolls. Remi stays the side rail and corner chip. Dates are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=shift-slim1, v=isdash1b, v=isdash1, v=remi-notes1, and v=clienthrs1b. -->
 <meta name="admin-build" content="2026-09-27-clienthrs1c">
 <!-- schedule slim edit 2026-09-27 v=shift-slim1 admin-build 2026-09-27-shift-slim1. Slim Edit/Add: no Slot key, Label, or Order on the form. Hours are read-only from Start–End (from start–end). Pills are Edit shift | Add another. Add another is a second shift for the same client and the same day. Weekday dropdown is Su–Sa checks. One Save on several checked weekdays is upsert_schedule_slot_pattern_weekdays in v=clienthrs1c; a single day still uses upsert_schedule_slot_pattern. Desktop week is full-bleed Mon–Sun and the day detail is a drawer under the grid. Phone week scrolls sideways and the day panel is tappable under it. Day marks drop Worked. Unmarked is assumed worked. Three buttons: Missed | Covered shift | On hold. Missed stores the reason in p_note via upsert_schedule_slot_day_mark p_mark missed. Covered shift is p_mark cover plus p_cover_aide_id. On hold is Hospital/ER Start · End (open-ended ok) · Note, chips On hold / paused · 0 hrs, and End hold fills the end date so the pattern resumes. Hospital/ER On hold is the live client-hold callable in v=clienthrs1c. Remi stays the side rail and corner chip. No full-page Remi. Dates are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=isdash1b, v=isdash1, v=remi-notes1, and v=clienthrs1b. -->
@@ -553,6 +555,58 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage input,#tab_coverage select,#tab_coverage textarea{font-size:16px;min-height:48px;}
 #tab_coverage .btn:disabled{opacity:0.45;cursor:not-allowed;}
 #tab_coverage .cover-back{margin-bottom:8px;}
+/* v=coverage-simple1 — record, one blast, Remi confirm, auto Covered. Phone-first. */
+#tab_coverage .cover-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px;}
+#tab_coverage .cover-stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 8px;min-width:0;}
+#tab_coverage .cover-stat .lbl{font-size:0.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+#tab_coverage .cover-stat .val{font-size:1.35rem;font-weight:800;color:var(--navy);line-height:1.1;margin-top:2px;}
+#tab_coverage .cover-stat .val.is-warn{color:#9a3412;}
+#tab_coverage .cover-stat .val.is-ok{color:var(--teal-dark);}
+#tab_coverage .cover-simple-banner{background:#e8f6ef;border:1px solid #b7e4c7;color:#14532d;border-radius:12px;padding:10px 12px;font-size:0.92rem;line-height:1.4;margin:0 0 12px;}
+#tab_coverage .cover-card-wrap{background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;box-shadow:0 6px 16px rgba(26,39,68,0.05);overflow:hidden;}
+#tab_coverage .cover-card-wrap .cover-card{border:0;border-left:0;border-radius:0;box-shadow:none;width:100%;}
+#tab_coverage .cover-card-actions{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px;}
+#tab_coverage .cover-card-actions .btn{flex:1 1 8rem;min-height:48px;width:auto;}
+#tab_coverage .cover-chip-open{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;}
+#tab_coverage .cover-no-assign{background:#f3fbfb;border:1px dashed var(--teal);border-radius:12px;color:var(--teal-dark);padding:10px 12px;font-size:0.92rem;line-height:1.4;margin:0 0 12px;}
+#tab_coverage .cover-hours-note{font-size:0.88rem;color:var(--muted);margin:-4px 0 12px;}
+.cover-simple-scrim{position:fixed;inset:0;z-index:180;background:rgba(26,39,68,.46);display:flex;align-items:flex-end;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) 8px calc(12px + env(safe-area-inset-bottom,0px));}
+.cover-simple-modal{background:#fff;width:min(560px,100%);max-height:min(86dvh,880px);overflow:auto;-webkit-overflow-scrolling:touch;border-radius:16px;padding:16px 16px 18px;box-shadow:0 18px 48px rgba(26,39,68,.24);}
+.cover-simple-modal h2{font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;color:var(--navy);margin:0 0 4px;}
+.cover-simple-modal .modal-sub{font-size:0.92rem;line-height:1.4;color:var(--text);margin:0 0 12px;}
+.cover-simple-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.cover-simple-bar .count{font-weight:800;color:var(--teal-dark);}
+.cover-simple-bar button{background:transparent;border:0;color:var(--teal);font-weight:700;font-family:'DM Sans',sans-serif;min-height:44px;padding:8px;cursor:pointer;touch-action:manipulation;}
+.cover-simple-aides{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.cover-simple-aide{width:100%;min-height:48px;text-align:left;display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;touch-action:manipulation;}
+.cover-simple-aide.is-on{background:#e8f4f4;border-color:var(--teal);}
+.cover-simple-aide .box{flex:0 0 auto;width:22px;height:22px;border-radius:6px;border:2px solid var(--teal);margin-top:2px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
+.cover-simple-aide.is-on .box{background:var(--teal);}
+.cover-simple-aide strong{display:block;font-size:1rem;line-height:1.25;}
+.cover-simple-aide span{display:block;font-size:0.84rem;color:var(--muted);margin-top:2px;}
+.cover-simple-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.cover-simple-toggle button{min-height:48px;border-radius:12px;border:1px solid var(--border);background:#f5f8fc;font-family:'DM Sans',sans-serif;font-weight:700;color:var(--navy);cursor:pointer;touch-action:manipulation;}
+.cover-simple-toggle button.is-on{background:#fff;border:2px solid var(--teal);color:var(--teal-dark);}
+.cover-simple-preview{background:#f3fbfb;border:1px dashed #b7d8d8;border-radius:12px;padding:12px;margin-bottom:12px;}
+.cover-simple-preview .lbl{font-size:0.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:6px;}
+.cover-simple-preview pre{white-space:pre-wrap;font-family:'DM Sans',sans-serif;font-size:0.92rem;line-height:1.45;margin:0;color:var(--navy);}
+.cover-simple-foot{display:flex;flex-direction:column;gap:8px;}
+.cover-simple-foot .btn{width:100%;min-height:48px;}
+#coverSimpleDraft{background:#f3fbfb;border:1px solid #b7d8d8;border-radius:14px;padding:12px;margin:10px 0;}
+#coverSimpleDraft .draft-lbl{display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:8px;}
+#coverSimpleDraft .pill{background:var(--teal);color:#fff;border-radius:999px;padding:2px 8px;font-size:0.72rem;}
+#coverSimpleDraft pre,#coverSimpleDraft textarea{white-space:pre-wrap;font-family:'DM Sans',sans-serif;font-size:1rem;line-height:1.45;color:var(--navy);margin:0 0 10px;width:100%;min-height:96px;}
+#coverSimpleDraft textarea{border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;}
+#coverSimpleDraft .draft-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;}
+#coverSimpleDraft .draft-actions .btn{min-height:48px;flex:1 1 7rem;}
+#coverSimpleDraft .auto-note{flex:1 1 100%;font-size:0.86rem;line-height:1.4;color:var(--text);margin:0;}
+#coverSimplePending{display:inline-flex;align-items:center;min-height:32px;padding:4px 10px;border-radius:999px;background:#fff7ed;color:#9a3412;font-size:0.78rem;font-weight:800;}
+#coverSimpleSchedBanner{margin:0 0 12px;}
+@media(min-width:800px){
+  .cover-simple-scrim{align-items:center;padding:24px;}
+  .cover-simple-foot{flex-direction:row;}
+  .cover-simple-foot .btn{width:auto;flex:1;}
+}
 #tab_coverage .cover-reason.is-selected{border-color:var(--teal-dark);background:var(--teal-light);color:var(--teal-dark);}
 #clientModal input,#clientModal select,#clientModal textarea,#addAideModal input,#addAideModal select,#addAideModal textarea{font-size:16px;min-height:48px;}
 #clientModal .mbtn,#addAideModal .mbtn{min-height:48px;}
@@ -1733,39 +1787,51 @@ bindLoginKeyboard();
       </div>
 
       <!-- COVERAGE — call-off / open-shift desk. Not Backup. Not PTO. -->
-      <div class="tab-panel" id="tab_coverage">
+      <div class="tab-panel" id="tab_coverage" data-coverage-simple1="v=coverage-simple1">
         <div id="coverListView">
           <div class="page-hdr">
             <div>
               <h1>Coverage</h1>
-              <p>Call-offs and open shifts.</p>
+              <p>Call-offs become open shifts. Record first — pick who to blast after. No assign on this step.</p>
             </div>
             <button type="button" class="btn btn-teal" id="coverIntakeOpen" onclick="coverShowIntake()">Record call-off</button>
           </div>
-          <p class="cover-note" id="coverSourceNote">Open shifts from call-offs.</p>
+          <p class="cover-note" id="coverSourceNote">Open shifts from call-offs. Clients and aides use the same lists as Schedule.</p>
+          <div id="coverSimpleBanner" class="cover-simple-banner" hidden></div>
+          <div class="cover-stats" id="coverStats" aria-label="Coverage counts">
+            <div class="cover-stat"><div class="lbl">Open</div><div class="val is-warn" id="coverStatOpen">0</div></div>
+            <div class="cover-stat"><div class="lbl">Within 48h</div><div class="val is-warn" id="coverStat48">0</div></div>
+            <div class="cover-stat"><div class="lbl">Assigned today</div><div class="val is-ok" id="coverStatAssigned">0</div></div>
+          </div>
           <div id="coverList" class="cover-list" aria-label="Open shifts"></div>
           <div id="coverEmpty" class="empty-state" hidden><p>No open shifts. Record a call-off to open one.</p></div>
         </div>
         <div id="coverIntakeView" hidden>
-          <button type="button" class="btn btn-ghost cover-back" id="coverIntakeBack" onclick="coverShowList()">← Open shifts</button>
+          <button type="button" class="btn btn-ghost cover-back" id="coverIntakeBack" onclick="coverShowList()">Cancel</button>
           <div class="page-hdr">
             <div>
               <h1>Record call-off</h1>
-              <p>This opens a shift on the Coverage list.</p>
+              <p>Creates an open shift. You blast aides next — do not assign a covering aide here.</p>
             </div>
           </div>
           <p class="cover-note" id="coverRosterNote">Clients and aides use the same lists as Schedule.</p>
-          <div class="field"><label for="coverClientSel">Client</label><select id="coverClientSel"></select></div>
-          <div class="field"><label for="coverAideSel">Regular aide</label><select id="coverAideSel"></select></div>
-          <div class="field"><label for="coverDate">Date</label><input type="text" id="coverDate" placeholder="MM/DD/YYYY" inputmode="numeric" data-date="mdy" maxlength="10" autocomplete="off" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" oninput="maskMDYInput(this,event)"></div>
+          <div class="field"><label for="coverClientSel">Client</label><select id="coverClientSel" onchange="coverSimpleHoursNote()"></select></div>
+          <div class="field"><label for="coverAideSel">Regular aide (called off)</label><select id="coverAideSel" onchange="coverSimpleHoursNote()"></select></div>
           <div class="cover-when-row">
-            <div class="field"><label for="coverTime">Start</label><input type="time" id="coverTime" value="08:00"></div>
-            <div class="field"><label for="coverEndTime">End</label><input type="time" id="coverEndTime" value="12:00"></div>
+            <div class="field"><label for="coverDate">Date</label><input type="text" id="coverDate" placeholder="MM/DD/YYYY" inputmode="numeric" data-date="mdy" maxlength="10" autocomplete="off" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" oninput="maskMDYInput(this,event);coverSimpleHoursNote()"></div>
+            <div class="field"><label for="coverNote">Reason</label><select id="coverNote" aria-label="Reason" onchange="coverSimpleToggleReason()"><option value="">Select reason…</option><option>Sick</option><option>Personal / family</option><option>Transport</option><option>Other</option></select></div>
           </div>
+          <div class="field" id="coverReasonOtherWrap" hidden><label for="coverReasonOther">Other reason</label><input type="text" id="coverReasonOther" autocomplete="off" placeholder="Short reason"></div>
+          <div class="cover-when-row">
+            <div class="field"><label for="coverTime">Start</label><input type="time" id="coverTime" value="08:00" oninput="coverSimpleHoursNote()"></div>
+            <div class="field"><label for="coverEndTime">End</label><input type="time" id="coverEndTime" value="12:00" oninput="coverSimpleHoursNote()"></div>
+          </div>
+          <p class="cover-hours-note" id="coverHoursNote">Hours follow the start and end.</p>
           <div class="field"><label for="coverPhone">Client phone</label><input type="tel" id="coverPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
-          <div class="field"><label for="coverNote">Reason</label><textarea id="coverNote" placeholder="Optional reason"></textarea></div>
+          <div class="cover-no-assign" id="coverNoAssign">No Assign aide on this screen — record then pick who to blast.</div>
           <div class="cover-actions">
             <button type="button" class="btn btn-teal" id="coverRecordBtn" onclick="coverRecordCalloff()">Record call-off</button>
+            <button type="button" class="btn btn-ghost" id="coverRecordCancel" onclick="coverShowList()">Cancel</button>
           </div>
         </div>
         <div id="coverOutcomeView" data-coverunlock1="v=coverunlock1" data-remiwider1b="v=remiwider1b" data-remiwider1c="v=remiwider1c" hidden>
@@ -1873,6 +1939,31 @@ bindLoginKeyboard();
               </div>
             </div>
           </section>
+        </div>
+        <div id="coverSimpleScrim" class="cover-simple-scrim" hidden role="dialog" aria-modal="true" aria-labelledby="coverSimpleTitle" data-coverage-simple1="v=coverage-simple1">
+          <div class="cover-simple-modal">
+            <h2 id="coverSimpleTitle">Who can cover</h2>
+            <p class="modal-sub" id="coverSimpleSub">Select aides, choose address detail, send one chat blast.</p>
+            <div class="cover-simple-bar">
+              <span class="count" id="coverSimpleCount">0 selected</span>
+              <button type="button" id="coverSimpleAll" onclick="coverSimpleSelectAll()">Select all active</button>
+            </div>
+            <div class="cover-simple-aides" id="coverSimpleAides" role="group" aria-label="Aides to blast"></div>
+            <div class="field" style="margin-bottom:8px"><label>Address in blast</label></div>
+            <div class="cover-simple-toggle" role="group" aria-label="Address detail">
+              <button type="button" id="coverSimpleFull" onclick="coverSimpleSetMode('full')">Full street</button>
+              <button type="button" id="coverSimpleArea" class="is-on" onclick="coverSimpleSetMode('area')">Area only</button>
+            </div>
+            <div class="cover-simple-preview" aria-label="One chat blast preview">
+              <div class="lbl">One chat blast preview</div>
+              <pre id="coverSimplePreview"></pre>
+              <p class="cover-note" id="coverSimpleAddrNote">Area only selected · full street held for the yes-confirm.</p>
+            </div>
+            <div class="cover-simple-foot">
+              <button type="button" class="btn btn-teal" id="coverSimpleSendBlast" onclick="coverSimpleSendBlast()">Send chat blast</button>
+              <button type="button" class="btn btn-ghost" id="coverSimpleBack" onclick="coverSimpleClose()">Back</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2037,7 +2128,8 @@ bindLoginKeyboard();
         <div class="page-hdr">
           <div>
             <h1>Schedule</h1>
-            <p id="schedIntro">Clients down the side, Monday–Sunday across. The usual week stays put. A cell change is an exception for that date.</p>
+            <p id="schedIntro">Clients down the side, Monday–Sunday across. The usual week stays put. A cell change is an exception for that date. A Coverage Send marks Covered here — no separate Schedule step.</p>
+            <div id="coverSimpleSchedBanner" class="cover-simple-banner" data-coverage-simple1="v=coverage-simple1" hidden></div>
             <div class="sched-views" role="tablist" aria-label="Schedule view">
               <button type="button" class="on" id="schedViewWeek" onclick="schedSetView('week')">Week</button>
               <button type="button" id="schedViewDay" onclick="schedSetView('day')">Day</button>
@@ -2388,11 +2480,22 @@ Call (216) 377-5991 with any questions.</textarea>
               <h1 id="aidechatThreadTitle">Aide</h1>
               <p id="aidechatThreadMeta">Open</p>
             </div>
+            <span id="coverSimplePending" hidden>Cover pending Send</span>
           </div>
           <div id="aidechatUrgentBanner" class="aidechat-urgent" hidden></div>
           <div id="aidechatMessages" class="aidechat-thread" aria-live="polite"></div>
+          <div id="coverSimpleDraft" data-coverage-simple1="v=coverage-simple1" hidden>
+            <div class="draft-lbl"><span class="pill">Remi</span> Draft for Jasmine — tap Send to confirm</div>
+            <pre id="coverSimpleDraftText"></pre>
+            <textarea id="coverSimpleDraftEdit" hidden aria-label="Edit Remi draft"></textarea>
+            <div class="draft-actions">
+              <button type="button" class="btn btn-teal" id="coverSimpleConfirm" onclick="coverSimpleConfirmSend()">Send</button>
+              <button type="button" class="btn btn-ghost" id="coverSimpleEdit" onclick="coverSimpleEditDraft()">Edit</button>
+              <p class="auto-note"><strong>On Send:</strong> chat goes to this aide and Schedule auto-marks <strong>Covered shift</strong> — no manual Schedule step.</p>
+            </div>
+          </div>
           <form id="aidechatComposer" class="aidechat-composer" onsubmit="aidechatSendOffice(event); return false;">
-            <textarea id="aidechatReply" maxlength="1000" placeholder="Reply as office" aria-label="Reply as office" autocomplete="off"></textarea>
+            <textarea id="aidechatReply" maxlength="1000" placeholder="Or type your own reply…" aria-label="Reply as office" autocomplete="off"></textarea>
             <button type="submit" class="btn btn-teal" id="aidechatSend">Send</button>
           </form>
         </div>
@@ -5165,6 +5268,7 @@ function coverFillIntake(){
       ?'Clients and aides use the same lists as Schedule.'
       :'No clients or aides loaded yet. Sign in, then open Coverage again. The lists are the same ones Schedule uses.';
   }
+  if(typeof coverSimpleHoursNote==='function')coverSimpleHoursNote();
 }
 function coverPaintList(){
   var box=document.getElementById('coverList');
@@ -5174,17 +5278,28 @@ function coverPaintList(){
   if(!open.length){
     box.innerHTML='';
     if(empty)empty.hidden=false;
+    if(typeof coverSimplePaintStats==='function')coverSimplePaintStats();
     return;
   }
   if(empty)empty.hidden=true;
   box.innerHTML=open.map(function(s){
     var intake=s&&s.intakeSource==='aide'?'aide':'office';
-    return '<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'" data-cover-intake="'+intake+'">'
-      +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+coverSourceChips(s)+'</div>'
-      +'<div class="cover-meta">Regular aide · '+coverEsc(s.aideName||'—')+'</div>'
-      +'<div class="cover-meta">When · '+coverEsc(coverFormatSpan(s.startsAt, s.endsAt))+'</div>'
-      +'</button>';
+    var chips=coverSourceChips(s);
+    var st=coverStatusKey(s);
+    if(st===''||st==='open'||st==='awaiting_client')chips=chips.replace('<span class="cover-chips">','<span class="cover-chips"><span class="cover-chip cover-chip-open">Open</span>');
+    var when=typeof coverSimpleWhenLabel==='function'?coverSimpleWhenLabel(s.startsAt, s.endsAt):coverFormatSpan(s.startsAt, s.endsAt);
+    var reason=s.note?(' · '+coverEsc(s.note)):'';
+    return '<div class="cover-card-wrap">'
+      +'<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'" data-cover-intake="'+intake+'">'
+      +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+chips+'</div>'
+      +'<div class="cover-meta">Regular aide · '+coverEsc(s.aideName||'—')+' · '+coverEsc(when||'—')+reason+'</div>'
+      +'</button>'
+      +'<div class="cover-card-actions">'
+      +'<button type="button" class="btn btn-teal" data-cover-blast="'+coverAttr(s.id)+'">Who can cover</button>'
+      +'<button type="button" class="btn btn-ghost" data-cover-text="'+coverAttr(s.id)+'">Text client</button>'
+      +'</div></div>';
   }).join('');
+  if(typeof coverSimplePaintStats==='function')coverSimplePaintStats();
 }
 function coverShowList(){
   coverEnsureBound();
@@ -6030,6 +6145,11 @@ async function coverRecordCalloff(){
   var startsAt=coverComposeWhen(dateEl&&dateEl.value, timeEl&&timeEl.value);
   var endsAt=coverComposeWhen(dateEl&&dateEl.value, endEl&&endEl.value);
   var noteText=noteEl?String(noteEl.value||'').trim():'';
+  if(noteText==='Other'){
+    var otherEl=document.getElementById('coverReasonOther');
+    var extra=otherEl?String(otherEl.value||'').trim():'';
+    noteText=extra||'Other';
+  }
   var phone=phoneEl?String(phoneEl.value||'').trim():'';
   if(!clientId||!clientName){
     if(typeof showTempMsg==='function')showTempMsg('Choose a client.','var(--warn)');
@@ -6082,6 +6202,7 @@ async function coverRecordCalloff(){
     try{await reloaded;}catch(eReload){}
     coverMergeRecorded(created);
     finish();
+    if(typeof coverSimpleAfterRecord==='function')coverSimpleAfterRecord(created);
     return;
   }
   if(got&&got.ok===false){
@@ -6412,6 +6533,20 @@ function coverEnsureBound(){
   root.addEventListener('click', function(ev){
     var t=ev.target;
     if(!t||!t.closest)return;
+    var blast=t.closest('[data-cover-blast]');
+    if(blast&&root.contains(blast)){
+      ev.preventDefault();
+      if(typeof coverSimpleOpenBlast==='function')coverSimpleOpenBlast(blast.getAttribute('data-cover-blast'));
+      return;
+    }
+    var textBtn=t.closest('[data-cover-text]');
+    if(textBtn&&root.contains(textBtn)){
+      ev.preventDefault();
+      if(typeof coverSimpleClose==='function')coverSimpleClose();
+      coverOpenOutcome(textBtn.getAttribute('data-cover-text'));
+      coverMarkContact('text');
+      return;
+    }
     var card=t.closest('[data-cover-id]');
     if(card&&root.contains(card)){
       coverOpenOutcome(card.getAttribute('data-cover-id'));
@@ -8940,10 +9075,14 @@ function aidechatPaintThread(){
       banner.innerHTML='<div>'+aidechatLinkPhones(aidechatEsc(line))+'</div><button type="button" class="btn btn-ghost" id="aidechatClearUrgent" onclick="aidechatClearUrgent()">Clear urgent</button>';
     }else banner.hidden=true;
   }
-  if(!box)return;
+  if(!box){
+    if(typeof coverSimplePaintDraft==='function')coverSimplePaintDraft();
+    return;
+  }
   var msgs=thread.messages||[];
   if(!msgs.length){
     box.innerHTML='<p class="aidechat-note">No messages in this thread yet.</p>';
+    if(typeof coverSimplePaintDraft==='function')coverSimplePaintDraft();
     return;
   }
   box.innerHTML=msgs.map(function(m){
@@ -8951,6 +9090,7 @@ function aidechatPaintThread(){
     return '<div class="aidechat-bubble aidechat-bubble-'+sender+'"><span class="aidechat-who">'+aidechatWho(sender)+'</span>'+aidechatLinkPhones(aidechatEsc(m.body))+'</div>';
   }).join('');
   try{box.scrollTop=box.scrollHeight;}catch(e){}
+  if(typeof coverSimplePaintDraft==='function')coverSimplePaintDraft();
 }
 function aidechatShow(which){
   aidechatView=which;
@@ -13640,6 +13780,754 @@ if(typeof window!=='undefined'&&window.addEventListener){
 }
 schedBootDeepLink();
 // end schedule multi-slot v=clienthrs1b
+
+// v=coverage-simple1 blast then yes then Remi confirm. Ace CALLABLE.
+// admin_blast_cover_request does not assign. admin_confirm_cover_send writes chat,
+// assigned_backup, and the Schedule cover mark. No SMS. No email. No Auth reseal.
+var COVERAGE_SIMPLE1_MARKER='v=coverage-simple1';
+var COVER_SIMPLE_KEY='evercare_coverage_simple1_blasts';
+var coverSimpleRows=[];
+var coverSimpleShift=null;
+var coverSimpleMode='area';
+var coverSimplePicked={};
+var coverSimpleBusy=false;
+var coverSimpleCurrentDraft=null;
+var coverSimpleEditOn=false;
+var coverSimpleEditKey='';
+function coverSimpleRead(){
+  try{
+    var raw=sessionStorage.getItem(COVER_SIMPLE_KEY);
+    var data=raw?JSON.parse(raw):[];
+    return Array.isArray(data)?data:[];
+  }catch(e){return [];}
+}
+function coverSimpleWrite(rows){
+  try{sessionStorage.setItem(COVER_SIMPLE_KEY, JSON.stringify(rows||[]));}catch(e){}
+}
+function coverSimpleLocalMinutes(hhmm){
+  var m=String(hhmm||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return null;
+  var h=Number(m[1]);
+  var min=Number(m[2]);
+  if(h>23||min>59)return null;
+  return h*60+min;
+}
+function coverSimpleSpanMinutes(a,b){
+  var am=coverSimpleLocalMinutes(a);
+  var bm=coverSimpleLocalMinutes(b);
+  if(am==null||bm==null||bm<=am)return null;
+  return bm-am;
+}
+function coverSimpleDaypart(hhmm){
+  var m=coverSimpleLocalMinutes(hhmm);
+  if(m==null)return 'shift';
+  return m>=12*60?'evening shift':'morning shift';
+}
+function coverSimpleNyMinutes(iso){
+  var t=Date.parse(iso==null?'':iso);
+  if(!isFinite(t))return null;
+  try{
+    var parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(t));
+    var h='';
+    var min='';
+    parts.forEach(function(p){
+      if(p.type==='hour')h=p.value;
+      if(p.type==='minute')min=p.value;
+    });
+    if(h===''||min==='')return null;
+    return Number(h)*60+Number(min);
+  }catch(e){return null;}
+}
+function coverSimpleWhenLabel(start, end){
+  var a=Date.parse(start==null?'':start);
+  if(!isFinite(a))return '';
+  var b=Date.parse(end==null?'':end);
+  try{
+    var date=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',month:'2-digit',day:'2-digit',year:'numeric'}).format(new Date(a)).replace(',','');
+    var timeFmt=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});
+    var t1=timeFmt.format(new Date(a));
+    var t2=isFinite(b)?timeFmt.format(new Date(b)):'';
+    var times=t2?(t1+'–'+t2):t1;
+    return date+(times?' · '+times:'');
+  }catch(e){return '';}
+}
+function coverSimpleFullAddress(shift){
+  var home=shift&&shift.clientHomeAddress?String(shift.clientHomeAddress).trim():'';
+  if(!home&&typeof coverClientRecord==='function'){
+    var rec=null;
+    try{rec=coverClientRecord(shift);}catch(e){rec=null;}
+    if(rec)home=String(rec.address||rec.home_address||rec.homeAddress||'').trim();
+  }
+  if(!home&&typeof remiWiderClientAddress==='function'){
+    try{home=String(remiWiderClientAddress(shift)||'').trim();}catch(e2){}
+  }
+  return home;
+}
+function coverSimpleAreaLine(shift){
+  var rec=null;
+  if(typeof coverClientRecord==='function'){
+    try{rec=coverClientRecord(shift);}catch(e){rec=null;}
+  }
+  var area='';
+  if(rec)area=String(rec.area||rec.neighborhood||rec.service_area||rec.area_label||'').trim();
+  if(!area&&shift&&shift.area)area=String(shift.area).trim();
+  if(area)return area;
+  var full=coverSimpleFullAddress(shift);
+  if(!full)return '';
+  var parts=full.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var street=(parts[0]||'').replace(/^\d+\s+/,'');
+  var city=parts.length>1?parts[1]:'';
+  if(street&&city)return street+' / '+city;
+  return street;
+}
+function coverSimpleBlastBody(openShiftId, aideIds, mode){
+  var address=String(mode||'area').toLowerCase()==='full'?'full':'area';
+  var ids=[];
+  (aideIds||[]).forEach(function(id){
+    var s=String(id||'').trim();
+    if(s&&ids.indexOf(s)<0)ids.push(s);
+  });
+  return {p_open_shift_id:String(openShiftId||''), p_aide_ids:ids, p_address_mode:address};
+}
+function coverSimpleConfirmBody(openShiftId, aideId, slotKey, confirmBody){
+  var key=String(slotKey||'').trim().toLowerCase();
+  if(!/^[a-z0-9_-]{1,32}$/.test(key))key='default';
+  var out={
+    p_open_shift_id:String(openShiftId||''),
+    p_backup_aide_id:String(aideId||''),
+    p_slot_key:key
+  };
+  var text=confirmBody==null?'':String(confirmBody);
+  if(text.trim())out.p_confirm_body=text;
+  return out;
+}
+function coverSimpleDraftText(ctx){
+  ctx=ctx||{};
+  var lines=[];
+  if(ctx.client_name)lines.push(String(ctx.client_name));
+  if(ctx.full_address)lines.push(String(ctx.full_address));
+  if(ctx.when_label)lines.push(String(ctx.when_label));
+  var first=String(ctx.aide_first||ctx.aide_name||'').trim().split(/\s+/)[0]||'';
+  lines.push('Shift is yours'+(first?', '+first:''));
+  return lines.join('\n');
+}
+function coverSimpleBlastPreview(ctx){
+  ctx=ctx||{};
+  var mode=ctx.address_mode==='full'?'full':'area';
+  var line=mode==='full'
+    ?('Address: '+(ctx.full_address||'Full street on file'))
+    :('Area: '+(ctx.area||'Area only'));
+  var lines=['Coverage needed'+(ctx.client_name?' · '+ctx.client_name:'')];
+  if(ctx.when_label)lines.push(String(ctx.when_label));
+  lines.push(line);
+  lines.push('Reply yes in this chat if you can take it.');
+  return lines.join('\n');
+}
+function coverSimpleIsYes(text){
+  var s=String(text||'').toLowerCase().replace(/[’']/g,"'").replace(/[^a-z'\s]/g,' ').replace(/\s+/g,' ').trim();
+  if(!s)return false;
+  if(/\b(no|nope|can't|cannot|cant|won't|wont|unable)\b/.test(s)&&!/\byes\b/.test(s))return false;
+  if(/^(yes|yep|yeah|yup|sure|ok|okay)( i can( take it| cover( it)?)?)?$/.test(s))return true;
+  if(/^(i can( take it| cover( it)?)?|i'll take it|ill take it|i can do it)$/.test(s))return true;
+  if(/\byes\b/.test(s)&&/\b(take|cover|can)\b/.test(s)&&s.length<=80)return true;
+  return false;
+}
+function coverSimpleLooksLikeBlast(body){
+  var s=String(body||'');
+  return /coverage needed/i.test(s)&&/reply yes/i.test(s);
+}
+function coverSimpleOverlap(a0,a1,b0,b1){
+  if(a0==null||a1==null||b0==null||b1==null)return 0;
+  var s=Math.max(a0,b0);
+  var e=Math.min(a1,b1);
+  return e>s?e-s:0;
+}
+function coverSimpleDayRows(client){
+  var days=client&&client.days;
+  if(!days)return [];
+  if(Array.isArray(days))return days;
+  return Object.keys(days).map(function(k){return days[k];});
+}
+function coverSimplePickSlot(shift, clients){
+  shift=shift||{};
+  var ymd='';
+  try{ymd=typeof coverNyYmd==='function'?coverNyYmd(shift.startsAt):'';}catch(e){ymd='';}
+  if(!ymd&&shift.on_date)ymd=String(shift.on_date).slice(0,10);
+  var client=null;
+  var i;
+  var list=clients||[];
+  for(i=0;i<list.length;i++){
+    var c=list[i];
+    if(!c)continue;
+    if(shift.clientId&&String(c.id)===String(shift.clientId)){client=c;break;}
+  }
+  if(!client&&shift.clientName){
+    var want=String(shift.clientName).trim().toLowerCase();
+    for(i=0;i<list.length;i++){
+      if(list[i]&&String(list[i].name||'').trim().toLowerCase()===want){client=list[i];break;}
+    }
+  }
+  if(!client)return 'default';
+  var day=null;
+  var days=coverSimpleDayRows(client);
+  for(i=0;i<days.length;i++){
+    if(days[i]&&String(days[i].on_date||'').slice(0,10)===ymd){day=days[i];break;}
+  }
+  if(!day||!day.slots||!day.slots.length)return 'default';
+  if(day.slots.length===1){
+    var only=String(day.slots[0].slot_key||'').trim().toLowerCase();
+    return /^[a-z0-9_-]{1,32}$/.test(only)?only:'default';
+  }
+  var start=coverSimpleNyMinutes(shift.startsAt);
+  var end=coverSimpleNyMinutes(shift.endsAt);
+  var best=null;
+  var bestScore=-1;
+  for(i=0;i<day.slots.length;i++){
+    var slot=day.slots[i];
+    if(!slot)continue;
+    var key=String(slot.slot_key||'').trim().toLowerCase();
+    if(!/^[a-z0-9_-]{1,32}$/.test(key))continue;
+    var score=coverSimpleOverlap(start, end, coverSimpleLocalMinutes(slot.start_local), coverSimpleLocalMinutes(slot.end_local));
+    if(shift.aideId&&slot.usual_aide_id&&String(slot.usual_aide_id)===String(shift.aideId))score+=1000;
+    else if(shift.aideName&&slot.aide_name&&String(slot.aide_name).trim().toLowerCase()===String(shift.aideName).trim().toLowerCase())score+=1000;
+    if(score>bestScore){bestScore=score;best=key;}
+  }
+  if(best&&bestScore>0)return best;
+  return 'default';
+}
+function coverSimpleHoursNote(){
+  var el=document.getElementById('coverHoursNote');
+  if(!el)return;
+  var startEl=document.getElementById('coverTime');
+  var endEl=document.getElementById('coverEndTime');
+  var aideEl=document.getElementById('coverAideSel');
+  var mins=coverSimpleSpanMinutes(startEl&&startEl.value, endEl&&endEl.value);
+  var bits=[];
+  if(mins!=null){
+    var h=Math.round((mins/60)*100)/100;
+    bits.push(String(h).replace(/\.0$/,'')+' hrs');
+  }
+  bits.push(coverSimpleDaypart(startEl&&startEl.value));
+  var name='';
+  if(typeof coverSelectedLabel==='function')name=coverSelectedLabel(aideEl);
+  bits.push('usual aide '+(name||'—'));
+  el.textContent=bits.join(' · ');
+}
+function coverSimpleToggleReason(){
+  var sel=document.getElementById('coverNote');
+  var wrap=document.getElementById('coverReasonOtherWrap');
+  if(wrap)wrap.hidden=!(sel&&sel.value==='Other');
+}
+function coverSimpleAssignedToday(){
+  var today='';
+  try{today=typeof coverNyYmd==='function'?coverNyYmd(new Date().toISOString()):'';}catch(e){today='';}
+  var n=0;
+  coverSimpleRead().forEach(function(row){
+    if(row&&row.confirmed&&today&&String(row.on_date||'').slice(0,10)===today)n+=1;
+  });
+  return n;
+}
+function coverSimplePaintStats(){
+  var open=(typeof coverShifts!=='undefined'?coverShifts:[]).filter(function(s){
+    return typeof coverListVisible!=='function'||coverListVisible(s);
+  });
+  var urgent=open.filter(function(s){return typeof coverShiftUrgent==='function'&&coverShiftUrgent(s);});
+  var o=document.getElementById('coverStatOpen');
+  var u=document.getElementById('coverStat48');
+  var a=document.getElementById('coverStatAssigned');
+  if(o)o.textContent=String(open.length);
+  if(u)u.textContent=String(urgent.length);
+  if(a)a.textContent=String(coverSimpleAssignedToday());
+}
+function coverSimpleSelectedIds(){
+  var ids=[];
+  coverSimpleRows.forEach(function(row){
+    if(row.calledOff)return;
+    if(coverSimplePicked[row.id])ids.push(row.id);
+  });
+  return ids;
+}
+function coverSimplePreviewCtx(){
+  var shift=coverSimpleShift||{};
+  return {
+    client_name:shift.clientName&&shift.clientName!=='Client'?shift.clientName:'',
+    when_label:coverSimpleWhenLabel(shift.startsAt, shift.endsAt),
+    address_mode:coverSimpleMode,
+    full_address:coverSimpleFullAddress(shift),
+    area:coverSimpleAreaLine(shift)
+  };
+}
+function coverSimplePaintBlast(){
+  var shift=coverSimpleShift;
+  var sub=document.getElementById('coverSimpleSub');
+  var count=document.getElementById('coverSimpleCount');
+  var list=document.getElementById('coverSimpleAides');
+  var preview=document.getElementById('coverSimplePreview');
+  var note=document.getElementById('coverSimpleAddrNote');
+  var fullBtn=document.getElementById('coverSimpleFull');
+  var areaBtn=document.getElementById('coverSimpleArea');
+  if(sub){
+    var when=shift?coverSimpleWhenLabel(shift.startsAt, shift.endsAt):'';
+    sub.textContent=((shift&&shift.clientName)||'This shift')+(when?' · '+when:'')+'. Select aides, choose address detail, send one chat blast.';
+  }
+  var ids=coverSimpleSelectedIds();
+  if(count)count.textContent=ids.length+' selected';
+  if(fullBtn)fullBtn.classList.toggle('is-on', coverSimpleMode==='full');
+  if(areaBtn)areaBtn.classList.toggle('is-on', coverSimpleMode!=='full');
+  if(list){
+    list.innerHTML=coverSimpleRows.map(function(row){
+      var on=!row.calledOff&&!!coverSimplePicked[row.id];
+      var esc=typeof coverEsc==='function'?coverEsc:function(s){return String(s==null?'':s);};
+      var attr=typeof coverAttr==='function'?coverAttr:esc;
+      return '<button type="button" class="cover-simple-aide'+(on?' is-on':'')+'" data-cover-simple-aide="'+attr(row.id)+'" aria-pressed="'+(on?'true':'false')+'">'
+        +'<span class="box" aria-hidden="true">'+(on?'✓':'')+'</span>'
+        +'<span><strong>'+esc(row.name||'Aide')+'</strong><span>'+esc(coverSimpleAideMeta(row, shift))+'</span></span></button>';
+    }).join('');
+  }
+  var ctx=coverSimplePreviewCtx();
+  if(preview)preview.textContent=coverSimpleBlastPreview(ctx);
+  if(note){
+    note.textContent=coverSimpleMode==='full'
+      ?'Full street is in this blast.'
+      :'Area only selected · full street held for the yes-confirm.';
+  }
+}
+function coverSimpleAideMeta(row, shift){
+  if(row&&row.calledOff)return 'Called off — excluded by default';
+  var bits=[];
+  if(row&&row.distance!=null&&row.distance!==''){
+    var n=Math.round(Number(row.distance)*10)/10;
+    if(isFinite(n)&&n>=0){
+      var text=Math.abs(n-Math.round(n))<1e-9?String(Math.round(n)):n.toFixed(1);
+      bits.push(text+' mi');
+    }
+  }
+  var c=Number(row&&row.continuity);
+  var client=shift&&shift.clientName?String(shift.clientName).trim().split(/\s+/)[0]:'this client';
+  if(client==='Client')client='this client';
+  if(isFinite(c)&&c>0)bits.push('covered '+client+' before');
+  else if(row&&row.continuity!=null&&row.continuity!==''&&isFinite(c))bits.push('never covered '+client);
+  if(!bits.length)bits.push('active');
+  return bits.join(' · ');
+}
+function coverSimpleSetMode(mode){
+  coverSimpleMode=mode==='full'?'full':'area';
+  coverSimplePaintBlast();
+}
+function coverSimpleToggleAide(id){
+  var row=null;
+  coverSimpleRows.forEach(function(r){if(String(r.id)===String(id))row=r;});
+  if(!row||row.calledOff)return;
+  if(coverSimplePicked[row.id])delete coverSimplePicked[row.id];
+  else coverSimplePicked[row.id]=1;
+  coverSimplePaintBlast();
+}
+function coverSimpleSelectAll(){
+  coverSimplePicked={};
+  coverSimpleRows.forEach(function(row){
+    if(!row.calledOff)coverSimplePicked[row.id]=1;
+  });
+  coverSimplePaintBlast();
+}
+function coverSimpleBuildRows(shift, ranked){
+  var out=[];
+  var seen={};
+  function push(row, calledOff){
+    var id=String(row&&(row.id||row.value)||'');
+    if(!id||seen[id])return;
+    seen[id]=1;
+    out.push({
+      id:id,
+      name:row.name||row.label||'Aide',
+      username:row.username||'',
+      distance:row.distance,
+      continuity:row.continuity,
+      calledOff:!!calledOff
+    });
+  }
+  (ranked||[]).forEach(function(r){push(r, false);});
+  var roster=[];
+  try{roster=typeof coverActiveRoster==='function'?coverActiveRoster(''):[];}catch(e){roster=[];}
+  (roster||[]).forEach(function(r){
+    var off=!!(shift&&shift.aideId&&String(r.id)===String(shift.aideId));
+    push(r, off);
+  });
+  if(shift&&shift.aideId&&!seen[String(shift.aideId)])push({id:shift.aideId, name:shift.aideName||'Regular aide'}, true);
+  var head=[];
+  var tail=[];
+  out.forEach(function(row){(row.calledOff?tail:head).push(row);});
+  return head.concat(tail);
+}
+function coverSimpleClose(){
+  var scrim=document.getElementById('coverSimpleScrim');
+  if(scrim)scrim.hidden=true;
+}
+function coverSimpleBindScrim(){
+  var scrim=document.getElementById('coverSimpleScrim');
+  if(!scrim||scrim.getAttribute('data-bound')==='1')return;
+  scrim.setAttribute('data-bound','1');
+  scrim.addEventListener('click', function(ev){
+    var aide=ev.target&&ev.target.closest?ev.target.closest('[data-cover-simple-aide]'):null;
+    if(aide){
+      ev.preventDefault();
+      coverSimpleToggleAide(aide.getAttribute('data-cover-simple-aide'));
+      return;
+    }
+    if(ev.target===scrim)coverSimpleClose();
+  });
+  document.addEventListener('keydown', function(ev){
+    if(ev.key!=='Escape')return;
+    var box=document.getElementById('coverSimpleScrim');
+    if(box&&!box.hidden)coverSimpleClose();
+  });
+}
+async function coverSimpleOpenBlast(id){
+  var shift=typeof coverFind==='function'?coverFind(id):null;
+  if(!shift)return;
+  if(typeof coverCanAssign==='function'&&!coverCanAssign(shift)){
+    if(typeof showTempMsg==='function')showTempMsg('A blast is for an open shift. This one is already closed.','var(--warn)');
+    return;
+  }
+  coverSimpleShift=shift;
+  coverSimpleMode='area';
+  coverSimplePicked={};
+  coverSimpleBindScrim();
+  var ranked=[];
+  if(typeof coverRpc==='function'&&typeof coverRankArgs==='function'&&typeof coverUuidOrNull==='function'&&coverUuidOrNull(shift.id)){
+    var got=await coverRpc('rank', coverRankArgs(shift.id));
+    if(got&&got.ok&&typeof coverRankRows==='function'){
+      ranked=coverRankRows(got.data).filter(function(r){
+        return !shift.aideId||String(r.id)!==String(shift.aideId);
+      });
+    }
+  }
+  coverSimpleRows=coverSimpleBuildRows(shift, ranked);
+  ranked.forEach(function(r){if(r&&r.id)coverSimplePicked[String(r.id)]=1;});
+  coverSimplePaintBlast();
+  var scrim=document.getElementById('coverSimpleScrim');
+  if(scrim)scrim.hidden=false;
+}
+function coverSimpleAfterRecord(created){
+  if(!created)return;
+  var row=null;
+  if(created.id&&typeof coverFind==='function')row=coverFind(created.id);
+  if(!row&&typeof coverShifts!=='undefined'){
+    (coverShifts||[]).some(function(s){
+      if(typeof coverSameClient==='function'&&coverSameClient(s, created)&&typeof coverSameWindow==='function'&&coverSameWindow(s, created)){
+        row=s;
+        return true;
+      }
+      return false;
+    });
+  }
+  var shift=row||created;
+  var banner=document.getElementById('coverSimpleBanner');
+  if(banner){
+    banner.hidden=false;
+    var when=coverSimpleWhenLabel(shift.startsAt, shift.endsAt);
+    banner.textContent='Call-off recorded · '+(shift.clientName||'Client')+(when?' · '+when:'');
+  }
+  if(typeof coverUuidOrNull==='function'&&coverUuidOrNull(shift.id))coverSimpleOpenBlast(shift.id);
+}
+async function coverSimpleRpc(name, body){
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function')return {missing:true};
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token)return {signedOut:true};
+  var got=null;
+  try{got=await sbRestRpc(name, body||{});}
+  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  if(got&&got.ok===true){
+    var node=got.data;
+    if(typeof sbRpcNode==='function'){
+      try{node=sbRpcNode(got.data);}catch(e2){node=got.data;}
+    }
+    var rpcErr='';
+    if(typeof sbRpcError==='function'){
+      try{rpcErr=sbRpcError(node)||'';}catch(e3){rpcErr='';}
+    }
+    if(rpcErr)return {ok:false, error:rpcErr};
+    if(node&&node.success===false)return {ok:false, error:node.error||'Request failed.'};
+    return {ok:true, data:node};
+  }
+  if(typeof coverRpcMissing==='function'&&coverRpcMissing(got))return {missing:true, error:got&&got.error};
+  return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status};
+}
+function coverSimpleRememberBlast(shift, body, data){
+  var payload=data&&data.payload&&typeof data.payload==='object'?data.payload:{};
+  var row={
+    open_shift_id:String((data&&data.open_shift_id)||(shift&&shift.id)||''),
+    aide_ids:(body.p_aide_ids||[]).slice(),
+    address_mode:body.p_address_mode||'area',
+    client_name:payload.client_name||(shift&&shift.clientName)||'',
+    client_id:String((shift&&shift.clientId)||''),
+    full_address:payload.full_address||coverSimpleFullAddress(shift),
+    area:payload.area||coverSimpleAreaLine(shift),
+    when_label:coverSimpleWhenLabel(shift&&shift.startsAt, shift&&shift.endsAt)||payload.time_label||'',
+    on_date:String(payload.shift_date||(typeof coverNyYmd==='function'?coverNyYmd(shift&&shift.startsAt):'')||'').slice(0,10),
+    slot_key:'',
+    regular_aide_name:(shift&&shift.aideName)||'',
+    confirmed:false
+  };
+  var rows=coverSimpleRead().filter(function(item){return String(item.open_shift_id)!==row.open_shift_id;});
+  rows.push(row);
+  coverSimpleWrite(rows);
+  return row;
+}
+async function coverSimpleSendBlast(){
+  var shift=coverSimpleShift;
+  if(!shift||coverSimpleBusy)return;
+  var ids=coverSimpleSelectedIds().filter(function(id){
+    return typeof coverUuidOrNull!=='function'||!!coverUuidOrNull(id);
+  });
+  if(!ids.length){
+    if(typeof showTempMsg==='function')showTempMsg('Select at least one aide with an office id.','var(--warn)');
+    return;
+  }
+  if(typeof coverUuidOrNull==='function'&&!coverUuidOrNull(shift.id)){
+    if(typeof showTempMsg==='function')showTempMsg('This shift is still on this phone, so the blast cannot send yet.','var(--warn)');
+    return;
+  }
+  var body=coverSimpleBlastBody(shift.id, ids, coverSimpleMode);
+  coverSimpleBusy=true;
+  var btn=document.getElementById('coverSimpleSendBlast');
+  if(btn)btn.disabled=true;
+  var got=await coverSimpleRpc('admin_blast_cover_request', body);
+  coverSimpleBusy=false;
+  if(btn)btn.disabled=false;
+  if(!got||got.ok!==true){
+    var why=(got&&got.signedOut)?'Sign in to send the blast.':(got&&got.missing)?'The office blast did not answer. Nothing was assigned.':((got&&got.error)||'Could not send the blast. Nothing was assigned.');
+    if(typeof showTempMsg==='function')showTempMsg(why,'var(--danger)');
+    return;
+  }
+  if(got.data&&got.data.assigned===true){
+    if(typeof showTempMsg==='function')showTempMsg('The blast answered assigned. Coverage did not assign from this screen.','var(--warn)');
+  }
+  coverSimpleRememberBlast(shift, body, got.data||{});
+  var n=(got.data&&got.data.blast_count!=null)?got.data.blast_count:ids.length;
+  var when=coverSimpleWhenLabel(shift.startsAt, shift.endsAt);
+  var modeLabel=coverSimpleMode==='full'?'Full street':'Area only';
+  var line='Blast sent to '+n+' aides · '+(shift.clientName||'Client')+(when?' · '+when:'')+' · '+modeLabel;
+  var banner=document.getElementById('coverSimpleBanner');
+  if(banner){banner.hidden=false;banner.textContent=line;}
+  if(typeof showTempMsg==='function')showTempMsg(line+' Nothing was assigned.','var(--success)');
+  coverSimpleClose();
+  if(typeof coverPaintList==='function')coverPaintList();
+}
+function coverSimpleBlastForAide(aideId){
+  var rows=coverSimpleRead();
+  var i;
+  for(i=rows.length-1;i>=0;i--){
+    var row=rows[i];
+    if(!row||row.confirmed)continue;
+    var ids=row.aide_ids||[];
+    if(aideId&&ids.some(function(id){return String(id)===String(aideId);}))return row;
+  }
+  return null;
+}
+function coverSimpleMarkConfirmed(openShiftId, aideId){
+  var rows=coverSimpleRead();
+  rows.forEach(function(row){
+    if(row&&String(row.open_shift_id)===String(openShiftId)){
+      row.confirmed=true;
+      row.backup_aide_id=String(aideId||'');
+    }
+  });
+  coverSimpleWrite(rows);
+}
+function coverSimpleHideDraft(){
+  var box=document.getElementById('coverSimpleDraft');
+  var pending=document.getElementById('coverSimplePending');
+  if(box)box.hidden=true;
+  if(pending)pending.hidden=true;
+  coverSimpleCurrentDraft=null;
+  coverSimpleEditOn=false;
+}
+function coverSimpleThreadDraft(thread){
+  if(!thread)return null;
+  var msgs=thread.messages||[];
+  var blastAt=-1;
+  var yesAt=-1;
+  var i;
+  for(i=0;i<msgs.length;i++){
+    var m=msgs[i];
+    if(!m)continue;
+    if((m.sender==='office'||m.sender==='remi')&&coverSimpleLooksLikeBlast(m.body))blastAt=i;
+    if(m.sender==='aide'&&coverSimpleIsYes(m.body)&&(blastAt>=0||coverSimpleBlastForAide(thread.aide_id)))yesAt=i;
+    if(yesAt>=0&&i>yesAt&&(m.sender==='office'||m.sender==='remi')&&/shift is yours/i.test(String(m.body||'')))return null;
+  }
+  var stored=coverSimpleBlastForAide(thread.aide_id);
+  if(yesAt<0)return null;
+  if(blastAt<0&&!stored)return null;
+  if(stored&&stored.confirmed)return null;
+  var ctx={
+    open_shift_id:stored?String(stored.open_shift_id||''):'',
+    client_id:stored?String(stored.client_id||''):'',
+    client_name:stored?String(stored.client_name||''):'',
+    full_address:stored?String(stored.full_address||''):'',
+    area:stored?String(stored.area||''):'',
+    when_label:stored?String(stored.when_label||''):'',
+    on_date:stored?String(stored.on_date||'').slice(0,10):'',
+    aide_id:String(thread.aide_id||''),
+    aide_name:String(thread.name||thread.username||''),
+    regular_aide_name:stored?String(stored.regular_aide_name||''):''
+  };
+  if(!ctx.client_name&&blastAt>=0){
+    var hit=String(msgs[blastAt].body||'').match(/Coverage needed\s*·\s*([^\n]+)/i);
+    if(hit)ctx.client_name=hit[1].trim();
+  }
+  var found=null;
+  if(ctx.open_shift_id&&typeof coverFind==='function')found=coverFind(ctx.open_shift_id);
+  if(!found&&ctx.client_name&&typeof coverShifts!=='undefined'){
+    (coverShifts||[]).some(function(s){
+      if(!s)return false;
+      var open=typeof coverIsOpen!=='function'||coverIsOpen(s);
+      if(open&&String(s.clientName||'').trim().toLowerCase()===ctx.client_name.trim().toLowerCase()){found=s;return true;}
+      return false;
+    });
+  }
+  if(found){
+    ctx.shift=found;
+    if(!ctx.open_shift_id)ctx.open_shift_id=String(found.id||'');
+    if(!ctx.client_id)ctx.client_id=String(found.clientId||'');
+    if(!ctx.on_date&&typeof coverNyYmd==='function')ctx.on_date=coverNyYmd(found.startsAt);
+    if(!ctx.when_label)ctx.when_label=coverSimpleWhenLabel(found.startsAt, found.endsAt);
+    if(!ctx.full_address)ctx.full_address=coverSimpleFullAddress(found);
+    if(!ctx.regular_aide_name)ctx.regular_aide_name=found.aideName||'';
+  }else if(!ctx.full_address){
+    ctx.full_address=coverSimpleFullAddress({clientName:ctx.client_name, clientId:ctx.client_id});
+  }
+  ctx.pass_body=!!ctx.full_address;
+  ctx.draft=coverSimpleDraftText(ctx);
+  return ctx;
+}
+function coverSimplePaintDraft(){
+  var thread=typeof aidechatFind==='function'?aidechatFind(typeof aidechatSelectedId!=='undefined'?aidechatSelectedId:''):null;
+  var box=document.getElementById('coverSimpleDraft');
+  var pending=document.getElementById('coverSimplePending');
+  if(!thread||(typeof aidechatView!=='undefined'&&aidechatView!=='thread')){
+    coverSimpleHideDraft();
+    return;
+  }
+  var ctx=coverSimpleThreadDraft(thread);
+  if(!ctx){
+    coverSimpleHideDraft();
+    return;
+  }
+  var key=ctx.open_shift_id+'|'+ctx.aide_id;
+  coverSimpleCurrentDraft=ctx;
+  if(box)box.hidden=false;
+  if(pending)pending.hidden=false;
+  var pre=document.getElementById('coverSimpleDraftText');
+  var edit=document.getElementById('coverSimpleDraftEdit');
+  if(coverSimpleEditOn&&coverSimpleEditKey===key)return;
+  coverSimpleEditOn=false;
+  coverSimpleEditKey=key;
+  if(pre){pre.hidden=false;pre.textContent=ctx.draft;}
+  if(edit){edit.hidden=true;edit.value=ctx.draft;}
+  var note=box?box.querySelector('.auto-note'):null;
+  if(note){
+    var when=ctx.when_label||'that day';
+    var who=String(ctx.aide_name||'the aide').split(/\s+/)[0];
+    var esc=typeof coverEsc==='function'?coverEsc:function(s){return String(s==null?'':s);};
+    note.innerHTML='<strong>On Send:</strong> chat goes to '+esc(who)+' and Schedule '+esc(when)+' auto-marks <strong>Covered shift · '+esc(who)+'</strong> — no manual Schedule step.';
+  }
+}
+function coverSimpleEditDraft(){
+  var pre=document.getElementById('coverSimpleDraftText');
+  var edit=document.getElementById('coverSimpleDraftEdit');
+  if(!pre||!edit)return;
+  if(edit.hidden){
+    edit.value=pre.textContent||'';
+    edit.hidden=false;
+    pre.hidden=true;
+    coverSimpleEditOn=true;
+    try{edit.focus();}catch(e){}
+    return;
+  }
+  pre.textContent=edit.value;
+  edit.hidden=true;
+  pre.hidden=false;
+}
+async function coverSimpleEnsureSlot(shift){
+  var ymd='';
+  try{ymd=typeof coverNyYmd==='function'?coverNyYmd(shift&&shift.startsAt):'';}catch(e){ymd='';}
+  if(!ymd&&shift&&shift.on_date)ymd=String(shift.on_date).slice(0,10);
+  var clients=(typeof schedSlotClients!=='undefined'&&schedSlotClients)?schedSlotClients:[];
+  if(ymd&&typeof schedMondayOf==='function'&&typeof schedIsoDate==='function'&&typeof schedParseIso==='function'&&typeof schedLoadWeek==='function'){
+    var week=schedIsoDate(schedMondayOf(schedParseIso(ymd)));
+    var loaded=typeof schedEnsureWeek==='function'&&schedEnsureWeek()===week&&clients.length;
+    if(!loaded){
+      schedWeekStart=week;
+      try{await schedLoadWeek(week);}catch(e2){}
+      clients=(typeof schedSlotClients!=='undefined'&&schedSlotClients)?schedSlotClients:[];
+    }
+  }
+  return coverSimplePickSlot(shift, clients);
+}
+async function coverSimpleConfirmSend(){
+  var ctx=coverSimpleCurrentDraft;
+  if(!ctx||coverSimpleBusy)return;
+  if(!ctx.open_shift_id||!ctx.aide_id){
+    if(typeof showTempMsg==='function')showTempMsg('This yes is not tied to an open shift yet. Nothing was assigned.','var(--warn)');
+    return;
+  }
+  var edit=document.getElementById('coverSimpleDraftEdit');
+  var pre=document.getElementById('coverSimpleDraftText');
+  var edited=!!(edit&&!edit.hidden);
+  var text=edited?String(edit.value||''):(pre?String(pre.textContent||''):String(ctx.draft||''));
+  var pass=edited||(!!ctx.full_address&&text.indexOf(ctx.full_address)>=0);
+  var shift=ctx.shift||(typeof coverFind==='function'?coverFind(ctx.open_shift_id):null)||{
+    id:ctx.open_shift_id,
+    clientId:ctx.client_id,
+    clientName:ctx.client_name,
+    startsAt:ctx.on_date||'',
+    on_date:ctx.on_date,
+    aideName:ctx.regular_aide_name
+  };
+  var slot=await coverSimpleEnsureSlot(shift);
+  var body=coverSimpleConfirmBody(ctx.open_shift_id, ctx.aide_id, slot, pass?text:'');
+  coverSimpleBusy=true;
+  var btn=document.getElementById('coverSimpleConfirm');
+  if(btn)btn.disabled=true;
+  var got=await coverSimpleRpc('admin_confirm_cover_send', body);
+  coverSimpleBusy=false;
+  if(btn)btn.disabled=false;
+  if(!got||got.ok!==true){
+    var why=(got&&got.signedOut)?'Sign in to send the confirm.':(got&&got.missing)?'Confirm send did not answer. Nothing was assigned.':((got&&got.error)||'Could not send the confirm. Nothing was assigned.');
+    if(typeof showTempMsg==='function')showTempMsg(why,'var(--danger)');
+    return;
+  }
+  var data=got.data||{};
+  var link=(data.deep_link&&typeof data.deep_link==='object')?data.deep_link:((data.day_mark&&data.day_mark.deep_link)||{});
+  var onDate=String((link&&link.on_date)||data.on_date||ctx.on_date||'').slice(0,10);
+  var slotKey=String((link&&link.slot_key)||data.slot_key||body.p_slot_key||'default');
+  var clientId=String((link&&link.client_id)||ctx.client_id||'');
+  coverSimpleMarkConfirmed(ctx.open_shift_id, ctx.aide_id);
+  var rows=coverSimpleRead();
+  rows.forEach(function(row){
+    if(row&&String(row.open_shift_id)===String(ctx.open_shift_id)){
+      if(onDate)row.on_date=onDate;
+      row.slot_key=slotKey;
+    }
+  });
+  coverSimpleWrite(rows);
+  var first=String(ctx.aide_name||'the aide').split(/\s+/)[0];
+  var when=onDate&&typeof formatAdminDate==='function'?formatAdminDate(onDate):onDate;
+  var line='Chat sent to '+first+(when?' · Schedule '+when+' auto-marked Covered shift · '+first:'');
+  var regular=String(ctx.regular_aide_name||'').split(/\s+/)[0];
+  if(regular&&regular!=='—')line+=' (for '+regular+')';
+  var banner=document.getElementById('coverSimpleSchedBanner');
+  if(banner){banner.hidden=false;banner.textContent=line;}
+  if(typeof showTempMsg==='function')showTempMsg(line,'var(--success)');
+  coverSimpleHideDraft();
+  if(clientId&&onDate){
+    try{schedPendingDeepLink={client_id:clientId, on_date:onDate, slot_key:slotKey};}catch(e){}
+  }
+  if(typeof showTab==='function')showTab('schedule');
+}
+// end v=coverage-simple1
+
 
 // remi notes v=remi-notes1
 var REMI_NOTES1_MARKER='v=remi-notes1';
