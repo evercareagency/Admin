@@ -17,7 +17,7 @@ assert.ok(html.includes('GHOST-CLIENTHRS1B-CONTRACT-v1'), 'clienthrs1b contract'
 assert.ok(html.includes("var CLIENTHRS1B_MARKER='v=clienthrs1b'"), 'clienthrs1b script marker');
 assert.ok(html.includes('CLIENTHRS'), 'CLIENTHRS marker string');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-26-isdash1b'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-shift-slim1'), 'shift-slim1 is the first admin-build meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-26-clienthrs1a">'), 'clienthrs1a meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidechat1">'), 'aidechat1 meta stays');
 assert.ok(html.indexOf('content="2026-09-26-clienthrs1b"') < html.indexOf('content="2026-09-26-clienthrs1a"'), 'clienthrs1a stays below clienthrs1b');
@@ -215,8 +215,9 @@ assert.ok(els.schedBody.innerHTML.includes('>5h<') || els.schedBody.innerHTML.in
 assert.ok(els.schedSlotDaySum.textContent.includes('9 hrs'), 'day detail totals both shifts');
 assert.ok(els.schedSlotCards.innerHTML.includes('Morning'), 'day detail lists the morning slot');
 assert.ok(els.schedSlotCards.innerHTML.includes('data-slot-action="missed"'), 'missed mark control');
-assert.ok(els.schedSlotCards.innerHTML.includes('data-slot-action="worked"'), 'worked mark control');
-assert.ok(els.schedSlotCards.innerHTML.includes('Swap cover'), 'cover control');
+assert.ok(!els.schedSlotCards.innerHTML.includes('data-slot-action="worked"'), 'worked mark control is gone');
+assert.ok(els.schedSlotCards.innerHTML.includes('Covered shift'), 'cover control');
+assert.ok(els.schedSlotCards.innerHTML.includes('On hold'), 'on hold control');
 assert.ok(els.schedSlotCards.innerHTML.includes('data-deep-link=') && els.schedSlotCards.innerHTML.includes('slot_key') && els.schedSlotCards.innerHTML.includes('on_date'), 'deep link shape is on the slot');
 assert.strictEqual(els.schedSlotDetail.hidden, false, 'day detail is open beside the week');
 
@@ -236,9 +237,9 @@ assert.strictEqual(marked.day_hours, 4, 'missed morning drops out of the day buc
 sandbox.schedSelectSlotDay(ada, '2026-09-23', 3);
 sandbox.schedPaint();
 assert.ok(els.schedBody.innerHTML.includes('is-missed'), 'missed chip is marked');
-assert.ok(els.schedSlotCards.innerHTML.includes('Missed / no-show'), 'day detail shows the missed mark');
-assert.ok(els.schedSlotCards.innerHTML.includes('no cover'), 'missed without a cover aide shows the hour loss');
-assert.ok(els.schedSlotCards.innerHTML.includes('✓ Worked'), 'evening shows worked');
+assert.ok(els.schedSlotCards.innerHTML.includes('✕ Missed'), 'day detail shows the missed mark');
+assert.ok(els.schedSlotCards.innerHTML.includes('No-show'), 'missed reason includes no-show');
+assert.ok(els.schedSlotCards.innerHTML.includes('Assumed worked'), 'evening stays assumed worked');
 
 sandbox.schedFocusDeepLink({client_id: ada, on_date: '2026-09-23', slot_key: 'pm'});
 assert.strictEqual(sandbox.schedSlotView, 'day');
@@ -435,7 +436,7 @@ async function phoneShots(){
         detail: !document.getElementById('schedSlotDetail').hidden
       };
     });
-    assert.strictEqual(week.build, '2026-09-26-isdash1b');
+    assert.strictEqual(week.build, '2026-09-27-shift-slim1');
     assert.strictEqual(week.viewW, 390);
     assert.ok(week.chips >= 2, 'two chips on the week board ' + week.chips);
     assert.ok(week.stack.indexOf('Sara') >= 0 && week.stack.indexOf('Kim') >= 0, 'stacked Sara and Kim ' + week.stack);
@@ -502,7 +503,7 @@ async function phoneShots(){
       };
     });
     assert.ok(day.text.indexOf('Missed') >= 0, 'day detail shows missed ' + day.text);
-    assert.ok(day.text.indexOf('no cover') >= 0, 'day detail shows no cover');
+    assert.ok(day.text.indexOf('No-show') >= 0, 'day detail shows missed reasons');
     assert.strictEqual(day.worked, true, 'evening worked card is on the day');
     assert.ok(day.btnH >= 44, 'mark control is at least 44px ' + day.btnH);
     assert.ok(day.btnTop >= 0 && day.btnBottom <= day.navTop + 1, 'mark control sits above the bottom nav');
@@ -513,13 +514,18 @@ async function phoneShots(){
     assert.strictEqual(link.on_date, '2026-09-23');
     await page.screenshot({path: path.join(outDir, 'clienthrs1b-day-phone.png')});
 
-    const missBtn = await page.$('.sched-slot-card.is-missed [data-slot-action="worked"]');
+    await page.evaluate(function(){
+      var btn = document.querySelector('.sched-slot-card.is-missed [data-slot-action="save-miss"]');
+      if(btn && btn.scrollIntoView) btn.scrollIntoView({block:'center'});
+    });
+    const missBtn = await page.$('.sched-slot-card.is-missed [data-slot-action="save-miss"]');
     await missBtn.click();
+    await new Promise(function(r){ setTimeout(r, 40); });
     const called = await page.evaluate(function(){
       return window.__hrsCalls.filter(function(c){ return c.name === 'upsert_schedule_slot_day_mark'; }).pop();
     });
-    assert.ok(called, 'tapping Worked calls upsert_schedule_slot_day_mark');
-    assert.strictEqual(called.body.p_mark, 'worked');
+    assert.ok(called, 'tapping Save mark calls upsert_schedule_slot_day_mark');
+    assert.strictEqual(called.body.p_mark, 'missed');
     assert.strictEqual(called.body.p_slot_key, 'am');
     assert.strictEqual(called.body.p_on_date, '2026-09-23');
 
@@ -543,19 +549,23 @@ async function phoneShots(){
       var fab = document.getElementById('copilotFab').getBoundingClientRect();
       var detail = document.getElementById('schedSlotDetail').getBoundingClientRect();
       var grid = document.getElementById('schedScroll').getBoundingClientRect();
+      var main = document.querySelector('#tab_schedule .sched-main').getBoundingClientRect();
       return {
         layout: layout,
         chips: document.querySelectorAll('#schedScroll .sched-chip').length,
-        detailRight: detail.right,
-        gridRight: grid.right,
+        detailTop: detail.top,
+        gridBottom: grid.bottom,
+        gridWidth: grid.width,
+        mainWidth: main.width,
         fabRight: fab.right,
         viewW: window.innerWidth,
         hiddenRemiPage: !document.getElementById('tab_remi')
       };
     });
-    assert.strictEqual(wide.layout, 'row', 'desktop schedule stays side by side');
+    assert.strictEqual(wide.layout, 'column', 'desktop week is full-bleed and the drawer is below');
     assert.ok(wide.chips >= 2, 'desktop shows both chips');
-    assert.ok(wide.detailRight > wide.gridRight - 2, 'day detail sits to the right of the week grid');
+    assert.ok(wide.detailTop >= wide.gridBottom - 2, 'day detail sits under the week grid');
+    assert.ok(wide.gridWidth >= wide.mainWidth - 8, 'the drawer does not squeeze the week grid');
     assert.ok(wide.fabRight > wide.viewW - 120, 'Remi chip stays on the right');
     assert.strictEqual(wide.hiddenRemiPage, true);
 
