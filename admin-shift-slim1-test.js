@@ -19,7 +19,7 @@ assert.ok(html.includes('<!-- schedule slim edit 2026-09-27 v=shift-slim1 admin-
 assert.ok(html.includes("var CLIENTHRS1C_MARKER='v=clienthrs1c'"), 'clienthrs1c script marker');
 assert.ok(html.includes("var SHIFT_SLIM1_MARKER='v=shift-slim1'"), 'shift-slim1 script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-remi-cm-email1'), 'first admin-build is clienthrs1c');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-clienthrs1d'), 'first admin-build is clienthrs1c');
 ['2026-09-27-shift-slim1','2026-09-26-isdash1b','2026-09-26-isdash1','2026-09-26-remi-notes1','2026-09-26-clienthrs1b','2026-09-26-clienthrs1a'].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="'+meta+'">'), 'prior meta stays '+meta);
 });
@@ -405,7 +405,7 @@ async function shots(){
         sheetHidden: document.getElementById('copilotSheet').hidden
       };
     });
-    assert.strictEqual(phoneProbe.build, '2026-09-27-coverage-simple1');
+    assert.strictEqual(phoneProbe.build, '2026-09-27-clienthrs1d');
     assert.strictEqual(phoneProbe.viewW, 390);
     assert.ok(phoneProbe.scroll > phoneProbe.client + 40, 'phone week scrolls');
     assert.strictEqual(phoneProbe.checks, 7);
