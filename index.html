@@ -42,6 +42,8 @@
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
+<!-- aide text chat 2026-09-27 v=aide-text-chat1 admin-build 2026-09-27-aide-text-chat1. GHOST-AIDE-TEXT-CHAT1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Coverage and the client contact sheet Text this aide posts admin_compose_aide_text {p_aide_id, p_body optional, p_client_id optional} and opens the existing Aide chat draft at admin/messages?aide_id=. Compose never auto-sends. Send posts admin_send_aide_text {p_aide_id, p_body, p_client_id optional}. Optional chrome posts admin_get_aide_text_channel {p_aide_id}. Channel is in_app_messages. phone_required is false. sms_sent is false. has_push_subscription is not a blocker. Phone is not required. No SMS Confirm. Label stays Text this aide. Subtitle is Messages (push notifies phone). Caregiver deep link is caregiver/messages. Reuses aidechat1. Text client stays client-phone sms: and tel: when a phone is present. No admin_text_client. No Quo. No Auth reseal. Nurse is denied (42501). Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=cancel-shift1, v=remi-payroll1, v=client-ins1, v=aidechat1, v=covercomms1, and v=vapid1. -->
+<meta name="admin-build" content="2026-09-27-aide-text-chat1">
 <!-- remi float hide 2026-09-27 v=remi-float-hide1 admin-build 2026-09-27-remi-float-hide1. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Hide the Float pool from Receipts and Coverage confirm. Do not move Float elsewhere. Coverage confirm calls admin_rank_float_pool_aides {p_open_shift_id} and paints ranked as Ranked · same-day yes / 30d and rest as Rest of list with rank, name, same_day_yes_30d, and miles. is_float is always false. No Float chip or tag. float_pool is ignored and stays []. hide_float_ui is true. Confirm blast on an open hole still posts admin_blast_cover_request {p_open_shift_id, p_aide_ids, p_address_mode}. coverage-simple1 stays. Receipts and Payroll have no Float block so the payroll card and the Receipts, Payroll, and Coverage tabs stay clear. No-show still polls admin_list_due_noshow_rescues, Confirm posts admin_confirm_noshow_rescue, and Dismiss posts admin_dismiss_noshow_rescue. Confirm is kept. Float UI wording is stripped. Never auto-blast. patches/remi-float-noshow1-v1.sql stays. This tip only supersedes the Float UI paint. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. No Quo/SMS. Prior markers stay, including v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1">
 <!-- tab bar cap 8 2026-09-27 v=tabbar-8 admin-build 2026-09-27-tabbar-8. GHOST-TABBAR-8-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Bottom nav shows up to 8 primary tabs plus More. More stays pinned on the right and still lists the remaining tabs plus Edit tabs. Edit tabs selects and orders up to 8 on the bar. Cap copy is Up to 8 on the bar and Bar full (8/8). A 9th pin is blocked until one moves to More. MAX_BAR_TABS is 8. The previous bar was 5 slots with More pinned (4 primary). Prefs stay the same localStorage evercare_nav_tabs {v:1, slots} keyed by the signed-in admin id or email. Empty storage still opens on the layoutA1 set. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi rail is unchanged. Dates people read are MM/DD/YYYY. Prior markers stay, including v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=navedit1, v=layoutA1, and v=admintheme1. -->
@@ -573,6 +575,10 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .page-hdr .btn,#tab_coverage .cover-actions .btn,#tab_coverage .cover-back{width:100%;min-width:0;min-height:48px;height:auto;justify-content:center;text-align:center;font-size:1rem;line-height:1.25;white-space:normal;overflow-wrap:anywhere;}
 #tab_coverage [hidden]{display:none !important;}
 #tab_coverage .cover-note{font-size:0.9rem;line-height:1.4;color:var(--navy);margin:0 0 12px;}
+.aide-text-chat1-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;max-width:100%;}
+.aide-text-chat1-chip{display:inline-flex;align-items:center;min-height:28px;background:var(--teal-light);color:var(--teal-dark);font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;}
+.aide-text-chat1-chip.is-ok{background:#d8f3e0;color:#1a5c32;}
+.aide-text-chat1-chip.is-oos{background:#eee;color:#666;text-decoration:line-through;}
 #tab_coverage{max-width:100%;min-width:0;padding-bottom:96px;}
 #tab_coverage .cover-list{display:flex;flex-direction:column;gap:10px;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;}
 #tab_coverage .cover-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);box-shadow:0 6px 16px rgba(26,39,68,0.05);}
@@ -618,7 +624,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-card-wrap{background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;box-shadow:0 6px 16px rgba(26,39,68,0.05);overflow:hidden;}
 #tab_coverage .cover-card-wrap .cover-card{border:0;border-left:0;border-radius:0;box-shadow:none;width:100%;}
 #tab_coverage .cover-card-actions{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px;}
-#tab_coverage .cover-card-actions .btn{flex:1 1 0;min-width:0;min-height:48px;width:auto;padding:8px 6px;font-size:0.78rem;line-height:1.15;white-space:normal;text-align:center;justify-content:center;}
+#tab_coverage .cover-card-actions .btn{flex:1 1 8.5rem;min-width:0;min-height:48px;width:auto;padding:8px 6px;font-size:0.78rem;line-height:1.15;white-space:normal;text-align:center;justify-content:center;}
 #tab_coverage .cover-card-actions .cover-card-cancel{background:#fff;color:var(--danger);border:1.5px solid #e0a8a0;}
 #tab_coverage .cover-card-actions .cover-card-cancel:hover,
 #tab_coverage .cover-card-actions .cover-card-cancel:focus-visible{background:#fde8e6;border-color:var(--danger);}
@@ -2283,15 +2289,21 @@ bindLoginKeyboard();
               <p id="coverRosterEmpty" class="cover-note" hidden>No active aides on this desk yet.</p>
             </div>
           </section>
-          <section class="cover-section" aria-label="Text">
+          <section class="cover-section" aria-label="Text" data-aide-text-chat1="v=aide-text-chat1">
             <h2>Text</h2>
             <div class="cover-actions">
-              <button type="button" class="btn btn-teal" id="coverTextAideBtn" onclick="coverTextAide()">Text this aide</button>
+              <button type="button" class="btn btn-teal" id="coverTextAideBtn" data-aide-text-chat1="v=aide-text-chat1" onclick="coverTextAide()">Text this aide</button>
               <button type="button" class="btn btn-teal" id="coverTextBtn" onclick="coverMarkContact('text')">Text client</button>
               <button type="button" class="btn btn-navy" id="coverCallBtn" onclick="coverMarkContact('call')">Call client</button>
               <button type="button" class="btn btn-navy" id="coverShareBtn" onclick="coverShareAddress()">Share address</button>
             </div>
-            <p class="cover-note" id="coverSmsNote">Texts open in Messages with a draft. You press Send.</p>
+            <p class="cover-note" id="coverAideTextSub" data-aide-text-chat1="v=aide-text-chat1">Messages (push notifies phone)</p>
+            <div class="aide-text-chat1-chips" id="coverAideTextChips" data-aide-text-chat1="v=aide-text-chat1">
+              <span class="aide-text-chat1-chip is-ok">in_app_messages</span>
+              <span class="aide-text-chat1-chip">phone_required: false</span>
+              <span class="aide-text-chat1-chip is-oos">SMS</span>
+            </div>
+            <p class="cover-note" id="coverSmsNote">Text client opens a phone draft when a number is on file. You press Send. Text this aide stays in Aide chat. Phone is not required.</p>
             <div id="coverOutboundConfirm" hidden>
               <p class="cover-note" id="coverOutboundNote">Confirm before this opens. You send it yourself.</p>
               <div class="cover-actions">
@@ -2990,6 +3002,8 @@ Call (216) 377-5991 with any questions.</textarea>
             </div>
             <span id="coverSimplePending" hidden>Cover pending Send</span>
           </div>
+          <p class="aidechat-note" id="aideTextChatSub" data-aide-text-chat1="v=aide-text-chat1" hidden>Messages (push notifies phone)</p>
+          <div class="aide-text-chat1-chips" id="aideTextChatChips" data-aide-text-chat1="v=aide-text-chat1" hidden></div>
           <div id="aidechatUrgentBanner" class="aidechat-urgent" hidden></div>
           <div id="aidechatMessages" class="aidechat-thread" aria-live="polite"></div>
           <div id="coverSimpleDraft" data-coverage-simple1="v=coverage-simple1" hidden>
@@ -5986,6 +6000,7 @@ function coverPaintList(){
       +'</button>'
       +'<div class="cover-card-actions">'
       +'<button type="button" class="btn btn-teal" data-cover-blast="'+coverAttr(s.id)+'">Who can cover</button>'
+      +'<button type="button" class="btn btn-teal" data-cover-text-aide="'+coverAttr(s.id)+'" data-aide-text-chat1="v=aide-text-chat1">Text this aide</button>'
       +'<button type="button" class="btn btn-ghost" data-cover-text="'+coverAttr(s.id)+'">Text client</button>'
       +'<button type="button" class="btn cover-card-cancel" data-cover-cancel="'+coverAttr(s.id)+'">Cancel</button>'
       +'</div></div>';
@@ -6548,11 +6563,28 @@ function coverConfirmOutbound(){
 function coverTextAide(){
   var shift=coverFind(coverSelectedId);
   var aide=coverSelectedRank();
-  if(!aide){
+  if(!aide&&coverSelectedAideId)aide={id:String(coverSelectedAideId), name:'Aide', username:''};
+  if(!aide||!String(aide.id||'').trim()){
     if(typeof showTempMsg==='function')showTempMsg('Tap an aide under Who can cover first.','var(--warn)');
     return;
   }
-  coverAskOutbound('sms', coverSmsHref(coverAidePhone(aide), coverAideSms(shift, aide)), 'Text this aide');
+  var body=typeof coverAideSms==='function'?coverAideSms(shift, aide):'';
+  if(typeof aideTextChatCompose==='function'){
+    return aideTextChatCompose({
+      aideId:String(aide.id||''),
+      aideName:String(aide.name||aide.username||'Aide'),
+      username:String(aide.username||''),
+      clientId:shift&&shift.clientId?String(shift.clientId):'',
+      body:body,
+      source:'coverage'
+    });
+  }
+  if(typeof showTempMsg==='function')showTempMsg('Aide Messages is not on this desk yet.','var(--warn)');
+}
+function coverTextAideFromCard(id){
+  if(typeof coverSimpleClose==='function')coverSimpleClose();
+  coverOpenOutcome(id);
+  coverTextAide();
 }
 function coverTextOnTheWay(){
   var shift=coverFind(coverSelectedId);
@@ -7239,6 +7271,12 @@ function coverEnsureBound(){
     if(blast&&root.contains(blast)){
       ev.preventDefault();
       if(typeof coverSimpleOpenBlast==='function')coverSimpleOpenBlast(blast.getAttribute('data-cover-blast'));
+      return;
+    }
+    var aideTextBtn=t.closest('[data-cover-text-aide]');
+    if(aideTextBtn&&root.contains(aideTextBtn)){
+      ev.preventDefault();
+      coverTextAideFromCard(aideTextBtn.getAttribute('data-cover-text-aide'));
       return;
     }
     var textBtn=t.closest('[data-cover-text]');
@@ -9856,6 +9894,7 @@ function aidechatPaintThread(){
   }
   if(typeof coverSimplePaintDraft==='function')coverSimplePaintDraft();
   if(typeof clienthrs1dPaintSchedule==='function')clienthrs1dPaintSchedule();
+  if(typeof aideTextChatSyncSendLabel==='function')aideTextChatSyncSendLabel();
 }
 function aidechatWide(){
   try{return !!(window.matchMedia&&window.matchMedia('(min-width:901px)').matches);}catch(e){return false;}
@@ -9876,6 +9915,7 @@ function aidechatShow(which){
 }
 function aidechatShowInbox(){
   if(!aidechatRoleOk())return;
+  if(typeof aideTextChatClearDraft==='function')aideTextChatClearDraft();
   aidechatSelectedId='';
   aidechatShow('inbox');
   aidechatPaintInbox();
@@ -9965,6 +10005,10 @@ async function aidechatOpen(){
   await aidechatRefresh();
   if(typeof clienthrs1dLoadNames==='function')clienthrs1dLoadNames();
   if(typeof clienthrs1dKickDue==='function')clienthrs1dKickDue();
+  if(aideTextChatDraft&&aideTextChatDraft.active&&aideTextChatDraft.forceOpen&&typeof aideTextChatReveal==='function'){
+    aideTextChatDraft.forceOpen=false;
+    await aideTextChatReveal();
+  }
 }
 async function aidechatMaybeRemi(thread, now){
   if(!thread||!aidechatRoleOk())return;
@@ -10086,6 +10130,13 @@ async function aidechatSendOffice(ev){
   thread.last_at=msg.created_at;
   if(box)box.value='';
   aidechatPaintThread();
+  if(typeof aideTextChatConsumeSend==='function'){
+    var routed=await aideTextChatConsumeSend(thread, text);
+    if(routed){
+      if(aidechatSource!=='ace')aidechatWriteSession();
+      return false;
+    }
+  }
   await aidechatRpc('send', aidechatWireSend(thread, text));
   if(aidechatSource!=='ace')aidechatWriteSession();
   return false;
@@ -10131,6 +10182,277 @@ async function aidechatSettingsChanged(){
     aidechatWriteSettings(aidechatSettings);
   }
   aidechatPaintSettings();
+}
+// v=aide-text-chat1 Text this aide opens Aide chat. Phone is not required. Compose does not send.
+var AIDE_TEXT_CHAT1_MARKER='v=aide-text-chat1';
+var AIDE_TEXT_CHAT1_CAREGIVER='caregiver/messages';
+var aideTextChatDraft=null;
+function aideTextChatEsc(s){
+  if(typeof aidechatEsc==='function')return aidechatEsc(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function aideTextChatUuid(v){
+  if(typeof clienthrs1dUuid==='function')return clienthrs1dUuid(v);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||'').trim());
+}
+function aideTextChatRoleOk(){
+  if(typeof aidechatRoleOk==='function')return aidechatRoleOk();
+  return false;
+}
+function aideTextChatDenied(got){
+  var err=String((got&&(got.error||got.message||got.status))||'');
+  return /42501/.test(err);
+}
+async function aideTextChatRpc(name, body){
+  if(typeof clienthrs1dRpc==='function')return clienthrs1dRpc(name, body||{});
+  return {missing:true};
+}
+function aideTextChatClearDraft(){
+  aideTextChatDraft=null;
+  var send=document.getElementById('aidechatSend');
+  if(send)send.textContent='Send';
+  var sub=document.getElementById('aideTextChatSub');
+  var chips=document.getElementById('aideTextChatChips');
+  if(sub)sub.hidden=true;
+  if(chips){chips.hidden=true;chips.innerHTML='';}
+}
+function aideTextChatSyncSendLabel(){
+  var send=document.getElementById('aidechatSend');
+  var draft=aideTextChatDraft;
+  var thread=typeof aidechatFind==='function'?aidechatFind(typeof aidechatSelectedId!=='undefined'?aidechatSelectedId:''):null;
+  var on=!!(draft&&draft.active&&thread&&(String(thread.aide_id||'')===String(draft.aideId||'')||String(thread.id||'')===String(draft.threadId||'')));
+  if(send)send.textContent=on?'Send in Messages':'Send';
+  if(!on){
+    var sub=document.getElementById('aideTextChatSub');
+    var chips=document.getElementById('aideTextChatChips');
+    if(sub)sub.hidden=true;
+    if(chips)chips.hidden=true;
+    return;
+  }
+  aideTextChatPaintChrome();
+}
+function aideTextChatPaintChrome(){
+  var draft=aideTextChatDraft;
+  var sub=document.getElementById('aideTextChatSub');
+  var chips=document.getElementById('aideTextChatChips');
+  if(!draft||!draft.active){
+    if(sub)sub.hidden=true;
+    if(chips)chips.hidden=true;
+    return;
+  }
+  if(sub){
+    sub.hidden=false;
+    sub.textContent='Messages (push notifies phone)';
+  }
+  if(!chips)return;
+  chips.hidden=false;
+  var bits=[];
+  bits.push('<span class="aide-text-chat1-chip is-ok">'+aideTextChatEsc(draft.channel||'in_app_messages')+'</span>');
+  bits.push('<span class="aide-text-chat1-chip">phone_required: false</span>');
+  if(draft.sent){
+    bits.push('<span class="aide-text-chat1-chip is-ok">sms_sent: false</span>');
+    bits.push('<span class="aide-text-chat1-chip'+(draft.pushJobId?' is-ok':'')+'">'+(draft.pushJobId?'push_job_id ✓':'push when allowed')+'</span>');
+  }else{
+    bits.push('<span class="aide-text-chat1-chip">'+(draft.hasPush?'Push is on':'Push is not required')+'</span>');
+  }
+  bits.push('<span class="aide-text-chat1-chip is-oos">SMS</span>');
+  chips.innerHTML=bits.join('');
+}
+function aideTextChatRememberLink(draft){
+  var aideId=String(draft&&draft.aideId||'');
+  var link=draft&&draft.link?String(draft.link):('admin/messages?aide_id='+encodeURIComponent(aideId));
+  try{document.documentElement.setAttribute('data-aide-text-deep-link', link);}catch(e){}
+  try{
+    if(!history||!history.replaceState||!aideId)return;
+    var url=new URL(location.href);
+    url.searchParams.set('v','aide-text-chat1');
+    url.searchParams.set('aide_id', aideId);
+    history.replaceState({aideTextChat:link}, '', url.pathname+url.search+url.hash);
+  }catch(e2){}
+}
+function aideTextChatActivateTab(){
+  if(typeof layoutA1CloseAvatar==='function')layoutA1CloseAvatar();
+  document.querySelectorAll('#adminScreen .tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#adminScreen .nav-item').forEach(function(n){n.classList.remove('active');});
+  var panel=document.getElementById('tab_aidechat');
+  if(panel){
+    panel.classList.add('active');
+    panel.removeAttribute('hidden');
+  }
+  var nav=document.getElementById('nav_aidechat');
+  if(nav)nav.classList.add('active');
+  var primary=typeof layoutA1Primary==='function'?layoutA1Primary('aidechat'):'more';
+  var primaryNav=document.getElementById('nav_'+primary);
+  if(primaryNav)primaryNav.classList.add('active');
+  if(typeof showScreen==='function'){
+    var admin=document.getElementById('adminScreen');
+    if(admin&&!admin.classList.contains('active'))showScreen('adminScreen');
+  }
+}
+async function aideTextChatReveal(){
+  var draft=aideTextChatDraft;
+  if(!draft||!draft.active)return;
+  var aide={id:draft.aideId, aide_id:draft.aideId, username:draft.username, name:draft.name};
+  var thread=typeof aidechatFindByAide==='function'?aidechatFindByAide(aide):null;
+  if(!thread){
+    thread={
+      id:draft.threadId||draft.aideId,
+      aide_id:draft.aideId,
+      username:draft.username||'',
+      name:draft.name||'Aide',
+      urgent:false,
+      urgent_reason:'',
+      heads_up:'',
+      status:'open',
+      last_message:'',
+      last_at:'',
+      messages:[]
+    };
+    if(typeof aidechatThreads!=='undefined'&&aidechatThreads)aidechatThreads.push(thread);
+  }else if(draft.threadId){
+    thread.id=draft.threadId;
+  }
+  if(typeof aidechatSelectedId!=='undefined')aidechatSelectedId=thread.id;
+  if(draft.threadId&&typeof aidechatRpc==='function'&&aideTextChatUuid(draft.threadId)){
+    try{await aidechatRpc('read', {p_thread_id:draft.threadId});}catch(eRead){}
+  }
+  if(typeof aidechatRpc==='function'){
+    var listed=await aidechatRpc('messages', typeof aidechatWireMessages==='function'?aidechatWireMessages(thread):{p_limit:80, p_aide_id:draft.aideId});
+    if(listed&&listed.ok&&typeof aidechatMessagesFrom==='function'){
+      var msgs=aidechatMessagesFrom(listed.data);
+      if(msgs&&msgs.length)thread.messages=msgs;
+    }
+  }
+  if(typeof aidechatShow==='function')aidechatShow('thread');
+  if(typeof aidechatPaintThread==='function')aidechatPaintThread();
+  var box=document.getElementById('aidechatReply');
+  if(box&&!draft.prefilled){
+    box.value=draft.body||'';
+    draft.prefilled=true;
+  }
+  var send=document.getElementById('aidechatSend');
+  if(send)send.textContent='Send in Messages';
+  aideTextChatPaintChrome();
+  aideTextChatRememberLink(draft);
+}
+async function aideTextChatCompose(opts){
+  opts=opts||{};
+  if(!aideTextChatRoleOk()){
+    if(typeof showTempMsg==='function')showTempMsg('Aide Messages is for Admin and Scheduler.','var(--warn)');
+    return {ok:false, denied:true};
+  }
+  var aideId=String(opts.aideId||'').trim();
+  if(!aideId){
+    if(typeof showTempMsg==='function')showTempMsg('Tap an aide under Who can cover first.','var(--warn)');
+    return {ok:false};
+  }
+  var clientId=String(opts.clientId||'').trim();
+  var draftBody=opts.body==null?'':String(opts.body);
+  var data=null;
+  if(aideTextChatUuid(aideId)){
+    var payload={p_aide_id:aideId};
+    if(draftBody)payload.p_body=draftBody;
+    if(aideTextChatUuid(clientId))payload.p_client_id=clientId;
+    var got=await aideTextChatRpc('admin_compose_aide_text', payload);
+    if(aideTextChatDenied(got)){
+      if(typeof showTempMsg==='function')showTempMsg('Nurse cannot open Aide Messages.','var(--warn)');
+      return {ok:false, denied:true};
+    }
+    if(got&&got.ok&&got.data)data=got.data;
+  }
+  var echoed=data&&data.draft?data.draft.body:null;
+  var prefill=echoed==null?draftBody:String(echoed);
+  var channelGot=null;
+  if(aideTextChatUuid(aideId))channelGot=await aideTextChatRpc('admin_get_aide_text_channel', {p_aide_id:aideId});
+  var hasPush=false;
+  var channel=data&&data.channel?String(data.channel):'in_app_messages';
+  if(channelGot&&channelGot.ok&&channelGot.data){
+    hasPush=!!channelGot.data.has_push_subscription;
+    if(channelGot.data.channel)channel=String(channelGot.data.channel);
+  }
+  aideTextChatDraft={
+    active:true,
+    forceOpen:true,
+    prefilled:false,
+    aideId:aideId,
+    clientId:aideTextChatUuid(clientId)?clientId:(data&&data.client_id?String(data.client_id):''),
+    threadId:data&&data.thread_id?String(data.thread_id):'',
+    name:data&&data.aide_name?String(data.aide_name):String(opts.aideName||'Aide'),
+    username:data&&data.aide_username?String(data.aide_username):String(opts.username||''),
+    body:prefill,
+    link:data&&data.admin_deep_link?String(data.admin_deep_link):('admin/messages?aide_id='+encodeURIComponent(aideId)),
+    channel:channel||'in_app_messages',
+    phoneRequired:false,
+    smsSent:false,
+    autoSent:false,
+    hasPush:hasPush,
+    sent:false,
+    pushJobId:'',
+    source:String(opts.source||'coverage')
+  };
+  aideTextChatActivateTab();
+  if(typeof aidechatEnsureBound==='function')aidechatEnsureBound();
+  if(typeof aidechatOpen==='function')await aidechatOpen();
+  else await aideTextChatReveal();
+  return {ok:true, data:data, draft:aideTextChatDraft};
+}
+async function aideTextChatConsumeSend(thread, text){
+  var draft=aideTextChatDraft;
+  if(!draft||!draft.active)return false;
+  var aid=String(thread&&(thread.aide_id||'')||'');
+  var tid=String(thread&&thread.id||'');
+  if(aid&&draft.aideId&&aid!==draft.aideId&&tid!==String(draft.threadId||'')&&tid!==draft.aideId)return false;
+  var body={p_aide_id:draft.aideId, p_body:String(text||'')};
+  if(draft.clientId&&aideTextChatUuid(draft.clientId))body.p_client_id=draft.clientId;
+  var got=null;
+  if(aideTextChatUuid(draft.aideId))got=await aideTextChatRpc('admin_send_aide_text', body);
+  draft.smsSent=false;
+  draft.phoneRequired=false;
+  draft.autoSent=false;
+  draft.sent=true;
+  draft.channel='in_app_messages';
+  if(got&&got.ok&&got.data){
+    if(got.data.push_job_id)draft.pushJobId=String(got.data.push_job_id);
+    if(got.data.channel)draft.channel=String(got.data.channel);
+    if(got.data.thread_id)draft.threadId=String(got.data.thread_id);
+  }
+  var msgs=thread&&thread.messages?thread.messages:[];
+  var last=msgs.length?msgs[msgs.length-1]:null;
+  if(last&&last.sender==='office'&&!last.display_name){
+    var who='Moe (Manager)';
+    try{if(typeof clienthrs1dNames==='object'&&clienthrs1dNames&&clienthrs1dNames.admin)who=String(clienthrs1dNames.admin);}catch(eWho){}
+    last.display_name=who;
+  }
+  if(typeof aidechatPaintThread==='function')aidechatPaintThread();
+  aideTextChatPaintChrome();
+  if(got&&aideTextChatDenied(got)){
+    if(typeof showTempMsg==='function')showTempMsg('Nurse cannot send Aide Messages.','var(--warn)');
+  }else if(got&&got.ok===false&&!got.missing){
+    if(typeof showTempMsg==='function')showTempMsg(String(got.error||'Could not send in Messages.'),'var(--danger)');
+  }else if(got&&got.missing){
+    if(typeof showTempMsg==='function')showTempMsg('The office send did not answer. Nothing was texted to a phone number.','var(--warn)');
+  }else if(typeof showTempMsg==='function'){
+    showTempMsg('Sent in Messages. Push notifies the phone.','var(--success)');
+  }
+  return true;
+}
+function aideTextChatFromLocation(){
+  if(!aideTextChatRoleOk())return;
+  var id='';
+  try{
+    var q=new URLSearchParams(location.search||'');
+    var raw=String(q.get('aide_id')||'').trim();
+    var hash=String(location.hash||'');
+    var path=String(location.pathname||'');
+    if(raw&&(q.get('v')==='aide-text-chat1'||/messages/i.test(path)||/messages/i.test(hash)))id=raw;
+    if(!id){
+      var m=hash.match(/[?&]aide_id=([^&]+)/);
+      if(m&&/messages/i.test(hash))id=decodeURIComponent(m[1]);
+    }
+  }catch(e){id='';}
+  id=String(id||'').trim();
+  if(!aideTextChatUuid(id))return;
+  aideTextChatCompose({aideId:id, aideName:'Aide', body:'', source:'deep-link'});
 }
 // v=vapid1 Ace CALLABLE keys live. #notifVapid follows get_vapid_public_key. No private key.
 var VAPID1_MARKER='v=vapid1';
@@ -21761,6 +22083,7 @@ function openPortalHome(sess, opts){
       refreshNurseAlertBadge();
     });
     if(fresh)logActivity('Logged in');
+    if(typeof aideTextChatFromLocation==='function')aideTextChatFromLocation();
     Promise.all([apiGetCached('get_users'),apiGetCached('get_clients'),apiGetCached('get_assigned_topic')]).catch(function(){});
   };
   if(typeof requestAnimationFrame==='function')requestAnimationFrame(function(){setTimeout(run,0);});

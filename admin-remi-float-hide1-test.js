@@ -23,8 +23,9 @@ assert.ok(html.includes('id="copilotTabCover"'), 'Coverage tab');
 assert.ok(html.includes('id="copilotTabProof"'), 'Receipts tab stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1'), 'first admin-build is remi-float-hide1');
-assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 is the next admin-build');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aide-text-chat1'), 'first admin-build is aide-text-chat1');
+assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
 assert.ok(html.indexOf('content="2026-09-27-tabbar-8"') < html.indexOf('content="2026-09-27-cover-card-cancel1"'), 'cover-card-cancel1 stays after tabbar-8');
 assert.ok(html.indexOf('content="2026-09-27-cover-card-cancel1"') < html.indexOf('content="2026-09-27-nosvc-reason-draft1"'), 'nosvc-reason-draft1 stays after cover-card-cancel1');
 assert.ok(html.indexOf('content="2026-09-27-nosvc-reason-draft1"') < html.indexOf('content="2026-09-27-cover-unselect1"'), 'cover-unselect1 stays after nosvc-reason-draft1');
@@ -427,7 +428,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(receipts.build, '2026-09-27-remi-float-hide1');
+    assert.strictEqual(receipts.build, '2026-09-27-aide-text-chat1');
     assert.strictEqual(receipts.viewW, 390);
     assert.strictEqual(receipts.fullPage, false);
     assert.ok(receipts.sheetWidth <= 390);
