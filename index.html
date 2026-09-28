@@ -12,6 +12,9 @@
 <!-- punch leftovers 2026-09-28 v=punch-leftovers1 ?v=punch-leftovers1 admin-build 2026-09-28-punch-leftovers1. GHOST-PUNCH-LEFTOVERS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone shell, max-width 430px including a typical 390 CSS px phone: the sticky EverCare header was covering the Clients subtitle and the More heading. Desk titles stick just below that teal bar with a clear gap, so Clients, More, Timesheets, Schedule, Aides, and the other desks keep the title and subtitle fully visible. The header look is unchanged. Schedule cold load, refresh, and entry into Schedule land on the week calendar only. The day drawer and Edit shift stay closed until a day is tapped, Add shift is opened, or an explicit deep link names that day. No client or shift is pre-selected, and a leftover QaHold row is not auto-opened. Ace deletes leftover QaHold test rows. This tip does not delete database rows. More desks stick. Opening Inservices, Coverage, Nurse, or any other desk from More writes that desk into the hash and leaves it open, on desktop and on a phone. Role apply does not send an allowed desk back to Timesheets or the default first tab after paint, and an empty hash does not reset the open desk. A reload or a hash of that desk opens it again. A role-forbidden desk such as Payroll for Scheduler still returns to Timesheets. Sandata Reminder and Call off empty Submit stay in the other repo. Out of scope: Nurse bottom nav overlap, Remi fullscreen rail, Clients edit/delete wrap, Remi chip over the dock. Prior markers stay, including v=remi-payroll-ins1, v=remi-float-hide1b, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-28-punch-leftovers1">
 <script>var PUNCH_LEFTOVERS1_MARKER='v=punch-leftovers1';var PUNCH_LEFTOVERS1_BUILD='2026-09-28-punch-leftovers1';</script>
+<!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. FIX A3: the same tiny compact A–Z chip (class sched-az-chip list-az-chip) also sits beside the Aides and Clients titles and calls listAz1Toggle against the same evercare_list_order preference. It is not a fat pill and not a second key. Manage stays the credentials control. FIX A4: Admin default Aides rail mounts on #aideCredList when A–Z is on; Manage stays credentials-only. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
+<meta name="admin-build" content="2026-09-28-list-az-sticky1">
+<script>var LIST_AZ_STICKY1_MARKER='v=list-az-sticky1';var LIST_AZ_STICKY1_BUILD='2026-09-28-list-az-sticky1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -313,6 +316,8 @@ textarea{resize:vertical;min-height:80px;}
 .sched-client-label{vertical-align:middle;}
 .sched-az-chip{display:inline-flex;align-items:center;justify-content:center;margin:0 0 0 6px;padding:0 5px;height:16px;min-width:0;border-radius:4px;border:1px solid rgba(255,255,255,.78);background:rgba(0,0,0,.22);color:#fff;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0;line-height:1;vertical-align:middle;cursor:pointer;box-shadow:none;-webkit-appearance:none;appearance:none;}
 .sched-az-chip[aria-pressed="true"]{background:rgba(255,255,255,.2);border-color:#fff;}
+#tab_aides .page-hdr .list-az-chip,#tab_clients .page-hdr .list-az-chip{height:16px;min-height:16px;max-height:16px;margin:0 0 2px 8px;padding:0 5px;border-radius:4px;border:1px solid var(--teal);background:#fff;color:var(--navy);font-size:10px;font-weight:700;line-height:1;vertical-align:middle;box-shadow:none;}
+#tab_aides .page-hdr .list-az-chip[aria-pressed="true"],#tab_clients .page-hdr .list-az-chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;}
 .sched-grid td.sched-name{z-index:1;background:#fff;font-weight:600;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;}
 .sched-grid tr.is-jump td.sched-name{background:#e8f4f4;}
 .sched-grid td.sched-slot{min-width:7.6rem;padding:4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
@@ -1596,6 +1601,34 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(min-width:900px){
   #tab_aides .aide-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
+/* v=list-az-sticky1 — sticky A–Z letter jump rail on Aides + Clients. Builds on list-az1. */
+#tab_aides .aide-info-cards:has(.az-stage),
+#tab_aides .aide-cards:has(.az-stage){max-width:none;width:100%;display:flex;flex-direction:column;}
+#tab_aides .az-stage,#aideCredsRoot .az-stage,#aideCredList .az-stage,#tab_clients .az-stage{position:relative;height:min(680px,calc(100dvh - 260px));min-height:240px;}
+#tab_aides .az-scroll,#aideCredsRoot .az-scroll,#aideCredList .az-scroll,#tab_clients .az-scroll{position:relative;height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 32px 16px 0;scrollbar-width:thin;}
+#tab_aides .az-group,#aideCredsRoot .az-group,#aideCredList .az-group,#tab_clients .az-group{display:block;}
+#tab_aides .az-tail,#aideCredsRoot .az-tail,#aideCredList .az-tail,#tab_clients .az-tail{height:48px;pointer-events:none;}
+#tab_aides .az-sec,#aideCredsRoot .az-sec,#aideCredList .az-sec,#tab_clients .az-sec{position:sticky;top:0;z-index:5;background:rgba(245,248,252,.96);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:12px;font-weight:800;color:var(--teal-dark);letter-spacing:.08em;padding:8px 4px 6px;margin:2px 0 6px;border-bottom:1px solid var(--border);}
+#tab_clients .az-sec,#tab_aides .card .az-sec{background:rgba(255,255,255,.96);}
+#tab_aides .az-item,#aideCredsRoot .az-item,#aideCredList .az-item,#tab_clients .az-item{margin:0 0 8px;}
+#tab_aides .az-scroll .aide-card,#tab_clients .az-scroll .aide-card,#aideCredList .az-scroll .aide-cred-person{margin-bottom:0;}
+#tab_aides .az-rail,#aideCredsRoot .az-rail,#aideCredList .az-rail,#tab_clients .az-rail{position:absolute;top:50%;right:2px;transform:translateY(-50%);z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:6px 2px;max-height:calc(100% - 12px);min-height:0;overflow:hidden;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:rgba(255,255,255,.82);border:1px solid var(--border);border-radius:999px;box-shadow:0 4px 16px rgba(26,39,68,.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+#tab_aides .az-rail button,#aideCredsRoot .az-rail button,#aideCredList .az-rail button,#tab_clients .az-rail button{width:18px;height:15px;max-height:16px;min-height:0;flex:1 1 auto;border:0;background:transparent;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:9px;font-weight:800;line-height:1;padding:0;margin:0;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;appearance:none;box-shadow:none;}
+#tab_aides .az-rail button.on,#aideCredsRoot .az-rail button.on,#aideCredList .az-rail button.on,#tab_clients .az-rail button.on{background:var(--teal);color:#fff;box-shadow:0 1px 4px rgba(42,127,127,.35);}
+@media (hover:hover){
+  #tab_aides .az-rail button:hover,#aideCredList .az-rail button:hover,#tab_clients .az-rail button:hover{color:var(--navy);}
+  #tab_aides .az-rail button.on:hover,#aideCredList .az-rail button.on:hover,#tab_clients .az-rail button.on:hover{color:#fff;}
+}
+#tab_aides .az-rail button:focus-visible,#aideCredList .az-rail button:focus-visible,#tab_clients .az-rail button:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
+@media(min-width:900px){
+  #tab_aides .az-scroll,#aideCredsRoot .az-scroll,#aideCredList .az-scroll,#tab_clients .az-scroll{padding-right:44px;}
+  #tab_aides .az-rail,#aideCredsRoot .az-rail,#aideCredList .az-rail,#tab_clients .az-rail{right:8px;padding:8px 3px;}
+  #tab_aides .az-rail button,#aideCredList .az-rail button,#tab_clients .az-rail button{width:20px;height:17px;max-height:18px;font-size:10px;}
+}
+@media(max-width:899px){
+  #tab_aides .az-stage,#aideCredsRoot .az-stage,#aideCredList .az-stage{height:calc(100dvh - 300px);}
+  #tab_clients .az-stage{height:calc(100dvh - 328px);}
+}
 /* v=aidecreds1 — phone credentials list, card, and edit sheet. Admin only. */
 #aideCredsRoot[hidden],#aideCredSheet[hidden],#aideCredBanner[hidden],#aideCredSearchWrap[hidden],#aideCredList[hidden],#aideCredDetail[hidden],#aideCredRemove[hidden],#aideCredManageBtn[hidden],#aideCredAideField[hidden]{display:none !important;}
 #tab_aides.aide-creds-on #aideDeskSub{display:none;}
@@ -2801,9 +2834,9 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1">
         <div class="page-hdr">
-          <div><h1>Aides</h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
+          <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
             <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()">Manage</button>
             <button class="btn btn-ghost" onclick="renderAides(true)">🔄 Refresh</button>
@@ -2880,9 +2913,9 @@ bindLoginKeyboard();
       </div>
 
       <!-- CLIENTS TAB -->
-      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1">
+      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1">
         <div class="page-hdr">
-          <div><h1>Clients</h1><p>Manage client addresses and assign aides for location verification</p></div>
+          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p>Manage client addresses and assign aides for location verification</p></div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
@@ -5203,6 +5236,7 @@ function listAz1Read(){
 function listAz1Write(mode){
   mode=mode==='az'?'az':'usual';
   try{localStorage.setItem(listAz1StorageKey(), JSON.stringify({v:1, mode:mode}));}catch(e){}
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(e2){}
   return mode;
 }
 function listAz1On(){
@@ -5385,8 +5419,12 @@ function listAz1Repaint(){
   try{if(typeof aidechatPaintInbox==='function'&&typeof aidechatThreads!=='undefined')aidechatPaintInbox();}catch(e6){}
   try{
     var aidesBox=document.getElementById('aidesContainer');
-    if(aidesBox&&aidesBox.querySelector&&aidesBox.querySelector('.aide-info-card, .aide-row-card')&&typeof renderAides==='function')renderAides(false);
+    if(aidesBox&&aidesBox.querySelector&&aidesBox.querySelector('.aide-info-card, .aide-row-card, .az-stage, .az-rail')&&typeof renderAides==='function')renderAides(false);
   }catch(e7){}
+  try{
+    if(typeof aideCredPaintList==='function'&&typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.view!=='detail')aideCredPaintList();
+  }catch(eCred){}
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(e8){}
 }
 function listAz1Toggle(ev){
   if(ev&&ev.preventDefault)ev.preventDefault();
@@ -5396,6 +5434,299 @@ function listAz1Toggle(ev){
 }
 try{listAz1NoteQuery();}catch(e){}
 // end list order A–Z v=list-az1
+// list az sticky rail v=list-az-sticky1
+if(typeof LIST_AZ_STICKY1_MARKER!=='string')var LIST_AZ_STICKY1_MARKER='v=list-az-sticky1';
+function listAzSticky1On(){
+  try{return typeof listAz1On==='function'&&!!listAz1On();}catch(e){return false;}
+}
+function listAzSticky1Letter(name){
+  var s=String(name==null?'':name).replace(/^\s+/, '');
+  if(!s)return '#';
+  var ch=s.charAt(0).toUpperCase();
+  try{
+    var base=s.charAt(0).toLocaleUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if(base)ch=base.charAt(0);
+  }catch(e){}
+  if(ch>='A'&&ch<='Z')return ch;
+  return '#';
+}
+function listAzSticky1Esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function listAzSticky1Nearest(have, want){
+  var letters=[];
+  var i;
+  if(!have||!have.length)return '';
+  for(i=0;i<have.length;i++){
+    if(have[i]&&letters.indexOf(have[i])<0)letters.push(have[i]);
+  }
+  if(!letters.length)return '';
+  want=String(want||'');
+  if(letters.indexOf(want)>=0)return want;
+  for(i=0;i<letters.length;i++){
+    if(letters[i]!=='#'&&letters[i]>=want)return letters[i];
+  }
+  for(i=letters.length-1;i>=0;i--){
+    if(letters[i]!=='#')return letters[i];
+  }
+  return letters[letters.length-1];
+}
+function listAzSticky1StageHtml(pairs){
+  if(!pairs||!pairs.length)return '';
+  var parts=[];
+  var bucket=[];
+  var last='';
+  var first='';
+  var i;
+  function listAzSticky1Flush(){
+    if(!last)return;
+    parts.push('<section class="az-group" data-az-letter="'+listAzSticky1Esc(last)+'"><div class="az-sec" data-az-letter="'+listAzSticky1Esc(last)+'">'+listAzSticky1Esc(last)+'</div>'+bucket.join('')+'</section>');
+    bucket=[];
+  }
+  for(i=0;i<pairs.length;i++){
+    var letter=listAzSticky1Letter(pairs[i]&&pairs[i].name);
+    if(letter!==last){
+      listAzSticky1Flush();
+      last=letter;
+      if(!first&&letter!=='#')first=letter;
+    }
+    bucket.push('<div class="az-item" data-az-letter="'+listAzSticky1Esc(letter)+'">'+((pairs[i]&&pairs[i].html)||'')+'</div>');
+  }
+  listAzSticky1Flush();
+  if(!first)first=(last&&last!=='#')?last:'A';
+  var buttons=[];
+  var alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(i=0;i<alphabet.length;i++){
+    var L=alphabet.charAt(i);
+    var on=L===first;
+    buttons.push('<button type="button" data-az="'+L+'" aria-label="Jump to '+L+'"'+(on?' class="on" aria-current="true"':'')+'>'+L+'</button>');
+  }
+  return '<div class="az-stage" data-list-az-sticky1="'+LIST_AZ_STICKY1_MARKER+'"><div class="az-scroll">'+parts.join('')+'<div class="az-tail" aria-hidden="true"></div></div><nav class="az-rail" aria-label="Jump to letter" data-list-az-sticky1="'+LIST_AZ_STICKY1_MARKER+'">'+buttons.join('')+'</nav></div>';
+}
+function listAzSticky1Fit(stage){
+  if(!stage||!stage.getBoundingClientRect||!stage.style)return;
+  var rect;
+  try{rect=stage.getBoundingClientRect();}catch(e){return;}
+  if(!rect||(rect.width<8&&rect.height<8))return;
+  var navTop=(typeof window!=='undefined'&&window.innerHeight)?window.innerHeight:rect.bottom;
+  try{
+    var nav=document.querySelector('#adminScreen .bottom-nav');
+    if(nav&&nav.getBoundingClientRect){
+      var nr=nav.getBoundingClientRect();
+      if(nr&&nr.height>20&&nr.top>80)navTop=nr.top;
+    }
+  }catch(e2){}
+  var h=Math.floor(navTop-rect.top-8);
+  if(h<200)h=200;
+  if(h>760)h=760;
+  stage.style.height=h+'px';
+  var scroll=stage.querySelector('.az-scroll');
+  if(scroll){
+    var tail=scroll.querySelector('.az-tail');
+    if(!tail&&scroll.appendChild&&document.createElement){
+      tail=document.createElement('div');
+      tail.className='az-tail';
+      tail.setAttribute('aria-hidden','true');
+      scroll.appendChild(tail);
+    }
+    if(tail&&tail.style){
+      var room=scroll.clientHeight||h;
+      tail.style.height=Math.max(24, room-48)+'px';
+    }
+  }
+  var rail=stage.querySelector('.az-rail');
+  if(!rail||!rail.style)return;
+  var fabTop=null;
+  try{
+    var fab=document.getElementById('copilotFab');
+    if(fab&&fab.getBoundingClientRect){
+      var fr=fab.getBoundingClientRect();
+      var fabCss=window.getComputedStyle?getComputedStyle(fab):null;
+      var fabHidden=!!fab.hidden||fr.height<8||(fabCss&&(fabCss.display==='none'||fabCss.visibility==='hidden'));
+      if(!fabHidden&&fr.top>80)fabTop=fr.top;
+    }
+  }catch(eFab){fabTop=null;}
+  var stageRect=stage.getBoundingClientRect();
+  var limit=stageRect.bottom-6;
+  if(fabTop!=null)limit=Math.min(limit, fabTop-8);
+  var safeH=Math.max(140, limit-stageRect.top-8);
+  var prefer=26*16+20;
+  var pill=Math.min(safeH, prefer);
+  var extra=Math.max(0, safeH-pill);
+  rail.style.top=Math.round(8+extra/2)+'px';
+  rail.style.bottom='auto';
+  rail.style.height=Math.round(pill)+'px';
+  rail.style.maxHeight=Math.round(pill)+'px';
+  rail.style.transform='none';
+}
+function listAzSticky1Bind(root){
+  if(!root||!root.querySelector)return;
+  var stage=root.querySelector('.az-stage');
+  if(!stage||stage.getAttribute('data-az-bound')==='1')return;
+  var scroll=stage.querySelector('.az-scroll');
+  var rail=stage.querySelector('.az-rail');
+  if(!scroll||!rail)return;
+  stage.setAttribute('data-az-bound','1');
+  function present(){
+    var groups=scroll.querySelectorAll('.az-group[data-az-letter]');
+    var out=[];
+    var i;
+    for(i=0;i<groups.length;i++)out.push(groups[i].getAttribute('data-az-letter')||'');
+    return out;
+  }
+  function layoutTop(el){
+    if(!el)return 0;
+    if(el.offsetParent===scroll)return el.offsetTop;
+    try{return el.getBoundingClientRect().top-scroll.getBoundingClientRect().top+scroll.scrollTop;}catch(e){return el.offsetTop||0;}
+  }
+  function setOn(letter){
+    var buttons=rail.querySelectorAll('button[data-az]');
+    var i;
+    for(i=0;i<buttons.length;i++){
+      var on=buttons[i].getAttribute('data-az')===letter;
+      if(buttons[i].classList)buttons[i].classList.toggle('on', on);
+      if(on)buttons[i].setAttribute('aria-current','true');
+      else buttons[i].removeAttribute('aria-current');
+    }
+  }
+  function jump(letter, smooth){
+    var want=listAzSticky1Nearest(present(), letter);
+    if(!want)return;
+    var el=null;
+    var groups=scroll.querySelectorAll('.az-group[data-az-letter]');
+    var i;
+    for(i=0;i<groups.length;i++){
+      if(groups[i].getAttribute('data-az-letter')===want){el=groups[i];break;}
+    }
+    if(!el)return;
+    var next=Math.max(0, layoutTop(el)-1);
+    try{scroll.scrollTo({top:next, behavior:smooth?'smooth':'auto'});}
+    catch(e2){scroll.scrollTop=next;}
+    setOn(want);
+  }
+  function sync(){
+    var groups=scroll.querySelectorAll('.az-group[data-az-letter]');
+    if(!groups.length)return;
+    var edge=scroll.scrollTop+8;
+    var current=groups[0].getAttribute('data-az-letter')||'';
+    var i;
+    for(i=0;i<groups.length;i++){
+      if(layoutTop(groups[i])<=edge)current=groups[i].getAttribute('data-az-letter')||current;
+    }
+    setOn(current);
+  }
+  function letterFromEvent(ev){
+    var node=null;
+    try{if(ev.clientX!=null)node=document.elementFromPoint(ev.clientX, ev.clientY);}catch(eHit){node=null;}
+    var btn=node&&node.closest?node.closest('button[data-az]'):null;
+    if((!btn||(rail.contains&&!rail.contains(btn)))&&ev.target&&ev.target.closest)btn=ev.target.closest('button[data-az]');
+    if(btn&&(!rail.contains||rail.contains(btn))){
+      var fromBtn=btn.getAttribute('data-az')||'';
+      if(fromBtn)return fromBtn;
+    }
+    return letterAt(ev.clientY);
+  }
+  function letterAt(clientY){
+    var buttons=rail.querySelectorAll('button[data-az]');
+    if(!buttons.length)return '';
+    var rect=rail.getBoundingClientRect();
+    var ratio=(clientY-rect.top)/Math.max(1, rect.height);
+    var idx=Math.floor(ratio*buttons.length);
+    if(idx<0)idx=0;
+    if(idx>=buttons.length)idx=buttons.length-1;
+    return buttons[idx].getAttribute('data-az')||'';
+  }
+  rail.addEventListener('click', function(ev){
+    var btn=ev.target&&ev.target.closest?ev.target.closest('button[data-az]'):null;
+    if(!btn||(rail.contains&&!rail.contains(btn)))return;
+    if(ev.preventDefault)ev.preventDefault();
+    jump(btn.getAttribute('data-az'), true);
+  });
+  rail.addEventListener('pointerdown', function(ev){
+    if(ev.button!=null&&ev.button!==0)return;
+    var letter=letterFromEvent(ev);
+    if(!letter)return;
+    if(rail.setPointerCapture&&ev.pointerId!=null){
+      try{rail.setPointerCapture(ev.pointerId);}catch(eCap){}
+    }
+    if(ev.preventDefault)ev.preventDefault();
+    jump(letter, false);
+    function move(e){
+      var L=letterFromEvent(e);
+      if(L)jump(L, false);
+    }
+    function up(){
+      rail.removeEventListener('pointermove', move);
+      rail.removeEventListener('pointerup', up);
+      rail.removeEventListener('pointercancel', up);
+    }
+    rail.addEventListener('pointermove', move);
+    rail.addEventListener('pointerup', up);
+    rail.addEventListener('pointercancel', up);
+  });
+  var azSyncQueued=false;
+  scroll.addEventListener('scroll', function(){
+    if(azSyncQueued)return;
+    azSyncQueued=true;
+    var run=function(){
+      azSyncQueued=false;
+      sync();
+    };
+    if(typeof window!=='undefined'&&window.requestAnimationFrame)window.requestAnimationFrame(run);
+    else run();
+  }, {passive:true});
+  try{listAzSticky1Fit(stage);}catch(eFit){}
+  sync();
+  if(typeof window!=='undefined'&&window.requestAnimationFrame){
+    window.requestAnimationFrame(function(){
+      try{listAzSticky1Fit(stage);}catch(eFit2){}
+      sync();
+    });
+  }
+  if(typeof window!=='undefined'&&!listAzSticky1Bind._resize){
+    listAzSticky1Bind._resize=true;
+    window.addEventListener('resize', function(){
+      var stages=[];
+      try{stages=document.querySelectorAll('.az-stage');}catch(eQ){stages=[];}
+      var n;
+      for(n=0;n<stages.length;n++){
+        try{listAzSticky1Fit(stages[n]);}catch(eR){}
+      }
+    });
+  }
+}
+function listAzSticky1QueryOn(){
+  var search='';
+  try{search=String((typeof location!=='undefined'&&location&&location.search)||'');}catch(e){search='';}
+  return /(?:^|[?&])v=list-az-sticky1(?:&|$)/.test(search);
+}
+function listAzSticky1NoteQuery(){
+  var on=false;
+  try{on=listAzSticky1QueryOn();}catch(e){on=false;}
+  try{
+    if(on&&typeof document!=='undefined'&&document.documentElement)document.documentElement.setAttribute('data-list-az-sticky1', LIST_AZ_STICKY1_MARKER);
+  }catch(e2){}
+  return on;
+}
+function listAzSticky1SyncChips(){
+  var on=false;
+  var pressed='false';
+  var ids=['aidesAzChip','clientsAzChip','schedAzChip'];
+  var i;
+  var el;
+  try{on=typeof listAz1On==='function'&&!!listAz1On();}catch(e){on=false;}
+  pressed=on?'true':'false';
+  if(typeof document==='undefined'||!document.getElementById)return;
+  for(i=0;i<ids.length;i++){
+    try{
+      el=document.getElementById(ids[i]);
+      if(el&&el.setAttribute)el.setAttribute('aria-pressed', pressed);
+    }catch(e2){}
+  }
+}
+try{listAzSticky1NoteQuery();}catch(e){}
+try{listAzSticky1SyncChips();}catch(eChips){}
+// end list az sticky rail v=list-az-sticky1
 function navEditRead(){
   var raw=null;
   try{raw=localStorage.getItem(navEditStorageKey());}catch(e){}
@@ -5809,6 +6140,7 @@ function showTab(tab){
   var primaryNav=document.getElementById('nav_'+primary);
   if(primaryNav)primaryNav.classList.add('active');
   if(tab==='aides')renderAides();
+  if(tab==='aides'||tab==='clients'){try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eAzChip){}}
   if(tab==='backups')renderBackupRequests();
   if(tab==='broadcast')renderBroadcastPreview();
   if(tab==='clients')renderClients();
@@ -30146,8 +30478,15 @@ async function aidesInfo1TryPaint(container, force){
     try{loadedAidesList=users.filter(function(u){return u.username;});}catch(e){}
     try{if(typeof allAidesForAssign!=='undefined')allAidesForAssign=loadedAidesList.slice();}catch(e2){}
   }
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!users.length){
     container.innerHTML=typeof aideEmptyHtml==='function'?aideEmptyHtml():'';
+  }else if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
+    var azPairs=users.map(function(user){
+      return {name:(user&&(user.name||user.fullName||user.full_name))||'', html:aidesInfo1CardHtml(user)};
+    });
+    container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+listAzSticky1StageHtml(azPairs)+'</div>';
+    if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
   }else{
     container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+users.map(aidesInfo1CardHtml).join('')+'</div>';
   }
@@ -30228,10 +30567,20 @@ async function renderAides(force){
         +'</article>';
       return {row:row, card:card};
     });
+    var cardsHtml=built.map(function(x){return x.card;}).join('');
+    if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
+      var azPairs=[];
+      for(var azI=0;azI<aides.length;azI++){
+        var azU=aides[azI]||{};
+        azPairs.push({name:azU.name||azU.fullName||azU.full_name||'', html:built[azI].card});
+      }
+      cardsHtml=listAzSticky1StageHtml(azPairs);
+    }
     container.innerHTML='<div class="card"><div class="card-title"><span class="ico">👥</span> '+title+'</div>'
-      +'<div class="aide-cards" aria-label="Aides">'+built.map(function(x){return x.card;}).join('')+'</div>'
+      +'<div class="aide-cards" aria-label="Aides">'+cardsHtml+'</div>'
       +'<div class="aides-sheet table-wrap" style="overflow-x:auto"><table class="data-table" id="aidesTable"><thead><tr><th>Name</th><th>Username</th><th>Assigned clients</th><th>Status</th><th>Actions</th></tr></thead><tbody>'
       +built.map(function(x){return x.row;}).join('')+'</tbody></table></div></div>';
+    if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
     if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
     return;
   }catch(e){}
@@ -30595,13 +30944,19 @@ function aideCredPaintList(){
     list.innerHTML='<p class="aide-cred-muted">'+escapeHtml(aideCredState.error)+'</p>';
     return;
   }
+  if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
+    rows=listAz1Apply(rows,[
+      function(a){return (a&&(a.name||a.username))||'';},
+      function(a){return (a&&a.id)||'';}
+    ]);
+  }
   var showEmpty=!q&&!aideCredState.recordCount;
   var emptyHtml=showEmpty?aideCredEmptyAddHtml():'';
   if(!rows.length){
     list.innerHTML=emptyHtml||('<p class="aide-cred-muted">'+(q?'No aides match that search.':'No credential records yet.')+'</p>');
     return;
   }
-  list.innerHTML=emptyHtml+rows.map(function(a, i){
+  function aideCredPersonHtml(a, i){
     var chips=a.bare?'':aideCredChipsFromRollup(a).map(aideCredChipHtml).join('');
     var color=AIDE_CRED_COLORS[i%AIDE_CRED_COLORS.length];
     return '<button type="button" class="aide-cred-person" data-aide-cred-open="'+escapeAttr(a.id)+'">'
@@ -30610,7 +30965,17 @@ function aideCredPaintList(){
       +'<span class="aide-cred-chips">'+chips+'</span>'
       +'<span class="aide-cred-chev" aria-hidden="true">\u203A</span>'
       +'</button>';
-  }).join('');
+  }
+  var people=rows.map(aideCredPersonHtml).join('');
+  if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
+    var stage=listAzSticky1StageHtml(rows.map(function(a, i){
+      return {name:(a&&(a.name||a.username))||'', html:aideCredPersonHtml(a, i)};
+    }));
+    list.innerHTML=emptyHtml+(stage||people);
+    if(stage&&typeof listAzSticky1Bind==='function')listAzSticky1Bind(list);
+    return;
+  }
+  list.innerHTML=emptyHtml+people;
 }
 function aideCredEmptyAddHtml(){
   return '<div class="aide-cred-empty"><p class="aide-cred-muted">No credential records yet.</p>'
@@ -34202,6 +34567,7 @@ async function renderClients(force){
 
 function paintClients(){
   const container=document.getElementById('clientsContainer');
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!container)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
   let list=allClients;
@@ -34218,7 +34584,7 @@ function paintClients(){
     return;
   }
 
-  container.innerHTML=list.map(c=>{
+  const clientCards=list.map(c=>{
     const aideCount=(c.assignedAides||[]).length;
     const hasGPS=c.lat&&c.lng;
     const head=typeof clientInsCardHead==='function'?clientInsCardHead(c):('<h4>'+(c.name||'')+'</h4>');
@@ -34233,7 +34599,15 @@ function paintClients(){
         <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient('${c.id}')">Delete</button>
       </div>
     </div>`;
-  }).join('');
+  });
+  if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
+    container.innerHTML=listAzSticky1StageHtml(list.map(function(c, i){
+      return {name:(c&&c.name)||'', html:clientCards[i]};
+    }));
+    if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
+    return;
+  }
+  container.innerHTML=clientCards.join('');
 }
 
 async function loadAidesForAssignment(selectedIds=[]){
