@@ -30,6 +30,9 @@
 <!-- manage done 2026-09-28 v=manage-done1 ?v=manage-done1 admin-build 2026-09-28-manage-done1. GHOST-MANAGE-DONE1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. Done fully exits Manage. It is a force-off, not a second call to the same half-toggle. On Aides, Done calls aideManageDone1Exit: remove aide-manage-on and aide-manage-confirming (and manage-confirming), hide Done, show Manage + Refresh + Add aide (+ Aide), hide the select bar, checkboxes, N selected, and Are you sure? chrome, clear the selection, and keep #aideCredsRoot hidden so credentials do not reopen (manage-clean1). Mo does not switch Active or Recently deleted to leave Manage. While Manage is on, Manage itself is hidden so the header is not dual Manage+Done. Clients clientManageDelete1ToggleManage(false) and Timesheets tsManageDelete1ToggleManage(false) use the same force-off: hide Done, restore Manage, drop client-manage-on / ts-manage-on and the confirming class, and hide the select bar. Prior markers stay, including v=aide-manage-delete1, v=manage-clean1, v=aides-info1, and v=aidadel1. -->
 <meta name="admin-build" content="2026-09-28-manage-done1">
 <script>var MANAGE_DONE1_MARKER='v=manage-done1';var MANAGE_DONE1_BUILD='2026-09-28-manage-done1';</script>
+<!-- manage dots creds 2026-09-28 v=manage-dots-creds1 ?v=manage-dots-creds1 admin-build 2026-09-28-manage-dots-creds1. GHOST-MANAGE-DOTS-CREDS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Admin Aides Manage only. Row tap on an aides-info1 card while Manage is on toggles that row's .aide-manage-cb through aideManageDelete1Toggle and does not open credentials or profile. The ··· button (.aide-info-more → aidesInfo1OpenSheet) stays available in Manage. The ··· menu includes Credentials plus View profile, Reset temp password, and Delete. Credentials closes the ··· sheet and opens that aide's credential detail from aidesInfo1Current.id without leaving Manage and without untoggling Active. The full credentials list, search, and banner stay hidden (manage-clean1). Select bar, Done, and Manage chrome stay. Done (aideManageDone1Exit) still force-exits Manage and closes the credential overlay. Bulk soft-delete stays aide-manage-delete1. Prior markers stay, including v=manage-done1, v=manage-clean1, v=aide-manage-delete1, v=aides-info1, v=aidecreds1, v=aidecreds1b, and v=aidecreds1c. -->
+<meta name="admin-build" content="2026-09-28-manage-dots-creds1">
+<script>var MANAGE_DOTS_CREDS1_MARKER='v=manage-dots-creds1';var MANAGE_DOTS_CREDS1_BUILD='2026-09-28-manage-dots-creds1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -1721,6 +1724,17 @@ html.remi-ask-kb #copilotSheet{z-index:180;}
 #tab_aides:not(.aide-manage-on) #aideManageDoneBtn{display:none !important;}
 /* v=manage-done1 — while Manage is on, only Done is the exit. Manage returns after a full exit. */
 #tab_aides.aide-manage-on #aideCredManageBtn{display:none !important;}
+/* v=manage-dots-creds1 — row tap selects. ··· stays. One aide's credential detail may show. The list stack stays hidden. */
+#tab_aides.aide-manage-on .aide-info-more{visibility:visible;pointer-events:auto;}
+#tab_aides.aide-manage-on:not(.aide-desk-deleted) article.aide-info-card{cursor:pointer;}
+#tab_aides.aide-manage-on.aide-manage-creds #aideCredsRoot:not([hidden]){display:block !important;}
+#tab_aides.aide-manage-on.aide-manage-creds #aideCredDetail:not([hidden]){display:block !important;}
+#tab_aides.aide-manage-on.aide-manage-creds #aideCredList,
+#tab_aides.aide-manage-on.aide-manage-creds #aideCredSearchWrap,
+#tab_aides.aide-manage-on.aide-manage-creds #aideCredBanner{display:none !important;}
+#tab_aides.aide-manage-on.aide-manage-creds #aidesContainer{display:none !important;}
+#tab_aides.aide-manage-on.aide-manage-creds #aideCredSheet:not([hidden]){display:block !important;}
+.aide-info-manage-note{margin:0 0 8px;color:var(--muted);font-size:0.88rem;font-weight:650;}
 #tab_aides.aide-manage-on #aideManageBar .aide-manage-pair{flex:2 1 0;min-width:0;}
 #tab_aides.aide-manage-on #aideManageBar .aide-manage-pair .btn{padding:0 8px;font-size:0.82rem;white-space:nowrap;}
 #tab_aides.aide-manage-on #aideManageBar .aide-manage-delete{flex:1 1 0;min-width:0;padding:0 8px;font-size:0.82rem;white-space:nowrap;background:var(--danger);color:#fff;border-color:var(--danger);}
@@ -3106,7 +3120,7 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" data-manage-dots-creds1="v=manage-dots-creds1">
         <p id="aideManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
           <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
@@ -3149,7 +3163,7 @@ bindLoginKeyboard();
           <div id="aideCredList" aria-label="Aides"></div>
           <div id="aideCredDetail" hidden></div>
         </div>
-        <div id="aidesContainer"><p style="color:var(--muted)">Loading...</p></div>
+        <div id="aidesContainer" data-manage-dots-creds1="v=manage-dots-creds1"><p style="color:var(--muted)">Loading...</p></div>
         <div id="aideInfoSheet" data-aides-info1="v=aides-info1" hidden role="dialog" aria-modal="true" aria-labelledby="aideInfoSheetTitle">
           <div class="aide-info-back" onclick="aidesInfo1CloseSheet()"></div>
           <div class="aide-info-sheet">
@@ -31617,7 +31631,16 @@ function aidesInfo1OpenSheet(key){
   var box=document.getElementById('aideInfoSheetActions');
   var can=typeof canManageAides==='function'&&canManageAides();
   var deleted=(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
-  var html='<button type="button" class="aide-info-act" onclick="aidesInfo1ViewProfile()">View profile</button>';
+  var showCreds=!!(row.id);
+  if(typeof aideCredsIsAdmin==='function')showCreds=showCreds&&aideCredsIsAdmin();
+  var html='';
+  if(typeof aideCredManageOn==='function'&&aideCredManageOn()){
+    html+='<p class="aide-info-manage-note" data-manage-dots-creds1="v=manage-dots-creds1">Manage mode · actions still available</p>';
+  }
+  if(showCreds){
+    html+='<button type="button" class="aide-info-act" data-manage-dots-creds1="v=manage-dots-creds1" onclick="aidesInfo1Credentials()">Credentials</button>';
+  }
+  html+='<button type="button" class="aide-info-act" onclick="aidesInfo1ViewProfile()">View profile</button>';
   if(can&&!deleted&&row.username){
     html+='<button type="button" class="aide-info-act" onclick="aidesInfo1Reset()">Reset temp password</button>';
     html+='<button type="button" class="aide-info-act danger" onclick="aidesInfo1Delete()">Delete</button>';
@@ -31627,6 +31650,17 @@ function aidesInfo1OpenSheet(key){
   if(box)box.innerHTML=html;
   var sheet=document.getElementById('aideInfoSheet');
   if(sheet)sheet.hidden=false;
+}
+function aidesInfo1Credentials(){
+  var row=aidesInfo1Current;
+  var id=row&&row.id?String(row.id):'';
+  var name=row&&(row.name||row.fullName)?String(row.name||row.fullName):'';
+  aidesInfo1CloseSheet();
+  if(!id){
+    if(typeof showTempMsg==='function')showTempMsg('No credentials on this aide.','var(--warn)');
+    return;
+  }
+  if(typeof aideCredOpenFromManageDots==='function')aideCredOpenFromManageDots(id, name);
 }
 function aidesInfo1ViewProfile(){
   var row=aidesInfo1Current;
@@ -32108,6 +32142,7 @@ function aideCredHideForManage(){
   if(tab&&tab.classList){
     tab.classList.remove('aide-creds-on');
     tab.classList.remove('aide-creds-detail');
+    tab.classList.remove('aide-manage-creds');
   }
   var detail=document.getElementById('aideCredDetail');
   if(detail){detail.hidden=true;detail.innerHTML='';}
@@ -32118,6 +32153,7 @@ function aideCredHideForManage(){
   if(typeof aideCredCloseSheet==='function')aideCredCloseSheet();
   if(typeof aideCredState!=='undefined'&&aideCredState){
     aideCredState.seq=(aideCredState.seq||0)+1;
+    aideCredState.manageDots=false;
     aideCredState.view='list';
     aideCredState.aideId='';
     aideCredState.aideName='';
@@ -32134,10 +32170,15 @@ function aideCredShowAfterManage(){
   if(tab&&tab.classList){
     tab.classList.remove('aide-creds-on');
     tab.classList.remove('aide-creds-detail');
+    tab.classList.remove('aide-manage-creds');
   }
   var detail=document.getElementById('aideCredDetail');
   if(detail){detail.hidden=true;detail.innerHTML='';}
+  var list=document.getElementById('aideCredList');
+  if(list)list.hidden=true;
   if(typeof aideCredState!=='undefined'&&aideCredState){
+    aideCredState.seq=(aideCredState.seq||0)+1;
+    aideCredState.manageDots=false;
     aideCredState.view='list';
     aideCredState.aideId='';
     aideCredState.aideName='';
@@ -32210,6 +32251,7 @@ function aideCredsAfterAides(){
   var root=document.getElementById('aideCredsRoot');
   var tab=document.getElementById('tab_aides');
   if(aideCredManageOn()){
+    if(typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.manageDots)return;
     if(root)root.hidden=true;
     if(typeof aideCredState!=='undefined'&&aideCredState){
       aideCredState.view='list';
@@ -32374,22 +32416,30 @@ function aideCredDetailTop(){
 }
 function aideCredPaintDetail(messageHtml){
   if(aideCredManageOn()){
-    var blocked=document.getElementById('aideCredDetail');
-    if(blocked)blocked.hidden=true;
-    var blockedRoot=document.getElementById('aideCredsRoot');
-    if(blockedRoot)blockedRoot.hidden=true;
-    var blockedTab=document.getElementById('tab_aides');
-    if(blockedTab&&blockedTab.classList)blockedTab.classList.remove('aide-creds-detail');
-    if(typeof aideCredState!=='undefined'&&aideCredState){
-      aideCredState.view='list';
-      aideCredState.aideId='';
-      aideCredState.aideName='';
+    if(!(typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.manageDots)){
+      var blocked=document.getElementById('aideCredDetail');
+      if(blocked)blocked.hidden=true;
+      var blockedRoot=document.getElementById('aideCredsRoot');
+      if(blockedRoot)blockedRoot.hidden=true;
+      var blockedTab=document.getElementById('tab_aides');
+      if(blockedTab&&blockedTab.classList){
+        blockedTab.classList.remove('aide-creds-detail');
+        blockedTab.classList.remove('aide-manage-creds');
+      }
+      if(typeof aideCredState!=='undefined'&&aideCredState){
+        aideCredState.manageDots=false;
+        aideCredState.view='list';
+        aideCredState.aideId='';
+        aideCredState.aideName='';
+      }
+      return;
     }
-    return;
   }
+  var dots=!!(aideCredManageOn()&&typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.manageDots);
   var tab=document.getElementById('tab_aides');
   var root=document.getElementById('aideCredsRoot');
   if(tab&&tab.classList){
+    tab.classList.toggle('aide-manage-creds', dots);
     tab.classList.add('aide-creds-on');
     tab.classList.add('aide-creds-detail');
   }
@@ -32469,6 +32519,33 @@ async function aideCredsRefresh(){
   if(aideCredState.view==='detail')return;
   aideCredPaintList();
 }
+async function aideCredOpenFromManageDots(aideId, aideName){
+  if(typeof aideCredsIsAdmin==='function'&&!aideCredsIsAdmin())return;
+  var id=String(aideId||'').trim();
+  if(!id)return;
+  if(typeof aideCredBind==='function')aideCredBind();
+  if(!aideCredManageOn()){
+    return aideCredOpen(id);
+  }
+  var seq=++aideCredState.seq;
+  aideCredState.manageDots=true;
+  aideCredState.view='detail';
+  aideCredState.aideId=id;
+  var known=(aideCredState.aides||[]).filter(function(a){return a&&a.id===id;})[0];
+  var named=String(aideName||'').trim();
+  aideCredState.aideName=named||(known?(known.name||known.username||'Aide'):'Aide');
+  aideCredState.credentials=[];
+  aideCredPaintDetail('<p class="aide-cred-muted">Loading credentials...</p>');
+  var res=await sbAdminListAideCredentials(id);
+  if(seq!==aideCredState.seq)return;
+  if(!aideCredManageOn()||!aideCredState.manageDots||aideCredState.aideId!==id)return;
+  if(!res||!res.success){
+    aideCredPaintDetail('<p class="aide-cred-muted">'+escapeHtml((res&&res.error)||'Could not load credentials.')+'</p>');
+    return;
+  }
+  aideCredState.credentials=res.credentials||[];
+  aideCredPaintDetail();
+}
 async function aideCredOpen(aideId){
   if(!aideCredsIsAdmin())return;
   if(aideCredManageOn())return;
@@ -32494,6 +32571,11 @@ async function aideCredOpen(aideId){
 }
 function aideCredBack(){
   aideCredCloseSheet();
+  if(aideCredManageOn()){
+    aideCredHideForManage();
+    return;
+  }
+  aideCredState.manageDots=false;
   aideCredState.view='list';
   aideCredPaintList();
 }
@@ -33048,11 +33130,34 @@ function aideManageDelete1Sync(){
   aideManageDelete1Bind();
 }
 function aideManageDelete1OnDesk(){
+  if(typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.manageDots&&typeof aideCredHideForManage==='function')aideCredHideForManage();
   aideManageDelete1Sel={};
   aideManageDelete1CloseConfirm();
   aideManageDelete1Sync();
 }
+function aideManageDots1Bind(){
+  if(aideManageDots1Bind.done)return;
+  var root=document.getElementById('aidesContainer');
+  if(!root||!root.addEventListener)return;
+  aideManageDots1Bind.done=true;
+  if(root.setAttribute)root.setAttribute('data-manage-dots-creds1','v=manage-dots-creds1');
+  root.addEventListener('click', function(ev){
+    if(typeof aideManageDelete1Active!=='function'||!aideManageDelete1Active())return;
+    var t=ev.target;
+    if(t&&t.nodeType===3)t=t.parentElement;
+    if(!t||!t.closest)return;
+    if(t.closest('.aide-info-more,.aide-manage-check,a,button,input,label,select,textarea'))return;
+    var card=t.closest('article.aide-info-card');
+    if(!card||(root.contains&&!root.contains(card)))return;
+    var cb=card.querySelector?card.querySelector('input.aide-manage-cb'):null;
+    if(!cb||cb.disabled)return;
+    if(ev.preventDefault)ev.preventDefault();
+    cb.checked=!cb.checked;
+    aideManageDelete1Toggle(cb);
+  });
+}
 function aideManageDelete1Bind(){
+  if(typeof aideManageDots1Bind==='function')aideManageDots1Bind();
   if(aideManageDelete1Bind.done)return;
   aideManageDelete1Bind.done=true;
   document.addEventListener('keydown', function(ev){
