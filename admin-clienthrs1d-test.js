@@ -12,7 +12,7 @@ assert.ok(html.includes('data-clienthrs1d="v=clienthrs1d"'), 'clienthrs1d data a
 assert.ok(html.includes('<!-- client hours notifications 2026-09-27 v=clienthrs1d admin-build 2026-09-27-clienthrs1d'), 'clienthrs1d comment');
 assert.ok(html.includes("var CLIENTHRS1D_MARKER='v=clienthrs1d'"), 'clienthrs1d script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aides-info1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-client1'), 'first admin-build is vapid1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-clienthrs1d">'), 'clienthrs1d meta stays');
 assert.ok(html.indexOf('content="2026-09-27-clienthrs1d"') < html.indexOf('content="2026-09-27-remi-cm-email1"'), 'remi-cm-email1 stays after this tip');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-cm-email1">'), 'remi-cm-email1 meta stays');
@@ -128,16 +128,16 @@ async function runBrowser(){
         chip: document.querySelector('#copilotFab img').getAttribute('src')
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-aides-info1');
-    assert.strictEqual(boot.second, '2026-09-27-login-toast1');
-    assert.strictEqual(boot.third, '2026-09-27-aide-office-vis1');
-    assert.strictEqual(boot.fourth, '2026-09-27-remi-langs1');
-    assert.strictEqual(boot.fifth, '2026-09-27-hold-clear1');
-    assert.strictEqual(boot.sixth, '2026-09-27-sched-time-tap1');
-    assert.strictEqual(boot.seventh, '2026-09-27-aide-text-chat1');
-    assert.strictEqual(boot.eighth, '2026-09-27-remi-float-hide1');
-    assert.strictEqual(boot.ninth, '2026-09-27-tabbar-8');
-    assert.strictEqual(boot.tenth, '2026-09-27-cover-card-cancel1');
+    assert.strictEqual(boot.first, '2026-09-27-hold-client1');
+    assert.strictEqual(boot.second, '2026-09-27-aides-info1');
+    assert.strictEqual(boot.third, '2026-09-27-login-toast1');
+    assert.strictEqual(boot.fourth, '2026-09-27-aide-office-vis1');
+    assert.strictEqual(boot.fifth, '2026-09-27-remi-langs1');
+    assert.strictEqual(boot.sixth, '2026-09-27-hold-clear1');
+    assert.strictEqual(boot.seventh, '2026-09-27-sched-time-tap1');
+    assert.strictEqual(boot.eighth, '2026-09-27-aide-text-chat1');
+    assert.strictEqual(boot.ninth, '2026-09-27-remi-float-hide1');
+    assert.strictEqual(boot.tenth, '2026-09-27-tabbar-8');
     assert.strictEqual(boot.marker, 'v=clienthrs1d');
     assert.ok(boot.chip.indexOf('remi-locked.png') >= 0, boot.chip);
 
