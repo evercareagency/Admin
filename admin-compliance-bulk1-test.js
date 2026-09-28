@@ -37,12 +37,14 @@ assert.ok(html.includes('Do not squash-merge'), 'no squash');
 assert.ok(html.includes('No SQL') && html.includes('No new RPC') && html.includes('No Auth reseal'), 'hard rules');
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-compliance-bulk1'), 'first admin-build is compliance-bulk1');
-assert.ok(html.indexOf('content="2026-09-27-compliance-bulk1"') < html.indexOf('content="2026-09-27-msg-dense1"'), 'msg-dense1 stays after compliance-bulk1');
+assert.ok(html.indexOf('content="2026-09-27-compliance-bulk1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after compliance-bulk1');
+assert.ok(html.indexOf('content="2026-09-27-hold-autosave1"') < html.indexOf('content="2026-09-27-msg-dense1"'), 'msg-dense1 stays after hold-autosave1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-hold-autosave1">'), 'hold-autosave1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-msg-dense1">'), 'msg-dense1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-aide-notif-search1">'), 'aide-notif-search1 meta stays');
 assert.ok(html.includes('v=isdel1') && html.includes('v=isclear1') && html.includes('v=isdash1'), 'prior inservice markers stay');
-['v=msg-dense1','v=aide-notif-search1','v=remi-chat1','v=hold-client1','v=aides-info1','v=login-toast1','v=isdel1','v=isclear1','v=isdash1b'].forEach(function(mark){
+['v=hold-autosave1','v=msg-dense1','v=aide-notif-search1','v=remi-chat1','v=hold-client1','v=aides-info1','v=login-toast1','v=isdel1','v=isclear1','v=isdash1b'].forEach(function(mark){
   assert.ok(html.includes(mark), 'prior marker stays ' + mark);
 });
 

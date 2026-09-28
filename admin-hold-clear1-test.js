@@ -20,6 +20,7 @@ assert.ok(html.includes('Patch none'), 'no SQL patch in the tip');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/hold-clear1-v1.sql')), 'no hold-clear1 SQL file');
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-compliance-bulk1'), 'first admin-build is msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-hold-autosave1"') < html.indexOf('content="2026-09-27-msg-dense1"'), '2026-09-27-msg-dense1 stays after hold-autosave1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
@@ -54,9 +55,11 @@ const slotEnd = html.indexOf('// end schedule multi-slot v=clienthrs1b');
 const schedSrc = html.slice(schedStart, schedEnd);
 const slotSrc = html.slice(slotStart, slotEnd);
 const clearFn = slotSrc.slice(slotSrc.indexOf('async function schedClearHold'), slotSrc.indexOf('async function schedClearSlotMark'));
-assert.ok(clearFn.includes("sbRestRpc('clear_schedule_client_hold',{p_hold_id:String(holdId)})"), 'Clear omits p_end_date');
+assert.ok(clearFn.includes("sbRestRpc('clear_schedule_client_hold',{p_client_id:String(clientId)})"), 'Clear is client-scoped and omits p_end_date');
+assert.ok(!clearFn.includes('p_hold_id'), 'Clear omits p_hold_id');
 assert.ok(!clearFn.includes('p_end_date'), 'the Clear function does not send an end date');
 const endFn = slotSrc.slice(slotSrc.indexOf('async function schedWriteHold'), slotSrc.indexOf('async function schedSaveCover'));
+assert.ok(endFn.includes('p_client_id:String(clientId)'), 'End hold is client-scoped');
 assert.ok(endFn.includes('p_end_date:end||schedDateOnly(onDate)'), 'End hold still sends p_end_date');
 assert.ok(!endFn.includes('clear_schedule_slot_day_mark'), 'End hold does not clear day marks');
 
@@ -243,7 +246,8 @@ function clearedPayload(){
   const soft = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
   const marks = rpc.filter(function(c){ return c.name === 'clear_schedule_slot_day_mark'; });
   assert.strictEqual(soft.length, 1, 'Clear posts one client hold clear');
-  assert.strictEqual(soft[0].body.p_hold_id, holdId);
+  assert.strictEqual(soft[0].body.p_client_id, ada);
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(soft[0].body, 'p_hold_id'), false, 'Clear omits p_hold_id');
   assert.strictEqual(Object.prototype.hasOwnProperty.call(soft[0].body, 'p_end_date'), false, 'Clear does not send p_end_date');
   assert.strictEqual(marks.length, 2, 'each on_hold slot on the hold is cleared');
   assert.deepStrictEqual(marks.map(function(c){ return c.body.p_on_date + ' ' + c.body.p_slot_key; }), ['2026-09-10 am', '2026-09-10 pm']);
@@ -285,7 +289,8 @@ function clearedPayload(){
   await sandbox.schedWriteHold(ada, '2026-09-10', 'am', true);
   const ended = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
   assert.strictEqual(ended.length, 1, 'End hold still clears once');
-  assert.strictEqual(ended[0].body.p_hold_id, holdId);
+  assert.strictEqual(ended[0].body.p_client_id, ada);
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(ended[0].body, 'p_hold_id'), false, 'End hold omits p_hold_id');
   assert.strictEqual(ended[0].body.p_end_date, '2026-09-10', 'End hold still sends p_end_date');
   assert.strictEqual(rpc.filter(function(c){ return c.name === 'clear_schedule_slot_day_mark'; }).length, 0, 'End hold does not clear day marks');
 
@@ -482,7 +487,8 @@ async function shots(){
       };
     }, beforeClear);
     assert.deepStrictEqual(after.names, ['clear_schedule_client_hold', 'clear_schedule_slot_day_mark', 'clear_schedule_slot_day_mark', 'list_schedule_week_slots']);
-    assert.strictEqual(after.bodies[0].p_hold_id, holdId);
+    assert.strictEqual(after.bodies[0].p_client_id, ada);
+    assert.strictEqual(Object.prototype.hasOwnProperty.call(after.bodies[0], 'p_hold_id'), false);
     assert.strictEqual(Object.prototype.hasOwnProperty.call(after.bodies[0], 'p_end_date'), false);
     assert.strictEqual(after.bodies[1].p_slot_key, 'am');
     assert.strictEqual(after.bodies[1].p_on_date, '2026-09-10');
