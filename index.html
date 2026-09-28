@@ -12,7 +12,7 @@
 <!-- punch leftovers 2026-09-28 v=punch-leftovers1 ?v=punch-leftovers1 admin-build 2026-09-28-punch-leftovers1. GHOST-PUNCH-LEFTOVERS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone shell, max-width 430px including a typical 390 CSS px phone: the sticky EverCare header was covering the Clients subtitle and the More heading. Desk titles stick just below that teal bar with a clear gap, so Clients, More, Timesheets, Schedule, Aides, and the other desks keep the title and subtitle fully visible. The header look is unchanged. Schedule cold load, refresh, and entry into Schedule land on the week calendar only. The day drawer and Edit shift stay closed until a day is tapped, Add shift is opened, or an explicit deep link names that day. No client or shift is pre-selected, and a leftover QaHold row is not auto-opened. Ace deletes leftover QaHold test rows. This tip does not delete database rows. More desks stick. Opening Inservices, Coverage, Nurse, or any other desk from More writes that desk into the hash and leaves it open, on desktop and on a phone. Role apply does not send an allowed desk back to Timesheets or the default first tab after paint, and an empty hash does not reset the open desk. A reload or a hash of that desk opens it again. A role-forbidden desk such as Payroll for Scheduler still returns to Timesheets. Sandata Reminder and Call off empty Submit stay in the other repo. Out of scope: Nurse bottom nav overlap, Remi fullscreen rail, Clients edit/delete wrap, Remi chip over the dock. Prior markers stay, including v=remi-payroll-ins1, v=remi-float-hide1b, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-28-punch-leftovers1">
 <script>var PUNCH_LEFTOVERS1_MARKER='v=punch-leftovers1';var PUNCH_LEFTOVERS1_BUILD='2026-09-28-punch-leftovers1';</script>
-<!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. FIX A3: the same tiny compact A–Z chip (class sched-az-chip list-az-chip) also sits beside the Aides and Clients titles and calls listAz1Toggle against the same evercare_list_order preference. It is not a fat pill and not a second key. Manage stays the credentials control. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
+<!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. FIX A3: the same tiny compact A–Z chip (class sched-az-chip list-az-chip) also sits beside the Aides and Clients titles and calls listAz1Toggle against the same evercare_list_order preference. It is not a fat pill and not a second key. Manage stays the credentials control. FIX A4: Admin default Aides rail mounts on #aideCredList when A–Z is on; Manage stays credentials-only. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-28-list-az-sticky1">
 <script>var LIST_AZ_STICKY1_MARKER='v=list-az-sticky1';var LIST_AZ_STICKY1_BUILD='2026-09-28-list-az-sticky1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -1604,29 +1604,29 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 /* v=list-az-sticky1 — sticky A–Z letter jump rail on Aides + Clients. Builds on list-az1. */
 #tab_aides .aide-info-cards:has(.az-stage),
 #tab_aides .aide-cards:has(.az-stage){max-width:none;width:100%;display:flex;flex-direction:column;}
-#tab_aides .az-stage,#tab_clients .az-stage{position:relative;height:min(680px,calc(100dvh - 260px));min-height:240px;}
-#tab_aides .az-scroll,#tab_clients .az-scroll{position:relative;height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 32px 16px 0;scrollbar-width:thin;}
-#tab_aides .az-group,#tab_clients .az-group{display:block;}
-#tab_aides .az-tail,#tab_clients .az-tail{height:48px;pointer-events:none;}
-#tab_aides .az-sec,#tab_clients .az-sec{position:sticky;top:0;z-index:5;background:rgba(245,248,252,.96);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:12px;font-weight:800;color:var(--teal-dark);letter-spacing:.08em;padding:8px 4px 6px;margin:2px 0 6px;border-bottom:1px solid var(--border);}
+#tab_aides .az-stage,#aideCredsRoot .az-stage,#aideCredList .az-stage,#tab_clients .az-stage{position:relative;height:min(680px,calc(100dvh - 260px));min-height:240px;}
+#tab_aides .az-scroll,#aideCredsRoot .az-scroll,#aideCredList .az-scroll,#tab_clients .az-scroll{position:relative;height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:0 32px 16px 0;scrollbar-width:thin;}
+#tab_aides .az-group,#aideCredsRoot .az-group,#aideCredList .az-group,#tab_clients .az-group{display:block;}
+#tab_aides .az-tail,#aideCredsRoot .az-tail,#aideCredList .az-tail,#tab_clients .az-tail{height:48px;pointer-events:none;}
+#tab_aides .az-sec,#aideCredsRoot .az-sec,#aideCredList .az-sec,#tab_clients .az-sec{position:sticky;top:0;z-index:5;background:rgba(245,248,252,.96);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:12px;font-weight:800;color:var(--teal-dark);letter-spacing:.08em;padding:8px 4px 6px;margin:2px 0 6px;border-bottom:1px solid var(--border);}
 #tab_clients .az-sec,#tab_aides .card .az-sec{background:rgba(255,255,255,.96);}
-#tab_aides .az-item,#tab_clients .az-item{margin:0 0 8px;}
-#tab_aides .az-scroll .aide-card,#tab_clients .az-scroll .aide-card{margin-bottom:0;}
-#tab_aides .az-rail,#tab_clients .az-rail{position:absolute;top:50%;right:2px;transform:translateY(-50%);z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:6px 2px;max-height:calc(100% - 12px);min-height:0;overflow:hidden;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:rgba(255,255,255,.82);border:1px solid var(--border);border-radius:999px;box-shadow:0 4px 16px rgba(26,39,68,.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-#tab_aides .az-rail button,#tab_clients .az-rail button{width:18px;height:15px;max-height:16px;min-height:0;flex:1 1 auto;border:0;background:transparent;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:9px;font-weight:800;line-height:1;padding:0;margin:0;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;appearance:none;box-shadow:none;}
-#tab_aides .az-rail button.on,#tab_clients .az-rail button.on{background:var(--teal);color:#fff;box-shadow:0 1px 4px rgba(42,127,127,.35);}
+#tab_aides .az-item,#aideCredsRoot .az-item,#aideCredList .az-item,#tab_clients .az-item{margin:0 0 8px;}
+#tab_aides .az-scroll .aide-card,#tab_clients .az-scroll .aide-card,#aideCredList .az-scroll .aide-cred-person{margin-bottom:0;}
+#tab_aides .az-rail,#aideCredsRoot .az-rail,#aideCredList .az-rail,#tab_clients .az-rail{position:absolute;top:50%;right:2px;transform:translateY(-50%);z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:6px 2px;max-height:calc(100% - 12px);min-height:0;overflow:hidden;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;background:rgba(255,255,255,.82);border:1px solid var(--border);border-radius:999px;box-shadow:0 4px 16px rgba(26,39,68,.10);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+#tab_aides .az-rail button,#aideCredsRoot .az-rail button,#aideCredList .az-rail button,#tab_clients .az-rail button{width:18px;height:15px;max-height:16px;min-height:0;flex:1 1 auto;border:0;background:transparent;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:9px;font-weight:800;line-height:1;padding:0;margin:0;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none;appearance:none;box-shadow:none;}
+#tab_aides .az-rail button.on,#aideCredsRoot .az-rail button.on,#aideCredList .az-rail button.on,#tab_clients .az-rail button.on{background:var(--teal);color:#fff;box-shadow:0 1px 4px rgba(42,127,127,.35);}
 @media (hover:hover){
-  #tab_aides .az-rail button:hover,#tab_clients .az-rail button:hover{color:var(--navy);}
-  #tab_aides .az-rail button.on:hover,#tab_clients .az-rail button.on:hover{color:#fff;}
+  #tab_aides .az-rail button:hover,#aideCredList .az-rail button:hover,#tab_clients .az-rail button:hover{color:var(--navy);}
+  #tab_aides .az-rail button.on:hover,#aideCredList .az-rail button.on:hover,#tab_clients .az-rail button.on:hover{color:#fff;}
 }
-#tab_aides .az-rail button:focus-visible,#tab_clients .az-rail button:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
+#tab_aides .az-rail button:focus-visible,#aideCredList .az-rail button:focus-visible,#tab_clients .az-rail button:focus-visible{outline:2px solid var(--teal);outline-offset:1px;}
 @media(min-width:900px){
-  #tab_aides .az-scroll,#tab_clients .az-scroll{padding-right:44px;}
-  #tab_aides .az-rail,#tab_clients .az-rail{right:8px;padding:8px 3px;}
-  #tab_aides .az-rail button,#tab_clients .az-rail button{width:20px;height:17px;max-height:18px;font-size:10px;}
+  #tab_aides .az-scroll,#aideCredsRoot .az-scroll,#aideCredList .az-scroll,#tab_clients .az-scroll{padding-right:44px;}
+  #tab_aides .az-rail,#aideCredsRoot .az-rail,#aideCredList .az-rail,#tab_clients .az-rail{right:8px;padding:8px 3px;}
+  #tab_aides .az-rail button,#aideCredList .az-rail button,#tab_clients .az-rail button{width:20px;height:17px;max-height:18px;font-size:10px;}
 }
 @media(max-width:899px){
-  #tab_aides .az-stage{height:calc(100dvh - 300px);}
+  #tab_aides .az-stage,#aideCredsRoot .az-stage,#aideCredList .az-stage{height:calc(100dvh - 300px);}
   #tab_clients .az-stage{height:calc(100dvh - 328px);}
 }
 /* v=aidecreds1 — phone credentials list, card, and edit sheet. Admin only. */
@@ -5421,6 +5421,9 @@ function listAz1Repaint(){
     var aidesBox=document.getElementById('aidesContainer');
     if(aidesBox&&aidesBox.querySelector&&aidesBox.querySelector('.aide-info-card, .aide-row-card, .az-stage, .az-rail')&&typeof renderAides==='function')renderAides(false);
   }catch(e7){}
+  try{
+    if(typeof aideCredPaintList==='function'&&typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.view!=='detail')aideCredPaintList();
+  }catch(eCred){}
   try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(e8){}
 }
 function listAz1Toggle(ev){
@@ -30941,13 +30944,19 @@ function aideCredPaintList(){
     list.innerHTML='<p class="aide-cred-muted">'+escapeHtml(aideCredState.error)+'</p>';
     return;
   }
+  if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
+    rows=listAz1Apply(rows,[
+      function(a){return (a&&(a.name||a.username))||'';},
+      function(a){return (a&&a.id)||'';}
+    ]);
+  }
   var showEmpty=!q&&!aideCredState.recordCount;
   var emptyHtml=showEmpty?aideCredEmptyAddHtml():'';
   if(!rows.length){
     list.innerHTML=emptyHtml||('<p class="aide-cred-muted">'+(q?'No aides match that search.':'No credential records yet.')+'</p>');
     return;
   }
-  list.innerHTML=emptyHtml+rows.map(function(a, i){
+  function aideCredPersonHtml(a, i){
     var chips=a.bare?'':aideCredChipsFromRollup(a).map(aideCredChipHtml).join('');
     var color=AIDE_CRED_COLORS[i%AIDE_CRED_COLORS.length];
     return '<button type="button" class="aide-cred-person" data-aide-cred-open="'+escapeAttr(a.id)+'">'
@@ -30956,7 +30965,17 @@ function aideCredPaintList(){
       +'<span class="aide-cred-chips">'+chips+'</span>'
       +'<span class="aide-cred-chev" aria-hidden="true">\u203A</span>'
       +'</button>';
-  }).join('');
+  }
+  var people=rows.map(aideCredPersonHtml).join('');
+  if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
+    var stage=listAzSticky1StageHtml(rows.map(function(a, i){
+      return {name:(a&&(a.name||a.username))||'', html:aideCredPersonHtml(a, i)};
+    }));
+    list.innerHTML=emptyHtml+(stage||people);
+    if(stage&&typeof listAzSticky1Bind==='function')listAzSticky1Bind(list);
+    return;
+  }
+  list.innerHTML=emptyHtml+people;
 }
 function aideCredEmptyAddHtml(){
   return '<div class="aide-cred-empty"><p class="aide-cred-muted">No credential records yet.</p>'

@@ -38,6 +38,9 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-list-az1">
 assert.ok(html.includes('id="tab_aides"') && html.includes('data-list-az-sticky1="v=list-az-sticky1"'), 'aides tab marker');
 assert.ok(html.includes('id="tab_clients"') && html.includes('data-list-az-sticky1="v=list-az-sticky1"'), 'clients tab marker');
 assert.ok(html.includes('FIX A3'), 'FIX A3 notes the shared chip');
+assert.ok(html.includes('FIX A4: Admin default Aides rail mounts on #aideCredList when A–Z is on; Manage stays credentials-only.'), 'FIX A4 mounts the rail on the creds list');
+assert.ok(html.includes('#aideCredList .az-rail') && html.includes('#aideCredsRoot .az-stage'), 'creds list shares the rail css');
+assert.ok(html.includes('#aideCredList .az-scroll .aide-cred-person'), 'creds cards clear the rail');
 
 const aidesHdr = html.slice(html.indexOf('id="tab_aides"'), html.indexOf('id="aideDesk"'));
 assert.ok(aidesHdr.includes('id="aidesAzChip"'), 'Aides header has the A–Z chip');
@@ -74,6 +77,18 @@ const clientsUsualJoin = clients.indexOf('container.innerHTML=clientCards.join')
 assert.ok(clientsGate >= 0 && clientsStageCall > clientsGate, 'Clients stage html is inside the A–Z gate');
 assert.ok(clientsUsualJoin > clientsStageCall, 'usual Clients paint joins cards after the gate returns');
 assert.ok(!clients.slice(clientsUsualJoin).includes('listAzSticky1StageHtml'), 'usual Clients never mounts listAzSticky1StageHtml');
+const credPaint = html.slice(html.indexOf('function aideCredPaintList'), html.indexOf('function aideCredEmptyAddHtml'));
+assert.ok(credPaint.includes('listAzSticky1StageHtml'), 'default Aides creds list mounts the rail');
+assert.ok(credPaint.includes("typeof listAzSticky1On==='function'&&listAzSticky1On()"), 'creds rail follows A–Z preference');
+assert.ok(credPaint.includes('listAzSticky1Bind(list)'), 'creds rail binds jump on the visible list');
+assert.ok(credPaint.includes('listAz1Apply(rows,'), 'creds rows sort A–Z by display name');
+assert.ok(credPaint.includes('emptyHtml+(stage||people)'), 'empty credential block stays above the stage');
+const credUsual = credPaint.indexOf('list.innerHTML=emptyHtml+people');
+assert.ok(credUsual > credPaint.indexOf('listAzSticky1StageHtml'), 'usual creds list is the flat paint');
+assert.ok(!credPaint.slice(credUsual).includes('listAzSticky1StageHtml'), 'usual creds list does not mount the stage');
+const repaint = html.slice(html.indexOf('function listAz1Repaint'), html.indexOf('function listAz1Toggle'));
+assert.ok(repaint.includes('aideCredPaintList()'), 'toggle repaints the visible creds list');
+assert.ok(repaint.includes("aideCredState.view!=='detail'"), 'detail view is left alone');
 
 const start = html.indexOf('// list az sticky rail v=list-az-sticky1');
 const end = html.indexOf('// end list az sticky rail v=list-az-sticky1');
