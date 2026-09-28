@@ -29,7 +29,8 @@ assert.ok(html.includes('admin-build 2026-09-25-payready1b'), 'payready1b build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-payready1b">'), 'payready1b meta');
 assert.ok(html.includes('<!-- admin pay readiness export 2026-09-25 v=payready1b admin-build 2026-09-25-payready1b'), 'payready1b comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build is remi-float-hide1b');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1b"') < html.indexOf('content="2026-09-27-list-az1"'), 'list-az1 stays after remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
@@ -298,7 +299,7 @@ async function runBrowser(){
         calls: calls.map(function(c){return c.name;})
       };
     });
-    assert.strictEqual(phone.build, '2026-09-27-list-az1');
+    assert.strictEqual(phone.build, '2026-09-27-remi-float-hide1b');
     assert.strictEqual(phone.marker, 'v=payready1b');
     assert.ok(phone.viewW >= 380 && phone.viewW <= 400, 'phone width '+phone.viewW);
     assert.strictEqual(phone.week, 'Week of 09/21/2026\u201309/27/2026');

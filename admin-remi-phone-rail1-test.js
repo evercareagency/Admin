@@ -25,7 +25,8 @@ assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/remi-phone-rail1-v1.sql')), 'no SQL patch');
 
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build is remi-float-hide1b');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1b"') < html.indexOf('content="2026-09-27-list-az1"'), 'list-az1 stays after remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-remi-chat-bleed1"'), 'remi-chat-bleed1 stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat-bleed1"') < html.indexOf('content="2026-09-27-remi-phone-rail1"'), 'remi-chat-bleed1 sits between list-az1 and this tip');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-remi-phone-rail1"'), 'this tip stays after list-az1');

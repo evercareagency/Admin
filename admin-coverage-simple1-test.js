@@ -31,7 +31,8 @@ assert.ok(html.includes('<!-- coverage simplify 2026-09-27 v=coverage-simple1 ad
 assert.ok(html.includes('GHOST-COVERAGE-SIMPLE1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes("var COVERAGE_SIMPLE1_MARKER='v=coverage-simple1'"), 'script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build is remi-float-hide1b');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1b"') < html.indexOf('content="2026-09-27-list-az1"'), 'list-az1 stays after remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
@@ -358,6 +359,15 @@ async function runBrowser(){
     await page.$eval('#coverSimpleSendBlast', function(el){el.scrollIntoView({block: 'center'});});
     await page.evaluate(function(){
       document.getElementById('coverSimpleSendBlast').click();
+    });
+    await page.waitForFunction(function(){
+      var gate = document.getElementById('coverSimpleBlastGate');
+      var note = document.getElementById('coverSimpleBlastGateNote');
+      return gate && !gate.hidden && note && note.textContent.indexOf('Confirm before this blast sends. Not yet writes nothing.') >= 0;
+    }, {timeout: 8000});
+    assert.ok(!calls.some(function(c){return c.rpc === 'admin_blast_cover_request';}), 'first Send chat blast does not post');
+    await page.evaluate(function(){
+      document.getElementById('coverSimpleBlastGo').click();
     });
     await page.waitForFunction(function(){
       var scrim = document.getElementById('coverSimpleScrim');

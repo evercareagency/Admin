@@ -13,7 +13,8 @@ assert.ok(html.includes('admin-build 2026-09-25-remiwider1c'), 'remiwider1c buil
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiwider1c">'), 'remiwider1c meta');
 assert.ok(html.includes('<!-- remi wider tip 1c 2026-09-25 v=remiwider1c admin-build 2026-09-25-remiwider1c'), 'remiwider1c comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build is remi-float-hide1b');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1b"') < html.indexOf('content="2026-09-27-list-az1"'), 'list-az1 stays after remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
@@ -175,7 +176,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(gate.build, '2026-09-27-list-az1');
+    assert.strictEqual(gate.build, '2026-09-27-remi-float-hide1b');
     assert.strictEqual(gate.hidden, false);
     assert.strictEqual(gate.aide, '');
     assert.ok(/Not yet writes nothing/.test(gate.note), gate.note);
