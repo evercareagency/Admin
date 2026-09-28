@@ -39,5 +39,17 @@ assert.ok(css.includes('scroll-margin-top:68px'), 'scroll offset');
 assert.ok(html.includes('#adminScreen .shell-top{position:sticky;top:0;'), 'header stays the sticky teal bar');
 assert.ok(!css.includes('schedSlotDetail'), 'schedule day drawer is not in this offset');
 assert.ok(!css.includes('schedSlotModeEdit'), 'schedule edit control is not in this offset');
+assert.ok(html.includes('week calendar only'), 'cold load is the week calendar');
+assert.ok(!html.includes('Schedule QaHold sticky Day/Edit on cold load is not touched'), 'cold load is in scope');
+assert.ok(html.includes('var schedSlotDrawerClosed=true'), 'day drawer starts closed');
+assert.ok(html.includes('function schedClearEntrySelection()'), 'entry clears a sticky day');
+assert.ok(html.includes('if(!schedKeepDayOnLoad&&!schedPendingDeepLink)schedClearEntrySelection()'), 'schedule entry clears unless a deep link or week move asked to keep the day');
+
+const ensureAt = html.indexOf('function schedEnsureSlotSelection()');
+const ensure = html.slice(ensureAt, html.indexOf('function schedChipHtml', ensureAt));
+assert.ok(ensureAt > 0 && ensure.length < 800, 'selection helper stays small');
+assert.ok(!ensure.includes("fallback.days['1']"), 'does not invent Monday of the first client');
+assert.ok(!ensure.includes('schedSlotSelected={'), 'does not invent a client or day');
+assert.ok(ensure.includes('schedSlotSelected=null'), 'an invalid leftover selection is dropped');
 
 console.log('admin-punch-leftovers1 unit ok');

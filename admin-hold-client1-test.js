@@ -166,6 +166,8 @@ const banner = {
   assert.strictEqual(els.schedEmpty.hidden, true, 'empty week does not demand Add shift first');
   assert.ok(els.schedBody.innerHTML.includes('Bowlax'), 'empty week still lists the client');
   assert.ok(els.schedBody.innerHTML.includes('sched-dash'), 'empty days are dashes');
+  assert.strictEqual(els.schedSlotDetail.hidden, true, 'cold paint does not open the client panel');
+  sandbox.schedSelectSlotDay(bowlax, '2026-09-28', 1);
   assert.ok(els.schedSlotCards.innerHTML.includes('Put on hold'), 'Put on hold is on the client week');
   assert.ok(els.schedSlotCards.innerHTML.includes('Save hold'), 'Start/End/Note save is on the panel');
   assert.ok(els.schedSlotCards.innerHTML.includes('No Add shift required'), 'no Add shift prerequisite');
