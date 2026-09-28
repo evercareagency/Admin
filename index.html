@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
+<!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
+<meta name="admin-build" content="2026-09-27-list-az1">
 <!-- compliance bulk 2026-09-27 v=compliance-bulk1 admin-build 2026-09-27-compliance-bulk1. GHOST-COMPLIANCE-BULK1-CONTRACT-v1. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi N/A. Compliance Dashboard search filters by aide name, case-insensitive. An empty search shows the full roster (every active aide × every catalog topic). Select all and Unselect all ship as a pair and both stay visible when the selection is empty or full. Select all checks every visible deletable row. Unselect all clears the selection and leaves search and Select Topic alone. Delete selected confirms once, then calls the same admin_unassign_inservice_aide path as the row Delete (isdel1) with p_archive_active_result true for Completed and false for assigned Not Completed, then refreshes once. Rows that only have Send Reminder are not deletable: the checkbox is disabled and the count can say N selected · M skipped (not deletable). Send Reminder stays per row. Select Topic, Assign, and Clear Assignment stay as they are. Phone cards first; the desk table keeps the same toolbar. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=isdel1, v=isclear1, v=isdash1, and v=isdash1b. -->
 <meta name="admin-build" content="2026-09-27-compliance-bulk1">
 <!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. A leftover On hold from another client, another day, or a cold open with no On hold pick is unselected when the opened day has no active client_on_hold, no hold_banner, and no active hold. That open clears Start, End, and Note hold drafts so Save cannot co-fire them. Save week still does not post upsert_schedule_client_hold or a day mark p_mark on_hold unless the user explicitly selected On hold and then used Save hold. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. Ace assert3 is LIVE. When the user confirms End hold…, the desk posts clear_schedule_client_hold with p_client_id and p_end_date and omits p_hold_id, so Ace ends every active hold for that client, including a 10/03 open leftover. Clear posts clear_schedule_client_hold with p_client_id only and omits p_hold_id and p_end_date, so Ace soft-clears every active hold for that client. The On hold End and Clear buttons do not send hold_banner.hold_id. Save hold may still pass p_hold_id. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
@@ -294,6 +296,9 @@ textarea{resize:vertical;min-height:80px;}
 .sched-grid th{position:sticky;top:0;z-index:2;background:var(--navy);color:#fff;padding:8px 6px;font-weight:600;text-align:center;min-width:7.6rem;box-shadow:0 1px 0 rgba(0,0,0,.15);white-space:nowrap;}
 .sched-grid th.sched-client-h,.sched-grid td.sched-name{position:sticky;left:0;min-width:188px;text-align:left;}
 .sched-grid th.sched-client-h{z-index:3;}
+.sched-client-label{vertical-align:middle;}
+.sched-az-chip{display:inline-flex;align-items:center;justify-content:center;margin:0 0 0 6px;padding:0 5px;height:16px;min-width:0;border-radius:4px;border:1px solid rgba(255,255,255,.78);background:rgba(0,0,0,.22);color:#fff;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0;line-height:1;vertical-align:middle;cursor:pointer;box-shadow:none;-webkit-appearance:none;appearance:none;}
+.sched-az-chip[aria-pressed="true"]{background:rgba(255,255,255,.2);border-color:#fff;}
 .sched-grid td.sched-name{z-index:1;background:#fff;font-weight:600;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;}
 .sched-grid tr.is-jump td.sched-name{background:#e8f4f4;}
 .sched-grid td.sched-slot{min-width:7.6rem;padding:4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
@@ -4919,6 +4924,221 @@ function navEditStorageKey(){
   var who=navEditIdentity();
   return navEditStorageKeyFor(who.id, who.email);
 }
+// list order A–Z v=list-az1
+var LIST_AZ1_MARKER='v=list-az1';
+function listAz1StorageKey(){
+  var who=(typeof navEditIdentity==='function')?navEditIdentity():{id:'',email:''};
+  var id=String(who&&who.id||'').trim();
+  var email=String(who&&who.email||'').trim().toLowerCase();
+  var part=(id&&email)?(id+'|'+email):(id||email||'browser');
+  return 'evercare_list_order:'+part;
+}
+function listAz1Read(){
+  var raw='';
+  try{raw=localStorage.getItem(listAz1StorageKey())||'';}catch(e){raw='';}
+  if(!raw)return 'usual';
+  try{
+    var data=JSON.parse(raw);
+    if(data&&Number(data.v)===1&&data.mode==='az')return 'az';
+  }catch(e2){}
+  return 'usual';
+}
+function listAz1Write(mode){
+  mode=mode==='az'?'az':'usual';
+  try{localStorage.setItem(listAz1StorageKey(), JSON.stringify({v:1, mode:mode}));}catch(e){}
+  return mode;
+}
+function listAz1On(){
+  return listAz1Read()==='az';
+}
+function listAz1Cmp(a, b){
+  var as=String(a==null?'':a);
+  var bs=String(b==null?'':b);
+  try{return as.localeCompare(bs, undefined, {sensitivity:'base'});}
+  catch(e){
+    as=as.toLowerCase();
+    bs=bs.toLowerCase();
+    if(as<bs)return -1;
+    if(as>bs)return 1;
+    return 0;
+  }
+}
+function listAz1Apply(list, keys){
+  if(!list||!list.length||!listAz1On()||!keys||!keys.length)return list;
+  var indexed=[];
+  var i;
+  for(i=0;i<list.length;i++)indexed.push({item:list[i], i:i});
+  indexed.sort(function(a,b){
+    var k, c;
+    for(k=0;k<keys.length;k++){
+      c=listAz1Cmp(keys[k](a.item), keys[k](b.item));
+      if(c)return c;
+    }
+    return a.i-b.i;
+  });
+  var out=[];
+  for(i=0;i<indexed.length;i++)out.push(indexed[i].item);
+  return out;
+}
+function listAz1QueryOn(){
+  var search='';
+  try{search=String((typeof location!=='undefined'&&location&&location.search)||'');}catch(e){search='';}
+  return /(?:^|[?&])v=list-az1(?:&|$)/.test(search);
+}
+function listAz1NoteQuery(){
+  var on=false;
+  try{on=listAz1QueryOn();}catch(e){on=false;}
+  try{
+    if(on&&typeof document!=='undefined'&&document.documentElement)document.documentElement.setAttribute('data-list-az1', LIST_AZ1_MARKER);
+  }catch(e2){}
+  return on;
+}
+function listAz1SchedName(c){
+  return String(c&&(c.name||c.clientName||c.client_name)||'');
+}
+function listAz1SchedRows(clients){
+  if(!clients||!clients.length||typeof listAz1On!=='function'||!listAz1On())return clients;
+  return listAz1Apply(clients,[
+    function(c){return listAz1SchedName(c);},
+    function(c){return String(c&&(c.id||c.client_id)||'');}
+  ]);
+}
+function listAz1AideName(t){
+  return String((t&&(t.name||t.username))||'Aide');
+}
+function listAz1ReorderSchedDom(){
+  var body=null;
+  try{body=document.getElementById('schedBody');}catch(e){body=null;}
+  if(!body||!body.querySelectorAll||!body.appendChild)return;
+  var nodes=body.querySelectorAll('tr[id^="sched-row-"]');
+  var rows=[];
+  var i;
+  for(i=0;i<nodes.length;i++)rows.push(nodes[i]);
+  if(rows.length<2)return;
+  var on=false;
+  try{on=listAz1On();}catch(e2){on=false;}
+  var indexed=[];
+  for(i=0;i<rows.length;i++){
+    var tr=rows[i];
+    var name='';
+    try{name=tr.getAttribute('data-sched-name')||tr.getAttribute('data-name')||'';}catch(e3){name='';}
+    if(!name&&tr.querySelector){
+      var named=tr.querySelector('.ins-text');
+      if(named)name=String(named.textContent||'');
+    }
+    var usual=parseInt(tr.getAttribute('data-list-usual'),10);
+    if(!isFinite(usual))usual=i;
+    indexed.push({tr:tr, i:i, name:name, usual:usual});
+  }
+  indexed.sort(function(a,b){
+    if(!on){
+      if(a.usual!==b.usual)return a.usual-b.usual;
+      return a.i-b.i;
+    }
+    var c=listAz1Cmp(a.name, b.name);
+    if(c)return c;
+    return a.i-b.i;
+  });
+  var same=true;
+  for(i=0;i<indexed.length;i++)if(indexed[i].tr!==rows[i])same=false;
+  if(same)return;
+  for(i=0;i<indexed.length;i++)body.appendChild(indexed[i].tr);
+}
+function listAz1TimesheetName(r){
+  r=r||{};
+  var name=r.empName;
+  if(name==null||String(name).trim()==='')name=r.emp_name;
+  if(name==null||String(name).trim()==='')name=r.full_name;
+  if(name==null||String(name).trim()==='')name=r.fullName;
+  if(name==null||String(name).trim()==='')name=r.username;
+  return String(name==null?'':name).trim();
+}
+function listAz1TimesheetRows(recs){
+  if(!recs||!recs.length||typeof listAz1On!=='function'||!listAz1On())return recs;
+  return listAz1Apply(recs,[
+    function(r){return listAz1TimesheetName(r);},
+    function(r){return String(r&&(r.clientName||r.client_name)||'');},
+    function(r){return String(r&&(r.weekStart||r.week_start)||'');},
+    function(r){return String(r&&r.id||'');}
+  ]);
+}
+function listAz1ReorderBox(box, selector){
+  if(!box||!box.querySelectorAll||!box.appendChild)return;
+  var nodes=box.querySelectorAll(selector);
+  var rows=[];
+  var i;
+  for(i=0;i<nodes.length;i++)rows.push(nodes[i]);
+  if(rows.length<2)return;
+  var on=false;
+  try{on=listAz1On();}catch(e){on=false;}
+  var indexed=[];
+  for(i=0;i<rows.length;i++){
+    var el=rows[i];
+    var name='';
+    var client='';
+    var week='';
+    if(el.querySelector){
+      var strong=el.querySelector('.ts-card-top strong');
+      if(!strong)strong=el.querySelector('td strong');
+      if(strong)name=String(strong.textContent||'').trim();
+    }
+    try{
+      if(!name)name=el.getAttribute('data-list-az-name')||'';
+      client=el.getAttribute('data-list-az-client')||'';
+      week=el.getAttribute('data-list-az-week')||'';
+    }catch(e2){}
+    var usual=parseInt(el.getAttribute('data-list-usual'),10);
+    if(!isFinite(usual))usual=i;
+    indexed.push({el:el, i:i, name:name, client:client, week:week, usual:usual});
+  }
+  indexed.sort(function(a,b){
+    if(!on){
+      if(a.usual!==b.usual)return a.usual-b.usual;
+      return a.i-b.i;
+    }
+    var c=listAz1Cmp(a.name, b.name);
+    if(c)return c;
+    c=listAz1Cmp(a.client, b.client);
+    if(c)return c;
+    c=listAz1Cmp(a.week, b.week);
+    if(c)return c;
+    return a.i-b.i;
+  });
+  var same=true;
+  for(i=0;i<indexed.length;i++)if(indexed[i].el!==rows[i])same=false;
+  if(same)return;
+  for(i=0;i<indexed.length;i++)box.appendChild(indexed[i].el);
+}
+function listAz1ReorderTimesheetDom(){
+  var cards=null;
+  var body=null;
+  try{cards=document.getElementById('tsCards');}catch(e){cards=null;}
+  try{body=document.getElementById('tsBody');}catch(e2){body=null;}
+  listAz1ReorderBox(cards, 'article.ts-card');
+  listAz1ReorderBox(body, 'tr[data-list-az-name]');
+}
+function listAz1Repaint(){
+  try{if(typeof schedPaint==='function')schedPaint();}catch(e){}
+  try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eDom){}
+  try{if(typeof paintClients==='function'&&typeof allClients!=='undefined')paintClients();}catch(e2){}
+  try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(e3){}
+  try{if(typeof listAz1ReorderTimesheetDom==='function')listAz1ReorderTimesheetDom();}catch(eTs){}
+  try{if(typeof paintBackupRequests==='function'&&typeof allBackupRecords!=='undefined'&&allBackupRecords)paintBackupRequests();}catch(e4){}
+  try{if(typeof coverPaintList==='function'&&typeof coverShifts!=='undefined')coverPaintList();}catch(e5){}
+  try{if(typeof aidechatPaintInbox==='function'&&typeof aidechatThreads!=='undefined')aidechatPaintInbox();}catch(e6){}
+  try{
+    var aidesBox=document.getElementById('aidesContainer');
+    if(aidesBox&&aidesBox.querySelector&&aidesBox.querySelector('.aide-info-card, .aide-row-card')&&typeof renderAides==='function')renderAides(false);
+  }catch(e7){}
+}
+function listAz1Toggle(ev){
+  if(ev&&ev.preventDefault)ev.preventDefault();
+  if(ev&&ev.stopPropagation)ev.stopPropagation();
+  listAz1Write(listAz1On()?'usual':'az');
+  listAz1Repaint();
+}
+try{listAz1NoteQuery();}catch(e){}
+// end list order A–Z v=list-az1
 function navEditRead(){
   var raw=null;
   try{raw=localStorage.getItem(navEditStorageKey());}catch(e){}
@@ -5348,7 +5568,10 @@ function showTab(tab){
     document.getElementById('schedulerNoAccessCard').style.display=isAdmin?'none':'block';
     if(typeof clienthrs1dOpenNames==='function')clienthrs1dOpenNames();
   }
-  if(tab==='timesheets'&&typeof payReadyLoad==='function')payReadyLoad();
+  if(tab==='timesheets'){
+    try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(eTs){}
+    if(typeof payReadyLoad==='function')payReadyLoad();
+  }
 }
 
 // v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
@@ -6259,6 +6482,16 @@ function coverPaintList(){
   var empty=document.getElementById('coverEmpty');
   if(!box)return;
   var open=(coverShifts||[]).filter(coverListVisible);
+  if(typeof listAz1Apply==='function'&&listAz1On()){
+    open=listAz1Apply(open,[
+      function(s){
+        var name=String(s&&s.clientName||'').trim();
+        if(!name||name==='Client')return String(s&&(s.aideName||s.regular_aide_name)||'');
+        return name;
+      },
+      function(s){return s&&s.id||'';}
+    ]);
+  }
   if(!open.length){
     box.innerHTML='';
     if(empty){
@@ -10047,6 +10280,12 @@ function aidechatIsOpen(t){
 function aidechatSorted(){
   var rows=aidechatThreads.filter(aidechatIsOpen);
   if(aidechatWantEscalateOnly())rows=rows.filter(function(t){return t&&t.urgent;});
+  if(typeof listAz1On==='function'&&listAz1On()&&typeof listAz1Apply==='function'){
+    return listAz1Apply(rows,[
+      function(t){return typeof listAz1AideName==='function'?listAz1AideName(t):String((t&&(t.name||t.username))||'Aide');},
+      function(t){return String((t&&(t.id||t.aide_id))||'');}
+    ]);
+  }
   return rows.slice().sort(function(a,b){
     if(!!a.urgent!==!!b.urgent)return a.urgent?-1:1;
     return String(b.last_at||'').localeCompare(String(a.last_at||''));
@@ -10153,6 +10392,12 @@ function aidechatPaintInbox(){
   if(note)note.textContent=aidechatSourceNote();
   aidechatPaintSettings();
   var rows=aidechatSorted();
+  if(typeof listAz1On==='function'&&listAz1On()&&typeof listAz1Apply==='function'){
+    rows=listAz1Apply(rows,[
+      function(t){return typeof listAz1AideName==='function'?listAz1AideName(t):String((t&&(t.name||t.username))||'Aide');},
+      function(t){return String((t&&(t.id||t.aide_id))||'');}
+    ]);
+  }
   if(empty)empty.hidden=rows.length>0;
   if(!list)return;
   if(!rows.length){list.innerHTML='';return;}
@@ -11215,7 +11460,11 @@ function aideOfficeVis1Install(){
   }
   if(typeof aidechatSorted==='function'&&!aidechatSorted.__aideOffice){
     var prevSort=aidechatSorted;
-    var wrappedSort=function(){return aideOfficeVis1Sort(prevSort());};
+    var wrappedSort=function(){
+      var rows=prevSort();
+      if(typeof listAz1On==='function'&&listAz1On())return rows;
+      return aideOfficeVis1Sort(rows);
+    };
     wrappedSort.__aideOffice=1;
     aidechatSorted=wrappedSort;
   }
@@ -15629,6 +15878,12 @@ function schedCellInner(cell){
   if(cell.state==='calloff')html+='<span class="sched-tag">Call-off</span>';
   return html;
 }
+function schedClientHeadHtml(){
+  var on=false;
+  try{on=typeof listAz1On==='function'&&listAz1On();}catch(e){on=false;}
+  var mark=(typeof LIST_AZ1_MARKER==='string'&&LIST_AZ1_MARKER)?LIST_AZ1_MARKER:'v=list-az1';
+  return '<th class="sched-client-h" data-list-az1="'+mark+'"><span class="sched-client-label">Client</span><button type="button" class="sched-az-chip" id="schedAzChip" data-list-az1="'+mark+'" aria-pressed="'+(on?'true':'false')+'" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A\u2013Z</button></th>';
+}
 function schedPaint(){
   var week=schedEnsureWeek();
   var label=schedEl('schedWeekLabel');
@@ -15655,7 +15910,7 @@ function schedPaint(){
   var head=schedEl('schedHead');
   var body=schedEl('schedBody');
   if(head){
-    var headHtml='<th class="sched-client-h">Client</th>';
+    var headHtml=schedClientHeadHtml();
     for(var d=0;d<7;d++){
       var iso=schedAddDays(week,d);
       headHtml+='<th scope="col">'+SCHED_SHORT[d]+'<br>'+schedHeaderDate(iso)+'</th>';
@@ -15673,14 +15928,30 @@ function schedPaint(){
     return;
   }
   var rows=schedBuildRows();
+  var usualIx={};
+  rows.forEach(function(row, ix){
+    var cid=row&&row.client&&row.client.id;
+    if(cid!=null)usualIx[String(cid)]=ix;
+  });
+  if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
+    rows=listAz1Apply(rows,[
+      function(row){
+        var c=row&&row.client||{};
+        return typeof listAz1SchedName==='function'?listAz1SchedName(c):(c.name||c.clientName||c.client_name||'');
+      },
+      function(row){var c=row&&row.client||{};return c.id||'';}
+    ]);
+  }
   var html='';
   rows.forEach(function(row){
     if(row.hide)return;
     var client=row.client;
     var id=String(client.id);
-    var name=String(client.name||client.clientName||'Client');
+    var name=String(client.name||client.clientName||client.client_name||'Client');
+    var usual=usualIx[id];
+    if(usual==null)usual='';
     var jump=schedJumpId&&schedJumpId===id?' is-jump':'';
-    html+='<tr id="sched-row-'+schedAttr(id)+'" data-name="'+schedAttr(name)+'" class="'+jump.trim()+'">';
+    html+='<tr id="sched-row-'+schedAttr(id)+'" data-name="'+schedAttr(name)+'" data-sched-name="'+schedAttr(name)+'" data-list-usual="'+schedAttr(usual)+'" class="'+jump.trim()+'">';
     html+='<td class="sched-name">'+schedInsNameHtml(name, schedInsPack(client))+'</td>';
     row.cells.forEach(function(cell){
       var text=cell.state==='open'?'Open':schedCellText(cell);
@@ -15691,6 +15962,7 @@ function schedPaint(){
     html+='</tr>';
   });
   body.innerHTML=html;
+  try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eAz){}
   schedPaintPanel();
 }
 function schedJumpClient(){
@@ -16710,7 +16982,16 @@ function schedPaintSlotGrid(){
   schedSyncFilters();
   var note=schedEl('schedSourceNote');
   if(note)note.textContent=schedLoadError||'';
+  var usualIx={};
+  (schedSlotClients||[]).forEach(function(c, ix){if(c&&c.id!=null)usualIx[String(c.id)]=ix;});
   var clients=schedSlotClients;
+  if(typeof listAz1SchedRows==='function')clients=listAz1SchedRows(clients);
+  else if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
+    clients=listAz1Apply(clients,[
+      function(c){return c&&(c.name||c.clientName||c.client_name)||'';},
+      function(c){return c&&c.id||'';}
+    ]);
+  }
   var noClients=schedEl('schedNoClients');
   var empty=schedEl('schedEmpty');
   var scroll=schedEl('schedScroll');
@@ -16720,7 +17001,7 @@ function schedPaintSlotGrid(){
   var head=schedEl('schedHead');
   var body=schedEl('schedBody');
   if(head){
-    var headHtml='<th class="sched-client-h">Client</th>';
+    var headHtml=schedClientHeadHtml();
     for(var d=0;d<7;d++){
       var isoHead=schedAddDays(week,d);
       var headDay=schedParseIso(isoHead);
@@ -16741,7 +17022,10 @@ function schedPaintSlotGrid(){
     var auth=schedAuthText(client.weekly_authorized_hours);
     var onHoldRow=schedClientWeekOnHold(client);
     var banner=onHoldRow?schedPrimaryHold(client):null;
-    html+='<tr id="sched-row-'+schedAttr(client.id)+'" class="'+(jump.trim()+(onHoldRow?' client-on-hold':'')).trim()+'">';
+    var schedName=String(client.name||client.clientName||client.client_name||'');
+    var usual=usualIx[String(client.id)];
+    if(usual==null)usual='';
+    html+='<tr id="sched-row-'+schedAttr(client.id)+'" data-sched-name="'+schedAttr(schedName)+'" data-list-usual="'+schedAttr(usual)+'" class="'+(jump.trim()+(onHoldRow?' client-on-hold':'')).trim()+'">';
     html+='<td class="sched-name'+(onHoldRow?' has-hold':'')+'"><div class="sched-name-stack">'+schedInsNameHtml(client.name, schedInsPack(client));
     if(auth)html+='<span class="sched-auth-badge">'+schedEsc(auth)+'</span>';
     if(banner)html+=schedRowHoldBannerHtml(banner);
@@ -16770,6 +17054,7 @@ function schedPaintSlotGrid(){
     html='<tr class="hold-filter-empty"><td class="sched-name" colspan="8">No clients on hold this week.</td></tr>';
   }
   body.innerHTML=html;
+  try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eAz){}
 }
 function schedSlotRange(slot){
   var label=slot.label||(slot.sort_order>0?'Evening':'Morning');
@@ -17682,7 +17967,9 @@ function schedFillSlotPatternForm(slot, clientId, weekday){
   var sel=schedEl('schedSlotClient');
   if(sel){
     var html='';
-    schedSlotClients.forEach(function(c){
+    var optClients=schedSlotClients;
+    if(typeof listAz1SchedRows==='function')optClients=listAz1SchedRows(optClients);
+    optClients.forEach(function(c){
       html+='<option value="'+schedAttr(c.id)+'">'+schedEsc(c.name)+'</option>';
     });
     sel.innerHTML=html||'<option value="">No clients</option>';
@@ -28305,6 +28592,16 @@ function paintTimesheets(){
   let recs=allRecords.filter(function(r){
     return sbTimesheetOnDesk({status:r.status,is_active:r.isActive,isActive:r.isActive,deleted_at:r.deletedAt,deletedAt:r.deletedAt}, tsDesk);
   }).slice().reverse();
+  var usualPos=recs.slice();
+  if(typeof listAz1TimesheetRows==='function')recs=listAz1TimesheetRows(recs);
+  else if(typeof listAz1Apply==='function'&&listAz1On()){
+    recs=listAz1Apply(recs,[
+      function(r){return r&&(r.empName||r.full_name||r.fullName||r.username)||'';},
+      function(r){return r&&r.clientName||'';},
+      function(r){return r&&r.weekStart||'';},
+      function(r){return r&&r.id||'';}
+    ]);
+  }
   if(q)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(q)||(r.clientName||'').toLowerCase().includes(q)||(r.weekStart||'').toLowerCase().includes(q)||formatWeekLabel(r.weekStart).toLowerCase().includes(q));
 
   document.getElementById('st_total').textContent=allRecords.length;
@@ -28341,9 +28638,18 @@ function paintTimesheets(){
     const days=r.days||{};
     const locs=[...new Set(Object.values(days).filter(d=>d&&d.location&&!d.location.includes('not')).map(d=>d.location))];
     const locSum=locs.length?`📍 ${locs[0].split(',')[0]}`:'—';
-    const row=`<tr>
+    // list-az1: .ts-card-top strong is the aide display name (sort key). .ts-card-sub is client · week, not the A–Z key.
+    const aideShown=(typeof listAz1TimesheetName==='function'?listAz1TimesheetName(r):String(r.empName||''))||'—';
+    const clientShown=String(r.clientName||r.client_name||'');
+    const weekShown=String(r.weekStart||r.week_start||'');
+    var usual='';
+    for(var ui=0;ui<usualPos.length;ui++){if(usualPos[ui]===r){usual=ui;break;}}
+    const azAttr=String(aideShown).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const clientAttr=clientShown.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const weekAttr=weekShown.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const row=`<tr data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
       <td style="font-size:0.73rem">${formatDateTimeLabel(r.submitted)}</td>
-      <td><strong>${r.empName}</strong></td>
+      <td><strong>${aideShown}</strong></td>
       <td>${r.clientName}</td>
       <td>${formatWeekLabel(r.weekStart)}</td>
       <td><strong style="color:var(--teal)">${r.totalHrs}</strong></td>
@@ -28355,9 +28661,9 @@ function paintTimesheets(){
         ${timesheetRowDeskButton(r)}
       </div></td>
     </tr>`;
-    const card=`<article class="ts-card">
-      <div class="ts-card-top"><strong>${r.empName||'—'}</strong>${statusBadge(r.status)}</div>
-      <div class="ts-card-sub">${r.clientName||'—'} · ${formatWeekLabel(r.weekStart)}</div>
+    const card=`<article class="ts-card" data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
+      <div class="ts-card-top"><strong>${aideShown}</strong>${statusBadge(r.status)}</div>
+      <div class="ts-card-sub">${clientShown||'—'} · ${formatWeekLabel(weekShown)}</div>
       <div class="ts-card-meta"><span class="ts-card-hrs">${r.totalHrs||'—'}</span><span>${locSum}</span><span>${formatDateTimeLabel(r.submitted)}</span></div>
       <div class="actions">
         <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewRec('${r.id}')">👁 View</button>
@@ -28369,6 +28675,7 @@ function paintTimesheets(){
   });
   tbody.innerHTML=built.map(function(x){return x.row;}).join('');
   if(cards)cards.innerHTML=built.map(function(x){return x.card;}).join('');
+  try{if(typeof listAz1ReorderTimesheetDom==='function')listAz1ReorderTimesheetDom();}catch(eAz){}
 }
 
 
@@ -28462,6 +28769,14 @@ function paintBackupRequests(){
   const qClient=(document.getElementById('bakSearchClient')?.value||'').toLowerCase();
   const qWeek=(document.getElementById('bakSearchWeek')?.value||'').toLowerCase();
   let recs=(allBackupRecords||[]).filter(layoutA1DraftOpen).slice();
+  if(typeof listAz1Apply==='function'&&listAz1On()){
+    recs=listAz1Apply(recs,[
+      function(r){return r&&(r.empName||r.username)||'';},
+      function(r){return r&&r.clientName||'';},
+      function(r){return r&&r.weekStart||'';},
+      function(r){return r&&r.id||'';}
+    ]);
+  }
   if(qAide)recs=recs.filter(r=>(r.empName||'').toLowerCase().includes(qAide)||(r.username||'').toLowerCase().includes(qAide));
   if(qClient)recs=recs.filter(r=>(r.clientName||'').toLowerCase().includes(qClient));
   if(qWeek)recs=recs.filter(r=>(r.weekStart||'').toLowerCase().includes(qWeek)||formatWeekLabel(r.weekStart).toLowerCase().includes(qWeek));
@@ -29014,6 +29329,13 @@ async function aidesInfo1TryPaint(container, force){
   if(!listed||!listed.success)return false;
   var desk=includeDeleted?'deleted':'active';
   var users=(listed.rows||[]).filter(function(row){return aidesInfo1Keep(row, desk);}).map(aidesInfo1AsUser);
+  if(typeof listAz1Apply==='function'&&listAz1On()){
+    users=listAz1Apply(users,[
+      function(u){return u&&(u.name||u.fullName||u.full_name)||'';},
+      function(u){return u&&u.username||'';},
+      function(u){return u&&(u.id||u.username)||'';}
+    ]);
+  }
   aidesInfo1ByKey={};
   users.forEach(function(user){aidesInfo1ByKey[aidesInfo1Key(user)]=user;});
   if(typeof rememberAideRows==='function')rememberAideRows(users);
@@ -29058,7 +29380,14 @@ async function renderAides(force){
       return;
     }
     const raw=(data&&data.success&&data.data)?data.data.filter(function(u){return u&&u.username;}):[];
-    const aides=raw.filter(function(u){return aideOnDesk(u, aideDesk);});
+    let aides=raw.filter(function(u){return aideOnDesk(u, aideDesk);});
+    if(typeof listAz1Apply==='function'&&listAz1On()){
+      aides=listAz1Apply(aides,[
+        function(u){return u&&(u.name||u.fullName||u.full_name)||'';},
+        function(u){return u&&u.username||'';},
+        function(u){return u&&(u.id||u.username)||'';}
+      ]);
+    }
     rememberAideRows(aides);
     if(aideDesk!=='deleted'){
       loadedAidesList=raw.filter(function(u){return aideOnDesk(u,'active');});
@@ -33073,6 +33402,12 @@ function paintClients(){
   if(!container)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
   let list=allClients;
+  if(typeof listAz1Apply==='function'&&listAz1On()){
+    list=listAz1Apply(list,[
+      function(c){return c&&c.name||'';},
+      function(c){return c&&c.id||'';}
+    ]);
+  }
   if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q));
 
   if(!list.length){

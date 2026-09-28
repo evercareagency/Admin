@@ -19,8 +19,7 @@ assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callab
 assert.ok(html.includes('Do not squash-merge.'), 'do not squash-merge');
 assert.ok(html.includes('holds_written'), 'weekdays response lock');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-compliance-bulk1'), 'first admin-build is compliance-bulk1');
-assert.ok(html.indexOf('content="2026-09-27-compliance-bulk1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after compliance-bulk1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
 assert.ok(html.indexOf('content="2026-09-27-hold-autosave1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after this tip');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
 assert.ok(html.indexOf('content="2026-09-27-aide-office-vis1"') < html.indexOf('content="2026-09-27-remi-langs1"'), 'remi-langs1 stays after aide-office-vis1');
@@ -782,7 +781,7 @@ async function shots(){
         when: document.getElementById('schedSlotWhen').textContent
       };
     }, before);
-    assert.strictEqual(saved.build, '2026-09-27-compliance-bulk1');
+    assert.strictEqual(saved.build, '2026-09-27-list-az1');
     assert.ok(saved.names.indexOf('upsert_schedule_slot_pattern_weekdays') >= 0, saved.names.join(','));
     assert.strictEqual(saved.holds, 0, 'phone Save week fired no hold RPC');
     assert.strictEqual(saved.assumed, 'Assumed worked');
