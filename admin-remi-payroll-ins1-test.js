@@ -70,8 +70,13 @@ assert.ok(!/desktop report stays in the Remi rail/i.test(src), 'no Remi-rail-as-
 assert.ok(src.includes('\\u2190 All insurers'), 'clear path back to All insurers');
 assert.ok(src.includes('Open full report'), 'open full report');
 assert.ok(src.includes("role.toLowerCase()==='admin'"), 'Admin-only gate');
+assert.ok(src.includes('function remiPayrollIns1ApplyRoleGate'), 'Scheduler role gate');
 assert.ok(!/\bQuo\b|twilio|send_sms|mossier|reset_aide_temp_password|admin_set_role_password/.test(src), 'no Auth reseal and no Quo/SMS');
 assert.ok(src.includes('is_scheduler_office') === false, 'ins1 gate is not the scheduler office check');
+assert.ok(html.includes('#tab_payroll[hidden]{display:none !important;}'), 'hidden payroll page cannot stay on screen');
+assert.ok(html.includes('#nav_payroll[hidden],#remiPayrollIns1TimesheetsOpen[hidden]{display:none !important;}'), 'hidden payroll entry points stay hidden');
+assert.ok(html.includes("el.classList.remove('active')"), 'forbidden tab panels lose .active');
+assert.ok(html.includes("showTab('timesheets')"), 'a forbidden active desk returns home');
 
 const DOT = '\u00B7';
 const REPORT = {
@@ -248,12 +253,168 @@ function runSlice(){
   assert.strictEqual(rpc[0].name, 'admin_run_remi_payroll_report');
   assert.strictEqual(rpc[0].body.p_insurance_plan, 'other');
 
+  runRoleHandoff();
   console.log('admin-remi-payroll-ins1 unit ok');
   await runBrowser();
 })().catch(function(err){
   console.error(err);
   process.exit(1);
 });
+
+function extractFn(srcText, sig){
+  const start = srcText.indexOf(sig);
+  assert.ok(start > 0, sig);
+  let i = srcText.indexOf('{', start);
+  let depth = 0;
+  for(; i < srcText.length; i++){
+    if(srcText[i] === '{')depth++;
+    else if(srcText[i] === '}'){
+      depth--;
+      if(depth === 0)return srcText.slice(start, i + 1);
+    }
+  }
+  throw new Error('unclosed ' + sig);
+}
+
+function roleNode(id, opts){
+  opts = opts || {};
+  const node = {
+    id:id,
+    className:opts.className || '',
+    hidden:!!opts.hidden,
+    parentNode:opts.parent || null,
+    children:opts.children || [],
+    attrs:Object.assign({}, opts.attrs || {}),
+    innerHTML:opts.innerHTML || ''
+  };
+  node.classList = {
+    contains:function(name){return (' ' + node.className + ' ').indexOf(' ' + name + ' ') >= 0;},
+    add:function(name){if(!node.classList.contains(name))node.className = (node.className + ' ' + name).trim();},
+    remove:function(name){node.className = (' ' + node.className + ' ').replace(' ' + name + ' ', ' ').trim();}
+  };
+  node.getAttribute = function(name){return Object.prototype.hasOwnProperty.call(node.attrs, name) ? node.attrs[name] : null;};
+  node.setAttribute = function(name, value){
+    node.attrs[name] = String(value);
+    if(name === 'hidden')node.hidden = true;
+  };
+  node.removeAttribute = function(name){
+    delete node.attrs[name];
+    if(name === 'hidden')node.hidden = false;
+  };
+  node.querySelectorAll = function(sel){
+    const found = [];
+    node.children.forEach(function walk(child){
+      if(sel.split(',').some(function(part){
+        part = part.trim();
+        if(part.charAt(0) === '#')return child.id === part.slice(1);
+        if(part.charAt(0) === '.')return child.classList && child.classList.contains(part.slice(1));
+        return false;
+      }))found.push(child);
+      (child.children || []).forEach(walk);
+    });
+    return found;
+  };
+  node.removeChild = function(child){
+    node.children = node.children.filter(function(item){return item !== child;});
+    if(child)child.parentNode = null;
+  };
+  node.children.forEach(function(child){child.parentNode = node;});
+  return node;
+}
+
+function runRoleHandoff(){
+  const box = runSlice();
+  const timesheets = roleNode('tab_timesheets', {className:'tab-panel active'});
+  const schedule = roleNode('tab_schedule', {className:'tab-panel'});
+  const payroll = roleNode('tab_payroll', {className:'tab-panel', hidden:true, attrs:{'data-layout-roles':'Admin'}});
+  const host = roleNode('remiPayrollIns1Host', {innerHTML:'<div class="ins1-chips"><button class="ins1-chip">All</button><button class="ins1-chip">CareSource</button><button class="ins1-chip">Passport</button><button class="ins1-chip">Other</button></div>'});
+  const sheetChip = roleNode('chip', {className:'ins1-chips'});
+  const sheetClear = roleNode('remiPayrollIns1Clear', {className:'ins1-clear'});
+  const sheetOpen = roleNode('remiPayrollIns1OpenFull', {className:'alt'});
+  const sheet = roleNode('copilotSheet', {attrs:{'data-layout-roles':'Admin Scheduler'}, children:[sheetChip, sheetClear, sheetOpen]});
+  const navPayroll = roleNode('nav_payroll', {attrs:{'data-layout-roles':'Admin'}});
+  const openBtn = roleNode('remiPayrollIns1TimesheetsOpen', {attrs:{'data-layout-roles':'Admin'}});
+  const navTimesheets = roleNode('nav_timesheets', {attrs:{'data-layout-roles':'Admin Scheduler'}});
+  const navSecret = roleNode('nav_secret', {attrs:{'data-layout-roles':'Admin'}});
+  const panels = [timesheets, schedule, payroll];
+  const els = [navTimesheets, navSecret, navPayroll, openBtn, payroll, sheet];
+  box.showTabCalls = [];
+  box.showTab = function(tab){
+    box.showTabCalls.push(tab);
+    panels.forEach(function(panel){
+      const on = panel.id === 'tab_' + tab;
+      panel.classList.remove('active');
+      if(on){
+        panel.classList.add('active');
+        panel.removeAttribute('hidden');
+      }else panel.setAttribute('hidden', '');
+    });
+  };
+  box.document = {
+    getElementById:function(id){
+      if(id === 'avatarMenuBtn')return box.btn;
+      return [timesheets, schedule, payroll, host, sheet, navPayroll, openBtn, navTimesheets, navSecret].filter(function(node){return node.id === id;})[0] || null;
+    },
+    querySelectorAll:function(sel){
+      assert.strictEqual(sel, '#adminScreen [data-layout-roles]');
+      return els;
+    },
+    querySelector:function(sel){
+      assert.strictEqual(sel, '#adminScreen .tab-panel.active');
+      return panels.filter(function(panel){return panel.classList.contains('tab-panel') && panel.classList.contains('active');})[0] || null;
+    }
+  };
+  box.btn = {textContent:'', setAttribute:function(name, value){this[name] = value;}};
+  vm.runInContext(extractFn(html, 'function layoutA1ApplyRoles()'), box);
+
+  box.currentAdminRole = 'Admin';
+  schedule.classList.add('active');
+  timesheets.classList.remove('active');
+  box.showTabCalls = [];
+  vm.runInContext('layoutA1ApplyRoles()', box);
+  assert.ok(schedule.classList.contains('active'), 'Admin stays on Schedule');
+  assert.strictEqual(box.showTabCalls.length, 0, 'Admin on an open desk is not sent home');
+  assert.ok(host.innerHTML.indexOf('CareSource') >= 0, 'Admin gate does not clear the payroll host');
+
+  timesheets.classList.remove('active');
+  schedule.classList.remove('active');
+  payroll.classList.add('active');
+  payroll.removeAttribute('hidden');
+  host.innerHTML = '<div class="ins1-chips"><button class="ins1-chip">All</button><button class="ins1-chip">CareSource</button><button class="ins1-chip">Passport</button><button class="ins1-chip">Other</button></div>';
+  box.currentAdminRole = 'Scheduler';
+  box.currentAdminUsername = 'Jasmine';
+  box.showTabCalls = [];
+  vm.runInContext('layoutA1ApplyRoles()', box);
+  assert.strictEqual(payroll.hidden, true, 'Scheduler payroll page is hidden');
+  assert.ok(!payroll.classList.contains('active'), 'Scheduler payroll page is not active');
+  assert.strictEqual(host.innerHTML, '', 'Scheduler host has no insurance chips');
+  assert.ok(!/CareSource|Passport|Other/.test(host.innerHTML));
+  assert.ok(timesheets.classList.contains('active'), 'Scheduler home is Timesheets');
+  assert.ok(box.showTabCalls.indexOf('timesheets') >= 0, box.showTabCalls.join(','));
+  assert.strictEqual(navPayroll.hidden, true, 'Scheduler payroll nav stays hidden');
+  assert.strictEqual(openBtn.hidden, true, 'Scheduler timesheets payroll button stays hidden');
+  assert.strictEqual(navTimesheets.hidden, false, 'Scheduler keeps Timesheets');
+  assert.strictEqual(sheet.querySelectorAll('.ins1-chips,.ins1-clear,#remiPayrollIns1OpenFull').length, 0, 'Scheduler sheet loses Admin chip UI');
+  box.railShows = 0;
+  box.pageOpens = 0;
+  box.remiPayroll1Show = function(){box.railShows++; return {ok:true};};
+  box.remiPayrollIns1OpenPage = function(){box.pageOpens++; return {ok:true};};
+  const fromRail = box.remiPayrollIns1FromRail();
+  assert.strictEqual(box.pageOpens, 0, 'Scheduler rail does not open the own page');
+  assert.strictEqual(box.railShows, 1, 'Scheduler rail stays on remi-payroll1');
+  assert.strictEqual(fromRail.ok, true);
+
+  payroll.classList.add('active');
+  payroll.removeAttribute('hidden');
+  host.innerHTML = '<button class="ins1-chip">CareSource</button>';
+  box.currentAdminRole = 'Nurse';
+  box.showTabCalls = [];
+  vm.runInContext('layoutA1ApplyRoles()', box);
+  assert.strictEqual(payroll.hidden, true);
+  assert.ok(!payroll.classList.contains('active'));
+  assert.strictEqual(host.innerHTML, '');
+  assert.ok(timesheets.classList.contains('active'));
+}
 
 function loadPuppeteer(){
   try{return require('puppeteer-core');}
@@ -375,6 +536,22 @@ async function runBrowser(){
     assert.ok(phoneCare.text.indexOf('Devon') >= 0, phoneCare.text);
     assert.ok(phoneCare.maria < 0, 'filtered phone list drops other aides');
     await phone.screenshot({path:path.join(shotDir, 'remi-payroll-ins1-phone-caresource.png')});
+    const phoneGate = await phone.evaluate(function(){
+      var before = document.querySelectorAll('#copilotSheet .ins1-chip').length;
+      currentAdminRole = 'Scheduler';
+      currentAdminUsername = 'Jasmine';
+      layoutA1ApplyRoles();
+      return {
+        before:before,
+        chips:document.querySelectorAll('#copilotSheet .ins1-chip, #copilotSheet .ins1-clear, #copilotSheet .ins1-scope, #copilotSheet .ins1-filter').length,
+        open:document.getElementById('remiPayrollIns1OpenFull'),
+        pageOn:document.getElementById('tab_payroll').classList.contains('active')
+      };
+    });
+    assert.ok(phoneGate.before >= 4, 'phone had Admin chips before the role switch');
+    assert.strictEqual(phoneGate.chips, 0, 'Scheduler phone sheet has no insurance chips');
+    assert.strictEqual(phoneGate.open, null, 'Scheduler phone sheet has no Open full report button');
+    assert.strictEqual(phoneGate.pageOn, false, 'Scheduler phone does not keep the payroll page');
 
     const desk = await browser.newPage();
     watch(desk);
@@ -460,6 +637,77 @@ async function runBrowser(){
     assert.strictEqual(schedView.chips, 0, 'Scheduler rail has no insurance chips');
     assert.ok(schedView.sheetText.indexOf('Payroll report') >= 0, schedView.sheetText);
     assert.ok(schedView.sheetText.indexOf('36.20') >= 0, schedView.sheetText);
+
+    const handoff = await browser.newPage();
+    watch(handoff);
+    await boot(handoff, 'Admin', 1280, 800);
+    await handoff.evaluate(async function(){
+      showTab('payroll');
+      if(remiPayrollIns1Shown && remiPayrollIns1Shown.then)await remiPayrollIns1Shown;
+    });
+    const beforeLeave = await handoff.evaluate(function(){
+      var page = document.getElementById('tab_payroll');
+      return {on:page.classList.contains('active'), text:page.innerText};
+    });
+    assert.strictEqual(beforeLeave.on, true, 'Admin has the payroll own page open');
+    assert.ok(beforeLeave.text.indexOf('CareSource') >= 0 && beforeLeave.text.indexOf('Passport') >= 0 && beforeLeave.text.indexOf('Other') >= 0, beforeLeave.text);
+    const afterLeave = await handoff.evaluate(function(){
+      currentAdminRole = 'Scheduler';
+      currentAdminUsername = 'Jasmine';
+      layoutA1ApplyRoles();
+      var page = document.getElementById('tab_payroll');
+      var host = document.getElementById('remiPayrollIns1Host');
+      var active = document.querySelector('#adminScreen .tab-panel.active');
+      var nav = document.getElementById('nav_payroll');
+      var open = document.getElementById('remiPayrollIns1TimesheetsOpen');
+      return {
+        hidden:!!(page && page.hidden),
+        active:!!(page && page.classList.contains('active')),
+        display:page ? getComputedStyle(page).display : '',
+        hostText:host ? host.innerText : 'missing',
+        hostChips:host ? host.querySelectorAll('.ins1-chip, .ins1-chips').length : -1,
+        activeId:active ? active.id : '',
+        navHidden:!!(nav && nav.hidden),
+        openHidden:!!(open && open.hidden),
+        navDisplay:nav ? getComputedStyle(nav).display : '',
+        openDisplay:open ? getComputedStyle(open).display : ''
+      };
+    });
+    assert.strictEqual(afterLeave.hidden, true, 'Scheduler payroll page is hidden');
+    assert.strictEqual(afterLeave.active, false, 'Scheduler payroll page is not active');
+    assert.strictEqual(afterLeave.display, 'none', 'hidden payroll page is not displayed');
+    assert.strictEqual(afterLeave.hostChips, 0, 'Scheduler host has no insurance chips');
+    assert.ok(!/CareSource|Passport|\bOther\b/.test(afterLeave.hostText), afterLeave.hostText);
+    assert.strictEqual(afterLeave.activeId, 'tab_timesheets', afterLeave.activeId);
+    assert.strictEqual(afterLeave.navHidden, true, 'Scheduler payroll nav stays hidden');
+    assert.strictEqual(afterLeave.openHidden, true, 'Scheduler timesheets payroll button stays hidden');
+    assert.strictEqual(afterLeave.navDisplay, 'none');
+    assert.strictEqual(afterLeave.openDisplay, 'none');
+    await handoff.screenshot({path:path.join(shotDir, 'remi-payroll-ins1-scheduler-after-admin.png'), fullPage:true});
+    const belt = await handoff.evaluate(function(){
+      var page = document.getElementById('tab_payroll');
+      page.classList.add('active');
+      page.setAttribute('hidden', '');
+      return getComputedStyle(page).display;
+    });
+    assert.strictEqual(belt, 'none', 'CSS keeps a hidden payroll page off screen even if .active remains');
+    const railAfter = await handoff.evaluate(async function(){
+      currentAdminRole = 'Scheduler';
+      layoutA1ApplyRoles();
+      await remiPayrollIns1FromRail();
+      var page = document.getElementById('tab_payroll');
+      var body = document.getElementById('copilotBody');
+      return {
+        pageOn:!!(page && page.classList.contains('active')),
+        pageDisplay:page ? getComputedStyle(page).display : '',
+        chips:document.querySelectorAll('#copilotSheet .ins1-chip').length,
+        text:body ? body.innerText : ''
+      };
+    });
+    assert.strictEqual(railAfter.pageOn, false, 'Scheduler Remi payroll does not open the own page');
+    assert.strictEqual(railAfter.pageDisplay, 'none');
+    assert.strictEqual(railAfter.chips, 0, 'Scheduler Remi payroll has no insurance chips');
+    assert.ok(railAfter.text.indexOf('Payroll report') >= 0, railAfter.text);
 
     assert.ok(!errors.some(function(line){return /SyntaxError|remiPayrollIns1/.test(line);}), errors.join('\n'));
     console.log('admin-remi-payroll-ins1 browser ok');

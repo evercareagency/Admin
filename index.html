@@ -292,6 +292,9 @@ textarea{resize:vertical;min-height:80px;}
 .tab-panel{display:none;}.tab-panel.active{display:block;}
 /* v=more-hide1 — an inactive desk cannot paint over the next one. #tab_aidechat.is-thread used to set display:grid and beat this. */
 #adminScreen .tab-panel:not(.active){display:none !important;}
+/* v=remi-payroll-ins1 — [hidden] must beat .tab-panel.active so a Scheduler session cannot keep the Admin payroll page. */
+#tab_payroll[hidden]{display:none !important;}
+#nav_payroll[hidden],#remiPayrollIns1TimesheetsOpen[hidden]{display:none !important;}
 .sched-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;max-width:100%;min-width:0;}
 .sched-toolbar .sched-search{flex:1;min-width:180px;max-width:280px;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;}
 .sched-week{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy);max-width:100%;min-width:0;}
@@ -4897,22 +4900,53 @@ function layoutA1CloseAvatar(){
   if(btn)btn.setAttribute('aria-expanded','false');
 }
 function layoutA1ApplyRoles(){
-  var role='';
-  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
-  document.querySelectorAll('#adminScreen [data-layout-roles]').forEach(function(el){
-    if(el.id==='copilotSheet')return;
-    var allow=String(el.getAttribute('data-layout-roles')||'').split(/\s+/).filter(Boolean);
-    var show=!role||allow.indexOf(role)>=0;
-    if(show)el.removeAttribute('hidden');
-    else el.setAttribute('hidden','');
-  });
-  var btn=document.getElementById('avatarMenuBtn');
-  if(btn){
-    var label=String((typeof currentAdminUsername!=='undefined'&&currentAdminUsername)||role||'A').trim();
-    btn.textContent=(label.charAt(0)||'A').toUpperCase();
-    if(role)btn.setAttribute('aria-label','Account menu, '+role);
+  if(layoutA1ApplyRoles._busy)return;
+  layoutA1ApplyRoles._busy=1;
+  try{
+    var role='';
+    try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+    document.querySelectorAll('#adminScreen [data-layout-roles]').forEach(function(el){
+      if(!el||el.id==='copilotSheet')return;
+      var allow=String(el.getAttribute('data-layout-roles')||'').split(/\s+/).filter(Boolean);
+      var show=!role||allow.indexOf(role)>=0;
+      var panel=!!(el.classList&&el.classList.contains('tab-panel'));
+      if(!show){
+        el.setAttribute('hidden','');
+        if(panel)el.classList.remove('active');
+        return;
+      }
+      if(panel&&!(el.classList.contains('active'))){
+        el.setAttribute('hidden','');
+        return;
+      }
+      el.removeAttribute('hidden');
+    });
+    var active=null;
+    try{if(document.querySelector)active=document.querySelector('#adminScreen .tab-panel.active');}catch(eActive){active=null;}
+    var gatedOff=false;
+    if(active&&role&&active.getAttribute){
+      var raw=active.getAttribute('data-layout-roles');
+      if(raw!=null&&String(raw).trim()){
+        var ok=String(raw).split(/\s+/).filter(Boolean);
+        if(ok.indexOf(role)<0)gatedOff=true;
+      }
+    }
+    var needsHome=!active||!!(active&&active.hidden)||gatedOff;
+    if(role&&needsHome&&typeof showTab==='function'){
+      var onHome=!!(active&&active.id==='tab_timesheets'&&!active.hidden&&!gatedOff);
+      if(!onHome)showTab('timesheets');
+    }
+    var btn=document.getElementById('avatarMenuBtn');
+    if(btn){
+      var label=String((typeof currentAdminUsername!=='undefined'&&currentAdminUsername)||role||'A').trim();
+      btn.textContent=(label.charAt(0)||'A').toUpperCase();
+      if(role)btn.setAttribute('aria-label','Account menu, '+role);
+    }
+    if(typeof copilotSyncRole==='function')copilotSyncRole();
+    if(typeof remiPayrollIns1ApplyRoleGate==='function')remiPayrollIns1ApplyRoleGate();
+  }finally{
+    layoutA1ApplyRoles._busy=0;
   }
-  if(typeof copilotSyncRole==='function')copilotSyncRole();
 }
 var NAV_EDIT_META={
   timesheets:{label:'Timesheets',icon:'📋',short:''},
@@ -22713,6 +22747,31 @@ async function remiPayrollIns1ApplyAsk(plan){
   if(remiPayrollIns1PreferPage())return remiPayrollIns1OpenPage();
   if(typeof remiPayroll1Show==='function')return remiPayroll1Show();
   return {ok:true};
+}
+function remiPayrollIns1ApplyRoleGate(){
+  if(remiPayrollIns1AdminOk())return;
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(eRole){role='';}
+  if(!role)return;
+  var page=null;
+  try{page=document.getElementById('tab_payroll');}catch(ePage){page=null;}
+  var onPayroll=!!(page&&page.classList&&page.classList.contains('active'));
+  if(page){
+    page.setAttribute('hidden','');
+    if(page.classList)page.classList.remove('active');
+  }
+  var host=null;
+  try{host=document.getElementById('remiPayrollIns1Host');}catch(eHost){host=null;}
+  if(host)host.innerHTML='';
+  var sheet=null;
+  try{sheet=document.getElementById('copilotSheet');}catch(eSheet){sheet=null;}
+  if(sheet&&sheet.querySelectorAll){
+    var nodes=sheet.querySelectorAll('.ins1-chips,.ins1-chip,.ins1-clear,.ins1-scope,.ins1-filter,.ins1-tag,#remiPayrollIns1OpenFull');
+    var list=[];
+    for(var i=0;i<nodes.length;i++)list.push(nodes[i]);
+    list.forEach(function(n){if(n&&n.parentNode)n.parentNode.removeChild(n);});
+  }
+  if(onPayroll&&typeof showTab==='function')showTab('timesheets');
 }
 // end remi payroll ins1 v=remi-payroll-ins1
 
