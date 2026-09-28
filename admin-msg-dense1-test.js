@@ -41,6 +41,12 @@ assert.ok(html.includes('id="aidechatThreadAv"'), 'thread header avatar');
 assert.ok(html.includes('class="aide-office-av"'), 'aide list avatar stays');
 assert.ok(html.includes('id="msgDensePanel"'), 'fixed thread panel');
 assert.ok(html.includes('function msgDense1Fit'), 'height lock');
+assert.ok(html.includes('v=more-hide1'), 'more-hide1 marker');
+assert.ok(html.includes('data-more-hide1="v=more-hide1"'), 'more-hide1 data attr');
+assert.ok(html.includes("var MORE_HIDE1_MARKER='v=more-hide1'"), 'more-hide1 script marker');
+assert.ok(html.includes('function moreHide1Leave'), 'leave hides the thread');
+assert.ok(html.includes('#adminScreen .tab-panel:not(.active){display:none !important;}'), 'inactive panels cannot paint');
+assert.ok(html.includes('#tab_aidechat.active.is-thread{display:grid'), 'split grid only while Messages is active');
 assert.ok(html.includes('padding:6px 10px'), 'tighter bubble padding');
 assert.ok(html.includes('admin_get_remi_payroll_report'), 'payroll desk stays');
 const denseNote = html.slice(html.indexOf('<!-- messages dense 2026-09-27 v=msg-dense1'), html.indexOf('<meta name="admin-build" content="2026-09-27-msg-dense1">') + 62);
@@ -61,6 +67,52 @@ function loadPuppeteer(){
     try{return require('/tmp/probe/node_modules/puppeteer-core');}
     catch(e2){return null;}
   }
+}
+
+async function assertNoBleed(page, label){
+  const left = await page.evaluate(function(){
+    var tabs = ['nurse','inservices','more','schedule','timesheets','aides','clients','coverage'];
+    var rows = [];
+    tabs.forEach(function(tab){
+      showTab('aidechat');
+      aidechatShow('thread');
+      var chat = document.getElementById('tab_aidechat');
+      var split = chat.classList.contains('is-thread');
+      showTab(tab);
+      var dest = document.getElementById('tab_'+tab);
+      var cs = getComputedStyle(chat);
+      var rect = chat.getBoundingClientRect();
+      rows.push({
+        tab:tab,
+        split:split,
+        active:chat.classList.contains('active'),
+        hidden:!!chat.hidden,
+        display:cs.display,
+        h:rect.height,
+        destOn:!!(dest&&dest.classList.contains('active')&&!dest.hidden&&getComputedStyle(dest).display!=='none')
+      });
+    });
+    showTab('aidechat');
+    var back = document.getElementById('tab_aidechat');
+    return {
+      rows:rows,
+      backOn:back.classList.contains('active')&&!back.hidden&&getComputedStyle(back).display!=='none',
+      fab:!!document.getElementById('copilotFab'),
+      sheet:!!document.getElementById('copilotSheet'),
+      rail:!!document.getElementById('aideOfficeRail')
+    };
+  });
+  assert.strictEqual(left.fab, true, label+' Remi chip stays');
+  assert.strictEqual(left.sheet, true, label+' Remi sheet stays');
+  assert.strictEqual(left.rail, true, label+' Remi rail stays');
+  assert.strictEqual(left.backOn, true, label+' Messages can open again');
+  left.rows.forEach(function(row){
+    assert.strictEqual(row.active, false, label+' '+row.tab+' still active');
+    assert.strictEqual(row.hidden, true, label+' '+row.tab+' not hidden');
+    assert.strictEqual(row.display, 'none', label+' '+row.tab+' display '+row.display+' split '+row.split);
+    assert.strictEqual(row.h, 0, label+' '+row.tab+' still painted');
+    assert.strictEqual(row.destOn, true, label+' '+row.tab+' destination hidden');
+  });
 }
 
 async function runBrowser(){
@@ -231,6 +283,7 @@ async function runBrowser(){
     assert.strictEqual(grown.client, 0, 'message viewport stays fixed '+JSON.stringify(grown));
     assert.ok(Math.abs(grown.tab) < 2, 'tab does not grow '+JSON.stringify(grown));
     assert.ok(grown.scroll > grown.box, 'only the msgs box scrolls');
+    await assertNoBleed(phone, 'phone');
     await phone.screenshot({path: path.join(shotDir, 'msg-dense1-phone.png')});
 
     const desk = await browser.newPage();
@@ -263,6 +316,7 @@ async function runBrowser(){
     assert.strictEqual(deskGrown.doc, 0, 'desktop page does not grow '+JSON.stringify(deskGrown));
     assert.strictEqual(deskGrown.panel, 0, 'desktop panel stays fixed '+JSON.stringify(deskGrown));
     assert.ok(deskGrown.scroll > deskGrown.box);
+    await assertNoBleed(desk, 'desktop');
     await desk.screenshot({path: path.join(shotDir, 'msg-dense1-desktop.png')});
     assert.deepStrictEqual(errors, []);
     console.log('admin-msg-dense1 browser ok');
