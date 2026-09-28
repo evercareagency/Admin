@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- aide profile link fix 2026-09-28 v=aide-profile-link-fix ?v=aide-profile-link-fix admin-build 2026-09-28-aide-profile-link-fix. GHOST-AIDE-PROFILE-LINK-FIX-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Supersedes aides-profile-link1 scroll-and-highlight (draft PR #165). View profile is one full page. It is not a scroll or teal outline on the Aides list, and it is not the credentials rollup sitting above the list. From Aides ··· View profile, and from aidesInfo1Follow when deep_link is the string admin/aides?aide_id=<uuid>, Ghost parses a leading #, aides and admin/aides path variants, and query aide_id, then replaces the Aides list (and Manage chrome if it is open) with #aideProfilePage until Back. The page has Back, a header (name, phone, language chip, client chips, next, creds due — the existing aides-info1 profile content), and Credentials through the existing aidecreds paths (admin_list_aide_credentials, edit sheet, add, save). The Aides list, desk tabs, Manage bar, A–Z rail, and credentials rollup stay display:none, including on a phone. Phone CSS must not unhide the list. Back returns to the normal Aides list on the Active desk and force-exits Manage. Bare tab names and schedule deep-link objects stay as aides-info1 left them. This is not Auth profile_id. More must not end half-active: while this page is open on the Aides bottom tab, #nav_more and #tab_more lose active, and leaving for More closes the page so More is the only active desk. Do not break Manage select/delete, manage-dots-creds1 ··· Credentials-in-Manage, manage-done1 Done exit, aidadel1 Delete, or list-az-sticky1. Prior markers stay, including v=aides-info1, v=aides-profile-link1, v=manage-dots-creds1, v=manage-done1, v=manage-clean1, v=aide-manage-delete1, v=aidadel1, v=aidecreds1, v=aidecreds1b, v=aidecreds1c, v=list-az-sticky1, and v=list-az1. -->
+<meta name="admin-build" content="2026-09-28-aide-profile-link-fix">
+<script>var AIDE_PROFILE_LINK_FIX_MARKER='v=aide-profile-link-fix';var AIDE_PROFILE_LINK_FIX_BUILD='2026-09-28-aide-profile-link-fix';</script>
 <!-- timesheet archive kill 2026-09-28 v=timesheet-archive-kill1 ?v=timesheet-archive-kill1 admin-build 2026-09-28-timesheet-archive-kill1. GHOST-TIMESHEET-ARCHIVE-KILL1-CONTRACT-v1. Ace migrate DONE. Archived bucket emptied (35 rows now have deleted_at). Ghost UI only. NO new SQL. NO new RPC. NO Auth reseal. Quiet Mo. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Timesheets desk tabs are Active and Recently deleted only. The Archived tab button and archived desk copy are gone. setTimesheetDesk('archived') and sbTimesheetDesk('archived') coerce to deleted, because those rows now live in Recently deleted. There is no archived list filter. #tsDeskSub drops the archived string. #tsDetailArchiveBtn stays the filing-cabinet control, class mbtn-archive, and reads 🗄️ Delete. quickDelete and deleteRec confirm exactly Delete this timesheet? with primary Delete, then commitTimesheetTrash (action trash_timesheet through sbAdminTrashTimesheet: is_active false and deleted_at). They do not call commitTimesheetDelete or action delete. The toast is the soft-delete toast: Moved to Recently deleted · restore 7 days. The row cabinet is Delete via quickDelete. More → Delete… is an alias of the same confirm. Archive Restore is not painted: list rows do not call restoreArchivedTimesheet, and syncTimesheetDetailActions shows Restore only when deleted_at is set. Recently deleted Restore still posts restore_trashed_timesheet. Active list is is_active true and deleted_at null. Manage bulk tsManageDelete1 stays the trash_timesheet loop. Dates people read are MM/DD/YYYY. Do not break payready1, the pdf desk, list-az, cover-desk, Manage Done, or aides Manage. Prior markers stay, including v=aide-manage-delete1, v=manage-done1, v=manage-dots-creds1, v=manage-clean1, v=payready1, v=pdf1p, v=client-phone1, v=cover-desk1, and v=list-az-sticky1. -->
 <meta name="admin-build" content="2026-09-28-timesheet-archive-kill1">
 <script>var TIMESHEET_ARCHIVE_KILL1_MARKER='v=timesheet-archive-kill1';var TIMESHEET_ARCHIVE_KILL1_BUILD='2026-09-28-timesheet-archive-kill1';</script>
@@ -1924,6 +1927,57 @@ html.remi-ask-kb #copilotSheet{z-index:180;}
   #aideCredsRoot{max-width:560px;}
   .aide-cred-sheet{left:50%;right:auto;width:min(440px,calc(100% - 32px));transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));border-radius:18px;}
 }
+/* v=aide-profile-link-fix — full aide page replaces the list. Phone CSS must not unhide it. */
+#aideProfilePage[hidden]{display:none !important;}
+#adminScreen #tab_aides.aide-profile-on #aideProfilePage:not([hidden]){display:block !important;}
+#adminScreen #tab_aides.aide-profile-on > .page-hdr,
+#adminScreen #tab_aides.aide-profile-on #aideDesk,
+#adminScreen #tab_aides.aide-profile-on #aideDeskSub,
+#adminScreen #tab_aides.aide-profile-on #aideManageBar,
+#adminScreen #tab_aides.aide-profile-on #aideManageSure,
+#adminScreen #tab_aides.aide-profile-on #aideManageConfirm,
+#adminScreen #tab_aides.aide-profile-on #aidesContainer,
+#adminScreen #tab_aides.aide-profile-on #aideCredsRoot,
+#adminScreen #tab_aides.aide-profile-on #aideCredList,
+#adminScreen #tab_aides.aide-profile-on #aideCredSearchWrap,
+#adminScreen #tab_aides.aide-profile-on #aideCredBanner,
+#adminScreen #tab_aides.aide-profile-on #aideCredDetail,
+#adminScreen #tab_aides.aide-profile-on #remiLangsAideCard,
+#adminScreen #tab_aides.aide-profile-on .aide-info-cards,
+#adminScreen #tab_aides.aide-profile-on .aide-cards,
+#adminScreen #tab_aides.aide-profile-on .az-stage,
+#adminScreen #tab_aides.aide-profile-on .az-rail,
+#adminScreen #tab_aides.aide-profile-on article.aide-info-card,
+#adminScreen #tab_aides.aide-profile-on article.aide-row-card{display:none !important;}
+.aide-profile-back{display:inline-flex;align-items:center;min-height:44px;margin:0 0 8px;padding:0 2px;border:0;background:transparent;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;}
+.aide-profile-head{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin:0 0 14px;box-shadow:0 6px 16px rgba(26,39,68,0.05);}
+.aide-profile-id{flex:1;min-width:0;}
+.aide-profile-head h1{font-family:'DM Sans',sans-serif;font-size:1.35rem;font-weight:700;color:var(--navy);margin:0;line-height:1.25;}
+#aideProfilePage .aide-info-avatar{width:56px;height:56px;flex:0 0 56px;font-size:1.05rem;}
+#aideProfileCreds .aide-cred-card{margin:0;}
+@media(max-width:899px){
+  #adminScreen #tab_aides.aide-profile-on > .page-hdr,
+  #adminScreen #tab_aides.aide-profile-on #aideDesk,
+  #adminScreen #tab_aides.aide-profile-on #aideManageBar,
+  #adminScreen #tab_aides.aide-profile-on #aideManageSure,
+  #adminScreen #tab_aides.aide-profile-on #aideManageConfirm,
+  #adminScreen #tab_aides.aide-profile-on #aidesContainer,
+  #adminScreen #tab_aides.aide-profile-on #aideCredsRoot,
+  #adminScreen #tab_aides.aide-profile-on #aideCredList,
+  #adminScreen #tab_aides.aide-profile-on #aideCredDetail,
+  #adminScreen #tab_aides.aide-profile-on .aide-info-cards,
+  #adminScreen #tab_aides.aide-profile-on .az-rail,
+  #adminScreen #tab_aides.aide-profile-on article.aide-info-card,
+  #adminScreen #tab_aides.aide-profile-on article.aide-row-card{display:none !important;}
+  #adminScreen #tab_aides.aide-profile-on #aideProfilePage:not([hidden]){display:block !important;}
+}
+@media(max-width:430px){
+  #adminScreen #tab_aides.aide-profile-on #aidesContainer,
+  #adminScreen #tab_aides.aide-profile-on #aideCredsRoot,
+  #adminScreen #tab_aides.aide-profile-on article.aide-info-card,
+  #adminScreen #tab_aides.aide-profile-on .aide-info-cards,
+  #adminScreen #tab_aides.aide-profile-on .az-rail{display:none !important;}
+}
 .mbtn-archive{background:#eef2f6;color:#1a2744;border:1.5px solid #c5d0dc;}
 .mbtn-warn{background:var(--warn);color:white;}
 .det-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
@@ -3122,7 +3176,21 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" data-manage-dots-creds1="v=manage-dots-creds1">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" data-manage-dots-creds1="v=manage-dots-creds1" data-aide-profile-link-fix="v=aide-profile-link-fix">
+        <div id="aideProfilePage" data-aide-profile-link-fix="v=aide-profile-link-fix" hidden>
+          <button type="button" class="aide-profile-back" id="aideProfileBack" onclick="aideProfileLinkFixBack()">← Back</button>
+          <div class="aide-profile-head">
+            <div class="aide-info-avatar" id="aideProfileAvatar" aria-hidden="true">A</div>
+            <div class="aide-profile-id">
+              <h1 id="aideProfileName">Aide</h1>
+              <div id="aideProfileContact" class="aide-info-contact"></div>
+              <div id="aideProfileClients" class="aide-info-clients"></div>
+              <div id="aideProfileNext" class="aide-info-next" hidden></div>
+              <div id="aideProfileCredsDue" class="aide-info-creds" hidden></div>
+            </div>
+          </div>
+          <div id="aideProfileCreds" aria-label="Credentials"></div>
+        </div>
         <p id="aideManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
           <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
@@ -6469,6 +6537,9 @@ function showTab(tab){
   // Old top-level Completed intakes → Nurse tab (Completes card). Admin + Scheduler only.
   if(tab==='completes')tab='nurse';
   if(tab==='cover')tab='coverage';
+  if(typeof aideProfileLinkFixOn==='function'&&aideProfileLinkFixOn()){
+    try{aideProfileLinkFixLeave();}catch(eProfileLeave){}
+  }
   if(tab==='payroll'&&typeof remiPayrollIns1AdminOk==='function'&&!remiPayrollIns1AdminOk())tab='timesheets';
   layoutA1CloseAvatar();
   var primary=layoutA1Primary(tab);
@@ -31586,6 +31657,15 @@ function aidesInfo1Follow(link){
     return;
   }
   if(typeof link==='string'){
+    var profileId='';
+    try{if(typeof aideProfileLinkFixParse==='function')profileId=aideProfileLinkFixParse(link)||'';}catch(eParse){profileId='';}
+    if(profileId){
+      var openedProfile=false;
+      try{if(typeof aideProfileLinkFixOpen==='function')openedProfile=!!aideProfileLinkFixOpen(profileId);}catch(eOpen){openedProfile=false;}
+      if(openedProfile)return;
+      if(typeof showTempMsg==='function')showTempMsg('No profile link on this aide.','var(--warn)');
+      return;
+    }
     var named=String(link).replace(/^#/,'').trim().toLowerCase();
     if(named&&typeof showTab==='function'&&document.getElementById('tab_'+named)){
       showTab(named);
@@ -31597,6 +31677,15 @@ function aidesInfo1Follow(link){
   if(typeof link!=='object')return;
   var clientId=link.client_id||link.clientId||'';
   var onDate=link.on_date||link.onDate||'';
+  if(!(clientId&&onDate)&&typeof aideProfileLinkFixOpen==='function'){
+    var fromObj=String(link.aide_id||link.aideId||'').trim();
+    var surfEarly=String(link.surface||link.tab||link.screen||'').trim().toLowerCase();
+    if(fromObj&&(!surfEarly||surfEarly==='aides'||surfEarly==='aide')){
+      var openedObj=false;
+      try{openedObj=!!aideProfileLinkFixOpen(fromObj);}catch(eObj){openedObj=false;}
+      if(openedObj)return;
+    }
+  }
   if(clientId&&onDate){
     try{schedPendingDeepLink={client_id:String(clientId), on_date:String(onDate).slice(0,10), slot_key:String(link.slot_key||link.slotKey||'default')};}catch(e){}
     if(typeof showTab==='function')showTab('schedule');
@@ -31659,7 +31748,35 @@ function aidesInfo1Credentials(){
 function aidesInfo1ViewProfile(){
   var row=aidesInfo1Current;
   var link=row&&row.deep_link;
+  var rowId=row&&row.id?String(row.id):'';
   aidesInfo1CloseSheet();
+  var schedule=false;
+  var otherDesk=false;
+  if(link&&typeof link==='object'){
+    schedule=!!((link.client_id||link.clientId)&&(link.on_date||link.onDate));
+    var surface=String(link.surface||link.tab||link.screen||'').trim().toLowerCase();
+    otherDesk=!!surface&&surface!=='aides'&&surface!=='aide';
+  }
+  if(!schedule&&!otherDesk&&rowId&&typeof aideProfileLinkFixOpen==='function'){
+    var parsed='';
+    var bareTab=false;
+    if(typeof link==='string'){
+      if(typeof aideProfileLinkFixParse==='function'){
+        try{parsed=aideProfileLinkFixParse(link)||'';}catch(eParse){parsed='';}
+      }
+      if(!parsed){
+        var named=String(link).replace(/^#/,'').trim().toLowerCase();
+        if(named&&named.indexOf('/')<0&&named.indexOf('?')<0)bareTab=true;
+      }
+    }else if(link&&typeof link==='object'){
+      parsed=String(link.aide_id||link.aideId||'').trim();
+    }
+    if(!bareTab){
+      var opened=false;
+      try{opened=!!aideProfileLinkFixOpen(parsed||rowId);}catch(eOpen){opened=false;}
+      if(opened)return;
+    }
+  }
   aidesInfo1Follow(link);
 }
 function aidesInfo1Reset(){
@@ -31723,9 +31840,291 @@ async function aidesInfo1TryPaint(container, force){
     container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+users.map(aidesInfo1CardHtml).join('')+'</div>';
   }
   if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
+  try{if(typeof aideProfileLinkFixAfterPaint==='function')aideProfileLinkFixAfterPaint();}catch(eProfile){}
   return true;
 }
 // end v=aides-info1
+
+// v=aide-profile-link-fix — one full aide page. Not scroll/highlight. Not the credentials rollup above the list.
+var aideProfileLinkFixWant='';
+function aideProfileLinkFixOn(){
+  var tab=null;
+  try{tab=document.getElementById('tab_aides');}catch(e){tab=null;}
+  return !!(tab&&tab.classList&&tab.classList.contains('aide-profile-on'));
+}
+function aideProfileLinkFixParse(link){
+  var raw=String(link==null?'':link).trim();
+  if(!raw)return '';
+  raw=raw.replace(/^#+/, '');
+  raw=raw.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+\/?/i, '');
+  raw=raw.replace(/^\/+/, '');
+  var path=raw;
+  var query='';
+  var qAt=raw.indexOf('?');
+  if(qAt>=0){
+    path=raw.slice(0, qAt);
+    query=raw.slice(qAt+1);
+  }
+  var hashAt=path.indexOf('#');
+  if(hashAt>=0)path=path.slice(0, hashAt);
+  path=path.replace(/^\/+|\/+$/g, '').toLowerCase();
+  var aideId='';
+  if(query){
+    var hashQ=query.indexOf('#');
+    if(hashQ>=0)query=query.slice(0, hashQ);
+    var parts=query.split('&');
+    var i;
+    for(i=0;i<parts.length;i++){
+      if(!parts[i])continue;
+      var eq=parts[i].indexOf('=');
+      var key=eq>=0?parts[i].slice(0, eq):parts[i];
+      var val=eq>=0?parts[i].slice(eq+1):'';
+      try{key=decodeURIComponent(String(key).replace(/\+/g, ' '));}catch(eKey){}
+      key=String(key||'').trim().toLowerCase();
+      if(key!=='aide_id')continue;
+      try{val=decodeURIComponent(String(val).replace(/\+/g, ' '));}catch(eVal){}
+      aideId=String(val||'').trim();
+      if(aideId)break;
+    }
+  }
+  if(!aideId)return '';
+  if(path&&path!=='aides'&&!/(^|\/)aides$/.test(path))return '';
+  return aideId;
+}
+function aideProfileLinkFixFind(aideId){
+  var want=String(aideId||'').trim().toLowerCase();
+  if(!want)return null;
+  var map={};
+  try{map=(typeof aidesInfo1ByKey!=='undefined'&&aidesInfo1ByKey)?aidesInfo1ByKey:{};}catch(e){map={};}
+  var keys=[];
+  try{keys=Object.keys(map);}catch(e2){keys=[];}
+  var i;
+  for(i=0;i<keys.length;i++){
+    var row=map[keys[i]];
+    if(row&&String(row.id||'').trim().toLowerCase()===want)return row;
+  }
+  return null;
+}
+function aideProfileLinkFixEsc(s){
+  if(typeof escapeHtml==='function')return escapeHtml(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function aideProfileLinkFixStickNav(){
+  var aides=null;
+  var more=null;
+  var moreNav=null;
+  var aidesNav=null;
+  try{aides=document.getElementById('tab_aides');}catch(e){aides=null;}
+  try{more=document.getElementById('tab_more');}catch(e2){more=null;}
+  try{moreNav=document.getElementById('nav_more');}catch(e3){moreNav=null;}
+  try{aidesNav=document.getElementById('nav_aides');}catch(e4){aidesNav=null;}
+  var primary='aides';
+  try{if(typeof layoutA1Primary==='function')primary=layoutA1Primary('aides')||'aides';}catch(e5){primary='aides';}
+  if(aides){
+    aides.hidden=false;
+    if(aides.classList)aides.classList.add('active');
+  }
+  if(primary!=='aides')return;
+  if(more){
+    more.hidden=true;
+    if(more.classList)more.classList.remove('active');
+  }
+  if(moreNav&&moreNav.classList)moreNav.classList.remove('active');
+  if(aidesNav&&aidesNav.classList)aidesNav.classList.add('active');
+  var rows=[];
+  try{rows=document.querySelectorAll('#tab_more .nav-item.active, #moreList .nav-item.active');}catch(e6){rows=[];}
+  var n;
+  for(n=0;n<rows.length;n++){
+    if(rows[n]&&rows[n].classList)rows[n].classList.remove('active');
+  }
+}
+function aideProfileLinkFixPaint(aideId){
+  var row=aideProfileLinkFixFind(aideId);
+  var name=row&&(row.name||row.fullName)?String(row.name||row.fullName):'Aide';
+  var nameEl=document.getElementById('aideProfileName');
+  if(nameEl)nameEl.textContent=name;
+  var av=document.getElementById('aideProfileAvatar');
+  if(av){
+    var initials=row&&row.initials?String(row.initials):'';
+    if(!initials&&row&&row._raw&&typeof aidesInfo1Initials==='function'){
+      try{initials=aidesInfo1Initials(row._raw)||'';}catch(eInit){initials='';}
+    }
+    if(!initials)initials=(name.charAt(0)||'A').toUpperCase();
+    av.textContent=initials;
+    var color='#2a7f7f';
+    if(typeof aidesInfo1AvatarColor==='function'){
+      try{color=aidesInfo1AvatarColor(name)||color;}catch(eColor){}
+    }
+    av.style.background=color;
+  }
+  var contact=document.getElementById('aideProfileContact');
+  if(contact){
+    var phone=row&&row.phone?String(row.phone):'';
+    var lang=row&&row.preferred_language_label?String(row.preferred_language_label):'';
+    var bits='';
+    if(phone)bits+='<span class="aide-info-phone">'+aideProfileLinkFixEsc(phone)+'</span>';
+    if(lang)bits+='<span class="aide-info-lang">'+aideProfileLinkFixEsc(lang)+'</span>';
+    contact.innerHTML=bits;
+  }
+  var clients=document.getElementById('aideProfileClients');
+  if(clients){
+    var list=(row&&row.assignedClients)||[];
+    clients.innerHTML=list.map(function(c){
+      return '<span class="aide-info-client">'+aideProfileLinkFixEsc(c&&c.name?c.name:'')+'</span>';
+    }).join('');
+  }
+  var nextEl=document.getElementById('aideProfileNext');
+  if(nextEl){
+    var next=null;
+    if(row&&row._raw&&typeof aidesInfo1Next==='function'){
+      try{next=aidesInfo1Next(row._raw);}catch(eNext){next=null;}
+    }
+    if(next&&next.label){
+      nextEl.className='aide-info-next is-'+next.tone;
+      nextEl.textContent=next.label;
+      nextEl.hidden=false;
+    }else{
+      nextEl.className='aide-info-next';
+      nextEl.textContent='';
+      nextEl.hidden=true;
+    }
+  }
+  var due=document.getElementById('aideProfileCredsDue');
+  if(due){
+    var creds='';
+    if(row&&row._raw&&typeof aidesInfo1Creds==='function'){
+      try{creds=aidesInfo1Creds(row._raw)||'';}catch(eDue){creds='';}
+    }
+    due.textContent=creds;
+    due.hidden=!creds;
+  }
+  return name;
+}
+function aideProfileLinkFixPaintCreds(messageHtml){
+  var host=document.getElementById('aideProfileCreds');
+  if(!host)return;
+  host.hidden=false;
+  var body='';
+  if(messageHtml){
+    body=messageHtml;
+  }else{
+    var rows='';
+    try{rows=(typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.credentials||[]).map(aideCredRowHtml).join('');}catch(eRows){rows='';}
+    if(!rows)rows='<p class="aide-cred-muted">No credentials on file for this aide.</p>';
+    var add='';
+    if(typeof aideCredsIsAdmin!=='function'||aideCredsIsAdmin()){
+      add='<button type="button" class="btn btn-teal aide-cred-add" data-aide-cred-add>+ Add credential</button>';
+    }
+    body=rows+add;
+  }
+  host.innerHTML='<section class="aide-cred-card" data-aide-profile-link-fix="v=aide-profile-link-fix"><h3>Credentials</h3>'+body+'</section>';
+}
+async function aideProfileLinkFixLoadCreds(id, name){
+  var host=document.getElementById('aideProfileCreds');
+  if(!host)return;
+  if(typeof aideCredBind==='function')aideCredBind();
+  if(typeof aideCredState==='undefined'||!aideCredState){
+    aideProfileLinkFixPaintCreds('<p class="aide-cred-muted">No credentials on file for this aide.</p>');
+    return;
+  }
+  var seq=++aideCredState.seq;
+  aideCredState.profilePage=true;
+  aideCredState.manageDots=false;
+  aideCredState.view='detail';
+  aideCredState.aideId=String(id||'');
+  aideCredState.aideName=name||aideCredState.aideName||'Aide';
+  aideCredState.credentials=[];
+  if(typeof aideCredsIsAdmin==='function'&&!aideCredsIsAdmin()){
+    aideProfileLinkFixPaintCreds('<p class="aide-cred-muted">Credentials stay on the Admin desk.</p>');
+    return;
+  }
+  aideProfileLinkFixPaintCreds('<p class="aide-cred-muted">Loading credentials...</p>');
+  var res=null;
+  try{res=await sbAdminListAideCredentials(id);}catch(e){res={success:false, error:'Could not load credentials.'};}
+  if(!aideProfileLinkFixOn()||seq!==aideCredState.seq||aideCredState.aideId!==String(id||''))return;
+  if(!res||!res.success){
+    aideProfileLinkFixPaintCreds('<p class="aide-cred-muted">'+aideProfileLinkFixEsc((res&&res.error)||'Could not load credentials.')+'</p>');
+    return;
+  }
+  aideCredState.credentials=res.credentials||[];
+  aideProfileLinkFixPaintCreds('');
+}
+function aideProfileLinkFixLeave(){
+  aideProfileLinkFixWant='';
+  var tab=null;
+  try{tab=document.getElementById('tab_aides');}catch(e){tab=null;}
+  if(tab&&tab.classList)tab.classList.remove('aide-profile-on');
+  var page=null;
+  try{page=document.getElementById('aideProfilePage');}catch(e2){page=null;}
+  if(page)page.hidden=true;
+  if(typeof aideCredState!=='undefined'&&aideCredState)aideCredState.profilePage=false;
+}
+function aideProfileLinkFixBack(){
+  aideProfileLinkFixLeave();
+  if(typeof aideCredCloseSheet==='function'){
+    try{aideCredCloseSheet();}catch(e){}
+  }
+  if(typeof aideCredState!=='undefined'&&aideCredState){
+    aideCredState.view='list';
+    aideCredState.manageDots=false;
+    aideCredState.profilePage=false;
+    aideCredState.aideId='';
+    aideCredState.aideName='';
+    aideCredState.credentials=[];
+  }
+  aideProfileLinkFixStickNav();
+  if(typeof aideDesk!=='undefined'&&aideDesk!=='active'&&typeof setAideDesk==='function'){
+    setAideDesk('active');
+    return;
+  }
+  if(typeof renderAides==='function')renderAides(false);
+}
+function aideProfileLinkFixAfterPaint(){
+  if(!aideProfileLinkFixOn()||!aideProfileLinkFixWant)return;
+  aideProfileLinkFixPaint(aideProfileLinkFixWant);
+}
+function aideProfileLinkFixOpen(aideId){
+  var id=String(aideId||'').trim();
+  if(!id)return false;
+  var tab=null;
+  try{tab=document.getElementById('tab_aides');}catch(e){tab=null;}
+  if(!tab)return false;
+  var onAides=!!(tab.classList&&tab.classList.contains('active')&&!tab.hidden);
+  if(!onAides&&typeof showTab==='function'){
+    try{showTab('aides');}catch(eShow){}
+  }
+  if(typeof aideCredManageOn==='function'&&aideCredManageOn()&&typeof aideManageDone1Exit==='function'){
+    try{aideManageDone1Exit();}catch(eDone){}
+  }
+  if(tab.classList){
+    tab.classList.add('aide-profile-on');
+    tab.classList.remove('aide-manage-creds');
+    tab.classList.remove('aide-creds-detail');
+    tab.classList.remove('aide-creds-on');
+    tab.classList.remove('aide-manage-confirming');
+    tab.classList.remove('manage-confirming');
+  }
+  aideProfileLinkFixWant=id;
+  var page=document.getElementById('aideProfilePage');
+  if(page)page.hidden=false;
+  var root=document.getElementById('aideCredsRoot');
+  if(root)root.hidden=true;
+  var sheet=document.getElementById('aideInfoSheet');
+  if(sheet)sheet.hidden=true;
+  var sure=document.getElementById('aideManageSure');
+  if(sure)sure.hidden=true;
+  var bar=document.getElementById('aideManageBar');
+  if(bar)bar.hidden=true;
+  var box=document.getElementById('aideManageConfirm');
+  if(box)box.hidden=true;
+  aideProfileLinkFixStickNav();
+  var name=aideProfileLinkFixPaint(id);
+  aideProfileLinkFixLoadCreds(id, name);
+  try{window.scrollTo(0,0);}catch(eScroll){}
+  var back=document.getElementById('aideProfileBack');
+  try{if(back&&back.focus)back.focus();}catch(eFocus){}
+  return true;
+}
 
 async function renderAides(force){
   const container=document.getElementById('aidesContainer');
@@ -31825,7 +32224,7 @@ async function renderAides(force){
   if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
 }
 
-var aideCredState={view:'list',q:'',aides:[],attention:0,recordCount:0,aideId:'',aideName:'',credentials:[],editing:null,sheetOpen:false,pickAide:false,seq:0,error:''};
+var aideCredState={view:'list',q:'',aides:[],attention:0,recordCount:0,aideId:'',aideName:'',credentials:[],editing:null,sheetOpen:false,pickAide:false,seq:0,error:'',profilePage:false,manageDots:false};
 var AIDE_CRED_COLORS=['#1f8f86','#3b6fd8','#7a4ec8','#1f8f86'];
 function aideCredsIsAdmin(){
   var role='';
@@ -32121,6 +32520,14 @@ function aideCredBind(){
     if(t.closest('[data-aide-cred-back]')){aideCredBack();return;}
     if(t.closest('[data-aide-cred-add]'))aideCredAdd();
   });
+  var profileCreds=document.getElementById('aideProfileCreds');
+  if(profileCreds)profileCreds.addEventListener('click', function(ev){
+    var t=ev.target;
+    if(!t||!t.closest)return;
+    var edit=t.closest('[data-aide-cred-edit]');
+    if(edit){aideCredEdit(edit.getAttribute('data-aide-cred-edit'));return;}
+    if(t.closest('[data-aide-cred-add]'))aideCredAdd();
+  });
   document.addEventListener('keydown', function(ev){
     if(ev.key==='Escape'&&aideCredState.sheetOpen)aideCredCloseSheet();
   });
@@ -32242,6 +32649,7 @@ function aideManageDone1Exit(){
 }
 function aideCredsAfterAides(){
   aideCredBind();
+  if(typeof aideProfileLinkFixOn==='function'&&aideProfileLinkFixOn())return;
   var root=document.getElementById('aideCredsRoot');
   var tab=document.getElementById('tab_aides');
   if(aideCredManageOn()){
@@ -32409,6 +32817,10 @@ function aideCredDetailTop(){
   return '<div class="aide-cred-detail-top"><button type="button" data-aide-cred-back aria-label="Back to aides">\u2190</button><h2>'+escapeHtml(aideCredState.aideName||'Aide')+'</h2></div>';
 }
 function aideCredPaintDetail(messageHtml){
+  if(typeof aideProfileLinkFixOn==='function'&&aideProfileLinkFixOn()){
+    if(typeof aideProfileLinkFixPaintCreds==='function')aideProfileLinkFixPaintCreds(messageHtml||'');
+    return;
+  }
   if(aideCredManageOn()){
     if(!(typeof aideCredState!=='undefined'&&aideCredState&&aideCredState.manageDots)){
       var blocked=document.getElementById('aideCredDetail');
@@ -32484,6 +32896,7 @@ async function aideCredFillBareChips(aides, seq){
 }
 async function aideCredsRefresh(){
   if(!aideCredsIsAdmin())return;
+  if(typeof aideProfileLinkFixOn==='function'&&aideProfileLinkFixOn())return;
   if(aideCredManageOn())return;
   var seq=++aideCredState.seq;
   aideCredState.error='';
@@ -32564,6 +32977,10 @@ async function aideCredOpen(aideId){
   aideCredPaintDetail();
 }
 function aideCredBack(){
+  if(typeof aideProfileLinkFixOn==='function'&&aideProfileLinkFixOn()){
+    if(typeof aideProfileLinkFixBack==='function')aideProfileLinkFixBack();
+    return;
+  }
   aideCredCloseSheet();
   if(aideCredManageOn()){
     aideCredHideForManage();
