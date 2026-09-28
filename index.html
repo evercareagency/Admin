@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
-<!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. remiFloatHide1Split ignores float_pool, hide_float_ui stays true, and is_float is always false in paint. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
+<!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] is empty, same-day yes rows (same_day_yes_30d > 0) from rest, aides, and float_pool are promoted into Ranked for paint only. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false in paint. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
@@ -37503,7 +37503,8 @@ async function loadNewClientIntakeDrafts(){
 // remi float hide1b v=remi-float-hide1b
 // MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only.
 // Coverage confirm chip and section titles are never Float pool.
-// remiFloatHide1Split ignores float_pool. hide_float_ui true. is_float always false.
+// When ranked[] is empty, same-day yes rows move into Ranked for paint from rest, aides, and float_pool.
+// float_pool is never a chip or section. hide_float_ui true. is_float always false.
 // Confirm blast stays admin_blast_cover_request. No-show rescue cards stay.
 var REMI_FLOAT_HIDE1B_MARKER='v=remi-float-hide1b';
 function remiFloatHide1bIntro(){
@@ -37541,6 +37542,33 @@ if(typeof remiFloatHide1Split==='function'&&!remiFloatHide1Split.__remiFloatHide
     clean.float_pool=[];
     clean.hide_float_ui=true;
     var split=remiFloatHide1bSplitBase(clean)||{ranked:[], rest:[]};
+    var ranked=Array.isArray(split.ranked)?split.ranked.slice():[];
+    var rest=Array.isArray(split.rest)?split.rest.slice():[];
+    if(!ranked.length){
+      var seen={};
+      var promoted=[];
+      var kept=[];
+      function idOf(row){
+        if(typeof remiFloat1AideId==='function')return remiFloat1AideId(row);
+        return String((row&&(row.aide_id||row.id))||'').trim();
+      }
+      function take(row, needsCopy){
+        if(!row||typeof row!=='object')return;
+        var copy=needsCopy&&typeof remiFloatHide1Copy==='function'?remiFloatHide1Copy(row):row;
+        var id=idOf(copy);
+        if(id&&seen[id])return;
+        if(id)seen[id]=1;
+        if(Number(copy.same_day_yes_30d)>0)promoted.push(copy);
+        else kept.push(copy);
+      }
+      rest.forEach(function(row){take(row, false);});
+      if(Array.isArray(data.aides))data.aides.forEach(function(row){take(row, true);});
+      if(Array.isArray(data.float_pool))data.float_pool.forEach(function(row){take(row, true);});
+      ranked=promoted;
+      rest=kept;
+    }
+    split.ranked=ranked;
+    split.rest=rest;
     split.float_pool=[];
     split.hide_float_ui=true;
     function force(rows){

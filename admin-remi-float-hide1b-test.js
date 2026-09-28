@@ -87,7 +87,38 @@ const ONLY_POOL = {
   shift_end: '2026-09-27T17:00:00.000Z',
   ranked: [],
   rest: [],
-  float_pool: [{rank: 1, aide_id: GHOST, name: 'ShouldNotPaint', same_day_yes_30d: 3, miles: 1, is_float: true}]
+  float_pool: [{rank: 1, aide_id: GHOST, name: 'PoolYes', same_day_yes_30d: 3, miles: 1, is_float: true}]
+};
+const REST_MIXED = {
+  client_name: 'Bowlax',
+  shift_start: '2026-09-27T13:00:00.000Z',
+  shift_end: '2026-09-27T17:00:00.000Z',
+  ranked: [],
+  rest: [
+    {rank: 1, aide_id: DEVON, name: 'Devon', same_day_yes_30d: 8, miles: 2.1, is_float: true},
+    {rank: 2, aide_id: LINA, name: 'Lina', same_day_yes_30d: 6, miles: 3, is_float: true},
+    {rank: 12, aide_id: JAMAL, name: 'Jamal', same_day_yes_30d: 0, miles: 5.2, is_float: false},
+    {rank: 13, aide_id: AISHA, name: 'Aisha', same_day_yes_30d: 0, miles: 4.4, is_float: false}
+  ],
+  aides: [
+    {rank: 8, aide_id: SARA, name: 'Sara', same_day_yes_30d: 4, miles: 1.8, is_float: true}
+  ],
+  float_pool: [
+    {rank: 9, aide_id: GHOST, name: 'PoolYes', same_day_yes_30d: 2, miles: 1, is_float: true},
+    {rank: 20, aide_id: '44444444-4444-4444-8444-444444444448', name: 'PoolZero', same_day_yes_30d: 0, miles: 9, is_float: true}
+  ]
+};
+const ALL_REST = {
+  client_name: 'Bowlax',
+  ranked: [],
+  rest: [{rank: 4, aide_id: JAMAL, name: 'Jamal', same_day_yes_30d: 0, miles: 5.2, is_float: false}],
+  float_pool: []
+};
+const ALL_YES = {
+  client_name: 'Bowlax',
+  ranked: [],
+  rest: [{rank: 1, aide_id: DEVON, name: 'Devon', same_day_yes_30d: 8, miles: 2.1, is_float: true}],
+  float_pool: []
 };
 const RESCUE_CARD = {
   id: RESCUE,
@@ -151,11 +182,21 @@ function runSlice(){
   assert.ok(!split.ranked.concat(split.rest).some(function(row){return row.name === 'ShouldNotPaint';}));
   assert.strictEqual(RANK.ranked[0].is_float, true, 'paint does not mutate the rank payload');
 
-  const ignored = sandbox.remiFloatHide1Split(ONLY_POOL);
-  assert.strictEqual(ignored.hide_float_ui, true);
-  assert.strictEqual(ignored.float_pool.length, 0);
-  assert.strictEqual(ignored.ranked.length, 0, 'float_pool rows are not promoted into ranked');
-  assert.strictEqual(ignored.rest.length, 0);
+  const poolOnly = sandbox.remiFloatHide1Split(ONLY_POOL);
+  assert.strictEqual(poolOnly.hide_float_ui, true);
+  assert.strictEqual(poolOnly.float_pool.length, 0);
+  assert.strictEqual(poolOnly.ranked.length, 1, 'same-day yes float_pool row is promoted when ranked is empty');
+  assert.strictEqual(poolOnly.ranked[0].name, 'PoolYes');
+  assert.strictEqual(poolOnly.ranked[0].is_float, false);
+  assert.strictEqual(poolOnly.rest.length, 0);
+  assert.strictEqual(ONLY_POOL.float_pool[0].is_float, true, 'promotion does not mutate the payload');
+
+  const mixed = sandbox.remiFloatHide1Split(REST_MIXED);
+  assert.strictEqual(mixed.hide_float_ui, true);
+  assert.strictEqual(mixed.float_pool.length, 0);
+  assert.strictEqual(mixed.ranked.map(function(row){return row.name;}).join('|'), 'Devon|Lina|Sara|PoolYes');
+  assert.strictEqual(mixed.rest.map(function(row){return row.name;}).join('|'), 'Jamal|Aisha|PoolZero');
+  assert.ok(mixed.ranked.concat(mixed.rest).every(function(row){return row.is_float === false;}));
 
   sandbox.remiFloat1Rank = RANK;
   sandbox.remiFloat1ShiftId = SHIFT;
@@ -187,7 +228,38 @@ function runSlice(){
 
   sandbox.remiFloat1Rank = ONLY_POOL;
   sandbox.remiFloat1ShiftId = SHIFT;
-  assert.strictEqual(sandbox.remiFloat1FloatHtml(), '', 'a float_pool-only payload paints no confirm card');
+  const poolCard = sandbox.remiFloat1FloatHtml();
+  const poolTitles = titles(poolCard);
+  assert.ok(poolTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, poolCard);
+  assert.ok(poolTitles.labels.indexOf('Rest of list') < 0, 'ranked-only is ok when every aide is ranked-eligible');
+  assert.ok(poolCard.indexOf('Float pool') < 0, poolCard);
+  assert.ok(poolCard.indexOf('PoolYes') >= 0, poolCard);
+
+  sandbox.remiFloat1Rank = REST_MIXED;
+  const mixedCard = sandbox.remiFloat1FloatHtml();
+  const mixedTitles = titles(mixedCard);
+  assert.ok(mixedTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, 'same-day yes aides must paint a Ranked section');
+  assert.ok(mixedTitles.labels.indexOf('Rest of list') >= 0, mixedCard);
+  assert.ok(!(mixedTitles.labels.length === 1 && mixedTitles.labels[0] === 'Rest of list'), mixedCard);
+  assert.ok(mixedCard.indexOf('Float pool') < 0, mixedCard);
+  assert.ok(mixedCard.indexOf('Devon') >= 0 && mixedCard.indexOf('Jamal') >= 0, mixedCard);
+  assert.ok(mixedCard.indexOf('Ranked \u00b7 same-day yes / 30d') < mixedCard.indexOf('Devon'), 'Devon paints under the Ranked title');
+  assert.ok(mixedCard.indexOf('Devon') < mixedCard.indexOf('Rest of list'), 'same-day yes aides are not left in Rest');
+  assert.ok(mixedCard.indexOf('Rest of list') < mixedCard.indexOf('Jamal'), mixedCard);
+
+  sandbox.remiFloat1Rank = ALL_REST;
+  const restOnly = sandbox.remiFloat1FloatHtml();
+  const restTitles = titles(restOnly);
+  assert.ok(restTitles.labels.indexOf('Rest of list') >= 0, restOnly);
+  assert.ok(restTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') < 0, 'rest-only is ok when nobody has a same-day yes');
+  assert.ok(restOnly.indexOf('Float pool') < 0, restOnly);
+
+  sandbox.remiFloat1Rank = ALL_YES;
+  const yesOnly = sandbox.remiFloat1FloatHtml();
+  const yesTitles = titles(yesOnly);
+  assert.ok(yesTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, yesOnly);
+  assert.ok(yesTitles.labels.indexOf('Rest of list') < 0, yesOnly);
+  assert.ok(yesOnly.indexOf('Float pool') < 0, yesOnly);
   sandbox.remiFloat1Rank = RANK;
 
   const legacy = '<span class="remi-fn-chip">Float pool</span><div class="remi-fn-label">Float pool</div><span class="remi-fn-tag">Float</span><button>Blast float pool</button><p>Ranked aides \u2014 no separate Float pool block. Float pool UI removed from Remi.</p><div class="remi-fn-gone">No \u201cFloat pool\u201d chip</div>';
