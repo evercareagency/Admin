@@ -37,6 +37,23 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-list-az1">
 
 assert.ok(html.includes('id="tab_aides"') && html.includes('data-list-az-sticky1="v=list-az-sticky1"'), 'aides tab marker');
 assert.ok(html.includes('id="tab_clients"') && html.includes('data-list-az-sticky1="v=list-az-sticky1"'), 'clients tab marker');
+assert.ok(html.includes('FIX A3'), 'FIX A3 notes the shared chip');
+
+const aidesHdr = html.slice(html.indexOf('id="tab_aides"'), html.indexOf('id="aideDesk"'));
+assert.ok(aidesHdr.includes('id="aidesAzChip"'), 'Aides header has the A–Z chip');
+assert.ok(aidesHdr.includes('class="sched-az-chip list-az-chip"'), 'Aides chip uses the shared tiny class');
+assert.ok(aidesHdr.includes('onclick="listAz1Toggle(event)"'), 'Aides chip calls listAz1Toggle');
+assert.ok(aidesHdr.includes('aria-pressed='), 'Aides chip reflects pressed state');
+assert.ok(aidesHdr.includes('data-list-az1="v=list-az1"'), 'Aides chip shares the list-az1 preference');
+assert.ok(aidesHdr.includes('id="aideCredManageBtn"') && aidesHdr.includes('onclick="aideCredToggleManage()"'), 'Manage stays the credentials control');
+assert.ok(!aidesHdr.slice(aidesHdr.indexOf('id="aideCredManageBtn"'), aidesHdr.indexOf('id="aideCredManageBtn"') + 180).includes('listAz1Toggle'), 'Manage does not toggle list order');
+
+const clientsHdr = html.slice(html.indexOf('id="tab_clients"'), html.indexOf('id="clientSearch"'));
+assert.ok(clientsHdr.includes('id="clientsAzChip"'), 'Clients header has the A–Z chip');
+assert.ok(clientsHdr.includes('class="sched-az-chip list-az-chip"'), 'Clients chip uses the shared tiny class');
+assert.ok(clientsHdr.includes('onclick="listAz1Toggle(event)"'), 'Clients chip calls listAz1Toggle');
+assert.ok(clientsHdr.includes('aria-pressed='), 'Clients chip reflects pressed state');
+assert.ok(html.includes('#tab_aides .page-hdr .list-az-chip') && html.includes('height:16px;min-height:16px;max-height:16px'), 'desk chip stays 16px, not a fat pill');
 assert.ok(html.includes('#tab_aides .az-rail') && html.includes('#tab_clients .az-rail'), 'rail css on both desks');
 assert.ok(html.includes('.az-rail button.on') && html.includes('background:var(--teal)'), 'active letter is teal');
 assert.ok(html.includes('padding:0 32px 16px 0'), 'scroll pad clears the rail');
@@ -51,6 +68,12 @@ const clients = html.slice(html.indexOf('function paintClients'), html.indexOf('
 assert.ok(clients.includes('listAzSticky1StageHtml'), 'clients mount the rail');
 assert.ok(clients.includes('clientCards.join'), 'usual clients paint stays a card list');
 assert.ok(clients.includes("typeof listAzSticky1On==='function'&&listAzSticky1On()"), 'clients rail follows A–Z preference');
+const clientsGate = clients.indexOf("typeof listAzSticky1On==='function'&&listAzSticky1On()");
+const clientsStageCall = clients.indexOf('listAzSticky1StageHtml');
+const clientsUsualJoin = clients.indexOf('container.innerHTML=clientCards.join');
+assert.ok(clientsGate >= 0 && clientsStageCall > clientsGate, 'Clients stage html is inside the A–Z gate');
+assert.ok(clientsUsualJoin > clientsStageCall, 'usual Clients paint joins cards after the gate returns');
+assert.ok(!clients.slice(clientsUsualJoin).includes('listAzSticky1StageHtml'), 'usual Clients never mounts listAzSticky1StageHtml');
 
 const start = html.indexOf('// list az sticky rail v=list-az-sticky1');
 const end = html.indexOf('// end list az sticky rail v=list-az-sticky1');
@@ -107,8 +130,25 @@ assert.ok(stage.includes('Nina Okonkwo'), 'later letter stays');
 assert.strictEqual((stage.match(/class="az-sec"/g) || []).length, 2, 'one section per letter');
 assert.ok(!sandbox.listAzSticky1StageHtml([]), 'empty list has no rail');
 
+const chips = {};
+sandbox.document.getElementById = function(id){
+  if(!chips[id]) chips[id] = { attrs: {} };
+  return { setAttribute: function(k, v){ chips[id].attrs[k] = v; } };
+};
+sandbox.listAz1Write('az');
+sandbox.listAzSticky1SyncChips();
+assert.strictEqual(chips.aidesAzChip.attrs['aria-pressed'], 'true', 'Aides chip pressed follows listAz1On');
+assert.strictEqual(chips.clientsAzChip.attrs['aria-pressed'], 'true', 'Clients chip pressed follows listAz1On');
+sandbox.listAz1Write('usual');
+sandbox.listAzSticky1SyncChips();
+assert.strictEqual(chips.aidesAzChip.attrs['aria-pressed'], 'false');
+assert.strictEqual(chips.clientsAzChip.attrs['aria-pressed'], 'false');
+assert.strictEqual(sandbox.listAzSticky1On(), false, 'usual still hides the rail');
+
 const headFn = html.slice(html.indexOf('function schedClientHeadHtml'), html.indexOf('function schedPaint()'));
 assert.ok(headFn.includes('class="sched-az-chip"'), 'schedule chip placement unchanged');
 assert.ok(!headFn.includes('az-rail'), 'schedule header does not grow a rail');
+assert.ok(html.includes('listAzSticky1SyncChips'), 'repaint syncs the desk chips');
+assert.ok(html.includes("querySelector('.aide-info-card, .aide-row-card, .az-stage, .az-rail')"), 'Aides repaint drops or remounts the rail');
 
 console.log('admin-list-az-sticky1-test ok');

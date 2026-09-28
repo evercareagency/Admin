@@ -12,7 +12,7 @@
 <!-- punch leftovers 2026-09-28 v=punch-leftovers1 ?v=punch-leftovers1 admin-build 2026-09-28-punch-leftovers1. GHOST-PUNCH-LEFTOVERS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone shell, max-width 430px including a typical 390 CSS px phone: the sticky EverCare header was covering the Clients subtitle and the More heading. Desk titles stick just below that teal bar with a clear gap, so Clients, More, Timesheets, Schedule, Aides, and the other desks keep the title and subtitle fully visible. The header look is unchanged. Schedule cold load, refresh, and entry into Schedule land on the week calendar only. The day drawer and Edit shift stay closed until a day is tapped, Add shift is opened, or an explicit deep link names that day. No client or shift is pre-selected, and a leftover QaHold row is not auto-opened. Ace deletes leftover QaHold test rows. This tip does not delete database rows. More desks stick. Opening Inservices, Coverage, Nurse, or any other desk from More writes that desk into the hash and leaves it open, on desktop and on a phone. Role apply does not send an allowed desk back to Timesheets or the default first tab after paint, and an empty hash does not reset the open desk. A reload or a hash of that desk opens it again. A role-forbidden desk such as Payroll for Scheduler still returns to Timesheets. Sandata Reminder and Call off empty Submit stay in the other repo. Out of scope: Nurse bottom nav overlap, Remi fullscreen rail, Clients edit/delete wrap, Remi chip over the dock. Prior markers stay, including v=remi-payroll-ins1, v=remi-float-hide1b, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-28-punch-leftovers1">
 <script>var PUNCH_LEFTOVERS1_MARKER='v=punch-leftovers1';var PUNCH_LEFTOVERS1_BUILD='2026-09-28-punch-leftovers1';</script>
-<!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
+<!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. FIX A3: the same tiny compact A–Z chip (class sched-az-chip list-az-chip) also sits beside the Aides and Clients titles and calls listAz1Toggle against the same evercare_list_order preference. It is not a fat pill and not a second key. Manage stays the credentials control. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-28-list-az-sticky1">
 <script>var LIST_AZ_STICKY1_MARKER='v=list-az-sticky1';var LIST_AZ_STICKY1_BUILD='2026-09-28-list-az-sticky1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -316,6 +316,8 @@ textarea{resize:vertical;min-height:80px;}
 .sched-client-label{vertical-align:middle;}
 .sched-az-chip{display:inline-flex;align-items:center;justify-content:center;margin:0 0 0 6px;padding:0 5px;height:16px;min-width:0;border-radius:4px;border:1px solid rgba(255,255,255,.78);background:rgba(0,0,0,.22);color:#fff;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:0;line-height:1;vertical-align:middle;cursor:pointer;box-shadow:none;-webkit-appearance:none;appearance:none;}
 .sched-az-chip[aria-pressed="true"]{background:rgba(255,255,255,.2);border-color:#fff;}
+#tab_aides .page-hdr .list-az-chip,#tab_clients .page-hdr .list-az-chip{height:16px;min-height:16px;max-height:16px;margin:0 0 2px 8px;padding:0 5px;border-radius:4px;border:1px solid var(--teal);background:#fff;color:var(--navy);font-size:10px;font-weight:700;line-height:1;vertical-align:middle;box-shadow:none;}
+#tab_aides .page-hdr .list-az-chip[aria-pressed="true"],#tab_clients .page-hdr .list-az-chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;}
 .sched-grid td.sched-name{z-index:1;background:#fff;font-weight:600;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;}
 .sched-grid tr.is-jump td.sched-name{background:#e8f4f4;}
 .sched-grid td.sched-slot{min-width:7.6rem;padding:4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
@@ -2834,7 +2836,7 @@ bindLoginKeyboard();
 
       <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1">
         <div class="page-hdr">
-          <div><h1>Aides</h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
+          <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
             <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()">Manage</button>
             <button class="btn btn-ghost" onclick="renderAides(true)">🔄 Refresh</button>
@@ -2913,7 +2915,7 @@ bindLoginKeyboard();
       <!-- CLIENTS TAB -->
       <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1">
         <div class="page-hdr">
-          <div><h1>Clients</h1><p>Manage client addresses and assign aides for location verification</p></div>
+          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p>Manage client addresses and assign aides for location verification</p></div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
@@ -5234,6 +5236,7 @@ function listAz1Read(){
 function listAz1Write(mode){
   mode=mode==='az'?'az':'usual';
   try{localStorage.setItem(listAz1StorageKey(), JSON.stringify({v:1, mode:mode}));}catch(e){}
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(e2){}
   return mode;
 }
 function listAz1On(){
@@ -5416,8 +5419,9 @@ function listAz1Repaint(){
   try{if(typeof aidechatPaintInbox==='function'&&typeof aidechatThreads!=='undefined')aidechatPaintInbox();}catch(e6){}
   try{
     var aidesBox=document.getElementById('aidesContainer');
-    if(aidesBox&&aidesBox.querySelector&&aidesBox.querySelector('.aide-info-card, .aide-row-card')&&typeof renderAides==='function')renderAides(false);
+    if(aidesBox&&aidesBox.querySelector&&aidesBox.querySelector('.aide-info-card, .aide-row-card, .az-stage, .az-rail')&&typeof renderAides==='function')renderAides(false);
   }catch(e7){}
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(e8){}
 }
 function listAz1Toggle(ev){
   if(ev&&ev.preventDefault)ev.preventDefault();
@@ -5701,7 +5705,24 @@ function listAzSticky1NoteQuery(){
   }catch(e2){}
   return on;
 }
+function listAzSticky1SyncChips(){
+  var on=false;
+  var pressed='false';
+  var ids=['aidesAzChip','clientsAzChip','schedAzChip'];
+  var i;
+  var el;
+  try{on=typeof listAz1On==='function'&&!!listAz1On();}catch(e){on=false;}
+  pressed=on?'true':'false';
+  if(typeof document==='undefined'||!document.getElementById)return;
+  for(i=0;i<ids.length;i++){
+    try{
+      el=document.getElementById(ids[i]);
+      if(el&&el.setAttribute)el.setAttribute('aria-pressed', pressed);
+    }catch(e2){}
+  }
+}
 try{listAzSticky1NoteQuery();}catch(e){}
+try{listAzSticky1SyncChips();}catch(eChips){}
 // end list az sticky rail v=list-az-sticky1
 function navEditRead(){
   var raw=null;
@@ -6116,6 +6137,7 @@ function showTab(tab){
   var primaryNav=document.getElementById('nav_'+primary);
   if(primaryNav)primaryNav.classList.add('active');
   if(tab==='aides')renderAides();
+  if(tab==='aides'||tab==='clients'){try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eAzChip){}}
   if(tab==='backups')renderBackupRequests();
   if(tab==='broadcast')renderBroadcastPreview();
   if(tab==='clients')renderClients();
@@ -30453,6 +30475,7 @@ async function aidesInfo1TryPaint(container, force){
     try{loadedAidesList=users.filter(function(u){return u.username;});}catch(e){}
     try{if(typeof allAidesForAssign!=='undefined')allAidesForAssign=loadedAidesList.slice();}catch(e2){}
   }
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!users.length){
     container.innerHTML=typeof aideEmptyHtml==='function'?aideEmptyHtml():'';
   }else if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
@@ -34525,6 +34548,7 @@ async function renderClients(force){
 
 function paintClients(){
   const container=document.getElementById('clientsContainer');
+  try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!container)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
   let list=allClients;
