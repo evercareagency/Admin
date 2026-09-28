@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
+<!-- compliance bulk 2026-09-27 v=compliance-bulk1 admin-build 2026-09-27-compliance-bulk1. GHOST-COMPLIANCE-BULK1-CONTRACT-v1. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi N/A. Compliance Dashboard search filters by aide name, case-insensitive. An empty search shows the full roster (every active aide × every catalog topic). Select all and Unselect all ship as a pair and both stay visible when the selection is empty or full. Select all checks every visible deletable row. Unselect all clears the selection and leaves search and Select Topic alone. Delete selected confirms once, then calls the same admin_unassign_inservice_aide path as the row Delete (isdel1) with p_archive_active_result true for Completed and false for assigned Not Completed, then refreshes once. Rows that only have Send Reminder are not deletable: the checkbox is disabled and the count can say N selected · M skipped (not deletable). Send Reminder stays per row. Select Topic, Assign, and Clear Assignment stay as they are. Phone cards first; the desk table keeps the same toolbar. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=isdel1, v=isclear1, v=isdash1, and v=isdash1b. -->
+<meta name="admin-build" content="2026-09-27-compliance-bulk1">
 <!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. A leftover On hold from another client, another day, or a cold open with no On hold pick is unselected when the opened day has no active client_on_hold, no hold_banner, and no active hold. That open clears Start, End, and Note hold drafts so Save cannot co-fire them. Save week still does not post upsert_schedule_client_hold or a day mark p_mark on_hold unless the user explicitly selected On hold and then used Save hold. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. Ace assert3 is LIVE. When the user confirms End hold…, the desk posts clear_schedule_client_hold with p_client_id and p_end_date and omits p_hold_id, so Ace ends every active hold for that client, including a 10/03 open leftover. Clear posts clear_schedule_client_hold with p_client_id only and omits p_hold_id and p_end_date, so Ace soft-clears every active hold for that client. The On hold End and Clear buttons do not send hold_banner.hold_id. Save hold may still pass p_hold_id. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-27-hold-autosave1">
 <!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1b: the left Aide Office name list is a fixed-height column with its own scrollbar (overflow-y: auto). A long roster does not stretch the Messages page. The thread panel and Schedule a Remi message stay fixed in view and do not scroll away with the roster. Option 2 one-box scroll stays: the message box scrolls and Schedule a Remi stays pinned in the thread panel. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
@@ -1922,6 +1924,36 @@ body.ts-print-open{overflow:hidden;}
 .is-compliance-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 .is-compliance-actions .btn{min-height:44px;}
 .is-compliance-score{font-weight:700;color:var(--navy);white-space:nowrap;}
+/* v=compliance-bulk1 — phone cards first; desk table from 900px. Select all stays beside Unselect all. */
+.is-bulk-toolbar{display:flex;flex-direction:column;gap:8px;margin:0 0 12px;}
+.is-bulk-search{width:100%;min-height:44px;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);background:#fff;}
+.is-bulk-search:focus{outline:none;border-color:var(--teal);}
+.is-bulk-pair{display:flex;gap:6px;align-items:center;}
+.is-bulk-pair-label{display:none;}
+.is-bulk-pair .btn{flex:1;min-height:44px;justify-content:center;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-weight:700;}
+.is-bulk-delete{width:100%;min-height:44px;justify-content:center;background:#fff;color:var(--danger);border:1.5px solid #f5c6c0;font-weight:700;}
+.is-bulk-delete:disabled{opacity:.45;cursor:not-allowed;}
+.is-bulk-count{font-size:0.78rem;font-weight:700;color:var(--navy);}
+#isComplianceCards{display:flex;flex-direction:column;gap:8px;}
+.is-compliance-card{border:1px solid var(--border);border-radius:12px;padding:10px;display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;background:#fff;}
+.is-compliance-card .is-compliance-cb{width:18px;height:18px;margin-top:2px;accent-color:var(--teal);}
+.is-compliance-card .nm{font-weight:700;font-size:0.95rem;color:var(--navy);}
+.is-compliance-card .meta{font-size:0.75rem;color:var(--muted);margin-top:2px;line-height:1.35;}
+.is-compliance-card .acts{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.is-compliance-none{margin:0;padding:12px;color:var(--muted);font-size:0.82rem;text-align:center;}
+#isComplianceTable .is-compliance-cb{width:18px;height:18px;accent-color:var(--teal);}
+#isComplianceScroll.is-bulk-desk{display:none;}
+@media(min-width:900px){
+  .is-bulk-toolbar{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;}
+  .is-bulk-search{flex:1 1 180px;max-width:280px;width:auto;font-size:14px;}
+  .is-bulk-pair{flex:0 0 auto;}
+  .is-bulk-pair .btn{flex:0 0 auto;min-height:36px;}
+  .is-bulk-pair-label{display:inline;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-right:2px;}
+  .is-bulk-delete{width:auto;min-height:36px;}
+  .is-bulk-count{margin-left:auto;}
+  #isComplianceScroll.is-bulk-desk{display:block;}
+  #isComplianceCards{display:none;}
+}
 .is-results-modal{max-width:720px;max-height:min(92vh,920px);display:flex;flex-direction:column;overflow:hidden;padding-bottom:12px;}
 .is-results-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;flex-shrink:0;}
 .is-results-head h3{margin:0;padding-right:8px;}
@@ -3016,15 +3048,26 @@ bindLoginKeyboard();
         </div>
 
         <!-- COMPLIANCE DASHBOARD -->
-        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b">
+        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b" data-compliance-bulk1="v=compliance-bulk1">
           <div class="card-title"><span class="ico">&#9989;</span> Compliance Dashboard</div>
-          <p class="is-compliance-note">Every aide and every topic. Completed if there is a result, otherwise Not Completed. Delete works only when that topic is assigned to the aide, or the row is Completed. Select Topic only chooses what Assign and Clear apply to.</p>
-          <div id="isComplianceScroll" style="overflow-x:auto">
+          <p class="is-compliance-note">Every aide and every topic. Search filters by aide name. An empty search shows the full roster. Select all and Unselect all stay together. Delete selected only removes rows that already allow Delete (assigned or Completed). Send Reminder stays on each row. Completed if there is a result, otherwise Not Completed. Select Topic only chooses what Assign and Clear apply to.</p>
+          <div class="is-bulk-toolbar">
+            <input class="is-bulk-search" id="isComplianceSearch" type="search" placeholder="Search aide by name…" aria-label="Search aide by name" autocomplete="off" oninput="onISComplianceSearch()">
+            <span class="is-bulk-pair" role="group" aria-label="Selection">
+              <span class="is-bulk-pair-label">Selection</span>
+              <button type="button" class="btn btn-sm" id="isComplianceSelectAll" onclick="isComplianceSelectAll()">Select all</button>
+              <button type="button" class="btn btn-sm" id="isComplianceUnselectAll" onclick="isComplianceUnselectAll()">Unselect all</button>
+            </span>
+            <button type="button" class="btn btn-sm is-bulk-delete" id="isComplianceDeleteSelected" onclick="confirmDeleteISSelected()" disabled>Delete selected</button>
+            <span class="is-bulk-count" id="isComplianceSelCount">0 selected</span>
+          </div>
+          <div id="isComplianceScroll" class="is-bulk-desk" style="overflow-x:auto">
             <table class="data-table" id="isComplianceTable">
-              <thead><tr><th>Aide Name</th><th>Topic</th><th>Status</th><th>Completed</th><th>Score</th><th>Actions</th></tr></thead>
+              <thead><tr><th style="width:36px"></th><th>Aide Name</th><th>Topic</th><th>Status</th><th>Completed</th><th>Score</th><th>Actions</th></tr></thead>
               <tbody id="isComplianceBody"></tbody>
             </table>
           </div>
+          <div id="isComplianceCards" aria-label="Compliance cards"></div>
           <div id="isComplianceEmpty" class="empty-state" style="display:none"><p>&#128235; No inservice data yet. Assign a topic to get started.</p></div>
         </div>
       </div>
@@ -31449,10 +31492,14 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 // ─── INSERVICE ADMIN ────────────────────────────────────
 var ISDASH1_MARKER='v=isdash1';
 var ISDASH1B_MARKER='v=isdash1b';
+var COMPLIANCE_BULK1_MARKER='v=compliance-bulk1';
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
 let isAssignTopicTouched=false;
 let isComplianceRows=[];
+let isComplianceSelected=new Set();
+let isComplianceBulkBusy=false;
+let isComplianceDeleteQuiet=false;
 let isResultsState={rowIndex:-1,row:null,questions:[],editing:false};
 let isResultDetailById={};
 
@@ -31984,40 +32031,217 @@ function isAideOnCurrentISAssignment(assignView, username){
   }
   return false;
 }
-function renderISComplianceTable(rows){
-  const tbody=document.getElementById('isComplianceBody');
-  const empty=document.getElementById('isComplianceEmpty');
-  isComplianceRows=(rows||[]).map(mergeCachedISResultRow);
-  if(!tbody)return;
-  if(!isComplianceRows.length){
+function isComplianceRowDeletable(row){
+  if(!row)return false;
+  if(row.isCompleted)return true;
+  return row.inAssignmentScope===true;
+}
+function isComplianceSearchQuery(){
+  var el=document.getElementById('isComplianceSearch');
+  return el?String(el.value||'').trim().toLowerCase():'';
+}
+function isComplianceRowMatchesSearch(row){
+  var q=isComplianceSearchQuery();
+  if(!q)return true;
+  var name=String((row&&row.empName)||'').toLowerCase();
+  var user=String((row&&row.username)||'').toLowerCase();
+  return name.indexOf(q)>=0||user.indexOf(q)>=0;
+}
+function isComplianceSelectionSet(){
+  if(typeof isComplianceSelected==='undefined'||!isComplianceSelected||typeof isComplianceSelected.add!=='function'){
+    isComplianceSelected=new Set();
+  }
+  return isComplianceSelected;
+}
+function isCompliancePruneSelection(){
+  var live={};
+  (isComplianceRows||[]).forEach(function(row){
+    if(!isComplianceRowDeletable(row))return;
+    live[isCompliancePairKey(row.username, row.topicId)]=1;
+  });
+  var set=isComplianceSelectionSet();
+  Array.from(set).forEach(function(key){
+    if(!live[key])set.delete(key);
+  });
+}
+function isComplianceSelectedCount(){
+  isCompliancePruneSelection();
+  return isComplianceSelectionSet().size;
+}
+function isComplianceSkippedCount(visible){
+  var n=0;
+  (visible||[]).forEach(function(item){
+    if(!isComplianceRowDeletable(item.row))n++;
+  });
+  return n;
+}
+function isComplianceCountLabel(selected, skipped){
+  if(!selected)return '0 selected';
+  if(skipped>0)return selected+' selected · '+skipped+' skipped (not deletable)';
+  return selected+' selected';
+}
+function isCompliancePaintCount(selected, skipped){
+  var count=document.getElementById('isComplianceSelCount');
+  if(count)count.textContent=isComplianceCountLabel(selected, skipped);
+  var del=document.getElementById('isComplianceDeleteSelected');
+  if(del)del.disabled=!selected||isComplianceBulkBusy===true;
+}
+function isComplianceCheckHtml(row, i){
+  var name=row.empName||row.username||'aide';
+  if(!isComplianceRowDeletable(row)){
+    return '<input type="checkbox" class="is-compliance-cb" disabled title="Not assigned — nothing to remove" aria-label="'+escapeAttr(name)+' not deletable">';
+  }
+  var key=isCompliancePairKey(row.username, row.topicId);
+  var checked=isComplianceSelectionSet().has(key)?' checked':'';
+  return '<input type="checkbox" class="is-compliance-cb"'+checked+' aria-label="Select '+escapeAttr(name)+'" onchange="onISComplianceToggle('+i+',this.checked)">';
+}
+function isComplianceCardMeta(row){
+  var topic=row.topicShort||row.topicTitle||'';
+  if(!row.isCompleted)return topic;
+  var bits=[topic];
+  var completion=row;
+  var score=formatISScoreColumn(row);
+  var date=formatISCompletedDate(formatCertDate(certDateFromRecord(completion)));
+  if(score&&score!=='—')bits.push(score);
+  if(date&&date!=='—')bits.push(date);
+  return bits.join(' · ');
+}
+function isComplianceRowHtml(row, i){
+  var completion=row;
+  var name=escapeHtml(row.empName||row.username||'');
+  var topic=escapeHtml(row.topicShort||row.topicTitle||'');
+  var acts=row.isCompleted?isCompletedActionsHtml(i):isPendingActionsHtml(i);
+  var status=row.isCompleted
+    ?'<span class="badge badge-ok">✅ Completed</span>'
+    :'<span class="badge badge-fix">❌ Not Completed</span>';
+  var done=row.isCompleted?escapeHtml(formatISCompletedDate(formatCertDate(certDateFromRecord(completion)))):'—';
+  var score=row.isCompleted?escapeHtml(formatISScoreColumn(row)):'—';
+  return '<tr>'
+    +'<td>'+isComplianceCheckHtml(row, i)+'</td>'
+    +'<td><strong>'+name+'</strong></td>'
+    +'<td style="font-size:0.78rem">'+topic+'</td>'
+    +'<td>'+status+'</td>'
+    +'<td style="font-size:0.75rem">'+done+'</td>'
+    +'<td class="is-compliance-score">'+score+'</td>'
+    +'<td>'+acts+'</td>'
+    +'</tr>';
+}
+function isComplianceCardHtml(row, i){
+  var name=escapeHtml(row.empName||row.username||'');
+  var acts=row.isCompleted?isCompletedActionsHtml(i):isPendingActionsHtml(i);
+  var badge=row.isCompleted
+    ?'<span class="badge badge-ok">Completed</span>'
+    :'<span class="badge badge-fix">Not Completed</span>';
+  return '<article class="is-compliance-card">'
+    +isComplianceCheckHtml(row, i)
+    +'<div><div class="nm">'+name+'</div>'
+    +'<div class="meta">'+escapeHtml(isComplianceCardMeta(row))+'</div>'
+    +badge
+    +'<div class="acts">'+acts+'</div></div>'
+    +'</article>';
+}
+function isComplianceVisibleItems(){
+  var items=[];
+  (isComplianceRows||[]).forEach(function(row, i){
+    if(isComplianceRowMatchesSearch(row))items.push({row:row, i:i});
+  });
+  return items;
+}
+function paintISComplianceBoard(){
+  var tbody=document.getElementById('isComplianceBody');
+  var empty=document.getElementById('isComplianceEmpty');
+  var cards=document.getElementById('isComplianceCards');
+  if(!isComplianceRows||!isComplianceRows.length){
     if(empty)empty.style.display='block';
-    tbody.innerHTML='';
+    if(tbody)tbody.innerHTML='';
+    if(cards)cards.innerHTML='';
+    isCompliancePaintCount(0, 0);
     return;
   }
   if(empty)empty.style.display='none';
-  tbody.innerHTML=isComplianceRows.map(function(row,i){
-    const completion=row;
-    const name=escapeHtml(row.empName||row.username||'');
-    const topic=escapeHtml(row.topicShort||row.topicTitle||'');
-    if(row.isCompleted){
-      return '<tr>'
-        +'<td><strong>'+name+'</strong></td>'
-        +'<td style="font-size:0.78rem">'+topic+'</td>'
-        +'<td><span class="badge badge-ok">✅ Completed</span></td>'
-        +'<td style="font-size:0.75rem">'+escapeHtml(formatISCompletedDate(formatCertDate(certDateFromRecord(completion))))+'</td>'
-        +'<td class="is-compliance-score">'+escapeHtml(formatISScoreColumn(row))+'</td>'
-        +'<td>'+isCompletedActionsHtml(i)+'</td>'
-        +'</tr>';
+  var visible=isComplianceVisibleItems();
+  var skipped=isComplianceSkippedCount(visible);
+  if(!visible.length){
+    var none='<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--muted)">No aides match that search.</td></tr>';
+    if(tbody)tbody.innerHTML=none;
+    if(cards)cards.innerHTML='<p class="is-compliance-none">No aides match that search.</p>';
+    isCompliancePaintCount(isComplianceSelectedCount(), skipped);
+    return;
+  }
+  if(tbody)tbody.innerHTML=visible.map(function(item){return isComplianceRowHtml(item.row, item.i);}).join('');
+  if(cards)cards.innerHTML=visible.map(function(item){return isComplianceCardHtml(item.row, item.i);}).join('');
+  isCompliancePaintCount(isComplianceSelectedCount(), skipped);
+}
+function renderISComplianceTable(rows){
+  const tbody=document.getElementById('isComplianceBody');
+  isComplianceRows=(rows||[]).map(mergeCachedISResultRow);
+  if(!tbody)return;
+  paintISComplianceBoard();
+}
+function onISComplianceSearch(){
+  paintISComplianceBoard();
+}
+function onISComplianceToggle(index, checked){
+  var row=isComplianceRows[index];
+  if(!row||!isComplianceRowDeletable(row))return;
+  var key=isCompliancePairKey(row.username, row.topicId);
+  var set=isComplianceSelectionSet();
+  if(checked)set.add(key);
+  else set.delete(key);
+  paintISComplianceBoard();
+}
+function isComplianceSelectAll(){
+  isComplianceVisibleItems().forEach(function(item){
+    if(!isComplianceRowDeletable(item.row))return;
+    isComplianceSelectionSet().add(isCompliancePairKey(item.row.username, item.row.topicId));
+  });
+  paintISComplianceBoard();
+}
+function isComplianceUnselectAll(){
+  isComplianceSelectionSet().clear();
+  paintISComplianceBoard();
+}
+function isComplianceDeleteJobs(){
+  var jobs=[];
+  (isComplianceRows||[]).forEach(function(row, i){
+    if(!isComplianceRowDeletable(row))return;
+    var key=isCompliancePairKey(row.username, row.topicId);
+    if(!isComplianceSelectionSet().has(key))return;
+    jobs.push({i:i, archive:row.isCompleted===true, key:key});
+  });
+  return jobs;
+}
+function confirmDeleteISSelected(){
+  if(isComplianceBulkBusy)return;
+  if(!isComplianceDeleteJobs().length)return;
+  showSharedConfirm('Are you sure?', function(){return deleteISSelected();}, 'Yes, delete');
+}
+async function deleteISSelected(){
+  var jobs=isComplianceDeleteJobs().slice();
+  if(!jobs.length||isComplianceBulkBusy)return;
+  isComplianceBulkBusy=true;
+  isComplianceDeleteQuiet=true;
+  isCompliancePaintCount(jobs.length, 0);
+  var okN=0;
+  var failN=0;
+  try{
+    for(var n=0;n<jobs.length;n++){
+      var res=await commitISComplianceDelete(jobs[n].i, jobs[n].archive===true);
+      if(res&&res.ok)okN++;
+      else failN++;
     }
-    return '<tr>'
-      +'<td><strong>'+name+'</strong></td>'
-      +'<td style="font-size:0.78rem">'+topic+'</td>'
-      +'<td><span class="badge badge-fix">❌ Not Completed</span></td>'
-      +'<td style="font-size:0.75rem">—</td>'
-      +'<td class="is-compliance-score">—</td>'
-      +'<td>'+isPendingActionsHtml(i)+'</td>'
-      +'</tr>';
-  }).join('');
+  }finally{
+    isComplianceDeleteQuiet=false;
+    isComplianceBulkBusy=false;
+  }
+  isComplianceSelectionSet().clear();
+  if(okN){
+    cacheInvalidate('get_assigned_topic');
+    showTempMsg(okN===1?'Removed 1 selected row.':'Removed '+okN+' selected rows.','var(--success)');
+    await renderInservices(true);
+  }
+  if(failN)showTempMsg(failN+' could not be removed.','var(--danger)');
+  if(!okN)paintISComplianceBoard();
 }
 
 function isComplianceAssignmentViews(data){
@@ -32058,7 +32282,10 @@ async function loadISCompliance(force){
   const tbody=document.getElementById('isComplianceBody');
   const empty=document.getElementById('isComplianceEmpty');
   if(!tbody)return;
-  tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
+  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
+  var bulkCards=document.getElementById('isComplianceCards');
+  if(bulkCards)bulkCards.innerHTML='';
+  if(typeof isComplianceSelected!=='undefined'&&isComplianceSelected&&typeof isComplianceSelected.clear==='function')isComplianceSelected.clear();
 
   try{
     const [usersData, isData, assignData]=await Promise.all([
@@ -32071,7 +32298,7 @@ async function loadISCompliance(force){
       if(sbFail){
         if(empty)empty.style.display='none';
         isComplianceRows=[];
-        tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--danger)">'+escapeHtml(String(sbFail))+'</td></tr>';
+        tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--danger)">'+escapeHtml(String(sbFail))+'</td></tr>';
         return;
       }
     }
@@ -32096,7 +32323,7 @@ async function loadISCompliance(force){
     if(!rows.length){
       isComplianceRows=[];
       if(empty)empty.style.display='none';
-      tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--muted)">No aides on this desk yet. Completed results stay here after Clear Assignment.</td></tr>';
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--muted)">No aides on this desk yet. Completed results stay here after Clear Assignment.</td></tr>';
       return;
     }
     renderISComplianceTable(rows);
@@ -32178,38 +32405,44 @@ async function deleteISAssignment(rowIndex){
 }
 
 async function commitISComplianceDelete(rowIndex, archiveActiveResult){
+  const quiet=(typeof isComplianceDeleteQuiet!=='undefined'&&isComplianceDeleteQuiet===true);
   const row=isComplianceRows[rowIndex];
   if(!row){
-    showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
-    return;
+    if(!quiet)showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
+    return {ok:false};
   }
   const username=String(row.username||'').trim();
   const topicId=isComplianceDeleteTopicId(row);
   if(!username||!topicId){
-    showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
-    return;
+    if(!quiet)showTempMsg('Cannot delete — aide or topic missing.','var(--danger)');
+    return {ok:false};
   }
   const data=await sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult===true);
   if(!data||data.success===false){
-    showTempMsg(String((data&&(data.error||data.message))||'Could not remove this assignment.'),'var(--danger)');
-    return;
+    if(!quiet)showTempMsg(String((data&&(data.error||data.message))||'Could not remove this assignment.'),'var(--danger)');
+    return {ok:false};
   }
   const mode=String(data.mode||'');
   const removed=data.removed===true&&(mode==='was_selected'||mode==='was_all');
   if(removed){
     cacheInvalidate('get_assigned_topic');
-    showTempMsg(archiveActiveResult===true?'Removed from this topic. This result was archived.':'Removed from this topic. Completed results are kept.','var(--success)');
-    await renderInservices(true);
-    return;
+    if(!quiet){
+      showTempMsg(archiveActiveResult===true?'Removed from this topic. This result was archived.':'Removed from this topic. Completed results are kept.','var(--success)');
+      await renderInservices(true);
+    }
+    return {ok:true};
   }
   const archivedN=Number(data.archived_count);
   if(archiveActiveResult===true&&!isNaN(archivedN)&&archivedN>0){
     cacheInvalidate('get_assigned_topic');
-    showTempMsg('This result was archived.','var(--teal)');
-    await renderInservices(true);
-    return;
+    if(!quiet){
+      showTempMsg('This result was archived.','var(--teal)');
+      await renderInservices(true);
+    }
+    return {ok:true};
   }
-  showTempMsg('Not assigned — nothing to remove.','var(--danger)');
+  if(!quiet)showTempMsg('Not assigned — nothing to remove.','var(--danger)');
+  return {ok:false};
 }
 
 function buildLocalISQuestions(row){
