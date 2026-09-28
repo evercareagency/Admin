@@ -130,11 +130,24 @@ const PROBE_SHOT = {
   ranked: [],
   float_pool: [],
   hide_float_ui: true,
+  any_is_float: false,
+  float_count: 0,
   rest: [
     {rank: 1, aide_id: PROBE_A, name: 'CancelAide kcbipc', same_day_yes_30d: 0, is_float: true},
-    {rank: 2, aide_id: PROBE_B, name: 'Fh1Devon kd302d', same_day_yes_30d: 0, is_float: true},
+    {rank: 2, aide_id: PROBE_B, name: 'Fh1Devon kd302d', same_day_yes_30d: 0, is_float: false},
     {rank: 3, aide_id: PROBE_C, name: 'RestAide zero', same_day_yes_30d: 0, is_float: false}
   ]
+};
+const LIVE_REST = {
+  client_name: 'ProbeHold HC1kgaxcu',
+  hide_float_ui: true,
+  float_pool: [],
+  float_count: 0,
+  any_is_float: false,
+  ranked: [],
+  rest: [1, 2, 3, 4].map(function(n){
+    return {rank: n, aide_id: '44444444-4444-4444-8444-44444444447' + n, name: 'LiveRest ' + n, same_day_yes_30d: 0, is_float: false};
+  })
 };
 const PROBE_SHADOW = {
   client_name: 'ProbeHold HC1kgaxcu',
@@ -219,8 +232,9 @@ function runSlice(){
   const mixed = sandbox.remiFloatHide1Split(REST_MIXED);
   assert.strictEqual(mixed.hide_float_ui, true);
   assert.strictEqual(mixed.float_pool.length, 0);
-  assert.strictEqual(mixed.ranked.map(function(row){return row.name;}).join('|'), 'Devon|Lina|Sara|PoolYes|PoolZero');
-  assert.strictEqual(mixed.rest.map(function(row){return row.name;}).join('|'), 'Jamal|Aisha');
+  assert.strictEqual(mixed.ranked.map(function(row){return row.name;}).join('|'), 'Devon|Lina|Sara|PoolYes');
+  assert.strictEqual(mixed.rest.map(function(row){return row.name;}).join('|'), 'Jamal|Aisha|PoolZero');
+  assert.strictEqual(mixed.ranked.every(function(row){return row.is_float === false;}), true);
   assert.ok(mixed.ranked.concat(mixed.rest).every(function(row){return row.is_float === false;}));
 
   sandbox.remiFloat1Rank = RANK;
@@ -290,14 +304,26 @@ function runSlice(){
   sandbox.remiFloat1ShiftId = SHIFT;
   const probeCard = sandbox.remiFloat1FloatHtml();
   const probeTitles = titles(probeCard);
-  assert.ok(probeTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, 'probe rest-only list must still paint Ranked');
+  assert.strictEqual(probeTitles.chips.join('|'), 'Open shift');
   assert.ok(probeTitles.labels.indexOf('Rest of list') >= 0, probeCard);
-  assert.ok(!(probeTitles.labels.length === 1 && probeTitles.labels[0] === 'Rest of list'), probeCard);
+  assert.ok(probeTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') < 0, '0 same-day yes is Rest-only even if is_float was true');
   assert.ok(probeCard.indexOf('Float pool') < 0, probeCard);
-  assert.ok(probeCard.indexOf('Ranked \u00b7 same-day yes / 30d') < probeCard.indexOf('CancelAide kcbipc'), probeCard);
-  assert.ok(probeCard.indexOf('CancelAide kcbipc') < probeCard.indexOf('Rest of list'), probeCard);
-  assert.ok(probeCard.indexOf('Rest of list') < probeCard.indexOf('RestAide zero'), probeCard);
-  assert.ok(probeCard.indexOf('0 same-day yes') >= 0, probeCard);
+  assert.ok(probeCard.indexOf('remi-fn-tag') < 0, probeCard);
+  assert.ok(probeCard.indexOf('CancelAide kcbipc') >= 0, probeCard);
+
+  sandbox.remiFloat1Rank = LIVE_REST;
+  const liveCard = sandbox.remiFloat1FloatHtml();
+  const liveTitles = titles(liveCard);
+  const liveSplit = sandbox.remiFloatHide1Split(LIVE_REST);
+  assert.strictEqual(liveSplit.ranked.length, 0);
+  assert.strictEqual(liveSplit.rest.length, 4);
+  assert.strictEqual(liveSplit.float_pool.length, 0);
+  assert.strictEqual(liveSplit.hide_float_ui, true);
+  assert.ok(liveSplit.rest.every(function(row){return row.is_float === false;}));
+  assert.strictEqual(liveTitles.chips.join('|'), 'Open shift');
+  assert.ok(liveTitles.labels.indexOf('Rest of list') >= 0, liveCard);
+  assert.ok(liveTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') < 0, liveCard);
+  assert.ok(liveCard.indexOf('Float pool') < 0, liveCard);
 
   sandbox.remiFloat1Rank = PROBE_SHADOW;
   const shadowCard = sandbox.remiFloat1FloatHtml();
@@ -379,10 +405,32 @@ function runSlice(){
   const ranked = await sandbox.remiFloat1LoadRank(SHIFT);
   assert.strictEqual(ranked.ok, true);
   assert.strictEqual(rpc[0].name, 'admin_rank_float_pool_aides');
-  const blasted = await sandbox.remiFloat1ConfirmBlast();
+  const asked = await sandbox.remiFloat1ConfirmBlast();
+  assert.strictEqual(asked.gated, true);
+  assert.strictEqual(asked.sent, false);
+  assert.ok(!rpc.some(function(row){return row.name === 'admin_blast_cover_request';}), 'first blast tap does not call Ace');
+  const gateCard = sandbox.remiFloat1FloatHtml();
+  assert.ok(gateCard.indexOf('Confirm before this blast sends. Not yet writes nothing.') >= 0, gateCard);
+  assert.ok(gateCard.indexOf('data-remi-float-act="blast-go">Confirm<') >= 0, gateCard);
+  assert.ok(gateCard.indexOf('>Not yet<') >= 0, gateCard);
+  assert.ok(gateCard.indexOf('>Cancel<') >= 0, gateCard);
+  assert.ok(gateCard.indexOf('Edit list') >= 0, gateCard);
+  assert.ok(gateCard.indexOf('Float pool') < 0, gateCard);
+  assert.ok(gateCard.indexOf('>Confirm blast<') < 0, gateCard);
+  const held = sandbox.remiFloatHide1bGateCancel();
+  assert.strictEqual(held.cancelled, true);
+  assert.ok(!rpc.some(function(row){return row.name === 'admin_blast_cover_request';}), 'Not yet writes nothing');
+  const closed = sandbox.remiFloat1FloatHtml();
+  assert.ok(closed.indexOf('>Confirm blast<') >= 0, closed);
+  assert.ok(closed.indexOf('Confirm before this blast sends') < 0, closed);
+  const askedAgain = await sandbox.remiFloat1ConfirmBlast();
+  assert.strictEqual(askedAgain.gated, true);
+  assert.ok(!rpc.some(function(row){return row.name === 'admin_blast_cover_request';}));
+  const blasted = await sandbox.remiFloatHide1bGateConfirm();
   assert.strictEqual(blasted.ok, true);
   const blast = rpc.filter(function(row){return row.name === 'admin_blast_cover_request';}).pop();
-  assert.ok(blast, 'confirm blast uses admin_blast_cover_request');
+  assert.ok(blast, 'gate Confirm uses admin_blast_cover_request');
+  assert.strictEqual(rpc.filter(function(row){return row.name === 'admin_blast_cover_request';}).length, 1);
   assert.strictEqual(blast.body.p_address_mode, 'area');
   assert.ok(blast.body.p_aide_ids.indexOf(DEVON) >= 0);
   assert.ok(blast.body.p_aide_ids.indexOf(JAMAL) >= 0);

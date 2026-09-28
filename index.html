@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
-<!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] is empty, Ranked for paint is any row with same_day_yes_30d > 0 or is_float true, taken from rest, aides, and float_pool before is_float is cleared. A 0 same-day yes row that is still marked float paints under Ranked, not as a Float pool section. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false in paint. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
+<!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
@@ -37503,10 +37503,12 @@ async function loadNewClientIntakeDrafts(){
 // remi float hide1b v=remi-float-hide1b
 // MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only.
 // Coverage confirm chip and section titles are never Float pool.
-// When ranked[] is empty, Ranked is same-day yes (same_day_yes_30d > 0) or is_float rows
-// from rest, aides, and float_pool, read before is_float is cleared. Count 0 with is_float
-// still paints under Ranked. float_pool is never a chip or section. hide_float_ui true. is_float false on paint.
-// Confirm blast stays admin_blast_cover_request. No-show rescue cards stay.
+// Prefer Ace ranked[] + rest[] when ranked.length > 0.
+// When ranked[] is empty, promote same_day_yes_30d > 0 only. Do not use is_float.
+// Nobody with a same-day yes means Rest-only. float_pool is never a chip or section.
+// hide_float_ui true. is_float false on paint copies. Confirm blast asks first.
+// Confirm sends admin_blast_cover_request. Not yet and Cancel write nothing.
+var remiFloatHide1bGateOn=false;
 var REMI_FLOAT_HIDE1B_MARKER='v=remi-float-hide1b';
 function remiFloatHide1bIntro(){
   var ctx={client:'This shift', start:'', end:''};
@@ -37558,9 +37560,7 @@ if(typeof remiFloatHide1Split==='function'&&!remiFloatHide1Split.__remiFloatHide
         return isFinite(n)?n:0;
       }
       function eligible(row){
-        if(!row||typeof row!=='object')return false;
-        if(yesCount(row)>0)return true;
-        return row.is_float===true||row.is_float==='true'||row.is_float===1||row.is_float==='t';
+        return !!(row&&typeof row==='object'&&yesCount(row)>0);
       }
       var order=[];
       var anon=0;
@@ -37603,6 +37603,48 @@ if(typeof remiFloatHide1Split==='function'&&!remiFloatHide1Split.__remiFloatHide
   remiFloatHide1bSplit.__remiFloatHide1b=1;
   remiFloatHide1Split=remiFloatHide1bSplit;
 }
+if(typeof remiFloat1ConfirmBlast==='function'&&!remiFloat1ConfirmBlast.__remiFloatHide1b){
+  var remiFloatHide1bBlastBase=remiFloat1ConfirmBlast;
+  var remiFloatHide1bAskBlast=async function(){
+    if(typeof remiFloat1OfficeOk==='function'&&!remiFloat1OfficeOk())return {ok:false, forbidden:true};
+    remiFloatHide1bGateOn=true;
+    try{if(typeof remiFloat1Paint==='function')remiFloat1Paint();}catch(eAsk){}
+    return {ok:true, gated:true, sent:false};
+  };
+  remiFloatHide1bAskBlast.__remiFloatHide1b=1;
+  remiFloat1ConfirmBlast=remiFloatHide1bAskBlast;
+  remiFloatHide1bGateCancel=function(){
+    remiFloatHide1bGateOn=false;
+    try{if(typeof remiFloat1Paint==='function')remiFloat1Paint();}catch(eCancel){}
+    return {ok:true, cancelled:true};
+  };
+  remiFloatHide1bGateConfirm=async function(){
+    remiFloatHide1bGateOn=false;
+    return remiFloatHide1bBlastBase.apply(this, arguments);
+  };
+}
+if(typeof remiFloat1Bind==='function'&&!remiFloat1Bind.__remiFloatHide1b){
+  var remiFloatHide1bPrevBind=remiFloat1Bind;
+  var remiFloatHide1bBind=function(){
+    var out=remiFloatHide1bPrevBind.apply(this, arguments);
+    try{
+      var host=document.getElementById('remiFloatHost');
+      if(host&&host.getAttribute('data-remi-float-hide1b-bound')!=='1'){
+        host.setAttribute('data-remi-float-hide1b-bound','1');
+        host.addEventListener('click', function(ev){
+          var t=ev.target&&ev.target.closest?ev.target.closest('[data-remi-float-act]'):null;
+          if(!t||!host.contains(t))return;
+          var act=t.getAttribute('data-remi-float-act');
+          if(act==='blast-go')remiFloatHide1bGateConfirm();
+          else if(act==='blast-notyet'||act==='blast-cancel')remiFloatHide1bGateCancel();
+        });
+      }
+    }catch(eBind){}
+    return out;
+  };
+  remiFloatHide1bBind.__remiFloatHide1b=1;
+  remiFloat1Bind=remiFloatHide1bBind;
+}
 remiFloat1FloatHtml=function(){
   var view='';
   try{view=String(copilotView||'');}catch(eView){view='';}
@@ -37620,7 +37662,14 @@ remiFloat1FloatHtml=function(){
   html+=remiFloatHide1Band(ranked, 'ranked', 'Ranked \u00b7 same-day yes / 30d');
   html+=remiFloatHide1Band(rest, 'rest', 'Rest of list');
   html+='<div class="remi-fn-btns">';
-  html+='<button type="button" class="remi-fn-go" id="remiFloat1Blast" data-remi-float-act="blast">Confirm blast</button>';
+  if(remiFloatHide1bGateOn){
+    html+='<p class="remi-fn-note" id="remiFloatHide1bGate">Confirm before this blast sends. Not yet writes nothing.</p>';
+    html+='<button type="button" class="remi-fn-go" data-remi-float-act="blast-go">Confirm</button>';
+    html+='<button type="button" class="remi-fn-alt" data-remi-float-act="blast-notyet">Not yet</button>';
+    html+='<button type="button" class="remi-fn-alt" data-remi-float-act="blast-cancel">Cancel</button>';
+  }else{
+    html+='<button type="button" class="remi-fn-go" id="remiFloat1Blast" data-remi-float-act="blast">Confirm blast</button>';
+  }
   html+='<button type="button" class="remi-fn-alt" id="remiFloat1Edit" data-remi-float-act="edit" aria-pressed="'+(remiFloat1Editing?'true':'false')+'">Edit list</button>';
   html+='</div>';
   html+='<p class="remi-fn-note">Coverage still ranks aides.</p>';
