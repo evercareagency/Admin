@@ -14,7 +14,8 @@ assert.ok(html.includes('<!-- remi secretary 2026-09-25 v=remisec1 admin-build 2
 assert.ok(html.includes('data-remisec="v=remisec1"'), 'remisec1 string marker');
 assert.ok(html.includes('placeholder="Ask or just chat..."'), 'composer invites chat');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-client1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-25-coverpick1"') < html.indexOf('content="2026-09-25-remisec1"'), 'remisec1 stays after coverpick1');
 [
   '2026-09-25-payready1d',
@@ -189,7 +190,7 @@ async function runBrowser(){
           kinds: (ans.actions||[]).map(function(a){return a.kind;})
         };
       }
-      var help = grab('hello remi');
+      var help = grab('what can you do?');
       var greet = grab('hey Remi');
       var weather = grab("what's the weather?");
       var calloff = grab('any call-offs today?');
@@ -285,7 +286,7 @@ async function runBrowser(){
         wide: cr.width > sr.width + 2
       };
     });
-    assert.ok(/Ask about Timesheets/.test(weatherUi.text), 'desk hello stays above the weather');
+    assert.ok(/Ask or just chat/.test(weatherUi.text), 'desk hello stays above the weather');
     assert.ok(/Cleveland right now/.test(weatherUi.text) && /Cleveland OH 44129/.test(weatherUi.card) && /72/.test(weatherUi.card), weatherUi.card);
     assert.ok(/High 76/.test(weatherUi.card) && /Low 58/.test(weatherUi.card) && /12PM/.test(weatherUi.card), weatherUi.card);
     assert.ok(/Still on desk duty/.test(weatherUi.text));

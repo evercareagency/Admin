@@ -31,7 +31,8 @@ assert.ok(html.includes('<!-- coverage simplify 2026-09-27 v=coverage-simple1 ad
 assert.ok(html.includes('GHOST-COVERAGE-SIMPLE1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes("var COVERAGE_SIMPLE1_MARKER='v=coverage-simple1'"), 'script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-client1'), 'first admin-build is coverage-simple1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'first admin-build is coverage-simple1');
+assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 ['2026-09-27-clienthrs1c','2026-09-27-shift-slim1','2026-09-26-isdash1b','2026-09-26-clienthrs1b','2026-09-25-aidechat1','2026-09-25-coverpick1','2026-09-25-cover1'].forEach(function(meta){
   assert.ok(html.includes('<meta name="admin-build" content="' + meta + '">'), 'prior meta stays ' + meta);
 });
