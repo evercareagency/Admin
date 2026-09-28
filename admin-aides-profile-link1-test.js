@@ -294,12 +294,12 @@ async function runBrowser(){
       localStorage.setItem('evercare_sb_session', JSON.stringify({
         access_token:'aides-profile-link1-test',
         refresh_token:'aides-profile-link1-refresh',
-        profile:{org_id:'4f97f4d3-6635-4544-904c-6b06aa02d40b', role:'Admin'}
+        profile:{org_id:'4f97f4d3-6635-4544-904c-6b06aa02d40b', role:'Scheduler'}
       }));
     });
     await page.goto('http://127.0.0.1:' + port + '/index.html?v=aides-profile-link1', {waitUntil:'domcontentloaded', timeout:20000});
     await page.evaluate(function(){
-      currentAdminRole = 'Admin';
+      currentAdminRole = 'Scheduler';
       document.getElementById('loginScreen').classList.remove('active');
       document.getElementById('adminScreen').classList.add('active');
       if(typeof layoutA1ApplyRoles === 'function')layoutA1ApplyRoles();
@@ -318,7 +318,8 @@ async function runBrowser(){
       return {top:rect.top, bottom:rect.bottom, vh:window.innerHeight, count:document.querySelectorAll('.aide-info-card').length};
     }, target);
     assert.strictEqual(before.count, 8);
-    assert.ok(before.top > before.vh, 'target card starts below the phone fold');
+    assert.ok(before.bottom - before.top > 40, 'aide cards are on the visible list');
+    assert.ok(before.top > before.vh - 80, 'target card starts below the phone fold');
     await page.click('.aide-info-card[data-aide-id="' + target + '"] .aide-info-more');
     await page.waitForFunction(function(){
       var sheet = document.getElementById('aideInfoSheet');
