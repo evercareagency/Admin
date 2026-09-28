@@ -12,7 +12,7 @@ assert.ok(html.includes('data-aidecreds1c="v=aidecreds1c"'), 'aidecreds1c string
 assert.ok(html.includes('admin-build 2026-09-25-aidecreds1c'), 'aidecreds1c build note');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidecreds1c">'), 'aidecreds1c meta');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-compliance-bulk1'), 'isdash1 is the first admin-build meta');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
@@ -244,7 +244,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(after.build, '2026-09-27-msg-dense1');
+    assert.strictEqual(after.build, '2026-09-27-compliance-bulk1');
     assert.strictEqual(after.banner, '⚠ 2 credentials need attention');
     assert.strictEqual(after.cover, '✓ All current', after.cover);
     assert.ok(after.probe.indexOf('Expiring') >= 0 && after.probe.indexOf('1 overdue') >= 0, after.probe);

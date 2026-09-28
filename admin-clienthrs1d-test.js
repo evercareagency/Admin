@@ -12,7 +12,7 @@ assert.ok(html.includes('data-clienthrs1d="v=clienthrs1d"'), 'clienthrs1d data a
 assert.ok(html.includes('<!-- client hours notifications 2026-09-27 v=clienthrs1d admin-build 2026-09-27-clienthrs1d'), 'clienthrs1d comment');
 assert.ok(html.includes("var CLIENTHRS1D_MARKER='v=clienthrs1d'"), 'clienthrs1d script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-msg-dense1'), 'first admin-build is vapid1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-compliance-bulk1'), 'first admin-build is vapid1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
@@ -136,7 +136,7 @@ async function runBrowser(){
         chip: document.querySelector('#copilotFab img').getAttribute('src')
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-msg-dense1');
+    assert.strictEqual(boot.first, '2026-09-27-compliance-bulk1');
     assert.strictEqual(boot.second, '2026-09-27-aide-notif-search1');
     assert.strictEqual(boot.third, '2026-09-27-remi-chat1');
     assert.strictEqual(boot.fourth, '2026-09-27-hold-client1');

@@ -23,7 +23,7 @@ assert.ok(html.includes('id="copilotSheet"'), 'phone sheet stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 assert.ok(!html.includes('admin_why_open'), 'does not use the retired why-open name');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'first admin-build is remi-ideas763');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-compliance-bulk1'), 'first admin-build is remi-ideas763');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');

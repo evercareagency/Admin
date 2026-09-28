@@ -20,7 +20,7 @@ assert.ok(html.includes('Do not claim LIVE'), 'do not claim LIVE');
 assert.ok(html.includes('Probe PASS'), 'merge waits for Probe PASS');
 assert.ok(html.includes('hold-client1-v1.sql'), 'Ace patch already applied');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-msg-dense1'), 'first admin-build is msg-dense1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-compliance-bulk1'), 'first admin-build is msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
@@ -367,7 +367,7 @@ async function shots(){
         dashes: document.querySelectorAll('#schedBody .sched-dash').length
       };
     }, bowlaxId, adaId, hid);
-    assert.strictEqual(boot.build, '2026-09-27-msg-dense1');
+    assert.strictEqual(boot.build, '2026-09-27-compliance-bulk1');
     assert.strictEqual(boot.marker, 'v=hold-client1');
     assert.ok(boot.put.indexOf('Put on hold') >= 0, boot.put);
     assert.ok(boot.put.indexOf('Save hold') >= 0, boot.put);
