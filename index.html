@@ -15,7 +15,7 @@
 <!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. FIX A3: the same tiny compact A–Z chip (class sched-az-chip list-az-chip) also sits beside the Aides and Clients titles and calls listAz1Toggle against the same evercare_list_order preference. It is not a fat pill and not a second key. Manage stays the credentials control. FIX A4: Admin default Aides rail mounts on #aideCredList when A–Z is on; Manage stays credentials-only. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-28-list-az-sticky1">
 <script>var LIST_AZ_STICKY1_MARKER='v=list-az-sticky1';var LIST_AZ_STICKY1_BUILD='2026-09-28-list-az-sticky1';</script>
-<!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No new Ace RPC. No SQL. No Auth reseal. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. Open shifts paint Hot / Today / Tomorrow. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. Smart assign opens a ranked sheet from admin_rank_backup_aides. Display order weighs same-client continuity over raw miles: a slightly farther aide who has worked the client ranks above a closer aide with no history. The why-line uses miles plus a continuity count. The count is worked_this_client, continuity_count, same_client_count, or times_with_client when Ace sends one, otherwise continuity_score, which this desk already reads as times worked. A free-window phrase paints only when the rank row includes availability, free_window, or note. Assign posts the existing admin_cover_outcome assigned_backup. Who can cover stays the chat blast. Text client, Text this aide, and Cancel stay. Cancel stays cover-card-cancel1. Prefer-wait / no-backup paints only when the open shift or its client payload sets prefer_wait, prefer_to_wait, no_backup, or no_backup_aide. That purple gate blocks Assign. Confirm wait posts admin_cover_outcome client_refused_resume_next_day. Text client stays the existing draft. Override is Admin only and then shows the ranked sheet. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
+<!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No new Ace RPC. No SQL. No Auth reseal. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk uses LIVE admin_list_open_shifts {p_include_resolved:false}, admin_record_call_off, and admin_cover_outcome (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h, the ≤48h flag. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign rank is admin_rank_backup_aides {p_open_shift_id, p_limit:20}, not the float pool. Paint rank, name, aide_id, distance_miles as miles, score, and continuity_score as worked this client N×. Display order weighs continuity_score over raw miles, so a slightly farther aide with history ranks above a closer aide with no history. Assign posts admin_cover_outcome assigned_backup. Who can cover, Text this aide, Text client, and Cancel stay. (3) Ace GAP: there are no clients.cover_* , no_backup, or prefer_wait columns yet. Do not invent durable client prefer-wait fields. The purple gate is shift-level only, for awaiting_client and client_refused_resume_next_day. It blocks Assign. Wait posts admin_cover_outcome awaiting_client. Text client stays the existing draft. Manager Override then posts assigned_backup. Do not claim a saved client preference until Ace ships (3). NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -6497,40 +6497,7 @@ function coverMapShift(row){
       var client=src.client&&typeof src.client==='object'?src.client:null;
       if(!home&&client)home=String(coverPick(client,'home_address','p_home_address','client_home_address','address')||'').trim();
       return home;
-    })(),
-    preferWait:(function(){
-      function flagOn(obj, keys){
-        if(!obj||typeof obj!=='object')return false;
-        var i;
-        for(i=0;i<keys.length;i++){
-          var v=obj[keys[i]];
-          if(v===true||v===1)return true;
-          var s=String(v==null?'':v).trim().toLowerCase();
-          if(s==='true'||s==='1'||s==='yes'||s==='y')return true;
-        }
-        return false;
-      }
-      var preferKeys=['prefer_wait','prefer_to_wait','preferWait','prefers_to_wait','client_prefer_wait','preferToWait'];
-      var clientObj=src.client&&typeof src.client==='object'?src.client:null;
-      return flagOn(src, preferKeys)||flagOn(clientObj, preferKeys);
-    })(),
-    noBackup:(function(){
-      function flagOn(obj, keys){
-        if(!obj||typeof obj!=='object')return false;
-        var i;
-        for(i=0;i<keys.length;i++){
-          var v=obj[keys[i]];
-          if(v===true||v===1)return true;
-          var s=String(v==null?'':v).trim().toLowerCase();
-          if(s==='true'||s==='1'||s==='yes'||s==='y')return true;
-        }
-        return false;
-      }
-      var backupKeys=['no_backup','no_backup_aide','noBackup','client_no_backup','noBackupAide'];
-      var clientObj=src.client&&typeof src.client==='object'?src.client:null;
-      return flagOn(src, backupKeys)||flagOn(clientObj, backupKeys);
-    })(),
-    urgencyLabel:String(coverPick(src,'urgency','urgency_label','urgencyLabel')||'').trim().toLowerCase()
+    })()
   };
 }
 function coverCoerceNode(data){
@@ -6766,16 +6733,6 @@ function coverMapRank(row){
     score:src.score==null||src.score===''?null:src.score,
     rank:src.rank==null||src.rank===''?null:src.rank,
     phone:coverPickPhone(src),
-    visits:(function(){
-      var keys=['worked_this_client','worked_this_client_count','continuity_count','same_client_count','times_with_client','client_visits','visit_count'];
-      var i;
-      for(i=0;i<keys.length;i++){
-        if(src[keys[i]]==null||src[keys[i]]==='')continue;
-        var n=Number(src[keys[i]]);
-        if(isFinite(n))return n;
-      }
-      return null;
-    })(),
     freeWindow:String((typeof coverPick==='function'?coverPick(src,'availability','free_window','freeWindow','note'):'')||'')
   };
 }
@@ -7282,7 +7239,7 @@ function coverPaintList(){
     var tone=gated?' is-pref':(typeof coverDesk1Urgency==='function'&&coverDesk1Urgency(s)==='hot'?' is-hot':'');
     var aideBit=coverEsc(s.aideName&&s.aideName!=='—'?(s.aideName+' called off'):'Aide called off');
     var meta=aideBit+' · '+coverEsc(when||'—')+reason;
-    var smartLabel=gated?'View preference':'Smart assign';
+    var smartLabel=gated?'View wait':'Smart assign';
     return '<div class="cover-card-wrap'+tone+'" data-cover-card-cancel1="v=cover-card-cancel1" data-cover-desk1="v=cover-desk1" data-open-shift-id="'+coverAttr(s.id)+'" data-client-id="'+coverAttr(s.clientId||'')+'" data-service-date="'+coverAttr(serviceDate)+'">'
       +'<button type="button" class="cover-card" data-cover-id="'+coverAttr(s.id)+'" data-cover-intake="'+intake+'">'
       +'<div class="cover-card-top"><strong>'+coverEsc(s.clientName||'Client')+'</strong>'+chips+'</div>'
@@ -8634,7 +8591,7 @@ function coverEnsureBound(){
   });
 }
 
-// v=cover-desk1 — urgency, smart assign, prefer-wait. Reuses list + rank + outcome. No new Ace RPC. NO PTO.
+// v=cover-desk1 — urgency from shift_start + urgency_within_48h. Smart assign is admin_rank_backup_aides. Gate is awaiting_client / client_refused only. No client prefer-wait columns. NO PTO.
 var coverDesk1Filter='all';
 var coverDesk1Override={};
 var coverDesk1SmartId='';
@@ -8662,12 +8619,12 @@ function coverDesk1Ymd(iso){
   if(!isFinite(t))return '';
   return coverDesk1NyParts(t).ymd;
 }
-function coverDesk1Urgency(shift, nowMs){
+function coverDesk1Hot(shift){
+  if(!shift)return false;
+  return shift.urgencyWithin48h===true||shift.urgency_within_48h===true;
+}
+function coverDesk1Day(shift, nowMs){
   if(!shift)return '';
-  var explicit=String(shift.urgencyLabel||shift.urgency||'').trim().toLowerCase();
-  if(explicit==='hot'||shift.hot===true)return 'hot';
-  if(explicit==='today')return 'today';
-  if(explicit==='tomorrow'||explicit==='tmrw')return 'tmrw';
   var start=Date.parse(shift.startsAt||shift.shift_start||'');
   if(!isFinite(start))return '';
   var now=nowMs==null?Date.now():Number(nowMs);
@@ -8675,39 +8632,32 @@ function coverDesk1Urgency(shift, nowMs){
   var startDay=coverDesk1Ymd(shift.startsAt||shift.shift_start);
   var nowDay=coverDesk1NyParts(now).ymd;
   var tomorrow=coverDesk1NyParts(now+24*60*60*1000).ymd;
-  if(startDay===nowDay){
-    var end=Date.parse(shift.endsAt||shift.shift_end||'');
-    var startMin=coverDesk1NyParts(start).minutes;
-    var nowMin=coverDesk1NyParts(now).minutes;
-    var endMin=isFinite(end)?coverDesk1NyParts(end).minutes:(startMin+60);
-    if(endMin<startMin)endMin=24*60;
-    if(nowMin>=startMin-30&&nowMin<=endMin+15)return 'hot';
-    return 'today';
-  }
+  if(startDay===nowDay)return 'today';
   if(startDay===tomorrow)return 'tmrw';
   return '';
 }
-function coverDesk1FlagOn(v){
-  if(v===true||v===1)return true;
-  var s=String(v==null?'':v).trim().toLowerCase();
-  return s==='true'||s==='1'||s==='yes'||s==='y';
+function coverDesk1Urgency(shift, nowMs){
+  if(!shift)return '';
+  if(coverDesk1Hot(shift))return 'hot';
+  return coverDesk1Day(shift, nowMs);
+}
+function coverDesk1Status(shift){
+  if(typeof coverStatusKey==='function')return coverStatusKey(shift);
+  return String(shift&&shift.status||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
 }
 function coverDesk1PrefersWait(shift){
   if(!shift)return false;
-  if(shift.preferWait===true||shift.noBackup===true)return true;
-  var rec=null;
-  try{rec=(typeof coverClientRecord==='function')?coverClientRecord(shift):null;}catch(e){rec=null;}
-  if(!rec)return false;
-  return coverDesk1FlagOn(rec.prefer_wait)||coverDesk1FlagOn(rec.prefer_to_wait)||coverDesk1FlagOn(rec.preferWait)||coverDesk1FlagOn(rec.no_backup)||coverDesk1FlagOn(rec.no_backup_aide)||coverDesk1FlagOn(rec.noBackup);
+  var st=coverDesk1Status(shift);
+  if(st==='awaiting_client'||st==='client_refused_resume_next_day')return true;
+  return shift.isClientRefusedBackup===true||shift.is_client_refused_backup===true;
 }
 function coverDesk1FilterShifts(rows){
   var key=coverDesk1Filter||'all';
   if(!key||key==='all')return rows||[];
   return (rows||[]).filter(function(s){
-    var u=coverDesk1Urgency(s);
-    if(key==='today')return u==='today'||u==='hot';
-    if(key==='hot')return u==='hot';
-    if(key==='tmrw')return u==='tmrw';
+    if(key==='today')return coverDesk1Day(s)==='today';
+    if(key==='hot')return coverDesk1Hot(s);
+    if(key==='tmrw')return coverDesk1Day(s)==='tmrw';
     return true;
   });
 }
@@ -8721,10 +8671,10 @@ function coverDesk1PaintFilters(){
   });
   var counts={all:open.length,hot:0,today:0,tmrw:0};
   open.forEach(function(s){
-    var u=coverDesk1Urgency(s);
-    if(u==='hot'){counts.hot+=1;counts.today+=1;}
-    else if(u==='today')counts.today+=1;
-    else if(u==='tmrw')counts.tmrw+=1;
+    if(coverDesk1Hot(s))counts.hot+=1;
+    var day=coverDesk1Day(s);
+    if(day==='today')counts.today+=1;
+    else if(day==='tmrw')counts.tmrw+=1;
   });
   var map={all:['coverFilterAll','All'],hot:['coverFilterHot','🔥 Hot'],today:['coverFilterToday','Today'],tmrw:['coverFilterTmrw','Tomorrow']};
   Object.keys(map).forEach(function(k){
@@ -8746,16 +8696,17 @@ function coverDesk1CardChips(shift){
   var intake=shift&&shift.intakeSource==='aide'?'aide':'office';
   bits.push('<span class="cover-desk-chip '+intake+'">'+(intake==='aide'?'Aide':'Office')+'</span>');
   if(coverDesk1PrefersWait(shift)){
-    if(!shift||shift.noBackup||!shift.preferWait)bits.push('<span class="cover-desk-chip nobackup">No backup</span>');
-    if(!shift||shift.preferWait||shift.noBackup||(!shift.preferWait&&!shift.noBackup))bits.push('<span class="cover-desk-chip pref">Prefer wait</span>');
+    var gst=coverDesk1Status(shift);
+    if(gst==='client_refused_resume_next_day'||(shift&&(shift.isClientRefusedBackup===true||shift.is_client_refused_backup===true)))bits.push('<span class="cover-desk-chip pref">Prefer wait</span>');
+    else bits.push('<span class="cover-desk-chip pref">Awaiting client</span>');
   }
   return '<div class="cover-desk-chips">'+bits.join('')+'</div>';
 }
 function coverDesk1Visits(row){
-  if(!row)return null;
-  if(row.visits!=null&&row.visits!==''&&isFinite(Number(row.visits)))return Math.round(Number(row.visits));
-  if(row.continuity!=null&&row.continuity!==''&&isFinite(Number(row.continuity)))return Math.round(Number(row.continuity));
-  return null;
+  if(!row||row.continuity==null||row.continuity==='')return null;
+  var n=Number(row.continuity);
+  if(!isFinite(n))return null;
+  return Math.round(n);
 }
 function coverDesk1Miles(row){
   if(!row||row.distance==null||row.distance==='')return null;
@@ -8795,8 +8746,13 @@ function coverDesk1WhyHtml(row, clientName, closest){
   var first=(typeof coverFirstName==='function'?coverFirstName(clientName):'')||'this client';
   var left=miles==null?'<strong>No home address on file</strong>':('<strong>'+esc(coverDesk1MilesText(miles))+' mi</strong>');
   var free=row&&row.freeWindow?(' · '+esc(String(row.freeWindow))):'';
-  if(n!=null&&n>0)return left+free+' <span class="cont">worked this client '+n+'×</span>';
-  return left+free+(closest?' · closest':'')+' · <em>no '+esc(first)+' history</em>';
+  var score='';
+  if(row&&row.score!=null&&row.score!==''&&isFinite(Number(row.score))){
+    var sn=Number(row.score);
+    score=' · score '+(Math.abs(sn-Math.round(sn))<1e-9?String(Math.round(sn)):String(Math.round(sn*10)/10));
+  }
+  if(n!=null&&n>0)return left+free+' <span class="cont">worked this client '+n+'×</span>'+score;
+  return left+free+(closest?' · closest':'')+' · <em>no '+esc(first)+' history</em>'+score;
 }
 function coverDesk1RankHtml(rows, shift){
   var esc=typeof coverEsc==='function'?coverEsc:function(s){return String(s==null?'':s);};
@@ -8834,21 +8790,20 @@ function coverDesk1GateHtml(shift){
   var first=(typeof coverFirstName==='function'?coverFirstName(name):'')||name;
   var aide=shift&&shift.aideName&&shift.aideName!=='—'?shift.aideName:'the regular aide';
   var aideFirst=(typeof coverFirstName==='function'?coverFirstName(aide):'')||aide;
-  var bits=[];
-  if(shift&&shift.noBackup)bits.push('<strong>no backup aide</strong>');
-  if(shift&&shift.preferWait)bits.push('<strong>prefer to wait</strong>');
-  if(!bits.length)bits.push('<strong>no backup / prefer to wait</strong>');
+  var st=coverDesk1Status(shift);
+  var refused=st==='client_refused_resume_next_day'||!!(shift&&(shift.isClientRefusedBackup===true||shift.is_client_refused_backup===true));
+  var state=refused?'client refused backup and will resume the next day':'awaiting the client';
   return '<div class="cover-pref-gate" role="alert">'
-    +'<div class="flag">Client preference · do not auto-cover</div>'
-    +'<h3>'+esc(first)+' prefers to wait</h3>'
-    +'<p class="pref-body">Client setting: '+bits.join(' · ')+' for regular aide '+esc(aideFirst)+'. Smart assign is <strong>gated</strong> — office must not push a stranger cover.</p>'
-    +'<div class="gated"><span class="strike">Smart assign · Assign backup</span> Blocked by client preference · use alternate path below</div>'
+    +'<div class="flag">Shift outcome · do not auto-cover</div>'
+    +'<h3>'+esc(first)+(refused?' prefers to wait':' is awaiting a decision')+'</h3>'
+    +'<p class="pref-body">This open shift is <strong>'+state+'</strong> for regular aide '+esc(aideFirst)+'. Assign is <strong>gated</strong>. Wait, text, or a manager override uses the existing cover outcome.</p>'
+    +'<div class="gated"><span class="strike">Smart assign · Assign backup</span> Blocked until a manager overrides</div>'
     +'<div class="cover-pref-alts">'
     +'<button type="button" class="btn wait-primary" data-cover-wait="1">Confirm: wait for '+esc(aideFirst)+'</button>'
     +'<button type="button" class="btn wait" data-cover-text="'+attr(shift&&shift.id)+'">Text '+esc(first)+' · confirm wait</button>'
     +'<button type="button" class="btn btn-ghost" data-cover-override="1">Override (manager only)</button>'
     +'</div></div>'
-    +'<div class="cover-smart-banner is-gated"><div class="ttl">Smart assign · gated</div><div class="body">Suggestions hidden until preference cleared or manager override.</div></div>';
+    +'<div class="cover-smart-banner is-gated"><div class="ttl">Smart assign · gated</div><div class="body">Suggestions hidden until a manager overrides this shift outcome.</div></div>';
 }
 function coverDesk1Phone(){
   try{return !!window.matchMedia&&window.matchMedia('(max-width: 960px)').matches;}catch(e){return true;}
@@ -8869,7 +8824,7 @@ function coverDesk1SheetHtml(shift, rows, pending){
   var banner=gated?'':('<div class="cover-smart-banner"><div class="ttl">Why this ranking</div><div class="body">Distance (miles) + continuity · <span>same client history beats strangers nearby</span></div></div>');
   var ranks;
   if(pending)ranks='<p class="cover-note">Loading who can cover…</p>';
-  else if(gated)ranks='<div class="cover-desk-locked" aria-hidden="true"><div class="cover-rank-card"><div class="rank">—</div><div><div class="aname">Suggestions locked</div><div class="why">No-backup / prefer-wait honored</div></div><div class="dist">—</div></div></div>';
+  else if(gated)ranks='<div class="cover-desk-locked" aria-hidden="true"><div class="cover-rank-card"><div class="rank">—</div><div><div class="aname">Suggestions locked</div><div class="why">Awaiting client · assign gated</div></div><div class="dist">—</div></div></div>';
   else ranks=coverDesk1RankHtml(rows, shift);
   var note='<p class="cover-note">Same-client history outranks a closer stranger. <span class="cover-no-pto" style="margin:0"><strong>NO PTO</strong></span></p>';
   var foot='<div class="cover-smart-foot"><button type="button" class="btn btn-ghost" onclick="coverShowList()">← Back to Cover</button>'
@@ -8883,8 +8838,8 @@ function coverDesk1PaintSmart(shift, rows, pending){
   var gated=coverDesk1PrefersWait(shift)&&!coverDesk1Override[String(shift.id||'')];
   var badge=document.getElementById('coverSmartBadge');
   var intro=document.getElementById('coverSmartIntro');
-  if(badge)badge.textContent=gated?'Client preference':'Smart assign';
-  if(intro)intro.textContent=gated?'Honor no-backup / prefer-to-wait — assign is gated.':'Ranked by distance + continuity with the same client.';
+  if(badge)badge.textContent=gated?'Shift wait':'Smart assign';
+  if(intro)intro.textContent=gated?'This shift is awaiting the client or refused backup. Assign stays gated.':'Ranked by distance + continuity with the same client.';
   var phoneBody=document.getElementById('coverDeskSmartBody');
   var sideBody=document.getElementById('coverDeskSideBody');
   if(coverDesk1Phone()){
@@ -8923,14 +8878,14 @@ async function coverDesk1Open(id){
 function coverDesk1Assign(id, name){
   var shift=(typeof coverFind==='function')?coverFind(coverSelectedId):null;
   if(shift&&coverDesk1PrefersWait(shift)&&!coverDesk1Override[String(shift.id)]){
-    if(typeof showTempMsg==='function')showTempMsg('Assign is blocked by the client preference.','var(--warn)');
+    if(typeof showTempMsg==='function')showTempMsg('Assign is blocked while this shift is awaiting the client.','var(--warn)');
     return;
   }
   if(typeof coverPickRank==='function')coverPickRank(id, name);
   if(typeof coverConfirmAssign==='function')coverConfirmAssign();
 }
 function coverDesk1ConfirmWait(){
-  if(typeof coverApplyOutcome==='function')coverApplyOutcome('client_refused_resume_next_day');
+  if(typeof coverApplyOutcome==='function')coverApplyOutcome('awaiting_client');
 }
 function coverDesk1OverrideOpen(){
   var role='';
@@ -20398,12 +20353,8 @@ function coverSimplePaintStats(){
   var o=document.getElementById('coverStatOpen');
   var u=document.getElementById('coverStat48');
   var a=document.getElementById('coverStatAssigned');
-  var hotN=open.filter(function(s){return typeof coverDesk1Urgency==='function'&&coverDesk1Urgency(s)==='hot';}).length;
-  var todayN=open.filter(function(s){
-    if(typeof coverDesk1Urgency!=='function')return false;
-    var uKey=coverDesk1Urgency(s);
-    return uKey==='hot'||uKey==='today';
-  }).length;
+  var hotN=open.filter(function(s){return typeof coverDesk1Hot==='function'&&coverDesk1Hot(s);}).length;
+  var todayN=open.filter(function(s){return typeof coverDesk1Day==='function'&&coverDesk1Day(s)==='today';}).length;
   if(o)o.textContent=String(open.length);
   if(u)u.textContent=String(typeof coverDesk1Urgency==='function'?hotN:urgent.length);
   if(a)a.textContent=String(typeof coverDesk1Urgency==='function'?todayN:coverSimpleAssignedToday());

@@ -39,7 +39,17 @@ assert.ok(extractFn(html, 'function navEditDefaults()').includes('coverage'), 'C
 assert.ok(html.includes("list:['admin_list_open_shifts']"), 'list callable stays');
 assert.ok(html.includes("rank:['admin_rank_backup_aides']"), 'rank callable stays');
 assert.ok(html.includes("outcome:['admin_cover_outcome']"), 'outcome callable stays');
-assert.ok(html.includes('client_refused_resume_next_day'), 'prefer-wait reuses refuse outcome');
+assert.ok(html.includes('client_refused_resume_next_day'), 'refused outcome stays on the desk');
+assert.ok(html.includes("coverApplyOutcome('awaiting_client')"), 'wait posts awaiting_client');
+assert.ok(!extractFn(html, 'function coverMapShift(row)').includes('prefer_wait'), 'map does not invent prefer_wait');
+assert.ok(!extractFn(html, 'function coverMapShift(row)').includes('no_backup'), 'map does not invent no_backup');
+assert.ok(!extractFn(html, 'function coverMapRank(row)').includes('worked_this_client'), 'rank count is continuity_score');
+const gateFn = extractFn(html, 'function coverDesk1PrefersWait(shift)');
+assert.ok(gateFn.includes('awaiting_client') && gateFn.includes('client_refused_resume_next_day'), 'gate is shift outcome');
+assert.ok(!gateFn.includes('prefer_wait') && !gateFn.includes('no_backup'), 'gate does not read client columns');
+assert.ok(extractFn(html, 'function coverDesk1Hot(shift)').includes('urgencyWithin48h'), 'hot badge is the 48h flag');
+assert.ok(extractFn(html, 'async function coverDesk1Open(id)').includes("coverRpc('rank'"), 'smart assign uses backup rank');
+assert.ok(!extractFn(html, 'async function coverDesk1Open(id)').includes('float_pool'), 'smart assign is not the float pool');
 
 function extractFn(src, sig){
   const start = src.indexOf(sig);
@@ -61,8 +71,10 @@ vm.createContext(ctx);
 [
   'function coverDesk1NyParts(ms)',
   'function coverDesk1Ymd(iso)',
+  'function coverDesk1Hot(shift)',
+  'function coverDesk1Day(shift, nowMs)',
   'function coverDesk1Urgency(shift, nowMs)',
-  'function coverDesk1FlagOn(v)',
+  'function coverDesk1Status(shift)',
   'function coverDesk1PrefersWait(shift)',
   'function coverDesk1Visits(row)',
   'function coverDesk1Miles(row)',
@@ -80,25 +92,31 @@ vm.createContext(ctx);
 });
 
 const now = Date.parse('2026-09-28T19:02:00Z');
-assert.strictEqual(vm.runInContext('coverDesk1Urgency({startsAt:"2026-09-28T14:00:00Z", endsAt:"2026-09-28T19:00:00Z"}, '+now+')', ctx), 'hot', 'in-progress today is hot');
-assert.strictEqual(vm.runInContext('coverDesk1Urgency({startsAt:"2026-09-28T20:00:00Z", endsAt:"2026-09-29T00:00:00Z"}, '+now+')', ctx), 'today', 'later today stays today');
+assert.strictEqual(vm.runInContext('coverDesk1Urgency({startsAt:"2026-09-28T14:00:00Z", endsAt:"2026-09-28T19:00:00Z", urgencyWithin48h:true}, '+now+')', ctx), 'hot', 'urgency_within_48h is the hot badge');
+assert.strictEqual(vm.runInContext('coverDesk1Day({startsAt:"2026-09-28T14:00:00Z"}, '+now+')', ctx), 'today', 'hot shift is still today on the calendar');
+assert.strictEqual(vm.runInContext('coverDesk1Urgency({startsAt:"2026-09-28T20:00:00Z", endsAt:"2026-09-29T00:00:00Z"}, '+now+')', ctx), 'today', 'later today without the 48h flag stays today');
 assert.strictEqual(vm.runInContext('coverDesk1Urgency({startsAt:"2026-09-29T13:00:00Z", endsAt:"2026-09-29T18:00:00Z"}, '+now+')', ctx), 'tmrw', 'next day is tomorrow');
-assert.strictEqual(vm.runInContext('coverDesk1Urgency({urgencyLabel:"hot", startsAt:"2026-10-01T13:00:00Z", endsAt:"2026-10-01T18:00:00Z"}, '+now+')', ctx), 'hot', 'explicit hot wins');
+assert.strictEqual(vm.runInContext('coverDesk1Urgency({urgencyWithin48h:true, startsAt:"2026-09-29T13:00:00Z"}, '+now+')', ctx), 'hot', 'a tomorrow shift inside 48h wears the hot badge');
+assert.strictEqual(vm.runInContext('coverDesk1Day({startsAt:"2026-09-29T13:00:00Z"}, '+now+')', ctx), 'tmrw', 'the 48h flag does not change the calendar day');
 
 const sorted = JSON.parse(JSON.stringify(vm.runInContext('coverDesk1SmartSort([{id:"moe", name:"moe", distance:0.9, continuity:0, rank:4},{id:"devon", name:"Devon Park", distance:1.8, continuity:12, rank:2},{id:"jamal", name:"Jamal Wright", distance:2.4, continuity:4, rank:3},{id:"aisha", name:"Aisha Khan", distance:3.1, continuity:1, rank:1}]).map(function(r){return r.id;})', ctx)));
 assert.deepStrictEqual(sorted, ['devon','jamal','aisha','moe'], 'continuity outranks a closer stranger');
 
-const pref = vm.runInContext('coverMapShift({id:"h1", client_name:"Helen Park", regular_aide_name:"Sara Nguyen", prefer_wait:true, no_backup:true, shift_start:"2026-09-29T13:00:00Z"})', ctx);
-assert.strictEqual(pref.preferWait, true);
-assert.strictEqual(pref.noBackup, true);
-assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(pref)+')', ctx), true);
-const plain = vm.runInContext('coverMapShift({id:"r1", client_name:"Rivera", shift_start:"2026-09-29T17:00:00Z"})', ctx);
-assert.strictEqual(plain.preferWait, false, 'missing flags do not invent prefer-wait');
-assert.strictEqual(plain.noBackup, false);
+const flagged = vm.runInContext('coverMapShift({id:"h1", client_name:"Helen Park", regular_aide_name:"Sara Nguyen", prefer_wait:true, no_backup:true, status:"open", shift_start:"2026-09-29T13:00:00Z"})', ctx);
+assert.strictEqual(flagged.preferWait, undefined, 'prefer_wait is not stored on the shift');
+assert.strictEqual(flagged.noBackup, undefined, 'no_backup is not stored on the shift');
+assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(flagged)+')', ctx), false, 'client columns do not open the gate');
+const waiting = vm.runInContext('coverMapShift({id:"h2", client_name:"Helen Park", status:"awaiting_client", shift_start:"2026-09-29T13:00:00Z"})', ctx);
+assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(waiting)+')', ctx), true, 'awaiting_client gates assign');
+const refused = vm.runInContext('coverMapShift({id:"h3", client_name:"Helen Park", status:"client_refused_resume_next_day", shift_start:"2026-09-29T13:00:00Z"})', ctx);
+assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(refused)+')', ctx), true, 'refused backup gates assign');
+const plain = vm.runInContext('coverMapShift({id:"r1", client_name:"Rivera", status:"open", shift_start:"2026-09-29T17:00:00Z"})', ctx);
+assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(plain)+')', ctx), false, 'an open shift is not gated');
 
-const ranked = vm.runInContext('coverMapRank({aide_id:"a1", name:"Devon", continuity_score:4, distance_miles:1.8, worked_this_client:12, score:9, rank:1})', ctx);
-assert.strictEqual(ranked.visits, 12, 'explicit continuity count wins');
-assert.strictEqual(ranked.continuity, 4, 'ace score field stays stored');
+const ranked = vm.runInContext('coverMapRank({aide_id:"a1", name:"Devon", continuity_score:12, distance_miles:1.8, worked_this_client:4, score:9, rank:1})', ctx);
+assert.strictEqual(ranked.continuity, 12, 'continuity_score is the times-worked count');
+assert.strictEqual(vm.runInContext('coverDesk1Visits('+JSON.stringify(ranked)+')', ctx), 12, 'why-line uses continuity_score');
 assert.strictEqual(ranked.score, 9);
+assert.strictEqual(ranked.id, 'a1');
 
 console.log('admin-cover-desk1 unit ok');
