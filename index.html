@@ -31856,11 +31856,9 @@ function aideCredManageOn(){
 }
 function aideCredHideForManage(){
   var root=document.getElementById('aideCredsRoot');
-  if(aideCredHideForManage.held!==true){
-    aideCredHideForManage.wasHidden=!(root&&root.hidden===false);
-    aideCredHideForManage.held=true;
-  }
+  var tab=document.getElementById('tab_aides');
   if(root)root.hidden=true;
+  if(tab&&tab.classList)tab.classList.remove('aide-creds-on');
   var detail=document.getElementById('aideCredDetail');
   if(detail){detail.hidden=true;detail.innerHTML='';}
   var list=document.getElementById('aideCredList');
@@ -31869,6 +31867,8 @@ function aideCredHideForManage(){
   if(typeof aideCredState!=='undefined'&&aideCredState){
     aideCredState.seq=(aideCredState.seq||0)+1;
     aideCredState.view='list';
+    aideCredState.aideId='';
+    aideCredState.aideName='';
     aideCredState.sheetOpen=false;
     aideCredState.pickAide=false;
     aideCredState.editing=null;
@@ -31876,14 +31876,18 @@ function aideCredHideForManage(){
   }
 }
 function aideCredShowAfterManage(){
-  if(aideCredHideForManage.held!==true)return;
-  var wasHidden=aideCredHideForManage.wasHidden!==false;
-  aideCredHideForManage.held=false;
   var root=document.getElementById('aideCredsRoot');
-  if(root)root.hidden=wasHidden;
-  if(wasHidden)return;
-  if(typeof aideCredState!=='undefined'&&aideCredState)aideCredState.view='list';
-  if(typeof aideCredPaintList==='function')aideCredPaintList();
+  var tab=document.getElementById('tab_aides');
+  if(root)root.hidden=true;
+  if(tab&&tab.classList)tab.classList.remove('aide-creds-on');
+  var detail=document.getElementById('aideCredDetail');
+  if(detail){detail.hidden=true;detail.innerHTML='';}
+  if(typeof aideCredState!=='undefined'&&aideCredState){
+    aideCredState.view='list';
+    aideCredState.aideId='';
+    aideCredState.aideName='';
+    aideCredState.credentials=[];
+  }
 }
 function aideCredToggleManage(){
   var tab=document.getElementById('tab_aides');
