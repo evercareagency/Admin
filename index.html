@@ -24,6 +24,12 @@
 <!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage, Done, and + Aide. Refresh stays hidden. v=manage-clean1. Done exits Manage back to the Aides info-card list and does not reopen credentials. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. Ace tip 2026-09-28: no admin_deactivate_client RPC and no Ace patch. The client loop posts archive_client once per id through sbAdminArchiveClient, which PATCH clients is_active=false and selects id, is_active. After that row confirms, the same id soft-unassigns active assignments (PATCH assignments is_active=false where client_id and is_active true). Never hard-DELETE. Restore on Recently deleted is PATCH clients is_active=true, not a restore RPC, and it does not turn assignments back on. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at and selects id, is_active, deleted_at. Not archive-only. Restore of Recently deleted PATCH is_active true and deleted_at null only where deleted_at is not null. Archive stays is_active false with deleted_at null. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-28-aide-manage-delete1">
 <script>var AIDE_MANAGE_DELETE1_MARKER='v=aide-manage-delete1';var AIDE_MANAGE_DELETE1_BUILD='2026-09-28-aide-manage-delete1';</script>
+<!-- care msg safe 2026-09-28 v=care-msg-safe1 ?v=care-msg-safe1 admin-build 2026-09-28-care-msg-safe1. GHOST-CARE-MSG-SAFE1-CONTRACT-v1. Admin half. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Aide chat / Messages (#tab_aidechat) keeps the composer (Type a message / Send) ABOVE the fixed Admin bottom tab bar. It never sits under Schedule, Timesheets, Aides, Cover, Backup, or More. When that composer focuses and the phone keyboard opens, the thread and the composer stay in the visual viewport (visualViewport pin, html.aidechat-kb). Bottom tabs tuck while the keyboard is open so they do not float over Safari chrome and bubbles do not scroll into empty white. Remi Ask on the phone sheet uses the same rule for the composer placeholder Ask or just chat…: the composer sits ABOVE #bottomNav, and a focused Ask field pins the Remi thread plus the Ask composer to the visual viewport (html.remi-ask-kb) with the Admin tabs tucked. Desktop right rail at 900px and up stays. Prior markers stay, including v=msg-dense1, v=remi-phone-rail1, v=remi-chat1, v=loginkb1, and v=aide-manage-delete1. -->
+<meta name="admin-build" content="2026-09-28-care-msg-safe1">
+<script>var CARE_MSG_SAFE1_MARKER='v=care-msg-safe1';var CARE_MSG_SAFE1_BUILD='2026-09-28-care-msg-safe1';</script>
+<!-- manage done 2026-09-28 v=manage-done1 ?v=manage-done1 admin-build 2026-09-28-manage-done1. GHOST-MANAGE-DONE1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. Done fully exits Manage. It is a force-off, not a second call to the same half-toggle. On Aides, Done calls aideManageDone1Exit: remove aide-manage-on and aide-manage-confirming (and manage-confirming), hide Done, show Manage + Refresh + Add aide (+ Aide), hide the select bar, checkboxes, N selected, and Are you sure? chrome, clear the selection, and keep #aideCredsRoot hidden so credentials do not reopen (manage-clean1). Mo does not switch Active or Recently deleted to leave Manage. While Manage is on, Manage itself is hidden so the header is not dual Manage+Done. Clients clientManageDelete1ToggleManage(false) and Timesheets tsManageDelete1ToggleManage(false) use the same force-off: hide Done, restore Manage, drop client-manage-on / ts-manage-on and the confirming class, and hide the select bar. Prior markers stay, including v=aide-manage-delete1, v=manage-clean1, v=aides-info1, and v=aidadel1. -->
+<meta name="admin-build" content="2026-09-28-manage-done1">
+<script>var MANAGE_DONE1_MARKER='v=manage-done1';var MANAGE_DONE1_BUILD='2026-09-28-manage-done1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -1046,13 +1052,23 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_aidechat .msg-dense-panel #aidechatMessages{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:4px 2px 8px;}
 #tab_aidechat .msg-dense-day{align-self:center;font-size:0.68rem;font-weight:800;letter-spacing:0.06em;color:var(--muted);margin:6px 0 2px;}
 #tab_aidechat .msg-dense-panel #clienthrs1dSched{margin-top:8px;max-height:min(280px,calc(100% - 148px));overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
-#tab_aidechat .msg-dense-panel .aidechat-composer{flex-direction:row;align-items:center;gap:8px;margin-top:8px;box-sizing:border-box;}
+#tab_aidechat .msg-dense-panel .aidechat-composer{flex-direction:row;align-items:center;gap:8px;margin-top:8px;box-sizing:border-box;flex-shrink:0;}
 #tab_aidechat .msg-dense-panel #aidechatReply{flex:1 1 auto;min-width:0;width:auto;max-width:100%;min-height:44px;max-height:88px;border-radius:999px;padding:10px 14px;resize:none;}
 #tab_aidechat .msg-dense-panel .aidechat-composer .btn{width:auto;min-width:72px;min-height:44px;border-radius:999px;flex:0 0 auto;padding:10px 16px;}
 #tab_aidechat .msg-dense-panel .aidechat-back{margin-bottom:6px;}
 @media(min-width:901px){
   #tab_aidechat.is-open .msg-dense-panel,#tab_aidechat.is-thread #aidechatInboxView{height:calc(100dvh - 168px);max-height:calc(100dvh - 150px);}
 }
+/* v=care-msg-safe1 — phone composer stays above #bottomNav. Keyboard tucks the tab bar. */
+@media(max-width:899px){
+  #tab_aidechat.is-open .msg-dense-panel{height:calc(100dvh - 240px);max-height:calc(100dvh - 220px);}
+}
+html.aidechat-kb #adminScreen .bottom-nav,
+html.remi-ask-kb #adminScreen .bottom-nav{display:none !important;}
+html.aidechat-kb,html.aidechat-kb body,
+html.remi-ask-kb,html.remi-ask-kb body{overflow:hidden;height:100%;}
+html.aidechat-kb #aidechatThreadView{background:#f4f8fb;}
+html.remi-ask-kb #copilotSheet{z-index:180;}
 /* v=clienthrs1d — Notifications roster, schedule-send, chat names. Phone-first. No SMS. */
 #tab_notifications{max-width:100%;min-width:0;}
 #tab_notifications[hidden]{display:none !important;}
@@ -1208,7 +1224,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .remi-wx-hours{display:flex;gap:10px;margin-top:12px;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;}
 .remi-wx-hour{flex:1 1 0;min-width:44px;text-align:center;font-size:0.75rem;line-height:1.2;font-weight:650;}
 .remi-wx-hour span{display:block;font-size:1.05rem;margin-bottom:2px;}
-.copilot-composer{display:flex;gap:8px;align-items:center;min-width:0;max-width:100%;padding-top:8px;box-sizing:border-box;}
+.copilot-composer{display:flex;gap:8px;align-items:center;min-width:0;max-width:100%;padding-top:8px;box-sizing:border-box;flex-shrink:0;}
 .copilot-composer[hidden]{display:none !important;}
 #copilotSheet .copilot-composer input{flex:1 1 auto;min-width:0;width:auto;}
 #copilotSheet .copilot-composer .btn{flex:0 0 auto;width:auto;min-width:72px;min-height:48px;padding:0 16px;}
@@ -1703,6 +1719,8 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_aides.aide-manage-on #aideManageDoneBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
 #aideManageDoneBtn[hidden]{display:none !important;}
 #tab_aides:not(.aide-manage-on) #aideManageDoneBtn{display:none !important;}
+/* v=manage-done1 — while Manage is on, only Done is the exit. Manage returns after a full exit. */
+#tab_aides.aide-manage-on #aideCredManageBtn{display:none !important;}
 #tab_aides.aide-manage-on #aideManageBar .aide-manage-pair{flex:2 1 0;min-width:0;}
 #tab_aides.aide-manage-on #aideManageBar .aide-manage-pair .btn{padding:0 8px;font-size:0.82rem;white-space:nowrap;}
 #tab_aides.aide-manage-on #aideManageBar .aide-manage-delete{flex:1 1 0;min-width:0;padding:0 8px;font-size:0.82rem;white-space:nowrap;background:var(--danger);color:#fff;border-color:var(--danger);}
@@ -1759,6 +1777,9 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_clients.client-manage-on #clientDeskSub,
 #tab_clients.client-manage-on #clientInsLegend{display:none !important;}
 #tab_clients.client-manage-on #clientManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#tab_clients.client-manage-on #clientManageBtn{display:none !important;}
+#clientManageDoneBtn[hidden],#tab_clients:not(.client-manage-on) #clientManageDoneBtn{display:none !important;}
+#tab_clients.client-manage-on #clientManageDoneBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
 #clientManageSure{scroll-margin-top:72px;}
 #tab_clients.client-manage-confirming #clientManageSure{position:relative;z-index:230;background:var(--off);}
 #tab_clients.client-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
@@ -1779,6 +1800,9 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_timesheets.ts-manage-on #tsRefreshBtn,
 #tab_timesheets.ts-manage-on #tsDeskSub{display:none !important;}
 #tab_timesheets.ts-manage-on #tsManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#tab_timesheets.ts-manage-on #tsManageBtn{display:none !important;}
+#tsManageDoneBtn[hidden],#tab_timesheets:not(.ts-manage-on) #tsManageDoneBtn{display:none !important;}
+#tab_timesheets.ts-manage-on #tsManageDoneBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
 #tsManageSure{scroll-margin-top:72px;}
 #tab_timesheets.ts-manage-confirming #tsManageSure{position:relative;z-index:230;background:var(--off);}
 #tab_timesheets.ts-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
@@ -2732,6 +2756,7 @@ bindLoginKeyboard();
           <div><h1>Timesheets</h1><p id="tsDeskSub">Active submitted caregiver timesheets</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost" id="tsManageBtn" type="button" onclick="tsManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
+            <button class="btn btn-navy" id="tsManageDoneBtn" type="button" data-manage-done1="v=manage-done1" hidden onclick="tsManageDelete1ToggleManage(false)">Done</button>
             <button type="button" class="btn btn-ghost" id="remiPayrollIns1TimesheetsOpen" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1OpenPage()">Payroll report</button>
             <button class="btn btn-ghost" id="exportAllPdfsBtn" onclick="exportAllAsPDFs()">📄 Export all as PDFs</button>
             <button class="btn btn-teal" id="tsRefreshBtn" type="button" onclick="renderTimesheets()">🔄 Refresh</button>
@@ -3087,7 +3112,7 @@ bindLoginKeyboard();
           <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
             <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()" aria-pressed="false">Manage</button>
-            <button class="btn btn-navy" id="aideManageDoneBtn" type="button" data-manage-clean1="v=manage-clean1" hidden onclick="aideCredToggleManage()">Done</button>
+            <button class="btn btn-navy" id="aideManageDoneBtn" type="button" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" hidden onclick="aideManageDone1Exit()">Done</button>
             <button class="btn btn-ghost" id="aideRefreshBtn" type="button" onclick="renderAides(true)">🔄 Refresh</button>
             <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Aide</button>
           </div>
@@ -3186,6 +3211,7 @@ bindLoginKeyboard();
           <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="clientDeskSub">Manage client addresses and assign aides for location verification</p></div>
           <div class="page-actions" style="display:flex;gap:8px">
             <button class="btn btn-ghost" id="clientManageBtn" type="button" onclick="clientManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
+            <button class="btn btn-navy" id="clientManageDoneBtn" type="button" data-manage-done1="v=manage-done1" hidden onclick="clientManageDelete1ToggleManage(false)">Done</button>
             <button class="btn btn-ghost" id="clientRefreshBtn" type="button" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
@@ -10177,29 +10203,67 @@ function copilotChatViewport(){
   var sheet=copilotEl('copilotSheet');
   if(!sheet)return;
   var vv=window.visualViewport;
-  var phone=window.innerWidth<=520;
+  var phone=(window.innerWidth||0)<=899;
+  var ask=(copilotView==='chat')&&!sheet.hidden&&phone;
   var chatting=(copilotView==='chat'||copilotView==='notes'||copilotView==='rules'||copilotView==='scheduled'||copilotView==='receipts')&&!sheet.hidden&&phone&&vv;
-  if(!chatting){
+  function clearKb(){
+    document.documentElement.classList.remove('remi-ask-kb');
+    if(document.body)document.body.classList.remove('remi-ask-kb');
+  }
+  if(!chatting&&!ask){
+    clearKb();
     sheet.style.top='';
     sheet.style.height='';
     sheet.style.maxHeight='';
     sheet.style.bottom='';
     return;
   }
-  var gap=window.innerHeight-((vv.height||0)+(vv.offsetTop||0));
-  if(gap<40){
+  var gap=vv?(window.innerHeight-((vv.height||0)+(vv.offsetTop||0))):0;
+  var input=document.getElementById('copilotChatInput');
+  var focused=!!(document.activeElement&&input&&(document.activeElement===input||document.activeElement.id==='copilotChatSend'));
+  if(ask&&focused&&gap>=80&&vv){
+    document.documentElement.classList.add('remi-ask-kb');
+    if(document.body)document.body.classList.add('remi-ask-kb');
+    var top=0;
+    if(typeof loginKbFixedFollowsLayout==='function'&&loginKbFixedFollowsLayout(vv))top=vv.offsetTop||0;
+    var h=Math.max(200, Math.round(vv.height||0));
+    sheet.style.top=Math.round(top)+'px';
+    sheet.style.bottom='auto';
+    sheet.style.height=h+'px';
+    sheet.style.maxHeight=h+'px';
+    var body=document.getElementById('copilotBody');
+    if(body)body.scrollTop=body.scrollHeight;
+    return;
+  }
+  clearKb();
+  if(ask&&gap<80){
+    var nav=document.getElementById('bottomNav');
+    var reserve=72;
+    if(nav&&nav.getBoundingClientRect){
+      var nr=nav.getBoundingClientRect();
+      var cs=window.getComputedStyle?window.getComputedStyle(nav):null;
+      var hiddenNav=cs&&(cs.display==='none'||cs.visibility==='hidden');
+      if(!hiddenNav&&nr.top>80&&nr.height>=8)reserve=Math.max(56, Math.round((window.innerHeight||0)-nr.top));
+    }
+    sheet.style.top='';
+    sheet.style.height='';
+    sheet.style.maxHeight='';
+    sheet.style.bottom=reserve+'px';
+    return;
+  }
+  if(!chatting||!vv||gap<40){
     sheet.style.top='';
     sheet.style.height='';
     sheet.style.maxHeight='';
     sheet.style.bottom='';
     return;
   }
-  var reserve=remiPhoneRail1NavReserve(vv);
-  var h=Math.max(200, Math.round((vv.height||0)-reserve));
+  var reserveKb=remiPhoneRail1NavReserve(vv);
+  var h2=Math.max(200, Math.round((vv.height||0)-reserveKb));
   sheet.style.top=(vv.offsetTop||0)+'px';
   sheet.style.bottom='auto';
-  sheet.style.height=h+'px';
-  sheet.style.maxHeight=h+'px';
+  sheet.style.height=h2+'px';
+  sheet.style.maxHeight=h2+'px';
 }
 function copilotChatBindViewport(){
   if(copilotChatBound)return;
@@ -12434,11 +12498,141 @@ function msgDense1Fit(){
       if(overlap>0&&fb.bottom>fr.top&&fb.top<fr.bottom)form.style.paddingRight=Math.ceil(overlap+8)+'px';
     }
   }
+  if(typeof careMsgSafe1AfterFit==='function')careMsgSafe1AfterFit();
+}
+function careMsgSafe1Phone(){
+  return (window.innerWidth||0)>0&&(window.innerWidth||0)<=899;
+}
+function careMsgSafe1KbGap(){
+  var vv=window.visualViewport;
+  if(!vv)return 0;
+  return Math.max(0,(window.innerHeight||0)-((vv.height||0)+(vv.offsetTop||0)));
+}
+function careMsgSafe1ClearAidePin(){
+  document.documentElement.classList.remove('aidechat-kb');
+  if(document.body)document.body.classList.remove('aidechat-kb');
+  var thread=document.getElementById('aidechatThreadView');
+  if(!thread)return;
+  thread.style.position='';
+  thread.style.top='';
+  thread.style.left='';
+  thread.style.right='';
+  thread.style.bottom='';
+  thread.style.width='';
+  thread.style.height='';
+  thread.style.maxHeight='';
+  thread.style.zIndex='';
+  thread.style.overflow='';
+}
+function careMsgSafe1PinAide(){
+  if(!careMsgSafe1Phone()){careMsgSafe1ClearAidePin();return;}
+  var tab=document.getElementById('tab_aidechat');
+  var open=!!(tab&&tab.classList.contains('active')&&tab.classList.contains('is-open')&&!tab.hidden);
+  var el=document.activeElement;
+  var focused=!!(el&&(el.id==='aidechatReply'||el.id==='aidechatSend'));
+  var gap=careMsgSafe1KbGap();
+  var vv=window.visualViewport;
+  if(!open||!focused||gap<80||!vv){
+    if(document.documentElement.classList.contains('aidechat-kb'))careMsgSafe1ClearAidePin();
+    return;
+  }
+  document.documentElement.classList.add('aidechat-kb');
+  if(document.body)document.body.classList.add('aidechat-kb');
+  var thread=document.getElementById('aidechatThreadView');
+  var panel=document.getElementById('msgDensePanel');
+  var top=0;
+  if(typeof loginKbFixedFollowsLayout==='function'&&loginKbFixedFollowsLayout(vv))top=vv.offsetTop||0;
+  var shell=document.querySelector('#adminScreen .shell-top');
+  var shellH=shell?Math.ceil(shell.getBoundingClientRect().height):56;
+  var pinTop=Math.round(top+shellH);
+  var h=Math.max(180, Math.round((vv.height||0)-shellH-6));
+  if(thread){
+    thread.style.position='fixed';
+    thread.style.top=pinTop+'px';
+    thread.style.left='0px';
+    thread.style.right='0px';
+    thread.style.width='100%';
+    thread.style.height=h+'px';
+    thread.style.maxHeight=h+'px';
+    thread.style.bottom='auto';
+    thread.style.zIndex='180';
+    thread.style.overflow='hidden';
+    thread.style.boxSizing='border-box';
+  }
+  if(panel){
+    panel.style.height='100%';
+    panel.style.maxHeight='100%';
+    panel.style.minHeight='0px';
+  }
+  var box=document.getElementById('aidechatMessages');
+  if(box)box.scrollTop=box.scrollHeight;
+}
+function careMsgSafe1FitComposer(){
+  if(!careMsgSafe1Phone())return;
+  if(document.documentElement.classList.contains('aidechat-kb'))return;
+  var tab=document.getElementById('tab_aidechat');
+  if(!(tab&&tab.classList.contains('is-open')&&!tab.hidden))return;
+  var panel=document.getElementById('msgDensePanel');
+  var nav=document.getElementById('bottomNav');
+  if(!panel||!nav||!nav.getBoundingClientRect)return;
+  var cs=window.getComputedStyle?window.getComputedStyle(nav):null;
+  if(cs&&(cs.display==='none'||cs.visibility==='hidden'))return;
+  var navTop=nav.getBoundingClientRect().top;
+  if(!(navTop>120))return;
+  var panelTop=panel.getBoundingClientRect().top;
+  var h=Math.round(navTop-8-panelTop);
+  var cap=Math.round(navTop-8);
+  if(h>cap)h=cap;
+  if(h<220)h=220;
+  panel.style.minHeight='0px';
+  panel.style.height=h+'px';
+  panel.style.maxHeight=h+'px';
+}
+function careMsgSafe1AfterFit(){
+  var tab=document.getElementById('tab_aidechat');
+  var open=!!(tab&&tab.classList.contains('is-open')&&!tab.hidden);
+  if(!open)careMsgSafe1ClearAidePin();
+  careMsgSafe1PinAide();
+  careMsgSafe1FitComposer();
+}
+function careMsgSafe1Bind(){
+  if(careMsgSafe1Bind.done)return;
+  careMsgSafe1Bind.done=true;
+  document.addEventListener('focusin', function(ev){
+    var t=ev&&ev.target;
+    if(!t)return;
+    if(t.id==='aidechatReply'||t.id==='aidechatSend'){
+      careMsgSafe1PinAide();
+      setTimeout(careMsgSafe1PinAide, 80);
+      setTimeout(careMsgSafe1PinAide, 320);
+    }
+    if(t.id==='copilotChatInput'||t.id==='copilotChatSend'){
+      if(typeof copilotChatViewport==='function'){
+        copilotChatViewport();
+        setTimeout(copilotChatViewport, 80);
+        setTimeout(copilotChatViewport, 320);
+      }
+    }
+  });
+  document.addEventListener('focusout', function(){
+    setTimeout(function(){
+      careMsgSafe1PinAide();
+      careMsgSafe1FitComposer();
+      if(typeof copilotChatViewport==='function')copilotChatViewport();
+    }, 60);
+  });
+  var vv=window.visualViewport;
+  if(vv&&vv.addEventListener){
+    vv.addEventListener('resize', function(){careMsgSafe1PinAide();if(typeof copilotChatViewport==='function')copilotChatViewport();});
+    vv.addEventListener('scroll', function(){careMsgSafe1PinAide();if(typeof copilotChatViewport==='function')copilotChatViewport();});
+  }
 }
 try{
   if(typeof window!=='undefined'&&window.addEventListener){
     window.addEventListener('resize', function(){msgDense1Fit();});
     if(window.visualViewport&&window.visualViewport.addEventListener)window.visualViewport.addEventListener('resize', function(){msgDense1Fit();});
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded', careMsgSafe1Bind);
+    else careMsgSafe1Bind();
   }
 }catch(e){}
 // v=more-hide1 — leaving Messages hides the thread on every tab. Not More-only.
@@ -31958,8 +32152,57 @@ function aideCredToggleManage(){
   var btn=document.getElementById('aideCredManageBtn');
   if(btn)btn.setAttribute('aria-pressed', on?'true':'false');
   if(on)aideCredHideForManage();
-  else aideCredShowAfterManage();
+  else {
+    if(tab.classList){
+      tab.classList.remove('aide-manage-confirming');
+      tab.classList.remove('manage-confirming');
+    }
+    var sureOff=document.getElementById('aideManageSure');
+    if(sureOff)sureOff.hidden=true;
+    var boxOff=document.getElementById('aideManageConfirm');
+    if(boxOff)boxOff.hidden=true;
+    var barOff=document.getElementById('aideManageBar');
+    if(barOff)barOff.hidden=true;
+    aideCredShowAfterManage();
+  }
   if(!on&&typeof aideManageDelete1Clear==='function')aideManageDelete1Clear();
+  if(typeof aideManageDelete1Sync==='function')aideManageDelete1Sync();
+}
+function aideManageDone1Exit(){
+  var tab=document.getElementById('tab_aides');
+  if(tab&&tab.classList){
+    tab.classList.remove('aide-manage-on');
+    tab.classList.remove('aide-manage-confirming');
+    tab.classList.remove('manage-confirming');
+  }
+  if(typeof aideCredShowAfterManage==='function')aideCredShowAfterManage();
+  if(typeof aideManageDelete1Sel!=='undefined')aideManageDelete1Sel={};
+  var sure=document.getElementById('aideManageSure');
+  if(sure)sure.hidden=true;
+  var box=document.getElementById('aideManageConfirm');
+  if(box)box.hidden=true;
+  var bar=document.getElementById('aideManageBar');
+  if(bar)bar.hidden=true;
+  var boxes=typeof aideManageDelete1Boxes==='function'?aideManageDelete1Boxes():[];
+  var i;
+  for(i=0;i<boxes.length;i++){
+    boxes[i].checked=false;
+    var card=boxes[i].closest?boxes[i].closest('article'):null;
+    if(card&&card.classList)card.classList.remove('is-selected');
+  }
+  var done=document.getElementById('aideManageDoneBtn');
+  if(done){
+    done.hidden=true;
+    done.style.display='none';
+    done.setAttribute('aria-pressed','false');
+  }
+  var manage=document.getElementById('aideCredManageBtn');
+  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&!(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  if(manage){
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
+    manage.setAttribute('aria-pressed','false');
+  }
   if(typeof aideManageDelete1Sync==='function')aideManageDelete1Sync();
 }
 function aideCredsAfterAides(){
@@ -32774,15 +33017,32 @@ function aideManageDelete1Sync(){
   var bar=document.getElementById('aideManageBar');
   var show=aideManageDelete1Active();
   if(bar)bar.hidden=!show;
-  if(!show)aideManageDelete1CloseConfirm();
+  if(!show){
+    var sure=document.getElementById('aideManageSure');
+    if(sure)sure.hidden=true;
+    var box=document.getElementById('aideManageConfirm');
+    if(box)box.hidden=true;
+    if(tab&&tab.classList){
+      tab.classList.remove('aide-manage-confirming');
+      tab.classList.remove('manage-confirming');
+    }
+  }
   var manageOn=!!(tab&&tab.classList&&tab.classList.contains('aide-manage-on'));
+  var deleted=(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  var can=(typeof canManageAides!=='function'||canManageAides());
   var manage=document.getElementById('aideCredManageBtn');
-  if(manage&&tab)manage.setAttribute('aria-pressed', manageOn?'true':'false');
+  if(manage){
+    var manageShow=can&&!deleted&&!manageOn;
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
+    manage.setAttribute('aria-pressed', manageOn?'true':'false');
+  }
   var done=document.getElementById('aideManageDoneBtn');
-  var doneShow=manageOn&&!(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  var doneShow=manageOn;
   if(done){
     done.hidden=!doneShow;
     done.style.display=doneShow?'':'none';
+    done.setAttribute('aria-pressed', manageOn?'true':'false');
   }
   aideManageDelete1PaintCount();
   aideManageDelete1Bind();
@@ -33395,16 +33655,33 @@ function tsManageDelete1Sync(){
   var tab=document.getElementById('tab_timesheets');
   var active=(typeof tsDesk==='undefined'||tsDesk==='active');
   if(tab&&tab.classList)tab.classList.toggle('ts-desk-active', active);
+  var on=!!(tab&&tab.classList&&tab.classList.contains('ts-manage-on'));
   var bar=document.getElementById('tsManageBar');
   var show=tsManageDelete1Active();
   if(bar)bar.hidden=!show;
-  if(!show)tsManageDelete1CloseConfirm();
+  if(!show){
+    var sure=document.getElementById('tsManageSure');
+    if(sure)sure.hidden=true;
+    var box=document.getElementById('tsManageConfirm');
+    if(box)box.hidden=true;
+    if(tab&&tab.classList){
+      tab.classList.remove('ts-manage-confirming');
+      tab.classList.remove('manage-confirming');
+    }
+  }
   var manage=document.getElementById('tsManageBtn');
-  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&active;
+  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&active&&!on;
   if(manage){
     manage.hidden=!manageShow;
     manage.style.display=manageShow?'':'none';
-    if(tab)manage.setAttribute('aria-pressed', tab.classList.contains('ts-manage-on')?'true':'false');
+    manage.setAttribute('aria-pressed', on?'true':'false');
+  }
+  var done=document.getElementById('tsManageDoneBtn');
+  var doneShow=on;
+  if(done){
+    done.hidden=!doneShow;
+    done.style.display=doneShow?'':'none';
+    done.setAttribute('aria-pressed', on?'true':'false');
   }
   tsManageDelete1PaintCount();
   tsManageDelete1Bind();
@@ -33415,13 +33692,36 @@ function tsManageDelete1OnDesk(){
   tsManageDelete1Sync();
 }
 function tsManageDelete1ToggleManage(){
+  var force=arguments[0];
   var tab=document.getElementById('tab_timesheets');
   if(!tab)return;
+  if(force===false){
+    tab.classList.remove('ts-manage-on');
+    tab.classList.remove('ts-manage-confirming');
+    tab.classList.remove('manage-confirming');
+    tsManageDelete1Sel={};
+    var sure=document.getElementById('tsManageSure');
+    if(sure)sure.hidden=true;
+    var box=document.getElementById('tsManageConfirm');
+    if(box)box.hidden=true;
+    var bar=document.getElementById('tsManageBar');
+    if(bar)bar.hidden=true;
+    tsManageDelete1Sync();
+    return;
+  }
   if(typeof canManageAides==='function'&&!canManageAides())return;
   if(typeof tsDesk!=='undefined'&&tsDesk!=='active')return;
   tab.classList.toggle('ts-manage-on');
   var on=tab.classList.contains('ts-manage-on');
-  if(!on)tsManageDelete1Clear();
+  if(!on){
+    tab.classList.remove('ts-manage-confirming');
+    tab.classList.remove('manage-confirming');
+    var sureOff=document.getElementById('tsManageSure');
+    if(sureOff)sureOff.hidden=true;
+    var boxOff=document.getElementById('tsManageConfirm');
+    if(boxOff)boxOff.hidden=true;
+    tsManageDelete1Clear();
+  }
   tsManageDelete1Sync();
 }
 function tsManageDelete1Bind(){
@@ -36580,16 +36880,35 @@ function clientManageDelete1CloseConfirm(){
 function clientManageDelete1Sync(){
   var tab=document.getElementById('tab_clients');
   if(tab&&tab.classList)tab.classList.toggle('client-desk-deleted', typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var on=!!(tab&&tab.classList&&tab.classList.contains('client-manage-on'));
   var bar=document.getElementById('clientManageBar');
   var show=clientManageDelete1Active();
   if(bar)bar.hidden=!show;
-  if(!show)clientManageDelete1CloseConfirm();
+  if(!show){
+    var sure=document.getElementById('clientManageSure');
+    if(sure)sure.hidden=true;
+    var box=document.getElementById('clientManageConfirm');
+    if(box)box.hidden=true;
+    if(tab&&tab.classList){
+      tab.classList.remove('client-manage-confirming');
+      tab.classList.remove('manage-confirming');
+    }
+  }
   var manage=document.getElementById('clientManageBtn');
-  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&!(typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var can=(typeof canManageAides!=='function'||canManageAides());
+  var deleted=(typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var manageShow=can&&!deleted&&!on;
   if(manage){
     manage.hidden=!manageShow;
     manage.style.display=manageShow?'':'none';
-    if(tab)manage.setAttribute('aria-pressed', tab.classList.contains('client-manage-on')?'true':'false');
+    manage.setAttribute('aria-pressed', on?'true':'false');
+  }
+  var done=document.getElementById('clientManageDoneBtn');
+  var doneShow=on;
+  if(done){
+    done.hidden=!doneShow;
+    done.style.display=doneShow?'':'none';
+    done.setAttribute('aria-pressed', on?'true':'false');
   }
   clientManageDelete1PaintCount();
   clientManageDelete1Bind();
@@ -36600,13 +36919,36 @@ function clientManageDelete1OnDesk(){
   clientManageDelete1Sync();
 }
 function clientManageDelete1ToggleManage(){
+  var force=arguments[0];
   var tab=document.getElementById('tab_clients');
   if(!tab)return;
+  if(force===false){
+    tab.classList.remove('client-manage-on');
+    tab.classList.remove('client-manage-confirming');
+    tab.classList.remove('manage-confirming');
+    clientManageDelete1Sel={};
+    var sure=document.getElementById('clientManageSure');
+    if(sure)sure.hidden=true;
+    var box=document.getElementById('clientManageConfirm');
+    if(box)box.hidden=true;
+    var bar=document.getElementById('clientManageBar');
+    if(bar)bar.hidden=true;
+    clientManageDelete1Sync();
+    return;
+  }
   if(typeof canManageAides==='function'&&!canManageAides())return;
   if(typeof clientDesk!=='undefined'&&clientDesk==='deleted')return;
   tab.classList.toggle('client-manage-on');
   var on=tab.classList.contains('client-manage-on');
-  if(!on)clientManageDelete1Clear();
+  if(!on){
+    tab.classList.remove('client-manage-confirming');
+    tab.classList.remove('manage-confirming');
+    var sureOff=document.getElementById('clientManageSure');
+    if(sureOff)sureOff.hidden=true;
+    var boxOff=document.getElementById('clientManageConfirm');
+    if(boxOff)boxOff.hidden=true;
+    clientManageDelete1Clear();
+  }
   clientManageDelete1Sync();
 }
 function clientManageDelete1Bind(){
