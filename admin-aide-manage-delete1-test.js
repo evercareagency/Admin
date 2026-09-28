@@ -497,6 +497,13 @@ assert.ok(tsRun.includes("cacheInvalidate('get_all')"), 'Timesheets cache drops'
 assert.ok(!/reset_aide_temp_password|reseal|mossier|action:\s*'delete'|sbAdminSoftDeleteTimesheet|sbRestRpc|method:\s*'DELETE'|DELETE\s+FROM/.test(tsRun), 'Timesheets bulk never reseals, hard-deletes, or archives without deleted_at');
 assert.ok(extractFn(html, 'function quickDelete(id)').includes("showSharedConfirm('Archive this timesheet?'"), 'single archive confirm stays');
 assert.ok(html.includes("action:'restore_trashed_timesheet'"), 'existing trash restore stays');
+const trashFn = extractFn(html, 'async function sbAdminTrashTimesheet(payload)');
+assert.ok(trashFn.includes('is_active:false,deleted_at:stamp') && trashFn.includes("['select','id,is_active,deleted_at']"), 'trash PATCH sets deleted_at and selects the stamp');
+assert.ok(!/method:\s*'DELETE'|DELETE\s+FROM/.test(trashFn), 'trash is not a hard DELETE');
+const trashRestore = extractFn(html, 'async function sbAdminRestoreTrashedTimesheet(payload)');
+assert.ok(trashRestore.includes('is_active:true,deleted_at:null') && trashRestore.includes("['deleted_at','not.is.null']"), 'Recently deleted restore requires deleted_at');
+const archiveOnly = extractFn(html, 'async function sbAdminSoftDeleteTimesheet(payload)');
+assert.ok(!archiveOnly.includes('deleted_at:'), 'box Archive does not set deleted_at');
 const tsOpen = extractFn(html, 'function tsManageDelete1OpenConfirm()');
 assert.ok(tsOpen.includes('tsManageSure'), 'Timesheets confirm reveals the page heading');
 assert.ok(tsOpen.includes("'Delete 1 timesheet?'") && tsOpen.includes("'Delete '+n+' timesheets?'"), 'timesheet count copy');
