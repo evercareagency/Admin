@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
+<!-- aide notif search 2026-09-27 v=aide-notif-search1 admin-build 2026-09-27-aide-notif-search1. GHOST-AIDE-NOTIF-SEARCH1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. More → Notifications (#tab_notifications, clienthrs1d) has a search field above the filter chips (Needs attention, All aides, Location off, Chat off). Search matches aide name and username / @handle, case-insensitive, and a leading @ is optional. Filters still call admin_list_aide_notification_roster {p_filter}. Search only narrows the painted rows from that response. Switching a filter chip keeps the search text and re-applies it after paint. An empty search shows the full filtered roster. No matches say No aides match that search. Same spirit as coverRosterSearch and aideCredSearch. No p_search. Nudge buttons stay. No Auth reseal. No Quo/SMS. Remi is unchanged. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=clienthrs1d, v=vapid1, v=aidechat1, and v=remiface1. -->
+<meta name="admin-build" content="2026-09-27-aide-notif-search1">
 <!-- remi just chat 2026-09-27 v=remi-chat1 admin-build 2026-09-27-remi-chat1. GHOST-REMI-CHAT1-CONTRACT-v1. Ace CALLABLE. UI-only. No SQL patch. No new Ace RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Ask “just chat” and “just chatting”, and other small-talk, get a warm short reply with kind empty and no actions. Those lines do not list Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, or Broadcast, and they do not say Name a desk or a person. The desk inventory pitch stays for “what can you do?”, “help”, and “what do you look up?”. The first Ask hello is a light chat-or-ask hint and does not repeat that inventory. An unmatched line that is not small-talk asks what to look up and does not dump the inventory again. Work asks stay the remichat1 local desk lookups and drafts Confirm. Quiet hours stay. Placeholder is Ask or just chat…. Nurse does not get Remi. No Auth reseal. No mossier. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=eca-copilot1, v=remi-float-hide1, remichat1, and remisec1. -->
 <meta name="admin-build" content="2026-09-27-remi-chat1">
 <!-- client hold 2026-09-27 v=hold-client1 admin-build 2026-09-27-hold-client1. GHOST-HOLD-CLIENT1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-client1-v1.sql is already applied. Client-level On hold from the Schedule week and client panel even when the week is dashes only. No Add shift and no invent-a-shift. Put on hold opens Start, End, and Note. Save posts upsert_schedule_client_hold {p_client_id, p_start_date, p_end_date optional, p_note optional}. Filter On hold lists clients with client_on_hold true. The row banner uses hold_banner.label (note · MM/DD – MM/DD). End hold… posts clear_schedule_client_hold {p_hold_id, p_end_date} only. Clear abandons with clear_schedule_client_hold {p_hold_id} and no p_end_date (hold-clear1). list_schedule_week_slots marker and v are hold-client1 and this desk paints client_on_hold and hold_banner. Empty slot days still list the client. After the end date, later weeks have client_on_hold false and the filter excludes them. Hours can resume later. Remi N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Banner short labels are MM/DD. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, v=client-ins1, and v=sched1. -->
@@ -879,6 +881,10 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_notifications{max-width:100%;min-width:0;}
 #tab_notifications[hidden]{display:none !important;}
 .notif-sub{font-size:0.9rem;line-height:1.4;color:var(--muted);margin:4px 0 14px;}
+/* v=aide-notif-search1 — local search above the filter chips. Phone-first. No new RPC. */
+.notif-search{margin:0 0 12px;max-width:100%;min-width:0;}
+.notif-search-lbl{display:block;font-size:0.85rem;font-weight:700;color:var(--navy);margin:0 0 6px;}
+#notifRosterSearch{display:block;width:100%;box-sizing:border-box;min-height:48px;padding:10px 12px;border:1.5px solid var(--border);border-radius:12px;background:#fff;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--navy);}
 .notif-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;}
 .notif-chip{min-height:44px;padding:8px 12px;border-radius:20px;border:1px solid var(--border);background:#fff;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;touch-action:manipulation;}
 .notif-chip.on{background:var(--teal-light);color:var(--teal-dark);border-color:transparent;}
@@ -3126,12 +3132,16 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
       </div>
 
-      <div class="tab-panel" id="tab_notifications" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d" data-vapid1="v=vapid1">
+      <div class="tab-panel" id="tab_notifications" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d" data-vapid1="v=vapid1" data-aide-notif-search1="v=aide-notif-search1">
         <div class="page-hdr">
           <div>
             <h1>Aide notifications</h1>
             <p class="notif-sub">Who has Remi reminders, office chat push, and timesheet location on. Remi delivers the nudge in Messages (+ push if allowed).</p>
           </div>
+        </div>
+        <div class="notif-search" data-aide-notif-search1="v=aide-notif-search1">
+          <label class="notif-search-lbl" for="notifRosterSearch">Search aides</label>
+          <input type="search" id="notifRosterSearch" placeholder="Name or username" autocomplete="off" enterkeyhint="search" aria-label="Search aides by name or username" oninput="clienthrs1dPaintRoster()">
         </div>
         <div class="notif-filters" role="tablist" aria-label="Notification filters">
           <button type="button" class="notif-chip on" id="notifFilterNeeds" data-filter="needs_attention" onclick="clienthrs1dSetFilter('needs_attention')">Needs attention</button>
@@ -11507,6 +11517,24 @@ function clienthrs1dAideLabel(row){
   if(user&&name.indexOf('@'+user)<0)return name+' @'+user;
   return name||user||'Aide';
 }
+// v=aide-notif-search1 local roster search. No p_search. No new RPC.
+var AIDE_NOTIF_SEARCH1_MARKER='v=aide-notif-search1';
+function clienthrs1dSearchQuery(){
+  var el=null;
+  try{el=document.getElementById('notifRosterSearch');}catch(e){el=null;}
+  var q=el?String(el.value||'').trim().toLowerCase():'';
+  while(q.charAt(0)==='@')q=q.slice(1);
+  return q;
+}
+function clienthrs1dRosterMatch(row, query){
+  var q=String(query==null?clienthrs1dSearchQuery():query).trim().toLowerCase();
+  while(q.charAt(0)==='@')q=q.slice(1);
+  if(!q)return true;
+  var name=String(row&&(row.aide_name||row.name)||'').toLowerCase();
+  var user=String(row&&(row.aide_username||row.username)||'').toLowerCase();
+  while(user.charAt(0)==='@')user=user.slice(1);
+  return name.indexOf(q)>=0||user.indexOf(q)>=0;
+}
 function clienthrs1dPaintFilters(){
   var nodes=document.querySelectorAll('#tab_notifications .notif-chip');
   var i;
@@ -11523,8 +11551,12 @@ function clienthrs1dPaintRoster(){
   var empty=document.getElementById('notifEmpty');
   var vapid=document.getElementById('notifVapid');
   if(vapid)vapid.textContent=clienthrs1dVapidNote||'';
-  var rows=clienthrs1dRoster||[];
-  if(empty)empty.hidden=rows.length>0;
+  var q=clienthrs1dSearchQuery();
+  var rows=(clienthrs1dRoster||[]).filter(function(row){return clienthrs1dRosterMatch(row, q);});
+  if(empty){
+    empty.hidden=rows.length>0;
+    empty.textContent=q?'No aides match that search.':'No aides in this filter.';
+  }
   if(!box)return;
   if(!rows.length){box.innerHTML='';return;}
   box.innerHTML=rows.map(function(row){
@@ -11626,6 +11658,7 @@ function clienthrs1dSetFilter(filter){
   if(!allow[filter])filter='needs_attention';
   clienthrs1dFilter=filter;
   clienthrs1dPaintFilters();
+  // v=aide-notif-search1 keeps #notifRosterSearch and re-applies it after this load paints.
   clienthrs1dLoadRoster();
 }
 async function clienthrs1dNudge(aideId, kind, btn){

@@ -20,7 +20,8 @@ assert.ok(html.includes('Do not claim LIVE'), 'do not claim LIVE');
 assert.ok(html.includes('Probe PASS'), 'merge waits for Probe PASS');
 assert.ok(html.includes('hold-client1-v1.sql'), 'Ace patch already applied');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'first admin-build is remi-chat1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-aide-notif-search1'), 'first admin-build is aide-notif-search1');
+assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-hold-client1"') < html.indexOf('content="2026-09-27-aides-info1"'), 'aides-info1 stays after hold-client1');
 assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
@@ -363,7 +364,7 @@ async function shots(){
         dashes: document.querySelectorAll('#schedBody .sched-dash').length
       };
     }, bowlaxId, adaId, hid);
-    assert.strictEqual(boot.build, '2026-09-27-remi-chat1');
+    assert.strictEqual(boot.build, '2026-09-27-aide-notif-search1');
     assert.strictEqual(boot.marker, 'v=hold-client1');
     assert.ok(boot.put.indexOf('Put on hold') >= 0, boot.put);
     assert.ok(boot.put.indexOf('Save hold') >= 0, boot.put);

@@ -13,7 +13,8 @@ assert.ok(html.includes('admin-build 2026-09-25-aidechat1'), 'aidechat1 build no
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-aidechat1">'), 'aidechat1 meta');
 assert.ok(html.includes('<!-- aide office chat 2026-09-25 v=aidechat1 admin-build 2026-09-25-aidechat1'), 'aidechat1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'isdash1b is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'isdash1b is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiask1">'), 'remiask1 meta stays');
 assert.ok(html.indexOf('content="2026-09-25-aidechat1"') < html.indexOf('content="2026-09-25-remiask1"'), 'remiask1 stays on the next meta');
@@ -145,19 +146,21 @@ async function runBrowser(){
         seventh: metas[6] ? metas[6].content : '',
         eighth: metas[7] ? metas[7].content : '',
         ninth: metas[8] ? metas[8].content : '',
+        tenth: metas[9] ? metas[9].content : '',
         marker: AIDECHAT_MARKER,
         ask: typeof REMI_ASK_MARKER === 'string' ? REMI_ASK_MARKER : ''
       };
     });
-    assert.strictEqual(boot.first, '2026-09-27-remi-chat1');
-    assert.strictEqual(boot.second, '2026-09-27-hold-client1');
-    assert.strictEqual(boot.third, '2026-09-27-aides-info1');
-    assert.strictEqual(boot.fourth, '2026-09-27-login-toast1');
-    assert.strictEqual(boot.fifth, '2026-09-27-aide-office-vis1');
-    assert.strictEqual(boot.sixth, '2026-09-27-remi-langs1');
-    assert.strictEqual(boot.seventh, '2026-09-27-hold-clear1');
-    assert.strictEqual(boot.eighth, '2026-09-27-sched-time-tap1');
-    assert.strictEqual(boot.ninth, '2026-09-27-aide-text-chat1');
+    assert.strictEqual(boot.first, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(boot.second, '2026-09-27-remi-chat1');
+    assert.strictEqual(boot.third, '2026-09-27-hold-client1');
+    assert.strictEqual(boot.fourth, '2026-09-27-aides-info1');
+    assert.strictEqual(boot.fifth, '2026-09-27-login-toast1');
+    assert.strictEqual(boot.sixth, '2026-09-27-aide-office-vis1');
+    assert.strictEqual(boot.seventh, '2026-09-27-remi-langs1');
+    assert.strictEqual(boot.eighth, '2026-09-27-hold-clear1');
+    assert.strictEqual(boot.ninth, '2026-09-27-sched-time-tap1');
+    assert.strictEqual(boot.tenth, '2026-09-27-aide-text-chat1');
     assert.strictEqual(boot.marker, 'v=aidechat1');
     assert.strictEqual(boot.ask, 'v=remiask1');
 
