@@ -143,8 +143,14 @@ const box = {
   aidesInfo1Next: function(){return {tone:'next', label:'Next · 09/28/2026'};},
   aidesInfo1Creds: function(){return 'Creds due 10/15/2026';},
   escapeHtml: function(s){return String(s==null?'':s);},
-  renderAides: function(){renders.push(box.aideDesk);},
-  setAideDesk: function(view){box.aideDesk = view; desks.push(view); renders.push(view);},
+  renderAides: function(){
+    renders.push(box.aideDesk);
+    return Promise.resolve().then(function(){
+      els.tab_aides.classList.add('aide-creds-on');
+      els.aideCredsRoot.hidden = false;
+    });
+  },
+  setAideDesk: function(view){box.aideDesk = view; desks.push(view); return box.renderAides();},
   showTab: function(tab){box._tabs = (box._tabs || []).concat(tab);},
   showTempMsg: function(msg){box._toasts = (box._toasts || []).concat(msg);}
 };
@@ -152,6 +158,7 @@ box.aideProfileLinkFixOn = null;
 
 const src = [
   'var aideProfileLinkFixWant="";',
+  'var aideProfileLinkFixRestoreList=false;',
   extractFn(html, 'function aideProfileLinkFixOn()'),
   extractFn(html, 'function aideProfileLinkFixParse(link)'),
   extractFn(html, 'function aideProfileLinkFixFind(aideId)'),
@@ -161,7 +168,8 @@ const src = [
   extractFn(html, 'function aideProfileLinkFixPaintCreds(messageHtml)'),
   extractFn(html, 'async function aideProfileLinkFixLoadCreds(id, name)'),
   extractFn(html, 'function aideProfileLinkFixLeave()'),
-  extractFn(html, 'function aideProfileLinkFixBack()'),
+  extractFn(html, 'function aideProfileLinkFixShowInfoList()'),
+  extractFn(html, 'async function aideProfileLinkFixBack()'),
   extractFn(html, 'function aideProfileLinkFixAfterPaint()'),
   extractFn(html, 'function aideProfileLinkFixOpen(aideId)'),
   extractFn(html, 'function aidesInfo1Follow(link)'),
@@ -205,11 +213,14 @@ assert.strictEqual(els.aideCredsRoot.hidden, true);
   assert.ok(els.aideProfileCreds.innerHTML.indexOf('aide-info-card') < 0, 'credential card is not the aides list');
 
   box.aideDesk = 'deleted';
-  box.aideProfileLinkFixBack();
+  await box.aideProfileLinkFixBack();
   assert.ok(!els.tab_aides.classList.contains('aide-profile-on'));
+  assert.ok(!els.tab_aides.classList.contains('aide-creds-on'), 'back strips the credentials rollup');
+  assert.strictEqual(els.aideCredsRoot.hidden, true);
   assert.strictEqual(els.aideProfilePage.hidden, true);
   assert.deepStrictEqual(desks, ['active'], 'back returns to the Active desk');
   assert.ok(!els.nav_more.classList.contains('active'));
+  assert.ok(els.nav_aides.classList.contains('active'));
 
   box.aidesInfo1Current = box.aidesInfo1ByKey.jdoe;
   box.aidesInfo1Current.deep_link = 'admin/aides?aide_id='+JANE;
@@ -407,15 +418,64 @@ async function runBrowser(){
     assert.strictEqual(seen.morePanelActive, false);
     assert.strictEqual(seen.manage, false);
     await page.screenshot({path: path.join(shotDir, 'aide-profile-link-fix-page.png')});
-    await page.evaluate(function(){currentAdminRole = 'Scheduler';});
+    await page.evaluate(function(){currentAdminRole = 'Admin';});
     await page.click('#aideProfileBack');
     await page.waitForFunction(function(){
+      function shown(el){
+        if(!el)return false;
+        var cs = getComputedStyle(el);
+        if(cs.display === 'none' || cs.visibility === 'hidden')return false;
+        var r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }
       var tab = document.getElementById('tab_aides');
       var list = document.getElementById('aidesContainer');
+      var desk = document.getElementById('aideDesk');
       var pageEl = document.getElementById('aideProfilePage');
-      var cs = getComputedStyle(list);
-      return tab && !tab.classList.contains('aide-profile-on') && pageEl && pageEl.hidden && cs.display !== 'none' && /Jane Doe/.test(list.innerText);
+      var root = document.getElementById('aideCredsRoot');
+      var more = document.querySelector('#aidesContainer .aide-info-more');
+      var moreNav = document.getElementById('nav_more');
+      var aidesNav = document.getElementById('nav_aides');
+      return tab && !tab.classList.contains('aide-profile-on') && !tab.classList.contains('aide-creds-on')
+        && pageEl && pageEl.hidden
+        && shown(desk) && shown(list) && shown(more)
+        && /Jane Doe/.test(list.innerText) && /\u22ef/.test(more.textContent || '')
+        && root && !shown(root)
+        && moreNav && !moreNav.classList.contains('active')
+        && aidesNav && aidesNav.classList.contains('active');
     }, {timeout:8000});
+    const backList = await page.evaluate(function(){
+      function shown(el){
+        if(!el)return false;
+        var cs = getComputedStyle(el);
+        if(cs.display === 'none' || cs.visibility === 'hidden')return false;
+        var r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }
+      var tab = document.getElementById('tab_aides');
+      var root = document.getElementById('aideCredsRoot');
+      var desk = document.getElementById('aideDesk');
+      var active = desk && desk.querySelector('[data-aide-desk="active"]');
+      return {
+        credsOn: tab.classList.contains('aide-creds-on'),
+        deskShown: shown(desk),
+        activeOn: !!(active && active.classList.contains('on')),
+        dots: document.querySelectorAll('#aidesContainer .aide-info-more').length,
+        rollupShown: shown(root),
+        rollupText: shown(root) ? (root.innerText || '') : '',
+        moreActive: document.getElementById('nav_more').classList.contains('active'),
+        morePanel: document.getElementById('tab_more').classList.contains('active')
+      };
+    });
+    assert.strictEqual(backList.credsOn, false, 'back does not leave aide-creds-on');
+    assert.strictEqual(backList.deskShown, true, 'Active desk tabs stay visible');
+    assert.strictEqual(backList.activeOn, true, 'Active desk is selected');
+    assert.ok(backList.dots >= 1, 'info-card ··· is on the list');
+    assert.strictEqual(backList.rollupShown, false, 'credentials rollup is not the Back surface');
+    assert.ok(!/No credential records yet/.test(backList.rollupText));
+    assert.strictEqual(backList.moreActive, false);
+    assert.strictEqual(backList.morePanel, false);
+    await page.screenshot({path: path.join(shotDir, 'aide-profile-link-fix-back-list.png')});
     await page.evaluate(function(){aidesInfo1OpenSheet('sokonkwo'); aidesInfo1ViewProfile();});
     await page.waitForFunction(function(){
       return document.getElementById('aideProfileName') && document.getElementById('aideProfileName').textContent === 'Sam Okonkwo';
