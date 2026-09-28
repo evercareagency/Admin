@@ -361,6 +361,15 @@ async function runBrowser(){
       document.getElementById('coverSimpleSendBlast').click();
     });
     await page.waitForFunction(function(){
+      var gate = document.getElementById('coverSimpleBlastGate');
+      var note = document.getElementById('coverSimpleBlastGateNote');
+      return gate && !gate.hidden && note && note.textContent.indexOf('Confirm before this blast sends. Not yet writes nothing.') >= 0;
+    }, {timeout: 8000});
+    assert.ok(!calls.some(function(c){return c.rpc === 'admin_blast_cover_request';}), 'first Send chat blast does not post');
+    await page.evaluate(function(){
+      document.getElementById('coverSimpleBlastGo').click();
+    });
+    await page.waitForFunction(function(){
       var scrim = document.getElementById('coverSimpleScrim');
       return scrim && scrim.hidden;
     }, {timeout: 8000});

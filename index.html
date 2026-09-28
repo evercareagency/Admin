@@ -2673,6 +2673,14 @@ bindLoginKeyboard();
               <button type="button" class="btn btn-teal is-disabled" id="coverSimpleSendBlast" onclick="coverSimpleSendBlast()" disabled aria-disabled="true">Send chat blast</button>
               <button type="button" class="btn btn-ghost" id="coverSimpleBack" onclick="coverSimpleClose()">Back</button>
             </div>
+            <div id="coverSimpleBlastGate" hidden data-remi-float-hide1b="v=remi-float-hide1b">
+              <p class="cover-note" id="coverSimpleBlastGateNote">Confirm before this blast sends. Not yet writes nothing.</p>
+              <div class="cover-actions">
+                <button type="button" class="btn btn-teal" id="coverSimpleBlastGo" onclick="coverSimpleBlastGateConfirm()">Confirm</button>
+                <button type="button" class="btn btn-ghost" id="coverSimpleBlastNotYet" onclick="coverSimpleBlastGateCancel()">Not yet</button>
+                <button type="button" class="btn btn-ghost" id="coverSimpleBlastCancel" onclick="coverSimpleBlastGateCancel()">Cancel</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -37508,6 +37516,7 @@ async function loadNewClientIntakeDrafts(){
 // Nobody with a same-day yes means Rest-only. float_pool is never a chip or section.
 // hide_float_ui true. is_float false on paint copies. Confirm blast asks first.
 // Confirm sends admin_blast_cover_request. Not yet and Cancel write nothing.
+// Who can cover Send chat blast uses the same gate before admin_blast_cover_request.
 var remiFloatHide1bGateOn=false;
 var REMI_FLOAT_HIDE1B_MARKER='v=remi-float-hide1b';
 function remiFloatHide1bIntro(){
@@ -37644,6 +37653,32 @@ if(typeof remiFloat1Bind==='function'&&!remiFloat1Bind.__remiFloatHide1b){
   };
   remiFloatHide1bBind.__remiFloatHide1b=1;
   remiFloat1Bind=remiFloatHide1bBind;
+}
+if(typeof coverSimpleSendBlast==='function'&&!coverSimpleSendBlast.__remiFloatHide1b){
+  var coverSimpleSendBlastBase=coverSimpleSendBlast;
+  var coverSimpleAskBlast=async function(){
+    try{
+      var box=document.getElementById('coverSimpleBlastGate');
+      if(box)box.hidden=false;
+    }catch(eAsk){}
+    return {ok:true, gated:true, sent:false};
+  };
+  coverSimpleAskBlast.__remiFloatHide1b=1;
+  coverSimpleSendBlast=coverSimpleAskBlast;
+  coverSimpleBlastGateCancel=function(){
+    try{
+      var box=document.getElementById('coverSimpleBlastGate');
+      if(box)box.hidden=true;
+    }catch(eCancel){}
+    return {ok:true, cancelled:true};
+  };
+  coverSimpleBlastGateConfirm=function(){
+    try{
+      var box=document.getElementById('coverSimpleBlastGate');
+      if(box)box.hidden=true;
+    }catch(eGo){}
+    return coverSimpleSendBlastBase.apply(this, arguments);
+  };
 }
 remiFloat1FloatHtml=function(){
   var view='';

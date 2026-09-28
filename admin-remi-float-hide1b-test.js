@@ -50,6 +50,10 @@ assert.ok(!/\bQuo\b|twilio|send_sms/.test(hide1bSrc), 'no Quo or SMS');
 const simple = html.slice(html.indexOf('// v=coverage-simple1 blast'), html.indexOf('// end v=coverage-simple1'));
 assert.ok(simple.includes("coverSimpleRpc('admin_blast_cover_request'"), 'coverage blast stays');
 assert.ok(!simple.includes('remi-float-hide1b'), 'coverage-simple1 block is unchanged');
+assert.ok(html.includes('id="coverSimpleBlastGate"'), 'who can cover blast gate');
+assert.ok(html.includes('id="coverSimpleBlastGateNote">Confirm before this blast sends. Not yet writes nothing.'), 'send chat blast gate note');
+assert.ok(html.includes('onclick="coverSimpleBlastGateConfirm()"'), 'gate confirm stays on the panel');
+assert.ok(html.includes('onclick="coverSimpleBlastGateCancel()"'), 'gate not yet stays on the panel');
 
 const SHIFT = '55555555-5555-4555-8555-555555555555';
 const DEVON = '44444444-4444-4444-8444-444444444441';
@@ -199,7 +203,13 @@ function runSlice(){
     clearInterval: function(){}
   };
   vm.createContext(sandbox);
-  vm.runInContext(noshowSrc + '\n' + hideSrc + '\n' + ideasSrc + '\n' + hide1bSrc, sandbox);
+  const coverStub = [
+    'async function coverSimpleSendBlast(){',
+    '  if(typeof sbRestRpc==="function")return sbRestRpc("admin_blast_cover_request", {p_open_shift_id:"probe", p_aide_ids:["aide"], p_address_mode:"area"});',
+    '  return {ok:true, sent:true};',
+    '}'
+  ].join('\n');
+  vm.runInContext(noshowSrc + '\n' + hideSrc + '\n' + ideasSrc + '\n' + coverStub + '\n' + hide1bSrc, sandbox);
   return sandbox;
 }
 
@@ -209,6 +219,7 @@ function runSlice(){
   assert.strictEqual(sandbox.remiFloatHide1Split.__remiFloatHide1b, 1);
   assert.strictEqual(sandbox.remiFloat1Paint.__remiFloatHide1b, 1);
   assert.strictEqual(sandbox.remiIdeas763WhyHtml.__remiFloatHide1b, 1);
+  assert.strictEqual(sandbox.coverSimpleSendBlast.__remiFloatHide1b, 1);
 
   const split = sandbox.remiFloatHide1Split(RANK);
   assert.strictEqual(split.hide_float_ui, true);
@@ -402,6 +413,19 @@ function runSlice(){
     if(name === 'admin_blast_cover_request')return {ok: true, data: {success: true, blast_count: (body.p_aide_ids || []).length, assigned: false}};
     return {ok: false, error: 'unexpected ' + name, status: 500};
   };
+  const chatAsked = await sandbox.coverSimpleSendBlast();
+  assert.strictEqual(chatAsked.gated, true);
+  assert.strictEqual(chatAsked.sent, false);
+  assert.ok(!rpc.some(function(row){return row.name === 'admin_blast_cover_request';}), 'first Send chat blast does not call Ace');
+  const chatHeld = sandbox.coverSimpleBlastGateCancel();
+  assert.strictEqual(chatHeld.cancelled, true);
+  assert.ok(!rpc.some(function(row){return row.name === 'admin_blast_cover_request';}), 'Not yet on Send chat blast writes nothing');
+  await sandbox.coverSimpleSendBlast();
+  const chatSent = await sandbox.coverSimpleBlastGateConfirm();
+  assert.strictEqual(chatSent.ok, true);
+  assert.strictEqual(rpc.filter(function(row){return row.name === 'admin_blast_cover_request';}).length, 1, 'gate Confirm sends the chat blast once');
+  rpc.length = 0;
+
   const ranked = await sandbox.remiFloat1LoadRank(SHIFT);
   assert.strictEqual(ranked.ok, true);
   assert.strictEqual(rpc[0].name, 'admin_rank_float_pool_aides');
