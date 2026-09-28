@@ -555,7 +555,8 @@ assert.ok(tsPanel.includes('id="tsManageBtn"') && tsPanel.includes('onclick="tsM
 assert.ok(tsPanel.includes('id="tsManageSelectAll"') && tsPanel.includes('>Select all<') && tsPanel.includes('>Unselect all<'), 'Timesheets select pair stays visible');
 assert.ok(tsPanel.indexOf('>Select all<') < tsPanel.indexOf('>Unselect all<'), 'Timesheets Select all stays beside Unselect all');
 assert.ok(tsPanel.includes('id="tsManageDeleteSelected"') && tsPanel.includes('>Delete selected<'), 'Timesheets Delete selected');
-assert.ok(tsPanel.includes('data-ts-desk="active"') && tsPanel.includes('>Archived<') && tsPanel.includes('>Recently deleted<'), 'Timesheets desks stay');
+assert.ok(tsPanel.includes('data-ts-desk="active"') && tsPanel.includes('>Recently deleted<'), 'Timesheets Active and Recently deleted stay');
+assert.ok(!tsPanel.includes('data-ts-desk="archived"') && !tsPanel.includes('>Archived<'), 'Timesheets Archived tab is gone');
 assert.ok(tsPanel.includes('id="payReadyExport"') && tsPanel.includes('id="exportAllPdfsBtn"'), 'payready and pdf desk stay');
 assert.ok(!tsPanel.includes('Manage ON'), 'no Timesheets Manage ON badge');
 const tsSheet = html.slice(html.indexOf('id="tsManageConfirm"'), html.indexOf('id="tab_payroll"'));
@@ -569,7 +570,8 @@ assert.ok(tsRun.includes('res.is_active===false&&res.deleted_at'), 'trash succes
 assert.ok(tsRun.includes('renderTimesheets()'), 'Timesheets list refreshes');
 assert.ok(tsRun.includes("cacheInvalidate('get_all')"), 'Timesheets cache drops');
 assert.ok(!/reset_aide_temp_password|reseal|mossier|action:\s*'delete'|sbAdminSoftDeleteTimesheet|sbRestRpc|method:\s*'DELETE'|DELETE\s+FROM/.test(tsRun), 'Timesheets bulk never reseals, hard-deletes, or archives without deleted_at');
-assert.ok(extractFn(html, 'function quickDelete(id)').includes("showSharedConfirm('Archive this timesheet?'"), 'single archive confirm stays');
+assert.ok(extractFn(html, 'function quickDelete(id)').includes("showSharedConfirm('Delete this timesheet?'"), 'single delete confirm is the trash confirm');
+assert.ok(extractFn(html, 'function quickDelete(id)').includes('commitTimesheetTrash'), 'single delete uses trash_timesheet');
 assert.ok(html.includes("action:'restore_trashed_timesheet'"), 'existing trash restore stays');
 const trashFn = extractFn(html, 'async function sbAdminTrashTimesheet(payload)');
 assert.ok(trashFn.includes('is_active:false,deleted_at:stamp') && trashFn.includes("['select','id,is_active,deleted_at']"), 'trash PATCH sets deleted_at and selects the stamp');

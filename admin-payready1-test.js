@@ -48,7 +48,7 @@ assert.ok(html.indexOf('content="2026-09-25-remidate1"') < html.indexOf('content
   assert.ok(html.includes(mark), 'prior marker stays ' + mark);
 });
 
-const note = html.slice(html.indexOf('v=payready1'), html.indexOf('<meta name="admin-build" content="2026-09-25-payready1">'));
+const note = html.slice(html.indexOf('<!-- admin pay readiness 2026-09-25 v=payready1'), html.indexOf('<meta name="admin-build" content="2026-09-25-payready1">'));
 assert.ok(/not the Scheduler desk-brain/.test(note), 'Scheduler desk-brain does not own pay readiness');
 assert.ok(/Remi stays the corner chip/.test(note), 'Remi stays corner-only');
 assert.ok(/No Auth reseal/.test(note), 'no Auth reseal');

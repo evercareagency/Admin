@@ -63,7 +63,8 @@ assert.ok(list.includes('id="payReadyExport"'), 'export stays on the list');
 assert.ok(list.includes('>Export ready list<'), 'export label');
 assert.ok(!empty.includes('id="payReadyExport"'), 'export is not trapped in the all-ready empty state');
 assert.ok(list.includes('Nothing held this pay period'), 'all-ready copy stays');
-assert.ok(html.includes('data-ts-desk="active"') && html.includes('>Archived<') && html.includes('>Recently deleted<'), 'timesheet desk stays');
+assert.ok(html.includes('data-ts-desk="active"') && html.includes('>Recently deleted<'), 'timesheet desk stays');
+assert.ok(!html.includes('>Archived<'), 'Archived timesheet tab is gone');
 assert.ok(html.includes('id="exportAllPdfsBtn"'), 'Export all as PDFs stays');
 
 const paint = extractFn(html, 'function payReadyPaint()');
