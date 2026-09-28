@@ -18,6 +18,9 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
+<!-- aides profile link 2026-09-28 v=aides-profile-link1 ?v=aides-profile-link1 admin-build 2026-09-28-aides-profile-link1. GHOST-AIDES-PROFILE-LINK1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Ghost parse fix: admin_list_aides_info already returns deep_link string admin/aides?aide_id=<uuid> on every active aide. View profile follows that string. aidesInfo1Follow opens the Aides tab and focuses, scrolls, and highlights that aide card on the list already on this desk. A leading #, aides and admin/aides path variants, and query aide_id are accepted. When aide_id is present and the Aides tab opens, the orange No profile link on this aide toast stays off. Bare tab names and schedule deep-link objects stay as they were. This is not Auth profile_id. Do not break aides-info1 Reset/Delete, list-az-sticky1, or Manage. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=aides-info1, v=list-az-sticky1, v=cover-desk1, v=punch-leftovers1, and v=list-az1. -->
+<meta name="admin-build" content="2026-09-28-aides-profile-link1">
+<script>var AIDES_PROFILE_LINK1_MARKER='v=aides-profile-link1';var AIDES_PROFILE_LINK1_BUILD='2026-09-28-aides-profile-link1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -1652,6 +1655,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #aideInfoSheet[hidden]{display:none !important;}
 #tab_aides .aide-info-cards{display:flex;flex-direction:column;gap:12px;max-width:480px;}
 #tab_aides article.aide-info-card{display:block;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:0 6px 16px rgba(26,39,68,0.05);}
+#tab_aides article.aide-info-card.is-focus,#tab_aides article.aide-row-card.is-focus{box-shadow:0 0 0 2px var(--teal);outline:2px solid var(--teal);outline-offset:2px;}
 #tab_aides article.aide-info-card .aide-info-top{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-start;gap:12px;}
 .aide-info-avatar{width:48px;height:48px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.95rem;letter-spacing:0.02em;flex:0 0 48px;}
 .aide-info-body{flex:1;min-width:0;padding-top:2px;}
@@ -2951,7 +2955,7 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aides-profile-link1="v=aides-profile-link1">
         <div class="page-hdr">
           <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
@@ -31122,12 +31126,121 @@ function aidesInfo1CardHtml(user){
     +contact+clientHtml+nextHtml+credsHtml
     +'</div></div></article>';
 }
+// v=aides-profile-link1 — parse admin/aides?aide_id= strings. Ace already sends them.
+var aidesProfileLink1Pending='';
+var aidesProfileLink1Seq=0;
+var aidesProfileLink1PaintSeq=0;
+function aidesProfileLink1Parse(link){
+  var raw=String(link==null?'':link).trim();
+  if(!raw)return '';
+  raw=raw.replace(/^#+/, '');
+  raw=raw.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+\/?/i, '');
+  raw=raw.replace(/^\/+/, '');
+  var path=raw;
+  var query='';
+  var qAt=raw.indexOf('?');
+  if(qAt>=0){
+    path=raw.slice(0, qAt);
+    query=raw.slice(qAt+1);
+  }
+  var hashAt=path.indexOf('#');
+  if(hashAt>=0)path=path.slice(0, hashAt);
+  path=path.replace(/^\/+|\/+$/g, '').toLowerCase();
+  var aideId='';
+  if(query){
+    var hashQ=query.indexOf('#');
+    if(hashQ>=0)query=query.slice(0, hashQ);
+    var parts=query.split('&');
+    var i;
+    for(i=0;i<parts.length;i++){
+      if(!parts[i])continue;
+      var eq=parts[i].indexOf('=');
+      var key=eq>=0?parts[i].slice(0, eq):parts[i];
+      var val=eq>=0?parts[i].slice(eq+1):'';
+      try{key=decodeURIComponent(String(key).replace(/\+/g, ' '));}catch(eKey){}
+      key=String(key||'').trim().toLowerCase();
+      if(key!=='aide_id')continue;
+      try{val=decodeURIComponent(String(val).replace(/\+/g, ' '));}catch(eVal){}
+      aideId=String(val||'').trim();
+      if(aideId)break;
+    }
+  }
+  if(!aideId)return '';
+  if(path&&path!=='aides'&&!/(^|\/)aides$/.test(path))return '';
+  return aideId;
+}
+function aidesProfileLink1Cards(){
+  var root=null;
+  try{root=document.getElementById('aidesContainer')||document.getElementById('tab_aides');}catch(e){root=null;}
+  if(!root||!root.querySelectorAll)return [];
+  try{return root.querySelectorAll('.aide-info-card, .aide-row-card');}catch(e2){return [];}
+}
+function aidesProfileLink1Focus(aideId){
+  var want=String(aideId||'').trim().toLowerCase();
+  if(!want)return false;
+  var cards=aidesProfileLink1Cards();
+  var hit=null;
+  var i;
+  for(i=0;i<cards.length;i++){
+    var card=cards[i];
+    var got='';
+    try{got=String(card.getAttribute('data-aide-id')||'').trim().toLowerCase();}catch(eGot){got='';}
+    var on=!!got&&got===want;
+    if(card.classList){
+      if(on)card.classList.add('is-focus');
+      else card.classList.remove('is-focus');
+    }
+    if(on&&!hit)hit=card;
+  }
+  if(!hit)return false;
+  try{hit.setAttribute('tabindex','-1');}catch(eTab){}
+  try{if(hit.focus)hit.focus();}catch(eFocus){}
+  try{if(hit.scrollIntoView)hit.scrollIntoView({block:'center', inline:'nearest'});}catch(eScroll){
+    try{hit.scrollIntoView(true);}catch(eScroll2){}
+  }
+  return true;
+}
+function aidesProfileLink1NotePaint(){
+  aidesProfileLink1PaintSeq=aidesProfileLink1Seq;
+}
+function aidesProfileLink1AfterPaint(){
+  var id=aidesProfileLink1Pending;
+  if(!id)return;
+  try{aidesProfileLink1Focus(id);}catch(e){}
+  if(aidesProfileLink1PaintSeq===aidesProfileLink1Seq)aidesProfileLink1Pending='';
+}
+function aidesProfileLink1Open(aideId){
+  var id=String(aideId||'').trim();
+  if(!id)return false;
+  aidesProfileLink1Pending=id;
+  aidesProfileLink1Seq=(Number(aidesProfileLink1Seq)||0)+1;
+  var opened=false;
+  var tab=null;
+  try{tab=document.getElementById('tab_aides');}catch(eTab){tab=null;}
+  if(tab&&typeof showTab==='function'){
+    try{showTab('aides');}catch(eShow){}
+    opened=true;
+  }
+  var found=false;
+  try{found=!!aidesProfileLink1Focus(id);}catch(eFocus){found=false;}
+  if(found&&!opened)aidesProfileLink1Pending='';
+  return opened||found;
+}
 function aidesInfo1Follow(link){
   if(!link){
     if(typeof showTempMsg==='function')showTempMsg('No profile link on this aide.','var(--warn)');
     return;
   }
   if(typeof link==='string'){
+    var aideId='';
+    try{if(typeof aidesProfileLink1Parse==='function')aideId=aidesProfileLink1Parse(link)||'';}catch(eParse){aideId='';}
+    if(aideId){
+      var opened=false;
+      try{opened=!!aidesProfileLink1Open(aideId);}catch(eOpen){opened=false;}
+      if(opened)return;
+      if(typeof showTempMsg==='function')showTempMsg('No profile link on this aide.','var(--warn)');
+      return;
+    }
     var named=String(link).replace(/^#/,'').trim().toLowerCase();
     if(named&&typeof showTab==='function'&&document.getElementById('tab_'+named)){
       showTab(named);
@@ -31210,6 +31323,7 @@ function aidesInfo1Restore(){
 }
 async function aidesInfo1TryPaint(container, force){
   if(!container)return false;
+  try{if(typeof aidesProfileLink1NotePaint==='function')aidesProfileLink1NotePaint();}catch(eSeq){}
   var includeDeleted=(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
   if(force===true){
     container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
@@ -31245,6 +31359,7 @@ async function aidesInfo1TryPaint(container, force){
     container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+users.map(aidesInfo1CardHtml).join('')+'</div>';
   }
   if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
+  try{if(typeof aidesProfileLink1AfterPaint==='function')aidesProfileLink1AfterPaint();}catch(eFocus){}
   return true;
 }
 // end v=aides-info1
@@ -31257,6 +31372,7 @@ async function renderAides(force){
     var aidesInfoPainted=await aidesInfo1TryPaint(container, force);
     if(aidesInfoPainted)return;
   }
+  try{if(typeof aidesProfileLink1NotePaint==='function')aidesProfileLink1NotePaint();}catch(eSeq){}
   const cacheName=aideDesk==='deleted'?'get_users:deleted':'get_users';
   if(force===true||!cacheGet(cacheName)){
     container.innerHTML='<div class="card"><p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px">Loading aides...</p></div>';
@@ -31272,6 +31388,7 @@ async function renderAides(force){
     if(aideDesk==='deleted'&&data&&data.success===false){
       showTempMsg(data.error||'Recently deleted needs the aides soft-delete fields.','var(--warn)');
       container.innerHTML=aideEmptyHtml();
+      try{if(typeof aidesProfileLink1AfterPaint==='function')aidesProfileLink1AfterPaint();}catch(eFocus){}
       if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
       return;
     }
@@ -31291,6 +31408,7 @@ async function renderAides(force){
     }
     if(!aides.length){
       container.innerHTML=aideEmptyHtml();
+      try{if(typeof aidesProfileLink1AfterPaint==='function')aidesProfileLink1AfterPaint();}catch(eFocus){}
       if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
       return;
     }
@@ -31313,7 +31431,7 @@ async function renderAides(force){
         +'<td>'+status+'</td>'
         +'<td class="actions">'+actions+'</td>'
         +'</tr>';
-      const card='<article class="aide-row-card">'
+      const card='<article class="aide-row-card" data-aide-id="'+escapeAttr(String(u.id||u.aide_id||''))+'" data-aide-user="'+escapeAttr(un)+'">'
         +'<div class="aide-row-top"><strong>'+escapeHtml(u.name||u.fullName||'—')+'</strong>'+status+'</div>'
         +'<div class="aide-row-sub">@'+escapeHtml(un)+'</div>'
         +'<div class="aide-row-meta">'+escapeHtml(formatAideAssignedClients(u))+'</div>'
@@ -31335,11 +31453,13 @@ async function renderAides(force){
       +'<div class="aides-sheet table-wrap" style="overflow-x:auto"><table class="data-table" id="aidesTable"><thead><tr><th>Name</th><th>Username</th><th>Assigned clients</th><th>Status</th><th>Actions</th></tr></thead><tbody>'
       +built.map(function(x){return x.row;}).join('')+'</tbody></table></div></div>';
     if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
+    try{if(typeof aidesProfileLink1AfterPaint==='function')aidesProfileLink1AfterPaint();}catch(eFocus){}
     if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
     return;
   }catch(e){}
   if(aideDesk!=='deleted')loadedAidesList=[];
   container.innerHTML=aideEmptyHtml();
+  try{if(typeof aidesProfileLink1AfterPaint==='function')aidesProfileLink1AfterPaint();}catch(eFocus2){}
   if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
 }
 
