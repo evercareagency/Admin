@@ -18,6 +18,9 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
+<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage, Done, and + Aide. Refresh stays hidden. v=manage-clean1. Done exits Manage back to the Aides info-card list and does not reopen credentials. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. Ace tip 2026-09-28: no admin_deactivate_client RPC and no Ace patch. The client loop posts archive_client once per id through sbAdminArchiveClient, which PATCH clients is_active=false and selects id, is_active. After that row confirms, the same id soft-unassigns active assignments (PATCH assignments is_active=false where client_id and is_active true). Never hard-DELETE. Restore on Recently deleted is PATCH clients is_active=true, not a restore RPC, and it does not turn assignments back on. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at and selects id, is_active, deleted_at. Not archive-only. Restore of Recently deleted PATCH is_active true and deleted_at null only where deleted_at is not null. Archive stays is_active false with deleted_at null. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
+<meta name="admin-build" content="2026-09-28-aide-manage-delete1">
+<script>var AIDE_MANAGE_DELETE1_MARKER='v=aide-manage-delete1';var AIDE_MANAGE_DELETE1_BUILD='2026-09-28-aide-manage-delete1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -1681,9 +1684,103 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
   #tab_aides .aide-info-cards{max-width:520px;}
   .aide-info-sheet{left:50%;right:auto;width:min(440px,calc(100% - 32px));transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom,0px));border-radius:18px;}
 }
+/* v=aide-manage-delete1 — Manage bulk soft-delete. Select all stays beside Unselect all. No Manage ON badge. */
+#aideManageSure[hidden],#aideManageBar[hidden],#aideManageConfirm[hidden]{display:none !important;}
+#tab_aides.aide-manage-on #aideRefreshBtn,
+#tab_aides.aide-manage-on #aideDeskSub,
+#tab_aides.aide-manage-on #aideCredsRoot,
+#tab_aides.aide-manage-on #aideCredSheet{display:none !important;}
+#tab_aides.aide-manage-on #aideCredManageBtn,
+#tab_aides.aide-manage-on #aideManageDoneBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#aideManageDoneBtn[hidden]{display:none !important;}
+#tab_aides:not(.aide-manage-on) #aideManageDoneBtn{display:none !important;}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-pair{flex:2 1 0;min-width:0;}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-pair .btn{padding:0 8px;font-size:0.82rem;white-space:nowrap;}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-delete{flex:1 1 0;min-width:0;padding:0 8px;font-size:0.82rem;white-space:nowrap;background:var(--danger);color:#fff;border-color:var(--danger);}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-count{flex:1 1 100%;display:flex;align-items:center;justify-content:center;min-height:40px;margin-top:2px;background:var(--navy);color:#fff;border-radius:12px;font-size:0.95rem;}
+.aide-manage-sure{font-family:'Playfair Display',Georgia,serif;font-size:1.65rem;font-weight:600;color:var(--navy);line-height:1.2;margin:0 0 8px;}
+#tab_aides.aide-manage-confirming #aideManageSure{position:relative;z-index:230;background:var(--off);}
+#tab_aides.aide-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
+#tab_aides.aide-manage-confirming #aideManageBar,
+#tab_aides.aide-manage-confirming #aideDesk,
+#tab_aides.aide-manage-confirming #aidesContainer,
+#tab_aides.aide-manage-confirming .page-hdr{opacity:.55;}
+.aide-manage-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px;}
+.aide-manage-pair{display:flex;gap:6px;flex:1 1 100%;}
+.aide-manage-pair .btn{flex:1 1 0;min-height:40px;justify-content:center;background:#fff;color:var(--navy);border:1.5px solid var(--border);font-weight:700;}
+.aide-manage-delete{flex:1 1 100%;min-height:40px;justify-content:center;background:#fff;color:var(--danger);border:1.5px solid #f5c6c0;font-weight:700;}
+.aide-manage-delete:disabled{opacity:.45;cursor:not-allowed;}
+.aide-manage-count{flex:1 1 100%;font-size:11px;font-weight:700;color:var(--navy);padding:0 2px;}
+.aide-manage-check{display:none;}
+#tab_aides.aide-manage-on:not(.aide-desk-deleted) .aide-manage-check{display:flex;position:absolute;left:12px;top:16px;z-index:2;margin:0;}
+#tab_aides.aide-manage-on:not(.aide-desk-deleted) article.aide-info-card,
+#tab_aides.aide-manage-on:not(.aide-desk-deleted) article.aide-row-card{position:relative;padding-left:44px;}
+#tab_aides.aide-manage-on:not(.aide-desk-deleted) article.is-selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(42,127,127,.18);}
+.aide-manage-cb{width:20px;height:20px;margin:0;accent-color:var(--teal);}
+.aide-manage-confirm{position:fixed;left:0;right:0;bottom:0;top:56px;z-index:145;}
+#aideManageSure{scroll-margin-top:72px;}
+.aide-manage-dim{position:absolute;inset:0;background:rgba(26,39,68,.35);}
+.aide-manage-sheet{position:absolute;left:0;right:0;bottom:0;z-index:2;background:#fff;border-radius:18px 18px 0 0;padding:14px 16px calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 28px rgba(26,39,68,.18);}
+.aide-manage-grab{width:42px;height:4px;border-radius:999px;background:#d5dde8;margin:0 auto 14px;}
+.aide-manage-sheet h2{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;font-weight:600;color:var(--navy);margin:0 0 6px;}
+.aide-manage-sheet p{font-size:0.95rem;color:var(--muted);line-height:1.4;margin:0 0 16px;}
+.aide-manage-go,.aide-manage-cancel{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;}
+.aide-manage-go{background:var(--danger);color:#fff;border:0;margin:0 0 8px;}
+.aide-manage-go:disabled{opacity:.6;cursor:not-allowed;}
+.aide-manage-cancel{background:transparent;color:var(--navy);border:0;}
+@media(min-width:900px){
+  #tab_aides.aide-manage-on:not(.aide-desk-deleted) .aide-info-cards{max-width:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  #tab_aides.aide-manage-on:not(.aide-desk-deleted) .aide-info-cards:has(.az-stage){display:flex;flex-direction:column;max-width:none;}
+  .aide-manage-pair{flex:0 0 auto;}
+  .aide-manage-pair .btn{flex:0 0 auto;min-height:40px;padding:0 14px;}
+  .aide-manage-delete{flex:0 0 auto;width:auto;padding:0 14px;}
+  .aide-manage-count{flex:0 0 auto;width:auto;font-size:12px;margin-left:4px;}
+  .aide-manage-sure{font-size:1.75rem;}
+  .aide-manage-dim{background:rgba(26,39,68,.28);}
+  .aide-manage-sheet{left:50%;right:auto;bottom:auto;top:42%;transform:translate(-50%,-50%);width:min(420px,90%);border-radius:16px;padding:22px 22px 18px;box-shadow:0 16px 48px rgba(26,39,68,.22);}
+  .aide-manage-grab{display:none;}
+  .aide-manage-cancel{border:1.5px solid var(--border);background:#fff;}
+}
 @media(min-width:900px){
   #tab_aides .aide-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
+/* v=aide-manage-delete1 clients — same Manage bar and confirm as Aides. */
+#clientManageSure[hidden],#clientManageBar[hidden],#clientManageConfirm[hidden]{display:none !important;}
+#tab_clients.client-manage-on #clientRefreshBtn,
+#tab_clients.client-manage-on #clientDeskSub,
+#tab_clients.client-manage-on #clientInsLegend{display:none !important;}
+#tab_clients.client-manage-on #clientManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#clientManageSure{scroll-margin-top:72px;}
+#tab_clients.client-manage-confirming #clientManageSure{position:relative;z-index:230;background:var(--off);}
+#tab_clients.client-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
+#tab_clients.client-manage-confirming #clientManageBar,
+#tab_clients.client-manage-confirming #clientDesk,
+#tab_clients.client-manage-confirming #clientInsLegend,
+#tab_clients.client-manage-confirming .card,
+#tab_clients.client-manage-confirming .page-hdr{opacity:.55;}
+#tab_clients.client-manage-on:not(.client-desk-deleted) .aide-manage-check{display:flex;position:absolute;left:12px;top:16px;z-index:2;margin:0;}
+#tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer .aide-card{position:relative;padding-left:44px;}
+#tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer .aide-card.is-selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(42,127,127,.18);}
+@media(min-width:900px){
+  #tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  #tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer:has(.az-stage){display:block;}
+}
+/* v=aide-manage-delete1 timesheets — same Manage bar and confirm as Aides. Active desk only. */
+#tsManageSure[hidden],#tsManageBar[hidden],#tsManageConfirm[hidden]{display:none !important;}
+#tab_timesheets.ts-manage-on #tsRefreshBtn,
+#tab_timesheets.ts-manage-on #tsDeskSub{display:none !important;}
+#tab_timesheets.ts-manage-on #tsManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#tsManageSure{scroll-margin-top:72px;}
+#tab_timesheets.ts-manage-confirming #tsManageSure{position:relative;z-index:230;background:var(--off);}
+#tab_timesheets.ts-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
+#tab_timesheets.ts-manage-confirming #tsManageBar,
+#tab_timesheets.ts-manage-confirming #payReady,
+#tab_timesheets.ts-manage-confirming .stats-grid,
+#tab_timesheets.ts-manage-confirming .card,
+#tab_timesheets.ts-manage-confirming .page-hdr{opacity:.55;}
+#tab_timesheets.ts-manage-on.ts-desk-active .aide-manage-check{display:flex;position:absolute;left:12px;top:16px;z-index:2;margin:0;}
+#tab_timesheets.ts-manage-on.ts-desk-active article.ts-card{position:relative;padding-left:44px;}
+#tab_timesheets.ts-manage-on.ts-desk-active article.ts-card.is-selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(42,127,127,.18);}
 /* v=list-az-sticky1 — sticky A–Z letter jump rail on Aides + Clients. Builds on list-az1. */
 #tab_aides .aide-info-cards:has(.az-stage),
 #tab_aides .aide-cards:has(.az-stage){max-width:none;width:100%;display:flex;flex-direction:column;}
@@ -1764,6 +1861,10 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #aideCredCancel{flex:1;min-height:48px;background:transparent;border:0;font-weight:700;color:var(--navy);font-size:1rem;font-family:'DM Sans',sans-serif;cursor:pointer;}
 #aideCredSave{flex:1;min-height:48px;justify-content:center;border-radius:12px;font-size:1rem;}
 #aideCredSheetErr{display:none;margin-top:6px;}
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aideDesk,
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aidesContainer,
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aideCredList,
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aideCredSearchWrap{display:none !important;}
 @media(max-width:899px){
   #tab_aides.aide-creds-on:not(.aide-manage-on) #aideDesk,
   #tab_aides.aide-creds-on:not(.aide-manage-on) #aidesContainer{display:none !important;}
@@ -2586,7 +2687,8 @@ bindLoginKeyboard();
     <div class="main-content">
 
       <!-- TIMESHEETS TAB -->
-      <div class="tab-panel active" id="tab_timesheets">
+      <div class="tab-panel active" id="tab_timesheets" data-aide-manage-delete1="v=aide-manage-delete1">
+        <p id="tsManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <section id="payReady" data-payready="v=payready1" data-payready1b="v=payready1b" data-payready1c="v=payready1c" data-payready1d="v=payready1d" aria-label="Pay readiness">
           <div id="payReadyListView">
             <p class="pay-week" id="payReadyWeek">Week of</p>
@@ -2620,9 +2722,10 @@ bindLoginKeyboard();
         <div class="page-hdr">
           <div><h1>Timesheets</h1><p id="tsDeskSub">Active submitted caregiver timesheets</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost" id="tsManageBtn" type="button" onclick="tsManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
             <button type="button" class="btn btn-ghost" id="remiPayrollIns1TimesheetsOpen" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1OpenPage()">Payroll report</button>
             <button class="btn btn-ghost" id="exportAllPdfsBtn" onclick="exportAllAsPDFs()">📄 Export all as PDFs</button>
-            <button class="btn btn-teal" onclick="renderTimesheets()">🔄 Refresh</button>
+            <button class="btn btn-teal" id="tsRefreshBtn" type="button" onclick="renderTimesheets()">🔄 Refresh</button>
           </div>
         </div>
         <div class="stats-grid stats-slim">
@@ -2637,12 +2740,30 @@ bindLoginKeyboard();
             <button type="button" data-ts-desk="archived" role="tab" aria-selected="false" onclick="setTimesheetDesk('archived')">Archived</button>
             <button type="button" data-ts-desk="deleted" role="tab" aria-selected="false" onclick="setTimesheetDesk('deleted')">Recently deleted</button>
           </div>
+          <div id="tsManageBar" class="aide-manage-bar" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+            <div class="aide-manage-pair" role="group" aria-label="Manage selection">
+              <button type="button" class="btn" id="tsManageSelectAll" onclick="tsManageDelete1SelectAll()">Select all</button>
+              <button type="button" class="btn" id="tsManageUnselectAll" onclick="tsManageDelete1UnselectAll()">Unselect all</button>
+            </div>
+            <button type="button" class="btn aide-manage-delete" id="tsManageDeleteSelected" onclick="tsManageDelete1OpenConfirm()" disabled>Delete selected</button>
+            <div class="aide-manage-count" id="tsManageCount">0 selected</div>
+          </div>
           <div class="search-bar"><input type="text" id="tsSearch" placeholder="🔍 Search by aide, client or week..." oninput="paintTimesheets()"></div>
           <div id="tsCards" class="ts-cards" aria-label="Timesheet cards"></div>
           <div class="ts-sheet" style="overflow-x:auto">
             <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>PDF</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
           </div>
           <div id="tsEmpty" class="empty-state" style="display:none"><p>📭 No timesheets yet.</p></div>
+        </div>
+        <div id="tsManageConfirm" class="aide-manage-confirm" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-dim" onclick="tsManageDelete1CloseConfirm()"></div>
+          <div class="aide-manage-sheet" role="dialog" aria-modal="true" aria-labelledby="tsManageConfirmTitle">
+            <div class="aide-manage-grab" aria-hidden="true"></div>
+            <h2 id="tsManageConfirmTitle">Delete selected?</h2>
+            <p id="tsManageConfirmBody">They move to Recently deleted.</p>
+            <button type="button" class="aide-manage-go" id="tsManageConfirmGo" onclick="tsManageDelete1Run()">Delete selected</button>
+            <button type="button" class="aide-manage-cancel" id="tsManageConfirmCancel" onclick="tsManageDelete1CloseConfirm()">Cancel</button>
+          </div>
         </div>
       </div>
 
@@ -2951,13 +3072,15 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1">
+        <p id="aideManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
           <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
-            <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()">Manage</button>
-            <button class="btn btn-ghost" onclick="renderAides(true)">🔄 Refresh</button>
-            <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Add aide</button>
+            <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()" aria-pressed="false">Manage</button>
+            <button class="btn btn-navy" id="aideManageDoneBtn" type="button" data-manage-clean1="v=manage-clean1" hidden onclick="aideCredToggleManage()">Done</button>
+            <button class="btn btn-ghost" id="aideRefreshBtn" type="button" onclick="renderAides(true)">🔄 Refresh</button>
+            <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Aide</button>
           </div>
         </div>
         <section id="remiLangsAideCard" class="remi-langs-card" hidden data-remi-langs1="v=remi-langs1" aria-label="Preferred language">
@@ -2974,6 +3097,14 @@ bindLoginKeyboard();
         <div class="ts-desk" id="aideDesk" role="tablist" aria-label="Aides list">
           <button type="button" class="on" data-aide-desk="active" role="tab" aria-selected="true" onclick="setAideDesk('active')">Active</button>
           <button type="button" data-aide-desk="deleted" role="tab" aria-selected="false" onclick="setAideDesk('deleted')">Recently deleted</button>
+        </div>
+        <div id="aideManageBar" class="aide-manage-bar" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-pair" role="group" aria-label="Manage selection">
+            <button type="button" class="btn" id="aideManageSelectAll" onclick="aideManageDelete1SelectAll()">Select all</button>
+            <button type="button" class="btn" id="aideManageUnselectAll" onclick="aideManageDelete1UnselectAll()">Unselect all</button>
+          </div>
+          <button type="button" class="btn aide-manage-delete" id="aideManageDeleteSelected" onclick="aideManageDelete1OpenConfirm()" disabled>Delete selected</button>
+          <div class="aide-manage-count" id="aideManageCount">0 selected</div>
         </div>
         <div id="aideCredsRoot" data-aidecreds="v=aidecreds1" data-aidecreds1b="v=aidecreds1b" data-aidecreds1c="v=aidecreds1c" hidden>
           <div id="aideCredBanner" class="aide-cred-banner" hidden></div>
@@ -3012,6 +3143,16 @@ bindLoginKeyboard();
             </div>
           </div>
         </div>
+        <div id="aideManageConfirm" class="aide-manage-confirm" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-dim" onclick="aideManageDelete1CloseConfirm()"></div>
+          <div class="aide-manage-sheet" role="dialog" aria-modal="true" aria-labelledby="aideManageConfirmTitle">
+            <div class="aide-manage-grab" aria-hidden="true"></div>
+            <h2 id="aideManageConfirmTitle">Delete selected?</h2>
+            <p id="aideManageConfirmBody">They move to Recently deleted.</p>
+            <button type="button" class="aide-manage-go" id="aideManageConfirmGo" onclick="aideManageDelete1Run()">Delete selected</button>
+            <button type="button" class="aide-manage-cancel" id="aideManageConfirmCancel" onclick="aideManageDelete1CloseConfirm()">Cancel</button>
+          </div>
+        </div>
       </div>
 
       <!-- BROADCAST TAB -->
@@ -3030,13 +3171,27 @@ bindLoginKeyboard();
       </div>
 
       <!-- CLIENTS TAB -->
-      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1">
+      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1">
+        <p id="clientManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
-          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p>Manage client addresses and assign aides for location verification</p></div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
+          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="clientDeskSub">Manage client addresses and assign aides for location verification</p></div>
+          <div class="page-actions" style="display:flex;gap:8px">
+            <button class="btn btn-ghost" id="clientManageBtn" type="button" onclick="clientManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
+            <button class="btn btn-ghost" id="clientRefreshBtn" type="button" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
+        </div>
+        <div class="ts-desk" id="clientDesk" role="tablist" aria-label="Clients list">
+          <button type="button" class="on" data-client-desk="active" role="tab" aria-selected="true" onclick="setClientDesk('active')">Active</button>
+          <button type="button" data-client-desk="deleted" role="tab" aria-selected="false" onclick="setClientDesk('deleted')">Recently deleted</button>
+        </div>
+        <div id="clientManageBar" class="aide-manage-bar" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-pair" role="group" aria-label="Manage selection">
+            <button type="button" class="btn" id="clientManageSelectAll" onclick="clientManageDelete1SelectAll()">Select all</button>
+            <button type="button" class="btn" id="clientManageUnselectAll" onclick="clientManageDelete1UnselectAll()">Unselect all</button>
+          </div>
+          <button type="button" class="btn aide-manage-delete" id="clientManageDeleteSelected" onclick="clientManageDelete1OpenConfirm()" disabled>Delete selected</button>
+          <div class="aide-manage-count" id="clientManageCount">0 selected</div>
         </div>
         <div class="ins-legend" id="clientInsLegend" data-client-ins1="v=client-ins1" aria-label="Insurance">
           <strong>Insurance</strong>
@@ -3049,6 +3204,16 @@ bindLoginKeyboard();
         <div class="card">
           <div class="search-bar"><input type="text" id="clientSearch" placeholder="&#128269; Search clients..." oninput="paintClients()"></div>
           <div id="clientsContainer"></div>
+        </div>
+        <div id="clientManageConfirm" class="aide-manage-confirm" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-dim" onclick="clientManageDelete1CloseConfirm()"></div>
+          <div class="aide-manage-sheet" role="dialog" aria-modal="true" aria-labelledby="clientManageConfirmTitle">
+            <div class="aide-manage-grab" aria-hidden="true"></div>
+            <h2 id="clientManageConfirmTitle">Delete selected?</h2>
+            <p id="clientManageConfirmBody">They move to Recently deleted.</p>
+            <button type="button" class="aide-manage-go" id="clientManageConfirmGo" onclick="clientManageDelete1Run()">Delete selected</button>
+            <button type="button" class="aide-manage-cancel" id="clientManageConfirmCancel" onclick="clientManageDelete1CloseConfirm()">Cancel</button>
+          </div>
         </div>
       </div>
 
@@ -4919,6 +5084,7 @@ async function apiGetCached(action,extra,force){
     cacheAction=action+':'+String(extra.topicId);
   }
   if(action==='get_users'&&extra&&extra.aideDesk==='deleted')cacheAction='get_users:deleted';
+  if(action==='get_clients'&&extra&&extra.clientDesk==='deleted')cacheAction='get_clients:deleted';
   if(!force){
     const hit=cacheGet(cacheAction);
     if(hit&&(sbList?hit.source==='supabase':hit.source!=='supabase'))return hit;
@@ -27403,8 +27569,13 @@ function sbMapClient(row){
     lat:row.lat==null?'':row.lat,
     lng:row.lng==null?'':row.lng,
     isActive:row.is_active!==false,
+    is_active:row.is_active!==false,
     assignedAides:aides
   };
+  if(row&&(row.deactivated_at!=null||row.deactivatedAt!=null)){
+    mapped.deactivated_at=row.deactivated_at||row.deactivatedAt||null;
+    mapped.deactivatedAt=mapped.deactivated_at||'';
+  }
   if(row&&(Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')||Object.prototype.hasOwnProperty.call(row,'weeklyAuthorizedHours'))){
     var raw=Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')?row.weekly_authorized_hours:row.weeklyAuthorizedHours;
     var n=sbClientHoursValue({weekly_authorized_hours:raw==null?null:raw});
@@ -27592,7 +27763,8 @@ async function sbApiList(payload){
       var clientSelect=hoursState.col===false?String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours',''):SB_CLIENT_SELECT;
       if(typeof sbClientInsState==='function'&&sbClientInsState().col===false)clientSelect=String(clientSelect).replace(',insurance_plan','');
       var clientPairs=[['select',clientSelect]];
-      if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
+      if(payload.clientDesk==='deleted')clientPairs.push(['is_active','eq.false']);
+      else if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
       clientPairs.push(['order','name.asc']);
       var clients=await sbRestGet('clients', clientPairs);
       if(!clients.ok && hoursState.col!==false && sbClientHoursColumnMissing(clients)){
@@ -28614,7 +28786,7 @@ function sbIsAdminWriteAction(action){
     ||action==='reset_password'||action==='set_password'
     ||action==='admin_deactivate_aide'||action==='admin_restore_aide'
     ||action==='add_client'||action==='update_client'
-    ||action==='archive_client'||action==='delete_client'
+    ||action==='archive_client'||action==='delete_client'||action==='restore_client'
     ||action==='update'||action==='send_correction'||action==='delete'
     ||action==='restore_timesheet'||action==='trash_timesheet'||action==='restore_trashed_timesheet';
 }
@@ -29153,6 +29325,24 @@ async function sbSoftUnassign(aideId, clientId){
     ['org_id','eq.'+sbOrgId()]
   ],{is_active:false},'return=representation');
 }
+// v=aide-manage-delete1 — Ace tip: one PATCH for every active assignment on this client. Not a hard DELETE.
+async function sbSoftUnassignClient(clientId){
+  var id=String(clientId||'').trim();
+  if(!id)return {ok:false,error:'No clientId for this row.'};
+  var got=await sbRestMutate('PATCH','assignments',[
+    ['client_id','eq.'+id],
+    ['is_active','eq.true'],
+    ['org_id','eq.'+sbOrgId()],
+    ['select','id,is_active']
+  ],{is_active:false},'return=representation');
+  if(!got.ok)return got;
+  var rows=Array.isArray(got.data)?got.data:(got.data?[got.data]:[]);
+  var i;
+  for(i=0;i<rows.length;i++){
+    if(!rows[i]||rows[i].is_active!==false)return {ok:false,error:'Unassign was not confirmed',data:got.data};
+  }
+  return {ok:true,data:rows};
+}
 async function sbActiveAssignmentRows(clientId){
   var got=await sbRestGet('assignments',[
     ['select','id,aide_id,is_active,aide:aides(id,username)'],
@@ -29525,6 +29715,20 @@ async function sbAdminArchiveClient(payload){
   confirmed.clientId=confirmed.id;
   return confirmed;
 }
+async function sbAdminRestoreClient(payload){
+  var id=String((payload&&(payload.clientId||payload.id))||'').trim();
+  if(!id)return {success:false,error:'No clientId for this row.'};
+  var got=await sbRestMutate('PATCH','clients',[
+    ['id','eq.'+id],
+    ['select','id,is_active']
+  ],{is_active:true},'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not restore client.',httpStatus:got.status||0,is_active:null};
+  var row=sbArchiveRepresentation(got.data);
+  if(!row||row.is_active!==true||String(row.id||'')!==id){
+    return {success:false,error:'Restore was not confirmed',is_active:row&&typeof row.is_active==='boolean'?row.is_active:null,id:row&&row.id||null};
+  }
+  return {success:true,id:row.id,clientId:row.id,is_active:true};
+}
 async function sbAdminUpdateTimesheet(payload){
   var id=String((payload&&payload.id)||'').trim();
   if(!id)return {success:false,error:'Timesheet id missing.'};
@@ -29595,7 +29799,7 @@ async function sbAdminTrashTimesheet(payload){
   var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
   if(!id)return {success:false,error:'Timesheet id missing.'};
   var stamp=new Date().toISOString();
-  var got=await sbAdminPatchTimesheet(id,{is_active:false,deleted_at:stamp});
+  var got=await sbAdminPatchTimesheet(id,{is_active:false,deleted_at:stamp},[['select','id,is_active,deleted_at']]);
   if(!got.ok)return {success:false,error:got.error||'Could not move timesheet to Recently deleted.',httpStatus:got.status||0};
   if(!(got.row.is_active===false&&got.row.deleted_at))return {success:false,error:'Delete was not confirmed',is_active:got.row.is_active,deleted_at:got.row.deleted_at||null};
   return {success:true,id:got.row.id||id,is_active:false,deleted_at:got.row.deleted_at};
@@ -29603,7 +29807,7 @@ async function sbAdminTrashTimesheet(payload){
 async function sbAdminRestoreTrashedTimesheet(payload){
   var id=String((payload&&(payload.id||payload.timesheetId))||'').trim();
   if(!id)return {success:false,error:'Timesheet id missing.'};
-  var got=await sbAdminPatchTimesheet(id,{is_active:true,deleted_at:null});
+  var got=await sbAdminPatchTimesheet(id,{is_active:true,deleted_at:null},[['deleted_at','not.is.null'],['select','id,is_active,deleted_at']]);
   if(!got.ok)return {success:false,error:got.error||'Could not restore timesheet.',httpStatus:got.status||0};
   if(got.row.is_active===false||got.row.deleted_at)return {success:false,error:'Restore was not confirmed',is_active:got.row.is_active===true,deleted_at:got.row.deleted_at||null};
   return {success:true,id:got.row.id||id,is_active:true,deleted_at:null};
@@ -29622,6 +29826,7 @@ async function sbAdminWriteDispatch(payload){
     if(action==='add_client')return await sbAdminAddClient(payload);
     if(action==='update_client')return await sbAdminUpdateClient(payload);
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
+    if(action==='restore_client')return await sbAdminRestoreClient(payload);
     if(action==='update')return await sbAdminUpdateTimesheet(payload);
     if(action==='send_correction')return await sbAdminSendCorrection(payload);
     if(action==='restore_timesheet')return await sbAdminRestoreTimesheet(payload);
@@ -29751,6 +29956,7 @@ function setTimesheetDesk(view){
         ?'Recently deleted timesheets can be restored for 7 days. After that the nightly cleanup removes the row and its PDF.'
         :'Active submitted caregiver timesheets';
   }
+  if(typeof tsManageDelete1OnDesk==='function')tsManageDelete1OnDesk();
   renderTimesheets();
 }
 function timesheetRecordDeleted(r){
@@ -30513,6 +30719,7 @@ function paintTimesheets(){
           ?'No timesheets in Recently deleted.'
           :'📭 No timesheets yet.';
     }
+    if(typeof tsManageDelete1Sync==='function')tsManageDelete1Sync();
     return;
   }
   empty.style.display='none';
@@ -30550,7 +30757,10 @@ function paintTimesheets(){
         ${timesheetRowDeskButton(r)}
       </div></td>
     </tr>`;
-    const card=`<article class="ts-card" data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
+    const tsPick=typeof tsManageDelete1CheckHtml==='function'?tsManageDelete1CheckHtml(r):'';
+    const tsSel=typeof tsManageDelete1IsSelected==='function'&&tsManageDelete1IsSelected(r)?' is-selected':'';
+    const card=`<article class="ts-card${tsSel}" data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
+      ${tsPick}
       <div class="ts-card-top"><strong>${aideShown}</strong>${statusBadge(r.status)}</div>
       <div class="ts-card-sub">${clientShown||'—'} · ${formatWeekLabel(weekShown)}</div>
       <div class="ts-card-meta"><span class="ts-card-hrs">${r.totalHrs||'—'}</span><span>${locSum}</span><span>${formatDateTimeLabel(r.submitted)}</span></div>
@@ -30565,6 +30775,7 @@ function paintTimesheets(){
   tbody.innerHTML=built.map(function(x){return x.row;}).join('');
   if(cards)cards.innerHTML=built.map(function(x){return x.card;}).join('');
   try{if(typeof listAz1ReorderTimesheetDom==='function')listAz1ReorderTimesheetDom();}catch(eAz){}
+  if(typeof tsManageDelete1Sync==='function')tsManageDelete1Sync();
 }
 
 
@@ -30898,6 +31109,7 @@ async function setAideDesk(view){
       :'Registered caregivers — username, assigned clients, and temp-password status';
   }
   syncAideManageButtons();
+  if(typeof aideManageDelete1OnDesk==='function')aideManageDelete1OnDesk();
   return renderAides(true);
 }
 function aideEmptyHtml(){
@@ -31113,7 +31325,10 @@ function aidesInfo1CardHtml(user){
   var nextHtml=next?('<div class="aide-info-next is-'+next.tone+'">'+esc(next.label)+'</div>'):'';
   var creds=aidesInfo1Creds(user._raw||{});
   var credsHtml=creds?('<div class="aide-info-creds">'+esc(creds)+'</div>'):'';
-  return '<article class="aide-info-card" data-aides-info1="v=aides-info1" data-aide-user="'+attr(user.username||'')+'" data-aide-id="'+attr(user.id||'')+'">'
+  var manageCheck=(typeof aideManageDelete1CheckHtml==='function')?aideManageDelete1CheckHtml(user):'';
+  var manageSel=manageCheck&&typeof aideManageDelete1IsSelected==='function'&&aideManageDelete1IsSelected(user)?' is-selected':'';
+  return '<article class="aide-info-card'+manageSel+'" data-aides-info1="v=aides-info1" data-aide-user="'+attr(user.username||'')+'" data-aide-id="'+attr(user.id||'')+'">'
+    +manageCheck
     +'<div class="aide-info-top">'
     +'<div class="aide-info-avatar" style="background:'+aidesInfo1AvatarColor(user.name)+'" aria-hidden="true">'+esc(user.initials||'A')+'</div>'
     +'<div class="aide-info-body">'
@@ -31253,6 +31468,7 @@ async function renderAides(force){
   const container=document.getElementById('aidesContainer');
   if(!container)return;
   syncAideManageButtons();
+  if(typeof aideManageDelete1Sync==='function')aideManageDelete1Sync();
   if(typeof aidesInfo1TryPaint==='function'){
     var aidesInfoPainted=await aidesInfo1TryPaint(container, force);
     if(aidesInfoPainted)return;
@@ -31306,6 +31522,8 @@ async function renderAides(force){
           ?'<span class="badge badge-warn">Still on temp password</span>'
           :'<span class="badge badge-ok">Active</span>');
       const actions=aideActionButtons(un, aideDesk);
+      const manageCheck=(typeof aideManageDelete1CheckHtml==='function')?aideManageDelete1CheckHtml(u):'';
+      const manageSel=manageCheck&&typeof aideManageDelete1IsSelected==='function'&&aideManageDelete1IsSelected(u)?' is-selected':'';
       const row='<tr>'
         +'<td>'+escapeHtml(u.name||u.fullName||'—')+'</td>'
         +'<td>@'+escapeHtml(un)+'</td>'
@@ -31313,7 +31531,8 @@ async function renderAides(force){
         +'<td>'+status+'</td>'
         +'<td class="actions">'+actions+'</td>'
         +'</tr>';
-      const card='<article class="aide-row-card">'
+      const card='<article class="aide-row-card">'.replace('aide-row-card"','aide-row-card'+manageSel+'"')
+        +manageCheck
         +'<div class="aide-row-top"><strong>'+escapeHtml(u.name||u.fullName||'—')+'</strong>'+status+'</div>'
         +'<div class="aide-row-sub">@'+escapeHtml(un)+'</div>'
         +'<div class="aide-row-meta">'+escapeHtml(formatAideAssignedClients(u))+'</div>'
@@ -31643,24 +31862,86 @@ function aideCredBind(){
     if(ev.key==='Escape'&&aideCredState.sheetOpen)aideCredCloseSheet();
   });
 }
+function aideCredManageOn(){
+  var tab=document.getElementById('tab_aides');
+  return !!(tab&&tab.classList&&tab.classList.contains('aide-manage-on'));
+}
+function aideCredHideForManage(){
+  var root=document.getElementById('aideCredsRoot');
+  var tab=document.getElementById('tab_aides');
+  if(root)root.hidden=true;
+  if(tab&&tab.classList){
+    tab.classList.remove('aide-creds-on');
+    tab.classList.remove('aide-creds-detail');
+  }
+  var detail=document.getElementById('aideCredDetail');
+  if(detail){detail.hidden=true;detail.innerHTML='';}
+  var list=document.getElementById('aideCredList');
+  if(list)list.hidden=true;
+  var info=document.getElementById('aideInfoSheet');
+  if(info)info.hidden=true;
+  if(typeof aideCredCloseSheet==='function')aideCredCloseSheet();
+  if(typeof aideCredState!=='undefined'&&aideCredState){
+    aideCredState.seq=(aideCredState.seq||0)+1;
+    aideCredState.view='list';
+    aideCredState.aideId='';
+    aideCredState.aideName='';
+    aideCredState.sheetOpen=false;
+    aideCredState.pickAide=false;
+    aideCredState.editing=null;
+    aideCredState.credentials=[];
+  }
+}
+function aideCredShowAfterManage(){
+  var root=document.getElementById('aideCredsRoot');
+  var tab=document.getElementById('tab_aides');
+  if(root)root.hidden=true;
+  if(tab&&tab.classList){
+    tab.classList.remove('aide-creds-on');
+    tab.classList.remove('aide-creds-detail');
+  }
+  var detail=document.getElementById('aideCredDetail');
+  if(detail){detail.hidden=true;detail.innerHTML='';}
+  if(typeof aideCredState!=='undefined'&&aideCredState){
+    aideCredState.view='list';
+    aideCredState.aideId='';
+    aideCredState.aideName='';
+    aideCredState.credentials=[];
+  }
+}
 function aideCredToggleManage(){
   var tab=document.getElementById('tab_aides');
   if(!tab)return;
   tab.classList.toggle('aide-manage-on');
+  var on=tab.classList.contains('aide-manage-on');
   var btn=document.getElementById('aideCredManageBtn');
-  if(btn)btn.setAttribute('aria-pressed', tab.classList.contains('aide-manage-on')?'true':'false');
+  if(btn)btn.setAttribute('aria-pressed', on?'true':'false');
+  if(on)aideCredHideForManage();
+  else aideCredShowAfterManage();
+  if(!on&&typeof aideManageDelete1Clear==='function')aideManageDelete1Clear();
+  if(typeof aideManageDelete1Sync==='function')aideManageDelete1Sync();
 }
 function aideCredsAfterAides(){
   aideCredBind();
   var root=document.getElementById('aideCredsRoot');
   var tab=document.getElementById('tab_aides');
+  if(aideCredManageOn()){
+    if(root)root.hidden=true;
+    if(typeof aideCredState!=='undefined'&&aideCredState){
+      aideCredState.view='list';
+      aideCredState.aideId='';
+      aideCredState.aideName='';
+    }
+    return;
+  }
   var show=aideCredsIsAdmin()&&(typeof aideDesk==='undefined'||aideDesk!=='deleted');
   if(root)root.hidden=!show;
   if(tab)tab.classList.toggle('aide-creds-on', !!show);
   var manage=document.getElementById('aideCredManageBtn');
+  var manageShow=(typeof canManageAides==='function'&&canManageAides())&&(typeof aideDesk==='undefined'||aideDesk!=='deleted');
   if(manage){
-    manage.hidden=!show;
-    manage.style.display=show?'':'none';
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
   }
   if(!show){
     aideCredCloseSheet();
@@ -31681,6 +31962,9 @@ function aideCredPaintBanner(){
   el.innerHTML='<span aria-hidden="true">\u26A0</span> '+escapeHtml(text);
 }
 function aideCredPaintList(){
+  if(aideCredManageOn())return;
+  var tab=document.getElementById('tab_aides');
+  if(tab&&tab.classList)tab.classList.remove('aide-creds-detail');
   var list=document.getElementById('aideCredList');
   var wrap=document.getElementById('aideCredSearchWrap');
   var detail=document.getElementById('aideCredDetail');
@@ -31805,6 +32089,27 @@ function aideCredDetailTop(){
   return '<div class="aide-cred-detail-top"><button type="button" data-aide-cred-back aria-label="Back to aides">\u2190</button><h2>'+escapeHtml(aideCredState.aideName||'Aide')+'</h2></div>';
 }
 function aideCredPaintDetail(messageHtml){
+  if(aideCredManageOn()){
+    var blocked=document.getElementById('aideCredDetail');
+    if(blocked)blocked.hidden=true;
+    var blockedRoot=document.getElementById('aideCredsRoot');
+    if(blockedRoot)blockedRoot.hidden=true;
+    var blockedTab=document.getElementById('tab_aides');
+    if(blockedTab&&blockedTab.classList)blockedTab.classList.remove('aide-creds-detail');
+    if(typeof aideCredState!=='undefined'&&aideCredState){
+      aideCredState.view='list';
+      aideCredState.aideId='';
+      aideCredState.aideName='';
+    }
+    return;
+  }
+  var tab=document.getElementById('tab_aides');
+  var root=document.getElementById('aideCredsRoot');
+  if(tab&&tab.classList){
+    tab.classList.add('aide-creds-on');
+    tab.classList.add('aide-creds-detail');
+  }
+  if(root)root.hidden=false;
   var list=document.getElementById('aideCredList');
   var wrap=document.getElementById('aideCredSearchWrap');
   var detail=document.getElementById('aideCredDetail');
@@ -31851,6 +32156,7 @@ async function aideCredFillBareChips(aides, seq){
 }
 async function aideCredsRefresh(){
   if(!aideCredsIsAdmin())return;
+  if(aideCredManageOn())return;
   var seq=++aideCredState.seq;
   aideCredState.error='';
   var res=await sbAdminAideCredentialsRollup(null);
@@ -31870,11 +32176,18 @@ async function aideCredsRefresh(){
     aideCredState.attention=res.attention;
     aideCredState.error='';
   }
+  if(aideCredManageOn()){
+    var stay=document.getElementById('aideCredsRoot');
+    if(stay)stay.hidden=true;
+    aideCredState.view='list';
+    return;
+  }
   if(aideCredState.view==='detail')return;
   aideCredPaintList();
 }
 async function aideCredOpen(aideId){
   if(!aideCredsIsAdmin())return;
+  if(aideCredManageOn())return;
   var id=String(aideId||'');
   var aide=(aideCredState.aides||[]).filter(function(a){return a.id===id;})[0];
   aideCredState.view='detail';
@@ -31883,6 +32196,10 @@ async function aideCredOpen(aideId){
   aideCredState.credentials=[];
   aideCredPaintDetail('<p class="aide-cred-muted">Loading credentials...</p>');
   var res=await sbAdminListAideCredentials(id);
+  if(aideCredManageOn()){
+    aideCredState.view='list';
+    return;
+  }
   if(aideCredState.aideId!==id||aideCredState.view!=='detail')return;
   if(!res||!res.success){
     aideCredPaintDetail('<p class="aide-cred-muted">'+escapeHtml((res&&res.error)||'Could not load credentials.')+'</p>');
@@ -32295,6 +32612,202 @@ async function softDeleteAide(username){
   }catch(e){
     showTempMsg(aceActionError(null,e,'admin_deactivate_aide'),'var(--danger)');
   }
+}
+// v=aide-manage-delete1 — list-level soft-delete. One existing deactivate call per selected id.
+var aideManageDelete1Sel={};
+var aideManageDelete1Busy=false;
+function aideManageDelete1Key(user){
+  var id=String(user&&(user.id||user.aide_id||user.aideId)||'').trim();
+  if(id)return 'id:'+id;
+  var un=String(user&&user.username||'').trim().toLowerCase();
+  if(un)return 'u:'+un;
+  return '';
+}
+function aideManageDelete1Active(){
+  var tab=document.getElementById('tab_aides');
+  var on=!!(tab&&tab.classList&&tab.classList.contains('aide-manage-on'));
+  var deleted=(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  var can=typeof canManageAides!=='function'||canManageAides();
+  return on&&!deleted&&!!can;
+}
+function aideManageDelete1IsSelected(user){
+  var key=aideManageDelete1Key(user);
+  return !!(key&&aideManageDelete1Sel[key]);
+}
+function aideManageDelete1CheckHtml(user){
+  if(typeof aideDesk!=='undefined'&&aideDesk==='deleted')return '';
+  if(typeof canManageAides==='function'&&!canManageAides())return '';
+  var key=aideManageDelete1Key(user);
+  if(!key)return '';
+  var id=String(user&&(user.id||user.aide_id||user.aideId)||'').trim();
+  var un=String(user&&user.username||'').trim();
+  var name=String((user&&(user.name||user.fullName||user.full_name))||un||'aide');
+  var attr=typeof escapeAttr==='function'?escapeAttr:function(s){return String(s==null?'':s);};
+  var checked=aideManageDelete1Sel[key]?' checked':'';
+  return '<label class="aide-manage-check" data-aide-manage-delete1="v=aide-manage-delete1"><input type="checkbox" class="aide-manage-cb"'+checked+' data-aide-key="'+attr(key)+'" data-aide-id="'+attr(id)+'" data-aide-user="'+attr(un)+'" aria-label="Select '+attr(name)+'" onchange="aideManageDelete1Toggle(this)"></label>';
+}
+function aideManageDelete1Boxes(){
+  var root=document.getElementById('aidesContainer');
+  if(!root||!root.querySelectorAll)return [];
+  return Array.prototype.slice.call(root.querySelectorAll('input.aide-manage-cb'));
+}
+function aideManageDelete1Toggle(el){
+  if(!el)return;
+  var key=el.getAttribute('data-aide-key')||'';
+  if(!key)return;
+  if(el.checked){
+    aideManageDelete1Sel[key]={id:el.getAttribute('data-aide-id')||'', username:el.getAttribute('data-aide-user')||''};
+  }else{
+    delete aideManageDelete1Sel[key];
+  }
+  var card=el.closest?el.closest('article'):null;
+  if(card&&card.classList)card.classList.toggle('is-selected', !!el.checked);
+  aideManageDelete1PaintCount();
+}
+function aideManageDelete1Picks(){
+  var out=[];
+  Object.keys(aideManageDelete1Sel).forEach(function(key){
+    var row=aideManageDelete1Sel[key];
+    if(!row)return;
+    var id=String(row.id||'').trim();
+    var un=String(row.username||'').trim();
+    if(!id&&!un)return;
+    out.push({id:id, username:un});
+  });
+  return out;
+}
+function aideManageDelete1PaintCount(){
+  var n=aideManageDelete1Picks().length;
+  var el=document.getElementById('aideManageCount');
+  if(el)el.textContent=n+' selected';
+  var del=document.getElementById('aideManageDeleteSelected');
+  if(del)del.disabled=n<1||aideManageDelete1Busy===true;
+}
+function aideManageDelete1SelectAll(){
+  if(!aideManageDelete1Active())return;
+  aideManageDelete1Boxes().forEach(function(el){
+    if(el.disabled)return;
+    el.checked=true;
+    aideManageDelete1Toggle(el);
+  });
+}
+function aideManageDelete1UnselectAll(){
+  aideManageDelete1Sel={};
+  aideManageDelete1Boxes().forEach(function(el){
+    el.checked=false;
+    var card=el.closest?el.closest('article'):null;
+    if(card&&card.classList)card.classList.remove('is-selected');
+  });
+  aideManageDelete1PaintCount();
+}
+function aideManageDelete1Clear(){
+  aideManageDelete1UnselectAll();
+  aideManageDelete1CloseConfirm();
+}
+function aideManageDelete1OpenConfirm(){
+  var n=aideManageDelete1Picks().length;
+  if(n<1||aideManageDelete1Busy)return;
+  if(!aideManageDelete1Active())return;
+  var title=document.getElementById('aideManageConfirmTitle');
+  if(title)title.textContent=n===1?'Delete 1 aide?':('Delete '+n+' aides?');
+  var sure=document.getElementById('aideManageSure');
+  if(sure)sure.hidden=false;
+  var box=document.getElementById('aideManageConfirm');
+  if(box)box.hidden=false;
+  var tab=document.getElementById('tab_aides');
+  if(tab&&tab.classList)tab.classList.add('aide-manage-confirming');
+  if(sure&&sure.scrollIntoView){try{sure.scrollIntoView({block:'start'});}catch(e){}}
+}
+function aideManageDelete1CloseConfirm(){
+  if(aideManageDelete1Busy)return;
+  var sure=document.getElementById('aideManageSure');
+  if(sure)sure.hidden=true;
+  var box=document.getElementById('aideManageConfirm');
+  if(box)box.hidden=true;
+  var tab=document.getElementById('tab_aides');
+  if(tab&&tab.classList)tab.classList.remove('aide-manage-confirming');
+}
+function aideManageDelete1Sync(){
+  var tab=document.getElementById('tab_aides');
+  if(tab&&tab.classList)tab.classList.toggle('aide-desk-deleted', typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  var bar=document.getElementById('aideManageBar');
+  var show=aideManageDelete1Active();
+  if(bar)bar.hidden=!show;
+  if(!show)aideManageDelete1CloseConfirm();
+  var manageOn=!!(tab&&tab.classList&&tab.classList.contains('aide-manage-on'));
+  var manage=document.getElementById('aideCredManageBtn');
+  if(manage&&tab)manage.setAttribute('aria-pressed', manageOn?'true':'false');
+  var done=document.getElementById('aideManageDoneBtn');
+  var doneShow=manageOn&&!(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  if(done){
+    done.hidden=!doneShow;
+    done.style.display=doneShow?'':'none';
+  }
+  aideManageDelete1PaintCount();
+  aideManageDelete1Bind();
+}
+function aideManageDelete1OnDesk(){
+  aideManageDelete1Sel={};
+  aideManageDelete1CloseConfirm();
+  aideManageDelete1Sync();
+}
+function aideManageDelete1Bind(){
+  if(aideManageDelete1Bind.done)return;
+  aideManageDelete1Bind.done=true;
+  document.addEventListener('keydown', function(ev){
+    if(!ev||ev.key!=='Escape'||aideManageDelete1Busy)return;
+    var box=document.getElementById('aideManageConfirm');
+    if(!box||box.hidden)return;
+    aideManageDelete1CloseConfirm();
+  });
+}
+async function aideManageDelete1Run(){
+  if(aideManageDelete1Busy)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  var picks=aideManageDelete1Picks();
+  if(!picks.length)return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Soft-delete needs the Supabase aides desk.','var(--warn)');
+    return;
+  }
+  aideManageDelete1Busy=true;
+  aideManageDelete1PaintCount();
+  var go=document.getElementById('aideManageConfirmGo');
+  if(go)go.disabled=true;
+  var ok=0;
+  var fail='';
+  var i;
+  for(i=0;i<picks.length;i++){
+    var pick=picks[i];
+    var payload={};
+    if(pick.username)payload.username=pick.username;
+    if(pick.id)payload.aideId=pick.id;
+    try{
+      var res=await postAideAction('admin_deactivate_aide','',payload);
+      var data=res&&res.data;
+      if(data&&data.success){
+        ok++;
+        if(typeof logActivity==='function')logActivity('Soft-deleted aide @'+(pick.username||pick.id));
+      }else if(typeof aceActionError==='function'){
+        fail=aceActionError(data,res&&res.err,'admin_deactivate_aide');
+      }else{
+        fail='Could not hide this aide.';
+      }
+    }catch(e){
+      fail=(typeof aceActionError==='function')?aceActionError(null,e,'admin_deactivate_aide'):'Could not hide this aide.';
+    }
+  }
+  aideManageDelete1Busy=false;
+  if(go)go.disabled=false;
+  aideManageDelete1Sel={};
+  aideManageDelete1CloseConfirm();
+  if(typeof cacheInvalidate==='function')cacheInvalidate('get_users');
+  if(typeof showTempMsg==='function'){
+    if(ok===1)showTempMsg('1 aide moved to Recently deleted.','var(--success)');
+    else if(ok)showTempMsg(ok+' aides moved to Recently deleted.','var(--success)');
+    if(fail)showTempMsg(fail,'var(--danger)');
+  }
+  if(typeof renderAides==='function')await renderAides(true);
 }
 function confirmRestoreAide(username){
   const un=String(username||'').trim();
@@ -32729,6 +33242,195 @@ async function commitTimesheetTrashRestore(id){
   }catch(e){
     showTempMsg('Could not restore timesheet.','var(--danger)');
   }
+}
+
+// v=aide-manage-delete1 — Timesheets Manage bulk soft-delete. One existing trash call per selected id.
+var tsManageDelete1Sel={};
+var tsManageDelete1Busy=false;
+function tsManageDelete1Key(rec){
+  var id=String(rec&&rec.id!=null?rec.id:'').trim();
+  return id?('id:'+id):'';
+}
+function tsManageDelete1Active(){
+  var tab=document.getElementById('tab_timesheets');
+  var on=!!(tab&&tab.classList&&tab.classList.contains('ts-manage-on'));
+  var active=(typeof tsDesk==='undefined'||tsDesk==='active');
+  var can=typeof canManageAides!=='function'||canManageAides();
+  return on&&active&&!!can;
+}
+function tsManageDelete1IsSelected(rec){
+  var key=tsManageDelete1Key(rec);
+  return !!(key&&tsManageDelete1Sel[key]);
+}
+function tsManageDelete1CheckHtml(rec){
+  if(typeof tsDesk!=='undefined'&&tsDesk!=='active')return '';
+  if(typeof canManageAides==='function'&&!canManageAides())return '';
+  var key=tsManageDelete1Key(rec);
+  if(!key)return '';
+  var id=String(rec&&rec.id!=null?rec.id:'').trim();
+  var name=String((rec&&(rec.empName||rec.clientName))||'timesheet');
+  var attr=typeof escapeAttr==='function'?escapeAttr:function(s){return String(s==null?'':s);};
+  var checked=tsManageDelete1Sel[key]?' checked':'';
+  return '<label class="aide-manage-check" data-aide-manage-delete1="v=aide-manage-delete1"><input type="checkbox" class="aide-manage-cb"'+checked+' data-ts-key="'+attr(key)+'" data-ts-id="'+attr(id)+'" aria-label="Select '+attr(name)+'" onchange="tsManageDelete1Toggle(this)"></label>';
+}
+function tsManageDelete1Boxes(){
+  var root=document.getElementById('tsCards');
+  if(!root||!root.querySelectorAll)return [];
+  return Array.prototype.slice.call(root.querySelectorAll('input.aide-manage-cb'));
+}
+function tsManageDelete1Toggle(el){
+  if(!el)return;
+  var key=el.getAttribute('data-ts-key')||'';
+  if(!key)return;
+  if(el.checked)tsManageDelete1Sel[key]={id:el.getAttribute('data-ts-id')||''};
+  else delete tsManageDelete1Sel[key];
+  var card=el.closest?el.closest('article.ts-card'):null;
+  if(card&&card.classList)card.classList.toggle('is-selected', !!el.checked);
+  tsManageDelete1PaintCount();
+}
+function tsManageDelete1Picks(){
+  var out=[];
+  Object.keys(tsManageDelete1Sel).forEach(function(key){
+    var row=tsManageDelete1Sel[key];
+    if(!row)return;
+    var id=String(row.id||'').trim();
+    if(!id)return;
+    out.push({id:id});
+  });
+  return out;
+}
+function tsManageDelete1PaintCount(){
+  var n=tsManageDelete1Picks().length;
+  var el=document.getElementById('tsManageCount');
+  if(el)el.textContent=n+' selected';
+  var del=document.getElementById('tsManageDeleteSelected');
+  if(del)del.disabled=n<1||tsManageDelete1Busy===true;
+}
+function tsManageDelete1SelectAll(){
+  if(!tsManageDelete1Active())return;
+  tsManageDelete1Boxes().forEach(function(el){
+    if(el.disabled)return;
+    el.checked=true;
+    tsManageDelete1Toggle(el);
+  });
+}
+function tsManageDelete1UnselectAll(){
+  tsManageDelete1Sel={};
+  tsManageDelete1Boxes().forEach(function(el){
+    el.checked=false;
+    var card=el.closest?el.closest('article.ts-card'):null;
+    if(card&&card.classList)card.classList.remove('is-selected');
+  });
+  tsManageDelete1PaintCount();
+}
+function tsManageDelete1Clear(){
+  tsManageDelete1UnselectAll();
+  tsManageDelete1CloseConfirm();
+}
+function tsManageDelete1OpenConfirm(){
+  var n=tsManageDelete1Picks().length;
+  if(n<1||tsManageDelete1Busy)return;
+  if(!tsManageDelete1Active())return;
+  var title=document.getElementById('tsManageConfirmTitle');
+  if(title)title.textContent=n===1?'Delete 1 timesheet?':('Delete '+n+' timesheets?');
+  var sure=document.getElementById('tsManageSure');
+  if(sure)sure.hidden=false;
+  var box=document.getElementById('tsManageConfirm');
+  if(box)box.hidden=false;
+  var tab=document.getElementById('tab_timesheets');
+  if(tab&&tab.classList)tab.classList.add('ts-manage-confirming');
+  if(sure&&sure.scrollIntoView){try{sure.scrollIntoView({block:'start'});}catch(e){}}
+}
+function tsManageDelete1CloseConfirm(){
+  if(tsManageDelete1Busy)return;
+  var sure=document.getElementById('tsManageSure');
+  if(sure)sure.hidden=true;
+  var box=document.getElementById('tsManageConfirm');
+  if(box)box.hidden=true;
+  var tab=document.getElementById('tab_timesheets');
+  if(tab&&tab.classList)tab.classList.remove('ts-manage-confirming');
+}
+function tsManageDelete1Sync(){
+  var tab=document.getElementById('tab_timesheets');
+  var active=(typeof tsDesk==='undefined'||tsDesk==='active');
+  if(tab&&tab.classList)tab.classList.toggle('ts-desk-active', active);
+  var bar=document.getElementById('tsManageBar');
+  var show=tsManageDelete1Active();
+  if(bar)bar.hidden=!show;
+  if(!show)tsManageDelete1CloseConfirm();
+  var manage=document.getElementById('tsManageBtn');
+  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&active;
+  if(manage){
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
+    if(tab)manage.setAttribute('aria-pressed', tab.classList.contains('ts-manage-on')?'true':'false');
+  }
+  tsManageDelete1PaintCount();
+  tsManageDelete1Bind();
+}
+function tsManageDelete1OnDesk(){
+  tsManageDelete1Sel={};
+  tsManageDelete1CloseConfirm();
+  tsManageDelete1Sync();
+}
+function tsManageDelete1ToggleManage(){
+  var tab=document.getElementById('tab_timesheets');
+  if(!tab)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof tsDesk!=='undefined'&&tsDesk!=='active')return;
+  tab.classList.toggle('ts-manage-on');
+  var on=tab.classList.contains('ts-manage-on');
+  if(!on)tsManageDelete1Clear();
+  tsManageDelete1Sync();
+}
+function tsManageDelete1Bind(){
+  if(tsManageDelete1Bind.done)return;
+  tsManageDelete1Bind.done=true;
+  document.addEventListener('keydown', function(ev){
+    if(!ev||ev.key!=='Escape'||tsManageDelete1Busy)return;
+    var box=document.getElementById('tsManageConfirm');
+    if(!box||box.hidden)return;
+    tsManageDelete1CloseConfirm();
+  });
+}
+async function tsManageDelete1Run(){
+  if(tsManageDelete1Busy)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  var picks=tsManageDelete1Picks();
+  if(!picks.length)return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Recently deleted needs the Supabase timesheet desk.','var(--warn)');
+    return;
+  }
+  tsManageDelete1Busy=true;
+  tsManageDelete1PaintCount();
+  var go=document.getElementById('tsManageConfirmGo');
+  if(go)go.disabled=true;
+  var ok=0;
+  var fail='';
+  var i;
+  for(i=0;i<picks.length;i++){
+    var id=picks[i].id;
+    try{
+      var res=await apiPost({action:'trash_timesheet', id:id});
+      if(res&&res.success===true&&res.is_active===false&&res.deleted_at)ok++;
+      else if(typeof aceActionError==='function')fail=aceActionError(res,null,'trash_timesheet');
+      else fail=(res&&(res.error||res.message))||'Could not move timesheet to Recently deleted.';
+    }catch(e){
+      fail=(typeof aceActionError==='function')?aceActionError(null,e,'trash_timesheet'):'Could not move timesheet to Recently deleted.';
+    }
+  }
+  tsManageDelete1Busy=false;
+  if(go)go.disabled=false;
+  tsManageDelete1Sel={};
+  tsManageDelete1CloseConfirm();
+  if(typeof cacheInvalidate==='function')cacheInvalidate('get_all');
+  if(typeof showTempMsg==='function'){
+    if(ok===1)showTempMsg('1 timesheet moved to Recently deleted.','var(--success)');
+    else if(ok)showTempMsg(ok+' timesheets moved to Recently deleted.','var(--success)');
+    if(fail)showTempMsg(fail,'var(--danger)');
+  }
+  if(typeof renderTimesheets==='function')await renderTimesheets();
 }
 
 function tsPctX(x){return (Number(x)/TS_FORM_PT.sheetW*100).toFixed(4)+'%';}
@@ -35304,18 +36006,45 @@ function printCert(r){
 
 // ─── CLIENT MANAGEMENT ──────────────────────────────────
 let allClients=[], allAidesForAssign=[];
+let clientDesk='active';
+let clientDeletedList=[];
+
+function clientOnDesk(c, desk){
+  if(!c)return false;
+  var inactive=c.isActive===false||c.is_active===false;
+  var stamp=c.deactivatedAt||c.deactivated_at||'';
+  if(desk==='deleted')return inactive||!!stamp;
+  if(inactive||stamp)return false;
+  return true;
+}
+function setClientDesk(view){
+  clientDesk=view==='deleted'?'deleted':'active';
+  document.querySelectorAll('[data-client-desk]').forEach(function(btn){
+    var on=btn.getAttribute('data-client-desk')===clientDesk;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-selected', on?'true':'false');
+  });
+  if(typeof clientManageDelete1OnDesk==='function')clientManageDelete1OnDesk();
+  return renderClients(true);
+}
 
 async function renderClients(force){
   const container=document.getElementById('clientsContainer');
-  if(force===true||!cacheGet('get_clients')){
+  var deleted=clientDesk==='deleted';
+  var cacheKey=deleted?'get_clients:deleted':'get_clients';
+  if(force===true||!cacheGet(cacheKey)){
     container.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:24px;margin-bottom:8px">⏳</div><p style="color:var(--muted);font-size:0.82rem">Loading clients from Google Sheets...</p></div>';
   }
   try{
-    const data=await apiGetCached('get_clients',null,force===true);
+    const data=await apiGetCached('get_clients',deleted?{clientDesk:'deleted'}:null,force===true);
     if(data.success){
-      allClients=data.data||[];
+      if(deleted)clientDeletedList=data.data||[];
+      else allClients=data.data||[];
     }
-  }catch(e){if(force===true||!allClients.length)allClients=[];}
+  }catch(e){
+    if(deleted){if(force===true)clientDeletedList=[];}
+    else if(force===true||!allClients.length)allClients=[];
+  }
   paintClients();
 }
 
@@ -35324,7 +36053,8 @@ function paintClients(){
   try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!container)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
-  let list=allClients;
+  let list=clientDesk==='deleted'?clientDeletedList:allClients;
+  list=(list||[]).filter(function(c){return clientOnDesk(c, clientDesk);});
   if(typeof listAz1Apply==='function'&&listAz1On()){
     list=listAz1Apply(list,[
       function(c){return c&&c.name||'';},
@@ -35334,7 +36064,10 @@ function paintClients(){
   if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q));
 
   if(!list.length){
-    container.innerHTML='<div class="empty-state"><p>&#127968; No clients added yet. Click "+ Add Client" to get started.</p></div>';
+    container.innerHTML=clientDesk==='deleted'
+      ?'<div class="empty-state"><p>No clients in Recently deleted.</p></div>'
+      :'<div class="empty-state"><p>&#127968; No clients added yet. Click "+ Add Client" to get started.</p></div>';
+    if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
     return;
   }
 
@@ -35342,7 +36075,13 @@ function paintClients(){
     const aideCount=(c.assignedAides||[]).length;
     const hasGPS=c.lat&&c.lng;
     const head=typeof clientInsCardHead==='function'?clientInsCardHead(c):('<h4>'+(c.name||'')+'</h4>');
-    return `<div class="aide-card" data-client-ins1="v=client-ins1">
+    const manageCheck=typeof clientManageDelete1CheckHtml==='function'?clientManageDelete1CheckHtml(c):'';
+    const manageSel=typeof clientManageDelete1IsSelected==='function'&&clientManageDelete1IsSelected(c)?' is-selected':'';
+    const rowDelete=clientDesk==='deleted'
+      ?'<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="restoreClient(\''+c.id+'\')">↺ Restore</button>'
+      :'<button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient(\''+c.id+'\')">Delete</button>';
+    var open='<div class="aide-card" data-client-ins1="v=client-ins1">'.replace('class="aide-card"','class="aide-card'+manageSel+'"');
+    return open+manageCheck+`
       <div>
         ${head}
         <p>&#128205; ${c.address||'No address set'} ${hasGPS?'<span style="color:var(--success)">&#10003; GPS Verified</span>':'<span style="color:var(--warn)">&#9888; GPS Not Set</span>'}</p>
@@ -35350,7 +36089,7 @@ function paintClients(){
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-sm btn-view" onclick="editClient('${c.id}')">Edit</button>
-        <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient('${c.id}')">Delete</button>
+        ${rowDelete}
       </div>
     </div>`;
   });
@@ -35359,9 +36098,11 @@ function paintClients(){
       return {name:(c&&c.name)||'', html:clientCards[i]};
     }));
     if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
+    if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
     return;
   }
   container.innerHTML=clientCards.join('');
+  if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
 }
 
 async function loadAidesForAssignment(selectedIds=[]){
@@ -35667,6 +36408,219 @@ async function saveClient(){
 
 function deleteClient(id){
   showSharedConfirm('Delete this client? This cannot be undone.',function(){commitDeleteClient(id);},'Delete');
+}
+function restoreClient(id){
+  showSharedConfirm('Restore this client to Active?',function(){commitClientRestore(id);},'Restore');
+}
+async function commitClientRestore(id){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Restore needs the Supabase clients desk.','var(--warn)');
+    return;
+  }
+  try{
+    var data=await apiPost({action:'restore_client', id:id, clientId:id});
+    if(!(data&&data.success===true&&data.is_active===true&&String(data.id||data.clientId||'')===String(id))){
+      showTempMsg((data&&(data.error||data.message))||'Could not restore client.','var(--danger)');
+      return;
+    }
+    if(typeof cacheInvalidate==='function')cacheInvalidate('get_clients');
+    showTempMsg('Client restored.','var(--success)');
+    if(typeof renderClients==='function')renderClients(true);
+  }catch(e){
+    showTempMsg('Could not restore client.','var(--danger)');
+  }
+}
+// v=aide-manage-delete1 — Clients Manage bulk soft-delete. One existing archive call per selected id.
+var clientManageDelete1Sel={};
+var clientManageDelete1Busy=false;
+function clientManageDelete1Key(client){
+  var id=String(client&&(client.id||client.clientId||client.client_id)||'').trim();
+  return id?('id:'+id):'';
+}
+function clientManageDelete1Active(){
+  var tab=document.getElementById('tab_clients');
+  var on=!!(tab&&tab.classList&&tab.classList.contains('client-manage-on'));
+  var deleted=(typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var can=typeof canManageAides!=='function'||canManageAides();
+  return on&&!deleted&&!!can;
+}
+function clientManageDelete1IsSelected(client){
+  var key=clientManageDelete1Key(client);
+  return !!(key&&clientManageDelete1Sel[key]);
+}
+function clientManageDelete1CheckHtml(client){
+  if(typeof clientDesk!=='undefined'&&clientDesk==='deleted')return '';
+  if(typeof canManageAides==='function'&&!canManageAides())return '';
+  var key=clientManageDelete1Key(client);
+  if(!key)return '';
+  var id=String(client&&(client.id||client.clientId||client.client_id)||'').trim();
+  var name=String((client&&client.name)||'client');
+  var attr=typeof escapeAttr==='function'?escapeAttr:function(s){return String(s==null?'':s);};
+  var checked=clientManageDelete1Sel[key]?' checked':'';
+  return '<label class="aide-manage-check" data-aide-manage-delete1="v=aide-manage-delete1"><input type="checkbox" class="aide-manage-cb"'+checked+' data-client-key="'+attr(key)+'" data-client-id="'+attr(id)+'" aria-label="Select '+attr(name)+'" onchange="clientManageDelete1Toggle(this)"></label>';
+}
+function clientManageDelete1Boxes(){
+  var root=document.getElementById('clientsContainer');
+  if(!root||!root.querySelectorAll)return [];
+  return Array.prototype.slice.call(root.querySelectorAll('input.aide-manage-cb'));
+}
+function clientManageDelete1Toggle(el){
+  if(!el)return;
+  var key=el.getAttribute('data-client-key')||'';
+  if(!key)return;
+  if(el.checked)clientManageDelete1Sel[key]={id:el.getAttribute('data-client-id')||''};
+  else delete clientManageDelete1Sel[key];
+  var card=el.closest?el.closest('.aide-card'):null;
+  if(card&&card.classList)card.classList.toggle('is-selected', !!el.checked);
+  clientManageDelete1PaintCount();
+}
+function clientManageDelete1Picks(){
+  var out=[];
+  Object.keys(clientManageDelete1Sel).forEach(function(key){
+    var row=clientManageDelete1Sel[key];
+    if(!row)return;
+    var id=String(row.id||'').trim();
+    if(!id)return;
+    out.push({id:id});
+  });
+  return out;
+}
+function clientManageDelete1PaintCount(){
+  var n=clientManageDelete1Picks().length;
+  var el=document.getElementById('clientManageCount');
+  if(el)el.textContent=n+' selected';
+  var del=document.getElementById('clientManageDeleteSelected');
+  if(del)del.disabled=n<1||clientManageDelete1Busy===true;
+}
+function clientManageDelete1SelectAll(){
+  if(!clientManageDelete1Active())return;
+  clientManageDelete1Boxes().forEach(function(el){
+    if(el.disabled)return;
+    el.checked=true;
+    clientManageDelete1Toggle(el);
+  });
+}
+function clientManageDelete1UnselectAll(){
+  clientManageDelete1Sel={};
+  clientManageDelete1Boxes().forEach(function(el){
+    el.checked=false;
+    var card=el.closest?el.closest('.aide-card'):null;
+    if(card&&card.classList)card.classList.remove('is-selected');
+  });
+  clientManageDelete1PaintCount();
+}
+function clientManageDelete1Clear(){
+  clientManageDelete1UnselectAll();
+  clientManageDelete1CloseConfirm();
+}
+function clientManageDelete1OpenConfirm(){
+  var n=clientManageDelete1Picks().length;
+  if(n<1||clientManageDelete1Busy)return;
+  if(!clientManageDelete1Active())return;
+  var title=document.getElementById('clientManageConfirmTitle');
+  if(title)title.textContent=n===1?'Delete 1 client?':('Delete '+n+' clients?');
+  var sure=document.getElementById('clientManageSure');
+  if(sure)sure.hidden=false;
+  var box=document.getElementById('clientManageConfirm');
+  if(box)box.hidden=false;
+  var tab=document.getElementById('tab_clients');
+  if(tab&&tab.classList)tab.classList.add('client-manage-confirming');
+  if(sure&&sure.scrollIntoView){try{sure.scrollIntoView({block:'start'});}catch(e){}}
+}
+function clientManageDelete1CloseConfirm(){
+  if(clientManageDelete1Busy)return;
+  var sure=document.getElementById('clientManageSure');
+  if(sure)sure.hidden=true;
+  var box=document.getElementById('clientManageConfirm');
+  if(box)box.hidden=true;
+  var tab=document.getElementById('tab_clients');
+  if(tab&&tab.classList)tab.classList.remove('client-manage-confirming');
+}
+function clientManageDelete1Sync(){
+  var tab=document.getElementById('tab_clients');
+  if(tab&&tab.classList)tab.classList.toggle('client-desk-deleted', typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var bar=document.getElementById('clientManageBar');
+  var show=clientManageDelete1Active();
+  if(bar)bar.hidden=!show;
+  if(!show)clientManageDelete1CloseConfirm();
+  var manage=document.getElementById('clientManageBtn');
+  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&!(typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  if(manage){
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
+    if(tab)manage.setAttribute('aria-pressed', tab.classList.contains('client-manage-on')?'true':'false');
+  }
+  clientManageDelete1PaintCount();
+  clientManageDelete1Bind();
+}
+function clientManageDelete1OnDesk(){
+  clientManageDelete1Sel={};
+  clientManageDelete1CloseConfirm();
+  clientManageDelete1Sync();
+}
+function clientManageDelete1ToggleManage(){
+  var tab=document.getElementById('tab_clients');
+  if(!tab)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof clientDesk!=='undefined'&&clientDesk==='deleted')return;
+  tab.classList.toggle('client-manage-on');
+  var on=tab.classList.contains('client-manage-on');
+  if(!on)clientManageDelete1Clear();
+  clientManageDelete1Sync();
+}
+function clientManageDelete1Bind(){
+  if(clientManageDelete1Bind.done)return;
+  clientManageDelete1Bind.done=true;
+  document.addEventListener('keydown', function(ev){
+    if(!ev||ev.key!=='Escape'||clientManageDelete1Busy)return;
+    var box=document.getElementById('clientManageConfirm');
+    if(!box||box.hidden)return;
+    clientManageDelete1CloseConfirm();
+  });
+}
+async function clientManageDelete1Run(){
+  if(clientManageDelete1Busy)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  var picks=clientManageDelete1Picks();
+  if(!picks.length)return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Soft-delete needs the Supabase clients desk.','var(--warn)');
+    return;
+  }
+  clientManageDelete1Busy=true;
+  clientManageDelete1PaintCount();
+  var go=document.getElementById('clientManageConfirmGo');
+  if(go)go.disabled=true;
+  var ok=0;
+  var fail='';
+  var i;
+  for(i=0;i<picks.length;i++){
+    var id=picks[i].id;
+    try{
+      var res=await apiPost({action:'archive_client', clientId:id, id:id});
+      var stamped=res&&res.success===true&&res.is_active===false&&String(res.id||res.clientId||'')===String(id);
+      if(stamped){
+        ok++;
+        var off=await sbSoftUnassignClient(id);
+        if(!(off&&off.ok))fail=(off&&off.error)||'Could not unassign aides for this client.';
+      }
+      else if(typeof aceActionError==='function')fail=aceActionError(res,null,'archive_client');
+      else fail=(res&&(res.error||res.message))||'Could not archive this client.';
+    }catch(e){
+      fail=(typeof aceActionError==='function')?aceActionError(null,e,'archive_client'):'Could not archive this client.';
+    }
+  }
+  clientManageDelete1Busy=false;
+  if(go)go.disabled=false;
+  clientManageDelete1Sel={};
+  clientManageDelete1CloseConfirm();
+  if(typeof cacheInvalidate==='function')cacheInvalidate('get_clients');
+  if(typeof showTempMsg==='function'){
+    if(ok===1)showTempMsg('1 client moved to Recently deleted.','var(--success)');
+    else if(ok)showTempMsg(ok+' clients moved to Recently deleted.','var(--success)');
+    if(fail)showTempMsg(fail,'var(--danger)');
+  }
+  if(typeof renderClients==='function')await renderClients(true);
 }
 async function commitDeleteClient(id){
   const client=allClients.find(c=>String(c.id)===String(id));
