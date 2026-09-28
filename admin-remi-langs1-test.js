@@ -24,7 +24,9 @@ assert.ok(html.includes('id="copilotFab"'), 'corner chip stays');
 assert.ok(html.includes('id="copilotSheet"'), 'phone sheet stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'first admin-build is aide-notif-search1');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'first admin-build is msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-hold-client1"') < html.indexOf('content="2026-09-27-aides-info1"'), 'aides-info1 stays after hold-client1');
@@ -556,7 +558,7 @@ async function runBrowser(){
         width: Math.round(box.width)
       };
     });
-    assert.strictEqual(phonePick.first, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(phonePick.first, '2026-09-27-msg-dense1');
     assert.strictEqual(phonePick.fullPage, false);
     assert.strictEqual(phonePick.hidden, false);
     assert.deepStrictEqual(phonePick.labels, LABELS);

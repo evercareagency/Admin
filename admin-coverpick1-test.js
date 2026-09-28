@@ -29,7 +29,9 @@ assert.ok(html.includes('admin-build 2026-09-25-coverpick1'), 'coverpick1 build 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-coverpick1">'), 'coverpick1 meta');
 assert.ok(html.includes('<!-- coverage pick another aide 2026-09-25 v=coverpick1 admin-build 2026-09-25-coverpick1'), 'coverpick1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-aide-notif-search1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-25-coverpick1"') < html.indexOf('content="2026-09-25-remisec1"'), 'remisec1 stays after coverpick1');
@@ -273,7 +275,7 @@ async function runBrowser(){
         clientWidth: document.documentElement.clientWidth
       };
     });
-    assert.strictEqual(ranked.build, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(ranked.build, '2026-09-27-msg-dense1');
     assert.strictEqual(ranked.marker, 'v=coverpick1');
     assert.ok(ranked.rankTop < ranked.btnTop, 'ranked list stays above Pick another aide');
     assert.strictEqual(ranked.rosterHidden, true, 'full roster stays closed until opened');
