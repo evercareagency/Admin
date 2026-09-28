@@ -218,6 +218,9 @@ assert.ok(els.schedBody.innerHTML.includes('sched-chip'), 'stacked chip class');
 assert.ok(els.schedBody.innerHTML.includes('is-pm'), 'second shift uses the evening chip');
 assert.ok(els.schedBody.innerHTML.includes('63 hrs/week'), 'authorized hours badge');
 assert.ok(els.schedBody.innerHTML.includes('>5h<') || els.schedBody.innerHTML.includes('5h'), 'morning hours on the chip');
+assert.strictEqual(els.schedSlotDetail.hidden, true, 'cold paint leaves the day drawer closed');
+assert.strictEqual(sandbox.schedSlotSelected, null, 'cold paint does not pick a client');
+sandbox.schedSelectSlotDay(ada, '2026-09-21', 1);
 assert.ok(els.schedSlotDaySum.textContent.includes('9 hrs'), 'day detail totals both shifts');
 assert.ok(els.schedSlotCards.innerHTML.includes('Morning'), 'day detail lists the morning slot');
 assert.ok(els.schedSlotCards.innerHTML.includes('data-slot-action="missed"'), 'missed mark control');
@@ -225,7 +228,7 @@ assert.ok(!els.schedSlotCards.innerHTML.includes('data-slot-action="worked"'), '
 assert.ok(els.schedSlotCards.innerHTML.includes('Covered shift'), 'cover control');
 assert.ok(els.schedSlotCards.innerHTML.includes('On hold'), 'on hold control');
 assert.ok(els.schedSlotCards.innerHTML.includes('data-deep-link=') && els.schedSlotCards.innerHTML.includes('slot_key') && els.schedSlotCards.innerHTML.includes('on_date'), 'deep link shape is on the slot');
-assert.strictEqual(els.schedSlotDetail.hidden, false, 'day detail is open beside the week');
+assert.strictEqual(els.schedSlotDetail.hidden, false, 'a tapped day opens the drawer');
 
 sandbox.schedApplyWeek({
   week_start: '2026-09-21',
@@ -452,7 +455,7 @@ async function phoneShots(){
     assert.ok(week.overflowX === 'auto' || week.overflowX === 'scroll', 'horizontal scroller');
     assert.ok(/pan-x/.test(week.touch), 'touch pan');
     assert.ok(week.docScroll <= week.docClient + 2, 'page itself does not scroll sideways');
-    assert.strictEqual(week.detail, true, 'day detail is on the schedule');
+    assert.strictEqual(week.detail, false, 'cold week paint does not open day detail');
     const grid = await page.$('#schedScroll');
     const gridBox = await grid.boundingBox();
     await page.touchscreen.touchStart(gridBox.x + gridBox.width - 20, gridBox.y + 36);
@@ -551,6 +554,7 @@ async function phoneShots(){
       }
       schedApplySlotWeek({week_start:'2026-09-21', clients:[{client_id:adaId, client_name:'Ada Cole', weekly_authorized_hours:63, days:days}]});
       schedSetView('week');
+      schedSelectSlotDay(adaId, '2026-09-21', 1, 'am');
       var layout = getComputedStyle(document.querySelector('#tab_schedule .sched-layout')).flexDirection;
       var fab = document.getElementById('copilotFab').getBoundingClientRect();
       var detail = document.getElementById('schedSlotDetail').getBoundingClientRect();

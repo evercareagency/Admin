@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- punch leftovers 2026-09-28 v=punch-leftovers1 ?v=punch-leftovers1 admin-build 2026-09-28-punch-leftovers1. GHOST-PUNCH-LEFTOVERS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone shell, max-width 430px including a typical 390 CSS px phone: the sticky EverCare header was covering the Clients subtitle and the More heading. Desk titles stick just below that teal bar with a clear gap, so Clients, More, Timesheets, Schedule, Aides, and the other desks keep the title and subtitle fully visible. The header look is unchanged. Schedule cold load, refresh, and entry into Schedule land on the week calendar only. The day drawer and Edit shift stay closed until a day is tapped, Add shift is opened, or an explicit deep link names that day. No client or shift is pre-selected, and a leftover QaHold row is not auto-opened. Ace deletes leftover QaHold test rows. This tip does not delete database rows. More desks stick. Opening Inservices, Coverage, Nurse, or any other desk from More writes that desk into the hash and leaves it open, on desktop and on a phone. Role apply does not send an allowed desk back to Timesheets or the default first tab after paint, and an empty hash does not reset the open desk. A reload or a hash of that desk opens it again. A role-forbidden desk such as Payroll for Scheduler still returns to Timesheets. Sandata Reminder and Call off empty Submit stay in the other repo. Out of scope: Nurse bottom nav overlap, Remi fullscreen rail, Clients edit/delete wrap, Remi chip over the dock. Prior markers stay, including v=remi-payroll-ins1, v=remi-float-hide1b, v=layoutA1, and v=admintheme1. -->
+<meta name="admin-build" content="2026-09-28-punch-leftovers1">
+<script>var PUNCH_LEFTOVERS1_MARKER='v=punch-leftovers1';var PUNCH_LEFTOVERS1_BUILD='2026-09-28-punch-leftovers1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -517,6 +520,30 @@ tr.client-on-hold td.sched-name{background:#fcfaff;}
 /* v=layoutA1 — phone-first Admin shell. Nurse portal keeps the left sidebar. */
 #adminScreen .admin-layout.layout-a1{display:block;min-height:100vh;min-height:100dvh;}
 #adminScreen .shell-top{position:sticky;top:0;z-index:130;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--teal);color:#fff;padding:8px 12px;min-height:56px;}
+/* v=punch-leftovers1 — phone offset. Header stays sticky and unchanged. Desk titles stick 12px under the 56px bar so they cannot slide under it. */
+@media(max-width:430px){
+  #adminScreen .page-hdr{
+    position:sticky;
+    top:68px;
+    z-index:20;
+    background:var(--off);
+    margin-left:-14px;
+    margin-right:-14px;
+    padding-left:14px;
+    padding-right:14px;
+    scroll-margin-top:68px;
+  }
+  #adminScreen .page-hdr::before{
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    top:-12px;
+    height:12px;
+    background:var(--off);
+    pointer-events:none;
+  }
+}
 #adminScreen .shell-top .sidebar-logo{padding:0;background:transparent;border:0;flex:1;min-width:0;}
 #adminScreen .shell-top .sidebar-logo h2,#adminScreen .shell-top .sidebar-logo p{color:#fff;}
 .avatar-slot{position:relative;flex-shrink:0;}
@@ -2422,7 +2449,7 @@ bindLoginKeyboard();
 <!-- ADMIN -->
 <div class="screen" id="adminScreen">
   <div class="admin-layout layout-a1">
-    <header class="shell-top">
+    <header class="shell-top" data-punch-leftovers1="v=punch-leftovers1">
       <div class="sidebar-logo" style="display:flex;align-items:center;gap:10px"><img src="data:image/jpeg;base64,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" style="width:36px;height:36px;object-fit:cover;border-radius:50%;flex-shrink:0"><div><h2>EverCare</h2><p>Admin Portal</p></div></div>
       <span class="aide-office-who" id="aideOfficeWho" data-aide-office-vis1="v=aide-office-vis1" hidden></span>
       <div class="avatar-slot">
@@ -3085,6 +3112,7 @@ bindLoginKeyboard();
               <p class="hours-note" id="schedSlotHoursNote">from start–end</p>
               <div class="sched-slim-keep" aria-hidden="true">
                 <select id="schedSlotWeekday">
+                  <option value="">Select a day</option>
                   <option value="1">Monday</option>
                   <option value="2">Tuesday</option>
                   <option value="3">Wednesday</option>
@@ -4899,6 +4927,78 @@ function layoutA1CloseAvatar(){
   if(menu)menu.hidden=true;
   if(btn)btn.setAttribute('aria-expanded','false');
 }
+function layoutA1HashTab(){
+  var raw='';
+  try{raw=String(location.hash||'');}catch(e){raw='';}
+  raw=raw.replace(/^#/,'').split('?')[0].split('&')[0].trim().toLowerCase();
+  if(raw==='completes')raw='nurse';
+  if(!raw)return '';
+  var el=null;
+  try{el=document.getElementById('tab_'+raw);}catch(e2){el=null;}
+  if(!el)return '';
+  return raw;
+}
+function layoutA1DeskAllowed(tab, role){
+  tab=String(tab||'').replace(/^#/,'').split('?')[0].trim();
+  if(tab==='completes')tab='nurse';
+  if(!tab)return false;
+  var panel=null;
+  var nav=null;
+  try{panel=document.getElementById('tab_'+tab);}catch(e){panel=null;}
+  try{nav=document.getElementById('nav_'+tab);}catch(e2){nav=null;}
+  if(!panel&&!nav)return false;
+  if(!role)return true;
+  function listed(el){
+    if(!el||!el.getAttribute)return null;
+    var raw=el.getAttribute('data-layout-roles');
+    if(raw==null||!String(raw).trim())return null;
+    return String(raw).split(/\s+/).filter(Boolean);
+  }
+  var gate=listed(panel);
+  if(!gate)gate=listed(nav);
+  if(!gate)return true;
+  return gate.indexOf(role)>=0;
+}
+function layoutA1RememberTab(tab){
+  tab=String(tab||'').replace(/^#/,'').split('?')[0].trim();
+  if(!tab||typeof history==='undefined'||!history||!history.replaceState||typeof location==='undefined'||!location)return;
+  try{
+    var cur=String(location.hash||'');
+    if(tab==='schedule'&&/client_id=/.test(cur)&&/on_date=/.test(cur))return;
+    var next='#'+tab;
+    if(cur===next)return;
+    history.replaceState(history.state,'',location.pathname+(location.search||'')+next);
+  }catch(e){}
+}
+function layoutA1RevealRoute(){
+  var tab='';
+  try{tab=layoutA1HashTab()||'';}catch(e){tab='';}
+  if(!tab||typeof showTab!=='function')return false;
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e2){role='';}
+  if(role&&!layoutA1DeskAllowed(tab, role))return false;
+  var active=null;
+  try{active=document.querySelector('#adminScreen .tab-panel.active');}catch(e3){active=null;}
+  if(active&&active.id===('tab_'+tab)&&!active.hidden)return true;
+  showTab(tab);
+  return true;
+}
+function layoutA1OnHash(){
+  var tab='';
+  try{tab=layoutA1HashTab()||'';}catch(e){tab='';}
+  if(!tab)return;
+  var deep=false;
+  try{
+    var h=String(location.hash||'');
+    deep=tab==='schedule'&&/client_id=/.test(h)&&/on_date=/.test(h);
+  }catch(e2){deep=false;}
+  if(deep)return;
+  layoutA1RevealRoute();
+}
+if(typeof window!=='undefined'&&window.addEventListener&&!layoutA1OnHash._bound){
+  layoutA1OnHash._bound=1;
+  window.addEventListener('hashchange', layoutA1OnHash);
+}
 function layoutA1ApplyRoles(){
   if(layoutA1ApplyRoles._busy)return;
   layoutA1ApplyRoles._busy=1;
@@ -4931,10 +5031,30 @@ function layoutA1ApplyRoles(){
         if(ok.indexOf(role)<0)gatedOff=true;
       }
     }
+    if(active&&!gatedOff&&active.hidden){
+      var keep=true;
+      var keepTab=String(active.id||'').replace(/^tab_/,'');
+      if(role&&typeof layoutA1DeskAllowed==='function'){
+        try{keep=!!layoutA1DeskAllowed(keepTab, role);}catch(eKeep){keep=true;}
+      }
+      if(keep){
+        active.hidden=false;
+        if(active.removeAttribute)active.removeAttribute('hidden');
+      }
+    }
     var needsHome=!active||!!(active&&active.hidden)||gatedOff;
     if(role&&needsHome&&typeof showTab==='function'){
-      var onHome=!!(active&&active.id==='tab_timesheets'&&!active.hidden&&!gatedOff);
-      if(!onHome)showTab('timesheets');
+      var home='timesheets';
+      if(!gatedOff&&typeof layoutA1HashTab==='function'&&typeof layoutA1DeskAllowed==='function'){
+        var routed='';
+        try{routed=layoutA1HashTab()||'';}catch(eRoute){routed='';}
+        if(routed&&layoutA1DeskAllowed(routed, role))home=routed;
+      }
+      var onHome=!!(active&&active.id===('tab_'+home)&&!active.hidden&&!gatedOff);
+      if(!onHome){
+        if(home==='timesheets')showTab('timesheets');
+        else showTab(home);
+      }
     }
     var btn=document.getElementById('avatarMenuBtn');
     if(btn){
@@ -5714,6 +5834,7 @@ function showTab(tab){
     try{remiPayrollIns1Shown=remiPayrollIns1OnShow();}catch(ePayIns){}
   }
   if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
+  if(typeof layoutA1RememberTab==='function')layoutA1RememberTab(tab);
 }
 
 // v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
@@ -16022,6 +16143,7 @@ async function loadAdminSchedule(){
 function schedShiftWeek(delta){
   schedWeekStart=schedAddDays(schedEnsureWeek(), (Number(delta)||0)*7);
   schedEditor=null;
+  schedKeepDayOnLoad=!schedSlotDrawerClosed&&!!schedSlotSelected;
   loadAdminSchedule();
 }
 function schedSetFilter(which){
@@ -16554,7 +16676,8 @@ var schedSlotFormStamp='';
 var schedSlotMarkOpen='';
 var schedHoldPick='';
 var schedHoldDraftClient='';
-var schedSlotDrawerClosed=false;
+var schedSlotDrawerClosed=true;
+var schedKeepDayOnLoad=false;
 var SCHED_MISS_REASONS=['Client declined service','No-show','No call','Other'];
 var SCHED_MISS_CODES={'Client declined service':'client_declined','No-show':'no_show','No call':'no_call','Other':'other'};
 var schedPendingDeepLink=null;
@@ -17125,6 +17248,19 @@ function schedSlotRowVisible(client){
   }
   return false;
 }
+function schedClearEntrySelection(){
+  schedSlotSelected=null;
+  schedSlotFocus=null;
+  schedSlotEditKey='';
+  schedSlotEditWeekday=0;
+  schedSlotFormMode='edit';
+  schedSlotAddAnother=false;
+  schedSlotFormStamp='';
+  schedSlotDrawerClosed=true;
+  if(typeof schedSetView==='function')schedSetView('week');
+  var panel=schedEl('schedSlotDetail');
+  if(panel)panel.hidden=true;
+}
 function schedEnsureSlotSelection(){
   if(schedSlotSelected){
     var current=schedFindSlotClient(schedSlotSelected.clientId);
@@ -17132,22 +17268,6 @@ function schedEnsureSlotSelection(){
     if(current&&day&&day.on_date===schedSlotSelected.onDate&&schedSlotRowVisible(current))return;
   }
   schedSlotSelected=null;
-  var fallback=null;
-  for(var i=0;i<schedSlotClients.length;i++){
-    var client=schedSlotClients[i];
-    if(!schedSlotRowVisible(client))continue;
-    if(!fallback)fallback=client;
-    for(var wd=1;wd<=7;wd++){
-      var slotDay=client.days[String(wd)];
-      if(slotDay&&slotDay.slots&&slotDay.slots.length){
-        schedSlotSelected={clientId:client.id, onDate:slotDay.on_date, weekday:wd};
-        return;
-      }
-    }
-  }
-  if(fallback&&fallback.days&&fallback.days['1']){
-    schedSlotSelected={clientId:fallback.id, onDate:fallback.days['1'].on_date, weekday:1};
-  }
 }
 function schedChipHtml(slot, index, client){
   var pack=client?schedInsPack(client):null;
@@ -17666,9 +17786,15 @@ function schedPaintSlotDetail(){
     panel.hidden=true;
     return;
   }
-  panel.hidden=false;
   schedEnsureSlotSelection();
   var sel=schedSlotSelected;
+  var adding=schedSlotFormMode==='add';
+  if(!sel&&!adding){
+    panel.hidden=true;
+    schedSlotDrawerClosed=true;
+    return;
+  }
+  panel.hidden=false;
   var client=sel?schedFindSlotClient(sel.clientId):null;
   var day=client&&sel?client.days[String(sel.weekday)]:null;
   var nameEl=schedEl('schedSlotClientName');
@@ -17730,8 +17856,13 @@ function schedPaintSlotDetail(){
   var sum=schedEl('schedSlotDaySum');
   var cards=schedEl('schedSlotCards');
   if(!client||!day){
-    if(sum)sum.textContent='Tap a day on the week board.';
+    if(nameEl){
+      nameEl.className='sched-client-name';
+      nameEl.textContent=adding?'Add shift':'Day';
+    }
+    if(sum)sum.textContent=adding?'Pick a client and a day.':'Tap a day on the week board.';
     if(cards)cards.innerHTML='';
+    if(adding)schedRefreshSlimForm(null, null);
     return;
   }
   var bits=[];
@@ -17916,6 +18047,7 @@ function schedShiftSlotDay(delta){
   schedSlotSelected={clientId:schedSlotSelected.clientId, onDate:next, weekday:schedWeekdayFromIso(next)};
   if(week!==schedEnsureWeek()){
     schedWeekStart=week;
+    schedKeepDayOnLoad=true;
     loadAdminSchedule();
     return;
   }
@@ -18166,13 +18298,18 @@ function schedFillSlotPatternForm(slot, clientId, weekday){
     optClients.forEach(function(c){
       html+='<option value="'+schedAttr(c.id)+'">'+schedEsc(c.name)+'</option>';
     });
-    sel.innerHTML=html||'<option value="">No clients</option>';
-    sel.value=String(clientId||(schedSlotSelected&&schedSlotSelected.clientId)||(schedSlotClients[0]&&schedSlotClients[0].id)||'');
+    sel.innerHTML='<option value="">Select a client</option>'+(html||'');
+    sel.value=String(clientId||(schedSlotSelected&&schedSlotSelected.clientId)||'');
   }
-  var wd=Number(weekday||(schedSlotSelected&&schedSlotSelected.weekday)||1);
+  var wd=Number(weekday||(schedSlotSelected&&schedSlotSelected.weekday)||0);
   var day=schedEl('schedSlotWeekday');
-  if(day)day.value=String(wd);
-  schedSetDayChecks([wd]);
+  if(wd>=1&&wd<=7){
+    if(day)day.value=String(wd);
+    schedSetDayChecks([wd]);
+  }else{
+    if(day)day.value='';
+    schedSetDayChecks([]);
+  }
   var keyEl=schedEl('schedSlotKey');
   if(keyEl)keyEl.value=slot&&schedSlotFormMode!=='add'?slot.slot_key:'';
   var label=schedEl('schedSlotLabel');
@@ -19128,6 +19265,8 @@ async function schedApplyPendingFocus(){
   schedFocusDeepLink(link);
 }
 loadAdminSchedule=async function(){
+  if(!schedKeepDayOnLoad&&!schedPendingDeepLink)schedClearEntrySelection();
+  schedKeepDayOnLoad=false;
   await loadAdminScheduleSingle();
   try{await schedApplyPendingFocus();}catch(e){}
 };
@@ -25841,6 +25980,7 @@ function openPortalHome(sess, opts){
     if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
     if(typeof navEditApply==='function')navEditApply();
     showScreen('adminScreen');
+    if(typeof layoutA1RevealRoute==='function')layoutA1RevealRoute();
   }
   const btn=document.getElementById('mgrLoginBtn');
   if(btn){btn.disabled=false;btn.textContent='Sign In →';}
