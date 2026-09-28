@@ -21,7 +21,8 @@ assert.ok(html.includes('No SQL') && html.includes('No new RPC') && html.include
 assert.ok(html.includes('No Quo/SMS'), 'no Quo');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/remi-chat-bleed1-v1.sql')), 'no SQL patch');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build is remi-float-hide1b');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1b"') < html.indexOf('content="2026-09-27-list-az1"'), 'list-az1 stays after remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-remi-chat-bleed1"'), 'remi-chat-bleed1 stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-remi-chat-bleed1"') < html.indexOf('content="2026-09-27-compliance-bulk1"'), 'compliance-bulk1 stays after remi-chat-bleed1');
 assert.ok(html.indexOf('content="2026-09-27-compliance-bulk1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after compliance-bulk1');
@@ -193,7 +194,7 @@ async function runBrowser(){
     const phone = await browser.newPage();
     phone.on('pageerror', function(err){errors.push('phone '+String(err && err.message || err));});
     const phoneView = await openThread(phone, 390, 844, true);
-    assert.strictEqual(phoneView.first, '2026-09-27-list-az1');
+    assert.strictEqual(phoneView.first, '2026-09-27-remi-float-hide1b');
     assert.strictEqual(phoneView.marker, 'v=remi-chat-bleed1');
     assert.strictEqual(phoneView.on, true);
     assert.strictEqual(phoneView.flag, '1');
