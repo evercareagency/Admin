@@ -18,7 +18,7 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
-<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. Ace tip 2026-09-28: no admin_deactivate_client RPC and no Ace patch. The client loop posts archive_client once per id through sbAdminArchiveClient, which PATCH clients is_active=false and selects id, is_active. After that row confirms, the same id soft-unassigns active assignments (PATCH assignments is_active=false where client_id and is_active true). Never hard-DELETE. Restore on Recently deleted is PATCH clients is_active=true, not a restore RPC, and it does not turn assignments back on. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at and selects id, is_active, deleted_at. Not archive-only. Restore of Recently deleted PATCH is_active true and deleted_at null only where deleted_at is not null. Archive stays is_active false with deleted_at null. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
+<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage, Done, and + Aide. Refresh stays hidden. v=manage-clean1. Done exits Manage back to the Aides info-card list and does not reopen credentials. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. Ace tip 2026-09-28: no admin_deactivate_client RPC and no Ace patch. The client loop posts archive_client once per id through sbAdminArchiveClient, which PATCH clients is_active=false and selects id, is_active. After that row confirms, the same id soft-unassigns active assignments (PATCH assignments is_active=false where client_id and is_active true). Never hard-DELETE. Restore on Recently deleted is PATCH clients is_active=true, not a restore RPC, and it does not turn assignments back on. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at and selects id, is_active, deleted_at. Not archive-only. Restore of Recently deleted PATCH is_active true and deleted_at null only where deleted_at is not null. Archive stays is_active false with deleted_at null. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-28-aide-manage-delete1">
 <script>var AIDE_MANAGE_DELETE1_MARKER='v=aide-manage-delete1';var AIDE_MANAGE_DELETE1_BUILD='2026-09-28-aide-manage-delete1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -1690,7 +1690,14 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_aides.aide-manage-on #aideDeskSub,
 #tab_aides.aide-manage-on #aideCredsRoot,
 #tab_aides.aide-manage-on #aideCredSheet{display:none !important;}
-#tab_aides.aide-manage-on #aideCredManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#tab_aides.aide-manage-on #aideCredManageBtn,
+#tab_aides.aide-manage-on #aideManageDoneBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#aideManageDoneBtn[hidden]{display:none !important;}
+#tab_aides:not(.aide-manage-on) #aideManageDoneBtn{display:none !important;}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-pair{flex:2 1 0;min-width:0;}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-pair .btn{padding:0 8px;font-size:0.82rem;white-space:nowrap;}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-delete{flex:1 1 0;min-width:0;padding:0 8px;font-size:0.82rem;white-space:nowrap;background:var(--danger);color:#fff;border-color:var(--danger);}
+#tab_aides.aide-manage-on #aideManageBar .aide-manage-count{flex:1 1 100%;display:flex;align-items:center;justify-content:center;min-height:40px;margin-top:2px;background:var(--navy);color:#fff;border-radius:12px;font-size:0.95rem;}
 .aide-manage-sure{font-family:'Playfair Display',Georgia,serif;font-size:1.65rem;font-weight:600;color:var(--navy);line-height:1.2;margin:0 0 8px;}
 #tab_aides.aide-manage-confirming #aideManageSure{position:relative;z-index:230;background:var(--off);}
 #tab_aides.aide-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
@@ -1854,6 +1861,10 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #aideCredCancel{flex:1;min-height:48px;background:transparent;border:0;font-weight:700;color:var(--navy);font-size:1rem;font-family:'DM Sans',sans-serif;cursor:pointer;}
 #aideCredSave{flex:1;min-height:48px;justify-content:center;border-radius:12px;font-size:1rem;}
 #aideCredSheetErr{display:none;margin-top:6px;}
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aideDesk,
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aidesContainer,
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aideCredList,
+#tab_aides.aide-creds-detail:not(.aide-manage-on) #aideCredSearchWrap{display:none !important;}
 @media(max-width:899px){
   #tab_aides.aide-creds-on:not(.aide-manage-on) #aideDesk,
   #tab_aides.aide-creds-on:not(.aide-manage-on) #aidesContainer{display:none !important;}
@@ -3061,12 +3072,13 @@ bindLoginKeyboard();
         <div id="bakEmpty" class="empty-state" style="display:none"><p>No phone-change drafts.</p></div>
       </div>
 
-      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1">
+      <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1">
         <p id="aideManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
           <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
             <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()" aria-pressed="false">Manage</button>
+            <button class="btn btn-navy" id="aideManageDoneBtn" type="button" data-manage-clean1="v=manage-clean1" hidden onclick="aideCredToggleManage()">Done</button>
             <button class="btn btn-ghost" id="aideRefreshBtn" type="button" onclick="renderAides(true)">🔄 Refresh</button>
             <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Aide</button>
           </div>
@@ -31858,11 +31870,16 @@ function aideCredHideForManage(){
   var root=document.getElementById('aideCredsRoot');
   var tab=document.getElementById('tab_aides');
   if(root)root.hidden=true;
-  if(tab&&tab.classList)tab.classList.remove('aide-creds-on');
+  if(tab&&tab.classList){
+    tab.classList.remove('aide-creds-on');
+    tab.classList.remove('aide-creds-detail');
+  }
   var detail=document.getElementById('aideCredDetail');
   if(detail){detail.hidden=true;detail.innerHTML='';}
   var list=document.getElementById('aideCredList');
   if(list)list.hidden=true;
+  var info=document.getElementById('aideInfoSheet');
+  if(info)info.hidden=true;
   if(typeof aideCredCloseSheet==='function')aideCredCloseSheet();
   if(typeof aideCredState!=='undefined'&&aideCredState){
     aideCredState.seq=(aideCredState.seq||0)+1;
@@ -31879,7 +31896,10 @@ function aideCredShowAfterManage(){
   var root=document.getElementById('aideCredsRoot');
   var tab=document.getElementById('tab_aides');
   if(root)root.hidden=true;
-  if(tab&&tab.classList)tab.classList.remove('aide-creds-on');
+  if(tab&&tab.classList){
+    tab.classList.remove('aide-creds-on');
+    tab.classList.remove('aide-creds-detail');
+  }
   var detail=document.getElementById('aideCredDetail');
   if(detail){detail.hidden=true;detail.innerHTML='';}
   if(typeof aideCredState!=='undefined'&&aideCredState){
@@ -31907,6 +31927,11 @@ function aideCredsAfterAides(){
   var tab=document.getElementById('tab_aides');
   if(aideCredManageOn()){
     if(root)root.hidden=true;
+    if(typeof aideCredState!=='undefined'&&aideCredState){
+      aideCredState.view='list';
+      aideCredState.aideId='';
+      aideCredState.aideName='';
+    }
     return;
   }
   var show=aideCredsIsAdmin()&&(typeof aideDesk==='undefined'||aideDesk!=='deleted');
@@ -31938,6 +31963,8 @@ function aideCredPaintBanner(){
 }
 function aideCredPaintList(){
   if(aideCredManageOn())return;
+  var tab=document.getElementById('tab_aides');
+  if(tab&&tab.classList)tab.classList.remove('aide-creds-detail');
   var list=document.getElementById('aideCredList');
   var wrap=document.getElementById('aideCredSearchWrap');
   var detail=document.getElementById('aideCredDetail');
@@ -32067,8 +32094,22 @@ function aideCredPaintDetail(messageHtml){
     if(blocked)blocked.hidden=true;
     var blockedRoot=document.getElementById('aideCredsRoot');
     if(blockedRoot)blockedRoot.hidden=true;
+    var blockedTab=document.getElementById('tab_aides');
+    if(blockedTab&&blockedTab.classList)blockedTab.classList.remove('aide-creds-detail');
+    if(typeof aideCredState!=='undefined'&&aideCredState){
+      aideCredState.view='list';
+      aideCredState.aideId='';
+      aideCredState.aideName='';
+    }
     return;
   }
+  var tab=document.getElementById('tab_aides');
+  var root=document.getElementById('aideCredsRoot');
+  if(tab&&tab.classList){
+    tab.classList.add('aide-creds-on');
+    tab.classList.add('aide-creds-detail');
+  }
+  if(root)root.hidden=false;
   var list=document.getElementById('aideCredList');
   var wrap=document.getElementById('aideCredSearchWrap');
   var detail=document.getElementById('aideCredDetail');
@@ -32693,8 +32734,15 @@ function aideManageDelete1Sync(){
   var show=aideManageDelete1Active();
   if(bar)bar.hidden=!show;
   if(!show)aideManageDelete1CloseConfirm();
+  var manageOn=!!(tab&&tab.classList&&tab.classList.contains('aide-manage-on'));
   var manage=document.getElementById('aideCredManageBtn');
-  if(manage&&tab)manage.setAttribute('aria-pressed', tab.classList.contains('aide-manage-on')?'true':'false');
+  if(manage&&tab)manage.setAttribute('aria-pressed', manageOn?'true':'false');
+  var done=document.getElementById('aideManageDoneBtn');
+  var doneShow=manageOn&&!(typeof aideDesk!=='undefined'&&aideDesk==='deleted');
+  if(done){
+    done.hidden=!doneShow;
+    done.style.display=doneShow?'':'none';
+  }
   aideManageDelete1PaintCount();
   aideManageDelete1Bind();
 }

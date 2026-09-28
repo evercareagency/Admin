@@ -24,6 +24,9 @@ function extractFn(src, sig){
 }
 
 assert.ok(html.includes('v=aide-manage-delete1'), 'marker');
+assert.ok(html.includes('v=manage-clean1'), 'manage-clean1 marker');
+assert.ok(html.includes('id="aideManageDoneBtn"') && html.includes('>Done</button>'), 'Done exits Manage');
+assert.ok(html.includes('aide-creds-detail'), 'detail view hides the aides list');
 assert.ok(html.includes('?v=aide-manage-delete1'), 'query marker');
 assert.ok(html.includes('data-aide-manage-delete1="v=aide-manage-delete1"'), 'data attr');
 assert.ok(html.includes('admin-build 2026-09-28-aide-manage-delete1'), 'build note');
