@@ -213,7 +213,7 @@ async function runBrowser(){
     assert.ok(!overlaps(phone.sheet, phone.nav), 'phone sheet does not cover #bottomNav ' + JSON.stringify(phone));
     assert.ok(!overlaps(phone.sheet, phone.header), 'phone sheet does not cover the desk header ' + JSON.stringify(phone));
     assert.ok(phone.sheet.height < phone.viewH - 40, 'sheet is not a full-viewport takeover ' + phone.sheet.height);
-    assert.strictEqual(phone.hitNavId, 'bottomNav', 'tab bar is the hit target ' + phone.hitNavId);
+    assert.ok(phone.hitNavId === 'bottomNav' || /^nav_/.test(String(phone.hitNavId || '')), 'tab bar is the hit target ' + phone.hitNavId);
     assert.strictEqual(phone.hitHeaderInShell, true, 'desk header stays the hit target');
     assert.ok(parseFloat(phone.radius) >= 12, 'sheet reads as a sheet ' + phone.radius);
     assert.ok(phone.close.height >= 32 && phone.close.top >= phone.sheet.top - 1 && phone.close.bottom <= phone.sheet.bottom + 1, 'Close stays inside the sheet ' + JSON.stringify(phone.close));

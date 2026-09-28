@@ -232,7 +232,7 @@ async function runBrowser(){
     assert.strictEqual(planned.weather.wx, 'card');
     assert.ok(/desk duty/.test(planned.weather.note), planned.weather.note);
     assert.ok(/09\/27\/2026/.test(planned.calloff.text) && /Oh CALL-OFF/.test(planned.calloff.text), planned.calloff.text);
-    assert.ok(planned.calloff.labels.indexOf('Draft SMS') >= 0 && planned.calloff.labels.indexOf('Open Coverage') >= 0, planned.calloff.labels.join(','));
+    assert.ok(planned.calloff.labels.indexOf('Draft SMS') >= 0 && planned.calloff.labels.indexOf('Open Cover') >= 0, planned.calloff.labels.join(','));
     assert.ok(/Nothing sends until you confirm/.test(planned.calloff.note), planned.calloff.note);
     assert.ok(/Ada Cole/.test(planned.look.text) && /@ada/.test(planned.look.text) && /216-555-0100/.test(planned.look.text), planned.look.text);
     assert.ok(/Ruth Coleman/.test(planned.client.text) && /10 Old Street/.test(planned.client.text), planned.client.text);
@@ -320,7 +320,7 @@ async function runBrowser(){
       };
     });
     assert.ok(/09\/27\/2026/.test(handoff.text) && /Oh CALL-OFF still open/.test(handoff.text), handoff.text);
-    assert.deepStrictEqual(handoff.labels, ['Draft SMS', 'Open Coverage']);
+    assert.deepStrictEqual(handoff.labels, ['Draft SMS', 'Open Cover']);
     assert.strictEqual(handoff.tall, true, 'handoff buttons are tappable');
     assert.strictEqual(handoff.inSheet, true, 'handoff buttons stay on the phone');
     assert.ok(/Nothing sends until you confirm/.test(handoff.text));

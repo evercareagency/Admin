@@ -317,7 +317,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     }, shiftId);
-    assert.deepStrictEqual(card.labels, ['Who can cover', 'Text this aide', 'Text client', 'Cancel']);
+    assert.deepStrictEqual(card.labels, ['Who can cover', 'Smart assign', 'Text this aide', 'Text client', 'Cancel']);
     assert.strictEqual(card.skip, true);
     assert.strictEqual(card.office, true);
     assert.strictEqual(card.name, true);
