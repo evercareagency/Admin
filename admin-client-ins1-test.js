@@ -32,7 +32,8 @@ assert.ok(html.includes('MERGE HOLD'), 'MERGE HOLD');
 assert.ok(html.includes('Do not claim LIVE'), 'do not claim LIVE');
 assert.ok(html.includes("var CLIENT_INS1_MARKER='v=client-ins1'"), 'script marker');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build is remi-float-hide1b');
+assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1b"') < html.indexOf('content="2026-09-27-list-az1"'), 'list-az1 stays after remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-hold-autosave1"'), 'hold-autosave1 stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
@@ -394,7 +395,7 @@ async function runBrowser(){
         hoursAbove: document.getElementById('clientWeeklyHours').compareDocumentPosition(document.getElementById('assignAidesList')) === Node.DOCUMENT_POSITION_FOLLOWING
       };
     });
-    assert.strictEqual(addPhone.build, '2026-09-27-list-az1');
+    assert.strictEqual(addPhone.build, '2026-09-27-remi-float-hide1b');
     assert.strictEqual(addPhone.marker, 'v=client-ins1');
     assert.strictEqual(addPhone.selected, 'caresource');
     assert.ok(/CareSource/.test(addPhone.label));
