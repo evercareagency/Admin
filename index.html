@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- client phone 2026-09-28 v=client-phone1 ?v=client-phone1 admin-build 2026-09-28-client-phone1. GHOST-CLIENT-PHONE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Add Client and Edit Client label #clientPhone Client Phone, placeholder (216) 555-0100, immediately after Home Address / #clientAddress and before Case Manager Name and Case Manager Email. Client Phone is clients.phone / p_phone. Add posts admin_add_client with p_phone (already in the signature: p_first_name, p_last_name, p_home_address, p_case_manager_name, p_case_manager_email, p_phone, p_weekly_authorized_hours, p_insurance_plan). Edit PATCHes /rest/v1/clients?id=eq.<uuid> {"phone":"..."} and does not call admin_update_client. Load select includes phone and editClient fills #clientPhone. Case manager stays name + email only. There is no case_manager_phone column and this desk does not add Case Manager Phone. Insurance chips, Weekly authorized hours, Cover prefs, Verify Address and Get GPS, Assigned Aides, Cancel, and Save stay. Prior markers stay, including v=cover-desk1, v=list-az-sticky1, v=punch-leftovers1, v=client-ins1, and v=clienthrs1a. -->
+<meta name="admin-build" content="2026-09-28-client-phone1">
+<script>var CLIENT_PHONE1_MARKER='v=client-phone1';var CLIENT_PHONE1_BUILD='2026-09-28-client-phone1';</script>
 <!-- punch leftovers 2026-09-28 v=punch-leftovers1 ?v=punch-leftovers1 admin-build 2026-09-28-punch-leftovers1. GHOST-PUNCH-LEFTOVERS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone shell, max-width 430px including a typical 390 CSS px phone: the sticky EverCare header was covering the Clients subtitle and the More heading. Desk titles stick just below that teal bar with a clear gap, so Clients, More, Timesheets, Schedule, Aides, and the other desks keep the title and subtitle fully visible. The header look is unchanged. Schedule cold load, refresh, and entry into Schedule land on the week calendar only. The day drawer and Edit shift stay closed until a day is tapped, Add shift is opened, or an explicit deep link names that day. No client or shift is pre-selected, and a leftover QaHold row is not auto-opened. Ace deletes leftover QaHold test rows. This tip does not delete database rows. More desks stick. Opening Inservices, Coverage, Nurse, or any other desk from More writes that desk into the hash and leaves it open, on desktop and on a phone. Role apply does not send an allowed desk back to Timesheets or the default first tab after paint, and an empty hash does not reset the open desk. A reload or a hash of that desk opens it again. A role-forbidden desk such as Payroll for Scheduler still returns to Timesheets. Sandata Reminder and Call off empty Submit stay in the other repo. Out of scope: Nurse bottom nav overlap, Remi fullscreen rail, Clients edit/delete wrap, Remi chip over the dock. Prior markers stay, including v=remi-payroll-ins1, v=remi-float-hide1b, v=layoutA1, and v=admintheme1. -->
 <meta name="admin-build" content="2026-09-28-punch-leftovers1">
 <script>var PUNCH_LEFTOVERS1_MARKER='v=punch-leftovers1';var PUNCH_LEFTOVERS1_BUILD='2026-09-28-punch-leftovers1';</script>
@@ -874,6 +877,12 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(max-width:520px){
   #clientModal .copilot-name-grid,#addAideModal .copilot-name-grid{grid-template-columns:1fr;}
 }
+/* v=client-phone1 — Client Phone after Home address. clients.phone. CM is name + email only. */
+#clientModal .client-phone label{color:var(--teal-dark);}
+#clientModal .client-phone input{border-color:#9ecfcf;background:#f7fcfc;}
+#clientModal .client-cm-block{margin:0 0 14px;padding:10px 12px 0;background:var(--off);border:1px solid var(--border);border-radius:10px;}
+#clientModal .client-cm-head{font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:0 0 8px;}
+#clientModal .client-cm-block .field:last-child{margin-bottom:10px;}
 /* v=clienthrs1a — weekly authorized hours, above Assigned Aides. Phone tap target. */
 #clientModal .client-hrs{background:var(--teal-light);border:1px solid #b8dcdc;border-radius:10px;padding:14px 16px;margin:0 0 16px;max-width:100%;min-width:0;box-sizing:border-box;}
 #clientModal .client-hrs .field{margin-bottom:0;min-width:0;}
@@ -4479,6 +4488,7 @@ Call (216) 377-5991 with any questions.</textarea>
 </div>
 
 <!-- ADD/EDIT CLIENT MODAL -->
+<!-- v=client-phone1 admin-build 2026-09-28-client-phone1. Client Phone is clients.phone / p_phone after Home Address. Case manager is name + email only. -->
 <div class="modal-bg" id="clientModal">
   <div class="modal" style="max-width:600px">
     <h3 id="clientModalTitle">Add Client</h3>
@@ -4489,9 +4499,12 @@ Call (216) 377-5991 with any questions.</textarea>
       <div class="field"><label for="clientLastName">Last name</label><input type="text" id="clientLastName" placeholder="Cole" autocomplete="family-name"></div>
     </div>
     <div class="field"><label for="clientAddress">Home address</label><input type="text" id="clientAddress" placeholder="Street, City, State, Zip" autocomplete="street-address"></div>
-    <div class="field"><label for="clientCmName">Case manager name</label><input type="text" id="clientCmName" placeholder="Pat Lee" autocomplete="name"></div>
-    <div class="field"><label for="clientCmEmail">Case manager email</label><input type="email" id="clientCmEmail" inputmode="email" autocomplete="email" placeholder="pat@example.com"></div>
-    <div class="field"><label for="clientPhone">Phone</label><input type="tel" id="clientPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
+    <div class="field client-phone" data-client-phone1="v=client-phone1"><label for="clientPhone">Client Phone</label><input type="tel" id="clientPhone" inputmode="tel" autocomplete="tel" placeholder="(216) 555-0100"></div>
+    <div class="client-cm-block" aria-label="Case manager">
+      <div class="client-cm-head">Case manager · name + email only</div>
+      <div class="field"><label for="clientCmName">Case manager name</label><input type="text" id="clientCmName" placeholder="Pat Lee" autocomplete="name"></div>
+      <div class="field"><label for="clientCmEmail">Case manager email</label><input type="email" id="clientCmEmail" inputmode="email" autocomplete="email" placeholder="pat@example.com"></div>
+    </div>
     <div class="client-ins" id="clientInsField" data-client-ins1="v=client-ins1">
       <div class="field">
         <label id="clientInsLabel">Insurance</label>
@@ -27576,6 +27589,10 @@ function sbMapClient(row){
     mapped.deactivated_at=row.deactivated_at||row.deactivatedAt||null;
     mapped.deactivatedAt=mapped.deactivated_at||'';
   }
+  if(row&&(Object.prototype.hasOwnProperty.call(row,'phone')||Object.prototype.hasOwnProperty.call(row,'client_phone'))){
+    var rawPhone=Object.prototype.hasOwnProperty.call(row,'phone')?row.phone:row.client_phone;
+    mapped.phone=rawPhone==null?'':String(rawPhone);
+  }
   if(row&&(Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')||Object.prototype.hasOwnProperty.call(row,'weeklyAuthorizedHours'))){
     var raw=Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')?row.weekly_authorized_hours:row.weeklyAuthorizedHours;
     var n=sbClientHoursValue({weekly_authorized_hours:raw==null?null:raw});
@@ -27723,7 +27740,7 @@ async function sbRestGet(table, pairs, refreshed){
   return {ok:true,data:data,status:res.status};
 }
 var SB_AIDE_SELECT='id,username,full_name,email,joined_at,location_status,last_seen_at,must_change_password,is_active,profile_id,legacy_sheet_row,assignments:assignments(id,is_active,client:clients(id,name,legacy_id,is_active))';
-var SB_CLIENT_SELECT='id,legacy_id,name,address,lat,lng,is_active,weekly_authorized_hours,insurance_plan,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
+var SB_CLIENT_SELECT='id,legacy_id,name,address,phone,lat,lng,is_active,weekly_authorized_hours,insurance_plan,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
 async function sbApiList(payload){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
   var action=payload&&payload.action;
@@ -27780,6 +27797,15 @@ async function sbApiList(payload){
         if(sbClientHoursState().col===false)insSelect=insSelect.replace(',weekly_authorized_hours','');
         clientPairs[0]=['select', insSelect];
         clients=await sbRestGet('clients', clientPairs);
+      }
+      if(!clients.ok){
+        var phoneErr=String(clients.error||'');
+        var phoneColMiss=/\bphone\b/i.test(phoneErr)&&/42703|PGRST204|does not exist|schema cache|could not find/i.test(phoneErr);
+        var phoneSelect=clientPairs[0]&&clientPairs[0][1]||'';
+        if(phoneColMiss && String(phoneSelect).indexOf(',phone')>=0){
+          clientPairs[0]=['select', String(phoneSelect).replace(',phone','')];
+          clients=await sbRestGet('clients', clientPairs);
+        }
       }
       if(!clients.ok)return {success:false,error:clients.error||'clients',httpStatus:clients.status||0};
       var clientRows=Array.isArray(clients.data)?clients.data:[];
@@ -29619,6 +29645,21 @@ async function sbAdminUpdateClient(payload){
   if(!got.ok)return {success:false,error:got.error||'Could not update client.',httpStatus:got.status||0};
   var row=sbFirstRow(got.data);
   if(!row)return {success:false,error:'Client not found.'};
+  // v=client-phone1: clients.phone. No admin_update_client. Omit when the payload has no phone key.
+  var phoneKnown=!!(payload&&(Object.prototype.hasOwnProperty.call(payload,'phone')||Object.prototype.hasOwnProperty.call(payload,'p_phone')));
+  if(phoneKnown){
+    var rawPhone=Object.prototype.hasOwnProperty.call(payload,'phone')?payload.phone:payload.p_phone;
+    var phoneText=rawPhone==null?'':String(rawPhone).trim();
+    var phoneGot=await sbRestMutate('PATCH','clients',[['id','eq.'+String(row.id||id)]],{phone:phoneText},'return=representation');
+    if(phoneGot&&phoneGot.ok){
+      var phrow=sbFirstRow(phoneGot.data);
+      if(phrow)row=Object.assign({}, row, phrow);
+    }else{
+      var phoneErr=String((phoneGot&&(phoneGot.error||phoneGot.message))||'');
+      var phoneMissing=/\bphone\b/i.test(phoneErr)&&/42703|PGRST204|does not exist|schema cache|could not find/i.test(phoneErr);
+      if(!phoneMissing)return {success:false, error:(phoneGot&&phoneGot.error)||'Could not save client phone.', httpStatus:(phoneGot&&phoneGot.status)||0};
+    }
+  }
   var hours=sbClientHoursValue(payload);
   if(hours!==undefined){
     var patched=await sbPatchClientHours(String(row.id||id), hours);
@@ -36306,7 +36347,7 @@ function editClient(id){
   if(cmName)cmName.value=c.caseManagerName||c.case_manager_name||'';
   if(cmEmail)cmEmail.value=c.caseManagerEmail||c.case_manager_email||'';
   const phoneEl=document.getElementById('clientPhone');
-  if(phoneEl)phoneEl.value=c.phone||'';
+  if(phoneEl)phoneEl.value=c.phone||c.client_phone||'';
   clientHoursFill(c);
   clientInsOpen('edit', c.insurance_plan||c.insurancePlan||'');
   if(typeof coverDesk1LoadClientPrefs==='function')coverDesk1LoadClientPrefs(c.id);
