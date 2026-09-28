@@ -11,6 +11,8 @@
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-remi-chat-bleed1">
+<!-- remi phone rail 2026-09-27 v=remi-phone-rail1 admin-build 2026-09-27-remi-phone-rail1. GHOST-REMI-PHONE-RAIL1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No new RPC. No Auth reseal. No Quo/SMS. On a phone, the corner chip opens Remi as a sheet between the Admin header and #bottomNav. It is not a full-viewport takeover and it does not cover the tab bar. Close stays on the sheet. Desktop at 900px and up stays the right rail. Nurse still has no Remi. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-chat-bleed1, v=list-az1, v=remi-chat1, v=remi-float-hide1, v=tabbar-8, v=remi-payroll1, v=aide-office-vis1, and v=msg-dense1. -->
+<meta name="admin-build" content="2026-09-27-remi-phone-rail1">
 <!-- compliance bulk 2026-09-27 v=compliance-bulk1 admin-build 2026-09-27-compliance-bulk1. GHOST-COMPLIANCE-BULK1-CONTRACT-v1. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi N/A. Compliance Dashboard search filters by aide name, case-insensitive. An empty search shows the full roster (every active aide × every catalog topic). Select all and Unselect all ship as a pair and both stay visible when the selection is empty or full. Select all checks every visible deletable row. Unselect all clears the selection and leaves search and Select Topic alone. Delete selected confirms once, then calls the same admin_unassign_inservice_aide path as the row Delete (isdel1) with p_archive_active_result true for Completed and false for assigned Not Completed, then refreshes once. Rows that only have Send Reminder are not deletable: the checkbox is disabled and the count can say N selected · M skipped (not deletable). Send Reminder stays per row. Select Topic, Assign, and Clear Assignment stay as they are. Phone cards first; the desk table keeps the same toolbar. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=isdel1, v=isclear1, v=isdash1, and v=isdash1b. -->
 <meta name="admin-build" content="2026-09-27-compliance-bulk1">
 <!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. A leftover On hold from another client, another day, or a cold open with no On hold pick is unselected when the opened day has no active client_on_hold, no hold_banner, and no active hold. That open clears Start, End, and Note hold drafts so Save cannot co-fire them. Save week still does not post upsert_schedule_client_hold or a day mark p_mark on_hold unless the user explicitly selected On hold and then used Save hold. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. Ace assert3 is LIVE. When the user confirms End hold…, the desk posts clear_schedule_client_hold with p_client_id and p_end_date and omits p_hold_id, so Ace ends every active hold for that client, including a 10/03 open leftover. Clear posts clear_schedule_client_hold with p_client_id only and omits p_hold_id and p_end_date, so Ace soft-clears every active hold for that client. The On hold End and Clear buttons do not send hold_banner.hold_id. Save hold may still pass p_hold_id. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
@@ -1098,6 +1100,23 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #copilotSheet .copilot-quiet-times input{min-width:0;width:100%;max-width:100%;}
 @media(min-width:900px){
   #copilotSheet{left:auto;right:0;width:min(440px,100vw);box-shadow:-12px 0 30px rgba(26,39,68,.18);}
+}
+/* v=remi-phone-rail1 — phone sheet stops under the shell header and above #bottomNav. Desktop right rail stays at min-width 900px. */
+@media(max-width:899px){
+  #copilotSheet{
+    inset:auto;
+    left:0;
+    right:0;
+    top:64px;
+    bottom:calc(72px + env(safe-area-inset-bottom, 0px));
+    width:auto;
+    height:auto;
+    max-height:none;
+    border-radius:18px 18px 0 0;
+    box-shadow:0 -16px 40px rgba(26,39,68,.22);
+    padding:12px;
+    z-index:155;
+  }
 }
 /* v=remi-notes1 — Notes tab in the Remi phone sheet and desktop right rail. */
 #remiNotesDock[hidden],#remiNotesPicker[hidden],#remiNotesScrim[hidden],#remiNotesComposer[hidden],#remiNotesDoneFoot[hidden]{display:none !important;}
@@ -2355,7 +2374,7 @@ bindLoginKeyboard();
         </div>
       </div>
     </header>
-    <nav class="bottom-nav" aria-label="Admin" data-tabbar-8="v=tabbar-8">
+    <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1">
       <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
@@ -3352,7 +3371,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" hidden data-layout-roles="Admin Scheduler" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -8580,6 +8599,7 @@ function copilotClose(){
     sheet.hidden=true;
     sheet.style.top='';
     sheet.style.height='';
+    sheet.style.maxHeight='';
     sheet.style.bottom='';
   }
   copilotPending=null;
@@ -8632,6 +8652,26 @@ function copilotHideConfirm(){
   var box=copilotEl('copilotConfirm');
   if(box){box.hidden=true;box.innerHTML='';}
 }
+// remi phone rail1 v=remi-phone-rail1
+var REMI_PHONE_RAIL1_MARKER='v=remi-phone-rail1';
+function remiPhoneRail1NavReserve(vv, navRect){
+  var nav=navRect||null;
+  if(!nav){
+    var el=document.getElementById('bottomNav');
+    if(!el||!el.getBoundingClientRect)return 72;
+    var cs=window.getComputedStyle?window.getComputedStyle(el):null;
+    if(cs&&(cs.display==='none'||cs.visibility==='hidden'))return 0;
+    nav=el.getBoundingClientRect();
+  }
+  if(!nav||!(nav.height>=8))return 72;
+  var viewTop=vv?(vv.offsetTop||0):0;
+  var viewH=vv&&vv.height?vv.height:(typeof window!=='undefined'?window.innerHeight:0);
+  var viewBottom=viewTop+viewH;
+  var overlap=Math.min(nav.bottom, viewBottom)-Math.max(nav.top, viewTop);
+  if(!(overlap>=8))return 0;
+  return Math.round(overlap);
+}
+// end remi phone rail1 v=remi-phone-rail1
 function copilotChatViewport(){
   var sheet=copilotEl('copilotSheet');
   if(!sheet)return;
@@ -8641,6 +8681,7 @@ function copilotChatViewport(){
   if(!chatting){
     sheet.style.top='';
     sheet.style.height='';
+    sheet.style.maxHeight='';
     sheet.style.bottom='';
     return;
   }
@@ -8648,12 +8689,16 @@ function copilotChatViewport(){
   if(gap<40){
     sheet.style.top='';
     sheet.style.height='';
+    sheet.style.maxHeight='';
     sheet.style.bottom='';
     return;
   }
+  var reserve=remiPhoneRail1NavReserve(vv);
+  var h=Math.max(200, Math.round((vv.height||0)-reserve));
   sheet.style.top=(vv.offsetTop||0)+'px';
   sheet.style.bottom='auto';
-  sheet.style.height=vv.height+'px';
+  sheet.style.height=h+'px';
+  sheet.style.maxHeight=h+'px';
 }
 function copilotChatBindViewport(){
   if(copilotChatBound)return;
@@ -9177,6 +9222,7 @@ function copilotShowRadar(){
     sheet.hidden=false;
     sheet.style.top='';
     sheet.style.height='';
+    sheet.style.maxHeight='';
     sheet.style.bottom='';
   }
   if(!copilotAlerts||!copilotAlerts.length)copilotAlerts=copilotDeskAlerts();
