@@ -17,7 +17,8 @@ assert.ok(html.includes("var CANCEL_SHIFT1_MARKER='cancel-shift1'"), 'cancel scr
 assert.ok(html.includes('GHOST-NOSVC-REASON-DRAFT1-CONTRACT-v1'), 'contract name');
 assert.ok(html.includes('Ace CALLABLE. MERGE HOLD. Do not claim LIVE.'), 'callable and merge hold');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-msg-dense1'), 'first admin-build is msg-dense1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-autosave1'), 'first admin-build is hold-autosave1');
+assert.ok(html.indexOf('content="2026-09-27-hold-autosave1"') < html.indexOf('content="2026-09-27-msg-dense1"'), '2026-09-27-msg-dense1 stays after hold-autosave1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-aide-notif-search1"'), 'aide-notif-search1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-notif-search1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after aide-notif-search1');
@@ -258,7 +259,7 @@ async function runBrowser(){
         fullPage: !!document.getElementById('tab_remi')
       };
     });
-    assert.strictEqual(personal.build, '2026-09-27-msg-dense1');
+    assert.strictEqual(personal.build, '2026-09-27-hold-autosave1');
     assert.strictEqual(personal.marker, 'v=nosvc-reason-draft1');
     assert.ok(/Side rail/.test(personal.sub), personal.sub);
     assert.strictEqual(personal.kicker, 'After you talk to the client');
