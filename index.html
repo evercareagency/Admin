@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
-<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. When the user confirms End hold…, the desk ends the targeted hold with clear_schedule_client_hold(p_hold_id, p_end_date) and also ends every other active hold on that same client with the same end date, including a 10/03 open leftover, so one End hold leaves the client fully clear. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. Clear still soft-clears only the targeted hold and omits p_end_date. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
+<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. Ace assert3 is LIVE. When the user confirms End hold…, the desk posts clear_schedule_client_hold with p_client_id and p_end_date and omits p_hold_id, so Ace ends every active hold for that client, including a 10/03 open leftover. Clear posts clear_schedule_client_hold with p_client_id only and omits p_hold_id and p_end_date, so Ace soft-clears every active hold for that client. The On hold End and Clear buttons do not send hold_banner.hold_id. Save hold may still pass p_hold_id. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-27-hold-autosave1">
 <!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1b: the left Aide Office name list is a fixed-height column with its own scrollbar (overflow-y: auto). A long roster does not stretch the Messages page. The thread panel and Schedule a Remi message stay fixed in view and do not scroll away with the roster. Option 2 one-box scroll stays: the message box scrolls and Schedule a Remi stays pinned in the thread panel. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-msg-dense1">
@@ -17919,7 +17919,7 @@ function schedHoldIdFor(client, onDate, slotKey){
   }
   return '';
 }
-// clienthrs1c hospital hold: upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date, p_note, p_hold_id) and clear_schedule_client_hold(p_hold_id, p_end_date). The tapped slot is also p_mark on_hold. list_schedule_client_holds fills holds[].
+// clienthrs1c hospital hold: upsert_schedule_client_hold(p_client_id, p_start_date, p_end_date, p_note, p_hold_id). The tapped slot is also p_mark on_hold. list_schedule_client_holds fills holds[]. End hold and Clear on this form are client-scoped (assert3): clear_schedule_client_hold({p_client_id, p_end_date}) and clear_schedule_client_hold({p_client_id}). They omit p_hold_id.
 async function schedWriteHold(clientId, onDate, slotKey, ending){
   if(schedPatternSaveLock){
     schedHoldAutosave1Fired++;
@@ -17948,29 +17948,21 @@ async function schedWriteHold(clientId, onDate, slotKey, ending){
   client=schedFindSlotClient(clientId)||client;
   var pinned=schedFindActiveHold(client, schedHoldTargetId);
   var holdId=pinned?String(pinned.hold_id):(schedHoldIdFor(client, start, key)||schedHoldIdFor(client, onDate, key));
-  var endedBatch=null;
   var endedOn='';
   schedSaving=true;
   try{
     var got;
     if(ending){
-      if(!holdId){schedToast('No hospital hold to end.','var(--warn)');return;}
-      endedOn=end||schedDateOnly(onDate);
-      endedBatch=[String(holdId)];
       var activeNow=schedActiveHolds(client);
-      for(var bi=0;bi<activeNow.length;bi++){
-        var bid=String(activeNow[bi]&&activeNow[bi].hold_id||'');
-        if(bid&&endedBatch.indexOf(bid)<0)endedBatch.push(bid);
-      }
-      for(var bj=0;bj<endedBatch.length;bj++){
-        got=await sbRestRpc('clear_schedule_client_hold',{
-          p_hold_id:endedBatch[bj],
-          p_end_date:end||schedDateOnly(onDate)
-        });
-        if(!got||got.ok!==true){
-          schedToast((got&&got.error)||'Could not end the hold.','var(--danger)');
-          return;
-        }
+      if(!holdId&&!activeNow.length){schedToast('No hospital hold to end.','var(--warn)');return;}
+      endedOn=end||schedDateOnly(onDate);
+      got=await sbRestRpc('clear_schedule_client_hold',{
+        p_client_id:String(clientId),
+        p_end_date:end||schedDateOnly(onDate)
+      });
+      if(!got||got.ok!==true){
+        schedToast((got&&got.error)||'Could not end the hold.','var(--danger)');
+        return;
       }
     }else{
       got=await sbRestRpc('upsert_schedule_client_hold',{
@@ -17997,13 +17989,11 @@ async function schedWriteHold(clientId, onDate, slotKey, ending){
       schedHoldTargetId='';
       await schedReloadWeek();
       client=schedFindSlotClient(clientId)||client;
-      if(client&&endedBatch){
-        var endedSet={};
-        for(var ei=0;ei<endedBatch.length;ei++)endedSet[endedBatch[ei]]=true;
+      if(client){
         var holdsLeft=client.holds||[];
         for(var ej=0;ej<holdsLeft.length;ej++){
           var eh=holdsLeft[ej];
-          if(!eh||!endedSet[String(eh.hold_id||'')])continue;
+          if(!eh||eh.is_active===false)continue;
           eh.end_date=endedOn;
           eh.open_ended=false;
           var hs=String(eh.start_date||'').slice(0,10);
@@ -18147,7 +18137,47 @@ function schedApplyHoldClearLocal(client, holdId, onDate, slotKey){
   }
   client.week_hours=Math.round(week*100)/100;
 }
-// hold-clear1: Clear soft-drops the client hold (no p_end_date) and any on_hold day marks. End hold still passes p_end_date only.
+function schedAllOnHoldMarkSlots(client){
+  var out=[];
+  if(!client)return out;
+  var seen={};
+  for(var wd=1;wd<=7;wd++){
+    var day=client.days[String(wd)];
+    if(!day)continue;
+    (day.slots||[]).forEach(function(s){
+      if(s.mark!=='on_hold')return;
+      var id=day.on_date+'|'+s.slot_key;
+      if(seen[id])return;
+      seen[id]=true;
+      out.push({on_date:day.on_date, slot_key:s.slot_key});
+    });
+  }
+  return out;
+}
+function schedApplyHoldClearAll(client, slotKey){
+  schedResetHoldForm(slotKey);
+  if(!client)return;
+  client.holds=[];
+  var week=0;
+  for(var wd=1;wd<=7;wd++){
+    var day=client.days[String(wd)];
+    if(!day)continue;
+    (day.slots||[]).forEach(function(s){
+      if(s.mark==='on_hold'||s.on_hold||s.hold_id)schedReleaseHoldSlot(s);
+    });
+    day.on_hold=false;
+    day.hold_id='';
+    day.hold_start='';
+    day.hold_end='';
+    day.hold_note='';
+    var hrs=0;
+    (day.slots||[]).forEach(function(s){hrs+=Number(schedSlotToward(s))||0;});
+    day.day_hours=Math.round(hrs*100)/100;
+    week+=day.day_hours;
+  }
+  client.week_hours=Math.round(week*100)/100;
+}
+// hold-clear1 + assert3: Clear soft-drops every active hold for the client and any on_hold day marks. The call is {p_client_id} only.
 async function schedClearHold(clientId, onDate, slotKey){
   if(schedSaving)return;
   if(!schedCanEdit()){schedDeny();return;}
@@ -18163,13 +18193,12 @@ async function schedClearHold(clientId, onDate, slotKey){
     if(!(await schedOfficeReady()))return;
     schedSaving=true;
     try{
-      if(holdId){
-        var got=await sbRestRpc('clear_schedule_client_hold',{p_hold_id:String(holdId)});
-        if(!got||got.ok!==true){
-          schedToast((got&&got.error)||'Could not clear the hold.','var(--danger)');
-          return;
-        }
+      var got=await sbRestRpc('clear_schedule_client_hold',{p_client_id:String(clientId)});
+      if(!got||got.ok!==true){
+        schedToast((got&&got.error)||'Could not clear the hold.','var(--danger)');
+        return;
       }
+      marks=schedAllOnHoldMarkSlots(client);
       for(var i=0;i<marks.length;i++){
         var cleared=await sbRestRpc('clear_schedule_slot_day_mark',{
           p_client_id:String(clientId),
@@ -18181,7 +18210,7 @@ async function schedClearHold(clientId, onDate, slotKey){
           return;
         }
       }
-      schedApplyHoldClearLocal(client, holdId, onDate, key);
+      schedApplyHoldClearAll(client, key);
       schedSlotFocus={client_id:String(clientId), on_date:String(onDate), slot_key:key};
       if(typeof logActivity==='function')logActivity('Cleared schedule hospital hold');
       schedToast('Hold cleared.','var(--success)');

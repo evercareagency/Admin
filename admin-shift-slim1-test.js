@@ -314,7 +314,8 @@ rpc.length = 0;
 await sandbox.schedWriteHold(ada, '2026-09-10', 'am', true);
 const ended = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
 assert.strictEqual(ended.length, 1, 'end hold clears the client hold');
-assert.strictEqual(ended[0].body.p_hold_id, holdSlot.hold_id);
+assert.strictEqual(ended[0].body.p_client_id, ada);
+assert.strictEqual(Object.prototype.hasOwnProperty.call(ended[0].body, 'p_hold_id'), false, 'End hold omits p_hold_id');
 assert.strictEqual(ended[0].body.p_end_date, '2026-09-10');
 assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_slot_pattern'; }), 'end hold does not rewrite patterns');
 

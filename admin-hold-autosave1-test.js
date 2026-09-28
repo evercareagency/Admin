@@ -53,10 +53,13 @@ assert.ok(!saveFn.includes('schedWriteHold'), 'Save week does not call Save hold
 assert.ok(!saveFn.includes("p_mark:'on_hold'") && !saveFn.includes('p_mark:"on_hold"'), 'Save week does not mark on_hold');
 assert.ok(!saveFn.includes('schedHoldStart') && !saveFn.includes('schedHoldEnd') && !saveFn.includes('schedHoldNote'), 'Save week does not read hold drafts');
 const clearFn = slotSrc.slice(slotSrc.indexOf('async function schedClearHold'), slotSrc.indexOf('async function schedClearSlotMark'));
-assert.ok(clearFn.includes("sbRestRpc('clear_schedule_client_hold',{p_hold_id:String(holdId)})"), 'Clear still omits p_end_date');
+assert.ok(clearFn.includes("sbRestRpc('clear_schedule_client_hold',{p_client_id:String(clientId)})"), 'Clear is client-scoped');
+assert.ok(!clearFn.includes('p_hold_id'), 'Clear omits p_hold_id');
 assert.ok(!clearFn.includes('p_end_date'), 'Clear still does not send an end date');
 const endFn = slotSrc.slice(slotSrc.indexOf('async function schedWriteHold'), slotSrc.indexOf('async function schedSaveCover'));
+assert.ok(endFn.includes('p_client_id:String(clientId)'), 'End hold is client-scoped');
 assert.ok(endFn.includes('p_end_date:end||schedDateOnly(onDate)'), 'End hold still sends p_end_date');
+assert.ok(endFn.includes("got=await sbRestRpc('clear_schedule_client_hold',{\n        p_client_id:String(clientId),\n        p_end_date:end||schedDateOnly(onDate)\n      })"), 'End hold omits p_hold_id');
 assert.ok(endFn.includes("sbRestRpc('upsert_schedule_client_hold'"), 'explicit Save hold still posts the client hold');
 
 const rpc = [];
@@ -345,7 +348,8 @@ function slot(on, key, extra){
     rpc.push({name: name, body: body});
     if(name === 'list_schedule_client_holds')return Promise.resolve({ok: true, data: {holds: listedHolds}});
     if(name === 'clear_schedule_client_hold'){
-      listedHolds = listedHolds.filter(function(h){ return h.hold_id !== body.p_hold_id; });
+      if(body && body.p_client_id && !Object.prototype.hasOwnProperty.call(body, 'p_hold_id')) listedHolds = [];
+      else listedHolds = listedHolds.filter(function(h){ return h.hold_id !== body.p_hold_id; });
       return Promise.resolve({ok: true, data: {ok: true}});
     }
     if(name === 'list_schedule_week_slots' || name === 'list_schedule_week'){
@@ -378,11 +382,10 @@ function slot(on, key, extra){
   toasts.length = 0;
   await sandbox.schedWriteHold(ada, '2026-09-21', 's1', true);
   const endedStack = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
-  assert.strictEqual(endedStack.length, 2, 'End hold ends the target and the stacked open hold');
-  assert.strictEqual(endedStack[0].body.p_hold_id, holdA);
-  assert.strictEqual(endedStack[1].body.p_hold_id, holdB);
+  assert.strictEqual(endedStack.length, 1, 'End hold is one client-scoped call');
+  assert.strictEqual(endedStack[0].body.p_client_id, ada);
   assert.strictEqual(endedStack[0].body.p_end_date, '2026-09-28');
-  assert.strictEqual(endedStack[1].body.p_end_date, '2026-09-28', 'the leftover open hold gets the same end date');
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(endedStack[0].body, 'p_hold_id'), false, 'End hold omits p_hold_id');
   assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_client_hold'; }), 'End hold does not invent a hold');
   assert.ok(toasts.indexOf('Hold ended. The pattern resumes after 09/28/2026.') >= 0, 'one End hold finishes the client');
   assert.ok(toasts.indexOf('Hold ended. Another active hold remains.') < 0, 'End hold does not leave a second hold to end');
@@ -433,7 +436,9 @@ function slot(on, key, extra){
   toasts.length = 0;
   await sandbox.schedWriteHold(ada, '2026-09-21', 's1', true);
   assert.strictEqual(rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; }).length, 1, 'a single hold still ends once');
+  assert.strictEqual(rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; })[0].body.p_client_id, ada);
   assert.strictEqual(rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; })[0].body.p_end_date, '2026-09-21');
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; })[0].body, 'p_hold_id'), false);
   assert.ok(toasts.indexOf('Hold ended. The pattern resumes after 09/21/2026.') >= 0, 'one hold still uses the end-date chrome');
   assert.ok(toasts.indexOf('Hold ended. Another active hold remains.') < 0, 'one hold does not pretend another remains');
 
@@ -451,10 +456,11 @@ function slot(on, key, extra){
   rpc.length = 0;
   await sandbox.schedClearHold(ada, '2026-09-21', 's1');
   const soft = rpc.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
-  assert.strictEqual(soft.length, 1, 'Clear soft-clears only the targeted hold');
-  assert.strictEqual(soft[0].body.p_hold_id, holdA);
+  assert.strictEqual(soft.length, 1, 'Clear is one client-scoped call');
+  assert.strictEqual(soft[0].body.p_client_id, ada);
+  assert.ok(!Object.prototype.hasOwnProperty.call(soft[0].body, 'p_hold_id'), 'Clear omits p_hold_id');
   assert.ok(!Object.prototype.hasOwnProperty.call(soft[0].body, 'p_end_date'), 'Clear omits p_end_date');
-  assert.ok(listedHolds.some(function(h){ return h.hold_id === holdB; }), 'Clear leaves the other active hold');
+  assert.strictEqual(listedHolds.length, 0, 'Clear-all drops every active hold for the client');
 
   await shots();
   console.log('admin-hold-autosave1-test ok');
@@ -684,7 +690,8 @@ async function shots(){
         window.__calls.push({name: name, body: body});
         if(name === 'list_schedule_client_holds')return {ok: true, data: {holds: window.__stack}};
         if(name === 'clear_schedule_client_hold'){
-          window.__stack = window.__stack.filter(function(h){ return h.hold_id !== body.p_hold_id; });
+          if(body && body.p_client_id && !Object.prototype.hasOwnProperty.call(body, 'p_hold_id')) window.__stack = [];
+          else window.__stack = window.__stack.filter(function(h){ return h.hold_id !== body.p_hold_id; });
           return {ok: true, data: {ok: true}};
         }
         if(name === 'list_schedule_week_slots' || name === 'list_schedule_week'){
@@ -742,11 +749,12 @@ async function shots(){
       btn.scrollIntoView({block: 'center'});
       btn.click();
     });
-    await phone.waitForFunction(function(holdB){
+    await phone.waitForFunction(function(adaId){
       var calls = window.__calls.filter(function(c){ return c.name === 'clear_schedule_client_hold'; });
       var text = document.body.innerText;
-      return calls.length === 2 && calls[0].body.p_end_date === '2026-09-28' && calls[1].body.p_hold_id === holdB && calls[1].body.p_end_date === '2026-09-28' && text.indexOf('The pattern resumes after') >= 0 && text.indexOf('Another active hold remains') < 0;
-    }, {}, holdB);
+      var body = calls[0] && calls[0].body;
+      return calls.length === 1 && body && body.p_client_id === adaId && body.p_end_date === '2026-09-28' && !Object.prototype.hasOwnProperty.call(body, 'p_hold_id') && text.indexOf('The pattern resumes after') >= 0 && text.indexOf('Another active hold remains') < 0;
+    }, {}, ada);
     await phone.evaluate(function(holdA, holdB, adaId){
       schedFilterHold = true;
       var days = {};
