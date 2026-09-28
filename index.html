@@ -5075,14 +5075,21 @@ function listAz1ReorderBox(box, selector){
   for(i=0;i<rows.length;i++){
     var el=rows[i];
     var name='';
-    try{name=el.getAttribute('data-list-az-name')||'';}catch(e2){name='';}
-    if(!name&&el.querySelector){
-      var strong=el.querySelector('.ts-card-top strong, td strong');
-      if(strong)name=String(strong.textContent||'');
+    var client='';
+    var week='';
+    if(el.querySelector){
+      var strong=el.querySelector('.ts-card-top strong');
+      if(!strong)strong=el.querySelector('td strong');
+      if(strong)name=String(strong.textContent||'').trim();
     }
+    try{
+      if(!name)name=el.getAttribute('data-list-az-name')||'';
+      client=el.getAttribute('data-list-az-client')||'';
+      week=el.getAttribute('data-list-az-week')||'';
+    }catch(e2){}
     var usual=parseInt(el.getAttribute('data-list-usual'),10);
     if(!isFinite(usual))usual=i;
-    indexed.push({el:el, i:i, name:name, usual:usual});
+    indexed.push({el:el, i:i, name:name, client:client, week:week, usual:usual});
   }
   indexed.sort(function(a,b){
     if(!on){
@@ -5090,6 +5097,10 @@ function listAz1ReorderBox(box, selector){
       return a.i-b.i;
     }
     var c=listAz1Cmp(a.name, b.name);
+    if(c)return c;
+    c=listAz1Cmp(a.client, b.client);
+    if(c)return c;
+    c=listAz1Cmp(a.week, b.week);
     if(c)return c;
     return a.i-b.i;
   });
@@ -28627,11 +28638,16 @@ function paintTimesheets(){
     const days=r.days||{};
     const locs=[...new Set(Object.values(days).filter(d=>d&&d.location&&!d.location.includes('not')).map(d=>d.location))];
     const locSum=locs.length?`📍 ${locs[0].split(',')[0]}`:'—';
+    // list-az1: .ts-card-top strong is the aide display name (sort key). .ts-card-sub is client · week, not the A–Z key.
     const aideShown=(typeof listAz1TimesheetName==='function'?listAz1TimesheetName(r):String(r.empName||''))||'—';
+    const clientShown=String(r.clientName||r.client_name||'');
+    const weekShown=String(r.weekStart||r.week_start||'');
     var usual='';
     for(var ui=0;ui<usualPos.length;ui++){if(usualPos[ui]===r){usual=ui;break;}}
     const azAttr=String(aideShown).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-    const row=`<tr data-list-az-name="${azAttr}" data-list-usual="${usual}">
+    const clientAttr=clientShown.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const weekAttr=weekShown.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const row=`<tr data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
       <td style="font-size:0.73rem">${formatDateTimeLabel(r.submitted)}</td>
       <td><strong>${aideShown}</strong></td>
       <td>${r.clientName}</td>
@@ -28645,9 +28661,9 @@ function paintTimesheets(){
         ${timesheetRowDeskButton(r)}
       </div></td>
     </tr>`;
-    const card=`<article class="ts-card" data-list-az-name="${azAttr}" data-list-usual="${usual}">
+    const card=`<article class="ts-card" data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
       <div class="ts-card-top"><strong>${aideShown}</strong>${statusBadge(r.status)}</div>
-      <div class="ts-card-sub">${r.clientName||'—'} · ${formatWeekLabel(r.weekStart)}</div>
+      <div class="ts-card-sub">${clientShown||'—'} · ${formatWeekLabel(weekShown)}</div>
       <div class="ts-card-meta"><span class="ts-card-hrs">${r.totalHrs||'—'}</span><span>${locSum}</span><span>${formatDateTimeLabel(r.submitted)}</span></div>
       <div class="actions">
         <button class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="viewRec('${r.id}')">👁 View</button>
