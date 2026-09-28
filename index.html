@@ -5044,11 +5044,74 @@ function listAz1ReorderSchedDom(){
   if(same)return;
   for(i=0;i<indexed.length;i++)body.appendChild(indexed[i].tr);
 }
+function listAz1TimesheetName(r){
+  r=r||{};
+  var name=r.empName;
+  if(name==null||String(name).trim()==='')name=r.emp_name;
+  if(name==null||String(name).trim()==='')name=r.full_name;
+  if(name==null||String(name).trim()==='')name=r.fullName;
+  if(name==null||String(name).trim()==='')name=r.username;
+  return String(name==null?'':name).trim();
+}
+function listAz1TimesheetRows(recs){
+  if(!recs||!recs.length||typeof listAz1On!=='function'||!listAz1On())return recs;
+  return listAz1Apply(recs,[
+    function(r){return listAz1TimesheetName(r);},
+    function(r){return String(r&&(r.clientName||r.client_name)||'');},
+    function(r){return String(r&&(r.weekStart||r.week_start)||'');},
+    function(r){return String(r&&r.id||'');}
+  ]);
+}
+function listAz1ReorderBox(box, selector){
+  if(!box||!box.querySelectorAll||!box.appendChild)return;
+  var nodes=box.querySelectorAll(selector);
+  var rows=[];
+  var i;
+  for(i=0;i<nodes.length;i++)rows.push(nodes[i]);
+  if(rows.length<2)return;
+  var on=false;
+  try{on=listAz1On();}catch(e){on=false;}
+  var indexed=[];
+  for(i=0;i<rows.length;i++){
+    var el=rows[i];
+    var name='';
+    try{name=el.getAttribute('data-list-az-name')||'';}catch(e2){name='';}
+    if(!name&&el.querySelector){
+      var strong=el.querySelector('.ts-card-top strong, td strong');
+      if(strong)name=String(strong.textContent||'');
+    }
+    var usual=parseInt(el.getAttribute('data-list-usual'),10);
+    if(!isFinite(usual))usual=i;
+    indexed.push({el:el, i:i, name:name, usual:usual});
+  }
+  indexed.sort(function(a,b){
+    if(!on){
+      if(a.usual!==b.usual)return a.usual-b.usual;
+      return a.i-b.i;
+    }
+    var c=listAz1Cmp(a.name, b.name);
+    if(c)return c;
+    return a.i-b.i;
+  });
+  var same=true;
+  for(i=0;i<indexed.length;i++)if(indexed[i].el!==rows[i])same=false;
+  if(same)return;
+  for(i=0;i<indexed.length;i++)box.appendChild(indexed[i].el);
+}
+function listAz1ReorderTimesheetDom(){
+  var cards=null;
+  var body=null;
+  try{cards=document.getElementById('tsCards');}catch(e){cards=null;}
+  try{body=document.getElementById('tsBody');}catch(e2){body=null;}
+  listAz1ReorderBox(cards, 'article.ts-card');
+  listAz1ReorderBox(body, 'tr[data-list-az-name]');
+}
 function listAz1Repaint(){
   try{if(typeof schedPaint==='function')schedPaint();}catch(e){}
   try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eDom){}
   try{if(typeof paintClients==='function'&&typeof allClients!=='undefined')paintClients();}catch(e2){}
   try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(e3){}
+  try{if(typeof listAz1ReorderTimesheetDom==='function')listAz1ReorderTimesheetDom();}catch(eTs){}
   try{if(typeof paintBackupRequests==='function'&&typeof allBackupRecords!=='undefined'&&allBackupRecords)paintBackupRequests();}catch(e4){}
   try{if(typeof coverPaintList==='function'&&typeof coverShifts!=='undefined')coverPaintList();}catch(e5){}
   try{if(typeof aidechatPaintInbox==='function'&&typeof aidechatThreads!=='undefined')aidechatPaintInbox();}catch(e6){}
@@ -5494,7 +5557,10 @@ function showTab(tab){
     document.getElementById('schedulerNoAccessCard').style.display=isAdmin?'none':'block';
     if(typeof clienthrs1dOpenNames==='function')clienthrs1dOpenNames();
   }
-  if(tab==='timesheets'&&typeof payReadyLoad==='function')payReadyLoad();
+  if(tab==='timesheets'){
+    try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(eTs){}
+    if(typeof payReadyLoad==='function')payReadyLoad();
+  }
 }
 
 // v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
@@ -28515,7 +28581,9 @@ function paintTimesheets(){
   let recs=allRecords.filter(function(r){
     return sbTimesheetOnDesk({status:r.status,is_active:r.isActive,isActive:r.isActive,deleted_at:r.deletedAt,deletedAt:r.deletedAt}, tsDesk);
   }).slice().reverse();
-  if(typeof listAz1Apply==='function'&&listAz1On()){
+  var usualPos=recs.slice();
+  if(typeof listAz1TimesheetRows==='function')recs=listAz1TimesheetRows(recs);
+  else if(typeof listAz1Apply==='function'&&listAz1On()){
     recs=listAz1Apply(recs,[
       function(r){return r&&(r.empName||r.full_name||r.fullName||r.username)||'';},
       function(r){return r&&r.clientName||'';},
@@ -28559,9 +28627,13 @@ function paintTimesheets(){
     const days=r.days||{};
     const locs=[...new Set(Object.values(days).filter(d=>d&&d.location&&!d.location.includes('not')).map(d=>d.location))];
     const locSum=locs.length?`📍 ${locs[0].split(',')[0]}`:'—';
-    const row=`<tr>
+    const aideShown=(typeof listAz1TimesheetName==='function'?listAz1TimesheetName(r):String(r.empName||''))||'—';
+    var usual='';
+    for(var ui=0;ui<usualPos.length;ui++){if(usualPos[ui]===r){usual=ui;break;}}
+    const azAttr=String(aideShown).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    const row=`<tr data-list-az-name="${azAttr}" data-list-usual="${usual}">
       <td style="font-size:0.73rem">${formatDateTimeLabel(r.submitted)}</td>
-      <td><strong>${r.empName}</strong></td>
+      <td><strong>${aideShown}</strong></td>
       <td>${r.clientName}</td>
       <td>${formatWeekLabel(r.weekStart)}</td>
       <td><strong style="color:var(--teal)">${r.totalHrs}</strong></td>
@@ -28573,8 +28645,8 @@ function paintTimesheets(){
         ${timesheetRowDeskButton(r)}
       </div></td>
     </tr>`;
-    const card=`<article class="ts-card">
-      <div class="ts-card-top"><strong>${r.empName||'—'}</strong>${statusBadge(r.status)}</div>
+    const card=`<article class="ts-card" data-list-az-name="${azAttr}" data-list-usual="${usual}">
+      <div class="ts-card-top"><strong>${aideShown}</strong>${statusBadge(r.status)}</div>
       <div class="ts-card-sub">${r.clientName||'—'} · ${formatWeekLabel(r.weekStart)}</div>
       <div class="ts-card-meta"><span class="ts-card-hrs">${r.totalHrs||'—'}</span><span>${locSum}</span><span>${formatDateTimeLabel(r.submitted)}</span></div>
       <div class="actions">
@@ -28587,6 +28659,7 @@ function paintTimesheets(){
   });
   tbody.innerHTML=built.map(function(x){return x.row;}).join('');
   if(cards)cards.innerHTML=built.map(function(x){return x.card;}).join('');
+  try{if(typeof listAz1ReorderTimesheetDom==='function')listAz1ReorderTimesheetDom();}catch(eAz){}
 }
 
 

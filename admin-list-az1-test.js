@@ -57,6 +57,9 @@ assert.ok(html.includes('listAz1Apply(list,'), 'clients sort');
 assert.ok(html.includes('function listAz1SchedRows(clients)'), 'slot clients go through listAz1SchedRows');
 assert.ok(html.includes('function listAz1ReorderSchedDom()'), 'schedule DOM reorder');
 assert.ok(html.includes("if(typeof listAz1On==='function'&&listAz1On())return rows;"), 'aide office sort yields to A–Z');
+assert.ok(html.includes('function listAz1TimesheetRows(recs)'), 'timesheets go through listAz1TimesheetRows');
+assert.ok(html.includes('recs=listAz1TimesheetRows(recs)'), 'timesheet paint sorts by painted aide name');
+assert.ok(html.includes("if(tab==='timesheets')") && html.includes('paintTimesheets()'), 'timesheets repaint when the tab opens with the sticky pref');
 
 const start = html.indexOf('// list order A–Z v=list-az1');
 const end = html.indexOf('// end list order A–Z v=list-az1');
@@ -127,6 +130,10 @@ const sheetOrder = Array.from(sandbox.listAz1Apply(sheets, [
   function(r){ return r.id; }
 ]), function(r){ return r.id; });
 assert.deepStrictEqual(sheetOrder, ['4', '3', '2', '1']);
+sandbox.listAz1Write('usual');
+assert.strictEqual(sandbox.listAz1TimesheetRows(sheets), sheets, 'usual timesheets stay today’s order');
+sandbox.listAz1Write('az');
+assert.deepStrictEqual(Array.from(sandbox.listAz1TimesheetRows(sheets), function(r){ return r.id; }), ['4', '3', '2', '1'], 'timesheet helper keeps aide then client then week');
 
 const shifts = [
   { clientName: 'Client', aideName: 'Zoe', id: 's2' },
@@ -258,5 +265,61 @@ assert.deepStrictEqual(Array.from(sandbox.wrappedSort(), function(t){ return t.n
   'Probe Throwaway AOV1',
   'Fh1Devon'
 ], 'usual messages stay unread then urgent then recency');
+
+const tsScramble = [
+  { id: 'w2', empName: 'Whitfield', clientName: 'Andre', weekStart: '2026-09-21' },
+  { id: 'w1', empName: 'Whitfield', clientName: 'Andre', weekStart: '2026-09-14' },
+  { id: 'b', empName: 'Bowlax', clientName: 'Cover', weekStart: '2026-09-07' },
+  { id: 'h', empName: 'Helen Park', clientName: 'Devon', weekStart: '2026-09-28' }
+];
+sandbox.listAz1Write('usual');
+assert.strictEqual(sandbox.listAz1TimesheetRows(tsScramble), tsScramble, 'usual timesheet rows stay the scrambled server order');
+sandbox.listAz1Write('az');
+assert.deepStrictEqual(Array.from(sandbox.listAz1TimesheetRows(tsScramble), function(r){ return r.id; }), [
+  'b', 'h', 'w1', 'w2'
+], 'timesheets A–Z by painted aide name, then client, then week');
+assert.deepStrictEqual(tsScramble.map(function(r){ return r.id; }), ['w2', 'w1', 'b', 'h'], 'usual timesheet source order is untouched');
+
+function fakeTsCard(id, name, usual){
+  return {
+    attrs: { 'data-list-az-name': name, 'data-list-usual': String(usual), id: id },
+    getAttribute: function(k){ return Object.prototype.hasOwnProperty.call(this.attrs, k) ? this.attrs[k] : null; },
+    querySelector: function(){ return null; }
+  };
+}
+const tsCards = {
+  children: [
+    fakeTsCard('w2', 'Whitfield', 0),
+    fakeTsCard('w1', 'Whitfield', 1),
+    fakeTsCard('b', 'Bowlax', 2),
+    fakeTsCard('h', 'Helen Park', 3)
+  ],
+  querySelectorAll: function(){ return this.children.slice(); },
+  appendChild: function(node){
+    var at = this.children.indexOf(node);
+    if(at >= 0) this.children.splice(at, 1);
+    this.children.push(node);
+  }
+};
+const prevGet = sandbox.document.getElementById;
+sandbox.document.getElementById = function(id){
+  if(id === 'tsCards') return tsCards;
+  if(id === 'tsBody') return { querySelectorAll: function(){ return []; }, appendChild: function(){} };
+  if(typeof prevGet === 'function') return prevGet(id);
+  return null;
+};
+sandbox.listAz1Write('az');
+sandbox.listAz1ReorderTimesheetDom();
+assert.deepStrictEqual(tsCards.children.map(function(node){ return node.attrs['data-list-az-name']; }), [
+  'Bowlax',
+  'Helen Park',
+  'Whitfield',
+  'Whitfield'
+], 'timesheet cards move A–Z by painted aide name');
+sandbox.listAz1Write('usual');
+sandbox.listAz1ReorderTimesheetDom();
+assert.deepStrictEqual(tsCards.children.map(function(node){ return node.attrs.id; }), [
+  'w2', 'w1', 'b', 'h'
+], 'timesheet cards restore usual order');
 
 console.log('admin-list-az1-test ok');
