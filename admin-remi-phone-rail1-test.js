@@ -26,15 +26,18 @@ assert.ok(!fs.existsSync(path.join(__dirname, 'patches/remi-phone-rail1-v1.sql')
 
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-list-az1'), 'first admin-build is list-az1');
+assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-remi-chat-bleed1"'), 'remi-chat-bleed1 stays after list-az1');
+assert.ok(html.indexOf('content="2026-09-27-remi-chat-bleed1"') < html.indexOf('content="2026-09-27-remi-phone-rail1"'), 'remi-chat-bleed1 sits between list-az1 and this tip');
 assert.ok(html.indexOf('content="2026-09-27-list-az1"') < html.indexOf('content="2026-09-27-remi-phone-rail1"'), 'this tip stays after list-az1');
 assert.ok(html.indexOf('content="2026-09-27-remi-phone-rail1"') < html.indexOf('content="2026-09-27-compliance-bulk1"'), 'compliance-bulk1 stays after this tip');
 assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
 assert.ok(html.indexOf('content="2026-09-27-aide-text-chat1"') < html.indexOf('content="2026-09-27-remi-float-hide1"'), 'remi-float-hide1 stays after aide-text-chat1');
 assert.ok(html.indexOf('content="2026-09-27-remi-float-hide1"') < html.indexOf('content="2026-09-27-tabbar-8"'), 'tabbar-8 stays after remi-float-hide1');
 assert.ok(html.indexOf('content="2026-09-27-cover-unselect1"') < html.indexOf('content="2026-09-27-remi-payroll1"'), 'payroll stays after cover-unselect1');
-['v=remi-chat1','v=remi-float-hide1','v=tabbar-8','v=remi-payroll1','v=aide-office-vis1','v=msg-dense1','v=list-az1'].forEach(function(mark){
+['v=remi-chat-bleed1','v=remi-chat1','v=remi-float-hide1','v=tabbar-8','v=remi-payroll1','v=aide-office-vis1','v=msg-dense1','v=list-az1'].forEach(function(mark){
   assert.ok(html.includes(mark), 'prior marker stays ' + mark);
 });
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-chat-bleed1">'), 'remi-chat-bleed1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-tabbar-8">'), 'tabbar-8 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-chat1">'), 'remi-chat1 meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-payroll1">'), 'payroll meta stays');

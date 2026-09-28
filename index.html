@@ -9,7 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
-<!-- remi phone rail 2026-09-27 v=remi-phone-rail1 admin-build 2026-09-27-remi-phone-rail1. GHOST-REMI-PHONE-RAIL1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No new RPC. No Auth reseal. No Quo/SMS. On a phone, the corner chip opens Remi as a sheet between the Admin header and #bottomNav. It is not a full-viewport takeover and it does not cover the tab bar. Close stays on the sheet. Desktop at 900px and up stays the right rail. Nurse still has no Remi. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=remi-chat1, v=remi-float-hide1, v=tabbar-8, v=remi-payroll1, v=aide-office-vis1, and v=msg-dense1. -->
+<!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
+<meta name="admin-build" content="2026-09-27-remi-chat-bleed1">
+<!-- remi phone rail 2026-09-27 v=remi-phone-rail1 admin-build 2026-09-27-remi-phone-rail1. GHOST-REMI-PHONE-RAIL1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No new RPC. No Auth reseal. No Quo/SMS. On a phone, the corner chip opens Remi as a sheet between the Admin header and #bottomNav. It is not a full-viewport takeover and it does not cover the tab bar. Close stays on the sheet. Desktop at 900px and up stays the right rail. Nurse still has no Remi. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-chat-bleed1, v=list-az1, v=remi-chat1, v=remi-float-hide1, v=tabbar-8, v=remi-payroll1, v=aide-office-vis1, and v=msg-dense1. -->
 <meta name="admin-build" content="2026-09-27-remi-phone-rail1">
 <!-- compliance bulk 2026-09-27 v=compliance-bulk1 admin-build 2026-09-27-compliance-bulk1. GHOST-COMPLIANCE-BULK1-CONTRACT-v1. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi N/A. Compliance Dashboard search filters by aide name, case-insensitive. An empty search shows the full roster (every active aide × every catalog topic). Select all and Unselect all ship as a pair and both stay visible when the selection is empty or full. Select all checks every visible deletable row. Unselect all clears the selection and leaves search and Select Topic alone. Delete selected confirms once, then calls the same admin_unassign_inservice_aide path as the row Delete (isdel1) with p_archive_active_result true for Completed and false for assigned Not Completed, then refreshes once. Rows that only have Send Reminder are not deletable: the checkbox is disabled and the count can say N selected · M skipped (not deletable). Send Reminder stays per row. Select Topic, Assign, and Clear Assignment stay as they are. Phone cards first; the desk table keeps the same toolbar. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=isdel1, v=isclear1, v=isdash1, and v=isdash1b. -->
 <meta name="admin-build" content="2026-09-27-compliance-bulk1">
@@ -982,6 +984,9 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #copilotFab[hidden]{display:none !important;}
 #copilotFab .remi-chip-face{display:block;width:72px;height:72px;border-radius:50%;object-fit:cover;background-color:transparent;background-image:url("assets/remi-locked.png?v=remiface1");background-size:cover;background-position:center;box-shadow:0 8px 22px rgba(10,8,28,.45);pointer-events:none;}
 #copilotFab .remi-chip-pill{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);background:rgba(16,10,36,.92);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.68rem;font-weight:700;letter-spacing:0.02em;line-height:1;border-radius:999px;padding:3px 8px;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.35);}
+/* v=remi-chat-bleed1 — park Schedule a Remi off the thread column. Hide the corner chip only while Messages is the active desk. */
+#tab_aidechat.active #clienthrs1dSched{display:none !important;}
+#adminScreen:has(#tab_aidechat.active) #copilotFab{display:none !important;}
 #copilotSheet{position:fixed;z-index:160;inset:0;display:flex;flex-direction:column;background:var(--off);color:var(--navy);padding:max(10px,env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));box-sizing:border-box;min-width:0;max-width:100%;overflow-x:hidden;touch-action:pan-y;}
 #copilotSheet[hidden]{display:none !important;}
 #copilotSheet .copilot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
@@ -3257,7 +3262,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="notif-note">Nudge = Remi posts in that aide’s Messages (and push if they already allow). Not SMS.</p>
       </div>
 
-      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1">
+      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1" data-remi-chat-bleed1="v=remi-chat-bleed1">
         <section id="remiLangsMsgCard" class="remi-langs-msg" hidden data-remi-langs1="v=remi-langs1" aria-label="Cover ask preview"></section>
         <div id="aidechatInboxView">
           <div class="page-hdr">
@@ -3315,7 +3320,7 @@ Call (216) 377-5991 with any questions.</textarea>
               <p class="auto-note"><strong>On Send:</strong> chat goes to this aide and Schedule auto-marks <strong>Covered shift</strong> — no manual Schedule step.</p>
             </div>
           </div>
-          <section class="clienthrs1d-sched" id="clienthrs1dSched" data-clienthrs1d="v=clienthrs1d" data-msg-dense1b="v=msg-dense1b" aria-label="Schedule a Remi message">
+          <section class="clienthrs1d-sched" id="clienthrs1dSched" data-clienthrs1d="v=clienthrs1d" data-msg-dense1b="v=msg-dense1b" data-remi-chat-bleed1="v=remi-chat-bleed1" aria-label="Schedule a Remi message">
             <h3>Schedule a Remi message</h3>
             <div class="field">
               <label for="clienthrs1dBody">Message</label>
@@ -3365,7 +3370,7 @@ Call (216) 377-5991 with any questions.</textarea>
       </div>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
-    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
+    <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
     <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
@@ -5591,6 +5596,7 @@ function showTab(tab){
     try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(eTs){}
     if(typeof payReadyLoad==='function')payReadyLoad();
   }
+  if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
 }
 
 // v=cover1 Coverage desk. GHOST-COVER1-CONTRACT-v1 locked names.
@@ -10559,6 +10565,7 @@ function aidechatShow(which){
   var live=document.getElementById('tab_aidechat');
   if(live&&!live.classList.contains('active')){
     live.hidden=true;
+    if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
     return;
   }
   aidechatView=which;
@@ -10575,6 +10582,7 @@ function aidechatShow(which){
     else panel.classList.remove('is-thread');
   }
   if(typeof msgDense1Fit==='function')msgDense1Fit();
+  if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
   try{window.scrollTo(0,0);}catch(e){}
 }
 function aidechatShowInbox(){
@@ -10948,6 +10956,26 @@ function moreHide1Leave(nextTab){
     if(host&&host.id===('tab_'+nextTab))continue;
     if(!host||host.id==='tab_aidechat')el.hidden=true;
   }
+  if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
+}
+// v=remi-chat-bleed1 — park Schedule a Remi off the aide-chat thread. Hide the corner chip on this desk only.
+var REMI_CHAT_BLEED1_MARKER='v=remi-chat-bleed1';
+function remiChatBleed1On(){
+  var chat=document.getElementById('tab_aidechat');
+  return !!(chat&&chat.classList.contains('active')&&!chat.hidden);
+}
+function remiChatBleed1Sync(){
+  var on=remiChatBleed1On();
+  var root=document.getElementById('adminScreen');
+  if(root){
+    if(on)root.setAttribute('data-remi-chat-bleed1-on','1');
+    else root.removeAttribute('data-remi-chat-bleed1-on');
+  }
+  var fab=document.getElementById('copilotFab');
+  if(fab&&!on)fab.style.display='';
+  var sched=document.getElementById('clienthrs1dSched');
+  if(sched&&!on)sched.style.display='';
+  return on;
 }
 // aide office vis1 v=aide-office-vis1
 // MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO.
