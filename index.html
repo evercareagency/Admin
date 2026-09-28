@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- remi open thread 2026-09-28 v=remi-open-thread1 ?v=remi-open-thread1 admin-build 2026-09-28-remi-open-thread1. GHOST-REMI-OPEN-THREAD1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi Radar Open thread for an aide closes the Remi rail and phone sheet through the same copilotClose path as other Remi dismissals, then showTab('aidechat') onto Aide chat / Messages, and opens that aide's office thread (aidechatOpen + aidechatOpenThread for that aide_id). It does not showTab('more'). It does not leave #nav_more or #tab_more selected. It does not stop on a toast. Same aidechat1 thread. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=care-msg-safe1, v=remi-chat-bleed1, v=manage-dots-creds1, v=timesheet-archive-kill1, v=remi-float-hide1b, v=remi-phone-rail1, v=aide-office-vis1, and v=manage-done1. -->
+<meta name="admin-build" content="2026-09-28-remi-open-thread1">
+<script>var REMI_OPEN_THREAD1_MARKER='v=remi-open-thread1';var REMI_OPEN_THREAD1_BUILD='2026-09-28-remi-open-thread1';</script>
 <!-- timesheet archive kill 2026-09-28 v=timesheet-archive-kill1 ?v=timesheet-archive-kill1 admin-build 2026-09-28-timesheet-archive-kill1. GHOST-TIMESHEET-ARCHIVE-KILL1-CONTRACT-v1. Ace migrate DONE. Archived bucket emptied (35 rows now have deleted_at). Ghost UI only. NO new SQL. NO new RPC. NO Auth reseal. Quiet Mo. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Timesheets desk tabs are Active and Recently deleted only. The Archived tab button and archived desk copy are gone. setTimesheetDesk('archived') and sbTimesheetDesk('archived') coerce to deleted, because those rows now live in Recently deleted. There is no archived list filter. #tsDeskSub drops the archived string. #tsDetailArchiveBtn stays the filing-cabinet control, class mbtn-archive, and reads 🗄️ Delete. quickDelete and deleteRec confirm exactly Delete this timesheet? with primary Delete, then commitTimesheetTrash (action trash_timesheet through sbAdminTrashTimesheet: is_active false and deleted_at). They do not call commitTimesheetDelete or action delete. The toast is the soft-delete toast: Moved to Recently deleted · restore 7 days. The row cabinet is Delete via quickDelete. More → Delete… is an alias of the same confirm. Archive Restore is not painted: list rows do not call restoreArchivedTimesheet, and syncTimesheetDetailActions shows Restore only when deleted_at is set. Recently deleted Restore still posts restore_trashed_timesheet. Active list is is_active true and deleted_at null. Manage bulk tsManageDelete1 stays the trash_timesheet loop. Dates people read are MM/DD/YYYY. Do not break payready1, the pdf desk, list-az, cover-desk, Manage Done, or aides Manage. Prior markers stay, including v=aide-manage-delete1, v=manage-done1, v=manage-dots-creds1, v=manage-clean1, v=payready1, v=pdf1p, v=client-phone1, v=cover-desk1, and v=list-az-sticky1. -->
 <meta name="admin-build" content="2026-09-28-timesheet-archive-kill1">
 <script>var TIMESHEET_ARCHIVE_KILL1_MARKER='v=timesheet-archive-kill1';var TIMESHEET_ARCHIVE_KILL1_BUILD='2026-09-28-timesheet-archive-kill1';</script>
@@ -12984,11 +12987,11 @@ function aideOfficeVis1CardHtml(alert){
   var first=name.split(/\s+/)[0]||name;
   return '<div class="aide-office-bubble" data-aide-office-vis1="'+AIDE_OFFICE_VIS1_MARKER+'">'
     +'<span class="aide-office-chip2">Unread · Aide Office</span>'
-    +'<div>'+aideOfficeVis1Esc(first)+' replied to your Office message. Thread opens in Remi — not buried.</div>'
+    +'<div>'+aideOfficeVis1Esc(first)+' replied to your Office message. Open thread goes to this aide\'s office chat.</div>'
     +'<div class="aide-office-msg"><div class="from">'+aideOfficeVis1Esc(name)+'</div>'
     +'<div class="body">'+aideOfficeVis1Esc(alert.preview||'')+'</div>'
     +'<div class="when">'+aideOfficeVis1Esc(when)+' · in-app badge</div></div>'
-    +'<button type="button" class="aide-office-open" data-aide-office-open="1" data-aide-office-thread="'+aideOfficeVis1Esc(alert.thread_id)+'" data-aide-office-aide="'+aideOfficeVis1Esc(alert.aide_id)+'" data-aide-office-link="'+aideOfficeVis1Esc(alert.deep_link)+'">Open thread</button>'
+    +'<button type="button" class="aide-office-open" data-remi-open-thread1="'+REMI_OPEN_THREAD1_MARKER+'" data-aide-office-open="1" data-aide-office-thread="'+aideOfficeVis1Esc(alert.thread_id)+'" data-aide-office-aide="'+aideOfficeVis1Esc(alert.aide_id)+'" data-aide-office-link="'+aideOfficeVis1Esc(alert.deep_link)+'">Open thread</button>'
     +'</div>';
 }
 function aideOfficeVis1PaintRail(){
@@ -13179,24 +13182,134 @@ async function aideOfficeVis1AfterRead(id){
   if(!got||got.ok!==true)aideOfficeVis1ApplyBadge(aideOfficeVis1Badge);
   return got;
 }
-async function aideOfficeVis1OpenAide(aideId, threadId){
-  if(!aideOfficeVis1OfficeOk())return;
-  if(typeof showTab==='function')showTab('aidechat');
-  if(typeof aidechatOpen==='function'){
-    try{await aidechatOpen();}catch(e){}
+var remiOpenThread1Hold=0;
+var remiOpenThread1Claimed=0;
+var remiOpenThread1Seq=0;
+function remiOpenThread1Install(){
+  if(remiOpenThread1Install.done)return;
+  remiOpenThread1Install.done=true;
+  if(typeof remiIdeas763ConsiderBilingual==='function'&&!remiIdeas763ConsiderBilingual.__openThread){
+    var prevConsider=remiIdeas763ConsiderBilingual;
+    var wrappedConsider=function(){
+      var gen=remiOpenThread1Hold;
+      if(gen)remiOpenThread1Claimed=gen;
+      var pending=prevConsider.apply(this, arguments);
+      if(!gen)return pending;
+      return Promise.resolve(pending).then(function(v){
+        if(remiOpenThread1Hold===gen){
+          if(typeof copilotClose==='function')copilotClose();
+          remiOpenThread1Desk();
+          remiOpenThread1Hold=0;
+        }
+        return v;
+      }, function(err){
+        if(remiOpenThread1Hold===gen){
+          if(typeof copilotClose==='function')copilotClose();
+          remiOpenThread1Desk();
+          remiOpenThread1Hold=0;
+        }
+        throw err;
+      });
+    };
+    wrappedConsider.__openThread=1;
+    remiIdeas763ConsiderBilingual=wrappedConsider;
   }
+}
+function remiOpenThread1Desk(){
+  var moreNav=null;
+  var morePanel=null;
+  var chat=null;
+  var chatNav=null;
+  try{moreNav=document.getElementById('nav_more');}catch(e){moreNav=null;}
+  try{morePanel=document.getElementById('tab_more');}catch(e2){morePanel=null;}
+  try{chat=document.getElementById('tab_aidechat');}catch(e3){chat=null;}
+  try{chatNav=document.getElementById('nav_aidechat');}catch(e4){chatNav=null;}
+  if(morePanel){
+    morePanel.classList.remove('active');
+    morePanel.hidden=true;
+  }
+  if(moreNav&&moreNav.classList)moreNav.classList.remove('active');
+  if(chat){
+    chat.hidden=false;
+    chat.classList.add('active');
+    if(chat.removeAttribute)chat.removeAttribute('hidden');
+  }
+  if(chatNav&&chatNav.classList)chatNav.classList.add('active');
+  if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
+}
+function remiOpenThread1Locate(aideId, threadId){
   var thread=null;
+  aideId=String(aideId||'');
+  threadId=String(threadId||'');
   if(threadId&&typeof aidechatFind==='function')thread=aidechatFind(threadId);
   if(!thread&&aideId&&typeof aidechatFindByAide==='function')thread=aidechatFindByAide({id:aideId, aide_id:aideId});
   if(!thread&&typeof aidechatThreads!=='undefined'){
     var i;
     for(i=0;i<(aidechatThreads||[]).length;i++){
       var t=aidechatThreads[i];
-      if(threadId&&String(t.id)===String(threadId)){thread=t;break;}
-      if(aideId&&String(t.aide_id)===String(aideId)){thread=t;break;}
+      if(!t)continue;
+      if(threadId&&String(t.id)===threadId){thread=t;break;}
+      if(aideId&&String(t.aide_id)===aideId){thread=t;break;}
     }
   }
-  if(thread&&typeof aidechatOpenThread==='function')await aidechatOpenThread(thread.id);
+  return thread;
+}
+async function aideOfficeVis1OpenAide(aideId, threadId, hint){
+  if(!aideOfficeVis1OfficeOk())return;
+  hint=hint||{};
+  aideId=String(aideId||'');
+  threadId=String(threadId||'');
+  remiOpenThread1Install();
+  var gen=++remiOpenThread1Seq;
+  remiOpenThread1Hold=gen;
+  remiOpenThread1Claimed=0;
+  if(typeof copilotClose==='function')copilotClose();
+  if(typeof showTab==='function')showTab('aidechat');
+  remiOpenThread1Desk();
+  if(typeof aidechatOpen==='function'){
+    try{await aidechatOpen();}catch(e){}
+  }
+  var thread=remiOpenThread1Locate(aideId, threadId);
+  if(!thread&&(aideId||threadId)&&typeof aidechatThreads!=='undefined'&&aidechatThreads){
+    var raw={
+      thread_id:threadId||aideId,
+      id:threadId||aideId,
+      aide_id:aideId,
+      aide_name:hint.aide_name||hint.name||'Aide',
+      preview:hint.preview||''
+    };
+    thread=typeof aidechatMapThread==='function'?aidechatMapThread(raw):{
+      id:threadId||aideId,
+      aide_id:aideId,
+      username:'',
+      name:String(hint.aide_name||hint.name||'Aide'),
+      urgent:false,
+      urgent_reason:'',
+      heads_up:'',
+      status:'open',
+      last_message:String(hint.preview||''),
+      last_at:'',
+      messages:[]
+    };
+    if(thread)aidechatThreads.push(thread);
+  }
+  if(thread&&typeof aidechatOpenThread==='function'){
+    try{await aidechatOpenThread(thread.id);}catch(e2){}
+  }
+  if(thread){
+    remiOpenThread1Desk();
+    if(typeof aidechatSelectedId!=='undefined')aidechatSelectedId=thread.id;
+    if(typeof aidechatShow==='function')aidechatShow('thread');
+    if(typeof aidechatPaintThread==='function')aidechatPaintThread();
+  }
+  if(typeof copilotClose==='function')copilotClose();
+  remiOpenThread1Desk();
+  var finishGen=gen;
+  Promise.resolve().then(function(){
+    if(remiOpenThread1Claimed===finishGen)return;
+    if(remiOpenThread1Hold===finishGen)remiOpenThread1Hold=0;
+  });
+  return thread;
 }
 function aideOfficeVis1OpenAlert(alert){
   alert=alert||{};
@@ -13206,7 +13319,7 @@ function aideOfficeVis1OpenAlert(alert){
   if(m){
     try{aideId=decodeURIComponent(m[1]);}catch(e){aideId=m[1];}
   }
-  return aideOfficeVis1OpenAide(aideId, alert.thread_id||'');
+  return aideOfficeVis1OpenAide(aideId, alert.thread_id||'', alert);
 }
 function aideOfficeVis1QueryAide(){
   var search='';
