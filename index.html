@@ -88,6 +88,8 @@
 <meta name="admin-build" content="2026-09-27-cover-unselect1">
 <!-- remi payroll 2026-09-27 v=remi-payroll1 admin-build 2026-09-27-remi-payroll1. GHOST-REMI-PAYROLL1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi payroll stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Scheduled card is Payroll report On, every other Wednesday at 8:00 AM ET, payroll report in this rail, biweekly. Next run reads next_run_at 2026-10-07T12:00:00+00:00 as Wed 10/07/2026 8:00 AM ET. Anchor pay day is Wed 09/23/2026, so 09/30/2026 is skipped. Chat such as run payroll, Sep 13–27, last week, and last 2 weeks posts admin_parse_remi_payroll_range {p_text}. Confirm posts admin_set_remi_payroll_range_prefs {p_start_date, p_end_date} and then admin_get_remi_payroll_report {p_start_date, p_end_date}. Default range is the last 14 days ET or the saved range prefs. Aides start collapsed. The summary line is Aide · Client · hours number only. Expand shows DATE, CLIENT, IN, OUT, HOURS from signed timesheets. Covers stay visible under each aide. Flag chips are missing only: Flag · missing and Flag · unsigned. Flag hours are excluded from paid totals. Tap a flag opens the timesheet deep_link. Chase stays in Aide chat. No Quo/SMS. Export CSV posts admin_export_remi_payroll_csv. Export PDF posts admin_export_remi_payroll_pdf with content_base64 and storage_path {org}/other/{uuid}.pdf under evercare-pdfs. Both posts admin_export_remi_payroll. Run posts admin_run_remi_payroll_report and paints the receipt rail chip. Create and update scheduled jobs accept p_recurrence biweekly, p_interval_days 14, p_anchor_date, and p_range_prefs. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. This tip does not depend on remi-ideas763. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
 <meta name="admin-build" content="2026-09-27-remi-payroll1">
+<!-- remi payroll insurance 2026-09-28 v=remi-payroll-ins1 admin-build 2026-09-28-remi-payroll-ins1. GHOST-REMI-PAYROLL-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Insurance filter on the Remi payroll report. Default is All timesheets. Chips are All, CareSource, Passport, and Other. A filtered frame is labeled with the insurer and has a clear path back, ← All insurers. Collapsed aide cards stay Aide · Client · hours number only, like remi-payroll1. Desktop payroll report is an OWN PAGE: the Admin shell plus full main content in #tab_payroll. It is not the Remi right rail and it is not inside #copilotSheet. Phone uses the Remi sheet with the same filter chips. Office Admin only. data-layout-roles="Admin". Scheduler and Nurse do not get this own page or these insurance chips. Scheduler can still open remi-payroll1 in Remi without this filter. RPCs: admin_list_remi_payroll_insurance_chips, admin_get_remi_payroll_report with optional p_insurance_plan, and the same optional p_insurance_plan on admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf, and admin_run_remi_payroll_report. null, blank, or all means All. caresource, passport, and other are the chip values. Other is null, blank, unknown, or not caresource or passport. Palette: CareSource #6B2D8B, Passport #E6B800, Other #6b7a90. Parse and set range prefs stay remi-payroll1 and is_scheduler_office. This filter gate is current_app_role admin. No Auth reseal. No Quo/SMS. Prior markers stay, including v=remi-payroll1, v=remi-float-hide1b, v=remi-phone-rail1, v=remi-chat-bleed1, and v=client-ins1. -->
+<meta name="admin-build" content="2026-09-28-remi-payroll-ins1">
 <!-- client insurance tint 2026-09-27 v=client-ins1 admin-build 2026-09-27-client-ins1. GHOST-CLIENT-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Add Client chip picker passes optional p_insurance_plan on admin_add_client and keeps p_weekly_authorized_hours. Catalog chips use admin_list_insurance_plans key, label, and color. Client list selects insurance_plan and tints the name and badge from the locked palette or insurance_color and insurance_label. Schedule week and slots paint insurance_plan, insurance_label, and insurance_color from list_schedule_week and list_schedule_week_slots. Edit uses admin_update_client_insurance or PATCH insurance_plan. Null and legacy plans stay muted. Locked palette: CareSource caresource #6B2D8B, Passport passport #E6B800, Anthem anthem #1E6BB8, Molina molina #C62828, Buckeye buckeye #1B8A3E. No Auth reseal. No Quo/SMS. Nurse writes 42501. Admin dates stay MM/DD/YYYY. Prior markers stay, including v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=clienthrs1d, v=clienthrs1c, v=clienthrs1b, v=clienthrs1a, v=sched1, v=remi-cm-email1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-client-ins1">
 <!-- remi ideas 763 2026-09-27 v=remi-ideas763 admin-build 2026-09-27-remi-ideas763. GHOST-REMI-IDEAS763-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Tap an open schedule cell and the rail calls admin_get_open_shift_why {p_open_shift_id} and admin_list_cover_attempts {p_open_shift_id, p_limit:3}. The card paints attempts with when_label, who_label, status, and detail. Status values are blasted, yes, no, ghost, dropped, and covered. Blast float pool calls admin_rank_float_pool_aides then the existing admin_blast_cover_request. coverage-simple1 blast and remi-float-noshow1 stay. Dismiss calls admin_dismiss_why_open. History stays. Bilingual preview calls admin_get_aide_preferred_language and admin_set_aide_preferred_language. The draft calls admin_draft_bilingual_cover_ask for an English source and a Spanish preview. Send SMS is a UI mock only: sms_send.implemented is false and sms_send.oos is true. No SMS provider. Send in Messages calls admin_send_bilingual_cover_in_messages into aidechat. Pay dispute calls admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply. Send calls admin_send_aide_office_message as Admin. No payroll writeback. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
@@ -290,6 +292,9 @@ textarea{resize:vertical;min-height:80px;}
 .tab-panel{display:none;}.tab-panel.active{display:block;}
 /* v=more-hide1 — an inactive desk cannot paint over the next one. #tab_aidechat.is-thread used to set display:grid and beat this. */
 #adminScreen .tab-panel:not(.active){display:none !important;}
+/* v=remi-payroll-ins1 — [hidden] must beat .tab-panel.active so a Scheduler session cannot keep the Admin payroll page. */
+#tab_payroll[hidden]{display:none !important;}
+#nav_payroll[hidden],#remiPayrollIns1TimesheetsOpen[hidden]{display:none !important;}
 .sched-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;max-width:100%;min-width:0;}
 .sched-toolbar .sched-search{flex:1;min-width:180px;max-width:280px;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;}
 .sched-week{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy);max-width:100%;min-width:0;}
@@ -1421,6 +1426,58 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(max-width:899px){
   #copilotSheet{top:72px;border-radius:22px 22px 0 0;box-shadow:0 -16px 40px rgba(26,39,68,.28);}
 }
+/* v=remi-payroll-ins1 — Admin payroll report own page. Phone chips sit in the Remi sheet. Desktop report is #tab_payroll, not the rail. */
+#tab_payroll .ins1-own-note{display:inline-flex;align-items:center;margin:0 0 10px;padding:4px 10px;border-radius:999px;background:#efe6f5;color:#6B2D8B;font-size:0.72rem;font-weight:800;}
+#tab_payroll .ins1-who{display:inline-flex;margin:0 0 8px;padding:4px 10px;border-radius:999px;background:#e7f6ee;color:#1e7a45;font-size:0.75rem;font-weight:700;}
+#tab_payroll .ins1-badges{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+#tab_payroll .pay-badge{font-size:0.72rem;font-weight:800;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);}
+#tab_payroll .ins1-filter{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin:0 0 14px;}
+#copilotSheet .ins1-filter{margin:0 0 10px;}
+#tab_payroll .ins1-kicker{font-size:0.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+#tab_payroll .ins1-chips,#copilotSheet .ins1-chips{display:flex;flex-wrap:wrap;gap:8px;}
+#tab_payroll .ins1-chip,#copilotSheet .ins1-chip{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;touch-action:manipulation;}
+#tab_payroll .ins1-chip .dot,#copilotSheet .ins1-chip .dot,#tab_payroll .ins1-tag .dot,#copilotSheet .ins1-tag .dot{width:8px;height:8px;border-radius:50%;background:var(--ins,#1a2744);display:inline-block;flex:0 0 8px;}
+#tab_payroll .ins1-clear,#copilotSheet .ins1-clear{display:inline-flex;align-items:center;min-height:36px;padding:0;border:0;background:transparent;color:#1e7a45;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;}
+#tab_payroll .ins1-scope,#copilotSheet .ins1-scope{margin:0 0 6px;font-size:0.78rem;font-weight:800;color:var(--navy);}
+#tab_payroll .ins1-list-label{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap;margin:4px 0 8px;}
+#tab_payroll .ins1-list-label h2{margin:0;font-size:1rem;color:var(--navy);font-family:'DM Sans',sans-serif;}
+#tab_payroll .ins1-list-label .count{font-size:0.75rem;color:var(--muted);text-align:right;}
+#tab_payroll .ins1-tag,#copilotSheet .ins1-tag{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 8px;border-radius:999px;border:1px solid var(--ins,#6b7a90);color:var(--ins,#6b7a90);font-size:0.68rem;font-weight:800;background:#fff;white-space:nowrap;}
+#tab_payroll .pay-meta{font-size:0.84rem;color:var(--muted);line-height:1.4;margin:4px 0 0;}
+#tab_payroll .pay-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 14px;}
+#tab_payroll .pay-stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;}
+#tab_payroll .pay-stat .lbl{font-size:0.66rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+#tab_payroll .pay-stat .val{font-size:1.45rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;}
+#tab_payroll .pay-aide{background:#fff;border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:0 6px 16px rgba(26,39,68,0.04);}
+#tab_payroll .pay-aide-h{display:flex;justify-content:space-between;gap:8px;padding:12px 14px;background:#fafcfe;border-bottom:1px solid var(--border);font-weight:800;color:var(--navy);}
+#tab_payroll .pay-aide-h .tot{color:#1e7a45;font-variant-numeric:tabular-nums;}
+#tab_payroll .pay-sum{display:flex;align-items:center;gap:8px;width:100%;padding:12px 14px;border:0;border-bottom:1px solid var(--border);background:#fff;text-align:left;font-family:'DM Sans',sans-serif;cursor:pointer;min-height:48px;}
+#tab_payroll .pay-sum .who{flex:1;min-width:0;font-size:0.92rem;font-weight:700;color:var(--navy);}
+#tab_payroll .pay-sum .hint{font-size:0.72rem;font-weight:800;color:var(--teal);white-space:nowrap;}
+#tab_payroll .pay-chev{width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:var(--off);color:var(--muted);display:inline-flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:800;flex:0 0 22px;}
+#tab_payroll .pay-aide.open .pay-chev{background:#e8f4f4;border-color:#b7d8d8;color:var(--teal);}
+#tab_payroll .pay-detail{display:none;}
+#tab_payroll .pay-aide.open .pay-detail{display:block;}
+#tab_payroll .pay-flags{display:flex;flex-direction:column;gap:6px;padding:0 14px 10px;}
+#tab_payroll .pay-aide.open .pay-flags{display:none;}
+#tab_payroll .pay-flag{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:10px;background:#fdecea;border:1px solid #f5c2c0;color:#b42318;font-size:0.78rem;font-family:'DM Sans',sans-serif;font-weight:650;cursor:pointer;min-height:44px;}
+#tab_payroll .pay-table-wrap{overflow-x:auto;max-width:100%;}
+#tab_payroll table.pay-rows{width:100%;border-collapse:collapse;min-width:280px;}
+#tab_payroll table.pay-rows th{text-align:left;font-size:0.66rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:8px;border-bottom:1px solid var(--border);background:#fafcfe;}
+#tab_payroll table.pay-rows td{padding:8px;border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--navy);vertical-align:top;}
+#tab_payroll table.pay-rows td.hrs,#tab_payroll table.pay-rows th.hrs{text-align:right;font-variant-numeric:tabular-nums;font-weight:800;}
+#tab_payroll .pay-covers{border-top:1px solid var(--border);background:#fbfcfe;}
+#tab_payroll .pay-covers-h{display:flex;justify-content:space-between;gap:8px;padding:8px 14px 2px;font-size:0.66rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+#tab_payroll .pay-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:8px 14px;background:#f3f5f8;border-top:1px solid var(--border);font-size:0.75rem;color:var(--muted);}
+#tab_payroll .pay-foot strong{color:var(--navy);}
+#tab_payroll .pay-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+#tab_payroll .pay-actions button{min-height:44px;border-radius:10px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.8rem;padding:8px 14px;cursor:pointer;}
+#tab_payroll .pay-actions .go{background:var(--teal);color:#fff;border:0;}
+#tab_payroll .pay-actions .alt{background:#fff;color:var(--teal);border:1px solid var(--border);}
+#tab_payroll .pay-next{margin:4px 0 0;font-size:0.84rem;font-weight:700;color:var(--navy);}
+@media(max-width:700px){
+  #tab_payroll .pay-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
 
 #coverOutcomeView .page-hdr{margin-bottom:8px;}
 #coverOutcomeView .page-hdr p{display:none;}
@@ -2419,7 +2476,8 @@ bindLoginKeyboard();
         </section>
         <div class="page-hdr">
           <div><h1>Timesheets</h1><p id="tsDeskSub">Active submitted caregiver timesheets</p></div>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" class="btn btn-ghost" id="remiPayrollIns1TimesheetsOpen" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1OpenPage()">Payroll report</button>
             <button class="btn btn-ghost" id="exportAllPdfsBtn" onclick="exportAllAsPDFs()">📄 Export all as PDFs</button>
             <button class="btn btn-teal" onclick="renderTimesheets()">🔄 Refresh</button>
           </div>
@@ -2445,6 +2503,19 @@ bindLoginKeyboard();
         </div>
       </div>
 
+      <!-- PAYROLL REPORT — Admin own page. Not the Remi rail. v=remi-payroll-ins1 -->
+      <div class="tab-panel" id="tab_payroll" hidden data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" data-surface="own-page" aria-label="Payroll report">
+        <p class="ins1-own-note">Own page · no Remi rail</p>
+        <div id="remiPayrollIns1Host" data-remi-payroll-ins1="v=remi-payroll-ins1">
+          <div class="ins1-chips" role="listbox" aria-label="Insurance filter">
+            <button type="button" class="ins1-chip" data-plan="all">All</button>
+            <button type="button" class="ins1-chip" data-plan="caresource">CareSource</button>
+            <button type="button" class="ins1-chip" data-plan="passport">Passport</button>
+            <button type="button" class="ins1-chip" data-plan="other">Other</button>
+          </div>
+        </div>
+      </div>
+
       <!-- MORE — Coverage desk is listed here (v=cover1). It is not a bottom tab. -->
       <div class="tab-panel" id="tab_more">
         <div class="page-hdr">
@@ -2467,6 +2538,7 @@ bindLoginKeyboard();
           </div>
         </div>
         <div class="more-list" id="moreList">
+          <button type="button" class="nav-item more-row" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="showTab('payroll')" id="nav_payroll"><span class="ni">💵</span> Payroll report</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('coverage')" id="nav_coverage"><span class="ni">🗺️</span> Coverage</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d" onclick="showTab('notifications')" id="nav_notifications"><span class="ni">🔔</span> Notifications</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
@@ -3400,7 +3472,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabRules" role="tab" aria-selected="false" data-remi-rules1="v=remi-rules1" onclick="remiRules1Show()">Rules</button>
         <button type="button" class="copilot-tab" id="copilotTabSched" role="tab" aria-selected="false" data-remi-sched1="v=remi-sched1" onclick="remiSched1Show()">Scheduled</button>
         <button type="button" class="copilot-tab" id="copilotTabProof" role="tab" aria-selected="false" data-remi-proof1="v=remi-proof1" onclick="remiProof1Show()">Receipts</button>
-        <button type="button" class="copilot-tab" id="copilotTabPayroll" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" onclick="remiPayroll1Show()">Payroll</button>
+        <button type="button" class="copilot-tab" id="copilotTabPayroll" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1FromRail()">Payroll</button>
         <button type="button" class="copilot-tab" id="copilotTabCover" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" onclick="remiFloatHide1ShowCoverage()">Coverage</button>
       </div>
       <div id="aideOfficeRail" hidden data-aide-office-vis1="v=aide-office-vis1" aria-live="polite" aria-label="Aide Office"></div>
@@ -4828,22 +4900,53 @@ function layoutA1CloseAvatar(){
   if(btn)btn.setAttribute('aria-expanded','false');
 }
 function layoutA1ApplyRoles(){
-  var role='';
-  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
-  document.querySelectorAll('#adminScreen [data-layout-roles]').forEach(function(el){
-    if(el.id==='copilotSheet')return;
-    var allow=String(el.getAttribute('data-layout-roles')||'').split(/\s+/).filter(Boolean);
-    var show=!role||allow.indexOf(role)>=0;
-    if(show)el.removeAttribute('hidden');
-    else el.setAttribute('hidden','');
-  });
-  var btn=document.getElementById('avatarMenuBtn');
-  if(btn){
-    var label=String((typeof currentAdminUsername!=='undefined'&&currentAdminUsername)||role||'A').trim();
-    btn.textContent=(label.charAt(0)||'A').toUpperCase();
-    if(role)btn.setAttribute('aria-label','Account menu, '+role);
+  if(layoutA1ApplyRoles._busy)return;
+  layoutA1ApplyRoles._busy=1;
+  try{
+    var role='';
+    try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+    document.querySelectorAll('#adminScreen [data-layout-roles]').forEach(function(el){
+      if(!el||el.id==='copilotSheet')return;
+      var allow=String(el.getAttribute('data-layout-roles')||'').split(/\s+/).filter(Boolean);
+      var show=!role||allow.indexOf(role)>=0;
+      var panel=!!(el.classList&&el.classList.contains('tab-panel'));
+      if(!show){
+        el.setAttribute('hidden','');
+        if(panel)el.classList.remove('active');
+        return;
+      }
+      if(panel&&!(el.classList.contains('active'))){
+        el.setAttribute('hidden','');
+        return;
+      }
+      el.removeAttribute('hidden');
+    });
+    var active=null;
+    try{if(document.querySelector)active=document.querySelector('#adminScreen .tab-panel.active');}catch(eActive){active=null;}
+    var gatedOff=false;
+    if(active&&role&&active.getAttribute){
+      var raw=active.getAttribute('data-layout-roles');
+      if(raw!=null&&String(raw).trim()){
+        var ok=String(raw).split(/\s+/).filter(Boolean);
+        if(ok.indexOf(role)<0)gatedOff=true;
+      }
+    }
+    var needsHome=!active||!!(active&&active.hidden)||gatedOff;
+    if(role&&needsHome&&typeof showTab==='function'){
+      var onHome=!!(active&&active.id==='tab_timesheets'&&!active.hidden&&!gatedOff);
+      if(!onHome)showTab('timesheets');
+    }
+    var btn=document.getElementById('avatarMenuBtn');
+    if(btn){
+      var label=String((typeof currentAdminUsername!=='undefined'&&currentAdminUsername)||role||'A').trim();
+      btn.textContent=(label.charAt(0)||'A').toUpperCase();
+      if(role)btn.setAttribute('aria-label','Account menu, '+role);
+    }
+    if(typeof copilotSyncRole==='function')copilotSyncRole();
+    if(typeof remiPayrollIns1ApplyRoleGate==='function')remiPayrollIns1ApplyRoleGate();
+  }finally{
+    layoutA1ApplyRoles._busy=0;
   }
-  if(typeof copilotSyncRole==='function')copilotSyncRole();
 }
 var NAV_EDIT_META={
   timesheets:{label:'Timesheets',icon:'📋',short:''},
@@ -5567,6 +5670,7 @@ document.addEventListener('click', function(){layoutA1CloseAvatar();});
 function showTab(tab){
   // Old top-level Completed intakes → Nurse tab (Completes card). Admin + Scheduler only.
   if(tab==='completes')tab='nurse';
+  if(tab==='payroll'&&typeof remiPayrollIns1AdminOk==='function'&&!remiPayrollIns1AdminOk())tab='timesheets';
   layoutA1CloseAvatar();
   var primary=layoutA1Primary(tab);
   document.querySelectorAll('#adminScreen .tab-panel').forEach(function(p){
@@ -5605,6 +5709,9 @@ function showTab(tab){
   if(tab==='timesheets'){
     try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(eTs){}
     if(typeof payReadyLoad==='function')payReadyLoad();
+  }
+  if(tab==='payroll'&&typeof remiPayrollIns1OnShow==='function'){
+    try{remiPayrollIns1Shown=remiPayrollIns1OnShow();}catch(ePayIns){}
   }
   if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
 }
@@ -9210,6 +9317,9 @@ function copilotChatSubmit(ev){
   }
   if(bubble.payrollQuery&&typeof remiPayroll1Lookup==='function'){
     try{remiPayroll1Lookup(copilotChat.length-1);}catch(ePayLook){}
+  }
+  if(ans.ins1Plan&&typeof remiPayrollIns1ApplyAsk==='function'){
+    try{remiPayrollIns1ApplyAsk(ans.ins1Plan);}catch(eInsAsk){}
   }
   if(ans.nosvc&&typeof nosvcFetch==='function')nosvcFetch(copilotChat.length-1);
   else if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
@@ -21676,6 +21786,12 @@ function remiPayroll1DateBody(){
   var body={};
   if(remiPayroll1Start)body.p_start_date=remiPayroll1Start;
   if(remiPayroll1End)body.p_end_date=remiPayroll1End;
+  if(typeof remiPayrollIns1PlanArg==='function'){
+    try{
+      var plan=remiPayrollIns1PlanArg();
+      if(plan)body.p_insurance_plan=plan;
+    }catch(ePlan){}
+  }
   return body;
 }
 function remiPayroll1PickReport(data){
@@ -21695,6 +21811,9 @@ function remiPayroll1Apply(data, keepOpen){
   var job=data.job||(report&&report.job)||null;
   if(job&&typeof job==='object')remiPayroll1Job=job;
   if(!keepOpen)remiPayroll1OpenMap={};
+  if(typeof remiPayrollIns1SyncPlan==='function'){
+    try{remiPayrollIns1SyncPlan(report||data);}catch(eSync){}
+  }
 }
 function remiPayroll1RangeFrom(data){
   data=data||{};
@@ -21722,6 +21841,11 @@ function remiPayroll1IsRangeAsk(q){
 }
 function remiPayroll1FromAsk(q){
   if(!remiPayroll1OfficeOk())return null;
+  if(typeof remiPayrollIns1FromAsk==='function'){
+    var insAsk=null;
+    try{insAsk=remiPayrollIns1FromAsk(q);}catch(eInsAsk){insAsk=null;}
+    if(insAsk)return insAsk;
+  }
   if(!remiPayroll1IsRangeAsk(q))return null;
   return {sec:true, kind:'', text:'Checking that payroll range.', actions:[], payrollQuery:String(q||'').trim(), payroll:{chip:'Payroll range', sent:false, draft:null, error:''}};
 }
@@ -21776,7 +21900,7 @@ async function remiPayroll1Confirm(idx){
   msg.payroll.error='';
   remiPayroll1Start=d.start_date;
   remiPayroll1End=d.end_date;
-  var got=await remiPayroll1Rpc('admin_get_remi_payroll_report', {p_start_date:d.start_date, p_end_date:d.end_date});
+  var got=await remiPayroll1Rpc('admin_get_remi_payroll_report', remiPayroll1DateBody());
   if(!got||!got.ok){
     msg.payroll.error=(got&&got.error)||'Could not open the payroll report.';
     try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePaint2){}
@@ -21948,6 +22072,9 @@ function remiPayroll1AideHtml(aide, idx){
   html+='<button type="button" class="pay-sum" aria-expanded="'+(open?'true':'false')+'" onclick="remiPayroll1Toggle(\''+key+'\')">';
   html+='<span class="pay-chev">'+(open?'\u25BC':'\u25B6')+'</span>';
   html+='<span class="who">'+remiPayroll1Esc(remiPayroll1SummaryLine(aide))+'</span>';
+  if(typeof remiPayrollIns1TagHtml==='function'){
+    try{html+=remiPayrollIns1TagHtml(aide);}catch(eTag){}
+  }
   html+='<span class="hint">'+(open?'tap to collapse':'tap to expand')+'</span></button>';
   if(flags.length){
     html+='<div class="pay-flags">';
@@ -21963,6 +22090,9 @@ function remiPayroll1AideHtml(aide, idx){
   if(cancelN)foot+=' \u00B7 '+cancelN+' cancel';
   foot+=' \u00B7 '+covers.length+' cover';
   if(client)foot+=' \u00B7 permanent '+client;
+  if(typeof remiPayrollIns1Foot==='function'){
+    try{foot+=remiPayrollIns1Foot(aide);}catch(eFoot){}
+  }
   html+='<div class="pay-foot"><span>'+remiPayroll1Esc(foot)+'</span><strong>Subtotal '+remiPayroll1Esc(remiPayroll1AideTotal(aide))+'</strong></div>';
   html+='</section>';
   return html;
@@ -21981,6 +22111,9 @@ function remiPayroll1ReportHtml(){
   html+='<button type="button" class="pay-back" onclick="remiSched1Show()">Scheduled</button>';
   html+='<div class="pay-head"><h3>Payroll report</h3>';
   html+='<p class="pay-meta">'+remiPayroll1Esc(range)+' \u00B7 aides collapsed \u00B7 covers always on \u00B7 America/New_York</p></div>';
+  if(typeof remiPayrollIns1SheetExtra==='function'){
+    try{html+=remiPayrollIns1SheetExtra()||'';}catch(eIns){}
+  }
   html+='<div class="pay-badges"><span class="pay-badge is-job">'+remiPayroll1Esc(schedule)+'</span>';
   html+='<span class="pay-badge'+(Number(stats.flags)?' is-flag':'')+'">'+remiPayroll1Esc(String(stats.flags))+' Flags</span>';
   html+='<span class="pay-badge">America/New_York</span></div>';
@@ -22016,6 +22149,10 @@ function remiPayroll1ReportHtml(){
   return html;
 }
 function remiPayroll1Paint(){
+  if(typeof remiPayrollIns1CapturePaint==='function'&&remiPayrollIns1CapturePaint())return;
+  if(typeof remiPayrollIns1PreferPage==='function'&&remiPayrollIns1PreferPage()&&typeof remiPayrollIns1OpenPage==='function'){
+    return remiPayrollIns1OpenPage();
+  }
   var host=remiPayroll1El('copilotBody');
   try{copilotView='payroll';}catch(eView){}
   if(typeof copilotHideConfirm==='function')copilotHideConfirm();
@@ -22069,6 +22206,9 @@ async function remiPayroll1Load(){
 }
 function remiPayroll1Show(){
   if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true};
+  if(typeof remiPayrollIns1PreferPage==='function'&&remiPayrollIns1PreferPage()){
+    return remiPayrollIns1OpenPage();
+  }
   var sheet=remiPayroll1El('copilotSheet');
   if(sheet)sheet.hidden=false;
   remiPayroll1Note='';
@@ -22190,11 +22330,450 @@ function remiPayroll1JobExtra(job){
   if(anchor)html+='<p class="remi-vis-hint">Anchor pay day '+remiPayroll1Esc(anchor)+' \u00B7 every '+(job.interval_days||14)+' days</p>';
   html+='<div class="pay-actions">';
   html+='<button type="button" class="go" id="remiPayroll1Open" onclick="remiPayroll1Show()">Open report</button>';
+  if(typeof remiPayrollIns1OpenBtn==='function'){
+    try{html+=remiPayrollIns1OpenBtn()||'';}catch(eOpen){}
+  }
   html+='<button type="button" class="alt" id="remiPayroll1Run" onclick="remiPayroll1Run()">Run</button>';
   html+='</div>';
   return html;
 }
 // end remi payroll1 v=remi-payroll1
+
+// remi payroll ins1 v=remi-payroll-ins1
+// MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Admin only.
+// Desktop payroll report is an OWN PAGE in #tab_payroll (main content). Not inside #copilotSheet.
+// Phone uses the Remi sheet with the same chips. Scheduler keeps remi-payroll1 without this filter.
+// Optional p_insurance_plan on admin_get_remi_payroll_report, admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf, and admin_run_remi_payroll_report.
+// null, blank, or all omits p_insurance_plan. caresource, passport, and other are sent.
+// No Auth reseal. No SMS provider.
+var REMI_PAYROLL_INS1_MARKER='v=remi-payroll-ins1';
+var REMI_PAYROLL_INS1_BUILD='2026-09-28-remi-payroll-ins1';
+var remiPayrollIns1Plan='all';
+var remiPayrollIns1Chips=null;
+var remiPayrollIns1ChipsLoading=false;
+var remiPayrollIns1Loaded=false;
+var remiPayrollIns1ChipsWait=null;
+var remiPayrollIns1Shown=null;
+var REMI_PAYROLL_INS1_FALLBACK=[
+  {key:'all', label:'All', color:null},
+  {key:'caresource', label:'CareSource', color:'#6B2D8B'},
+  {key:'passport', label:'Passport', color:'#E6B800'},
+  {key:'other', label:'Other', color:'#6b7a90'}
+];
+function remiPayrollIns1AdminOk(){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  return role.toLowerCase()==='admin';
+}
+function remiPayrollIns1Normalize(plan){
+  var p=String(plan==null?'':plan).trim().toLowerCase();
+  if(!p||p==='all')return 'all';
+  if(p==='caresource'||p==='passport'||p==='other')return p;
+  return 'all';
+}
+function remiPayrollIns1PlanArg(){
+  if(!remiPayrollIns1AdminOk())return '';
+  var plan=remiPayrollIns1Normalize(remiPayrollIns1Plan);
+  if(!plan||plan==='all')return '';
+  return plan;
+}
+function remiPayrollIns1IsDesktop(){
+  try{
+    if(typeof window!=='undefined'&&window.matchMedia)return !!window.matchMedia('(min-width: 900px)').matches;
+  }catch(e){}
+  return false;
+}
+function remiPayrollIns1PreferPage(){
+  return remiPayrollIns1AdminOk()&&remiPayrollIns1IsDesktop();
+}
+function remiPayrollIns1PageOn(){
+  if(!remiPayrollIns1AdminOk())return false;
+  try{
+    var panel=document.getElementById('tab_payroll');
+    if(!panel||!panel.classList)return false;
+    if(panel.hidden)return false;
+    return panel.classList.contains('active');
+  }catch(e){return false;}
+}
+function remiPayrollIns1Hex(color){
+  var c=String(color||'').trim();
+  if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c))return c;
+  return '';
+}
+function remiPayrollIns1Color(plan, given){
+  var hex=remiPayrollIns1Hex(given);
+  if(hex)return hex;
+  var key=remiPayrollIns1Normalize(plan);
+  if(key==='caresource')return '#6B2D8B';
+  if(key==='passport')return '#E6B800';
+  if(key==='other')return '#6b7a90';
+  if(String(plan||'').toLowerCase()==='anthem')return '#1E6BB8';
+  if(String(plan||'').toLowerCase()==='molina')return '#C62828';
+  if(String(plan||'').toLowerCase()==='buckeye')return '#1B8A3E';
+  return '#6b7a90';
+}
+function remiPayrollIns1SyncPlan(report){
+  if(!remiPayrollIns1AdminOk()||!report||typeof report!=='object')return;
+  if(report.insurance_plan==null||report.insurance_plan==='')return;
+  remiPayrollIns1Plan=remiPayrollIns1Normalize(report.insurance_plan);
+}
+function remiPayrollIns1ChipRows(data){
+  var list=null;
+  if(Array.isArray(data))list=data;
+  else if(data&&typeof data==='object'){
+    if(Array.isArray(data.chips))list=data.chips;
+    else if(Array.isArray(data.rows))list=data.rows;
+    else if(Array.isArray(data.plans))list=data.plans;
+    else if(Array.isArray(data.insurers))list=data.insurers;
+  }
+  if(!list)return [];
+  var allow={all:1, caresource:1, passport:1, other:1};
+  var out=[];
+  list.forEach(function(row){
+    if(!row)return;
+    var key=String(row.key||row.plan||row.id||'').trim().toLowerCase();
+    if(!allow[key])return;
+    var label=String(row.label||row.name||'').trim();
+    if(!label)label=key==='all'?'All':(key==='caresource'?'CareSource':(key==='passport'?'Passport':'Other'));
+    out.push({key:key, label:label, color:row.color||null});
+  });
+  return out;
+}
+function remiPayrollIns1MergeChips(rows){
+  var by={};
+  (rows||[]).forEach(function(row){if(row&&row.key)by[row.key]=row;});
+  return REMI_PAYROLL_INS1_FALLBACK.map(function(chip){
+    var got=by[chip.key];
+    if(!got)return {key:chip.key, label:chip.label, color:chip.color};
+    return {key:chip.key, label:got.label||chip.label, color:got.color||chip.color};
+  });
+}
+async function remiPayrollIns1LoadChips(){
+  if(remiPayrollIns1Chips)return remiPayrollIns1Chips;
+  if(remiPayrollIns1ChipsLoading&&remiPayrollIns1ChipsWait)return remiPayrollIns1ChipsWait;
+  remiPayrollIns1ChipsLoading=true;
+  remiPayrollIns1ChipsWait=(async function(){
+    var rows=[];
+    try{
+      if(remiPayrollIns1AdminOk()&&typeof remiPayroll1Rpc==='function'){
+        var got=await remiPayroll1Rpc('admin_list_remi_payroll_insurance_chips', {});
+        if(got&&got.ok)rows=remiPayrollIns1ChipRows(got.data);
+      }
+    }catch(eChips){}
+    remiPayrollIns1Chips=remiPayrollIns1MergeChips(rows);
+    remiPayrollIns1ChipsLoading=false;
+    return remiPayrollIns1Chips;
+  })();
+  return remiPayrollIns1ChipsWait;
+}
+function remiPayrollIns1AfterChips(){
+  if(remiPayrollIns1PageOn()&&remiPayrollIns1IsDesktop()){
+    remiPayrollIns1PaintPage();
+    return;
+  }
+  try{
+    if(typeof copilotView!=='undefined'&&copilotView==='payroll'&&typeof remiPayroll1Paint==='function')remiPayroll1Paint();
+  }catch(eAfter){}
+}
+function remiPayrollIns1EnsureChips(){
+  if(!remiPayrollIns1AdminOk()||remiPayrollIns1Chips||remiPayrollIns1ChipsLoading)return;
+  remiPayrollIns1LoadChips().then(function(){remiPayrollIns1AfterChips();}).catch(function(){});
+}
+function remiPayrollIns1ActiveLabel(){
+  var report=typeof remiPayroll1Report!=='undefined'?remiPayroll1Report:null;
+  var plan=remiPayrollIns1Normalize(remiPayrollIns1Plan);
+  if(report&&report.insurance_label){
+    var echoed=remiPayrollIns1Normalize(report.insurance_plan);
+    var from=String(report.insurance_label).trim();
+    if(from&&echoed===plan)return from;
+  }
+  var chips=remiPayrollIns1Chips||REMI_PAYROLL_INS1_FALLBACK;
+  for(var i=0;i<chips.length;i++){
+    if(chips[i].key===plan&&chips[i].label)return chips[i].label;
+  }
+  if(plan==='caresource')return 'CareSource';
+  if(plan==='passport')return 'Passport';
+  if(plan==='other')return 'Other';
+  return 'All';
+}
+function remiPayrollIns1ChipModel(report){
+  var base=remiPayrollIns1Chips||REMI_PAYROLL_INS1_FALLBACK;
+  var counts={};
+  var range=report&&Array.isArray(report.insurers_in_range)?report.insurers_in_range:[];
+  range.forEach(function(row){
+    if(!row)return;
+    counts[remiPayrollIns1Normalize(row.key)]=row;
+  });
+  return base.map(function(chip){
+    var extra=counts[chip.key]||{};
+    return {key:chip.key, label:chip.label||extra.label||chip.key, color:chip.color||extra.color||null, count:extra.count};
+  });
+}
+function remiPayrollIns1ChipStyle(color, on){
+  var c=remiPayrollIns1Hex(color)||'#1a2744';
+  if(!on)return '--ins:'+c;
+  if(c.toLowerCase()==='#e6b800')return '--ins:'+c+';background:'+c+';color:#1a2744;border-color:'+c;
+  return '--ins:'+c+';background:'+c+';color:#fff;border-color:'+c;
+}
+function remiPayrollIns1FilterHtml(mode){
+  var report=typeof remiPayroll1Report!=='undefined'?remiPayroll1Report:null;
+  var plan=remiPayrollIns1Normalize(remiPayrollIns1Plan);
+  var chips=remiPayrollIns1ChipModel(report||{});
+  var html='<div class="ins1-filter" data-remi-payroll-ins1="'+REMI_PAYROLL_INS1_MARKER+'">';
+  if(plan!=='all'){
+    html+='<button type="button" class="ins1-clear" id="remiPayrollIns1Clear" onclick="remiPayrollIns1SetPlan(\'all\')">\u2190 All insurers</button>';
+  }
+  if(mode==='page')html+='<span class="ins1-kicker">Insurer</span>';
+  html+='<div class="ins1-chips" role="listbox" aria-label="Insurance filter">';
+  chips.forEach(function(chip){
+    var on=chip.key===plan;
+    var color=chip.key==='all'?'#1a2744':remiPayrollIns1Color(chip.key, chip.color);
+    html+='<button type="button" class="ins1-chip'+(on?' on':'')+'" data-plan="'+chip.key+'" aria-selected="'+(on?'true':'false')+'" style="'+remiPayrollIns1ChipStyle(color, on)+'" onclick="remiPayrollIns1SetPlan(\''+chip.key+'\')"><span class="dot"></span>'+remiPayroll1Esc(chip.label)+'</button>';
+  });
+  html+='</div></div>';
+  return html;
+}
+function remiPayrollIns1OpenBtn(){
+  if(!remiPayrollIns1AdminOk())return '';
+  return '<button type="button" class="alt" id="remiPayrollIns1OpenFull" onclick="remiPayrollIns1OpenPage()">Open full report</button>';
+}
+function remiPayrollIns1SheetExtra(){
+  if(!remiPayrollIns1AdminOk())return '';
+  if(remiPayrollIns1IsDesktop())return '';
+  remiPayrollIns1EnsureChips();
+  var label=remiPayrollIns1ActiveLabel();
+  var plan=remiPayrollIns1Normalize(remiPayrollIns1Plan);
+  var scope=plan==='all'?'Payroll \u00B7 All insurers':'Payroll \u00B7 '+label;
+  return '<p class="ins1-scope">'+remiPayroll1Esc(scope)+'</p>'+remiPayrollIns1FilterHtml('sheet')+remiPayrollIns1OpenBtn();
+}
+function remiPayrollIns1TagHtml(aide){
+  if(!remiPayrollIns1AdminOk())return '';
+  aide=aide||{};
+  var label=String(aide.insurance_label||'').trim();
+  if(!label)return '';
+  var color=remiPayrollIns1Color(aide.insurance_bucket||aide.insurance_plan, aide.insurance_color);
+  return '<span class="ins1-tag" style="--ins:'+color+'"><span class="dot"></span>'+remiPayroll1Esc(label)+'</span>';
+}
+function remiPayrollIns1Foot(aide){
+  if(!remiPayrollIns1AdminOk())return '';
+  var label=String(aide&&aide.insurance_label||'').trim();
+  if(!label)return '';
+  return ' \u00B7 '+label;
+}
+function remiPayrollIns1Counts(report){
+  report=report||{};
+  var range=Array.isArray(report.insurers_in_range)?report.insurers_in_range:[];
+  var insurers=0;
+  range.forEach(function(row){
+    var key=String(row&&row.key||'').toLowerCase();
+    if(key&&key!=='all'&&Number(row.count)>0)insurers++;
+  });
+  if(!insurers){
+    var seen={};
+    (report.aides||[]).forEach(function(aide){
+      var key=remiPayrollIns1Normalize(aide&&(aide.insurance_bucket||aide.insurance_plan));
+      if(key&&key!=='all')seen[key]=1;
+    });
+    insurers=Object.keys(seen).length;
+  }
+  var clients={};
+  (report.aides||[]).forEach(function(aide){
+    var name=String(aide&&(aide.permanent_client_name||aide.client_name)||'').trim();
+    if(name)clients[name]=1;
+  });
+  return {insurers:insurers, clients:Object.keys(clients).length};
+}
+function remiPayrollIns1ScopeLine(report){
+  report=report||{};
+  var plan=remiPayrollIns1Normalize(remiPayrollIns1Plan);
+  if(plan==='all'){
+    var bits=[];
+    var range=Array.isArray(report.insurers_in_range)?report.insurers_in_range:[];
+    range.forEach(function(row){
+      if(!row)return;
+      var key=String(row.key||'').toLowerCase();
+      if(!key||key==='all')return;
+      if(row.label)bits.push(String(row.label));
+    });
+    if(!bits.length)bits=['CareSource','Passport','Other'];
+    var n=Array.isArray(report.aides)?report.aides.length:0;
+    return n+' '+(n===1?'aide':'aides')+' \u00B7 '+bits.join(' \u00B7 ');
+  }
+  var names=[];
+  (report.aides||[]).forEach(function(aide){
+    var who=String(aide.aide_name||aide.name||'').trim();
+    var client=String(aide.permanent_client_name||aide.client_name||'').trim();
+    var bit=[who, client].filter(Boolean).join(' \u00B7 ');
+    if(bit)names.push(bit);
+  });
+  if(!names.length)return 'timesheets only';
+  return names.join(', ')+' only';
+}
+function remiPayrollIns1Who(){
+  var role='Admin';
+  try{if(currentAdminRole)role=String(currentAdminRole);}catch(e){}
+  var name='';
+  try{name=String((typeof currentAdminName!=='undefined'&&currentAdminName)||'').trim();}catch(e2){}
+  if(!name){
+    try{name=String((typeof currentAdminUsername!=='undefined'&&currentAdminUsername)||'').trim();}catch(e3){}
+  }
+  if(name&&name.indexOf('@')<0)return name+' \u00B7 '+role;
+  return role;
+}
+function remiPayrollIns1PageHtml(){
+  var report=(typeof remiPayroll1Report!=='undefined'&&remiPayroll1Report)?remiPayroll1Report:{};
+  var stats=typeof remiPayroll1Stats==='function'?remiPayroll1Stats(report):{aides:0, paid_hours:'0.00', flags:0};
+  var counts=remiPayrollIns1Counts(report);
+  var plan=remiPayrollIns1Normalize(remiPayrollIns1Plan);
+  var label=remiPayrollIns1ActiveLabel();
+  var head=plan==='all'?'All insurers':label;
+  var startDisp=report.start_date_display||(typeof remiPayroll1Mdy==='function'?remiPayroll1Mdy(remiPayroll1Start):'');
+  var endDisp=report.end_date_display||(typeof remiPayroll1Mdy==='function'?remiPayroll1Mdy(remiPayroll1End):'');
+  var range=(startDisp&&endDisp)?(startDisp+' \u2013 '+endDisp):'Last 2 weeks';
+  var scope=plan==='all'?'all insurers':(label+' only');
+  var aides=Array.isArray(report.aides)?report.aides:[];
+  var html='<div class="pay-report ins1-page" id="remiPayrollIns1" data-remi-payroll-ins1="'+REMI_PAYROLL_INS1_MARKER+'" data-surface="own-page">';
+  html+='<span class="ins1-who">'+remiPayroll1Esc(remiPayrollIns1Who())+'</span>';
+  html+='<div class="page-hdr"><div><h1>Payroll report</h1>';
+  html+='<p class="pay-meta">'+remiPayroll1Esc(range+' \u00B7 '+scope+' \u00B7 collapsed')+'</p></div>';
+  html+='<div class="ins1-badges"><span class="pay-badge">America/New_York</span></div></div>';
+  html+=remiPayrollIns1FilterHtml('page');
+  html+='<div class="pay-stats">';
+  html+='<div class="pay-stat"><div class="lbl">Aides</div><div class="val">'+remiPayroll1Esc(String(stats.aides))+'</div></div>';
+  html+='<div class="pay-stat"><div class="lbl">Paid hours</div><div class="val">'+remiPayroll1Esc(String(stats.paid_hours))+'</div></div>';
+  html+='<div class="pay-stat"><div class="lbl">Insurers</div><div class="val">'+remiPayroll1Esc(String(counts.insurers))+'</div></div>';
+  html+='<div class="pay-stat"><div class="lbl">Clients</div><div class="val">'+remiPayroll1Esc(String(counts.clients))+'</div></div>';
+  html+='</div>';
+  html+='<div class="ins1-list-label"><h2>Timesheets \u00B7 '+remiPayroll1Esc(head)+'</h2><span class="count">'+remiPayroll1Esc(remiPayrollIns1ScopeLine(report))+'</span></div>';
+  if(typeof remiPayroll1Error!=='undefined'&&remiPayroll1Error)html+='<p class="remi-vis-hint">'+remiPayroll1Esc(remiPayroll1Error)+'</p>';
+  if(typeof remiPayroll1Note!=='undefined'&&remiPayroll1Note)html+='<p class="remi-vis-hint">'+remiPayroll1Esc(remiPayroll1Note)+'</p>';
+  html+='<div class="pay-actions">';
+  html+='<button type="button" class="go" id="remiPayrollIns1Run" onclick="remiPayroll1Run()">Run</button>';
+  html+='<button type="button" class="alt" id="remiPayrollIns1Csv" onclick="remiPayroll1Export(\'csv\')">CSV</button>';
+  html+='<button type="button" class="alt" id="remiPayrollIns1Pdf" onclick="remiPayroll1Export(\'pdf\')">PDF</button>';
+  html+='<button type="button" class="alt" id="remiPayrollIns1Both" onclick="remiPayroll1Export(\'both\')">Both</button>';
+  html+='</div>';
+  if(Number(stats.flags)){
+    html+='<div class="pay-actions"><button type="button" class="alt" id="remiPayrollIns1Chase" onclick="remiPayroll1Chase()">Aide chat</button></div>';
+  }
+  if(!aides.length&&remiPayrollIns1Loaded&&!(typeof remiPayroll1Error!=='undefined'&&remiPayroll1Error))html+='<p class="remi-vis-hint">No aides in this range.</p>';
+  aides.forEach(function(aide, idx){html+=remiPayroll1AideHtml(aide, idx);});
+  html+='</div>';
+  return html;
+}
+function remiPayrollIns1PaintPage(){
+  var host=null;
+  try{host=document.getElementById('remiPayrollIns1Host');}catch(eHost){host=null;}
+  if(!host)return;
+  remiPayrollIns1EnsureChips();
+  host.innerHTML=remiPayrollIns1PageHtml();
+}
+function remiPayrollIns1CapturePaint(){
+  if(!remiPayrollIns1PageOn())return false;
+  if(!remiPayrollIns1IsDesktop()){
+    var sheet=null;
+    try{sheet=document.getElementById('copilotSheet');}catch(eSheet){}
+    if(sheet&&sheet.hidden===false)return false;
+  }
+  remiPayrollIns1PaintPage();
+  return true;
+}
+async function remiPayrollIns1Load(){
+  if(!remiPayrollIns1AdminOk())return {ok:false, forbidden:true, error:'Payroll insurance filter is Admin only.'};
+  remiPayrollIns1PaintPage();
+  await remiPayrollIns1LoadChips();
+  var got=null;
+  if(typeof remiPayroll1Rpc==='function'&&typeof remiPayroll1DateBody==='function'){
+    got=await remiPayroll1Rpc('admin_get_remi_payroll_report', remiPayroll1DateBody());
+  }
+  if(!got||!got.ok){
+    if(typeof remiPayroll1Error!=='undefined')remiPayroll1Error=(got&&got.error)||'Could not load the payroll report.';
+  }else{
+    remiPayroll1Error='';
+    if(typeof remiPayroll1Apply==='function')remiPayroll1Apply(got.data, false);
+  }
+  remiPayrollIns1Loaded=true;
+  remiPayrollIns1PaintPage();
+  return got||{ok:false};
+}
+function remiPayrollIns1OnShow(){
+  var pending=remiPayrollIns1Load();
+  remiPayrollIns1Shown=pending;
+  return pending;
+}
+function remiPayrollIns1OpenPage(){
+  if(!remiPayrollIns1AdminOk())return Promise.resolve({ok:false, forbidden:true, error:'Payroll insurance filter is Admin only.'});
+  if(typeof copilotClose==='function'){
+    try{copilotClose();}catch(eClose){}
+  }
+  if(typeof showTab==='function')showTab('payroll');
+  return remiPayrollIns1Shown||Promise.resolve({ok:true});
+}
+function remiPayrollIns1FromRail(){
+  if(remiPayrollIns1PreferPage())return remiPayrollIns1OpenPage();
+  if(typeof remiPayroll1Show==='function')return remiPayroll1Show();
+  return {ok:false};
+}
+async function remiPayrollIns1SetPlan(plan){
+  if(!remiPayrollIns1AdminOk())return {ok:false, forbidden:true, error:'Payroll insurance filter is Admin only.'};
+  remiPayrollIns1Plan=remiPayrollIns1Normalize(plan);
+  if(typeof remiPayroll1OpenMap!=='undefined')remiPayroll1OpenMap={};
+  if(remiPayrollIns1PageOn())return remiPayrollIns1Load();
+  if(typeof remiPayroll1Load==='function')return remiPayroll1Load();
+  return {ok:true};
+}
+function remiPayrollIns1PlanFromText(q){
+  var low=String(q||'').toLowerCase();
+  if(!/\bpayroll\b|\btimesheets?\b|\binsurer\b/.test(low))return '';
+  if(/\bcaresource\b|\bcare\s*source\b/.test(low))return 'caresource';
+  if(/\bpassport\b/.test(low))return 'passport';
+  if(/\bself[-\s]?pay\b/.test(low)||/\bother\b/.test(low))return 'other';
+  if(/\ball insurers\b|\ball timesheets\b/.test(low))return 'all';
+  return '';
+}
+function remiPayrollIns1FromAsk(q){
+  if(!remiPayrollIns1AdminOk())return null;
+  var plan=remiPayrollIns1PlanFromText(q);
+  if(!plan)return null;
+  var names={all:'All', caresource:'CareSource', passport:'Passport', other:'Other'};
+  var label=names[plan]||'All';
+  var text=plan==='all'?'Showing all insurers. Tap a chip to filter.':'Showing '+label+' only. Clear the filter anytime.';
+  return {sec:true, kind:'', text:text, actions:[], ins1Plan:plan, payroll:{chip:plan==='all'?'All insurers':'Filtered', sent:true, draft:null, error:''}};
+}
+async function remiPayrollIns1ApplyAsk(plan){
+  if(!remiPayrollIns1AdminOk())return {ok:false, forbidden:true};
+  remiPayrollIns1Plan=remiPayrollIns1Normalize(plan);
+  if(typeof remiPayroll1OpenMap!=='undefined')remiPayroll1OpenMap={};
+  if(remiPayrollIns1PreferPage())return remiPayrollIns1OpenPage();
+  if(typeof remiPayroll1Show==='function')return remiPayroll1Show();
+  return {ok:true};
+}
+function remiPayrollIns1ApplyRoleGate(){
+  if(remiPayrollIns1AdminOk())return;
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(eRole){role='';}
+  if(!role)return;
+  var page=null;
+  try{page=document.getElementById('tab_payroll');}catch(ePage){page=null;}
+  var onPayroll=!!(page&&page.classList&&page.classList.contains('active'));
+  if(page){
+    page.setAttribute('hidden','');
+    if(page.classList)page.classList.remove('active');
+  }
+  var host=null;
+  try{host=document.getElementById('remiPayrollIns1Host');}catch(eHost){host=null;}
+  if(host)host.innerHTML='';
+  var sheet=null;
+  try{sheet=document.getElementById('copilotSheet');}catch(eSheet){sheet=null;}
+  if(sheet&&sheet.querySelectorAll){
+    var nodes=sheet.querySelectorAll('.ins1-chips,.ins1-chip,.ins1-clear,.ins1-scope,.ins1-filter,.ins1-tag,#remiPayrollIns1OpenFull');
+    var list=[];
+    for(var i=0;i<nodes.length;i++)list.push(nodes[i]);
+    list.forEach(function(n){if(n&&n.parentNode)n.parentNode.removeChild(n);});
+  }
+  if(onPayroll&&typeof showTab==='function')showTab('timesheets');
+}
+// end remi payroll ins1 v=remi-payroll-ins1
 
 // remi proof1 v=remi-proof1
 // Receipts stay in this rail. Finalize is additive after admin_confirm_cover_send. Blast and confirm stay.
