@@ -120,6 +120,31 @@ const ALL_YES = {
   rest: [{rank: 1, aide_id: DEVON, name: 'Devon', same_day_yes_30d: 8, miles: 2.1, is_float: true}],
   float_pool: []
 };
+const PROBE_A = '44444444-4444-4444-8444-444444444461';
+const PROBE_B = '44444444-4444-4444-8444-444444444462';
+const PROBE_C = '44444444-4444-4444-8444-444444444463';
+const PROBE_SHOT = {
+  client_name: 'ProbeHold HC1kgaxcu',
+  shift_start: '2026-09-28T12:00:00.000Z',
+  shift_end: '2026-09-28T16:00:00.000Z',
+  ranked: [],
+  float_pool: [],
+  hide_float_ui: true,
+  rest: [
+    {rank: 1, aide_id: PROBE_A, name: 'CancelAide kcbipc', same_day_yes_30d: 0, is_float: true},
+    {rank: 2, aide_id: PROBE_B, name: 'Fh1Devon kd302d', same_day_yes_30d: 0, is_float: true},
+    {rank: 3, aide_id: PROBE_C, name: 'RestAide zero', same_day_yes_30d: 0, is_float: false}
+  ]
+};
+const PROBE_SHADOW = {
+  client_name: 'ProbeHold HC1kgaxcu',
+  shift_start: '2026-09-28T12:00:00.000Z',
+  shift_end: '2026-09-28T16:00:00.000Z',
+  ranked: [],
+  rest: [{rank: 1, aide_id: PROBE_B, name: 'Fh1Devon kd302d', same_day_yes_30d: 0, is_float: false}],
+  aides: [{rank: 1, aide_id: PROBE_B, name: 'Fh1Devon kd302d', same_day_yes_30d: 8, miles: 2.1, is_float: false}],
+  float_pool: []
+};
 const RESCUE_CARD = {
   id: RESCUE,
   status: 'pending',
@@ -194,8 +219,8 @@ function runSlice(){
   const mixed = sandbox.remiFloatHide1Split(REST_MIXED);
   assert.strictEqual(mixed.hide_float_ui, true);
   assert.strictEqual(mixed.float_pool.length, 0);
-  assert.strictEqual(mixed.ranked.map(function(row){return row.name;}).join('|'), 'Devon|Lina|Sara|PoolYes');
-  assert.strictEqual(mixed.rest.map(function(row){return row.name;}).join('|'), 'Jamal|Aisha|PoolZero');
+  assert.strictEqual(mixed.ranked.map(function(row){return row.name;}).join('|'), 'Devon|Lina|Sara|PoolYes|PoolZero');
+  assert.strictEqual(mixed.rest.map(function(row){return row.name;}).join('|'), 'Jamal|Aisha');
   assert.ok(mixed.ranked.concat(mixed.rest).every(function(row){return row.is_float === false;}));
 
   sandbox.remiFloat1Rank = RANK;
@@ -260,6 +285,27 @@ function runSlice(){
   assert.ok(yesTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, yesOnly);
   assert.ok(yesTitles.labels.indexOf('Rest of list') < 0, yesOnly);
   assert.ok(yesOnly.indexOf('Float pool') < 0, yesOnly);
+
+  sandbox.remiFloat1Rank = PROBE_SHOT;
+  sandbox.remiFloat1ShiftId = SHIFT;
+  const probeCard = sandbox.remiFloat1FloatHtml();
+  const probeTitles = titles(probeCard);
+  assert.ok(probeTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, 'probe rest-only list must still paint Ranked');
+  assert.ok(probeTitles.labels.indexOf('Rest of list') >= 0, probeCard);
+  assert.ok(!(probeTitles.labels.length === 1 && probeTitles.labels[0] === 'Rest of list'), probeCard);
+  assert.ok(probeCard.indexOf('Float pool') < 0, probeCard);
+  assert.ok(probeCard.indexOf('Ranked \u00b7 same-day yes / 30d') < probeCard.indexOf('CancelAide kcbipc'), probeCard);
+  assert.ok(probeCard.indexOf('CancelAide kcbipc') < probeCard.indexOf('Rest of list'), probeCard);
+  assert.ok(probeCard.indexOf('Rest of list') < probeCard.indexOf('RestAide zero'), probeCard);
+  assert.ok(probeCard.indexOf('0 same-day yes') >= 0, probeCard);
+
+  sandbox.remiFloat1Rank = PROBE_SHADOW;
+  const shadowCard = sandbox.remiFloat1FloatHtml();
+  const shadowTitles = titles(shadowCard);
+  assert.ok(shadowTitles.labels.indexOf('Ranked \u00b7 same-day yes / 30d') >= 0, shadowCard);
+  assert.ok(shadowTitles.labels.indexOf('Rest of list') < 0, 'a higher same-day yes on aides must leave Rest');
+  assert.ok(shadowCard.indexOf('8 same-day yes') >= 0, shadowCard);
+  assert.ok(shadowCard.indexOf('Float pool') < 0, shadowCard);
   sandbox.remiFloat1Rank = RANK;
 
   const legacy = '<span class="remi-fn-chip">Float pool</span><div class="remi-fn-label">Float pool</div><span class="remi-fn-tag">Float</span><button>Blast float pool</button><p>Ranked aides \u2014 no separate Float pool block. Float pool UI removed from Remi.</p><div class="remi-fn-gone">No \u201cFloat pool\u201d chip</div>';
