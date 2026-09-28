@@ -35,7 +35,8 @@ assert.ok(html.includes('hold-client1'), 'explicit Save hold stays on the hold-c
 assert.ok(html.includes('id="copilotFab"'), 'Remi corner chip stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 assert.ok(html.includes('No Quo/SMS'), 'no Quo/SMS');
-const holdTip = html.slice(html.indexOf('GHOST-HOLD-AUTOSAVE1-CONTRACT-v1'), html.indexOf('GHOST-AIDES-INFO1-CONTRACT-v1'));
+const holdTipStart = html.indexOf('GHOST-HOLD-AUTOSAVE1-CONTRACT-v1');
+const holdTip = html.slice(holdTipStart, html.indexOf('-->', holdTipStart));
 assert.ok(holdTip.includes('No Auth reseal') && !holdTip.includes('mossier'), 'hold-autosave1 does not reseal auth');
 assert.ok(!html.includes('af44b579-5881-46ea-8cb8-83a33c0af200'), 'does not auto-clear Bowlax');
 
