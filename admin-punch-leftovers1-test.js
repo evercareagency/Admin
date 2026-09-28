@@ -52,4 +52,18 @@ assert.ok(!ensure.includes("fallback.days['1']"), 'does not invent Monday of the
 assert.ok(!ensure.includes('schedSlotSelected={'), 'does not invent a client or day');
 assert.ok(ensure.includes('schedSlotSelected=null'), 'an invalid leftover selection is dropped');
 
+assert.ok(html.includes('More desks stick'), 'more desks stay open');
+assert.ok(html.includes('an empty hash does not reset the open desk'), 'empty hash is not a home bounce');
+assert.ok(html.includes('function layoutA1HashTab()'), 'hash names the desk');
+assert.ok(html.includes('function layoutA1DeskAllowed(tab, role)'), 'role gate is shared');
+assert.ok(html.includes('function layoutA1RememberTab(tab)'), 'showTab writes the desk hash');
+assert.ok(html.includes('function layoutA1RevealRoute()'), 'boot opens the hashed desk');
+assert.ok(html.includes('function layoutA1OnHash()'), 'hash changes open that desk');
+assert.ok(html.includes('if(!tab)return;'), 'an empty hash does not pick a desk');
+assert.ok(html.includes("if(typeof layoutA1RememberTab==='function')layoutA1RememberTab(tab);"), 'leaving a desk records it');
+assert.ok(html.includes("if(typeof layoutA1RevealRoute==='function')layoutA1RevealRoute();"), 'portal home reveals the route');
+assert.ok(html.includes('if(routed&&layoutA1DeskAllowed(routed, role))home=routed'), 'a lost allowed desk is restored from the hash');
+assert.ok(html.includes("if(home==='timesheets')showTab('timesheets');"), 'a forbidden desk still returns to Timesheets');
+assert.ok(html.includes('tab===\'schedule\'&&/client_id=/.test(cur)&&/on_date=/.test(cur)'), 'a schedule deep link hash is left intact');
+
 console.log('admin-punch-leftovers1 unit ok');
