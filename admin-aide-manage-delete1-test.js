@@ -356,6 +356,8 @@ const clientRun = extractFn(html, 'async function clientManageDelete1Run()');
 assert.ok(clientRun.includes("apiPost({action:'archive_client', clientId:id, id:id})"), 'Clients bulk reuses archive_client');
 assert.ok(clientRun.includes('for(i=0;i<picks.length;i++)'), 'one archive call per selected client');
 assert.ok(clientRun.includes('res.is_active===false'), 'archive success is is_active false');
+assert.ok(clientRun.includes('sbSoftUnassignClient(id)'), 'confirmed archive also soft-unassigns that client');
+assert.ok(clientRun.includes("String(res.id||res.clientId||'')===String(id)"), 'archive is verified by the selected id');
 assert.ok(clientRun.includes('renderClients(true)'), 'Clients list refreshes');
 assert.ok(clientRun.includes("cacheInvalidate('get_clients')"), 'Clients cache drops');
 assert.ok(!/reset_aide_temp_password|reseal|mossier|admin_deactivate_client|sbRestRpc|method:\s*'DELETE'|DELETE\s+FROM/.test(clientRun), 'Clients bulk never reseals, hard-deletes, or invents a client RPC');
@@ -366,6 +368,15 @@ const clientOpen = extractFn(html, 'function clientManageDelete1OpenConfirm()');
 assert.ok(clientOpen.includes('clientManageSure'), 'Clients confirm reveals the page heading');
 assert.ok(clientOpen.includes("'Delete 1 client?'") && clientOpen.includes("'Delete '+n+' clients?'"), 'client count copy');
 assert.ok(!extractFn(html, 'function clientManageDelete1UnselectAll()').includes('apiPost'), 'client unselect does not post');
+const unassignClient = extractFn(html, 'async function sbSoftUnassignClient(clientId)');
+assert.ok(unassignClient.includes("['client_id','eq.'+id]") && unassignClient.includes("['is_active','eq.true']"), 'assignment soft-unassign filters client_id and active rows');
+assert.ok(unassignClient.includes('{is_active:false}'), 'assignment update is is_active false');
+assert.ok(!/method:\s*'DELETE'|DELETE\s+FROM/.test(unassignClient), 'assignment unassign is not a hard DELETE');
+const restoreClient = extractFn(html, 'async function sbAdminRestoreClient(payload)');
+assert.ok(restoreClient.includes("{is_active:true}") && restoreClient.includes("['select','id,is_active']"), 'client restore is PATCH is_active true verified by id select');
+assert.ok(!/sbRestRpc|admin_restore_client|admin_deactivate_client/.test(restoreClient), 'client restore is not an RPC');
+assert.ok(html.includes('function restoreClient(id)') && html.includes('↺ Restore</button>'), 'Recently deleted clients can restore');
+assert.ok(html.includes("action:'restore_client'"), 'restore posts restore_client');
 
 const cchecks = [node('cc1'), node('cc2')];
 cchecks[0].attrs = {'data-client-key':'id:c1', 'data-client-id':'c1'};
@@ -390,6 +401,7 @@ cels.tab_clients.classList.add('client-manage-on');
 cels.clientManageSure.scrollIntoView = function(){};
 const cposts = [];
 const ctoasts = [];
+const cunassign = [];
 const cnames = [
   'function clientManageDelete1Key(client)',
   'function clientManageDelete1Active()',
@@ -427,6 +439,10 @@ const cbox = {
   apiPost: async function(payload){
     cposts.push(JSON.parse(JSON.stringify(payload)));
     return {success: true, is_active: false, id: payload.id};
+  },
+  sbSoftUnassignClient: async function(id){
+    cunassign.push(id);
+    return {ok: true, data: []};
   }
 };
 vm.createContext(cbox);
@@ -455,6 +471,7 @@ await cbox.clientManageDelete1Run();
 assert.strictEqual(cposts.length, 2);
 assert.deepStrictEqual(cposts[0], {action:'archive_client', clientId:'c1', id:'c1'});
 assert.deepStrictEqual(cposts[1], {action:'archive_client', clientId:'c2', id:'c2'});
+assert.deepStrictEqual(cunassign, ['c1', 'c2']);
 assert.ok(/2 clients moved to Recently deleted/.test(ctoasts[0].msg));
 
 const tsPanel = html.slice(html.indexOf('id="tab_timesheets"'), html.indexOf('id="tab_payroll"'));

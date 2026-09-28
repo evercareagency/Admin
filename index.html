@@ -18,7 +18,7 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
-<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. The client loop posts archive_client once per id (same dispatcher as delete_client) through sbAdminArchiveClient, which PATCH is_active=false. No new client RPC. No admin_deactivate_client call until Ace tips that name. No client Restore is invented. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at. Not archive-only. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
+<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. Ace tip 2026-09-28: no admin_deactivate_client RPC and no Ace patch. The client loop posts archive_client once per id through sbAdminArchiveClient, which PATCH clients is_active=false and selects id, is_active. After that row confirms, the same id soft-unassigns active assignments (PATCH assignments is_active=false where client_id and is_active true). Never hard-DELETE. Restore on Recently deleted is PATCH clients is_active=true, not a restore RPC, and it does not turn assignments back on. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at. Not archive-only. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-28-aide-manage-delete1">
 <script>var AIDE_MANAGE_DELETE1_MARKER='v=aide-manage-delete1';var AIDE_MANAGE_DELETE1_BUILD='2026-09-28-aide-manage-delete1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -28772,7 +28772,7 @@ function sbIsAdminWriteAction(action){
     ||action==='reset_password'||action==='set_password'
     ||action==='admin_deactivate_aide'||action==='admin_restore_aide'
     ||action==='add_client'||action==='update_client'
-    ||action==='archive_client'||action==='delete_client'
+    ||action==='archive_client'||action==='delete_client'||action==='restore_client'
     ||action==='update'||action==='send_correction'||action==='delete'
     ||action==='restore_timesheet'||action==='trash_timesheet'||action==='restore_trashed_timesheet';
 }
@@ -29311,6 +29311,24 @@ async function sbSoftUnassign(aideId, clientId){
     ['org_id','eq.'+sbOrgId()]
   ],{is_active:false},'return=representation');
 }
+// v=aide-manage-delete1 — Ace tip: one PATCH for every active assignment on this client. Not a hard DELETE.
+async function sbSoftUnassignClient(clientId){
+  var id=String(clientId||'').trim();
+  if(!id)return {ok:false,error:'No clientId for this row.'};
+  var got=await sbRestMutate('PATCH','assignments',[
+    ['client_id','eq.'+id],
+    ['is_active','eq.true'],
+    ['org_id','eq.'+sbOrgId()],
+    ['select','id,is_active']
+  ],{is_active:false},'return=representation');
+  if(!got.ok)return got;
+  var rows=Array.isArray(got.data)?got.data:(got.data?[got.data]:[]);
+  var i;
+  for(i=0;i<rows.length;i++){
+    if(!rows[i]||rows[i].is_active!==false)return {ok:false,error:'Unassign was not confirmed',data:got.data};
+  }
+  return {ok:true,data:rows};
+}
 async function sbActiveAssignmentRows(clientId){
   var got=await sbRestGet('assignments',[
     ['select','id,aide_id,is_active,aide:aides(id,username)'],
@@ -29683,6 +29701,20 @@ async function sbAdminArchiveClient(payload){
   confirmed.clientId=confirmed.id;
   return confirmed;
 }
+async function sbAdminRestoreClient(payload){
+  var id=String((payload&&(payload.clientId||payload.id))||'').trim();
+  if(!id)return {success:false,error:'No clientId for this row.'};
+  var got=await sbRestMutate('PATCH','clients',[
+    ['id','eq.'+id],
+    ['select','id,is_active']
+  ],{is_active:true},'return=representation');
+  if(!got.ok)return {success:false,error:got.error||'Could not restore client.',httpStatus:got.status||0,is_active:null};
+  var row=sbArchiveRepresentation(got.data);
+  if(!row||row.is_active!==true||String(row.id||'')!==id){
+    return {success:false,error:'Restore was not confirmed',is_active:row&&typeof row.is_active==='boolean'?row.is_active:null,id:row&&row.id||null};
+  }
+  return {success:true,id:row.id,clientId:row.id,is_active:true};
+}
 async function sbAdminUpdateTimesheet(payload){
   var id=String((payload&&payload.id)||'').trim();
   if(!id)return {success:false,error:'Timesheet id missing.'};
@@ -29780,6 +29812,7 @@ async function sbAdminWriteDispatch(payload){
     if(action==='add_client')return await sbAdminAddClient(payload);
     if(action==='update_client')return await sbAdminUpdateClient(payload);
     if(action==='archive_client'||action==='delete_client')return await sbAdminArchiveClient(payload);
+    if(action==='restore_client')return await sbAdminRestoreClient(payload);
     if(action==='update')return await sbAdminUpdateTimesheet(payload);
     if(action==='send_correction')return await sbAdminSendCorrection(payload);
     if(action==='restore_timesheet')return await sbAdminRestoreTimesheet(payload);
@@ -35930,7 +35963,9 @@ function paintClients(){
     const head=typeof clientInsCardHead==='function'?clientInsCardHead(c):('<h4>'+(c.name||'')+'</h4>');
     const manageCheck=typeof clientManageDelete1CheckHtml==='function'?clientManageDelete1CheckHtml(c):'';
     const manageSel=typeof clientManageDelete1IsSelected==='function'&&clientManageDelete1IsSelected(c)?' is-selected':'';
-    const rowDelete=clientDesk==='deleted'?'':'<button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient(\''+c.id+'\')">Delete</button>';
+    const rowDelete=clientDesk==='deleted'
+      ?'<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="restoreClient(\''+c.id+'\')">↺ Restore</button>'
+      :'<button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient(\''+c.id+'\')">Delete</button>';
     var open='<div class="aide-card" data-client-ins1="v=client-ins1">'.replace('class="aide-card"','class="aide-card'+manageSel+'"');
     return open+manageCheck+`
       <div>
@@ -36260,6 +36295,27 @@ async function saveClient(){
 function deleteClient(id){
   showSharedConfirm('Delete this client? This cannot be undone.',function(){commitDeleteClient(id);},'Delete');
 }
+function restoreClient(id){
+  showSharedConfirm('Restore this client to Active?',function(){commitClientRestore(id);},'Restore');
+}
+async function commitClientRestore(id){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Restore needs the Supabase clients desk.','var(--warn)');
+    return;
+  }
+  try{
+    var data=await apiPost({action:'restore_client', id:id, clientId:id});
+    if(!(data&&data.success===true&&data.is_active===true&&String(data.id||data.clientId||'')===String(id))){
+      showTempMsg((data&&(data.error||data.message))||'Could not restore client.','var(--danger)');
+      return;
+    }
+    if(typeof cacheInvalidate==='function')cacheInvalidate('get_clients');
+    showTempMsg('Client restored.','var(--success)');
+    if(typeof renderClients==='function')renderClients(true);
+  }catch(e){
+    showTempMsg('Could not restore client.','var(--danger)');
+  }
+}
 // v=aide-manage-delete1 — Clients Manage bulk soft-delete. One existing archive call per selected id.
 var clientManageDelete1Sel={};
 var clientManageDelete1Busy=false;
@@ -36428,7 +36484,12 @@ async function clientManageDelete1Run(){
     var id=picks[i].id;
     try{
       var res=await apiPost({action:'archive_client', clientId:id, id:id});
-      if(res&&res.success===true&&res.is_active===false)ok++;
+      var stamped=res&&res.success===true&&res.is_active===false&&String(res.id||res.clientId||'')===String(id);
+      if(stamped){
+        ok++;
+        var off=await sbSoftUnassignClient(id);
+        if(!(off&&off.ok))fail=(off&&off.error)||'Could not unassign aides for this client.';
+      }
       else if(typeof aceActionError==='function')fail=aceActionError(res,null,'archive_client');
       else fail=(res&&(res.error||res.message))||'Could not archive this client.';
     }catch(e){
