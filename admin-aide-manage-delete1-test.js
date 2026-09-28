@@ -457,6 +457,131 @@ assert.deepStrictEqual(cposts[0], {action:'archive_client', clientId:'c1', id:'c
 assert.deepStrictEqual(cposts[1], {action:'archive_client', clientId:'c2', id:'c2'});
 assert.ok(/2 clients moved to Recently deleted/.test(ctoasts[0].msg));
 
+const tsPanel = html.slice(html.indexOf('id="tab_timesheets"'), html.indexOf('id="tab_payroll"'));
+assert.ok(tsPanel.indexOf('id="tsManageSure"') < tsPanel.indexOf('id="payReady"'), 'Timesheets Are you sure sits above pay readiness');
+assert.ok(tsPanel.includes('>Are you sure?</p>'), 'Timesheets page-level Are you sure');
+assert.ok(tsPanel.includes('id="tsManageBtn"') && tsPanel.includes('onclick="tsManageDelete1ToggleManage()"'), 'Timesheets Manage toggles this desk');
+assert.ok(tsPanel.includes('id="tsManageSelectAll"') && tsPanel.includes('>Select all<') && tsPanel.includes('>Unselect all<'), 'Timesheets select pair stays visible');
+assert.ok(tsPanel.indexOf('>Select all<') < tsPanel.indexOf('>Unselect all<'), 'Timesheets Select all stays beside Unselect all');
+assert.ok(tsPanel.includes('id="tsManageDeleteSelected"') && tsPanel.includes('>Delete selected<'), 'Timesheets Delete selected');
+assert.ok(tsPanel.includes('data-ts-desk="active"') && tsPanel.includes('>Archived<') && tsPanel.includes('>Recently deleted<'), 'Timesheets desks stay');
+assert.ok(tsPanel.includes('id="payReadyExport"') && tsPanel.includes('id="exportAllPdfsBtn"'), 'payready and pdf desk stay');
+assert.ok(!tsPanel.includes('Manage ON'), 'no Timesheets Manage ON badge');
+const tsSheet = html.slice(html.indexOf('id="tsManageConfirm"'), html.indexOf('id="tab_payroll"'));
+assert.ok(tsSheet.includes('They move to Recently deleted.'), 'Timesheets recently deleted copy');
+assert.ok(tsSheet.includes('id="tsManageConfirmGo"') && tsSheet.includes('>Delete selected<'), 'Timesheets primary Delete selected');
+assert.ok(!tsSheet.includes('>Are you sure?<'), 'Timesheets Are you sure is not only the sheet title');
+const tsRun = extractFn(html, 'async function tsManageDelete1Run()');
+assert.ok(tsRun.includes("apiPost({action:'trash_timesheet', id:id})"), 'Timesheets bulk reuses trash_timesheet');
+assert.ok(tsRun.includes('for(i=0;i<picks.length;i++)'), 'one trash call per selected timesheet');
+assert.ok(tsRun.includes('res.is_active===false&&res.deleted_at'), 'trash success needs is_active false and deleted_at');
+assert.ok(tsRun.includes('renderTimesheets()'), 'Timesheets list refreshes');
+assert.ok(tsRun.includes("cacheInvalidate('get_all')"), 'Timesheets cache drops');
+assert.ok(!/reset_aide_temp_password|reseal|mossier|action:\s*'delete'|sbAdminSoftDeleteTimesheet|sbRestRpc|method:\s*'DELETE'|DELETE\s+FROM/.test(tsRun), 'Timesheets bulk never reseals, hard-deletes, or archives without deleted_at');
+assert.ok(extractFn(html, 'function quickDelete(id)').includes("showSharedConfirm('Archive this timesheet?'"), 'single archive confirm stays');
+assert.ok(html.includes("action:'restore_trashed_timesheet'"), 'existing trash restore stays');
+const tsOpen = extractFn(html, 'function tsManageDelete1OpenConfirm()');
+assert.ok(tsOpen.includes('tsManageSure'), 'Timesheets confirm reveals the page heading');
+assert.ok(tsOpen.includes("'Delete 1 timesheet?'") && tsOpen.includes("'Delete '+n+' timesheets?'"), 'timesheet count copy');
+assert.ok(!extractFn(html, 'function tsManageDelete1UnselectAll()').includes('apiPost'), 'timesheet unselect does not post');
+const paintFn = html.slice(html.indexOf('function paintTimesheets'), html.indexOf('function layoutA1BackupFail'));
+assert.ok(paintFn.includes('class="ts-card-top"><strong>${aideShown}'), 'timesheet card strong stays the aide name');
+assert.ok(paintFn.includes('class="ts-card-sub">${clientShown'), 'timesheet card subtitle stays');
+
+const tchecks = [node('tc1'), node('tc2')];
+tchecks[0].attrs = {'data-ts-key':'id:t1', 'data-ts-id':'t1'};
+tchecks[1].attrs = {'data-ts-key':'id:t2', 'data-ts-id':'t2'};
+tchecks.forEach(function(el){
+  el.closest = function(sel){return sel === 'article.ts-card' ? el.card : null;};
+  el.card = {classList: classList()};
+});
+const tels = {
+  tab_timesheets: node('tab_timesheets'),
+  tsManageBar: node('tsManageBar'),
+  tsManageCount: node('tsManageCount'),
+  tsManageDeleteSelected: node('tsManageDeleteSelected'),
+  tsManageSure: node('tsManageSure'),
+  tsManageConfirm: node('tsManageConfirm'),
+  tsManageConfirmTitle: node('tsManageConfirmTitle'),
+  tsManageConfirmGo: node('tsManageConfirmGo'),
+  tsManageBtn: node('tsManageBtn'),
+  tsCards: {querySelectorAll: function(sel){return sel === 'input.aide-manage-cb' ? tchecks : [];}}
+};
+tels.tab_timesheets.classList.add('ts-manage-on');
+tels.tsManageSure.scrollIntoView = function(){};
+const tposts = [];
+const ttoasts = [];
+const tnames = [
+  'function tsManageDelete1Key(rec)',
+  'function tsManageDelete1Active()',
+  'function tsManageDelete1IsSelected(rec)',
+  'function tsManageDelete1CheckHtml(rec)',
+  'function tsManageDelete1Boxes()',
+  'function tsManageDelete1Toggle(el)',
+  'function tsManageDelete1Picks()',
+  'function tsManageDelete1PaintCount()',
+  'function tsManageDelete1SelectAll()',
+  'function tsManageDelete1UnselectAll()',
+  'function tsManageDelete1Clear()',
+  'function tsManageDelete1OpenConfirm()',
+  'function tsManageDelete1CloseConfirm()',
+  'function tsManageDelete1Sync()',
+  'function tsManageDelete1OnDesk()',
+  'function tsManageDelete1ToggleManage()',
+  'function tsManageDelete1Bind()',
+  'async function tsManageDelete1Run()'
+];
+const tsrc = ["var tsManageDelete1Sel={};", "var tsManageDelete1Busy=false;"].concat(tnames.map(function(sig){return extractFn(html, sig);})).join('\n');
+const tbox = {
+  tsDesk: 'active',
+  currentAdminRole: 'Admin',
+  tsManageDelete1Sel: {},
+  tsManageDelete1Busy: false,
+  document: {getElementById: function(id){return tels[id] || null;}, addEventListener: function(){}},
+  canManageAides: function(){return tbox.currentAdminRole === 'Admin' || tbox.currentAdminRole === 'Scheduler';},
+  evercareSbEnabled: function(){return true;},
+  escapeAttr: function(s){return String(s == null ? '' : s);},
+  showTempMsg: function(msg, color){ttoasts.push({msg: msg, color: color});},
+  cacheInvalidate: function(){},
+  renderTimesheets: async function(){},
+  aceActionError: function(data, err){return (data && data.error) || (err && err.message) || 'Request failed.';},
+  apiPost: async function(payload){
+    tposts.push(JSON.parse(JSON.stringify(payload)));
+    if(payload && payload.id === 't2') return {success: true, is_active: false};
+    return {success: true, is_active: false, deleted_at: '2026-09-28T12:00:00Z', id: payload.id};
+  }
+};
+vm.createContext(tbox);
+vm.runInContext(tsrc, tbox);
+assert.ok(tbox.tsManageDelete1CheckHtml({id:'t1', empName:'Andre'}).includes('aria-label="Select Andre"'));
+tbox.currentAdminRole = 'Nurse';
+assert.strictEqual(tbox.tsManageDelete1CheckHtml({id:'t1', empName:'Andre'}), '', 'Nurse timesheet rows have no checkbox');
+tbox.currentAdminRole = 'Admin';
+tbox.tsDesk = 'deleted';
+assert.strictEqual(tbox.tsManageDelete1CheckHtml({id:'t1', empName:'Andre'}), '', 'Recently deleted timesheets have no checkbox');
+tbox.tsDesk = 'archived';
+assert.strictEqual(tbox.tsManageDelete1CheckHtml({id:'t1', empName:'Andre'}), '', 'Archived timesheets have no checkbox');
+tbox.tsDesk = 'active';
+tbox.tsManageDelete1Sync();
+tbox.tsManageDelete1SelectAll();
+assert.strictEqual(tbox.tsManageDelete1Picks().length, 2);
+assert.strictEqual(tposts.length, 0, 'timesheet select all does not post');
+tbox.tsManageDelete1UnselectAll();
+assert.strictEqual(tbox.tsManageDelete1Picks().length, 0);
+tchecks[0].checked = true;
+tbox.tsManageDelete1Toggle(tchecks[0]);
+tchecks[1].checked = true;
+tbox.tsManageDelete1Toggle(tchecks[1]);
+tbox.tsManageDelete1OpenConfirm();
+assert.strictEqual(tels.tsManageSure.hidden, false);
+assert.strictEqual(tels.tsManageConfirmTitle.textContent, 'Delete 2 timesheets?');
+await tbox.tsManageDelete1Run();
+assert.strictEqual(tposts.length, 2);
+assert.deepStrictEqual(tposts[0], {action:'trash_timesheet', id:'t1'});
+assert.deepStrictEqual(tposts[1], {action:'trash_timesheet', id:'t2'});
+assert.ok(/1 timesheet moved to Recently deleted/.test(ttoasts[0].msg), 'only the stamped row counts');
+assert.ok(ttoasts[1] && ttoasts[1].msg, 'missing deleted_at is not a success');
+
 console.log('admin-aide-manage-delete1-test: ok');
 })().catch(function(err){
   console.error(err);

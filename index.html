@@ -18,7 +18,7 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
-<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. The client loop posts archive_client once per id (same dispatcher as delete_client) through sbAdminArchiveClient, which PATCH is_active=false. No new client RPC. No admin_deactivate_client call until Ace tips that name. No client Restore is invented. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
+<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. The client loop posts archive_client once per id (same dispatcher as delete_client) through sbAdminArchiveClient, which PATCH is_active=false. No new client RPC. No admin_deactivate_client call until Ace tips that name. No client Restore is invented. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Timesheets Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N timesheets? They move to Recently deleted. Primary Delete selected. The timesheet loop posts trash_timesheet once per id through sbAdminTrashTimesheet, which PATCH is_active=false and deleted_at. Not archive-only. No new timesheet RPC. Existing Restore stays. Active, Archived, and Recently deleted tabs stay. payready1, the pdf desk, list-az, and cover-desk stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-28-aide-manage-delete1">
 <script>var AIDE_MANAGE_DELETE1_MARKER='v=aide-manage-delete1';var AIDE_MANAGE_DELETE1_BUILD='2026-09-28-aide-manage-delete1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -1756,6 +1756,21 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
   #tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
   #tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer:has(.az-stage){display:block;}
 }
+/* v=aide-manage-delete1 timesheets — same Manage bar and confirm as Aides. Active desk only. */
+#tsManageSure[hidden],#tsManageBar[hidden],#tsManageConfirm[hidden]{display:none !important;}
+#tab_timesheets.ts-manage-on #tsRefreshBtn,
+#tab_timesheets.ts-manage-on #tsDeskSub{display:none !important;}
+#tab_timesheets.ts-manage-on #tsManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#tab_timesheets.ts-manage-confirming #tsManageSure{position:relative;z-index:230;background:var(--off);}
+#tab_timesheets.ts-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
+#tab_timesheets.ts-manage-confirming #tsManageBar,
+#tab_timesheets.ts-manage-confirming #payReady,
+#tab_timesheets.ts-manage-confirming .stats-grid,
+#tab_timesheets.ts-manage-confirming .card,
+#tab_timesheets.ts-manage-confirming .page-hdr{opacity:.55;}
+#tab_timesheets.ts-manage-on.ts-desk-active .aide-manage-check{display:flex;position:absolute;left:12px;top:16px;z-index:2;margin:0;}
+#tab_timesheets.ts-manage-on.ts-desk-active article.ts-card{position:relative;padding-left:44px;}
+#tab_timesheets.ts-manage-on.ts-desk-active article.ts-card.is-selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(42,127,127,.18);}
 /* v=list-az-sticky1 — sticky A–Z letter jump rail on Aides + Clients. Builds on list-az1. */
 #tab_aides .aide-info-cards:has(.az-stage),
 #tab_aides .aide-cards:has(.az-stage){max-width:none;width:100%;display:flex;flex-direction:column;}
@@ -2658,7 +2673,8 @@ bindLoginKeyboard();
     <div class="main-content">
 
       <!-- TIMESHEETS TAB -->
-      <div class="tab-panel active" id="tab_timesheets">
+      <div class="tab-panel active" id="tab_timesheets" data-aide-manage-delete1="v=aide-manage-delete1">
+        <p id="tsManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <section id="payReady" data-payready="v=payready1" data-payready1b="v=payready1b" data-payready1c="v=payready1c" data-payready1d="v=payready1d" aria-label="Pay readiness">
           <div id="payReadyListView">
             <p class="pay-week" id="payReadyWeek">Week of</p>
@@ -2692,9 +2708,10 @@ bindLoginKeyboard();
         <div class="page-hdr">
           <div><h1>Timesheets</h1><p id="tsDeskSub">Active submitted caregiver timesheets</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost" id="tsManageBtn" type="button" onclick="tsManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
             <button type="button" class="btn btn-ghost" id="remiPayrollIns1TimesheetsOpen" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1OpenPage()">Payroll report</button>
             <button class="btn btn-ghost" id="exportAllPdfsBtn" onclick="exportAllAsPDFs()">📄 Export all as PDFs</button>
-            <button class="btn btn-teal" onclick="renderTimesheets()">🔄 Refresh</button>
+            <button class="btn btn-teal" id="tsRefreshBtn" type="button" onclick="renderTimesheets()">🔄 Refresh</button>
           </div>
         </div>
         <div class="stats-grid stats-slim">
@@ -2709,12 +2726,30 @@ bindLoginKeyboard();
             <button type="button" data-ts-desk="archived" role="tab" aria-selected="false" onclick="setTimesheetDesk('archived')">Archived</button>
             <button type="button" data-ts-desk="deleted" role="tab" aria-selected="false" onclick="setTimesheetDesk('deleted')">Recently deleted</button>
           </div>
+          <div id="tsManageBar" class="aide-manage-bar" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+            <div class="aide-manage-pair" role="group" aria-label="Manage selection">
+              <button type="button" class="btn" id="tsManageSelectAll" onclick="tsManageDelete1SelectAll()">Select all</button>
+              <button type="button" class="btn" id="tsManageUnselectAll" onclick="tsManageDelete1UnselectAll()">Unselect all</button>
+            </div>
+            <button type="button" class="btn aide-manage-delete" id="tsManageDeleteSelected" onclick="tsManageDelete1OpenConfirm()" disabled>Delete selected</button>
+            <div class="aide-manage-count" id="tsManageCount">0 selected</div>
+          </div>
           <div class="search-bar"><input type="text" id="tsSearch" placeholder="🔍 Search by aide, client or week..." oninput="paintTimesheets()"></div>
           <div id="tsCards" class="ts-cards" aria-label="Timesheet cards"></div>
           <div class="ts-sheet" style="overflow-x:auto">
             <table class="data-table"><thead><tr><th>Submitted</th><th>Aide</th><th>Client</th><th>Week</th><th>Hours</th><th>Location</th><th>Status</th><th>PDF</th><th>Actions</th></tr></thead><tbody id="tsBody"></tbody></table>
           </div>
           <div id="tsEmpty" class="empty-state" style="display:none"><p>📭 No timesheets yet.</p></div>
+        </div>
+        <div id="tsManageConfirm" class="aide-manage-confirm" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-dim" onclick="tsManageDelete1CloseConfirm()"></div>
+          <div class="aide-manage-sheet" role="dialog" aria-modal="true" aria-labelledby="tsManageConfirmTitle">
+            <div class="aide-manage-grab" aria-hidden="true"></div>
+            <h2 id="tsManageConfirmTitle">Delete selected?</h2>
+            <p id="tsManageConfirmBody">They move to Recently deleted.</p>
+            <button type="button" class="aide-manage-go" id="tsManageConfirmGo" onclick="tsManageDelete1Run()">Delete selected</button>
+            <button type="button" class="aide-manage-cancel" id="tsManageConfirmCancel" onclick="tsManageDelete1CloseConfirm()">Cancel</button>
+          </div>
         </div>
       </div>
 
@@ -29873,6 +29908,7 @@ function setTimesheetDesk(view){
         ?'Recently deleted timesheets can be restored for 7 days. After that the nightly cleanup removes the row and its PDF.'
         :'Active submitted caregiver timesheets';
   }
+  if(typeof tsManageDelete1OnDesk==='function')tsManageDelete1OnDesk();
   renderTimesheets();
 }
 function timesheetRecordDeleted(r){
@@ -30635,6 +30671,7 @@ function paintTimesheets(){
           ?'No timesheets in Recently deleted.'
           :'📭 No timesheets yet.';
     }
+    if(typeof tsManageDelete1Sync==='function')tsManageDelete1Sync();
     return;
   }
   empty.style.display='none';
@@ -30672,7 +30709,10 @@ function paintTimesheets(){
         ${timesheetRowDeskButton(r)}
       </div></td>
     </tr>`;
-    const card=`<article class="ts-card" data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
+    const tsPick=typeof tsManageDelete1CheckHtml==='function'?tsManageDelete1CheckHtml(r):'';
+    const tsSel=typeof tsManageDelete1IsSelected==='function'&&tsManageDelete1IsSelected(r)?' is-selected':'';
+    const card=`<article class="ts-card${tsSel}" data-list-az-name="${azAttr}" data-list-az-client="${clientAttr}" data-list-az-week="${weekAttr}" data-list-usual="${usual}">
+      ${tsPick}
       <div class="ts-card-top"><strong>${aideShown}</strong>${statusBadge(r.status)}</div>
       <div class="ts-card-sub">${clientShown||'—'} · ${formatWeekLabel(weekShown)}</div>
       <div class="ts-card-meta"><span class="ts-card-hrs">${r.totalHrs||'—'}</span><span>${locSum}</span><span>${formatDateTimeLabel(r.submitted)}</span></div>
@@ -30687,6 +30727,7 @@ function paintTimesheets(){
   tbody.innerHTML=built.map(function(x){return x.row;}).join('');
   if(cards)cards.innerHTML=built.map(function(x){return x.card;}).join('');
   try{if(typeof listAz1ReorderTimesheetDom==='function')listAz1ReorderTimesheetDom();}catch(eAz){}
+  if(typeof tsManageDelete1Sync==='function')tsManageDelete1Sync();
 }
 
 
@@ -33053,6 +33094,195 @@ async function commitTimesheetTrashRestore(id){
   }catch(e){
     showTempMsg('Could not restore timesheet.','var(--danger)');
   }
+}
+
+// v=aide-manage-delete1 — Timesheets Manage bulk soft-delete. One existing trash call per selected id.
+var tsManageDelete1Sel={};
+var tsManageDelete1Busy=false;
+function tsManageDelete1Key(rec){
+  var id=String(rec&&rec.id!=null?rec.id:'').trim();
+  return id?('id:'+id):'';
+}
+function tsManageDelete1Active(){
+  var tab=document.getElementById('tab_timesheets');
+  var on=!!(tab&&tab.classList&&tab.classList.contains('ts-manage-on'));
+  var active=(typeof tsDesk==='undefined'||tsDesk==='active');
+  var can=typeof canManageAides!=='function'||canManageAides();
+  return on&&active&&!!can;
+}
+function tsManageDelete1IsSelected(rec){
+  var key=tsManageDelete1Key(rec);
+  return !!(key&&tsManageDelete1Sel[key]);
+}
+function tsManageDelete1CheckHtml(rec){
+  if(typeof tsDesk!=='undefined'&&tsDesk!=='active')return '';
+  if(typeof canManageAides==='function'&&!canManageAides())return '';
+  var key=tsManageDelete1Key(rec);
+  if(!key)return '';
+  var id=String(rec&&rec.id!=null?rec.id:'').trim();
+  var name=String((rec&&(rec.empName||rec.clientName))||'timesheet');
+  var attr=typeof escapeAttr==='function'?escapeAttr:function(s){return String(s==null?'':s);};
+  var checked=tsManageDelete1Sel[key]?' checked':'';
+  return '<label class="aide-manage-check" data-aide-manage-delete1="v=aide-manage-delete1"><input type="checkbox" class="aide-manage-cb"'+checked+' data-ts-key="'+attr(key)+'" data-ts-id="'+attr(id)+'" aria-label="Select '+attr(name)+'" onchange="tsManageDelete1Toggle(this)"></label>';
+}
+function tsManageDelete1Boxes(){
+  var root=document.getElementById('tsCards');
+  if(!root||!root.querySelectorAll)return [];
+  return Array.prototype.slice.call(root.querySelectorAll('input.aide-manage-cb'));
+}
+function tsManageDelete1Toggle(el){
+  if(!el)return;
+  var key=el.getAttribute('data-ts-key')||'';
+  if(!key)return;
+  if(el.checked)tsManageDelete1Sel[key]={id:el.getAttribute('data-ts-id')||''};
+  else delete tsManageDelete1Sel[key];
+  var card=el.closest?el.closest('article.ts-card'):null;
+  if(card&&card.classList)card.classList.toggle('is-selected', !!el.checked);
+  tsManageDelete1PaintCount();
+}
+function tsManageDelete1Picks(){
+  var out=[];
+  Object.keys(tsManageDelete1Sel).forEach(function(key){
+    var row=tsManageDelete1Sel[key];
+    if(!row)return;
+    var id=String(row.id||'').trim();
+    if(!id)return;
+    out.push({id:id});
+  });
+  return out;
+}
+function tsManageDelete1PaintCount(){
+  var n=tsManageDelete1Picks().length;
+  var el=document.getElementById('tsManageCount');
+  if(el)el.textContent=n+' selected';
+  var del=document.getElementById('tsManageDeleteSelected');
+  if(del)del.disabled=n<1||tsManageDelete1Busy===true;
+}
+function tsManageDelete1SelectAll(){
+  if(!tsManageDelete1Active())return;
+  tsManageDelete1Boxes().forEach(function(el){
+    if(el.disabled)return;
+    el.checked=true;
+    tsManageDelete1Toggle(el);
+  });
+}
+function tsManageDelete1UnselectAll(){
+  tsManageDelete1Sel={};
+  tsManageDelete1Boxes().forEach(function(el){
+    el.checked=false;
+    var card=el.closest?el.closest('article.ts-card'):null;
+    if(card&&card.classList)card.classList.remove('is-selected');
+  });
+  tsManageDelete1PaintCount();
+}
+function tsManageDelete1Clear(){
+  tsManageDelete1UnselectAll();
+  tsManageDelete1CloseConfirm();
+}
+function tsManageDelete1OpenConfirm(){
+  var n=tsManageDelete1Picks().length;
+  if(n<1||tsManageDelete1Busy)return;
+  if(!tsManageDelete1Active())return;
+  var title=document.getElementById('tsManageConfirmTitle');
+  if(title)title.textContent=n===1?'Delete 1 timesheet?':('Delete '+n+' timesheets?');
+  var sure=document.getElementById('tsManageSure');
+  if(sure)sure.hidden=false;
+  var box=document.getElementById('tsManageConfirm');
+  if(box)box.hidden=false;
+  var tab=document.getElementById('tab_timesheets');
+  if(tab&&tab.classList)tab.classList.add('ts-manage-confirming');
+  if(sure&&sure.scrollIntoView){try{sure.scrollIntoView({block:'start'});}catch(e){}}
+}
+function tsManageDelete1CloseConfirm(){
+  if(tsManageDelete1Busy)return;
+  var sure=document.getElementById('tsManageSure');
+  if(sure)sure.hidden=true;
+  var box=document.getElementById('tsManageConfirm');
+  if(box)box.hidden=true;
+  var tab=document.getElementById('tab_timesheets');
+  if(tab&&tab.classList)tab.classList.remove('ts-manage-confirming');
+}
+function tsManageDelete1Sync(){
+  var tab=document.getElementById('tab_timesheets');
+  var active=(typeof tsDesk==='undefined'||tsDesk==='active');
+  if(tab&&tab.classList)tab.classList.toggle('ts-desk-active', active);
+  var bar=document.getElementById('tsManageBar');
+  var show=tsManageDelete1Active();
+  if(bar)bar.hidden=!show;
+  if(!show)tsManageDelete1CloseConfirm();
+  var manage=document.getElementById('tsManageBtn');
+  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&active;
+  if(manage){
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
+    if(tab)manage.setAttribute('aria-pressed', tab.classList.contains('ts-manage-on')?'true':'false');
+  }
+  tsManageDelete1PaintCount();
+  tsManageDelete1Bind();
+}
+function tsManageDelete1OnDesk(){
+  tsManageDelete1Sel={};
+  tsManageDelete1CloseConfirm();
+  tsManageDelete1Sync();
+}
+function tsManageDelete1ToggleManage(){
+  var tab=document.getElementById('tab_timesheets');
+  if(!tab)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof tsDesk!=='undefined'&&tsDesk!=='active')return;
+  tab.classList.toggle('ts-manage-on');
+  var on=tab.classList.contains('ts-manage-on');
+  if(!on)tsManageDelete1Clear();
+  tsManageDelete1Sync();
+}
+function tsManageDelete1Bind(){
+  if(tsManageDelete1Bind.done)return;
+  tsManageDelete1Bind.done=true;
+  document.addEventListener('keydown', function(ev){
+    if(!ev||ev.key!=='Escape'||tsManageDelete1Busy)return;
+    var box=document.getElementById('tsManageConfirm');
+    if(!box||box.hidden)return;
+    tsManageDelete1CloseConfirm();
+  });
+}
+async function tsManageDelete1Run(){
+  if(tsManageDelete1Busy)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  var picks=tsManageDelete1Picks();
+  if(!picks.length)return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Recently deleted needs the Supabase timesheet desk.','var(--warn)');
+    return;
+  }
+  tsManageDelete1Busy=true;
+  tsManageDelete1PaintCount();
+  var go=document.getElementById('tsManageConfirmGo');
+  if(go)go.disabled=true;
+  var ok=0;
+  var fail='';
+  var i;
+  for(i=0;i<picks.length;i++){
+    var id=picks[i].id;
+    try{
+      var res=await apiPost({action:'trash_timesheet', id:id});
+      if(res&&res.success===true&&res.is_active===false&&res.deleted_at)ok++;
+      else if(typeof aceActionError==='function')fail=aceActionError(res,null,'trash_timesheet');
+      else fail=(res&&(res.error||res.message))||'Could not move timesheet to Recently deleted.';
+    }catch(e){
+      fail=(typeof aceActionError==='function')?aceActionError(null,e,'trash_timesheet'):'Could not move timesheet to Recently deleted.';
+    }
+  }
+  tsManageDelete1Busy=false;
+  if(go)go.disabled=false;
+  tsManageDelete1Sel={};
+  tsManageDelete1CloseConfirm();
+  if(typeof cacheInvalidate==='function')cacheInvalidate('get_all');
+  if(typeof showTempMsg==='function'){
+    if(ok===1)showTempMsg('1 timesheet moved to Recently deleted.','var(--success)');
+    else if(ok)showTempMsg(ok+' timesheets moved to Recently deleted.','var(--success)');
+    if(fail)showTempMsg(fail,'var(--danger)');
+  }
+  if(typeof renderTimesheets==='function')await renderTimesheets();
 }
 
 function tsPctX(x){return (Number(x)/TS_FORM_PT.sheetW*100).toFixed(4)+'%';}
