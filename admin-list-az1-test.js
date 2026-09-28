@@ -54,6 +54,9 @@ assert.ok(html.includes('listAz1Apply(open,'), 'declines / open shifts sort');
 assert.ok(html.includes('listAz1Apply(recs,'), 'timesheets and backup sort');
 assert.ok(html.includes('listAz1Apply(users,'), 'aides info cards sort');
 assert.ok(html.includes('listAz1Apply(list,'), 'clients sort');
+assert.ok(html.includes('function listAz1SchedRows(clients)'), 'slot clients go through listAz1SchedRows');
+assert.ok(html.includes('function listAz1ReorderSchedDom()'), 'schedule DOM reorder');
+assert.ok(html.includes("if(typeof listAz1On==='function'&&listAz1On())return rows;"), 'aide office sort yields to A–Z');
 
 const start = html.indexOf('// list order A–Z v=list-az1');
 const end = html.indexOf('// end list order A–Z v=list-az1');
@@ -164,5 +167,96 @@ assert.deepStrictEqual(azThreads, ['Ada', 'Zoe']);
 sandbox.listAz1Write('usual');
 const usualThreads = Array.from(sandbox.aidechatSorted(), function(t){ return t.name; });
 assert.deepStrictEqual(usualThreads, ['Zoe', 'Ada'], 'usual keeps urgent then recency');
+
+const probeClients = [
+  { id: 'q', name: 'QaHold Clientgc3oi' },
+  { id: 'p', name: 'ProbeHold HC1kgaxcu' },
+  { id: 'c', name: 'CoverCard mukk61tk' },
+  { id: 'b', name: 'Bowlax Abib' }
+];
+sandbox.listAz1Write('usual');
+assert.strictEqual(sandbox.listAz1SchedRows(probeClients), probeClients, 'usual schedule rows stay the server array');
+sandbox.listAz1Write('az');
+assert.deepStrictEqual(Array.from(sandbox.listAz1SchedRows(probeClients), function(c){ return c.name; }), [
+  'Bowlax Abib',
+  'CoverCard mukk61tk',
+  'ProbeHold HC1kgaxcu',
+  'QaHold Clientgc3oi'
+], 'A–Z reorders schedule client rows');
+assert.deepStrictEqual(probeClients.map(function(c){ return c.id; }), ['q', 'p', 'c', 'b'], 'usual source order is untouched');
+
+function fakeSchedRow(id, name, usual){
+  return {
+    attrs: { id: 'sched-row-' + id, 'data-sched-name': name, 'data-list-usual': String(usual) },
+    getAttribute: function(k){ return Object.prototype.hasOwnProperty.call(this.attrs, k) ? this.attrs[k] : null; },
+    querySelector: function(){ return null; }
+  };
+}
+const schedBody = {
+  children: [
+    fakeSchedRow('q', 'QaHold Clientgc3oi', 0),
+    fakeSchedRow('p', 'ProbeHold HC1kgaxcu', 1),
+    fakeSchedRow('c', 'CoverCard mukk61tk', 2),
+    fakeSchedRow('b', 'Bowlax Abib', 3)
+  ],
+  querySelectorAll: function(){
+    return this.children.filter(function(node){ return String(node.attrs.id || '').indexOf('sched-row-') === 0; });
+  },
+  appendChild: function(node){
+    var at = this.children.indexOf(node);
+    if(at >= 0) this.children.splice(at, 1);
+    this.children.push(node);
+  }
+};
+sandbox.document.getElementById = function(id){ return id === 'schedBody' ? schedBody : null; };
+sandbox.listAz1Write('az');
+sandbox.listAz1ReorderSchedDom();
+assert.deepStrictEqual(schedBody.children.map(function(node){ return node.attrs['data-sched-name']; }), [
+  'Bowlax Abib',
+  'CoverCard mukk61tk',
+  'ProbeHold HC1kgaxcu',
+  'QaHold Clientgc3oi'
+], 'schedule DOM rows move A–Z');
+sandbox.listAz1Write('usual');
+sandbox.listAz1ReorderSchedDom();
+assert.deepStrictEqual(schedBody.children.map(function(node){ return node.attrs.id; }), [
+  'sched-row-q',
+  'sched-row-p',
+  'sched-row-c',
+  'sched-row-b'
+], 'schedule DOM rows restore usual order');
+
+const officeSort = html.slice(html.indexOf('function aideOfficeVis1Sort'), html.indexOf('function aideOfficeVis1Node'));
+vm.runInContext(officeSort, sandbox);
+sandbox.aidechatThreads = [
+  { name: 'Langs1Fatima', id: 'fat', has_unread: true, unread: 5, urgent: false, last_at: '2026-09-27T20:00:00Z', last_message_at: '2026-09-27T20:00:00Z' },
+  { name: 'moe', id: 'moe', has_unread: false, unread: 0, urgent: true, last_at: '2026-09-27T18:00:00Z', last_message_at: '2026-09-27T18:00:00Z' },
+  { name: 'QA Probe', id: 'qa', has_unread: true, unread: 1, urgent: false, last_at: '2026-09-27T12:00:00Z', last_message_at: '2026-09-27T12:00:00Z' },
+  { name: 'Fh1Devon', id: 'dev', has_unread: false, unread: 0, urgent: false, last_at: '2026-09-01T12:00:00Z', last_message_at: '2026-09-01T12:00:00Z' },
+  { name: 'Lina', id: 'lina', has_unread: true, unread: 2, urgent: false, last_at: '2026-09-27T01:00:00Z', last_message_at: '2026-09-27T01:00:00Z' },
+  { name: 'Probe Throwaway AOV1', id: 'aov', has_unread: false, unread: 0, urgent: false, last_at: '2026-09-26T12:00:00Z', last_message_at: '2026-09-26T12:00:00Z' }
+];
+sandbox.prevSort = sandbox.aidechatSorted;
+const wrapAt = html.indexOf('var wrappedSort=function(){');
+const wrapEnd = html.indexOf('wrappedSort.__aideOffice');
+vm.runInContext(html.slice(wrapAt, wrapEnd) + '\nthis.wrappedSort=wrappedSort;', sandbox);
+sandbox.listAz1Write('az');
+assert.deepStrictEqual(Array.from(sandbox.wrappedSort(), function(t){ return t.name; }), [
+  'Fh1Devon',
+  'Langs1Fatima',
+  'Lina',
+  'moe',
+  'Probe Throwaway AOV1',
+  'QA Probe'
+], 'messages inbox is global A–Z when the office wrapper is installed');
+sandbox.listAz1Write('usual');
+assert.deepStrictEqual(Array.from(sandbox.wrappedSort(), function(t){ return t.name; }), [
+  'Langs1Fatima',
+  'Lina',
+  'QA Probe',
+  'moe',
+  'Probe Throwaway AOV1',
+  'Fh1Devon'
+], 'usual messages stay unread then urgent then recency');
 
 console.log('admin-list-az1-test ok');

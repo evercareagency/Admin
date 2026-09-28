@@ -4993,8 +4993,60 @@ function listAz1NoteQuery(){
   }catch(e2){}
   return on;
 }
+function listAz1SchedName(c){
+  return String(c&&(c.name||c.clientName||c.client_name)||'');
+}
+function listAz1SchedRows(clients){
+  if(!clients||!clients.length||typeof listAz1On!=='function'||!listAz1On())return clients;
+  return listAz1Apply(clients,[
+    function(c){return listAz1SchedName(c);},
+    function(c){return String(c&&(c.id||c.client_id)||'');}
+  ]);
+}
+function listAz1AideName(t){
+  return String((t&&(t.name||t.username))||'Aide');
+}
+function listAz1ReorderSchedDom(){
+  var body=null;
+  try{body=document.getElementById('schedBody');}catch(e){body=null;}
+  if(!body||!body.querySelectorAll||!body.appendChild)return;
+  var nodes=body.querySelectorAll('tr[id^="sched-row-"]');
+  var rows=[];
+  var i;
+  for(i=0;i<nodes.length;i++)rows.push(nodes[i]);
+  if(rows.length<2)return;
+  var on=false;
+  try{on=listAz1On();}catch(e2){on=false;}
+  var indexed=[];
+  for(i=0;i<rows.length;i++){
+    var tr=rows[i];
+    var name='';
+    try{name=tr.getAttribute('data-sched-name')||tr.getAttribute('data-name')||'';}catch(e3){name='';}
+    if(!name&&tr.querySelector){
+      var named=tr.querySelector('.ins-text');
+      if(named)name=String(named.textContent||'');
+    }
+    var usual=parseInt(tr.getAttribute('data-list-usual'),10);
+    if(!isFinite(usual))usual=i;
+    indexed.push({tr:tr, i:i, name:name, usual:usual});
+  }
+  indexed.sort(function(a,b){
+    if(!on){
+      if(a.usual!==b.usual)return a.usual-b.usual;
+      return a.i-b.i;
+    }
+    var c=listAz1Cmp(a.name, b.name);
+    if(c)return c;
+    return a.i-b.i;
+  });
+  var same=true;
+  for(i=0;i<indexed.length;i++)if(indexed[i].tr!==rows[i])same=false;
+  if(same)return;
+  for(i=0;i<indexed.length;i++)body.appendChild(indexed[i].tr);
+}
 function listAz1Repaint(){
   try{if(typeof schedPaint==='function')schedPaint();}catch(e){}
+  try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eDom){}
   try{if(typeof paintClients==='function'&&typeof allClients!=='undefined')paintClients();}catch(e2){}
   try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(e3){}
   try{if(typeof paintBackupRequests==='function'&&typeof allBackupRecords!=='undefined'&&allBackupRecords)paintBackupRequests();}catch(e4){}
@@ -10153,7 +10205,7 @@ function aidechatSorted(){
   if(aidechatWantEscalateOnly())rows=rows.filter(function(t){return t&&t.urgent;});
   if(typeof listAz1On==='function'&&listAz1On()&&typeof listAz1Apply==='function'){
     return listAz1Apply(rows,[
-      function(t){return String((t&&(t.name||t.username))||'');},
+      function(t){return typeof listAz1AideName==='function'?listAz1AideName(t):String((t&&(t.name||t.username))||'Aide');},
       function(t){return String((t&&(t.id||t.aide_id))||'');}
     ]);
   }
@@ -10263,6 +10315,12 @@ function aidechatPaintInbox(){
   if(note)note.textContent=aidechatSourceNote();
   aidechatPaintSettings();
   var rows=aidechatSorted();
+  if(typeof listAz1On==='function'&&listAz1On()&&typeof listAz1Apply==='function'){
+    rows=listAz1Apply(rows,[
+      function(t){return typeof listAz1AideName==='function'?listAz1AideName(t):String((t&&(t.name||t.username))||'Aide');},
+      function(t){return String((t&&(t.id||t.aide_id))||'');}
+    ]);
+  }
   if(empty)empty.hidden=rows.length>0;
   if(!list)return;
   if(!rows.length){list.innerHTML='';return;}
@@ -11325,7 +11383,11 @@ function aideOfficeVis1Install(){
   }
   if(typeof aidechatSorted==='function'&&!aidechatSorted.__aideOffice){
     var prevSort=aidechatSorted;
-    var wrappedSort=function(){return aideOfficeVis1Sort(prevSort());};
+    var wrappedSort=function(){
+      var rows=prevSort();
+      if(typeof listAz1On==='function'&&listAz1On())return rows;
+      return aideOfficeVis1Sort(rows);
+    };
     wrappedSort.__aideOffice=1;
     aidechatSorted=wrappedSort;
   }
@@ -15789,9 +15851,17 @@ function schedPaint(){
     return;
   }
   var rows=schedBuildRows();
-  if(typeof listAz1Apply==='function'&&listAz1On()){
+  var usualIx={};
+  rows.forEach(function(row, ix){
+    var cid=row&&row.client&&row.client.id;
+    if(cid!=null)usualIx[String(cid)]=ix;
+  });
+  if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
     rows=listAz1Apply(rows,[
-      function(row){var c=row&&row.client||{};return c.name||c.clientName||'';},
+      function(row){
+        var c=row&&row.client||{};
+        return typeof listAz1SchedName==='function'?listAz1SchedName(c):(c.name||c.clientName||c.client_name||'');
+      },
       function(row){var c=row&&row.client||{};return c.id||'';}
     ]);
   }
@@ -15800,9 +15870,11 @@ function schedPaint(){
     if(row.hide)return;
     var client=row.client;
     var id=String(client.id);
-    var name=String(client.name||client.clientName||'Client');
+    var name=String(client.name||client.clientName||client.client_name||'Client');
+    var usual=usualIx[id];
+    if(usual==null)usual='';
     var jump=schedJumpId&&schedJumpId===id?' is-jump':'';
-    html+='<tr id="sched-row-'+schedAttr(id)+'" data-name="'+schedAttr(name)+'" class="'+jump.trim()+'">';
+    html+='<tr id="sched-row-'+schedAttr(id)+'" data-name="'+schedAttr(name)+'" data-sched-name="'+schedAttr(name)+'" data-list-usual="'+schedAttr(usual)+'" class="'+jump.trim()+'">';
     html+='<td class="sched-name">'+schedInsNameHtml(name, schedInsPack(client))+'</td>';
     row.cells.forEach(function(cell){
       var text=cell.state==='open'?'Open':schedCellText(cell);
@@ -15813,6 +15885,7 @@ function schedPaint(){
     html+='</tr>';
   });
   body.innerHTML=html;
+  try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eAz){}
   schedPaintPanel();
 }
 function schedJumpClient(){
@@ -16832,10 +16905,13 @@ function schedPaintSlotGrid(){
   schedSyncFilters();
   var note=schedEl('schedSourceNote');
   if(note)note.textContent=schedLoadError||'';
+  var usualIx={};
+  (schedSlotClients||[]).forEach(function(c, ix){if(c&&c.id!=null)usualIx[String(c.id)]=ix;});
   var clients=schedSlotClients;
-  if(typeof listAz1Apply==='function'&&listAz1On()){
+  if(typeof listAz1SchedRows==='function')clients=listAz1SchedRows(clients);
+  else if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
     clients=listAz1Apply(clients,[
-      function(c){return c&&(c.name||c.clientName)||'';},
+      function(c){return c&&(c.name||c.clientName||c.client_name)||'';},
       function(c){return c&&c.id||'';}
     ]);
   }
@@ -16869,7 +16945,10 @@ function schedPaintSlotGrid(){
     var auth=schedAuthText(client.weekly_authorized_hours);
     var onHoldRow=schedClientWeekOnHold(client);
     var banner=onHoldRow?schedPrimaryHold(client):null;
-    html+='<tr id="sched-row-'+schedAttr(client.id)+'" class="'+(jump.trim()+(onHoldRow?' client-on-hold':'')).trim()+'">';
+    var schedName=String(client.name||client.clientName||client.client_name||'');
+    var usual=usualIx[String(client.id)];
+    if(usual==null)usual='';
+    html+='<tr id="sched-row-'+schedAttr(client.id)+'" data-sched-name="'+schedAttr(schedName)+'" data-list-usual="'+schedAttr(usual)+'" class="'+(jump.trim()+(onHoldRow?' client-on-hold':'')).trim()+'">';
     html+='<td class="sched-name'+(onHoldRow?' has-hold':'')+'"><div class="sched-name-stack">'+schedInsNameHtml(client.name, schedInsPack(client));
     if(auth)html+='<span class="sched-auth-badge">'+schedEsc(auth)+'</span>';
     if(banner)html+=schedRowHoldBannerHtml(banner);
@@ -16898,6 +16977,7 @@ function schedPaintSlotGrid(){
     html='<tr class="hold-filter-empty"><td class="sched-name" colspan="8">No clients on hold this week.</td></tr>';
   }
   body.innerHTML=html;
+  try{if(typeof listAz1ReorderSchedDom==='function')listAz1ReorderSchedDom();}catch(eAz){}
 }
 function schedSlotRange(slot){
   var label=slot.label||(slot.sort_order>0?'Evening':'Morning');
@@ -17810,7 +17890,9 @@ function schedFillSlotPatternForm(slot, clientId, weekday){
   var sel=schedEl('schedSlotClient');
   if(sel){
     var html='';
-    schedSlotClients.forEach(function(c){
+    var optClients=schedSlotClients;
+    if(typeof listAz1SchedRows==='function')optClients=listAz1SchedRows(optClients);
+    optClients.forEach(function(c){
       html+='<option value="'+schedAttr(c.id)+'">'+schedEsc(c.name)+'</option>';
     });
     sel.innerHTML=html||'<option value="">No clients</option>';
