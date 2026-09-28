@@ -18,6 +18,10 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
+<!-- remi open thread 2026-09-28 v=remi-open-thread1 ?v=remi-open-thread1 admin-build v=remi-open-thread1 admin-build 2026-09-28-remi-open-thread1. Mo LIVE bug. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Remi Radar / Remi rail card “replied to your Office message” Open thread was a no-op. aideOfficeVis1OpenAide called showTab('aidechat') and aidechatOpen / aidechatOpenThread. aidechatOpen returns immediately unless #tab_aidechat is already .active, and aidechatOpenThread paints only if that tab is still active after its awaits, so the open can no-op. Switching to More → Messages also hides the thread behind the Remi sheet on a phone. The card already says Thread opens in Remi — not buried. Open thread now keeps #copilotSheet open and paints that aidechat1 thread in #aideOfficeThread (thread_id, then aide_id, then deep_link admin/messages?aide_id= only if aide_id is missing). Messages load with admin_list_aide_office_messages. Ack is still admin_mark_aide_office_messages_read(p_thread_id) and the badge snapshot. It does not call showTab('aidechat'). Other Remi tabs close this pane. Remi Notes Open thread is unchanged. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. Prior markers stay, including v=aide-office-vis1, v=aidechat1, v=remi-notes-vis1, v=cover-desk1, and v=remi-float-hide1b. -->
+<meta name="admin-build" content="v=remi-open-thread1">
+<meta name="admin-build" content="2026-09-28-remi-open-thread1">
+<script>var REMI_OPEN_THREAD1_MARKER='v=remi-open-thread1';var REMI_OPEN_THREAD1_BUILD='2026-09-28-remi-open-thread1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
 <meta name="admin-build" content="2026-09-27-list-az1">
 <!-- remi chat bleed 2026-09-27 v=remi-chat-bleed1 admin-build 2026-09-27-remi-chat-bleed1. GHOST-REMI-CHAT-BLEED1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No mossier. No Quo/SMS. On Aide chat / Messages (#tab_aidechat, Aide Office) the Schedule a Remi message panel is parked out of the thread column so it does not sit on the bubbles or the composer. The form stays in the page and is not deleted. The floating Remi corner chip is hidden while Messages is the active desk so it does not cover bubbles or the composer, and it returns when you leave Messages. Remi stays available on other desks from the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Leaving Messages follows v=more-hide1: the inactive panel stays display none, and Remi or chat chrome does not paint over Nurse, Inservices, More, Schedule, or any other desk. Phone-first. Dates people read are MM/DD/YYYY. Do not break aide-text-chat1, aide-office-vis1, remi-chat1, msg-dense1, or remi-phone-rail1. Prior markers stay, including v=msg-dense1, v=more-hide1, v=aide-text-chat1, v=aide-office-vis1, v=remi-chat1, v=clienthrs1d, and v=remiface1. -->
@@ -1023,6 +1027,36 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 .aide-office-peek[hidden]{display:none !important;}
 .aide-office-peek strong{display:block;font-size:12px;color:var(--navy);margin-bottom:6px;}
 .aide-office-peek .chip{display:inline-block;font-size:10px;font-weight:700;padding:4px 7px;border-radius:6px;border:1px solid #f0c090;background:#fff0e0;color:#b86e00;}
+/* v=remi-open-thread1 — Aide Office thread stays in the Remi sheet. Not More → Messages. */
+#aideOfficeThread[hidden]{display:none !important;}
+#aideOfficeThread{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;min-width:0;max-width:100%;overflow:hidden;margin:0;}
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #copilotComposer,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #copilotBody,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #copilotConfirm,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #aideOfficeRail,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #remiNotesDock,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #remiFloatHost,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #remiIdeasHost,
+#copilotSheet:has(#aideOfficeThread:not([hidden])) #remiLangsHost{display:none !important;}
+#aideOfficeThread .aide-office-thread-top{display:flex;align-items:center;gap:8px;margin:0 0 8px;flex-shrink:0;}
+#aideOfficeThread .aide-office-thread-back{min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:#fff;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;}
+#aideOfficeThread .aide-office-thread-who{min-width:0;flex:1;}
+#aideOfficeThread .aide-office-thread-who strong{display:block;font-size:15px;color:var(--navy);line-height:1.2;}
+#aideOfficeThread .aide-office-thread-who span{display:block;font-size:11px;color:var(--muted);line-height:1.3;}
+#aideOfficeThread .aide-office-thread-log{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;display:flex;flex-direction:column;gap:6px;padding:2px 0 8px;}
+#aideOfficeThread .aide-office-day{align-self:center;font-size:0.68rem;font-weight:800;letter-spacing:0.06em;color:var(--muted);margin:6px 0 2px;}
+#aideOfficeThread .aide-office-bubble-line{max-width:92%;padding:8px 10px;border-radius:12px;font-size:13px;line-height:1.4;overflow-wrap:anywhere;}
+#aideOfficeThread .aide-office-bubble-line .who{display:block;font-size:0.68rem;font-weight:700;margin-bottom:2px;}
+#aideOfficeThread .aide-office-bubble-line.is-aide{align-self:flex-start;background:#fff;color:var(--navy);border:1px solid var(--border);border-bottom-left-radius:4px;}
+#aideOfficeThread .aide-office-bubble-line.is-aide .who{color:var(--muted);}
+#aideOfficeThread .aide-office-bubble-line.is-office{align-self:flex-end;background:var(--teal);color:#fff;border-bottom-right-radius:4px;}
+#aideOfficeThread .aide-office-bubble-line.is-office .who{color:rgba(255,255,255,.9);}
+#aideOfficeThread .aide-office-bubble-line.is-remi{align-self:flex-end;background:#e7f0f8;color:var(--navy);border:1px solid #d5e4f2;border-bottom-right-radius:4px;}
+#aideOfficeThread .aide-office-bubble-line.is-remi .who{color:var(--teal-dark);}
+#aideOfficeThread .aide-office-thread-note{font-size:12px;color:var(--muted);line-height:1.4;margin:0;}
+#aideOfficeThread .aide-office-thread-form{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-top:8px;}
+#aideOfficeThread .aide-office-thread-form textarea{flex:1 1 auto;min-width:0;min-height:44px;max-height:88px;border-radius:999px;padding:10px 14px;resize:none;font-size:16px;font-family:'DM Sans',sans-serif;border:1px solid var(--border);box-sizing:border-box;}
+#aideOfficeThread .aide-office-thread-form button{min-height:44px;min-width:72px;border:0;border-radius:999px;background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:10px 16px;cursor:pointer;touch-action:manipulation;}
 /* v=msg-dense1 — option 2 one-box scroll. Fixed-height thread. Messages scroll inside. Page does not grow. */
 #tab_aidechat .msg-dense-list-label{display:none;margin:0 0 8px;font-weight:800;color:var(--navy);font-size:0.95rem;}
 #tab_aidechat.is-open .msg-dense-panel{display:flex;flex-direction:column;height:calc(100dvh - 168px);max-height:calc(100dvh - 150px);min-height:260px;overflow:hidden;background:#f4f8fb;border:1px solid var(--border);border-radius:16px;padding:10px 12px 12px;box-sizing:border-box;min-width:0;}
@@ -3654,6 +3688,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabCover" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" onclick="remiFloatHide1ShowCoverage()">Coverage</button>
       </div>
       <div id="aideOfficeRail" hidden data-aide-office-vis1="v=aide-office-vis1" aria-live="polite" aria-label="Aide Office"></div>
+      <div id="aideOfficeThread" hidden data-aide-office-vis1="v=aide-office-vis1" data-remi-open-thread1="v=remi-open-thread1" aria-live="polite" aria-label="Aide Office thread"></div>
       <div id="remiFloatHost" hidden data-remi-float-noshow1="v=remi-float-noshow1" aria-live="polite"></div>
       <div id="remiIdeasHost" hidden data-remi-ideas763="v=remi-ideas763" aria-live="polite"></div>
       <div id="remiLangsHost" hidden data-remi-langs1="v=remi-langs1" aria-live="polite"></div>
@@ -9968,6 +10003,9 @@ function copilotSyncTabs(){
     else sheet.classList.remove('is-payroll');
   }
   if(!onNotes&&typeof remiNotesClosePicker==='function')remiNotesClosePicker();
+  if(typeof aideOfficeVis1OnSheetTab==='function'){
+    try{aideOfficeVis1OnSheetTab();}catch(eOfficeTab){}
+  }
 }
 function copilotHideConfirm(){
   copilotPending=null;
@@ -12309,6 +12347,7 @@ function remiChatBleed1Sync(){
 // notify.push is false. In-app Remi rail + Messages badge is the notify. No staff push table.
 // is_scheduler_office. Nurse denied 42501. Remi Notes is not this surface. Same aidechat1 thread.
 var AIDE_OFFICE_VIS1_MARKER='v=aide-office-vis1';
+var REMI_OPEN_THREAD1_MARKER='v=remi-open-thread1';
 var AIDE_OFFICE_VIS1_DEEP='admin/messages';
 var aideOfficeVis1Badge={unread_threads:0, unread_messages:0, deep_link_base:AIDE_OFFICE_VIS1_DEEP};
 var aideOfficeVis1Alerts=[];
@@ -12318,6 +12357,10 @@ var aideOfficeVis1Timer=0;
 var aideOfficeVis1Polling=false;
 var aideOfficeVis1Stopped=false;
 var aideOfficeVis1Acked='';
+var aideOfficeVis1ThreadOn=false;
+var aideOfficeVis1OpenThreadId='';
+var aideOfficeVis1OpenAideId='';
+var aideOfficeVis1OpenGen=0;
 function aideOfficeVis1Role(){
   try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
 }
@@ -12329,6 +12372,9 @@ function aideOfficeVis1Esc(s){
   var raw=String(s==null?'':s);
   if(typeof aidechatEsc==='function')return aidechatEsc(raw);
   return raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function aideOfficeVis1Attr(s){
+  return aideOfficeVis1Esc(String(s==null?'':s).replace(/\s+/g,' ').trim());
 }
 function aideOfficeVis1Initials(name){
   var parts=String(name||'').trim().split(/\s+/).filter(Boolean);
@@ -12599,7 +12645,7 @@ function aideOfficeVis1CardHtml(alert){
     +'<div class="aide-office-msg"><div class="from">'+aideOfficeVis1Esc(name)+'</div>'
     +'<div class="body">'+aideOfficeVis1Esc(alert.preview||'')+'</div>'
     +'<div class="when">'+aideOfficeVis1Esc(when)+' · in-app badge</div></div>'
-    +'<button type="button" class="aide-office-open" data-aide-office-open="1" data-aide-office-thread="'+aideOfficeVis1Esc(alert.thread_id)+'" data-aide-office-aide="'+aideOfficeVis1Esc(alert.aide_id)+'" data-aide-office-link="'+aideOfficeVis1Esc(alert.deep_link)+'">Open thread</button>'
+    +'<button type="button" class="aide-office-open" data-remi-open-thread1="'+REMI_OPEN_THREAD1_MARKER+'" data-aide-office-open="1" data-aide-office-thread="'+aideOfficeVis1Attr(alert.thread_id)+'" data-aide-office-aide="'+aideOfficeVis1Attr(alert.aide_id)+'" data-aide-office-name="'+aideOfficeVis1Attr(alert.aide_name)+'" data-aide-office-user="'+aideOfficeVis1Attr(alert.aide_username)+'" data-aide-office-preview="'+aideOfficeVis1Attr(alert.preview)+'" data-aide-office-at="'+aideOfficeVis1Attr(alert.at)+'" data-aide-office-link="'+aideOfficeVis1Attr(alert.deep_link)+'">Open thread</button>'
     +'</div>';
 }
 function aideOfficeVis1PaintRail(){
@@ -12610,7 +12656,8 @@ function aideOfficeVis1PaintRail(){
     alerts=alerts.filter(function(a){return String(a.thread_id||'')!==aideOfficeVis1Acked && String(a.aide_id||'')!==aideOfficeVis1Acked;});
   }
   if(host){
-    if(!alerts.length){host.innerHTML='';host.hidden=true;}
+    if(aideOfficeVis1ThreadOn){host.hidden=true;}
+    else if(!alerts.length){host.innerHTML='';host.hidden=true;}
     else{
       var html='<div class="aide-office-railhead"><strong>Remi · Aide Office</strong><span class="aide-office-new">NEW</span></div>';
       alerts.forEach(function(a){html+=aideOfficeVis1CardHtml(a);});
@@ -12634,6 +12681,8 @@ function aideOfficeVis1PaintRail(){
     if(alerts.length&&aideOfficeVis1OfficeOk())sub.textContent='Aide Office · notify';
     else if(sub.textContent==='Aide Office · notify')sub.textContent=aideOfficeVis1PaintRail.base;
   }
+  aideOfficeVis1BindRail();
+  aideOfficeVis1BindThread();
 }
 function aideOfficeVis1BindRail(){
   var host=document.getElementById('aideOfficeRail');
@@ -12642,11 +12691,33 @@ function aideOfficeVis1BindRail(){
   host.addEventListener('click', function(ev){
     var btn=ev.target&&ev.target.closest?ev.target.closest('[data-aide-office-open]'):null;
     if(!btn||!host.contains(btn))return;
+    if(ev.preventDefault)ev.preventDefault();
     aideOfficeVis1OpenAlert({
       thread_id:btn.getAttribute('data-aide-office-thread')||'',
       aide_id:btn.getAttribute('data-aide-office-aide')||'',
+      aide_name:btn.getAttribute('data-aide-office-name')||'',
+      aide_username:btn.getAttribute('data-aide-office-user')||'',
+      preview:btn.getAttribute('data-aide-office-preview')||'',
+      at:btn.getAttribute('data-aide-office-at')||'',
       deep_link:btn.getAttribute('data-aide-office-link')||''
     });
+  });
+}
+function aideOfficeVis1BindThread(){
+  var host=document.getElementById('aideOfficeThread');
+  if(!host||host.getAttribute('data-bound')==='1')return;
+  host.setAttribute('data-bound','1');
+  host.addEventListener('click', function(ev){
+    var back=ev.target&&ev.target.closest?ev.target.closest('[data-aide-office-back]'):null;
+    if(!back||!host.contains(back))return;
+    if(ev.preventDefault)ev.preventDefault();
+    aideOfficeVis1CloseThread();
+  });
+  host.addEventListener('submit', function(ev){
+    var form=ev.target&&ev.target.id==='aideOfficeThreadForm'?ev.target:null;
+    if(!form||!host.contains(form))return;
+    if(ev.preventDefault)ev.preventDefault();
+    aideOfficeVis1SendThread();
   });
 }
 function aideOfficeVis1SyncThreads(alerts){
@@ -12790,12 +12861,16 @@ async function aideOfficeVis1AfterRead(id){
   if(!got||got.ok!==true)aideOfficeVis1ApplyBadge(aideOfficeVis1Badge);
   return got;
 }
-async function aideOfficeVis1OpenAide(aideId, threadId){
-  if(!aideOfficeVis1OfficeOk())return;
-  if(typeof showTab==='function')showTab('aidechat');
-  if(typeof aidechatOpen==='function'){
-    try{await aidechatOpen();}catch(e){}
-  }
+function aideOfficeVis1AideFrom(alert){
+  alert=alert||{};
+  var aideId=String(alert.aide_id||'').trim();
+  if(aideId)return aideId;
+  var link=String(alert.deep_link||'');
+  var m=link.match(/[?&]aide_id=([^&]+)/);
+  if(!m)return '';
+  try{return decodeURIComponent(m[1]);}catch(e){return m[1];}
+}
+function aideOfficeVis1FindThread(aideId, threadId){
   var thread=null;
   if(threadId&&typeof aidechatFind==='function')thread=aidechatFind(threadId);
   if(!thread&&aideId&&typeof aidechatFindByAide==='function')thread=aidechatFindByAide({id:aideId, aide_id:aideId});
@@ -12803,21 +12878,205 @@ async function aideOfficeVis1OpenAide(aideId, threadId){
     var i;
     for(i=0;i<(aidechatThreads||[]).length;i++){
       var t=aidechatThreads[i];
+      if(!t)continue;
       if(threadId&&String(t.id)===String(threadId)){thread=t;break;}
       if(aideId&&String(t.aide_id)===String(aideId)){thread=t;break;}
     }
   }
-  if(thread&&typeof aidechatOpenThread==='function')await aidechatOpenThread(thread.id);
+  return thread;
+}
+function aideOfficeVis1EnsureSheet(){
+  var sheet=null;
+  try{sheet=document.getElementById('copilotSheet');}catch(e){sheet=null;}
+  if(sheet)sheet.hidden=false;
+  return sheet;
+}
+function aideOfficeVis1OnSheetTab(){
+  if(typeof copilotView!=='undefined'&&copilotView==='office')return;
+  if(!aideOfficeVis1ThreadOn)return;
+  aideOfficeVis1ThreadOn=false;
+  aideOfficeVis1OpenThreadId='';
+  aideOfficeVis1OpenAideId='';
+  var host=null;
+  try{host=document.getElementById('aideOfficeThread');}catch(e){host=null;}
+  if(host){host.hidden=true;host.innerHTML='';}
+  aideOfficeVis1PaintRail();
+}
+function aideOfficeVis1CloseThread(){
+  aideOfficeVis1ThreadOn=false;
+  aideOfficeVis1OpenThreadId='';
+  aideOfficeVis1OpenAideId='';
+  var host=null;
+  try{host=document.getElementById('aideOfficeThread');}catch(e){host=null;}
+  if(host){host.hidden=true;host.innerHTML='';}
+  try{if(typeof copilotView!=='undefined'&&copilotView==='office')copilotView='radar';}catch(eView){}
+  if(typeof copilotShowRadar==='function')copilotShowRadar();
+  else aideOfficeVis1PaintRail();
+}
+function aideOfficeVis1ThreadBubble(msg){
+  msg=msg||{};
+  var sender=msg.sender==='office'||msg.sender==='remi'?msg.sender:'aide';
+  var who=typeof aidechatWho==='function'?aidechatWho(sender, msg):(sender==='office'?'Office':(sender==='remi'?'Remi':'Aide'));
+  var body=typeof aidechatEsc==='function'?aidechatEsc(msg.body):aideOfficeVis1Esc(msg.body);
+  if(typeof aidechatLinkPhones==='function')body=aidechatLinkPhones(body);
+  var day='';
+  if(typeof msgDense1DayLabel==='function')day=msgDense1DayLabel(msg.created_at);
+  return {sender:sender, who:who, body:body, day:day};
+}
+function aideOfficeVis1PaintRemiThread(thread, alert, note){
+  var host=null;
+  try{host=document.getElementById('aideOfficeThread');}catch(e){host=null;}
+  if(!host)return;
+  aideOfficeVis1BindThread();
+  thread=thread||{};
+  alert=alert||{};
+  var name=String(thread.name||alert.aide_name||'Aide');
+  var user=String(thread.username||alert.aide_username||'');
+  var html='<div class="aide-office-thread-top" data-remi-open-thread1="'+REMI_OPEN_THREAD1_MARKER+'">'
+    +'<button type="button" class="aide-office-thread-back" data-aide-office-back="1">← Aide Office</button>'
+    +'<div class="aide-office-thread-who"><strong>'+aideOfficeVis1Esc(name)+'</strong><span>Aide Office · in Remi'
+    +(user?' · @'+aideOfficeVis1Esc(user):'')+'</span></div></div>';
+  html+='<div class="aide-office-thread-log" id="aideOfficeThreadLog">';
+  if(note)html+='<p class="aide-office-thread-note">'+aideOfficeVis1Esc(note)+'</p>';
+  var msgs=thread.messages||[];
+  if(!msgs.length&&alert.preview){
+    msgs=[{sender:'aide', body:alert.preview, created_at:alert.at||'', display_name:name}];
+  }
+  if(!msgs.length)html+='<p class="aide-office-thread-note">No messages in this thread yet.</p>';
+  var lastDay='';
+  var i;
+  for(i=0;i<msgs.length;i++){
+    var line=aideOfficeVis1ThreadBubble(msgs[i]);
+    if(line.day&&line.day!==lastDay){
+      lastDay=line.day;
+      html+='<div class="aide-office-day">'+aideOfficeVis1Esc(line.day)+'</div>';
+    }
+    html+='<div class="aide-office-bubble-line is-'+line.sender+'"><span class="who">'+aideOfficeVis1Esc(line.who)+'</span>'+line.body+'</div>';
+  }
+  html+='</div>';
+  html+='<form id="aideOfficeThreadForm" class="aide-office-thread-form">'
+    +'<textarea id="aideOfficeThreadReply" maxlength="1000" placeholder="Type a message…" aria-label="Reply as office" autocomplete="off"></textarea>'
+    +'<button type="submit">Send</button></form>';
+  host.innerHTML=html;
+  host.hidden=false;
+  var log=document.getElementById('aideOfficeThreadLog');
+  if(log){try{log.scrollTop=log.scrollHeight;}catch(eScroll){}}
+}
+async function aideOfficeVis1OpenAide(aideId, threadId, alert){
+  if(!aideOfficeVis1OfficeOk())return {ok:false, forbidden:true};
+  alert=alert||{};
+  aideId=String(aideId||alert.aide_id||'').trim();
+  threadId=String(threadId||alert.thread_id||'').trim();
+  var gen=++aideOfficeVis1OpenGen;
+  aideOfficeVis1ThreadOn=true;
+  aideOfficeVis1OpenThreadId=threadId;
+  aideOfficeVis1OpenAideId=aideId;
+  try{copilotView='office';}catch(eView){}
+  aideOfficeVis1EnsureSheet();
+  if(typeof copilotHideConfirm==='function')copilotHideConfirm();
+  if(typeof copilotSyncTabs==='function')copilotSyncTabs();
+  aideOfficeVis1PaintRemiThread({name:alert.aide_name||'Aide', username:alert.aide_username||'', messages:[]}, alert, 'Opening thread…');
+  try{
+    if(typeof aidechatRefresh==='function'){
+      try{await aidechatRefresh();}catch(eList){}
+    }
+    if(gen!==aideOfficeVis1OpenGen)return {ok:false, stale:true};
+    var thread=aideOfficeVis1FindThread(aideId, threadId);
+    if(!thread){
+      thread={
+        id:threadId,
+        aide_id:aideId,
+        username:String(alert.aide_username||''),
+        name:String(alert.aide_name||'Aide'),
+        messages:[],
+        preview_from_aide:String(alert.preview||'')
+      };
+      if((thread.id||thread.aide_id)&&typeof aidechatThreads!=='undefined'&&aidechatThreads)aidechatThreads.push(thread);
+    }
+    if(thread.id)aideOfficeVis1OpenThreadId=String(thread.id);
+    if(thread.aide_id)aideOfficeVis1OpenAideId=String(thread.aide_id);
+    if(typeof aidechatRpc==='function'&&typeof aidechatWireMessages==='function'&&(thread.id||thread.aide_id)){
+      var got=null;
+      try{got=await aidechatRpc('messages', aidechatWireMessages(thread));}catch(eMsg){got=null;}
+      if(gen!==aideOfficeVis1OpenGen)return {ok:false, stale:true};
+      if(got&&got.ok&&typeof aidechatMessagesFrom==='function'){
+        var msgs=aidechatMessagesFrom(got.data);
+        if(msgs&&msgs.length)thread.messages=msgs;
+      }
+    }
+    if(!thread.id&&!thread.aide_id&&!alert.preview){
+      aideOfficeVis1PaintRemiThread(thread, alert, 'This Office card has no thread to open.');
+      return {ok:false, error:'no thread'};
+    }
+    aideOfficeVis1PaintRemiThread(thread, alert, '');
+    if(thread.id&&typeof aidechatRpc==='function'){
+      try{await aidechatRpc('read', {p_thread_id:thread.id});}catch(eRead){}
+      if(gen!==aideOfficeVis1OpenGen)return {ok:false, stale:true};
+      try{await aideOfficeVis1AfterRead(thread.id);}catch(eAck){}
+    }
+    return {ok:true, thread_id:thread.id||'', aide_id:thread.aide_id||aideId};
+  }catch(err){
+    if(gen!==aideOfficeVis1OpenGen)return {ok:false, stale:true};
+    aideOfficeVis1PaintRemiThread({name:alert.aide_name||'Aide', username:alert.aide_username||'', messages:[]}, alert, 'Could not open that Office thread.');
+    return {ok:false, error:String(err&&err.message||err||'Could not open that Office thread.')};
+  }
+}
+async function aideOfficeVis1SendThread(){
+  if(!aideOfficeVis1OfficeOk()||!aideOfficeVis1ThreadOn)return {ok:false};
+  var box=null;
+  try{box=document.getElementById('aideOfficeThreadReply');}catch(e){box=null;}
+  var text=String(box&&box.value||'').trim();
+  if(!text)return {ok:false, error:'empty'};
+  var thread=aideOfficeVis1FindThread(aideOfficeVis1OpenAideId, aideOfficeVis1OpenThreadId);
+  if(!thread)return {ok:false, error:'no thread'};
+  var msg={
+    id:'m-local',
+    sender:'office',
+    body:text,
+    created_at:new Date().toISOString(),
+    kind:'office'
+  };
+  thread.messages=thread.messages||[];
+  thread.messages.push(msg);
+  thread.last_message=text;
+  thread.last_at=msg.created_at;
+  if(box)box.value='';
+  aideOfficeVis1PaintRemiThread(thread, {aide_name:thread.name, aide_username:thread.username}, '');
+  if(typeof aidechatRpc==='function'&&typeof aidechatWireSend==='function'){
+    try{await aidechatRpc('send', aidechatWireSend(thread, text));}catch(eSend){}
+  }
+  return {ok:true};
 }
 function aideOfficeVis1OpenAlert(alert){
   alert=alert||{};
-  var aideId=String(alert.aide_id||'');
-  var link=String(alert.deep_link||'');
-  var m=link.match(/[?&]aide_id=([^&]+)/);
-  if(m){
-    try{aideId=decodeURIComponent(m[1]);}catch(e){aideId=m[1];}
+  var threadId=String(alert.thread_id||'').trim();
+  var aideId=aideOfficeVis1AideFrom(alert);
+  var full=null;
+  var list=aideOfficeVis1Alerts||[];
+  var i;
+  for(i=0;i<list.length;i++){
+    var row=list[i];
+    if(!row)continue;
+    if(threadId&&String(row.thread_id)===threadId){full=row;break;}
+    if(!full&&aideId&&String(row.aide_id)===aideId)full=row;
   }
-  return aideOfficeVis1OpenAide(aideId, alert.thread_id||'');
+  if(full){
+    if(!threadId)threadId=String(full.thread_id||'');
+    if(!aideId)aideId=String(full.aide_id||'');
+    alert={
+      thread_id:threadId,
+      aide_id:aideId,
+      aide_name:alert.aide_name||full.aide_name||'',
+      aide_username:alert.aide_username||full.aide_username||'',
+      preview:alert.preview||full.preview||'',
+      at:alert.at||full.at||'',
+      deep_link:alert.deep_link||full.deep_link||''
+    };
+  }else{
+    alert.thread_id=threadId;
+    alert.aide_id=aideId;
+  }
+  return aideOfficeVis1OpenAide(aideId, threadId, alert);
 }
 function aideOfficeVis1QueryAide(){
   var search='';
@@ -12833,6 +13092,7 @@ function aideOfficeVis1Boot(){
   }
   aideOfficeVis1Stopped=false;
   aideOfficeVis1BindRail();
+  aideOfficeVis1BindThread();
   aideOfficeVis1PaintWho();
   aideOfficeVis1PaintBadges();
   var aideId=aideOfficeVis1QueryAide();
