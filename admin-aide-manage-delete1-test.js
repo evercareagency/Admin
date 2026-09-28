@@ -336,6 +336,127 @@ await box.aideManageDelete1Run();
 assert.strictEqual(posts.length, 0, 'sheets rollback does not post');
 assert.ok(/Supabase aides desk/.test(toasts[0].msg));
 
+const clientsHdr = html.slice(html.indexOf('id="tab_clients"'), html.indexOf('id="clientSearch"'));
+assert.ok(clientsHdr.includes('id="clientManageSure"') && clientsHdr.includes('>Are you sure?</p>'), 'Clients Are you sure sits at the top of the page');
+assert.ok(clientsHdr.indexOf('id="clientManageSure"') < clientsHdr.indexOf('class="page-hdr"'), 'Clients sure heading is above the title');
+assert.ok(clientsHdr.includes('id="clientsAzChip"') && clientsHdr.includes('onclick="listAz1Toggle(event)"'), 'Clients A–Z chip stays');
+assert.ok(clientsHdr.includes('id="clientManageBtn"') && clientsHdr.includes('onclick="clientManageDelete1ToggleManage()"'), 'Clients Manage toggles this desk');
+assert.ok(clientsHdr.includes('data-client-desk="active"') && clientsHdr.includes('>Recently deleted<'), 'Clients Active and Recently deleted tabs');
+assert.ok(clientsHdr.includes('id="clientManageSelectAll"') && clientsHdr.includes('>Select all<') && clientsHdr.includes('>Unselect all<'), 'Clients select pair stays visible');
+assert.ok(clientsHdr.indexOf('>Select all<') < clientsHdr.indexOf('>Unselect all<'), 'Clients Select all stays beside Unselect all');
+assert.ok(clientsHdr.includes('id="clientManageDeleteSelected"') && clientsHdr.includes('>Delete selected<'), 'Clients Delete selected');
+assert.ok(clientsHdr.includes('id="clientInsLegend"') && clientsHdr.includes('data-client-ins1="v=client-ins1"'), 'client-ins1 legend stays');
+assert.ok(!clientsHdr.includes('Manage ON'), 'no Clients Manage ON badge');
+const clientSheet = html.slice(html.indexOf('id="clientManageConfirm"'), html.indexOf('id="tab_nurse"'));
+assert.ok(clientSheet.includes('They move to Recently deleted.'), 'Clients recently deleted copy');
+assert.ok(clientSheet.includes('id="clientManageConfirmGo"') && clientSheet.includes('>Delete selected<'), 'Clients primary Delete selected');
+assert.ok(!clientSheet.includes('>Are you sure?<'), 'Clients Are you sure is not only the sheet title');
+assert.ok(!clientSheet.includes('>Restore<'), 'no invented Clients Restore');
+const clientRun = extractFn(html, 'async function clientManageDelete1Run()');
+assert.ok(clientRun.includes("apiPost({action:'archive_client', clientId:id, id:id})"), 'Clients bulk reuses archive_client');
+assert.ok(clientRun.includes('for(i=0;i<picks.length;i++)'), 'one archive call per selected client');
+assert.ok(clientRun.includes('res.is_active===false'), 'archive success is is_active false');
+assert.ok(clientRun.includes('renderClients(true)'), 'Clients list refreshes');
+assert.ok(clientRun.includes("cacheInvalidate('get_clients')"), 'Clients cache drops');
+assert.ok(!/reset_aide_temp_password|reseal|mossier|admin_deactivate_client|sbRestRpc|method:\s*'DELETE'|DELETE\s+FROM/.test(clientRun), 'Clients bulk never reseals, hard-deletes, or invents a client RPC');
+assert.ok(extractFn(html, 'function deleteClient(id)').includes("showSharedConfirm('Delete this client? This cannot be undone.'"), 'single client delete confirm stays');
+assert.ok(html.includes("if(payload.clientDesk==='deleted')clientPairs.push(['is_active','eq.false']);"), 'Recently deleted clients are is_active false');
+assert.ok(html.includes("else if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);"), 'Active clients stay is_active true unless includeInactive');
+const clientOpen = extractFn(html, 'function clientManageDelete1OpenConfirm()');
+assert.ok(clientOpen.includes('clientManageSure'), 'Clients confirm reveals the page heading');
+assert.ok(clientOpen.includes("'Delete 1 client?'") && clientOpen.includes("'Delete '+n+' clients?'"), 'client count copy');
+assert.ok(!extractFn(html, 'function clientManageDelete1UnselectAll()').includes('apiPost'), 'client unselect does not post');
+
+const cchecks = [node('cc1'), node('cc2')];
+cchecks[0].attrs = {'data-client-key':'id:c1', 'data-client-id':'c1'};
+cchecks[1].attrs = {'data-client-key':'id:c2', 'data-client-id':'c2'};
+cchecks.forEach(function(el){
+  el.closest = function(sel){return sel === '.aide-card' ? el.card : null;};
+  el.card = {classList: classList()};
+});
+const cels = {
+  tab_clients: node('tab_clients'),
+  clientManageBar: node('clientManageBar'),
+  clientManageCount: node('clientManageCount'),
+  clientManageDeleteSelected: node('clientManageDeleteSelected'),
+  clientManageSure: node('clientManageSure'),
+  clientManageConfirm: node('clientManageConfirm'),
+  clientManageConfirmTitle: node('clientManageConfirmTitle'),
+  clientManageConfirmGo: node('clientManageConfirmGo'),
+  clientManageBtn: node('clientManageBtn'),
+  clientsContainer: {querySelectorAll: function(sel){return sel === 'input.aide-manage-cb' ? cchecks : [];}}
+};
+cels.tab_clients.classList.add('client-manage-on');
+cels.clientManageSure.scrollIntoView = function(){};
+const cposts = [];
+const ctoasts = [];
+const cnames = [
+  'function clientManageDelete1Key(client)',
+  'function clientManageDelete1Active()',
+  'function clientManageDelete1IsSelected(client)',
+  'function clientManageDelete1CheckHtml(client)',
+  'function clientManageDelete1Boxes()',
+  'function clientManageDelete1Toggle(el)',
+  'function clientManageDelete1Picks()',
+  'function clientManageDelete1PaintCount()',
+  'function clientManageDelete1SelectAll()',
+  'function clientManageDelete1UnselectAll()',
+  'function clientManageDelete1Clear()',
+  'function clientManageDelete1OpenConfirm()',
+  'function clientManageDelete1CloseConfirm()',
+  'function clientManageDelete1Sync()',
+  'function clientManageDelete1OnDesk()',
+  'function clientManageDelete1ToggleManage()',
+  'function clientManageDelete1Bind()',
+  'async function clientManageDelete1Run()'
+];
+const csrc = ["var clientManageDelete1Sel={};", "var clientManageDelete1Busy=false;"].concat(cnames.map(function(sig){return extractFn(html, sig);})).join('\n');
+const cbox = {
+  clientDesk: 'active',
+  currentAdminRole: 'Admin',
+  clientManageDelete1Sel: {},
+  clientManageDelete1Busy: false,
+  document: {getElementById: function(id){return cels[id] || null;}, addEventListener: function(){}},
+  canManageAides: function(){return cbox.currentAdminRole === 'Admin' || cbox.currentAdminRole === 'Scheduler';},
+  evercareSbEnabled: function(){return true;},
+  escapeAttr: function(s){return String(s == null ? '' : s);},
+  showTempMsg: function(msg, color){ctoasts.push({msg: msg, color: color});},
+  cacheInvalidate: function(){},
+  renderClients: async function(){},
+  aceActionError: function(data, err){return (data && data.error) || (err && err.message) || 'Request failed.';},
+  apiPost: async function(payload){
+    cposts.push(JSON.parse(JSON.stringify(payload)));
+    return {success: true, is_active: false, id: payload.id};
+  }
+};
+vm.createContext(cbox);
+vm.runInContext(csrc, cbox);
+assert.ok(cbox.clientManageDelete1CheckHtml({id:'c1', name:'Helen Vargas'}).includes('aria-label="Select Helen Vargas"'));
+cbox.currentAdminRole = 'Nurse';
+assert.strictEqual(cbox.clientManageDelete1CheckHtml({id:'c1', name:'Helen'}), '', 'Nurse client rows have no checkbox');
+cbox.currentAdminRole = 'Admin';
+cbox.clientDesk = 'deleted';
+assert.strictEqual(cbox.clientManageDelete1CheckHtml({id:'c1', name:'Helen'}), '', 'Recently deleted clients have no checkbox');
+cbox.clientDesk = 'active';
+cbox.clientManageDelete1Sync();
+cbox.clientManageDelete1SelectAll();
+assert.strictEqual(cbox.clientManageDelete1Picks().length, 2);
+assert.strictEqual(cposts.length, 0, 'client select all does not post');
+cbox.clientManageDelete1UnselectAll();
+assert.strictEqual(cbox.clientManageDelete1Picks().length, 0);
+cchecks[0].checked = true;
+cbox.clientManageDelete1Toggle(cchecks[0]);
+cchecks[1].checked = true;
+cbox.clientManageDelete1Toggle(cchecks[1]);
+cbox.clientManageDelete1OpenConfirm();
+assert.strictEqual(cels.clientManageSure.hidden, false);
+assert.strictEqual(cels.clientManageConfirmTitle.textContent, 'Delete 2 clients?');
+await cbox.clientManageDelete1Run();
+assert.strictEqual(cposts.length, 2);
+assert.deepStrictEqual(cposts[0], {action:'archive_client', clientId:'c1', id:'c1'});
+assert.deepStrictEqual(cposts[1], {action:'archive_client', clientId:'c2', id:'c2'});
+assert.ok(/2 clients moved to Recently deleted/.test(ctoasts[0].msg));
+
 console.log('admin-aide-manage-delete1-test: ok');
 })().catch(function(err){
   console.error(err);

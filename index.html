@@ -18,7 +18,7 @@
 <!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
-<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, and v=aidecreds1. -->
+<!-- aide manage delete 2026-09-28 v=aide-manage-delete1 ?v=aide-manage-delete1 admin-build 2026-09-28-aide-manage-delete1. GHOST-AIDE-SOFT-DELETE-CONTRACT-v1. Ace CALLABLE via loop. NO new SQL. NO Ace patch. NO bulk RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. On the Aides Active desk, Manage adds list-level bulk soft-delete beside the existing single ⋯ Delete (aidadel1). Clean header while Manage is on: Manage and + Aide only. No Manage ON badge. No mock chrome over the buttons. Slim bar: Select all and Unselect all stay visible as a pair (same pattern as compliance-bulk1 and cover-unselect1), plus Delete selected and N selected. Select all checks every visible active aide. Unselect all clears the selection and does not post. Delete selected stays disabled until N is at least 1. Each active aide card gets a checkbox. Confirm paints Are you sure? at the top of the page, then Delete N aides? and They move to Recently deleted, with primary Delete selected. Phone sheet and desktop dialog. After confirm, the desk loops the existing single-delete path once per selected id, serial: postAideAction('admin_deactivate_aide') → sbAdminDeactivateAide → sbRestRpc('admin_deactivate_aide', {p_aide_id}). No admin_deactivate_aides. Then it refreshes Active (is_active true and deactivated_at null) and Recently deleted (is_active false and deactivated_at set) through the same renderAides paint. HARD: this flow never calls reset_aide_temp_password, reseal, or mossier, and it never hard-deletes. Single ⋯ Delete and Restore stay. list-az-sticky1, cover-desk1, aides-info1 cards, and credentials Manage stay. Dates people read are MM/DD/YYYY. Clients Active desk uses the same Manage bar and the same page-level Are you sure? confirm: Delete N clients? They move to Recently deleted. Primary Delete selected. The client loop posts archive_client once per id (same dispatcher as delete_client) through sbAdminArchiveClient, which PATCH is_active=false. No new client RPC. No admin_deactivate_client call until Ace tips that name. No client Restore is invented. Active clients are is_active true. Recently deleted clients are is_active false. list-az-sticky1, client-ins1 cards, and Schedule stay. Prior markers stay, including v=aidadel1, v=aides-info1, v=compliance-bulk1, v=cover-unselect1, v=list-az-sticky1, v=cover-desk1, v=client-ins1, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-28-aide-manage-delete1">
 <script>var AIDE_MANAGE_DELETE1_MARKER='v=aide-manage-delete1';var AIDE_MANAGE_DELETE1_BUILD='2026-09-28-aide-manage-delete1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -1736,6 +1736,26 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 @media(min-width:900px){
   #tab_aides .aide-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
+/* v=aide-manage-delete1 clients — same Manage bar and confirm as Aides. */
+#clientManageSure[hidden],#clientManageBar[hidden],#clientManageConfirm[hidden]{display:none !important;}
+#tab_clients.client-manage-on #clientRefreshBtn,
+#tab_clients.client-manage-on #clientDeskSub,
+#tab_clients.client-manage-on #clientInsLegend{display:none !important;}
+#tab_clients.client-manage-on #clientManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
+#tab_clients.client-manage-confirming #clientManageSure{position:relative;z-index:230;background:var(--off);}
+#tab_clients.client-manage-confirming .page-hdr h1{font-family:'Playfair Display',Georgia,serif;font-size:1.15rem;color:var(--muted);font-weight:600;}
+#tab_clients.client-manage-confirming #clientManageBar,
+#tab_clients.client-manage-confirming #clientDesk,
+#tab_clients.client-manage-confirming #clientInsLegend,
+#tab_clients.client-manage-confirming .card,
+#tab_clients.client-manage-confirming .page-hdr{opacity:.55;}
+#tab_clients.client-manage-on:not(.client-desk-deleted) .aide-manage-check{display:flex;position:absolute;left:12px;top:16px;z-index:2;margin:0;}
+#tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer .aide-card{position:relative;padding-left:44px;}
+#tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer .aide-card.is-selected{border-color:var(--teal);box-shadow:0 0 0 2px rgba(42,127,127,.18);}
+@media(min-width:900px){
+  #tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+  #tab_clients.client-manage-on:not(.client-desk-deleted) #clientsContainer:has(.az-stage){display:block;}
+}
 /* v=list-az-sticky1 — sticky A–Z letter jump rail on Aides + Clients. Builds on list-az1. */
 #tab_aides .aide-info-cards:has(.az-stage),
 #tab_aides .aide-cards:has(.az-stage){max-width:none;width:100%;display:flex;flex-direction:column;}
@@ -3101,13 +3121,27 @@ bindLoginKeyboard();
       </div>
 
       <!-- CLIENTS TAB -->
-      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1">
+      <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1">
+        <p id="clientManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
-          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p>Manage client addresses and assign aides for location verification</p></div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" onclick="renderClients(true)">🔄 Refresh</button>
+          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="clientDeskSub">Manage client addresses and assign aides for location verification</p></div>
+          <div class="page-actions" style="display:flex;gap:8px">
+            <button class="btn btn-ghost" id="clientManageBtn" type="button" onclick="clientManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
+            <button class="btn btn-ghost" id="clientRefreshBtn" type="button" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
+        </div>
+        <div class="ts-desk" id="clientDesk" role="tablist" aria-label="Clients list">
+          <button type="button" class="on" data-client-desk="active" role="tab" aria-selected="true" onclick="setClientDesk('active')">Active</button>
+          <button type="button" data-client-desk="deleted" role="tab" aria-selected="false" onclick="setClientDesk('deleted')">Recently deleted</button>
+        </div>
+        <div id="clientManageBar" class="aide-manage-bar" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-pair" role="group" aria-label="Manage selection">
+            <button type="button" class="btn" id="clientManageSelectAll" onclick="clientManageDelete1SelectAll()">Select all</button>
+            <button type="button" class="btn" id="clientManageUnselectAll" onclick="clientManageDelete1UnselectAll()">Unselect all</button>
+          </div>
+          <button type="button" class="btn aide-manage-delete" id="clientManageDeleteSelected" onclick="clientManageDelete1OpenConfirm()" disabled>Delete selected</button>
+          <div class="aide-manage-count" id="clientManageCount">0 selected</div>
         </div>
         <div class="ins-legend" id="clientInsLegend" data-client-ins1="v=client-ins1" aria-label="Insurance">
           <strong>Insurance</strong>
@@ -3120,6 +3154,16 @@ bindLoginKeyboard();
         <div class="card">
           <div class="search-bar"><input type="text" id="clientSearch" placeholder="&#128269; Search clients..." oninput="paintClients()"></div>
           <div id="clientsContainer"></div>
+        </div>
+        <div id="clientManageConfirm" class="aide-manage-confirm" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
+          <div class="aide-manage-dim" onclick="clientManageDelete1CloseConfirm()"></div>
+          <div class="aide-manage-sheet" role="dialog" aria-modal="true" aria-labelledby="clientManageConfirmTitle">
+            <div class="aide-manage-grab" aria-hidden="true"></div>
+            <h2 id="clientManageConfirmTitle">Delete selected?</h2>
+            <p id="clientManageConfirmBody">They move to Recently deleted.</p>
+            <button type="button" class="aide-manage-go" id="clientManageConfirmGo" onclick="clientManageDelete1Run()">Delete selected</button>
+            <button type="button" class="aide-manage-cancel" id="clientManageConfirmCancel" onclick="clientManageDelete1CloseConfirm()">Cancel</button>
+          </div>
         </div>
       </div>
 
@@ -4990,6 +5034,7 @@ async function apiGetCached(action,extra,force){
     cacheAction=action+':'+String(extra.topicId);
   }
   if(action==='get_users'&&extra&&extra.aideDesk==='deleted')cacheAction='get_users:deleted';
+  if(action==='get_clients'&&extra&&extra.clientDesk==='deleted')cacheAction='get_clients:deleted';
   if(!force){
     const hit=cacheGet(cacheAction);
     if(hit&&(sbList?hit.source==='supabase':hit.source!=='supabase'))return hit;
@@ -27474,8 +27519,13 @@ function sbMapClient(row){
     lat:row.lat==null?'':row.lat,
     lng:row.lng==null?'':row.lng,
     isActive:row.is_active!==false,
+    is_active:row.is_active!==false,
     assignedAides:aides
   };
+  if(row&&(row.deactivated_at!=null||row.deactivatedAt!=null)){
+    mapped.deactivated_at=row.deactivated_at||row.deactivatedAt||null;
+    mapped.deactivatedAt=mapped.deactivated_at||'';
+  }
   if(row&&(Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')||Object.prototype.hasOwnProperty.call(row,'weeklyAuthorizedHours'))){
     var raw=Object.prototype.hasOwnProperty.call(row,'weekly_authorized_hours')?row.weekly_authorized_hours:row.weeklyAuthorizedHours;
     var n=sbClientHoursValue({weekly_authorized_hours:raw==null?null:raw});
@@ -27663,7 +27713,8 @@ async function sbApiList(payload){
       var clientSelect=hoursState.col===false?String(SB_CLIENT_SELECT).replace(',weekly_authorized_hours',''):SB_CLIENT_SELECT;
       if(typeof sbClientInsState==='function'&&sbClientInsState().col===false)clientSelect=String(clientSelect).replace(',insurance_plan','');
       var clientPairs=[['select',clientSelect]];
-      if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
+      if(payload.clientDesk==='deleted')clientPairs.push(['is_active','eq.false']);
+      else if(!payload.includeInactive)clientPairs.push(['is_active','eq.true']);
       clientPairs.push(['order','name.asc']);
       var clients=await sbRestGet('clients', clientPairs);
       if(!clients.ok && hoursState.col!==false && sbClientHoursColumnMissing(clients)){
@@ -35577,18 +35628,45 @@ function printCert(r){
 
 // ─── CLIENT MANAGEMENT ──────────────────────────────────
 let allClients=[], allAidesForAssign=[];
+let clientDesk='active';
+let clientDeletedList=[];
+
+function clientOnDesk(c, desk){
+  if(!c)return false;
+  var inactive=c.isActive===false||c.is_active===false;
+  var stamp=c.deactivatedAt||c.deactivated_at||'';
+  if(desk==='deleted')return inactive||!!stamp;
+  if(inactive||stamp)return false;
+  return true;
+}
+function setClientDesk(view){
+  clientDesk=view==='deleted'?'deleted':'active';
+  document.querySelectorAll('[data-client-desk]').forEach(function(btn){
+    var on=btn.getAttribute('data-client-desk')===clientDesk;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-selected', on?'true':'false');
+  });
+  if(typeof clientManageDelete1OnDesk==='function')clientManageDelete1OnDesk();
+  return renderClients(true);
+}
 
 async function renderClients(force){
   const container=document.getElementById('clientsContainer');
-  if(force===true||!cacheGet('get_clients')){
+  var deleted=clientDesk==='deleted';
+  var cacheKey=deleted?'get_clients:deleted':'get_clients';
+  if(force===true||!cacheGet(cacheKey)){
     container.innerHTML='<div style="text-align:center;padding:30px"><div style="font-size:24px;margin-bottom:8px">⏳</div><p style="color:var(--muted);font-size:0.82rem">Loading clients from Google Sheets...</p></div>';
   }
   try{
-    const data=await apiGetCached('get_clients',null,force===true);
+    const data=await apiGetCached('get_clients',deleted?{clientDesk:'deleted'}:null,force===true);
     if(data.success){
-      allClients=data.data||[];
+      if(deleted)clientDeletedList=data.data||[];
+      else allClients=data.data||[];
     }
-  }catch(e){if(force===true||!allClients.length)allClients=[];}
+  }catch(e){
+    if(deleted){if(force===true)clientDeletedList=[];}
+    else if(force===true||!allClients.length)allClients=[];
+  }
   paintClients();
 }
 
@@ -35597,7 +35675,8 @@ function paintClients(){
   try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!container)return;
   const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
-  let list=allClients;
+  let list=clientDesk==='deleted'?clientDeletedList:allClients;
+  list=(list||[]).filter(function(c){return clientOnDesk(c, clientDesk);});
   if(typeof listAz1Apply==='function'&&listAz1On()){
     list=listAz1Apply(list,[
       function(c){return c&&c.name||'';},
@@ -35607,7 +35686,10 @@ function paintClients(){
   if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q));
 
   if(!list.length){
-    container.innerHTML='<div class="empty-state"><p>&#127968; No clients added yet. Click "+ Add Client" to get started.</p></div>';
+    container.innerHTML=clientDesk==='deleted'
+      ?'<div class="empty-state"><p>No clients in Recently deleted.</p></div>'
+      :'<div class="empty-state"><p>&#127968; No clients added yet. Click "+ Add Client" to get started.</p></div>';
+    if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
     return;
   }
 
@@ -35615,7 +35697,11 @@ function paintClients(){
     const aideCount=(c.assignedAides||[]).length;
     const hasGPS=c.lat&&c.lng;
     const head=typeof clientInsCardHead==='function'?clientInsCardHead(c):('<h4>'+(c.name||'')+'</h4>');
-    return `<div class="aide-card" data-client-ins1="v=client-ins1">
+    const manageCheck=typeof clientManageDelete1CheckHtml==='function'?clientManageDelete1CheckHtml(c):'';
+    const manageSel=typeof clientManageDelete1IsSelected==='function'&&clientManageDelete1IsSelected(c)?' is-selected':'';
+    const rowDelete=clientDesk==='deleted'?'':'<button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient(\''+c.id+'\')">Delete</button>';
+    var open='<div class="aide-card" data-client-ins1="v=client-ins1">'.replace('class="aide-card"','class="aide-card'+manageSel+'"');
+    return open+manageCheck+`
       <div>
         ${head}
         <p>&#128205; ${c.address||'No address set'} ${hasGPS?'<span style="color:var(--success)">&#10003; GPS Verified</span>':'<span style="color:var(--warn)">&#9888; GPS Not Set</span>'}</p>
@@ -35623,7 +35709,7 @@ function paintClients(){
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-sm btn-view" onclick="editClient('${c.id}')">Edit</button>
-        <button class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="deleteClient('${c.id}')">Delete</button>
+        ${rowDelete}
       </div>
     </div>`;
   });
@@ -35632,9 +35718,11 @@ function paintClients(){
       return {name:(c&&c.name)||'', html:clientCards[i]};
     }));
     if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
+    if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
     return;
   }
   container.innerHTML=clientCards.join('');
+  if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
 }
 
 async function loadAidesForAssignment(selectedIds=[]){
@@ -35940,6 +36028,193 @@ async function saveClient(){
 
 function deleteClient(id){
   showSharedConfirm('Delete this client? This cannot be undone.',function(){commitDeleteClient(id);},'Delete');
+}
+// v=aide-manage-delete1 — Clients Manage bulk soft-delete. One existing archive call per selected id.
+var clientManageDelete1Sel={};
+var clientManageDelete1Busy=false;
+function clientManageDelete1Key(client){
+  var id=String(client&&(client.id||client.clientId||client.client_id)||'').trim();
+  return id?('id:'+id):'';
+}
+function clientManageDelete1Active(){
+  var tab=document.getElementById('tab_clients');
+  var on=!!(tab&&tab.classList&&tab.classList.contains('client-manage-on'));
+  var deleted=(typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var can=typeof canManageAides!=='function'||canManageAides();
+  return on&&!deleted&&!!can;
+}
+function clientManageDelete1IsSelected(client){
+  var key=clientManageDelete1Key(client);
+  return !!(key&&clientManageDelete1Sel[key]);
+}
+function clientManageDelete1CheckHtml(client){
+  if(typeof clientDesk!=='undefined'&&clientDesk==='deleted')return '';
+  if(typeof canManageAides==='function'&&!canManageAides())return '';
+  var key=clientManageDelete1Key(client);
+  if(!key)return '';
+  var id=String(client&&(client.id||client.clientId||client.client_id)||'').trim();
+  var name=String((client&&client.name)||'client');
+  var attr=typeof escapeAttr==='function'?escapeAttr:function(s){return String(s==null?'':s);};
+  var checked=clientManageDelete1Sel[key]?' checked':'';
+  return '<label class="aide-manage-check" data-aide-manage-delete1="v=aide-manage-delete1"><input type="checkbox" class="aide-manage-cb"'+checked+' data-client-key="'+attr(key)+'" data-client-id="'+attr(id)+'" aria-label="Select '+attr(name)+'" onchange="clientManageDelete1Toggle(this)"></label>';
+}
+function clientManageDelete1Boxes(){
+  var root=document.getElementById('clientsContainer');
+  if(!root||!root.querySelectorAll)return [];
+  return Array.prototype.slice.call(root.querySelectorAll('input.aide-manage-cb'));
+}
+function clientManageDelete1Toggle(el){
+  if(!el)return;
+  var key=el.getAttribute('data-client-key')||'';
+  if(!key)return;
+  if(el.checked)clientManageDelete1Sel[key]={id:el.getAttribute('data-client-id')||''};
+  else delete clientManageDelete1Sel[key];
+  var card=el.closest?el.closest('.aide-card'):null;
+  if(card&&card.classList)card.classList.toggle('is-selected', !!el.checked);
+  clientManageDelete1PaintCount();
+}
+function clientManageDelete1Picks(){
+  var out=[];
+  Object.keys(clientManageDelete1Sel).forEach(function(key){
+    var row=clientManageDelete1Sel[key];
+    if(!row)return;
+    var id=String(row.id||'').trim();
+    if(!id)return;
+    out.push({id:id});
+  });
+  return out;
+}
+function clientManageDelete1PaintCount(){
+  var n=clientManageDelete1Picks().length;
+  var el=document.getElementById('clientManageCount');
+  if(el)el.textContent=n+' selected';
+  var del=document.getElementById('clientManageDeleteSelected');
+  if(del)del.disabled=n<1||clientManageDelete1Busy===true;
+}
+function clientManageDelete1SelectAll(){
+  if(!clientManageDelete1Active())return;
+  clientManageDelete1Boxes().forEach(function(el){
+    if(el.disabled)return;
+    el.checked=true;
+    clientManageDelete1Toggle(el);
+  });
+}
+function clientManageDelete1UnselectAll(){
+  clientManageDelete1Sel={};
+  clientManageDelete1Boxes().forEach(function(el){
+    el.checked=false;
+    var card=el.closest?el.closest('.aide-card'):null;
+    if(card&&card.classList)card.classList.remove('is-selected');
+  });
+  clientManageDelete1PaintCount();
+}
+function clientManageDelete1Clear(){
+  clientManageDelete1UnselectAll();
+  clientManageDelete1CloseConfirm();
+}
+function clientManageDelete1OpenConfirm(){
+  var n=clientManageDelete1Picks().length;
+  if(n<1||clientManageDelete1Busy)return;
+  if(!clientManageDelete1Active())return;
+  var title=document.getElementById('clientManageConfirmTitle');
+  if(title)title.textContent=n===1?'Delete 1 client?':('Delete '+n+' clients?');
+  var sure=document.getElementById('clientManageSure');
+  if(sure)sure.hidden=false;
+  var box=document.getElementById('clientManageConfirm');
+  if(box)box.hidden=false;
+  var tab=document.getElementById('tab_clients');
+  if(tab&&tab.classList)tab.classList.add('client-manage-confirming');
+  if(sure&&sure.scrollIntoView){try{sure.scrollIntoView({block:'start'});}catch(e){}}
+}
+function clientManageDelete1CloseConfirm(){
+  if(clientManageDelete1Busy)return;
+  var sure=document.getElementById('clientManageSure');
+  if(sure)sure.hidden=true;
+  var box=document.getElementById('clientManageConfirm');
+  if(box)box.hidden=true;
+  var tab=document.getElementById('tab_clients');
+  if(tab&&tab.classList)tab.classList.remove('client-manage-confirming');
+}
+function clientManageDelete1Sync(){
+  var tab=document.getElementById('tab_clients');
+  if(tab&&tab.classList)tab.classList.toggle('client-desk-deleted', typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  var bar=document.getElementById('clientManageBar');
+  var show=clientManageDelete1Active();
+  if(bar)bar.hidden=!show;
+  if(!show)clientManageDelete1CloseConfirm();
+  var manage=document.getElementById('clientManageBtn');
+  var manageShow=(typeof canManageAides!=='function'||canManageAides())&&!(typeof clientDesk!=='undefined'&&clientDesk==='deleted');
+  if(manage){
+    manage.hidden=!manageShow;
+    manage.style.display=manageShow?'':'none';
+    if(tab)manage.setAttribute('aria-pressed', tab.classList.contains('client-manage-on')?'true':'false');
+  }
+  clientManageDelete1PaintCount();
+  clientManageDelete1Bind();
+}
+function clientManageDelete1OnDesk(){
+  clientManageDelete1Sel={};
+  clientManageDelete1CloseConfirm();
+  clientManageDelete1Sync();
+}
+function clientManageDelete1ToggleManage(){
+  var tab=document.getElementById('tab_clients');
+  if(!tab)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  if(typeof clientDesk!=='undefined'&&clientDesk==='deleted')return;
+  tab.classList.toggle('client-manage-on');
+  var on=tab.classList.contains('client-manage-on');
+  if(!on)clientManageDelete1Clear();
+  clientManageDelete1Sync();
+}
+function clientManageDelete1Bind(){
+  if(clientManageDelete1Bind.done)return;
+  clientManageDelete1Bind.done=true;
+  document.addEventListener('keydown', function(ev){
+    if(!ev||ev.key!=='Escape'||clientManageDelete1Busy)return;
+    var box=document.getElementById('clientManageConfirm');
+    if(!box||box.hidden)return;
+    clientManageDelete1CloseConfirm();
+  });
+}
+async function clientManageDelete1Run(){
+  if(clientManageDelete1Busy)return;
+  if(typeof canManageAides==='function'&&!canManageAides())return;
+  var picks=clientManageDelete1Picks();
+  if(!picks.length)return;
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled()){
+    if(typeof showTempMsg==='function')showTempMsg('Soft-delete needs the Supabase clients desk.','var(--warn)');
+    return;
+  }
+  clientManageDelete1Busy=true;
+  clientManageDelete1PaintCount();
+  var go=document.getElementById('clientManageConfirmGo');
+  if(go)go.disabled=true;
+  var ok=0;
+  var fail='';
+  var i;
+  for(i=0;i<picks.length;i++){
+    var id=picks[i].id;
+    try{
+      var res=await apiPost({action:'archive_client', clientId:id, id:id});
+      if(res&&res.success===true&&res.is_active===false)ok++;
+      else if(typeof aceActionError==='function')fail=aceActionError(res,null,'archive_client');
+      else fail=(res&&(res.error||res.message))||'Could not archive this client.';
+    }catch(e){
+      fail=(typeof aceActionError==='function')?aceActionError(null,e,'archive_client'):'Could not archive this client.';
+    }
+  }
+  clientManageDelete1Busy=false;
+  if(go)go.disabled=false;
+  clientManageDelete1Sel={};
+  clientManageDelete1CloseConfirm();
+  if(typeof cacheInvalidate==='function')cacheInvalidate('get_clients');
+  if(typeof showTempMsg==='function'){
+    if(ok===1)showTempMsg('1 client moved to Recently deleted.','var(--success)');
+    else if(ok)showTempMsg(ok+' clients moved to Recently deleted.','var(--success)');
+    if(fail)showTempMsg(fail,'var(--danger)');
+  }
+  if(typeof renderClients==='function')await renderClients(true);
 }
 async function commitDeleteClient(id){
   const client=allClients.find(c=>String(c.id)===String(id));
