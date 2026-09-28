@@ -95,6 +95,16 @@ assert.ok(open.includes("'Delete 1 aide?'") && open.includes("'Delete '+n+' aide
 assert.ok(extractFn(html, 'function aideManageDelete1SelectAll()').includes('aideManageDelete1Active'), 'select all is manage-mode only');
 assert.ok(extractFn(html, 'function aideManageDelete1UnselectAll()').includes('aideManageDelete1Sel={}'), 'unselect clears');
 assert.ok(!extractFn(html, 'function aideManageDelete1UnselectAll()').includes('postAideAction'), 'unselect does not post');
+const credToggle = extractFn(html, 'function aideCredToggleManage()');
+assert.ok(credToggle.includes('aideCredHideForManage()') && credToggle.includes('aideCredShowAfterManage()'), 'Manage hides credentials and can restore them');
+const credHide = extractFn(html, 'function aideCredHideForManage()');
+assert.ok(credHide.includes('root.hidden=true') && credHide.includes("aideCredState.view='list'"), 'Manage forces the credentials root hidden and leaves detail');
+assert.ok(credHide.includes('aideCredCloseSheet()'), 'Manage closes the credential sheet');
+const credAfter = extractFn(html, 'function aideCredsAfterAides()');
+assert.ok(credAfter.indexOf('aideCredManageOn()') < credAfter.indexOf('root.hidden=!show'), 'credentials refresh cannot unhide the root during Manage');
+const credRefresh = extractFn(html, 'async function aideCredsRefresh()');
+assert.ok(credRefresh.indexOf('if(aideCredManageOn())return;') < credRefresh.indexOf('aideCredPaintList()'), 'credentials rollup does not paint during Manage');
+assert.ok(extractFn(html, 'function aideCredPaintDetail(messageHtml)').includes('if(aideCredManageOn())'), 'credential detail does not paint during Manage');
 
 function classList(){
   const set = new Set();
@@ -335,6 +345,58 @@ box.aideManageDelete1OpenConfirm();
 await box.aideManageDelete1Run();
 assert.strictEqual(posts.length, 0, 'sheets rollback does not post');
 assert.ok(/Supabase aides desk/.test(toasts[0].msg));
+
+const credRoot = node('aideCredsRoot');
+credRoot.hidden = false;
+credRoot.innerHTML = 'creds';
+const credDetail = node('aideCredDetail');
+credDetail.hidden = false;
+credDetail.innerHTML = 'Andre';
+const credList = node('aideCredList');
+credList.hidden = false;
+const credSheet = node('aideCredSheet');
+credSheet.hidden = false;
+const credTab = node('tab_aides');
+const credBtn = node('aideCredManageBtn');
+const credEls = {aideCredsRoot: credRoot, aideCredDetail: credDetail, aideCredList: credList, aideCredSheet: credSheet, tab_aides: credTab, aideCredManageBtn: credBtn};
+const credSrc = [
+  'var aideCredState={view:"detail",seq:1,sheetOpen:true,pickAide:false,editing:{id:"1"},credentials:[{id:"1"}]};',
+  extractFn(html, 'function aideCredManageOn()'),
+  extractFn(html, 'function aideCredHideForManage()'),
+  extractFn(html, 'function aideCredShowAfterManage()'),
+  extractFn(html, 'function aideCredToggleManage()'),
+  extractFn(html, 'function aideCredsAfterAides()')
+].join('\n');
+const credBox = {
+  aideCredState: {view:'detail', seq:1, sheetOpen:true, pickAide:false, editing:{id:'1'}, credentials:[{id:'1'}]},
+  aideDesk: 'active',
+  currentAdminRole: 'Admin',
+  document: {getElementById: function(id){return credEls[id] || null;}},
+  aideCredBind: function(){credBox.bound = true;},
+  aideCredsIsAdmin: function(){return true;},
+  aideCredCloseSheet: function(){credSheet.hidden = true; credBox.aideCredState.sheetOpen = false;},
+  aideCredPaintList: function(){credBox.painted = true; credList.hidden = false; credDetail.hidden = true;},
+  aideManageDelete1Clear: function(){credBox.cleared = true;},
+  aideManageDelete1Sync: function(){credBox.synced = true;}
+};
+vm.createContext(credBox);
+vm.runInContext(credSrc, credBox);
+credBox.aideCredToggleManage();
+assert.strictEqual(credTab.classList.contains('aide-manage-on'), true);
+assert.strictEqual(credRoot.hidden, true, 'Manage hides the credentials root');
+assert.strictEqual(credDetail.innerHTML, '', 'Manage clears the Andre credential card');
+assert.strictEqual(credBox.aideCredState.view, 'list');
+assert.strictEqual(credSheet.hidden, true);
+credBox.bound = false;
+credBox.aideCredsAfterAides();
+assert.strictEqual(credRoot.hidden, true, 'refresh during Manage does not show credentials');
+assert.strictEqual(credBox.bound, true);
+credBox.aideCredToggleManage();
+assert.strictEqual(credTab.classList.contains('aide-manage-on'), false);
+assert.strictEqual(credRoot.hidden, false, 'leaving Manage returns the credentials list');
+assert.strictEqual(credBox.aideCredState.view, 'list');
+assert.strictEqual(credBox.painted, true);
+assert.strictEqual(credDetail.hidden, true);
 
 const clientsHdr = html.slice(html.indexOf('id="tab_clients"'), html.indexOf('id="clientSearch"'));
 assert.ok(clientsHdr.includes('id="clientManageSure"') && clientsHdr.includes('>Are you sure?</p>'), 'Clients Are you sure sits at the top of the page');

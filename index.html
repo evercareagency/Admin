@@ -1688,7 +1688,8 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #aideManageSure[hidden],#aideManageBar[hidden],#aideManageConfirm[hidden]{display:none !important;}
 #tab_aides.aide-manage-on #aideRefreshBtn,
 #tab_aides.aide-manage-on #aideDeskSub,
-#tab_aides.aide-manage-on #aideCredsRoot{display:none !important;}
+#tab_aides.aide-manage-on #aideCredsRoot,
+#tab_aides.aide-manage-on #aideCredSheet{display:none !important;}
 #tab_aides.aide-manage-on #aideCredManageBtn{background:var(--navy);color:#fff;border-color:var(--navy);}
 .aide-manage-sure{font-family:'Playfair Display',Georgia,serif;font-size:1.65rem;font-weight:600;color:var(--navy);line-height:1.2;margin:0 0 8px;}
 #tab_aides.aide-manage-confirming #aideManageSure{position:relative;z-index:230;background:var(--off);}
@@ -31849,6 +31850,41 @@ function aideCredBind(){
     if(ev.key==='Escape'&&aideCredState.sheetOpen)aideCredCloseSheet();
   });
 }
+function aideCredManageOn(){
+  var tab=document.getElementById('tab_aides');
+  return !!(tab&&tab.classList&&tab.classList.contains('aide-manage-on'));
+}
+function aideCredHideForManage(){
+  var root=document.getElementById('aideCredsRoot');
+  if(aideCredHideForManage.held!==true){
+    aideCredHideForManage.wasHidden=!(root&&root.hidden===false);
+    aideCredHideForManage.held=true;
+  }
+  if(root)root.hidden=true;
+  var detail=document.getElementById('aideCredDetail');
+  if(detail){detail.hidden=true;detail.innerHTML='';}
+  var list=document.getElementById('aideCredList');
+  if(list)list.hidden=true;
+  if(typeof aideCredCloseSheet==='function')aideCredCloseSheet();
+  if(typeof aideCredState!=='undefined'&&aideCredState){
+    aideCredState.seq=(aideCredState.seq||0)+1;
+    aideCredState.view='list';
+    aideCredState.sheetOpen=false;
+    aideCredState.pickAide=false;
+    aideCredState.editing=null;
+    aideCredState.credentials=[];
+  }
+}
+function aideCredShowAfterManage(){
+  if(aideCredHideForManage.held!==true)return;
+  var wasHidden=aideCredHideForManage.wasHidden!==false;
+  aideCredHideForManage.held=false;
+  var root=document.getElementById('aideCredsRoot');
+  if(root)root.hidden=wasHidden;
+  if(wasHidden)return;
+  if(typeof aideCredState!=='undefined'&&aideCredState)aideCredState.view='list';
+  if(typeof aideCredPaintList==='function')aideCredPaintList();
+}
 function aideCredToggleManage(){
   var tab=document.getElementById('tab_aides');
   if(!tab)return;
@@ -31856,14 +31892,19 @@ function aideCredToggleManage(){
   var on=tab.classList.contains('aide-manage-on');
   var btn=document.getElementById('aideCredManageBtn');
   if(btn)btn.setAttribute('aria-pressed', on?'true':'false');
+  if(on)aideCredHideForManage();
+  else aideCredShowAfterManage();
   if(!on&&typeof aideManageDelete1Clear==='function')aideManageDelete1Clear();
-  if(on&&typeof aideCredCloseSheet==='function')aideCredCloseSheet();
   if(typeof aideManageDelete1Sync==='function')aideManageDelete1Sync();
 }
 function aideCredsAfterAides(){
   aideCredBind();
   var root=document.getElementById('aideCredsRoot');
   var tab=document.getElementById('tab_aides');
+  if(aideCredManageOn()){
+    if(root)root.hidden=true;
+    return;
+  }
   var show=aideCredsIsAdmin()&&(typeof aideDesk==='undefined'||aideDesk!=='deleted');
   if(root)root.hidden=!show;
   if(tab)tab.classList.toggle('aide-creds-on', !!show);
@@ -31892,6 +31933,7 @@ function aideCredPaintBanner(){
   el.innerHTML='<span aria-hidden="true">\u26A0</span> '+escapeHtml(text);
 }
 function aideCredPaintList(){
+  if(aideCredManageOn())return;
   var list=document.getElementById('aideCredList');
   var wrap=document.getElementById('aideCredSearchWrap');
   var detail=document.getElementById('aideCredDetail');
@@ -32016,6 +32058,13 @@ function aideCredDetailTop(){
   return '<div class="aide-cred-detail-top"><button type="button" data-aide-cred-back aria-label="Back to aides">\u2190</button><h2>'+escapeHtml(aideCredState.aideName||'Aide')+'</h2></div>';
 }
 function aideCredPaintDetail(messageHtml){
+  if(aideCredManageOn()){
+    var blocked=document.getElementById('aideCredDetail');
+    if(blocked)blocked.hidden=true;
+    var blockedRoot=document.getElementById('aideCredsRoot');
+    if(blockedRoot)blockedRoot.hidden=true;
+    return;
+  }
   var list=document.getElementById('aideCredList');
   var wrap=document.getElementById('aideCredSearchWrap');
   var detail=document.getElementById('aideCredDetail');
@@ -32062,6 +32111,7 @@ async function aideCredFillBareChips(aides, seq){
 }
 async function aideCredsRefresh(){
   if(!aideCredsIsAdmin())return;
+  if(aideCredManageOn())return;
   var seq=++aideCredState.seq;
   aideCredState.error='';
   var res=await sbAdminAideCredentialsRollup(null);
@@ -32081,11 +32131,18 @@ async function aideCredsRefresh(){
     aideCredState.attention=res.attention;
     aideCredState.error='';
   }
+  if(aideCredManageOn()){
+    var stay=document.getElementById('aideCredsRoot');
+    if(stay)stay.hidden=true;
+    aideCredState.view='list';
+    return;
+  }
   if(aideCredState.view==='detail')return;
   aideCredPaintList();
 }
 async function aideCredOpen(aideId){
   if(!aideCredsIsAdmin())return;
+  if(aideCredManageOn())return;
   var id=String(aideId||'');
   var aide=(aideCredState.aides||[]).filter(function(a){return a.id===id;})[0];
   aideCredState.view='detail';
@@ -32094,6 +32151,10 @@ async function aideCredOpen(aideId){
   aideCredState.credentials=[];
   aideCredPaintDetail('<p class="aide-cred-muted">Loading credentials...</p>');
   var res=await sbAdminListAideCredentials(id);
+  if(aideCredManageOn()){
+    aideCredState.view='list';
+    return;
+  }
   if(aideCredState.aideId!==id||aideCredState.view!=='detail')return;
   if(!res||!res.success){
     aideCredPaintDetail('<p class="aide-cred-muted">'+escapeHtml((res&&res.error)||'Could not load credentials.')+'</p>');
