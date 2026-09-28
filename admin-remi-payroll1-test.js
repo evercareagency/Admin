@@ -478,29 +478,43 @@ async function runBrowser(){
     }, {report:REPORT, jobs:[PAY_JOB]});
     const deskView = await desk.evaluate(function(){
       var sheet = document.getElementById('copilotSheet');
-      var box = sheet.getBoundingClientRect();
+      var page = document.getElementById('tab_payroll');
       return {
-        text: document.getElementById('copilotBody').innerText,
-        right: Math.round(box.right),
-        width: Math.round(box.width),
+        text: page ? page.innerText : '',
+        pageOn: !!(page && page.classList.contains('active')),
+        inRail: !!(page && page.closest && page.closest('#copilotSheet')),
+        sheetHidden: !!(sheet && sheet.hidden),
         fullPage: !!document.getElementById('tab_remi'),
         view: window.innerWidth
       };
     });
     assert.strictEqual(deskView.fullPage, false);
-    assert.ok(deskView.width <= 460, 'rail width '+deskView.width);
-    assert.ok(deskView.right >= deskView.view - 2, 'rail sits on the right '+deskView.right);
+    assert.strictEqual(deskView.pageOn, true, 'Admin desktop payroll is the own page');
+    assert.strictEqual(deskView.inRail, false, 'own page is not the Remi rail');
+    assert.strictEqual(deskView.sheetHidden, true, 'desktop report does not stay open in the rail');
     assert.ok(deskView.text.indexOf('Payroll report') >= 0, deskView.text);
     assert.ok(deskView.text.indexOf('36.15') >= 0, deskView.text);
+    assert.ok(deskView.text.indexOf('Own page') >= 0, deskView.text);
     await desk.screenshot({path:path.join(shotDir, 'remi-payroll1-desktop-report.png')});
     await desk.evaluate(async function(){remiSched1Show(); await remiSched1Load();});
     const deskSched = await desk.evaluate(function(){
-      return document.getElementById('copilotBody').innerText;
+      var sheet = document.getElementById('copilotSheet');
+      var box = sheet.getBoundingClientRect();
+      return {
+        text: document.getElementById('copilotBody').innerText,
+        width: Math.round(box.width),
+        right: Math.round(box.right),
+        view: window.innerWidth,
+        hidden: sheet.hidden
+      };
     });
-    assert.ok(deskSched.indexOf('Every other Wednesday') >= 0, deskSched);
-    assert.ok(deskSched.indexOf('Wed 10/07/2026') >= 0, deskSched);
-    assert.ok(deskSched.indexOf('09/23/2026') >= 0, deskSched);
-    assert.ok(deskSched.indexOf('10/08') < 0 && deskSched.indexOf('09/24') < 0, deskSched);
+    assert.strictEqual(deskSched.hidden, false);
+    assert.ok(deskSched.width <= 460, 'rail width '+deskSched.width);
+    assert.ok(deskSched.right >= deskSched.view - 2, 'rail sits on the right '+deskSched.right);
+    assert.ok(deskSched.text.indexOf('Every other Wednesday') >= 0, deskSched.text);
+    assert.ok(deskSched.text.indexOf('Wed 10/07/2026') >= 0, deskSched.text);
+    assert.ok(deskSched.text.indexOf('09/23/2026') >= 0, deskSched.text);
+    assert.ok(deskSched.text.indexOf('10/08') < 0 && deskSched.text.indexOf('09/24') < 0, deskSched.text);
     await desk.screenshot({path:path.join(shotDir, 'remi-payroll1-desktop-scheduled.png')});
     assert.ok(!errors.some(function(e){return /remiPayroll|SyntaxError/.test(e);}), errors.join('\n'));
     console.log('admin-remi-payroll1 browser ok');
