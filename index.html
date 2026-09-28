@@ -15,7 +15,7 @@
 <!-- list az sticky 2026-09-28 v=list-az-sticky1 ?v=list-az-sticky1 admin-build 2026-09-28-list-az-sticky1. GHOST-LIST-AZ-STICKY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Builds on list-az1: the tiny A–Z chip next to Client and the evercare_list_order preference stay. This tip is the letter jump rail, not a new sort chip. When listAz1On (mode az), Admin Aides (aides-info1 cards and the fallback aide cards) and Clients paint a fixed right-edge vertical A–Z rail over the list stage. The list scrolls underneath. The letter in view highlights teal. Tap or drag a letter to jump to that section. Right padding keeps cards clear of the rail. When usual order, the rail is omitted and today’s order stays. FIX A3: the same tiny compact A–Z chip (class sched-az-chip list-az-chip) also sits beside the Aides and Clients titles and calls listAz1Toggle against the same evercare_list_order preference. It is not a fat pill and not a second key. Manage stays the credentials control. FIX A4: Admin default Aides rail mounts on #aideCredList when A–Z is on; Manage stays credentials-only. Phone and desktop. Dates people read are MM/DD/YYYY. Prior markers stay, including v=list-az1, v=punch-leftovers1, v=aides-info1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-28-list-az-sticky1">
 <script>var LIST_AZ_STICKY1_MARKER='v=list-az-sticky1';var LIST_AZ_STICKY1_BUILD='2026-09-28-list-az-sticky1';</script>
-<!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
+<!-- cover desk 2026-09-28 v=cover-desk1 ?v=cover-desk1 admin-build 2026-09-28-cover-desk1. GHOST-COVER-DESK1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Cover is the call-off desk. The user-visible name is Cover on the bottom bar, in More, in Edit tabs, and in the Remi desk inventory. The panel stays #tab_coverage and the hash stays coverage. #cover aliases to the same panel. Empty nav storage pins Cover on the default bar after Aides and before Backup (Timesheets, Schedule, Aides, Cover, Backup, plus More), still under tabbar-8 (up to 8 + More). A saved bar already at 8 that omits Cover stays as saved. Edit tabs can still swap Cover off. (1) Open call-off desk CALLABLE LIVE: admin_list_open_shifts {p_include_resolved:false} returns open and awaiting_client rows plus urgency_within_48h, cover_no_backup, and cover_prefer_wait. admin_record_call_off and admin_cover_outcome stay (assigned_backup, awaiting_client, client_refused_resume_next_day, cancel, reopen). admin_cover_outcome takes p_manager_override, default false. Blast and confirm stay coverage-simple1. Cancel stays cover-card-cancel1. cover-unselect1 stays. admin_rank_float_pool_aides stays on Remi and the confirm band only (remi-float-hide1b) and is not the Cover smart-assign rank. Today and Tomorrow come from shift_start in America/New_York. The Hot badge is urgency_within_48h. Hot is solid red and pulses. Today is orange. Tomorrow is teal and muted. (2) Smart assign CALLABLE LIVE: admin_rank_backup_aides {p_open_shift_id, p_limit:20}. Paint rank, name, aide_id, distance_miles, score, and continuity_score as worked this client N×. Continuity outranks a closer aide with no history. (3) Durable prefs CALLABLE LIVE: admin_get_client_cover_prefs {p_client_id} and admin_set_client_cover_prefs {p_client_id, p_cover_no_backup null=unchanged, p_cover_prefer_wait null=unchanged}. Scheduler and Admin can set them from Edit Client and from the Cover gate. Cards chip No backup and Prefer wait from the list-row flags. Prefer wait is a soft gate: warn, Wait posts awaiting_client, Text stays the draft, and Assign anyway then assigns without p_manager_override. FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open. An Ace row that echoes status open does not overwrite a just-posted awaiting_client. Wait stays the default path when both cover_no_backup and cover_prefer_wait are set, and it does not require Override. No backup disables Assign until a manager Override, then assigned_backup posts p_manager_override true. Ace returns 400 client cover_no_backup: manager override required when that flag is set and override is false. NO PTO on this desk. Remi stays the corner chip. Remi rail is N/A for assign logic. Phone-first, with a desktop side panel for smart assign at 961px and up. Dates people read are MM/DD/YYYY. Prior markers stay, including v=punch-leftovers1, v=coverage-simple1, v=cover-card-cancel1, v=remi-float-hide1b, v=list-az1, v=tabbar-8, and v=cover-unselect1. -->
 <meta name="admin-build" content="2026-09-28-cover-desk1">
 <script>var COVER_DESK1_MARKER='v=cover-desk1';var COVER_DESK1_BUILD='2026-09-28-cover-desk1';</script>
 <!-- list order A–Z 2026-09-27 v=list-az1 admin-build 2026-09-27-list-az1. GHOST-LIST-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. LOOK LOCK quieter Option A. A tiny compact A–Z chip sits next to Client on the navy week header. Not a fat pill. Not beside Find a client. One sticky localStorage preference evercare_list_order, keyed like evercare_nav_tabs by the signed-in admin, stores {v:1, mode:az|usual}. Default usual. When az, Schedule client rows, Aides, Clients, Timesheets, Declines and Backup open-shift lists, and the Aide chat sidebar sort A–Z by the painted display name. When usual, today’s order stays. New adds land in A–Z after the next paint. No SQL. No preference RPC. No Auth reseal. No mossier. No Quo/SMS. Remi is N/A. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=compliance-bulk1, v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=remi-chat1, v=hold-client1, and v=aides-info1. -->
@@ -748,6 +748,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-card-actions .cover-card-cancel:focus-visible{background:#fde8e6;border-color:var(--danger);}
 #tab_coverage .cover-simple-banner.is-cancel{background:#fde8e6;border:1px solid #f0c4bc;color:#8b1e14;font-weight:600;}
 #tab_coverage .cover-chip-open{background:#fff7ed;color:#9a3412;border:1px solid #fdba74;}
+#tab_coverage .cover-chip-wait{background:#e8f4f4;color:#1e6060;border:1px solid #a8d4d4;}
 /* v=cover-desk1 — urgency chips, smart assign, prefer-wait gate. NO PTO. */
 #tab_coverage{
   --cd-hot:#c0392b; --cd-hot-bg:#fde8e6; --cd-hot-bd:#f0a8a0;
@@ -772,6 +773,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_coverage .cover-desk-chip.tmrw{background:var(--cd-tmrw-bg);color:var(--cd-tmrw);border-color:var(--cd-tmrw-bd);}
 #tab_coverage .cover-desk-chip.pref,#tab_coverage .cover-desk-chip.nobackup{background:var(--cd-pref);color:#fff;border-color:#5a1f68;box-shadow:0 0 0 2px var(--cd-pref-bg);text-transform:uppercase;}
 #tab_coverage .cover-desk-chip.open{background:#fff7ed;color:#9a3412;border-color:#fdba74;}
+#tab_coverage .cover-desk-chip.wait{background:var(--cd-tmrw-bg);color:var(--cd-tmrw);border-color:var(--cd-tmrw-bd);text-transform:uppercase;}
 #tab_coverage .cover-desk-chip.office{background:var(--teal-light);color:var(--teal-dark);border-color:#c5e0e0;text-transform:none;letter-spacing:0;font-weight:700;}
 #tab_coverage .cover-desk-chip.aide{background:#e7eef9;color:var(--navy);border-color:#c5d4ee;text-transform:none;letter-spacing:0;font-weight:700;}
 @keyframes coverDesk1Hot{
@@ -7264,7 +7266,8 @@ function coverPaintList(){
     var intake=s&&s.intakeSource==='aide'?'aide':'office';
     var chips=coverSourceChips(s);
     var st=coverStatusKey(s);
-    if(st===''||st==='open'||st==='awaiting_client')chips=chips.replace('<span class="cover-chips">','<span class="cover-chips"><span class="cover-chip cover-chip-open">Open</span>');
+    if(st==='awaiting_client')chips=chips.replace('<span class="cover-chips">','<span class="cover-chips"><span class="cover-chip cover-chip-wait">Waiting</span>');
+    else if(st===''||st==='open')chips=chips.replace('<span class="cover-chips">','<span class="cover-chips"><span class="cover-chip cover-chip-open">Open</span>');
     var when=typeof coverSimpleWhenLabel==='function'?coverSimpleWhenLabel(s.startsAt, s.endsAt):coverFormatSpan(s.startsAt, s.endsAt);
     var reason=s.note?(' · '+coverEsc(s.note)):'';
     var serviceDate=typeof coverCardCancel1Mdy==='function'?coverCardCancel1Mdy(s):'';
@@ -7327,6 +7330,7 @@ async function coverReload(opts){
     coverShifts=coverReadLocal();
     if(note)note.textContent=(got&&got.error)||'Could not load open shifts.';
   }
+  if(typeof coverDesk1StickAwaiting==='function')coverShifts=coverDesk1StickAwaiting(coverShifts);
   if(gen!==coverListGen)return {stale:true};
   coverPaintList();
   return {ok:!!(got&&got.ok), stale:false};
@@ -8303,8 +8307,16 @@ async function coverApplyOutcome(outcome){
     var rows=coverShiftRows(got.data);
     returned=coverMapShift((rows&&rows[0])||got.data||{})||null;
   }
-  if(returned&&returned.statusExplicit)shift.status=returned.status;
-  else shift.status=outcome;
+  if(outcome==='awaiting_client'&&got&&got.ok){
+    shift.status=coverDesk1ResolveAwaiting(returned);
+    if(coverStatusKey(shift)==='awaiting_client')coverDesk1PostedWait[String(shift.id)]=true;
+    else delete coverDesk1PostedWait[String(shift.id)];
+  }else if(returned&&returned.statusExplicit){
+    shift.status=returned.status;
+  }else{
+    shift.status=outcome;
+    if(outcome==='awaiting_client')coverDesk1PostedWait[String(shift.id)]=true;
+  }
   var sms='';
   if(returned&&returned.smsStub)sms=returned.smsStub;
   else if(got&&got.data&&got.data.sms_stub)sms=String(got.data.sms_stub);
@@ -8645,6 +8657,7 @@ function coverEnsureBound(){
 var coverDesk1Filter='all';
 var coverDesk1Override={};
 var coverDesk1Soft={};
+var coverDesk1PostedWait={};
 var coverDesk1SmartId='';
 var coverDesk1PrefsState={loaded:false,noBackup:null,preferWait:null};
 function coverDesk1NyParts(ms){
@@ -8759,7 +8772,8 @@ function coverDesk1CardChips(shift){
   else if(u==='today')bits.push('<span class="cover-desk-chip today">Today</span>');
   else if(u==='tmrw')bits.push('<span class="cover-desk-chip tmrw">Tomorrow</span>');
   var st=typeof coverStatusKey==='function'?coverStatusKey(shift):'';
-  if(st===''||st==='open'||st==='awaiting_client')bits.push('<span class="cover-desk-chip open">Open</span>');
+  if(st==='awaiting_client')bits.push('<span class="cover-desk-chip wait">Waiting</span>');
+  else if(st===''||st==='open')bits.push('<span class="cover-desk-chip open">Open</span>');
   var intake=shift&&shift.intakeSource==='aide'?'aide':'office';
   bits.push('<span class="cover-desk-chip '+intake+'">'+(intake==='aide'?'Aide':'Office')+'</span>');
   if(coverDesk1NoBackup(shift))bits.push('<span class="cover-desk-chip nobackup">No backup</span>');
@@ -8972,8 +8986,40 @@ function coverDesk1Assign(id, name){
   if(typeof coverPickRank==='function')coverPickRank(id, name);
   if(typeof coverConfirmAssign==='function')coverConfirmAssign();
 }
-function coverDesk1ConfirmWait(){
-  if(typeof coverApplyOutcome==='function')coverApplyOutcome('awaiting_client');
+function coverDesk1ResolveAwaiting(returned){
+  var retSt='';
+  if(returned&&returned.statusExplicit){
+    retSt=typeof coverStatusKey==='function'?coverStatusKey(returned):String(returned.status||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
+  }
+  if(retSt==='awaiting_client')return 'awaiting_client';
+  if(retSt&&retSt!=='open'&&retSt!=='call_off'&&retSt!=='calloff'&&retSt!=='reopen'&&retSt!=='reopened')return String(returned.status);
+  return 'awaiting_client';
+}
+function coverDesk1StickAwaiting(rows){
+  return (rows||[]).map(function(s){
+    if(!s||!s.id||!coverDesk1PostedWait[String(s.id)])return s;
+    var st=typeof coverStatusKey==='function'?coverStatusKey(s):String(s.status||'open').trim().toLowerCase().replace(/[\s-]+/g,'_');
+    if(st==='awaiting_client')return s;
+    if(!st||st==='open'||st==='call_off'||st==='calloff'||st==='reopen'||st==='reopened'){
+      s.status='awaiting_client';
+      return s;
+    }
+    delete coverDesk1PostedWait[String(s.id)];
+    return s;
+  });
+}
+async function coverDesk1ConfirmWait(){
+  if(typeof coverApplyOutcome!=='function')return;
+  var id='';
+  try{id=String(coverSelectedId||'');}catch(e){id='';}
+  await coverApplyOutcome('awaiting_client');
+  var posted=false;
+  try{posted=String(coverPostedKey||'')===id+'|awaiting_client';}catch(e2){posted=false;}
+  if(!posted||!id)return;
+  if(typeof coverReload==='function'){
+    try{await coverReload({keepOnFail:true});}catch(e3){}
+  }
+  if(typeof coverShowList==='function')coverShowList();
 }
 function coverDesk1OverrideOpen(){
   var role='';

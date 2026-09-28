@@ -41,6 +41,18 @@ assert.ok(html.includes("rank:['admin_rank_backup_aides']"), 'rank callable stay
 assert.ok(html.includes("outcome:['admin_cover_outcome']"), 'outcome callable stays');
 assert.ok(html.includes('client_refused_resume_next_day'), 'refused outcome stays on the desk');
 assert.ok(html.includes("coverApplyOutcome('awaiting_client')"), 'wait posts awaiting_client');
+assert.ok(html.includes('FIX A3 — Confirm Wait posts awaiting_client and paints Waiting, not Open.'), 'A3 contract');
+assert.ok(html.includes('cover-chip-wait'), 'waiting chip style');
+const paintFn = extractFn(html, 'function coverPaintList()');
+assert.ok(paintFn.includes('cover-chip-wait">Waiting'), 'list paints Waiting');
+assert.ok(paintFn.includes("if(st==='awaiting_client')chips") && paintFn.indexOf('cover-chip-wait">Waiting') < paintFn.indexOf('cover-chip-open">Open'), 'Waiting is its own chip before Open');
+const chipFn = extractFn(html, 'function coverDesk1CardChips(shift)');
+assert.ok(chipFn.includes('cover-desk-chip wait">Waiting'), 'desk chip paints Waiting');
+assert.ok(chipFn.includes("if(st==='awaiting_client')bits.push") && chipFn.indexOf('cover-desk-chip wait">Waiting') < chipFn.indexOf('cover-desk-chip open">Open'), 'desk Waiting chip is separate from Open');
+const waitFn = extractFn(html, 'async function coverDesk1ConfirmWait()');
+assert.ok(waitFn.includes("await coverApplyOutcome('awaiting_client')"), 'confirm wait awaits the outcome');
+assert.ok(waitFn.includes('coverReload'), 'confirm wait reloads from Ace');
+assert.ok(extractFn(html, 'async function coverApplyOutcome(outcome)').includes('coverDesk1ResolveAwaiting'), 'open echo does not keep Open');
 assert.ok(html.includes("prefsGet:['admin_get_client_cover_prefs']"), 'get prefs callable');
 assert.ok(html.includes("prefsSet:['admin_set_client_cover_prefs']"), 'set prefs callable');
 assert.ok(html.includes('id="clientCoverNoBackup"'), 'client edit no-backup');
@@ -97,7 +109,11 @@ vm.createContext(ctx);
   'function coverMapShift(row)',
   'function coverMapRank(row)',
   'function coverOutcomeBody(openShiftId, outcome, backupAideId, notes)',
-  'function coverDesk1PrefsSetBody(clientId, noBackup, preferWait)'
+  'function coverDesk1PrefsSetBody(clientId, noBackup, preferWait)',
+  'function coverStatusKey(shift)',
+  'function coverDesk1ResolveAwaiting(returned)',
+  'function coverDesk1StickAwaiting(rows)',
+  'function coverDesk1CardChips(shift)'
 ].forEach(function(sig){
   vm.runInContext(extractFn(html, sig), ctx);
 });
@@ -136,6 +152,24 @@ assert.strictEqual(plainOutcome.p_manager_override, undefined, 'override default
 const setBody = vm.runInContext('coverDesk1PrefsSetBody("c1", null, true)', ctx);
 assert.strictEqual(setBody.p_cover_no_backup, undefined, 'null leaves no-backup unchanged');
 assert.strictEqual(setBody.p_cover_prefer_wait, true);
+
+assert.strictEqual(vm.runInContext('coverDesk1ResolveAwaiting({status:"open", statusExplicit:true})', ctx), 'awaiting_client', 'echoed open becomes awaiting_client');
+assert.strictEqual(vm.runInContext('coverDesk1ResolveAwaiting({status:"awaiting_client", statusExplicit:true})', ctx), 'awaiting_client', 'explicit awaiting stays');
+assert.strictEqual(vm.runInContext('coverDesk1ResolveAwaiting({status:"assigned_backup", statusExplicit:true})', ctx), 'assigned_backup', 'a terminal outcome stays');
+assert.strictEqual(vm.runInContext('coverDesk1ResolveAwaiting(null)', ctx), 'awaiting_client', 'missing return stays awaiting');
+ctx.coverDesk1PostedWait = {h1:true, h3:true, h4:true};
+const stuck = JSON.parse(JSON.stringify(vm.runInContext('coverDesk1StickAwaiting([{id:"h1", status:"open"},{id:"h2", status:"open"},{id:"h4", status:"awaiting_client"},{id:"h3", status:"assigned_backup"}])', ctx)));
+assert.strictEqual(stuck[0].status, 'awaiting_client', 'reload open echo stays Waiting');
+assert.strictEqual(stuck[1].status, 'open', 'other open rows stay open');
+assert.strictEqual(stuck[2].status, 'awaiting_client', 'Ace awaiting_client stays');
+assert.strictEqual(stuck[3].status, 'assigned_backup', 'terminal reload is kept');
+assert.strictEqual(ctx.coverDesk1PostedWait.h3, undefined, 'terminal clears the wait stick');
+const waitingChips = vm.runInContext('coverDesk1CardChips({id:"h1", status:"awaiting_client", coverNoBackup:true, coverPreferWait:true, startsAt:"2026-09-29T13:00:00Z", intakeSource:"office"})', ctx);
+assert.ok(waitingChips.includes('>Waiting<'), 'both flags still chip Waiting');
+assert.ok(!waitingChips.includes('>Open<'), 'Waiting is not Open');
+assert.ok(waitingChips.includes('>No backup<') && waitingChips.includes('>Prefer wait<'), 'preference chips stay');
+const openChips = vm.runInContext('coverDesk1CardChips({id:"o1", status:"open", startsAt:"2026-09-29T13:00:00Z", intakeSource:"office"})', ctx);
+assert.ok(openChips.includes('>Open<') && !openChips.includes('>Waiting<'), 'open stays Open');
 
 const ranked = vm.runInContext('coverMapRank({aide_id:"a1", name:"Devon", continuity_score:12, distance_miles:1.8, worked_this_client:4, score:9, rank:1})', ctx);
 assert.strictEqual(ranked.continuity, 12, 'continuity_score is the times-worked count');
