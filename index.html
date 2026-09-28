@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
-<!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1: the Aide Office name list is a flex column whose list body scrolls (overflow-y: auto) at the same height as the thread panel, so a long roster does not grow the page or the thread. Schedule a Remi message stays pinned (flex-shrink: 0) above the composer and does not scroll away with the messages. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
+<!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1b: the left Aide Office name list is a fixed-height column with its own scrollbar (overflow-y: auto). A long roster does not stretch the Messages page. The thread panel and Schedule a Remi message stay fixed in view and do not scroll away with the roster. Option 2 one-box scroll stays: the message box scrolls and Schedule a Remi stays pinned in the thread panel. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-msg-dense1">
 <!-- aide notif search 2026-09-27 v=aide-notif-search1 admin-build 2026-09-27-aide-notif-search1. GHOST-AIDE-NOTIF-SEARCH1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. More → Notifications (#tab_notifications, clienthrs1d) has a search field above the filter chips (Needs attention, All aides, Location off, Chat off). Search matches aide name and username / @handle, case-insensitive, and a leading @ is optional. Filters still call admin_list_aide_notification_roster {p_filter}. Search only narrows the painted rows from that response. Switching a filter chip keeps the search text and re-applies it after paint. An empty search shows the full filtered roster. No matches say No aides match that search. Same spirit as coverRosterSearch and aideCredSearch. No p_search. Nudge buttons stay. No Auth reseal. No Quo/SMS. Remi is unchanged. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=clienthrs1d, v=vapid1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-aide-notif-search1">
@@ -837,7 +837,7 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
   #tab_aidechat.is-thread #aidechatInboxView .aidechat-settings,
   #tab_aidechat.is-thread #aidechatInboxView .aidechat-note,
   #tab_aidechat.is-thread #aidechatEmpty{display:none;}
-  #tab_aidechat.is-thread #aidechatList{gap:4px;overflow-x:hidden;overflow-y:auto;min-height:0;flex:1 1 auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  #tab_aidechat.is-thread #aidechatList{gap:4px;overflow-x:hidden;overflow-y:auto;min-height:0;flex:1 1 auto;scrollbar-gutter:stable;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
   #tab_aidechat.is-thread .aidechat-card{min-height:44px;padding:8px 10px;border-left-width:0;border-radius:10px;box-shadow:none;}
   #tab_aidechat.is-thread .aidechat-chips,#tab_aidechat.is-thread .aide-office-meta{display:none;}
   #tab_aidechat.is-thread .aidechat-preview{display:block;margin-top:2px;font-size:0.78rem;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -10526,9 +10526,11 @@ function msgDense1Fit(){
   var tab=document.getElementById('tab_aidechat');
   var inbox=document.getElementById('aidechatInboxView');
   var open=!!(tab&&tab.classList.contains('is-open')&&!tab.hidden);
+  var list=document.getElementById('aidechatList');
   if(!open){
     if(panel){panel.style.height='';panel.style.maxHeight='';}
     if(inbox){inbox.style.height='';inbox.style.maxHeight='';}
+    if(list){list.style.height='';list.style.maxHeight='';list.style.overflowY='';list.style.flex='';}
     return;
   }
   var top=document.querySelector('#adminScreen .shell-top');
@@ -10541,8 +10543,34 @@ function msgDense1Fit(){
   var h=Math.round((window.innerHeight||0)-topH-navH-padTop-10);
   if(h<240)h=240;
   if(panel){panel.style.height=h+'px';panel.style.maxHeight=h+'px';}
-  if(inbox&&tab.classList.contains('is-thread')){inbox.style.height=h+'px';inbox.style.maxHeight=h+'px';}
-  else if(inbox){inbox.style.height='';inbox.style.maxHeight='';}
+  if(inbox&&tab.classList.contains('is-thread')){
+    inbox.style.height=h+'px';
+    inbox.style.maxHeight=h+'px';
+    inbox.style.overflow='hidden';
+    if(list){
+      var pad=24;
+      var labelH=0;
+      try{
+        var ics=window.getComputedStyle(inbox);
+        pad=(parseFloat(ics.paddingTop)||0)+(parseFloat(ics.paddingBottom)||0);
+        var lab=document.getElementById('aidechatListLabel');
+        if(lab&&window.getComputedStyle(lab).display!=='none'){
+          var lcs=window.getComputedStyle(lab);
+          labelH=lab.offsetHeight+(parseFloat(lcs.marginTop)||0)+(parseFloat(lcs.marginBottom)||0);
+        }
+      }catch(e2){}
+      var listH=Math.floor(inbox.clientHeight-pad-labelH);
+      if(listH<80)listH=80;
+      list.style.flex='0 0 auto';
+      list.style.height=listH+'px';
+      list.style.maxHeight=listH+'px';
+      list.style.overflowY='auto';
+      list.style.minHeight='0';
+    }
+  }else{
+    if(inbox){inbox.style.height='';inbox.style.maxHeight='';}
+    if(list){list.style.height='';list.style.maxHeight='';list.style.overflowY='';list.style.flex='';}
+  }
   var form=document.getElementById('aidechatComposer');
   var fab=document.getElementById('copilotFab');
   if(form){
