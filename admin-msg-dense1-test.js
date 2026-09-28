@@ -20,7 +20,8 @@ assert.ok(html.includes('Not option 1 phone-width column'), 'not option 1');
 assert.ok(html.includes('overflow-y:auto') || html.includes('overflow-y: auto'), 'message list scrolls');
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 80).includes('2026-09-27-msg-dense1'), 'first admin-build is msg-dense1');
-assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-msg-dense1"') < html.indexOf('content="2026-09-27-remi-chat1"'), 'remi-chat1 stays after msg-dense1');
+assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-hold-client1"') < html.indexOf('content="2026-09-27-aides-info1"'), 'aides-info1 stays after hold-client1');
 assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
@@ -41,6 +42,10 @@ assert.ok(html.includes('id="aidechatThreadAv"'), 'thread header avatar');
 assert.ok(html.includes('class="aide-office-av"'), 'aide list avatar stays');
 assert.ok(html.includes('id="msgDensePanel"'), 'fixed thread panel');
 assert.ok(html.includes('function msgDense1Fit'), 'height lock');
+assert.ok(html.includes('v=msg-dense1b'), 'msg-dense1b marker');
+assert.ok(html.includes('data-msg-dense1b="v=msg-dense1b"'), 'msg-dense1b data attr');
+assert.ok(html.includes('aide-list-scroll1'), 'aide-list-scroll1 note');
+assert.ok(html.includes("var MSG_DENSE1B_MARKER='v=msg-dense1b'"), 'msg-dense1b script marker');
 assert.ok(html.includes('v=more-hide1'), 'more-hide1 marker');
 assert.ok(html.includes('data-more-hide1="v=more-hide1"'), 'more-hide1 data attr');
 assert.ok(html.includes("var MORE_HIDE1_MARKER='v=more-hide1'"), 'more-hide1 script marker');
@@ -51,6 +56,14 @@ assert.ok(html.includes('padding:6px 10px'), 'tighter bubble padding');
 assert.ok(html.includes('admin_get_remi_payroll_report'), 'payroll desk stays');
 const denseNote = html.slice(html.indexOf('<!-- messages dense 2026-09-27 v=msg-dense1'), html.indexOf('<meta name="admin-build" content="2026-09-27-msg-dense1">') + 62);
 assert.ok(!/patches\/msg-dense1|\.sql/.test(denseNote), 'no SQL in this tip');
+const panelChunk = html.slice(html.indexOf('id="msgDensePanel"'), html.indexOf('id="aideOfficeToast"'));
+assert.ok(panelChunk.indexOf('id="aidechatMessages"') < panelChunk.indexOf('id="clienthrs1dSched"'), 'schedule follows messages');
+assert.ok(panelChunk.indexOf('id="clienthrs1dSched"') < panelChunk.indexOf('id="aidechatComposer"'), 'schedule sits above the composer');
+assert.ok(panelChunk.indexOf('id="aidechatComposer"') < panelChunk.lastIndexOf('</div>'), 'composer stays inside the panel');
+assert.ok(html.includes('#tab_aidechat.is-thread #aidechatInboxView{background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px;min-width:0;min-height:0;overflow:hidden;'), 'roster column does not scroll as a page');
+assert.ok(html.includes('#tab_aidechat.is-thread #aidechatList{gap:4px;overflow-x:hidden;overflow-y:auto;min-height:0;flex:1 1 auto;'), 'list body scrolls');
+assert.ok(html.includes('#tab_aidechat .msg-dense-panel #clienthrs1dSched{margin-top:8px;max-height:min(280px,calc(100% - 148px));overflow-x:hidden;overflow-y:auto;'), 'schedule is pinned and can scroll on its own');
+assert.ok(html.includes('>Aide Office</p>'), 'roster label is Aide Office');
 
 const blockStart = html.indexOf('// v=msg-dense1 option 2 one-box scroll');
 const blockEnd = html.indexOf('// aide office vis1 v=aide-office-vis1', blockStart);
@@ -293,7 +306,7 @@ async function runBrowser(){
     assert.strictEqual(deskView.overflow, 'auto');
     assert.strictEqual(deskView.av, 'SA');
     assert.ok(deskView.listCount >= 3);
-    assert.strictEqual(deskView.label, 'Aides');
+    assert.strictEqual(deskView.label, 'Aide Office');
     assert.strictEqual(deskView.labelShown, true);
     assert.strictEqual(deskView.selected, true);
     assert.ok(deskView.panelW > 480, 'desktop thread is one wide box, not a phone column '+deskView.panelW);
@@ -316,6 +329,65 @@ async function runBrowser(){
     assert.strictEqual(deskGrown.doc, 0, 'desktop page does not grow '+JSON.stringify(deskGrown));
     assert.strictEqual(deskGrown.panel, 0, 'desktop panel stays fixed '+JSON.stringify(deskGrown));
     assert.ok(deskGrown.scroll > deskGrown.box);
+    const roster = await desk.evaluate(function(){
+      var beforeDoc = document.documentElement.scrollHeight;
+      var beforePanel = document.getElementById('msgDensePanel').clientHeight;
+      var beforeInbox = document.getElementById('aidechatInboxView').clientHeight;
+      var names = ['Kim Brooks','Lina Johnson','Keisha Williams','Alex Rivera','Jane Doe','Devon Price','Helen Vargas','Gloria Santos','William Chen','Irene Walsh','Pat Okonkwo','Rosa Diaz','Nina Patel','Omar Farah','Quinn Lee','Sam Ortiz','Tara Nguyen','Uma Shah','Vera Cole','Wes Park'];
+      names.forEach(function(name, i){
+        aidechatThreads.push({id:'r'+i, aide_id:'r'+i, username:'r'+i, name:name, urgent:false, last_message:'Roster line', last_at:'2026-09-27T12:00:00Z', messages:[], preview_from_aide:'Roster line', has_unread:false});
+      });
+      aidechatPaintInbox();
+      msgDense1Fit();
+      var list = document.getElementById('aidechatList');
+      var inbox = document.getElementById('aidechatInboxView');
+      var panel = document.getElementById('msgDensePanel');
+      var sched = document.getElementById('clienthrs1dSched');
+      var composer = document.getElementById('aidechatComposer');
+      var box = document.getElementById('aidechatMessages');
+      var schedTop = sched.getBoundingClientRect().top;
+      var composerTop = composer.getBoundingClientRect().top;
+      box.scrollTop = box.scrollHeight;
+      var afterSched = sched.getBoundingClientRect().top;
+      var afterComposer = composer.getBoundingClientRect().top;
+      return {
+        doc: document.documentElement.scrollHeight - beforeDoc,
+        panel: panel.clientHeight - beforePanel,
+        inbox: inbox.clientHeight - beforeInbox,
+        inboxH: inbox.clientHeight,
+        panelH: panel.clientHeight,
+        listScroll: list.scrollHeight,
+        listClient: list.clientHeight,
+        listOverflow: getComputedStyle(list).overflowY,
+        inboxOverflow: getComputedStyle(inbox).overflowY,
+        schedShrink: getComputedStyle(sched).flexShrink,
+        schedInPanel: !!(sched.closest && sched.closest('#msgDensePanel')),
+        schedNotInMsgs: !box.contains(sched),
+        composerAfter: composerTop >= sched.getBoundingClientRect().bottom - 2,
+        pinSched: Math.abs(afterSched - schedTop) < 1,
+        pinComposer: Math.abs(afterComposer - composerTop) < 1,
+        marker: MSG_DENSE1B_MARKER
+      };
+    });
+    assert.strictEqual(roster.marker, 'v=msg-dense1b');
+    assert.strictEqual(roster.doc, 0, 'long roster does not grow the page '+JSON.stringify(roster));
+    assert.strictEqual(roster.panel, 0, 'long roster does not grow the thread '+JSON.stringify(roster));
+    assert.strictEqual(roster.inbox, 0, 'long roster does not grow the list column '+JSON.stringify(roster));
+    assert.ok(Math.abs(roster.inboxH - roster.panelH) <= 2, 'roster column matches the thread height '+roster.inboxH+' '+roster.panelH);
+    assert.strictEqual(roster.listOverflow, 'auto');
+    assert.strictEqual(roster.inboxOverflow, 'hidden');
+    assert.ok(roster.listScroll > roster.listClient, 'name list scrolls inside the column '+JSON.stringify(roster));
+    assert.strictEqual(roster.schedShrink, '0', 'schedule does not shrink away');
+    assert.strictEqual(roster.schedInPanel, true);
+    assert.strictEqual(roster.schedNotInMsgs, true);
+    assert.strictEqual(roster.composerAfter, true, 'composer stays under the schedule');
+    assert.strictEqual(roster.pinSched, true, 'schedule does not scroll with messages');
+    assert.strictEqual(roster.pinComposer, true, 'composer does not scroll with messages');
+    await desk.evaluate(function(){
+      var list = document.getElementById('aidechatList');
+      list.scrollTop = list.scrollHeight;
+    });
+    await desk.screenshot({path: path.join(shotDir, 'msg-dense1-roster.png')});
     await assertNoBleed(desk, 'desktop');
     await desk.screenshot({path: path.join(shotDir, 'msg-dense1-desktop.png')});
     assert.deepStrictEqual(errors, []);

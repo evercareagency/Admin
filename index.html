@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
-<!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
+<!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1: the Aide Office name list is a flex column whose list body scrolls (overflow-y: auto) at the same height as the thread panel, so a long roster does not grow the page or the thread. Schedule a Remi message stays pinned (flex-shrink: 0) above the composer and does not scroll away with the messages. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-msg-dense1">
 <!-- aide notif search 2026-09-27 v=aide-notif-search1 admin-build 2026-09-27-aide-notif-search1. GHOST-AIDE-NOTIF-SEARCH1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Pure Admin UI. No SQL. No new RPC. More → Notifications (#tab_notifications, clienthrs1d) has a search field above the filter chips (Needs attention, All aides, Location off, Chat off). Search matches aide name and username / @handle, case-insensitive, and a leading @ is optional. Filters still call admin_list_aide_notification_roster {p_filter}. Search only narrows the painted rows from that response. Switching a filter chip keeps the search text and re-applies it after paint. An empty search shows the full filtered roster. No matches say No aides match that search. Same spirit as coverRosterSearch and aideCredSearch. No p_search. Nudge buttons stay. No Auth reseal. No Quo/SMS. Remi is unchanged. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=clienthrs1d, v=vapid1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-aide-notif-search1">
@@ -831,20 +831,20 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #tab_aidechat .aidechat-composer .btn{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
 #tab_aidechat textarea{min-height:72px;}
 @media(min-width:901px){
-  #tab_aidechat.active.is-thread{display:grid;grid-template-columns:260px minmax(0,1fr);gap:0 16px;align-items:start;}
-  #tab_aidechat.is-thread #aidechatInboxView{background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px;min-width:0;overflow:auto;align-self:start;display:flex;flex-direction:column;}
+  #tab_aidechat.active.is-thread{display:grid;grid-template-columns:260px minmax(0,1fr);gap:0 16px;align-items:stretch;}
+  #tab_aidechat.is-thread #aidechatInboxView{background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px;min-width:0;min-height:0;overflow:hidden;align-self:stretch;display:flex;flex-direction:column;box-sizing:border-box;}
   #tab_aidechat.is-thread #aidechatInboxView .page-hdr,
   #tab_aidechat.is-thread #aidechatInboxView .aidechat-settings,
   #tab_aidechat.is-thread #aidechatInboxView .aidechat-note,
   #tab_aidechat.is-thread #aidechatEmpty{display:none;}
-  #tab_aidechat.is-thread #aidechatList{gap:4px;overflow-y:auto;min-height:0;flex:1 1 auto;}
+  #tab_aidechat.is-thread #aidechatList{gap:4px;overflow-x:hidden;overflow-y:auto;min-height:0;flex:1 1 auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
   #tab_aidechat.is-thread .aidechat-card{min-height:44px;padding:8px 10px;border-left-width:0;border-radius:10px;box-shadow:none;}
   #tab_aidechat.is-thread .aidechat-chips,#tab_aidechat.is-thread .aide-office-meta{display:none;}
   #tab_aidechat.is-thread .aidechat-preview{display:block;margin-top:2px;font-size:0.78rem;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   #tab_aidechat.is-thread .aidechat-card.is-selected{background:#e7f4f3;border-color:#b7ddd8;}
   #tab_aidechat.is-thread #aidechatThreadView{min-width:0;}
   #tab_aidechat.is-thread #aidechatBack{display:none;}
-  #tab_aidechat.is-thread .msg-dense-list-label{display:block;}
+  #tab_aidechat.is-thread .msg-dense-list-label{display:block;flex-shrink:0;}
 }
 /* v=aide-office-vis1 — Messages unread badge, Remi corner chip, right-rail cards. Phone-first. */
 #tab_aidechat .aidechat-card{display:flex;gap:10px;align-items:flex-start;}
@@ -887,13 +887,14 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 /* v=msg-dense1 — option 2 one-box scroll. Fixed-height thread. Messages scroll inside. Page does not grow. */
 #tab_aidechat .msg-dense-list-label{display:none;margin:0 0 8px;font-weight:800;color:var(--navy);font-size:0.95rem;}
 #tab_aidechat.is-open .msg-dense-panel{display:flex;flex-direction:column;height:calc(100dvh - 168px);max-height:calc(100dvh - 150px);min-height:260px;overflow:hidden;background:#f4f8fb;border:1px solid var(--border);border-radius:16px;padding:10px 12px 12px;box-sizing:border-box;min-width:0;}
-#tab_aidechat .msg-dense-panel .aidechat-back,#tab_aidechat .msg-dense-panel .msg-dense-head,#tab_aidechat .msg-dense-panel .aidechat-urgent,#tab_aidechat .msg-dense-panel #coverSimpleDraft,#tab_aidechat .msg-dense-panel .aidechat-composer,#tab_aidechat .msg-dense-panel #aideTextChatSub,#tab_aidechat .msg-dense-panel #aideTextChatChips{flex-shrink:0;}
+#tab_aidechat .msg-dense-panel .aidechat-back,#tab_aidechat .msg-dense-panel .msg-dense-head,#tab_aidechat .msg-dense-panel .aidechat-urgent,#tab_aidechat .msg-dense-panel #coverSimpleDraft,#tab_aidechat .msg-dense-panel .aidechat-composer,#tab_aidechat .msg-dense-panel #clienthrs1dSched,#tab_aidechat .msg-dense-panel #aideTextChatSub,#tab_aidechat .msg-dense-panel #aideTextChatChips{flex-shrink:0;}
 #tab_aidechat .msg-dense-head{flex-direction:row;align-items:center;gap:10px;margin-bottom:8px;}
 #tab_aidechat .msg-dense-id{min-width:0;flex:1;}
 #tab_aidechat .msg-dense-head h1{font-size:1.05rem;margin:0;line-height:1.2;}
 #tab_aidechat .msg-dense-head p{margin:2px 0 0;font-size:0.78rem;line-height:1.3;color:var(--muted);}
 #tab_aidechat .msg-dense-panel #aidechatMessages{flex:1 1 auto;min-height:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;padding:4px 2px 8px;}
 #tab_aidechat .msg-dense-day{align-self:center;font-size:0.68rem;font-weight:800;letter-spacing:0.06em;color:var(--muted);margin:6px 0 2px;}
+#tab_aidechat .msg-dense-panel #clienthrs1dSched{margin-top:8px;max-height:min(280px,calc(100% - 148px));overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 #tab_aidechat .msg-dense-panel .aidechat-composer{flex-direction:row;align-items:center;gap:8px;margin-top:8px;box-sizing:border-box;}
 #tab_aidechat .msg-dense-panel #aidechatReply{flex:1 1 auto;min-width:0;width:auto;max-width:100%;min-height:44px;max-height:88px;border-radius:999px;padding:10px 14px;resize:none;}
 #tab_aidechat .msg-dense-panel .aidechat-composer .btn{width:auto;min-width:72px;min-height:44px;border-radius:999px;flex:0 0 auto;padding:10px 16px;}
@@ -3183,7 +3184,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="notif-note">Nudge = Remi posts in that aide’s Messages (and push if they already allow). Not SMS.</p>
       </div>
 
-      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-more-hide1="v=more-hide1">
+      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1">
         <section id="remiLangsMsgCard" class="remi-langs-msg" hidden data-remi-langs1="v=remi-langs1" aria-label="Cover ask preview"></section>
         <div id="aidechatInboxView">
           <div class="page-hdr">
@@ -3193,7 +3194,7 @@ Call (216) 377-5991 with any questions.</textarea>
             </div>
           </div>
           <p class="aidechat-note" id="aidechatSourceNote">Aide message callables are not on this desk yet. Threads stay on this phone until admin_list_aide_office_threads answers. Nothing here sends a text or an email.</p>
-          <p class="msg-dense-list-label" id="aidechatListLabel" data-msg-dense1="v=msg-dense1">Aides</p>
+          <p class="msg-dense-list-label" id="aidechatListLabel" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b">Aide Office</p>
           <div id="aidechatList" class="aidechat-list" aria-label="Aide threads"></div>
           <div id="aidechatEmpty" class="empty-state"><p>No aide threads yet.</p></div>
           <section class="aidechat-settings" id="aidechatSettings" aria-label="Remi auto-reply">
@@ -3241,12 +3242,7 @@ Call (216) 377-5991 with any questions.</textarea>
               <p class="auto-note"><strong>On Send:</strong> chat goes to this aide and Schedule auto-marks <strong>Covered shift</strong> — no manual Schedule step.</p>
             </div>
           </div>
-          <form id="aidechatComposer" class="aidechat-composer" onsubmit="aidechatSendOffice(event); return false;">
-            <textarea id="aidechatReply" maxlength="1000" placeholder="Type a message…" aria-label="Reply as office" autocomplete="off"></textarea>
-            <button type="submit" class="btn btn-teal" id="aidechatSend">Send</button>
-          </form>
-          </div>
-          <section class="clienthrs1d-sched" id="clienthrs1dSched" data-clienthrs1d="v=clienthrs1d" aria-label="Schedule a Remi message">
+          <section class="clienthrs1d-sched" id="clienthrs1dSched" data-clienthrs1d="v=clienthrs1d" data-msg-dense1b="v=msg-dense1b" aria-label="Schedule a Remi message">
             <h3>Schedule a Remi message</h3>
             <div class="field">
               <label for="clienthrs1dBody">Message</label>
@@ -3287,6 +3283,11 @@ Call (216) 377-5991 with any questions.</textarea>
             <p class="clienthrs1d-hint" id="clienthrs1dSchedNote">Remi delivers in Messages. Push goes out only when this aide already allows it. Not SMS.</p>
             <div id="clienthrs1dQueued"></div>
           </section>
+          <form id="aidechatComposer" class="aidechat-composer" onsubmit="aidechatSendOffice(event); return false;">
+            <textarea id="aidechatReply" maxlength="1000" placeholder="Type a message…" aria-label="Reply as office" autocomplete="off"></textarea>
+            <button type="submit" class="btn btn-teal" id="aidechatSend">Send</button>
+          </form>
+          </div>
         </div>
       </div>
     </div>
@@ -10511,6 +10512,7 @@ async function aidechatSettingsChanged(){
 }
 // v=msg-dense1 option 2 one-box scroll. Fixed-height thread. Messages scroll inside. Not a phone-width column.
 var MSG_DENSE1_MARKER='v=msg-dense1';
+var MSG_DENSE1B_MARKER='v=msg-dense1b';
 function msgDense1DayLabel(iso){
   if(!iso)return '';
   var label=typeof aideOfficeVis1Date==='function'?aideOfficeVis1Date(iso):'';
