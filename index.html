@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- timesheet archive kill 2026-09-28 v=timesheet-archive-kill1 ?v=timesheet-archive-kill1 admin-build 2026-09-28-timesheet-archive-kill1. GHOST-TIMESHEET-ARCHIVE-KILL1-CONTRACT-v1. Ace migrate DONE. Archived bucket emptied (35 rows now have deleted_at). Ghost UI only. NO new SQL. NO new RPC. NO Auth reseal. Quiet Mo. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Timesheets desk tabs are Active and Recently deleted only. The Archived tab button and archived desk copy are gone. setTimesheetDesk('archived') and sbTimesheetDesk('archived') coerce to deleted, because those rows now live in Recently deleted. There is no archived list filter. #tsDeskSub drops the archived string. #tsDetailArchiveBtn stays the filing-cabinet control, class mbtn-archive, and reads 🗄️ Delete. quickDelete and deleteRec confirm exactly Delete this timesheet? with primary Delete, then commitTimesheetTrash (action trash_timesheet through sbAdminTrashTimesheet: is_active false and deleted_at). They do not call commitTimesheetDelete or action delete. The toast is the soft-delete toast: Moved to Recently deleted · restore 7 days. The row cabinet is Delete via quickDelete. More → Delete… is an alias of the same confirm. Archive Restore is not painted: list rows do not call restoreArchivedTimesheet, and syncTimesheetDetailActions shows Restore only when deleted_at is set. Recently deleted Restore still posts restore_trashed_timesheet. Active list is is_active true and deleted_at null. Manage bulk tsManageDelete1 stays the trash_timesheet loop. Dates people read are MM/DD/YYYY. Do not break payready1, the pdf desk, list-az, cover-desk, Manage Done, or aides Manage. Prior markers stay, including v=aide-manage-delete1, v=manage-done1, v=manage-dots-creds1, v=manage-clean1, v=payready1, v=pdf1p, v=client-phone1, v=cover-desk1, and v=list-az-sticky1. -->
+<meta name="admin-build" content="2026-09-28-timesheet-archive-kill1">
+<script>var TIMESHEET_ARCHIVE_KILL1_MARKER='v=timesheet-archive-kill1';var TIMESHEET_ARCHIVE_KILL1_BUILD='2026-09-28-timesheet-archive-kill1';</script>
 <!-- client phone 2026-09-28 v=client-phone1 ?v=client-phone1 admin-build 2026-09-28-client-phone1. GHOST-CLIENT-PHONE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Add Client and Edit Client label #clientPhone Client Phone, placeholder (216) 555-0100, immediately after Home Address / #clientAddress and before Case Manager Name and Case Manager Email. Client Phone is clients.phone / p_phone. Add posts admin_add_client with p_phone (already in the signature: p_first_name, p_last_name, p_home_address, p_case_manager_name, p_case_manager_email, p_phone, p_weekly_authorized_hours, p_insurance_plan). Edit PATCHes /rest/v1/clients?id=eq.<uuid> {"phone":"..."} and does not call admin_update_client. Load select includes phone and editClient fills #clientPhone. Case manager stays name + email only. There is no case_manager_phone column and this desk does not add Case Manager Phone. Insurance chips, Weekly authorized hours, Cover prefs, Verify Address and Get GPS, Assigned Aides, Cancel, and Save stay. Prior markers stay, including v=cover-desk1, v=list-az-sticky1, v=punch-leftovers1, v=client-ins1, and v=clienthrs1a. -->
 <meta name="admin-build" content="2026-09-28-client-phone1">
 <script>var CLIENT_PHONE1_MARKER='v=client-phone1';var CLIENT_PHONE1_BUILD='2026-09-28-client-phone1';</script>
@@ -2783,9 +2786,8 @@ bindLoginKeyboard();
           <div class="stat-card"><div class="stat-num" id="st_aides">—</div><div class="stat-lbl">Active<br>Aides</div></div>
         </div>
         <div class="card">
-          <div class="ts-desk" role="tablist" aria-label="Timesheet desk">
+          <div class="ts-desk" role="tablist" aria-label="Timesheet desk" data-timesheet-archive-kill1="v=timesheet-archive-kill1">
             <button type="button" class="on" data-ts-desk="active" role="tab" aria-selected="true" onclick="setTimesheetDesk('active')">Active</button>
-            <button type="button" data-ts-desk="archived" role="tab" aria-selected="false" onclick="setTimesheetDesk('archived')">Archived</button>
             <button type="button" data-ts-desk="deleted" role="tab" aria-selected="false" onclick="setTimesheetDesk('deleted')">Recently deleted</button>
           </div>
           <div id="tsManageBar" class="aide-manage-bar" data-aide-manage-delete1="v=aide-manage-delete1" hidden>
@@ -4613,7 +4615,7 @@ Call (216) 377-5991 with any questions.</textarea>
       <h3 id="detailTitle" style="margin-bottom:0">Timesheet Detail</h3>
       <div class="ts-detail-bar" id="tsDetailActions">
         <button type="button" class="mbtn" id="tsDetailPdfBtn" style="background:var(--navy);color:white" title="View and save PDF" onclick="downloadTSPDF()">📄 PDF</button>
-        <button type="button" class="mbtn mbtn-archive" id="tsDetailArchiveBtn" onclick="deleteRec()">🗄️ Archive</button>
+        <button type="button" class="mbtn mbtn-archive" id="tsDetailArchiveBtn" onclick="deleteRec()">🗄️ Delete</button>
         <button type="button" class="mbtn mbtn-confirm" id="tsDetailRestoreBtn" hidden onclick="restoreCurrentTimesheet()">↺ Restore</button>
         <button type="button" class="mbtn mbtn-warn" id="tsDetailCorrectBtn" onclick="showCorrectionPanel()">⚠️ Request Correction</button>
         <div class="ts-overflow">
@@ -9537,7 +9539,7 @@ function copilotPlaybook(key){
     },
     timesheet_late:{
       title:'Timesheets',
-      explain:'Active timesheets, archived sheets, and recently deleted sheets live on the Timesheets desk. A correction request is a note to the aide. Remi does not submit it.',
+      explain:'Active timesheets and recently deleted sheets live on the Timesheets desk. A correction request is a note to the aide. Remi does not submit it.',
       steps:[
         'Open Timesheets and find the sheet.',
         'Read the days that need a fix.',
@@ -27852,7 +27854,8 @@ function sbMapTimesheet(row){
 }
 function sbTimesheetDesk(view){
   var v=typeof view==='object'&&view?String(view.timesheetDesk||view.desk||'active'):String(view||'active');
-  if(v==='archived'||v==='deleted')return v;
+  // v=timesheet-archive-kill1 — archived bucket was migrated onto deleted_at. No archived desk.
+  if(v==='archived'||v==='deleted')return 'deleted';
   return 'active';
 }
 function sbTimesheetListPairs(view){
@@ -27862,9 +27865,7 @@ function sbTimesheetListPairs(view){
     ['status','not.ilike.backup'],
     ['status','not.ilike.draft']
   ];
-  if(desk==='archived'){
-    pairs.push(['is_active','eq.false'],['deleted_at','is.null'],['order','submitted_at.desc']);
-  }else if(desk==='deleted'){
+  if(desk==='deleted'){
     pairs.push(['is_active','eq.false'],['deleted_at','not.is.null'],['order','deleted_at.desc']);
   }else{
     pairs.push(['is_active','eq.true'],['deleted_at','is.null'],['order','submitted_at.desc']);
@@ -27879,7 +27880,6 @@ function sbTimesheetOnDesk(row, view){
   var active=row.is_active!==false&&row.isActive!==false;
   var desk=sbTimesheetDesk(view);
   if(desk==='deleted')return active===false&&deleted;
-  if(desk==='archived')return active===false&&!deleted;
   return active&&!deleted;
 }
 async function sbRefreshSession(sess){
@@ -30191,7 +30191,8 @@ function adminLogout(){
 
 let tsDesk='active';
 function setTimesheetDesk(view){
-  tsDesk=(view==='archived'||view==='deleted')?view:'active';
+  // v=timesheet-archive-kill1 — archived is not a desk. Those rows are Recently deleted.
+  tsDesk=(view==='deleted'||view==='archived')?'deleted':'active';
   document.querySelectorAll('[data-ts-desk]').forEach(function(btn){
     const on=btn.getAttribute('data-ts-desk')===tsDesk;
     btn.classList.toggle('on', on);
@@ -30199,11 +30200,9 @@ function setTimesheetDesk(view){
   });
   const sub=document.getElementById('tsDeskSub');
   if(sub){
-    sub.textContent=tsDesk==='archived'
-      ?'Archived timesheets stay on file. Restore puts them back on the active desk.'
-      :tsDesk==='deleted'
-        ?'Recently deleted timesheets can be restored for 7 days. After that the nightly cleanup removes the row and its PDF.'
-        :'Active submitted caregiver timesheets';
+    sub.textContent=tsDesk==='deleted'
+      ?'Recently deleted timesheets can be restored for 7 days. After that the nightly cleanup removes the row and its PDF.'
+      :'Active submitted caregiver timesheets';
   }
   if(typeof tsManageDelete1OnDesk==='function')tsManageDelete1OnDesk();
   renderTimesheets();
@@ -30219,10 +30218,7 @@ function timesheetRowDeskButton(r){
   if(tsDesk==='deleted'||timesheetRecordDeleted(r)){
     return '<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="restoreTrashedTimesheet(\''+id+'\')">↺ Restore</button>';
   }
-  if(tsDesk==='archived'||timesheetRecordArchived(r)){
-    return '<button type="button" class="btn btn-sm" style="background:var(--teal-light);color:var(--teal-dark)" onclick="restoreArchivedTimesheet(\''+id+'\')">↺ Restore</button>';
-  }
-  return '<button type="button" class="btn btn-sm mbtn-archive" title="Archive" aria-label="Archive" onclick="quickDelete(\''+id+'\')">🗄️</button>';
+  return '<button type="button" class="btn btn-sm mbtn-archive" title="Delete" aria-label="Delete" onclick="quickDelete(\''+id+'\')">🗄️</button>';
 }
 // v=payready1 — Timesheets pay readiness. Not payroll. Remi does not own this screen.
 var PAYREADY_MARKER='v=payready1';
@@ -30962,11 +30958,9 @@ function paintTimesheets(){
     empty.style.display='block';
     const msg=empty.querySelector('p');
     if(msg){
-      msg.textContent=tsDesk==='archived'
-        ?'🗄️ No archived timesheets.'
-        :tsDesk==='deleted'
-          ?'No timesheets in Recently deleted.'
-          :'📭 No timesheets yet.';
+      msg.textContent=tsDesk==='deleted'
+        ?'No timesheets in Recently deleted.'
+        :'📭 No timesheets yet.';
     }
     if(typeof tsManageDelete1Sync==='function')tsManageDelete1Sync();
     return;
@@ -33490,40 +33484,31 @@ async function sendCorrectionRequest(){
 }
 
 function quickDelete(id){
-  showSharedConfirm('Archive this timesheet?',function(){commitTimesheetDelete(id);},'Yes, archive');
+  showSharedConfirm('Delete this timesheet?',function(){commitTimesheetTrash(id);},'Delete');
 }
 
 function deleteRec(){
   if(!currentRec)return;
   const rec=currentRec;
-  showSharedConfirm('Archive this timesheet?',function(){
-    logActivity('Archived timesheet for '+rec.empName+' ('+(rec.clientName||'')+', '+formatWeekLabel(rec.weekStart)+')');
-    commitTimesheetDelete(rec.id);
-    closeModal('detailModal');
-    currentRec=null;
-  },'Yes, archive');
-}
-function trashTimesheet(){
-  if(!currentRec)return;
-  const rec=currentRec;
-  showSharedConfirm('Move to Recently deleted? You can restore for 7 days.',function(){
+  showSharedConfirm('Delete this timesheet?',function(){
     logActivity('Moved timesheet to Recently deleted for '+rec.empName+' ('+(rec.clientName||'')+', '+formatWeekLabel(rec.weekStart)+')');
     commitTimesheetTrash(rec.id);
     closeModal('detailModal');
     currentRec=null;
-  },'Move to Recently deleted');
+  },'Delete');
+}
+function trashTimesheet(){
+  deleteRec();
 }
 function restoreCurrentTimesheet(){
-  if(!currentRec)return;
+  if(!currentRec||!timesheetRecordDeleted(currentRec))return;
   const rec=currentRec;
-  const trashed=timesheetRecordDeleted(rec);
-  if(trashed)commitTimesheetTrashRestore(rec.id);
-  else commitTimesheetArchiveRestore(rec.id);
+  commitTimesheetTrashRestore(rec.id);
   closeModal('detailModal');
   currentRec=null;
 }
-function restoreArchivedTimesheet(id){
-  showSharedConfirm('Restore this timesheet to Active?',function(){commitTimesheetArchiveRestore(id);},'Restore');
+function restoreArchivedTimesheet(){
+  // v=timesheet-archive-kill1 — Archive Restore is not painted. Recently deleted uses restoreTrashedTimesheet.
 }
 function restoreTrashedTimesheet(id){
   showSharedConfirm('Restore this timesheet to Active?',function(){commitTimesheetTrashRestore(id);},'Restore');
@@ -33547,7 +33532,6 @@ function toggleTimesheetMore(ev){
 }
 function syncTimesheetDetailActions(r){
   const trashed=timesheetRecordDeleted(r);
-  const archived=timesheetRecordArchived(r);
   const show=function(id,on){
     const el=document.getElementById(id);
     if(!el)return;
@@ -33555,8 +33539,8 @@ function syncTimesheetDetailActions(r){
     if(on)el.removeAttribute('hidden');
     else el.setAttribute('hidden','');
   };
-  show('tsDetailArchiveBtn',!trashed&&!archived);
-  show('tsDetailRestoreBtn',trashed||archived);
+  show('tsDetailArchiveBtn',!trashed);
+  show('tsDetailRestoreBtn',trashed);
   show('tsDetailCorrectBtn',!trashed);
   show('tsDetailMoreDelete',!trashed);
   closeTimesheetMore();
@@ -33625,7 +33609,7 @@ async function commitTimesheetTrash(id){
     cacheInvalidate('get_all');
     allRecords=allRecords.filter(r=>String(r.id)!==String(id));
     if(tsDesk==='active')store.set('admin_records',allRecords);
-    showTempMsg('Moved to Recently deleted. You can restore it for 7 days.','var(--warn)');
+    showTempMsg('Moved to Recently deleted · restore 7 days.','var(--warn)');
     renderTimesheets();
   }catch(e){
     showTempMsg('Could not move timesheet to Recently deleted.','var(--danger)');
