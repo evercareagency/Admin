@@ -7,6 +7,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>EverCare — Admin Portal</title>
+<!-- remi just chat 2026-09-27 v=remi-chat1 admin-build 2026-09-27-remi-chat1. GHOST-REMI-CHAT1-CONTRACT-v1. Ace CALLABLE. UI-only. No SQL patch. No new Ace RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Ask “just chat” and “just chatting”, and other small-talk, get a warm short reply with kind empty and no actions. Those lines do not list Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, or Broadcast, and they do not say Name a desk or a person. The desk inventory pitch stays for “what can you do?”, “help”, and “what do you look up?”. The first Ask hello is a light chat-or-ask hint and does not repeat that inventory. An unmatched line that is not small-talk asks what to look up and does not dump the inventory again. Work asks stay the remichat1 local desk lookups and drafts Confirm. Quiet hours stay. Placeholder is Ask or just chat…. Nurse does not get Remi. No Auth reseal. No mossier. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=eca-copilot1, v=remi-float-hide1, remichat1, and remisec1. -->
+<meta name="admin-build" content="2026-09-27-remi-chat1">
 <!-- client hold 2026-09-27 v=hold-client1 admin-build 2026-09-27-hold-client1. GHOST-HOLD-CLIENT1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-client1-v1.sql is already applied. Client-level On hold from the Schedule week and client panel even when the week is dashes only. No Add shift and no invent-a-shift. Put on hold opens Start, End, and Note. Save posts upsert_schedule_client_hold {p_client_id, p_start_date, p_end_date optional, p_note optional}. Filter On hold lists clients with client_on_hold true. The row banner uses hold_banner.label (note · MM/DD – MM/DD). End hold… posts clear_schedule_client_hold {p_hold_id, p_end_date} only. Clear abandons with clear_schedule_client_hold {p_hold_id} and no p_end_date (hold-clear1). list_schedule_week_slots marker and v are hold-client1 and this desk paints client_on_hold and hold_banner. Empty slot days still list the client. After the end date, later weeks have client_on_hold false and the filter excludes them. Hours can resume later. Remi N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Banner short labels are MM/DD. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, v=client-ins1, and v=sched1. -->
 <meta name="admin-build" content="2026-09-27-hold-client1">
 <!-- aides info cards 2026-09-27 v=aides-info1 admin-build 2026-09-27-aides-info1. GHOST-AIDES-INFO1-CONTRACT-v1. Ace CALLABLE. Mo LOOK LOCKED option 1 info cards. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Contract bullets: • Replace bare Aides cards with info cards matching mock 01-info-cards (name plus initials, phone plus ONE lang chip preferred_language_label uppercased en|es|ar|sw|zh|ru|uk, client chips, next status). • Call admin_list_aides_info() NOT admin_list_aides for card paint. • Paint next green, open blue, warn amber. When creds_due is set show Creds due MM/DD/YYYY. • The ⋯ sheet is View profile to deep_link, Reset through the existing reset_aide_temp_password and never vs mossier, Delete through admin_deactivate_aide. • Recently deleted tab sends p_include_deleted true. • Admin, Scheduler, and Nurse read (is_org_admin). Nurse write is N/A. Remi is N/A for this marker. • Do not break aide-soft-delete, remi-langs1, aidecreds1, schedule, clienthrs, cover-card-cancel1, or nosvc. • No Auth, no mossier, no Quo, no SMS. Additive only. Mobile-first. Dates people read are MM/DD/YYYY. Remi stays the side rail only where it is already present. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=aidadel1, v=aidecreds1, v=aidecreds1b, and v=aidecreds1c. -->
@@ -3280,8 +3282,8 @@ Call (216) 377-5991 with any questions.</textarea>
       <div id="remiLangsHost" hidden data-remi-langs1="v=remi-langs1" aria-live="polite"></div>
       <div id="copilotBody"></div>
       <div id="copilotConfirm" hidden></div>
-      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" data-remiwider1="v=remiwider1" data-remiwider1b="v=remiwider1b" data-remiask1="v=remiask1" onsubmit="return copilotChatSubmit(event)">
-        <input id="copilotChatInput" type="text" enterkeyhint="send" maxlength="400" placeholder="Ask or just chat..." autocomplete="off" aria-label="Ask Remi">
+      <form id="copilotComposer" class="copilot-composer" hidden data-remichat="v=remichat1" data-remisec="v=remisec1" data-remiwider1="v=remiwider1" data-remiwider1b="v=remiwider1b" data-remiask1="v=remiask1" data-remi-chat1="v=remi-chat1" onsubmit="return copilotChatSubmit(event)">
+        <input id="copilotChatInput" type="text" enterkeyhint="send" maxlength="400" placeholder="Ask or just chat..." autocomplete="off" aria-label="Ask Remi" data-remi-chat1="v=remi-chat1">
         <button type="submit" class="btn btn-teal" id="copilotChatSend">Ask</button>
       </form>
       <div id="remiNotesDock" hidden data-reminotes1="v=remi-notes1">
@@ -8630,6 +8632,46 @@ function copilotChatContact(kind, q){
   if(!hit)return {phone:'', email:''};
   return {phone:String(hit.phone||hit.aidePhone||''), email:String(hit.caseManagerEmail||'')};
 }
+// v=remi-chat1 just-chat. Small-talk stays conversational. The desk inventory is help, or the first Ask hello, not every unmatched line.
+var REMI_CHAT1_MARKER='v=remi-chat1';
+var REMI_CHAT1_INVENTORY='I can look up Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from what is already loaded on this desk. Name a desk or a person. I draft only. You send it.';
+function remiChat1Norm(q){
+  return String(q||'').toLowerCase().replace(/[\u2019]/g,"'").replace(/[^a-z0-9'\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function remiChat1HasDesk(s){
+  return /\b(timesheets?|time sheets?|inservices?|coverage|call ?offs?|schedules?|aides?|caregivers?|backups?|completes?|intakes?|compliance|broadcasts?|log ?ins?|passwords?|clients?|shifts?|nurses?|payroll|receipts?|weather|credentials?)\b/.test(s);
+}
+function remiChat1IsHelp(q){
+  var s=remiChat1Norm(q);
+  if(!s||remiChat1HasDesk(s))return false;
+  if(/^(help|help me|what can you do|what do you do|what can you help with|what do you look up|what can you look up|what do you know|what can i ask|what can you look up for me)$/.test(s))return true;
+  return /\b(what can you do|what do you look up|what can you look up)\b/.test(s);
+}
+function remiChat1IsSmallTalk(q){
+  var s=remiChat1Norm(q);
+  if(!s||s.length>160)return false;
+  if(remiChat1HasDesk(s))return false;
+  if(/^(just|only) (chat|chatting|talk|talking)\b/.test(s))return true;
+  if(/^(wanna|want to|can we|lets|let's|let us) (chat|talk)\b/.test(s))return true;
+  if(/^(chat|talk) with me$/.test(s)||/^small talk$/.test(s))return true;
+  if(/^(hi|hello|hey|yo|hiya|howdy|sup)( there| remi)?$/.test(s))return true;
+  if(/^(good morning|good afternoon|good evening|good night)( remi)?$/.test(s))return true;
+  if(/^(what'?s up|whats up|how are you|how'?s it going|hows it going|how you doing)( remi)?$/.test(s))return true;
+  if(/^(thanks|thank you|ty)( remi| so much)?$/.test(s))return true;
+  if(/^(ok|okay|k|cool|nice|lol|haha|yup|yeah|yep|sure|nm|not much|im good|i'm good|doing good|doing well|doing fine|all good|sounds good)$/.test(s))return true;
+  return false;
+}
+function remiChat1Talk(q){
+  var s=remiChat1Norm(q);
+  var name='';
+  try{name=(typeof remiSecHelloName==='function')?remiSecHelloName():'';}catch(eName){name='';}
+  if(!name||name==='there')name='';
+  var open='Happy to just chat'+(name?', '+name:'')+'.';
+  if(/thank/.test(s))open=name?('Anytime, '+name+'.'):'Anytime.';
+  else if(/how are you|how'?s it going|what'?s up|whats up|how you doing/.test(s))open=name?('I am good, '+name+'.'):'I am good.';
+  else if(/^(hi|hello|hey|yo|hiya|howdy|sup|good )/.test(s))open=name?('Hey '+name+'.'):'Hey.';
+  return {kind:'', text:open+' I am right here. When you need a desk lookup, name the area or the person.', actions:[]};
+}
 function copilotChatAnswer(q){
   if(typeof remiSecAnswer==='function'){
     var sec=remiSecAnswer(q);
@@ -8645,7 +8687,12 @@ function copilotChatAnswer(q){
     return {kind:primary, text:mixed+'\n\nDrafts only. You confirm, then you send.', actions:copilotAskModel({id:primary, kind:primary, phone:copilotChatContact(primary, q).phone, email:copilotChatContact(primary, q).email}).actions||[]};
   }
   if(!kind){
-    return {kind:'', text:'I can look up Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from what is already loaded on this desk. Name a desk or a person. I draft only. You send it.', actions:[]};
+    if(typeof copilotRoleOk==='function'&&!copilotRoleOk()){
+      return {kind:'', text:REMI_CHAT1_INVENTORY, actions:[]};
+    }
+    if(remiChat1IsHelp(q))return {kind:'', text:REMI_CHAT1_INVENTORY, actions:[]};
+    if(remiChat1IsSmallTalk(q))return remiChat1Talk(q);
+    return {kind:'', text:'What do you want to look up?', actions:[]};
   }
   var book=copilotPlaybook(kind);
   var learned=copilotDirectionNotes&&copilotDirectionNotes[kind]?('Your saved direction: '+copilotDirectionNotes[kind]):'';
@@ -8674,7 +8721,7 @@ function copilotChatHtml(text){
 }
 function copilotChatEnsureHello(){
   if(copilotChat.length)return;
-  copilotChat.push({role:'remi', kind:'', actions:[], text:'Ask about Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, or a login issue. I use what is already loaded on this desk. Nothing goes out until you confirm.'});
+  copilotChat.push({role:'remi', kind:'', actions:[], text:'Ask or just chat. I am right here either way. When you need a desk lookup, name the area or the person. Nothing goes out until you confirm.'});
 }
 function copilotPaintChat(){
   var host=copilotEl('copilotBody');
@@ -8881,7 +8928,7 @@ function remiSecIsGreeting(q){
   var s=String(q||'').trim().toLowerCase().replace(/[!?.]+$/g,'').replace(/\s+/g,' ');
   if(!s||s.length>40)return false;
   if(/\b(weather|forecast|address|aide|client|caregiver|call|coverage|timesheet|schedule|nurse|password|lookup|find)\b/.test(s))return false;
-  return /^(hey|hi|yo|good morning|good afternoon|good evening)(\s+remi)?$/.test(s);
+  return /^(hey|hi|hello|yo|good morning|good afternoon|good evening)(\s+remi)?$/.test(s);
 }
 function remiSecGreet(){
   var w=remiSecWeatherSnapshot();

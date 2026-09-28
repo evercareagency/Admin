@@ -13,7 +13,8 @@ assert.ok(html.includes('admin-build 2026-09-25-remiask1'), 'remiask1 build note
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiask1">'), 'remiask1 meta');
 assert.ok(html.includes('<!-- remi ask lookups 2026-09-25 v=remiask1 admin-build 2026-09-25-remiask1'), 'remiask1 comment');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-client1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'isdash1 is the first admin-build meta');
+assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-25-aidechat1"') < html.indexOf('content="2026-09-25-remiask1"'), 'remiask1 stays on the next meta');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-remiwider1c">'), 'remiwider1c meta stays');
 assert.ok(html.indexOf('content="2026-09-25-remiask1"') < html.indexOf('content="2026-09-25-remiwider1c"'), 'remiwider1c stays after remiask1');
@@ -133,7 +134,7 @@ async function runBrowser(){
         onScreen: r.left >= 0 && r.right <= window.innerWidth + 1 && r.bottom <= window.innerHeight + 1
       };
     });
-    assert.strictEqual(chip.build, '2026-09-27-hold-client1');
+    assert.strictEqual(chip.build, '2026-09-27-remi-chat1');
     assert.strictEqual(chip.marker, 'v=remiask1');
     assert.strictEqual(chip.sheetHidden, true);
     assert.strictEqual(chip.label, 'Remi');
@@ -253,7 +254,9 @@ async function runBrowser(){
     assert.strictEqual(planned.oldOpen.sec, false, 'who has an open shift stays the desk answer');
     assert.ok(planned.oldOpen.actions.indexOf('sms') >= 0, 'open-shift desk answer still has a text draft');
     assert.ok(planned.oldShift.actions.indexOf('sms') >= 0, 'open shift for Ruth still drafts');
-    assert.ok(/I can look up Timesheets/.test(planned.hello.text), 'unclear hello still offers the desks');
+    assert.ok(!/I can look up Timesheets/.test(planned.hello.text), 'hello stays conversational');
+    assert.ok(/Hey Mo/.test(planned.hello.text) && /just chatting/.test(planned.hello.text), planned.hello.text);
+    assert.strictEqual(planned.hello.actions.length, 0, 'hello has no draft buttons');
     assert.ok(/Tell Friday/.test(planned.friday.text), planned.friday.text);
     assert.ok(/Name the client/.test(planned.many.text), planned.many.text);
 

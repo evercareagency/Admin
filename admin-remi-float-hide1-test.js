@@ -23,7 +23,8 @@ assert.ok(html.includes('id="copilotTabCover"'), 'Coverage tab');
 assert.ok(html.includes('id="copilotTabProof"'), 'Receipts tab stays');
 assert.ok(!html.includes('id="tab_remi"'), 'Remi is not a full page');
 const buildAt = html.indexOf('<meta name="admin-build"');
-assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-hold-client1'), 'first admin-build is hold-client1');
+assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-chat1'), 'first admin-build is remi-chat1');
+assert.ok(html.indexOf('content="2026-09-27-remi-chat1"') < html.indexOf('content="2026-09-27-hold-client1"'), 'hold-client1 stays after remi-chat1');
 assert.ok(html.indexOf('content="2026-09-27-hold-client1"') < html.indexOf('content="2026-09-27-aides-info1"'), 'aides-info1 stays after hold-client1');
 assert.ok(html.indexOf('content="2026-09-27-aides-info1"') < html.indexOf('content="2026-09-27-login-toast1"'), 'login-toast1 stays after aides-info1');
 assert.ok(html.indexOf('content="2026-09-27-login-toast1"') < html.indexOf('content="2026-09-27-aide-office-vis1"'), 'aide-office-vis1 stays after login-toast1');
@@ -434,7 +435,7 @@ async function runBrowser(){
         build: document.querySelector('meta[name="admin-build"]').content
       };
     });
-    assert.strictEqual(receipts.build, '2026-09-27-hold-client1');
+    assert.strictEqual(receipts.build, '2026-09-27-remi-chat1');
     assert.strictEqual(receipts.viewW, 390);
     assert.strictEqual(receipts.fullPage, false);
     assert.ok(receipts.sheetWidth <= 390);
