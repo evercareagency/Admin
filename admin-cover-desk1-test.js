@@ -41,12 +41,17 @@ assert.ok(html.includes("rank:['admin_rank_backup_aides']"), 'rank callable stay
 assert.ok(html.includes("outcome:['admin_cover_outcome']"), 'outcome callable stays');
 assert.ok(html.includes('client_refused_resume_next_day'), 'refused outcome stays on the desk');
 assert.ok(html.includes("coverApplyOutcome('awaiting_client')"), 'wait posts awaiting_client');
-assert.ok(!extractFn(html, 'function coverMapShift(row)').includes('prefer_wait'), 'map does not invent prefer_wait');
-assert.ok(!extractFn(html, 'function coverMapShift(row)').includes('no_backup'), 'map does not invent no_backup');
+assert.ok(html.includes("prefsGet:['admin_get_client_cover_prefs']"), 'get prefs callable');
+assert.ok(html.includes("prefsSet:['admin_set_client_cover_prefs']"), 'set prefs callable');
+assert.ok(html.includes('id="clientCoverNoBackup"'), 'client edit no-backup');
+assert.ok(html.includes('id="clientCoverPreferWait"'), 'client edit prefer-wait');
+const mapFn = extractFn(html, 'function coverMapShift(row)');
+assert.ok(mapFn.includes('cover_no_backup') && mapFn.includes('cover_prefer_wait'), 'list flags map onto the shift');
+assert.ok(!mapFn.includes('prefer_to_wait') && !mapFn.includes('client_no_backup'), 'no invented preference columns');
 assert.ok(!extractFn(html, 'function coverMapRank(row)').includes('worked_this_client'), 'rank count is continuity_score');
-const gateFn = extractFn(html, 'function coverDesk1PrefersWait(shift)');
-assert.ok(gateFn.includes('awaiting_client') && gateFn.includes('client_refused_resume_next_day'), 'gate is shift outcome');
-assert.ok(!gateFn.includes('prefer_wait') && !gateFn.includes('no_backup'), 'gate does not read client columns');
+const hardFn = extractFn(html, 'function coverDesk1HardBlocked(shift)');
+assert.ok(hardFn.includes('coverDesk1NoBackup'), 'no backup is the hard gate');
+assert.ok(extractFn(html, 'function coverOutcomeBody(openShiftId, outcome, backupAideId, notes').includes('p_manager_override'), 'outcome sends manager override');
 assert.ok(extractFn(html, 'function coverDesk1Hot(shift)').includes('urgencyWithin48h'), 'hot badge is the 48h flag');
 assert.ok(extractFn(html, 'async function coverDesk1Open(id)').includes("coverRpc('rank'"), 'smart assign uses backup rank');
 assert.ok(!extractFn(html, 'async function coverDesk1Open(id)').includes('float_pool'), 'smart assign is not the float pool');
@@ -66,7 +71,7 @@ function extractFn(src, sig){
   throw new Error('unclosed ' + sig);
 }
 
-const ctx = {coverDesk1Filter:'all', coverDesk1Override:{}, coverRanks:[]};
+const ctx = {coverDesk1Filter:'all', coverDesk1Override:{}, coverDesk1Soft:{}, coverRanks:[]};
 vm.createContext(ctx);
 [
   'function coverDesk1NyParts(ms)',
@@ -75,7 +80,11 @@ vm.createContext(ctx);
   'function coverDesk1Day(shift, nowMs)',
   'function coverDesk1Urgency(shift, nowMs)',
   'function coverDesk1Status(shift)',
-  'function coverDesk1PrefersWait(shift)',
+  'function coverDesk1Bool(v)',
+  'function coverDesk1NoBackup(shift)',
+  'function coverDesk1PreferFlag(shift)',
+  'function coverDesk1HardBlocked(shift)',
+  'function coverDesk1SoftBlocked(shift)',
   'function coverDesk1Visits(row)',
   'function coverDesk1Miles(row)',
   'function coverDesk1MilesText(n)',
@@ -86,7 +95,9 @@ vm.createContext(ctx);
   'function coverPickPhone(obj)',
   'function coverIntakeSource(src)',
   'function coverMapShift(row)',
-  'function coverMapRank(row)'
+  'function coverMapRank(row)',
+  'function coverOutcomeBody(openShiftId, outcome, backupAideId, notes)',
+  'function coverDesk1PrefsSetBody(clientId, noBackup, preferWait)'
 ].forEach(function(sig){
   vm.runInContext(extractFn(html, sig), ctx);
 });
@@ -102,16 +113,29 @@ assert.strictEqual(vm.runInContext('coverDesk1Day({startsAt:"2026-09-29T13:00:00
 const sorted = JSON.parse(JSON.stringify(vm.runInContext('coverDesk1SmartSort([{id:"moe", name:"moe", distance:0.9, continuity:0, rank:4},{id:"devon", name:"Devon Park", distance:1.8, continuity:12, rank:2},{id:"jamal", name:"Jamal Wright", distance:2.4, continuity:4, rank:3},{id:"aisha", name:"Aisha Khan", distance:3.1, continuity:1, rank:1}]).map(function(r){return r.id;})', ctx)));
 assert.deepStrictEqual(sorted, ['devon','jamal','aisha','moe'], 'continuity outranks a closer stranger');
 
-const flagged = vm.runInContext('coverMapShift({id:"h1", client_name:"Helen Park", regular_aide_name:"Sara Nguyen", prefer_wait:true, no_backup:true, status:"open", shift_start:"2026-09-29T13:00:00Z"})', ctx);
-assert.strictEqual(flagged.preferWait, undefined, 'prefer_wait is not stored on the shift');
-assert.strictEqual(flagged.noBackup, undefined, 'no_backup is not stored on the shift');
-assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(flagged)+')', ctx), false, 'client columns do not open the gate');
-const waiting = vm.runInContext('coverMapShift({id:"h2", client_name:"Helen Park", status:"awaiting_client", shift_start:"2026-09-29T13:00:00Z"})', ctx);
-assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(waiting)+')', ctx), true, 'awaiting_client gates assign');
-const refused = vm.runInContext('coverMapShift({id:"h3", client_name:"Helen Park", status:"client_refused_resume_next_day", shift_start:"2026-09-29T13:00:00Z"})', ctx);
-assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(refused)+')', ctx), true, 'refused backup gates assign');
-const plain = vm.runInContext('coverMapShift({id:"r1", client_name:"Rivera", status:"open", shift_start:"2026-09-29T17:00:00Z"})', ctx);
-assert.strictEqual(vm.runInContext('coverDesk1PrefersWait('+JSON.stringify(plain)+')', ctx), false, 'an open shift is not gated');
+const flagged = vm.runInContext('coverMapShift({id:"h1", client_name:"Helen Park", regular_aide_name:"Sara Nguyen", cover_no_backup:true, cover_prefer_wait:true, prefer_wait:true, status:"open", shift_start:"2026-09-29T13:00:00Z"})', ctx);
+assert.strictEqual(flagged.coverNoBackup, true, 'cover_no_backup paints');
+assert.strictEqual(flagged.coverPreferWait, true, 'cover_prefer_wait paints');
+assert.strictEqual(vm.runInContext('coverDesk1HardBlocked('+JSON.stringify(flagged)+')', ctx), true, 'no backup blocks assign');
+assert.strictEqual(vm.runInContext('coverDesk1SoftBlocked('+JSON.stringify(flagged)+')', ctx), false, 'no backup owns the gate when both flags are set');
+const invented = vm.runInContext('coverMapShift({id:"old", client_name:"Helen Park", prefer_wait:true, no_backup:true, status:"awaiting_client", shift_start:"2026-09-29T13:00:00Z"})', ctx);
+assert.strictEqual(invented.coverNoBackup, false, 'old prefer_wait column is ignored');
+assert.strictEqual(invented.coverPreferWait, false, 'old no_backup column is ignored');
+assert.strictEqual(vm.runInContext('coverDesk1HardBlocked('+JSON.stringify(invented)+')', ctx), false, 'awaiting_client alone is not the hard gate');
+const soft = vm.runInContext('coverMapShift({id:"s1", client_name:"Ada Cole", cover_prefer_wait:true, status:"open", shift_start:"2026-09-28T14:00:00Z"})', ctx);
+assert.strictEqual(vm.runInContext('coverDesk1SoftBlocked('+JSON.stringify(soft)+')', ctx), true, 'prefer wait is a soft gate');
+assert.strictEqual(vm.runInContext('coverDesk1HardBlocked('+JSON.stringify(soft)+')', ctx), false);
+ctx.coverDesk1Soft.s1 = true;
+assert.strictEqual(vm.runInContext('coverDesk1SoftBlocked('+JSON.stringify(soft)+')', ctx), false, 'soft confirm unlocks prefer wait');
+ctx.coverDesk1Override.h1 = true;
+assert.strictEqual(vm.runInContext('coverDesk1HardBlocked('+JSON.stringify(flagged)+')', ctx), false, 'manager override unlocks no backup');
+const overridden = vm.runInContext('coverOutcomeBody("os1","assigned_backup","b1","", true)', ctx);
+assert.strictEqual(overridden.p_manager_override, true);
+const plainOutcome = vm.runInContext('coverOutcomeBody("os1","assigned_backup","b1","")', ctx);
+assert.strictEqual(plainOutcome.p_manager_override, undefined, 'override defaults off');
+const setBody = vm.runInContext('coverDesk1PrefsSetBody("c1", null, true)', ctx);
+assert.strictEqual(setBody.p_cover_no_backup, undefined, 'null leaves no-backup unchanged');
+assert.strictEqual(setBody.p_cover_prefer_wait, true);
 
 const ranked = vm.runInContext('coverMapRank({aide_id:"a1", name:"Devon", continuity_score:12, distance_miles:1.8, worked_this_client:4, score:9, rank:1})', ctx);
 assert.strictEqual(ranked.continuity, 12, 'continuity_score is the times-worked count');
