@@ -53,6 +53,11 @@ assert.ok(!saveFn.includes('upsert_schedule_client_hold'), 'Save week does not c
 assert.ok(!saveFn.includes('schedWriteHold'), 'Save week does not call Save hold');
 assert.ok(!saveFn.includes("p_mark:'on_hold'") && !saveFn.includes('p_mark:"on_hold"'), 'Save week does not mark on_hold');
 assert.ok(!saveFn.includes('schedHoldStart') && !saveFn.includes('schedHoldEnd') && !saveFn.includes('schedHoldNote'), 'Save week does not read hold drafts');
+assert.ok(saveFn.includes('schedReleaseUnselectedHoldDraft'), 'Save week drops an unselected hold before the pattern RPC');
+assert.ok(saveFn.indexOf('schedReleaseUnselectedHoldDraft') < saveFn.indexOf("schedPatternSaveRpc('upsert_schedule_slot_pattern"), 'hold drafts are cleared before either pattern callable');
+const clientHoldFn = slotSrc.slice(slotSrc.indexOf('async function schedSaveClientHold'), slotSrc.indexOf('async function schedEndClientHold'));
+assert.ok(clientHoldFn.includes('schedPatternSaveLock'), 'client Save hold refuses a pattern-save co-fire');
+assert.ok(clientHoldFn.indexOf('schedPatternSaveLock') < clientHoldFn.indexOf("sbRestRpc('upsert_schedule_client_hold'"), 'the lock is checked before the hold RPC');
 const clearFn = slotSrc.slice(slotSrc.indexOf('async function schedClearHold'), slotSrc.indexOf('async function schedClearSlotMark'));
 assert.ok(clearFn.includes("sbRestRpc('clear_schedule_client_hold',{p_client_id:String(clientId)})"), 'Clear is client-scoped');
 assert.ok(!clearFn.includes('p_hold_id'), 'Clear omits p_hold_id');
@@ -87,7 +92,7 @@ function makeEl(id){
   els[id] = el;
   return el;
 }
-['schedWeekLabel','schedSourceNote','schedNoClients','schedEmpty','schedEmptyAdd','schedScroll','schedHead','schedBody','schedPanel','schedSlotDetail','schedSlotClientName','schedSlotAuth','schedSlotWhen','schedSlotWeekStat','schedSlotDaySum','schedSlotCards','schedSlotPattern','schedSlotPatternTitle','schedSlotClient','schedSlotWeekday','schedSlotKey','schedSlotLabel','schedSlotStart','schedSlotEnd','schedSlotAide','schedSlotHours','schedSlotHoursView','schedSlotHoursNote','schedSlotSort','schedSlotDaysHint','schedSlotShiftSummary','schedSlotModeEdit','schedSlotModeAdd','schedSlotRemovePattern','schedIntro','schedAddUsualBtn','schedFilterCalloff','schedFilterHold','schedFilterAll','schedFilterOpen','schedLegend','schedSearch','tab_schedule','schedViewWeek','schedViewDay','schedHoldStart-s1','schedHoldEnd-s1','schedHoldNote-s1','schedHoldStart-am','schedHoldEnd-am','schedHoldNote-am'].forEach(makeEl);
+['schedWeekLabel','schedSourceNote','schedNoClients','schedEmpty','schedEmptyAdd','schedScroll','schedHead','schedBody','schedPanel','schedSlotDetail','schedSlotClientName','schedSlotAuth','schedSlotWhen','schedSlotWeekStat','schedSlotDaySum','schedSlotCards','schedSlotPattern','schedSlotPatternTitle','schedSlotClient','schedSlotWeekday','schedSlotKey','schedSlotLabel','schedSlotStart','schedSlotEnd','schedSlotAide','schedSlotHours','schedSlotHoursView','schedSlotHoursNote','schedSlotSort','schedSlotDaysHint','schedSlotShiftSummary','schedSlotModeEdit','schedSlotModeAdd','schedSlotRemovePattern','schedIntro','schedAddUsualBtn','schedFilterCalloff','schedFilterHold','schedFilterAll','schedFilterOpen','schedLegend','schedSearch','tab_schedule','schedViewWeek','schedViewDay','schedHoldStart-s1','schedHoldEnd-s1','schedHoldNote-s1','schedHoldStart-am','schedHoldEnd-am','schedHoldNote-am','schedClientHoldStart','schedClientHoldEnd','schedClientHoldNote'].forEach(makeEl);
 
 const pressed = {};
 const dayBtns = [7,1,2,3,4,5,6].map(function(wd){
@@ -463,6 +468,132 @@ function slot(on, key, extra){
   assert.ok(!Object.prototype.hasOwnProperty.call(soft[0].body, 'p_end_date'), 'Clear omits p_end_date');
   assert.strictEqual(listedHolds.length, 0, 'Clear-all drops every active hold for the client');
 
+  const qa = '22222222-2222-4222-8222-222222222222';
+  const qaDays = emptyDays('2026-09-21');
+  sandbox.schedWeekStart = '2026-09-21';
+  sandbox.schedHoldPick = sandbox.schedHoldPickKey(ada, '2026-09-21', 's1');
+  sandbox.schedHoldDraftClient = ada;
+  sandbox.schedSlotMarkOpen = 'hold:s1';
+  els['schedHoldStart-s1'].value = '09/21/2026';
+  els['schedHoldEnd-s1'].value = '09/26/2026';
+  els['schedHoldNote-s1'].value = 'resmoke QaHold';
+  els.schedClientHoldStart.value = '09/21/2026';
+  els.schedClientHoldEnd.value = '09/26/2026';
+  els.schedClientHoldNote.value = 'resmoke QaHold';
+  sandbox.schedApplySlotWeek({
+    week_start: '2026-09-21',
+    marker: 'hold-client1',
+    v: 'hold-client1',
+    clients: [{
+      client_id: qa,
+      client_name: 'QaHold Clientgc3oi',
+      client_on_hold: false,
+      hold_banner: null,
+      holds: [],
+      days: qaDays
+    }]
+  });
+  sandbox.schedSelectSlotDay(qa, '2026-09-21', 1);
+  assert.strictEqual(sandbox.schedSlotMarkOpen, '', 'opening a client with no hold unselects leftover On hold');
+  assert.strictEqual(sandbox.schedHoldPick, '', 'a leftover On hold pick does not follow the next client');
+  assert.strictEqual(els['schedHoldStart-s1'].value, '', 'leftover Start is empty');
+  assert.strictEqual(els['schedHoldEnd-s1'].value, '', 'leftover End is empty');
+  assert.strictEqual(els['schedHoldNote-s1'].value, '', 'leftover Note is empty');
+  assert.strictEqual(els.schedClientHoldStart.value, '', 'client hold Start is empty when no hold is painting');
+  assert.strictEqual(els.schedClientHoldEnd.value, '', 'client hold End is empty when no hold is painting');
+  assert.strictEqual(els.schedClientHoldNote.value, '', 'client hold Note is empty when no hold is painting');
+  assert.ok(els.schedSlotCards.innerHTML.includes('Save hold'), 'empty week still offers explicit Save hold');
+  assert.ok(!els.schedSlotCards.innerHTML.includes('resmoke QaHold'), 'the leftover note is not painted');
+  assert.ok(!els.schedSlotCards.innerHTML.includes('is-on-hold'), 'On hold is not selected');
+  els.schedSlotClient.value = qa;
+  els.schedSlotWeekday.value = '1';
+  els.schedSlotKey.value = '';
+  els.schedSlotLabel.value = '';
+  els.schedSlotStart.value = '08:00';
+  els.schedSlotEnd.value = '18:00';
+  els.schedSlotAide.value = '';
+  els.schedSlotHours.value = '';
+  els.schedSlotSort.value = '';
+  [1,2,3,4,5,6].forEach(function(wd){ pressed[wd] = true; });
+  pressed[7] = false;
+  sandbox.schedSlotFormMode = 'add';
+  sandbox.schedSlotEditKey = '';
+  els.schedClientHoldStart.value = '09/21/2026';
+  els.schedClientHoldEnd.value = '09/26/2026';
+  els.schedClientHoldNote.value = 'resmoke QaHold';
+  els['schedHoldStart-s1'].value = '09/21/2026';
+  els['schedHoldEnd-s1'].value = '09/26/2026';
+  els['schedHoldNote-s1'].value = 'resmoke QaHold';
+  sandbox.schedSlotMarkOpen = '';
+  sandbox.schedHoldPick = '';
+  const qaWeek = {
+    week_start: '2026-09-21',
+    marker: 'hold-client1',
+    v: 'hold-client1',
+    clients: [{
+      client_id: qa,
+      client_name: 'QaHold Clientgc3oi',
+      client_on_hold: false,
+      hold_banner: null,
+      holds: [],
+      days: qaDays
+    }]
+  };
+  sandbox.sbRestRpc = function(name, body){
+    rpc.push({name: name, body: body});
+    if(name === 'list_schedule_week_slots' || name === 'list_schedule_week'){
+      return Promise.resolve({ok: true, data: qaWeek});
+    }
+    if(name === 'upsert_schedule_slot_pattern_weekdays' || name === 'upsert_schedule_slot_pattern'){
+      return Promise.resolve({ok: true, data: {ok: true, marker: 'hold-autosave1', v: 'hold-autosave1', holds_written: false, count: 6}});
+    }
+    if(name === 'list_schedule_client_holds')return Promise.resolve({ok: true, data: {holds: []}});
+    return Promise.resolve({ok: true, data: {ok: true}});
+  };
+  rpc.length = 0;
+  toasts.length = 0;
+  await sandbox.schedSaveSlotPattern();
+  assert.ok(rpc.some(function(c){ return c.name === 'upsert_schedule_slot_pattern_weekdays'; }), 'Save week still posts the pattern');
+  assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_client_hold'; }), 'filled hold drafts do not co-fire when On hold is off');
+  assert.ok(!rpc.some(function(c){ return c.name === 'upsert_schedule_slot_day_mark' && c.body && c.body.p_mark === 'on_hold'; }), 'Save week does not day-mark on_hold');
+  assert.strictEqual(els.schedClientHoldStart.value, '', 'Save week empties client hold Start');
+  assert.strictEqual(els.schedClientHoldEnd.value, '', 'Save week empties client hold End');
+  assert.strictEqual(els.schedClientHoldNote.value, '', 'Save week empties client hold Note');
+  assert.strictEqual(sandbox.schedSlotMarkOpen, '', 'Save week leaves On hold unselected');
+  sandbox.schedPatternSaveLock = true;
+  rpc.length = 0;
+  await sandbox.schedSaveClientHold(qa);
+  assert.strictEqual(rpc.length, 0, 'a pattern save in flight cannot post a client hold');
+  sandbox.schedPatternSaveLock = false;
+  els['schedHoldStart-s1'].value = '09/21/2026';
+  els['schedHoldEnd-s1'].value = '09/26/2026';
+  els['schedHoldNote-s1'].value = 'resmoke QaHold';
+  rpc.length = 0;
+  await sandbox.schedWriteHold(qa, '2026-09-21', 's1', false);
+  assert.strictEqual(rpc.filter(function(c){ return c.name === 'upsert_schedule_client_hold'; }).length, 1, 'explicit Save hold still posts');
+  const paintedDays = emptyDays('2026-09-21');
+  paintedDays['1'].slots = [slot('2026-09-21', 's1', {hours: 0, on_hold: true, hold_id: holdId, hold_start: '2026-09-21', hold_end: '2026-09-26', mark: 'on_hold', note: 'resmoke QaHold'})];
+  sandbox.schedSlotMarkOpen = '';
+  sandbox.schedHoldPick = '';
+  sandbox.schedApplySlotWeek({
+    week_start: '2026-09-21',
+    marker: 'hold-client1',
+    v: 'hold-client1',
+    clients: [{
+      client_id: qa,
+      client_name: 'QaHold Clientgc3oi',
+      client_on_hold: true,
+      hold_banner: {hold_id: holdId, note: 'resmoke QaHold', start_date: '2026-09-21', end_date: '2026-09-26', start_label: '09/21', end_label: '09/26', label: 'resmoke QaHold · 09/21 – 09/26'},
+      holds: [{hold_id: holdId, start_date: '2026-09-21', end_date: '2026-09-26', note: 'resmoke QaHold', is_active: true}],
+      days: paintedDays
+    }]
+  });
+  sandbox.schedSelectSlotDay(qa, '2026-09-21', 1, 's1');
+  sandbox.schedPaint();
+  assert.ok(els.schedBody.innerHTML.includes('On hold'), 'an active hold still paints On hold');
+  assert.ok(els.schedSlotCards.innerHTML.includes('is-on-hold'), 'the held shift stays selected');
+  assert.ok(els.schedBody.innerHTML.includes('resmoke QaHold') || els.schedSlotCards.innerHTML.includes('resmoke QaHold'), 'the active banner note still paints');
+
   await shots();
   console.log('admin-hold-autosave1-test ok');
 })().catch(function(err){
@@ -657,7 +788,16 @@ async function shots(){
         mark: added.filter(function(c){ return c.name === 'upsert_schedule_slot_day_mark'; })[0],
         badge: card ? card.querySelector('.sched-mark.is-hold').textContent.replace(/\s+/g, ' ').trim() : '',
         hrs: card ? card.querySelector('.sched-hrs-pill').textContent.trim() : '',
-        banner: document.querySelector('.hold-banner') ? document.querySelector('.hold-banner').textContent.replace(/\s+/g, ' ').trim() : '',
+        banner: (function(){
+          var nodes = document.querySelectorAll('.hold-banner');
+          var text = '';
+          for(var i = 0; i < nodes.length; i++){
+            var bit = nodes[i].textContent.replace(/\s+/g, ' ').trim();
+            if(bit.indexOf('Hospital') >= 0)return bit;
+            if(!text)text = bit;
+          }
+          return text;
+        })(),
         chip: document.querySelector('#schedScroll .sched-chip.is-hold') ? document.querySelector('#schedScroll .sched-chip.is-hold').innerText.replace(/\s+/g, ' ').trim() : ''
       };
     }, beforeHold);
