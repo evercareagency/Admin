@@ -108,25 +108,25 @@ function run(code){
   return JSON.parse(JSON.stringify(vm.runInContext(code, ctx)));
 }
 
-assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','backups'], 'empty storage is the layoutA1 set');
+assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','coverage','backups'], 'empty storage pins Cover with the layoutA1 set');
 assert.strictEqual(run('navEditPool(navEditRead()).indexOf("settings")'), -1, 'settings never enters the pool');
 assert.ok(run('navEditPool(navEditRead()).indexOf("nurse")') >= 0, 'Scheduler can pick Nurse');
 assert.strictEqual(run("navEditIsBottom('clients')"), 'more', 'Clients highlights More until it is on the bar');
 assert.strictEqual(run("navEditIsBottom('settings')"), null);
 assert.deepStrictEqual(
   run("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','clients')"),
-  ['timesheets','schedule','aides','clients'],
-  'Clients replaces Backup'
+  ['timesheets','schedule','aides','clients','coverage'],
+  'Clients replaces Backup and a short bar still picks up Cover'
 );
 assert.ok(run("navEditPool(['timesheets','schedule','aides','clients']).indexOf('backups')") >= 0, 'Backup moves into More');
 assert.deepStrictEqual(
   run("navEditSwapIds(['timesheets','schedule','aides','clients'],'clients','backups')"),
-  ['timesheets','schedule','aides','backups'],
-  'swapping back restores Backup'
+  ['timesheets','schedule','aides','backups','coverage'],
+  'swapping back restores Backup and keeps Cover'
 );
 assert.deepStrictEqual(
   run("navEditSanitize(['nope','settings','more','clients','clients'])"),
-  ['clients','timesheets','schedule','aides'],
+  ['clients','timesheets','schedule','aides','coverage'],
   'junk, settings, and More cannot occupy a slot'
 );
 assert.strictEqual(run("navEditStorageKeyFor('user-1','Mo@Evercare.test')"), 'evercare_nav_tabs:user-1|mo@evercare.test');
@@ -139,7 +139,7 @@ ctx.currentAdminUsername = 'other@evercare.test';
 assert.notStrictEqual(run('navEditStorageKey()'), 'evercare_nav_tabs:sched@evercare.test');
 ctx.currentAdminUsername = 'sched@evercare.test';
 vm.runInContext("localStorage.setItem(navEditStorageKey(), JSON.stringify({v:1,slots:['timesheets','schedule','aides','clients']}))", ctx);
-assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','clients']);
+assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','clients','coverage']);
 assert.strictEqual(run("navEditIsBottom('clients')"), 'clients');
 assert.strictEqual(run("navEditIsBottom('backups')"), 'more');
 roles.nav_nurse = 'Admin';
@@ -147,7 +147,7 @@ assert.strictEqual(run("navEditRoleOk('nurse')"), false, 'Scheduler cannot open 
 assert.strictEqual(run('navEditPool(navEditRead()).indexOf("nurse")'), -1, 'Nurse is hidden from the picker');
 assert.deepStrictEqual(
   run("navEditSanitize(['timesheets','schedule','aides','nurse'])"),
-  ['timesheets','schedule','aides','backups'],
+  ['timesheets','schedule','aides','coverage','backups'],
   'a blocked Nurse slot falls back to an allowed tab'
 );
 assert.deepStrictEqual(
@@ -216,7 +216,7 @@ async function runBrowser(){
         nurse: !!document.getElementById('nav_nurse')
       };
     });
-    assert.deepStrictEqual(before.tabs, ['nav_timesheets','nav_schedule','nav_aides','nav_backups','nav_more']);
+    assert.deepStrictEqual(before.tabs, ['nav_timesheets','nav_schedule','nav_aides','nav_coverage','nav_backups','nav_more']);
     assert.strictEqual(before.edit.trim(), 'Edit tabs');
     await page.screenshot({path: path.join(shotDir, 'navedit1-more-edit-tabs.png')});
 
@@ -235,7 +235,7 @@ async function runBrowser(){
         cancel: document.getElementById('navEditCancel').textContent.trim()
       };
     });
-    assert.deepStrictEqual(picker.bottom, ['timesheets','schedule','aides','backups']);
+    assert.deepStrictEqual(picker.bottom, ['timesheets','schedule','aides','coverage','backups']);
     assert.ok(picker.pool.indexOf('clients') >= 0 && picker.pool.indexOf('nurse') >= 0, 'Admin picker includes Clients and Nurse');
     assert.strictEqual(picker.settings, -1);
     assert.ok(/Pinned/.test(picker.pinned), 'More is pinned');
@@ -253,9 +253,9 @@ async function runBrowser(){
       };
     });
     assert.ok(/Backup/.test(swapped.hint) && /Clients/.test(swapped.hint) && /swapped/.test(swapped.hint), swapped.hint);
-    assert.deepStrictEqual(swapped.bottom, ['timesheets','schedule','aides','clients']);
+    assert.deepStrictEqual(swapped.bottom, ['timesheets','schedule','aides','coverage','clients']);
     assert.ok(swapped.pool.indexOf('backups') >= 0 && swapped.pool.indexOf('clients') < 0);
-    assert.deepStrictEqual(swapped.live, ['nav_timesheets','nav_schedule','nav_aides','nav_backups','nav_more'], 'live bar waits for Save');
+    assert.deepStrictEqual(swapped.live, ['nav_timesheets','nav_schedule','nav_aides','nav_coverage','nav_backups','nav_more'], 'live bar waits for Save');
     await page.screenshot({path: path.join(shotDir, 'navedit1-edit-swap-clients-backup.png')});
 
     await page.click('#navEditCancel');
@@ -267,7 +267,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(cancelled.open, true);
-    assert.deepStrictEqual(cancelled.live, ['nav_timesheets','nav_schedule','nav_aides','nav_backups','nav_more']);
+    assert.deepStrictEqual(cancelled.live, ['nav_timesheets','nav_schedule','nav_aides','nav_coverage','nav_backups','nav_more']);
     assert.strictEqual(cancelled.stored, null, 'Cancel does not persist');
 
     await page.click('#navEditOpen');
@@ -300,12 +300,12 @@ async function runBrowser(){
     });
     assert.strictEqual(saved.key, 'evercare_nav_tabs:mo@evercare.test');
     assert.ok(saved.raw && saved.raw.indexOf('clients') >= 0 && saved.raw.indexOf('backups') < 0);
-    assert.deepStrictEqual(saved.live, ['nav_timesheets','nav_schedule','nav_aides','nav_clients','nav_more']);
-    assert.strictEqual(saved.count, 5);
+    assert.deepStrictEqual(saved.live, ['nav_timesheets','nav_schedule','nav_aides','nav_coverage','nav_clients','nav_more']);
+    assert.strictEqual(saved.count, 6);
     assert.strictEqual(saved.primary, 'clients');
     assert.strictEqual(saved.backupPrimary, 'more');
     assert.strictEqual(saved.settingsPrimary, 'more');
-    assert.strictEqual(saved.moreFirst, 'nav_backups');
+    assert.strictEqual(saved.moreFirst, 'nav_payroll');
     assert.strictEqual(saved.settingsInAccount, true);
     await page.screenshot({path: path.join(shotDir, 'navedit1-bottom-clients.png')});
 
@@ -354,7 +354,7 @@ async function runBrowser(){
     const afterDragCancel = await page.evaluate(function(){
       return Array.prototype.map.call(document.querySelectorAll('#adminScreen .bottom-nav .bottom-tab'), function(el){return el.id;}).join(',');
     });
-    assert.strictEqual(afterDragCancel, 'nav_timesheets,nav_schedule,nav_aides,nav_clients,nav_more', 'Cancel after a drag restores the saved bar');
+    assert.strictEqual(afterDragCancel, 'nav_timesheets,nav_schedule,nav_aides,nav_coverage,nav_clients,nav_more', 'Cancel after a drag restores the saved bar');
 
     await page.evaluate(function(){
       localStorage.setItem('admin_session', JSON.stringify({
@@ -367,7 +367,7 @@ async function runBrowser(){
     await page.reload({waitUntil:'domcontentloaded', timeout:20000});
     await page.waitForFunction(function(){
       var tabs = document.querySelectorAll('#adminScreen .bottom-nav .bottom-tab');
-      return tabs.length === 5 && tabs[3] && tabs[3].id === 'nav_clients' && document.getElementById('adminScreen').classList.contains('active');
+      return tabs.length === 6 && tabs[4] && tabs[4].id === 'nav_clients' && document.getElementById('adminScreen').classList.contains('active');
     }, {timeout:8000});
 
     await page.setViewport({width:1280, height:800, isMobile:false, hasTouch:false});
@@ -377,7 +377,7 @@ async function runBrowser(){
       var cs = getComputedStyle(document.querySelector('#adminScreen .bottom-tab'));
       return {tabs: tabs, dir: cs.flexDirection, edit: !!document.getElementById('navEditOpen')};
     });
-    assert.deepStrictEqual(desk.tabs, ['nav_timesheets','nav_schedule','nav_aides','nav_clients','nav_more']);
+    assert.deepStrictEqual(desk.tabs, ['nav_timesheets','nav_schedule','nav_aides','nav_coverage','nav_clients','nav_more']);
     assert.strictEqual(desk.dir, 'row', 'desktop bottom tabs stay in a row');
     assert.strictEqual(desk.edit, true);
     await page.screenshot({path: path.join(shotDir, 'navedit1-desktop-more.png')});
