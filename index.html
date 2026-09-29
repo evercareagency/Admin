@@ -15,6 +15,9 @@
 <!-- remi notes open thread 2026-09-29 v=remi-notes-open1 ?v=remi-notes-open1 admin-build 2026-09-29-remi-notes-open1. GHOST-REMI-NOTES-OPEN1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi Notes cards (My notes and Scheduler notes) paint Open thread, and the tap was a silent no-op: remiNotesVis1OpenThread only set remiNotesVis1ThreadId and posted remi_list_my_note_thread, so Mo stayed inside Remi Notes. This tip keeps that function name so the existing onclick keeps working. It resolves the note id with remiNotesVis1SafeId, finds the note on remiNotesVis1Cache (filled from remiNotesVis1PaintPane and Load) or re-fetches the existing notes list briefly, and reads link fields Ace may already return: aide_id, linked_aide_id, thread_id, office_thread_id, and deep_link. deep_link is a string such as admin/messages?aide_id=<uuid>. The query is parsed. An object is ignored. It closes Remi the same way as Radar Open thread, through copilotClose on the remi-open-thread1 path. It does not showTab('more'). It does not leave #nav_more or #tab_more selected. It navigates to Messages with showTab('aidechat') and remiOpenThread1Desk when that helper is present, and opens the aide office thread through aideOfficeVis1OpenAide(aideId, threadId) when an aide_id or a parsed deep_link exists. A thread_id or office_thread_id alone is still a linked thread. When the note has no linked aide or thread, it still leaves Notes and lands on the Messages inbox, with one soft toast: No linked Messages thread on this note. Admin and Scheduler are one portal and share this Open thread behavior. Nurse stays out through remiNotesVis1OfficeOk and the aidechat gates. Save, Update, the My notes and Scheduler notes tabs, and remi-notes1 reminders stay. remiNotesVis1CloseThread stays for any residual in-Notes thread UI. Open thread's primary action is Messages. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-vis1, v=remi-open-thread1, v=remi-msg-tab1, v=aide-office-vis1, v=remi-notes1, and v=care-msg-safe1. -->
 <meta name="admin-build" content="2026-09-29-remi-notes-open1">
 <script>var REMI_NOTES_OPEN1_MARKER='v=remi-notes-open1';var REMI_NOTES_OPEN1_BUILD='2026-09-29-remi-notes-open1';</script>
+<!-- remi notes open thread unlinked 2026-09-29 v=remi-notes-open1b ?v=remi-notes-open1b admin-build 2026-09-29-remi-notes-open1b. GHOST-REMI-NOTES-OPEN1B-CONTRACT-v1. Follow-up to v=remi-notes-open1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. A personal reminder and any Remi note with no Messages link must not show Open thread. The tap must not dump Mo into empty Remi Ask and must not hop to Messages. remiNotesVis1CardHtml and the pane paint render Open thread only when remiNotesOpen1Link(note).linked is true: aide_id, linked_aide_id, thread_id, office_thread_id, or a string deep_link with aide_id or thread_id. An object deep_link stays ignored. When the note is not linked, remiNotesOpen1Go and remiNotesVis1OpenThread do not call remiNotesOpen1Messages, do not copilotClose, do not showTab('aidechat'), do not remiOpenThread1Desk, and do not open Remi Ask or an empty Ask composer. They stay on Remi Notes. If Notes is not already open, they open the Notes tab through remiNotesShow. Linked notes keep the open1 path: copilotClose, showTab('aidechat'), remiOpenThread1Desk, and aideOfficeVis1OpenAide(aideId, threadId). remi-notes1 local Reminders (remind me in 10 mins, on this phone) never gain an Open thread button. They are not Messages threads. Admin and Scheduler are one portal. Nurse stays out. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1, v=remi-notes-vis1, v=remi-notes1, and v=remi-open-thread1. -->
+<meta name="admin-build" content="2026-09-29-remi-notes-open1b">
+<script>var REMI_NOTES_OPEN1B_MARKER='v=remi-notes-open1b';var REMI_NOTES_OPEN1B_BUILD='2026-09-29-remi-notes-open1b';</script>
 <!-- sched notes copy 2026-09-29 v=sched-notes-copy1 ?v=sched-notes-copy1 admin-build 2026-09-29-sched-notes-copy1. GHOST-SCHED-NOTES-COPY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI copy. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Same Remi Notes surface as v=remi-notes-open1. Admin and Scheduler are one portal. This string change is Scheduler-facing only. remiNotesVis1Hint() for role Scheduler paints Your notes only. It does not say Admin. Admin My notes and the Scheduler notes tab keep their hints: This tab only. Your My notes stay off her screen. and Save → only on My notes. Scheduler never sees this tab. Scheduler still has no Scheduler notes tab. Nurse stays out. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1, v=remi-notes-vis1, v=remi-open-thread1, and v=sched-payroll-hide1. -->
 <meta name="admin-build" content="2026-09-29-sched-notes-copy1">
 <script>var SCHED_NOTES_COPY1_MARKER='v=sched-notes-copy1';var SCHED_NOTES_COPY1_BUILD='2026-09-29-sched-notes-copy1';</script>
@@ -4328,7 +4331,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -24209,6 +24212,7 @@ function remiNotesRemindHtml(n, now){
   html+='</div>';
   return html;
 }
+// remi-notes-open1b: on-phone Reminders are not Messages threads. Never paint Open thread here.
 function remiNotesRowHtml(n, mode, now){
   var id=remiNotesEsc(n.id);
   var editing=mode==='open'&&remiNotesEditing===n.id;
@@ -24281,7 +24285,7 @@ function remiNotesPaint(){
     var vis='';
     try{if(typeof remiNotesVis1Html==='function')vis=String(remiNotesVis1Html()||'');}catch(eVis){vis='';}
     var keep=remiNotesView==='done'?remiNotesDoneHtml(now):remiNotesOpenHtml(now);
-    host.innerHTML=vis+'<div id="remiNotes1Keep"><div class="notes-head"><span class="ttl">Reminders</span><span class="cnt">on this phone</span></div>'+keep+'</div>';
+    host.innerHTML=vis+'<div id="remiNotes1Keep" data-reminotes1="v=remi-notes1" data-remi-notes-open1b="v=remi-notes-open1b"><div class="notes-head"><span class="ttl">Reminders</span><span class="cnt">on this phone</span></div>'+keep+'</div>';
   }
   var composer=remiNotesEl('remiNotesComposer');
   var foot=remiNotesEl('remiNotesDoneFoot');
@@ -24685,7 +24689,7 @@ function remiNotesVis1CardHtml(note, mode, allowThread){
       html+='<button type="button" class="del" onclick="remiNotesVis1AskDelete(\''+id+'\')">Delete</button>';
       html+='</div>';
     }
-    if(allowThread&&id)html+='<button type="button" class="remi-linkish" data-remi-notes-open1="v=remi-notes-open1" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
+    if(allowThread&&id&&remiNotesOpen1Link(note).linked)html+='<button type="button" class="remi-linkish" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
   }
   html+='</div>';
   return html;
@@ -24703,7 +24707,7 @@ function remiNotesVis1PaneHtml(rows, err){
   if(err)html+='<p class="remi-vis-hint">'+remiNotesVis1Esc(err)+'</p>';
   if(!rows.length&&!err)html+='<p class="remi-vis-hint">No notes yet.</p>';
   (rows||[]).forEach(function(note){
-    html+=remiNotesVis1CardHtml(note, mode, !remiNotesVis1ThreadId);
+    html+=remiNotesVis1CardHtml(note, mode, !remiNotesVis1ThreadId&&remiNotesOpen1Link(note).linked);
   });
   if(mode==='my'&&!remiNotesVis1ThreadId){
     html+='<div class="remi-vis-card"><textarea id="remiNotesVisInput" class="remi-pack-text" maxlength="4000" placeholder="Type normally\u2026" aria-label="My note"></textarea>';
@@ -24716,7 +24720,7 @@ function remiNotesVis1Html(){
   var admin=remiNotesVis1IsAdmin();
   var myOn=remiNotesVis1Which!=='scheduler'||!admin;
   if(!admin)myOn=true;
-  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-sched-notes-copy1="v=sched-notes-copy1" data-remi-rail-crud1="'+remiRailCrud1Mark()+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
+  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-sched-notes-copy1="v=sched-notes-copy1" data-remi-rail-crud1="'+remiRailCrud1Mark()+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
     +'<div class="remi-vis-tabs" role="tablist" aria-label="Notes">'
     +'<button type="button" id="remiNotesVisMy" role="tab" class="'+(myOn?'on':'')+'" aria-selected="'+(myOn?'true':'false')+'" onclick="remiNotesVis1Tab(\'my\')">My notes</button>'
     +'<button type="button" id="remiNotesVisSched" role="tab" class="'+(!myOn?'on':'')+'" aria-selected="'+(!myOn?'true':'false')+'"'+(admin?'':' hidden')+' onclick="remiNotesVis1Tab(\'scheduler\')">Scheduler notes</button>'
@@ -24764,22 +24768,38 @@ function remiNotesOpen1Messages(){
   if(typeof showTab==='function'){try{showTab('aidechat');}catch(eTab){}}
   if(typeof remiOpenThread1Desk==='function'){try{remiOpenThread1Desk();}catch(eDesk){}}
 }
+function remiNotesOpen1OnNotes(){
+  var view='';
+  try{view=typeof copilotView==='undefined'?'':String(copilotView||'');}catch(eView){view='';}
+  if(view!=='notes')return false;
+  var sheet=null;
+  try{
+    if(typeof document!=='undefined'&&document.getElementById)sheet=document.getElementById('copilotSheet');
+  }catch(eSheet){sheet=null;}
+  if(sheet&&sheet.hidden)return false;
+  return true;
+}
+function remiNotesOpen1Stay(){
+  if(!remiNotesOpen1OnNotes()&&typeof remiNotesShow==='function'){
+    try{remiNotesShow();}catch(eShow){}
+  }
+  return {ok:true, linked:false, stayed:true, aideId:'', threadId:''};
+}
 function remiNotesOpen1Go(link){
   link=link||{};
   var aide=remiNotesOpen1Clean(link.aideId);
   var thread=remiNotesOpen1Clean(link.threadId);
   var linked=!!(aide||thread);
+  if(!linked)return remiNotesOpen1Stay();
   remiNotesOpen1Messages();
   var office=typeof aideOfficeVis1OfficeOk!=='function'||aideOfficeVis1OfficeOk();
-  if(linked&&office&&typeof aideOfficeVis1OpenAide==='function'){
+  if(office&&typeof aideOfficeVis1OpenAide==='function'){
     try{
       var pending=aideOfficeVis1OpenAide(aide, thread);
       if(pending&&typeof pending.then==='function')pending.then(function(){}, function(){});
     }catch(eOpen){}
-  }else if(!linked&&typeof showTempMsg==='function'){
-    try{showTempMsg('No linked Messages thread on this note.');}catch(eToast){}
   }
-  return {ok:true, linked:linked, aideId:aide, threadId:thread};
+  return {ok:true, linked:true, aideId:aide, threadId:thread};
 }
 async function remiNotesOpen1Refetch(noteId){
   if(!remiNotesVis1OfficeOk())return null;
