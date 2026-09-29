@@ -44,9 +44,15 @@ assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide
 });
 assert.ok(html.includes("if(role==='Nurse')return false"), 'Nurse stays out of Remi');
 assert.ok(html.includes('id="copilotFab"') && html.includes('data-layout-roles="Admin Scheduler"'), 'Remi chip stays Admin and Scheduler');
+assert.ok(html.includes('Admin and Scheduler are one portal'), 'Scheduler shares the Radar dismiss contract');
+assert.ok(html.includes('This chrome is not Admin-only'), 'dismiss chrome is not Admin-only');
+assert.ok(html.includes('Admin and Scheduler share it'), 'Radar note names both roles');
+const roleFn = extractFn(html, 'function copilotRoleOk()');
+assert.ok(roleFn.includes("role==='Admin'||role==='Scheduler'"), 'Scheduler passes the Remi role check');
 
 const dismissFn = extractFn(html, 'async function remiRadarDismiss1Dismiss()');
 assert.ok(dismissFn.includes("copilotRpc('resolve', remiRadarDismiss1ResolveBody(id))"), 'checked rows resolve one id at a time');
+assert.ok(!dismissFn.includes("role==='Admin'"), 'dismiss is not an Admin-only role check');
 assert.ok(!dismissFn.includes('alert.ace'), 'every checked row is resolved, not only Ace-flagged rows');
 assert.ok(dismissFn.includes('copilotAlerts=(copilotAlerts||[]).filter'), 'dismiss removes those rows from the Radar list');
 assert.ok(dismissFn.includes('remiRadarDismiss1Remember'), 'dismiss is remembered for refresh');
@@ -56,6 +62,7 @@ assert.ok(html.includes('Ack stays on the Radar list'), 'ack stays on the list')
 });
 const selectFn = extractFn(html, 'function remiRadarDismiss1SelectAll()');
 const unselectFn = extractFn(html, 'function remiRadarDismiss1Unselect()');
+assert.ok(!selectFn.includes("role==='Admin'") && !unselectFn.includes("role==='Admin'"), 'Select all and Unselect are not Admin-only');
 assert.ok(!selectFn.includes('copilotRpc') && !unselectFn.includes('copilotRpc'), 'Select all and Unselect do not post');
 assert.ok(html.includes('>Select all<') && html.includes('>Unselect<') && html.includes('>Dismiss selected<'), 'toolbar labels');
 assert.ok(html.includes('Clears selected Radar rows only · not send · does not message anyone'), 'not-send callout');
@@ -166,6 +173,25 @@ await vm.runInContext('remiRadarDismiss1Dismiss()', ctx);
 assert.deepStrictEqual(plain('rpc'), [{kind:'resolve', body:{p_id:'desk-1'}}], 'a checked desk row still resolves by p_id');
 assert.deepStrictEqual(plain('copilotAlerts.map(function(a){return a.id;})'), ['desk-2']);
 assert.strictEqual(vm.runInContext('toasts[0]', ctx), 'Dismissed from Radar');
+
+vm.runInContext('currentAdminRole="Scheduler"; currentAdminUsername="scheduler"; remiRadarDismiss1Busy=false; remiRadarDismiss1Selected={}; copilotAlerts=[{id:"sch-1", kind:"schedule_gap", surface:"Fri mark", detail:"Open"},{id:"sch-2", kind:"coverage_open", surface:"Cover", detail:"Open"}]; rpc.length=0; toasts.length=0;', ctx);
+assert.strictEqual(vm.runInContext('copilotRoleOk()', ctx), true, 'Scheduler shares Remi');
+const schBar = vm.runInContext('remiRadarDismiss1ToolbarHtml(2, 0)', ctx);
+assert.ok(schBar.includes('Select all') && schBar.includes('Unselect') && schBar.includes('>Dismiss selected<'), 'Scheduler gets the same toolbar');
+assert.ok(/id="radarDismissGo"[^>]*disabled/.test(schBar), 'Scheduler dismiss stays muted until a check');
+vm.runInContext('remiRadarDismiss1SelectAll();', ctx);
+assert.strictEqual(vm.runInContext('rpc.length', ctx), 0, 'Scheduler Select all does not post');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1SelectedCount(copilotAlerts)', ctx), 2, 'Scheduler Select all checks every row');
+vm.runInContext('remiRadarDismiss1Unselect();', ctx);
+assert.strictEqual(vm.runInContext('remiRadarDismiss1SelectedCount(copilotAlerts)', ctx), 0, 'Scheduler Unselect clears checks');
+assert.strictEqual(vm.runInContext('rpc.length', ctx), 0, 'Scheduler Unselect does not post');
+vm.runInContext('remiRadarDismiss1Selected={"sch-1":1};', ctx);
+await vm.runInContext('remiRadarDismiss1Dismiss()', ctx);
+assert.deepStrictEqual(plain('rpc'), [{kind:'resolve', body:{p_id:'sch-1'}}], 'Scheduler dismiss loops admin_resolve_radar_signal by p_id');
+assert.deepStrictEqual(plain('copilotAlerts.map(function(a){return a.id;})'), ['sch-2'], 'Scheduler dismiss removes only the checked row');
+assert.strictEqual(vm.runInContext('toasts[0]', ctx), 'Dismissed from Radar');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sch-1", status:"open", kind:"schedule_gap"})', ctx), true, 'Scheduler refresh keeps that id off Radar');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sch-2", status:"open", kind:"coverage_open"})', ctx), false, 'Scheduler keeps the unchecked row');
 }
 
 function loadPuppeteer(){
@@ -340,8 +366,81 @@ async function runBrowser(){
     assert.strictEqual(cleared.disabled, true);
     assert.strictEqual(cleared.rpc, 2, 'Unselect does not post another resolve');
 
-    await page.setViewport({width:1280, height:800});
-    await page.evaluate(function(){copilotPaintRadar();});
+    const schedOpen = await page.evaluate(async function(){
+      currentAdminRole='Scheduler';
+      currentAdminUsername='scheduler';
+      if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
+      var fab=document.getElementById('copilotFab');
+      await copilotOpenRadar();
+      var go=document.getElementById('radarDismissGo');
+      var boxes=document.querySelectorAll('#copilotList .radar-dismiss-cb');
+      return {
+        roleOk:copilotRoleOk(),
+        fabHidden:!!(fab&&fab.hasAttribute('hidden')),
+        sheetHidden:document.getElementById('copilotSheet').hidden,
+        labels:{
+          all:document.getElementById('radarDismissSelectAll').textContent,
+          none:document.getElementById('radarDismissUnselect').textContent,
+          go:go.textContent
+        },
+        goDisabled:go.disabled,
+        boxCount:boxes.length,
+        note:(document.querySelector('#copilotBody .copilot-note')||{}).textContent||''
+      };
+    });
+    assert.strictEqual(schedOpen.roleOk, true, 'Scheduler can open Radar');
+    assert.strictEqual(schedOpen.fabHidden, false, 'Scheduler keeps the Remi chip');
+    assert.strictEqual(schedOpen.sheetHidden, false, 'Scheduler opens the same sheet');
+    assert.deepStrictEqual(schedOpen.labels, {all:'Select all', none:'Unselect', go:'Dismiss selected'});
+    assert.strictEqual(schedOpen.goDisabled, true);
+    assert.ok(schedOpen.boxCount >= 4, 'Scheduler sees a checkbox on each card, got '+schedOpen.boxCount);
+    assert.ok(schedOpen.note.indexOf('Admin and Scheduler share it')>=0, schedOpen.note);
+    await page.screenshot({path:path.join(outDir, '05-scheduler-radar.png')});
+
+    const rpcBefore = await page.evaluate(function(){return window.__rpc.length;});
+    await page.evaluate(function(){
+      var boxes=document.querySelectorAll('#copilotList .radar-dismiss-cb');
+      boxes[0].checked=true;
+      boxes[0].dispatchEvent(new Event('change', {bubbles:true}));
+    });
+    await page.waitForFunction(function(){
+      var go=document.getElementById('radarDismissGo');
+      return go && !go.disabled && document.querySelectorAll('#copilotList .radar-dismiss-cb:checked').length===1;
+    });
+    await page.evaluate(function(){document.getElementById('radarDismissGo').scrollIntoView({block:'center'});});
+    await page.click('#radarDismissGo');
+    await page.waitForFunction(function(){
+      return document.getElementById('radarDismissCallout') && document.getElementById('radarDismissCallout').textContent.indexOf('Dismissed from Radar')>=0;
+    });
+    const schedAfter = await page.evaluate(function(before){
+      var ids=[];
+      document.querySelectorAll('#copilotList [data-copilot-id]').forEach(function(el){ids.push(el.getAttribute('data-copilot-id'));});
+      var fresh=window.__rpc.slice(before);
+      var names={};
+      fresh.forEach(function(row){names[row.name]=(names[row.name]||0)+1;});
+      return {
+        ids:ids,
+        names:names,
+        resolves:fresh.filter(function(row){return row.name==='admin_resolve_radar_signal';}).map(function(row){return row.body;})
+      };
+    }, rpcBefore);
+    assert.ok(schedAfter.ids.indexOf('sig-fri')<0, 'Scheduler dismiss clears the checked row '+schedAfter.ids.join(','));
+    assert.ok(schedAfter.ids.indexOf('sig-wed')>=0, 'Scheduler keeps the unchecked row');
+    assert.strictEqual(schedAfter.names.admin_resolve_radar_signal, 1);
+    assert.deepStrictEqual(schedAfter.resolves, [{p_id:'sig-fri'}]);
+    ['admin_blast_cover_request','admin_confirm_cover_send','admin_ack_radar_signal'].forEach(function(name){
+      assert.ok(!schedAfter.names[name], 'Scheduler dismiss did not call '+name);
+    });
+    await page.screenshot({path:path.join(outDir, '06-scheduler-after-dismiss.png')});
+
+    await page.setViewport({width:1280, height:800, isMobile:false, hasTouch:false});
+    await page.evaluate(function(){
+      currentAdminRole='Scheduler';
+      var sheet=document.getElementById('copilotSheet');
+      if(sheet)sheet.hidden=false;
+      if(typeof copilotDeskAlerts==='function'&&(!copilotAlerts||!copilotAlerts.length))copilotAlerts=copilotDeskAlerts();
+      copilotPaintRadar();
+    });
     const desk = await page.evaluate(function(){
       var sheet=document.getElementById('copilotSheet');
       var style=getComputedStyle(sheet);
