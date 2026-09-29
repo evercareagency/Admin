@@ -189,7 +189,11 @@ function runSlice(){
   assert.strictEqual(rpc[0].name, 'admin_update_remi_scheduled_job');
   assert.strictEqual(rpc[0].body.p_id, 'j1');
   assert.strictEqual(rpc[0].body.p_is_on, false);
-  assert.ok(rpc[0].body.p_weekday == null && rpc[0].body.p_local_time == null, 'toggle sends is_on only');
+  assert.strictEqual(rpc[0].body.p_title, 'Missing hours report');
+  assert.strictEqual(rpc[0].body.p_weekday, 'mon');
+  assert.strictEqual(rpc[0].body.p_local_time, '09:00');
+  assert.ok(Object.prototype.hasOwnProperty.call(rpc[0].body, 'p_recurrence'), 'full arg set disambiguates the overload');
+  assert.ok(Object.prototype.hasOwnProperty.call(rpc[0].body, 'p_timezone'), 'full arg set includes timezone');
 
   rpc.length = 0;
   sandbox.remiSched1BeginEdit('j2');
@@ -200,7 +204,8 @@ function runSlice(){
   assert.strictEqual(rpc[0].body.p_id, 'j2');
   assert.strictEqual(rpc[0].body.p_weekday, 'fri');
   assert.strictEqual(rpc[0].body.p_local_time, '13:30');
-  assert.ok(!Object.prototype.hasOwnProperty.call(rpc[0].body, 'p_is_on'), 'time change does not send is_on');
+  assert.strictEqual(rpc[0].body.p_is_on, true, 'time change keeps the current On state in the full arg set');
+  assert.strictEqual(rpc[0].body.p_title, 'Hours nudge (aides)');
 
   sandbox.currentAdminRole = 'Nurse';
   rpc.length = 0;

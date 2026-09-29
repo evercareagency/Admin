@@ -15,6 +15,9 @@
 <!-- sched notes copy 2026-09-29 v=sched-notes-copy1 ?v=sched-notes-copy1 admin-build 2026-09-29-sched-notes-copy1. GHOST-SCHED-NOTES-COPY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI copy. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Same Remi Notes surface as v=remi-notes-open1. Admin and Scheduler are one portal. This string change is Scheduler-facing only. remiNotesVis1Hint() for role Scheduler paints Your notes only. It does not say Admin. Admin My notes and the Scheduler notes tab keep their hints: This tab only. Your My notes stay off her screen. and Save → only on My notes. Scheduler never sees this tab. Scheduler still has no Scheduler notes tab. Nurse stays out. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1, v=remi-notes-vis1, v=remi-open-thread1, and v=sched-payroll-hide1. -->
 <meta name="admin-build" content="2026-09-29-sched-notes-copy1">
 <script>var SCHED_NOTES_COPY1_MARKER='v=sched-notes-copy1';var SCHED_NOTES_COPY1_BUILD='2026-09-29-sched-notes-copy1';</script>
+<!-- remi rail crud 2026-09-29 v=remi-rail-crud1 ?v=remi-rail-crud1 admin-build 2026-09-29-remi-rail-crud1. GHOST-REMI-RAIL-CRUD1-CONTRACT-v1. Ace CALLABLE LIVE. No new SQL in this repo. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi right rail only. Admin and Scheduler are one portal. Nurse stays out. After Save, each My note, Rules card, and Scheduled job card keeps Edit and Delete. My notes Edit is an inline textarea with Save and Cancel and posts remi_edit_my_note {p_note_id, p_body} through the existing office JWT and remiNotesVis1Rpc. Delete asks Delete this note? then posts remi_delete_my_note {p_note_id} and refreshes the list so the deleted note is omitted. Scheduler My notes use the same Edit and Delete. The Scheduler hint is Your notes only, with no Admin wording. Admin Scheduler notes keep today's Update note path on remi_update_scheduler_note. Rules keep On and Off and title plus body edit through admin_update_remi_rule, inline Save and Cancel. Delete asks Delete this rule? then posts admin_delete_remi_rule {p_id}. Scheduled keeps On and Off. Edit keeps title, weekday, and time. Update posts admin_update_remi_scheduled_job with the full current argument set, including the payroll-aware fields, so PostgREST does not hit an overload. Delete asks Delete this scheduled job? then posts admin_delete_remi_scheduled_job {p_id}. Radar dismiss, Ask, Receipts, Coverage, and Payroll saved-card CRUD stay out. No Auth reseal. No Quo/SMS. The first admin-build meta stays 2026-09-27-remi-float-hide1b. admin-build.txt stays 2026-09-29-pages-cache-fresh1. Prior markers stay, including v=remi-notes-vis1, v=remi-rules1, and v=remi-sched1. -->
+<meta name="admin-build" content="2026-09-29-remi-rail-crud1">
+<script>var REMI_RAIL_CRUD1_MARKER='v=remi-rail-crud1';var REMI_RAIL_CRUD1_BUILD='2026-09-29-remi-rail-crud1';</script>
 <!-- sched payroll hide 2026-09-29 v=sched-payroll-hide1 ?v=sched-payroll-hide1 admin-build 2026-09-29-sched-payroll-hide1. GHOST-SCHED-PAYROLL-HIDE1-CONTRACT-v1. Ace NO CALLABLE. UI gate only. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Standing rule: Admin and Scheduler are one portal except payroll and Mo's notes, which are Admin-only. Mo's notes stay hidden for Scheduler (remi-notes-vis1). This tip hides the Remi Payroll tab (#copilotTabPayroll), the payroll panel (Payroll report, pay-day anchor, Aides, Paid shifts, Paid hours, Covers, Flags, Run, CSV, PDF, Both), and the Scheduled Payroll report job card (title, Open report, Run, pay-day anchor) from Scheduler. schedPayrollHide1UiOk() is the same Admin-only gate for the tab and that card: Scheduler is false, an empty role still paints, and Nurse stays out. data-layout-roles="Admin" on that tab, the same layoutA1 role family as the Admin payroll page and the same Admin-only check as Mo's notes (role Admin) with Nurse still OOS through copilotRoleOk and remiPayroll1OfficeOk. Admin keeps Payroll on the Remi rail. Admin payroll RPCs stay: admin_get_remi_payroll_report, admin_run_remi_payroll_report, admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf. More already has no Payroll for Scheduler. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including admin-sched-chat-push1, pages-cache-fresh1, login-land-schedule1, list-search-az1, remi-payroll1, the payroll insurance tip, and remi-notes-vis1. -->
 <meta name="admin-build" content="2026-09-29-sched-payroll-hide1">
 <script>var SCHED_PAYROLL_HIDE1_MARKER='v=sched-payroll-hide1';var SCHED_PAYROLL_HIDE1_BUILD='2026-09-29-sched-payroll-hide1';</script>
@@ -1692,6 +1695,22 @@ html.remi-ask-kb #copilotSheet{padding-bottom:0;}
 #copilotSheet .remi-pack-form .row button{flex:1;min-height:44px;border-radius:10px;font-weight:800;font-family:'DM Sans',sans-serif;cursor:pointer;}
 #copilotSheet .remi-pack-form .row .go{background:var(--teal);color:#fff;border:0;}
 #copilotSheet .remi-pack-form .row .alt{background:#fff;color:#6b7a90;border:1px solid var(--border);}
+/* v=remi-rail-crud1 — Edit + Delete on My notes, Rules, and Scheduled. Inline ring. Soft confirm. */
+#copilotSheet .remi-crud-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center;}
+#copilotSheet .remi-crud-actions button{width:auto;min-height:44px;padding:8px 14px;border-radius:10px;background:#fff;font-family:'DM Sans',sans-serif;font-weight:800;font-size:0.82rem;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-crud-actions .edit{color:var(--teal);border:1.5px solid #7ec8c8;}
+#copilotSheet .remi-crud-actions .del{color:#c0455a;border:1.5px solid #f0b4c0;}
+#copilotSheet .remi-vis-card.is-ring,#copilotSheet .remi-rule.is-ring,#copilotSheet .remi-job.is-ring{border-color:#3d9a9a;box-shadow:0 0 0 1px rgba(42,127,127,.45);}
+#copilotSheet .remi-crud-edit textarea,#copilotSheet .remi-crud-edit input,#copilotSheet .remi-crud-edit select{border:1.5px solid #7ec8c8;border-radius:12px;background:#fff;color:var(--navy);}
+#remiRailCrud1Confirm[hidden]{display:none !important;}
+#remiRailCrud1Confirm{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(10,18,32,.45);box-sizing:border-box;}
+#remiRailCrud1Confirm .remi-crud-modal{width:min(100%,320px);background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,.28);box-sizing:border-box;}
+#remiRailCrud1Confirm h3{margin:0 0 6px;font-size:1rem;font-weight:800;color:var(--navy);font-family:'DM Sans',sans-serif;}
+#remiRailCrud1Confirm p{margin:0;font-size:0.82rem;line-height:1.4;color:var(--muted);}
+#remiRailCrud1Confirm .row{display:flex;gap:8px;margin-top:14px;}
+#remiRailCrud1Confirm .row button{flex:1;min-height:44px;border-radius:10px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;touch-action:manipulation;}
+#remiRailCrud1Confirm .alt{background:#fff;color:#6b7a90;border:1px solid var(--border);}
+#remiRailCrud1Confirm .del{background:#fff;color:#c0392b;border:1.5px solid #e7a0ad;}
 #remiNotes1Keep{margin-top:14px;padding-top:8px;border-top:1px dashed var(--border);}
 #copilotSheet .remi-proof{min-width:0;max-width:100%;}
 #copilotSheet .remi-proof h3{font-size:0.95rem;color:var(--navy);margin:0 0 8px;}
@@ -4286,7 +4305,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -4359,6 +4378,16 @@ Call (216) 377-5991 with any questions.</textarea>
         </div>
         <p class="picker-preview" id="remiNotesPickPreview">Will remind</p>
         <button type="button" class="picker-confirm" id="remiNotesSetRemind" onclick="remiNotesCommitPicker()">Set reminder</button>
+      </div>
+      <div id="remiRailCrud1Confirm" class="remi-crud-scrim" hidden data-remi-rail-crud1="v=remi-rail-crud1" role="dialog" aria-modal="true" aria-labelledby="remiRailCrud1ConfirmTitle">
+        <div class="remi-crud-modal">
+          <h3 id="remiRailCrud1ConfirmTitle">Delete this note?</h3>
+          <p id="remiRailCrud1ConfirmDetail"></p>
+          <div class="row">
+            <button type="button" class="alt" id="remiRailCrud1ConfirmCancel" onclick="remiRailCrud1Close()">Cancel</button>
+            <button type="button" class="del" id="remiRailCrud1ConfirmGo" onclick="remiRailCrud1Yes()">Delete</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -24464,6 +24493,40 @@ var remiNotesVis1Which='my';
 var remiNotesVis1ThreadId='';
 var remiNotesVis1Error='';
 var remiNotesVis1Cache=[];
+var remiNotesVis1RowsCache=[];
+var remiNotesVis1EditId='';
+var remiNotesVis1DeleteId='';
+var remiRailCrud1Pending=null;
+function remiRailCrud1Mark(){
+  return (typeof REMI_RAIL_CRUD1_MARKER==='string'&&REMI_RAIL_CRUD1_MARKER)||'v=remi-rail-crud1';
+}
+function remiRailCrud1Open(title, detail, onYes){
+  remiRailCrud1Pending={title:String(title||''), detail:String(detail||''), onYes:onYes||null};
+  var box=null, h=null, p=null;
+  try{
+    if(typeof document!=='undefined'&&document&&document.getElementById){
+      box=document.getElementById('remiRailCrud1Confirm');
+      h=document.getElementById('remiRailCrud1ConfirmTitle');
+      p=document.getElementById('remiRailCrud1ConfirmDetail');
+    }
+  }catch(eBox){}
+  if(h)h.textContent=remiRailCrud1Pending.title;
+  if(p)p.textContent=remiRailCrud1Pending.detail;
+  if(box)box.hidden=false;
+}
+function remiRailCrud1Close(){
+  remiRailCrud1Pending=null;
+  var box=null;
+  try{
+    if(typeof document!=='undefined'&&document&&document.getElementById)box=document.getElementById('remiRailCrud1Confirm');
+  }catch(eBox){}
+  if(box)box.hidden=true;
+}
+function remiRailCrud1Yes(){
+  var fn=remiRailCrud1Pending&&remiRailCrud1Pending.onYes;
+  remiRailCrud1Close();
+  if(typeof fn==='function')return fn();
+}
 function remiNotesVis1Role(){
   try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
 }
@@ -24479,6 +24542,9 @@ function remiNotesVis1IsAdmin(){
 function remiNotesVis1ResetTab(){
   remiNotesVis1Which='my';
   remiNotesVis1ThreadId='';
+  remiNotesVis1EditId='';
+  remiNotesVis1DeleteId='';
+  if(typeof remiRailCrud1Close==='function')remiRailCrud1Close();
 }
 function remiNotesVis1El(id){
   try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
@@ -24549,19 +24615,34 @@ function remiNotesVis1CardHtml(note, mode, allowThread){
   var updates=remiNotesVis1Updates(note);
   var latest=note.latest_update&&typeof note.latest_update==='object'?note.latest_update:(updates.length?updates[updates.length-1]:null);
   var pill=latest&&latest.updated_label?String(latest.updated_label):'';
-  var html='<div class="remi-vis-card'+(mode==='scheduler'?' replying':'')+'" data-note-id="'+remiNotesVis1Esc(id)+'">';
-  html+='<div class="remi-vis-meta"><strong>'+remiNotesVis1Esc(who)+'</strong>'+(when?' \u00B7 '+remiNotesVis1Esc(when):'')+'</div>';
-  html+='<p>'+remiNotesVis1Esc(note.body||'')+'</p>';
-  if(pill)html+='<span class="remi-vis-pill">'+remiNotesVis1Esc(pill)+'</span>';
-  updates.forEach(function(u){
-    var name=String(u.author_display_name||'');
-    html+='<div class="remi-vis-update"><strong>'+remiNotesVis1Esc(name?name+':':'Updated')+'</strong> '+remiNotesVis1Esc(u.body||'')+'</div>';
-  });
-  if(mode==='scheduler'&&id){
-    html+='<textarea class="remi-pack-text" id="remiVisReply_'+id+'" aria-label="Update note" placeholder="Update note"></textarea>';
-    html+='<div class="remi-vis-row"><button type="button" class="go" onclick="remiNotesVis1Update(\''+id+'\')">Update note</button></div>';
+  var editing=mode==='my'&&!!id&&remiNotesVis1EditId===id;
+  var deleting=mode==='my'&&!!id&&remiNotesVis1DeleteId===id;
+  var html='<div class="remi-vis-card'+(mode==='scheduler'?' replying':'')+(editing||deleting?' is-ring':'')+'" data-note-id="'+remiNotesVis1Esc(id)+'">';
+  html+='<div class="remi-vis-meta"><strong>'+remiNotesVis1Esc(who)+'</strong>'+(editing?' \u00B7 editing':(when?' \u00B7 '+remiNotesVis1Esc(when):''))+'</div>';
+  if(editing){
+    html+='<div class="remi-crud-edit remi-pack-form"><label for="remiNotesVisEdit">Note</label>';
+    html+='<textarea id="remiNotesVisEdit" class="remi-pack-text" maxlength="4000" aria-label="Note">'+remiNotesVis1Esc(note.body||'')+'</textarea>';
+    html+='<div class="row"><button type="button" class="alt" onclick="remiNotesVis1CancelEdit()">Cancel</button>';
+    html+='<button type="button" class="go" onclick="remiNotesVis1SaveEdit(\''+id+'\')">Save</button></div></div>';
+  }else{
+    html+='<p>'+remiNotesVis1Esc(note.body||'')+'</p>';
+    if(pill)html+='<span class="remi-vis-pill">'+remiNotesVis1Esc(pill)+'</span>';
+    updates.forEach(function(u){
+      var name=String(u.author_display_name||'');
+      html+='<div class="remi-vis-update"><strong>'+remiNotesVis1Esc(name?name+':':'Updated')+'</strong> '+remiNotesVis1Esc(u.body||'')+'</div>';
+    });
+    if(mode==='scheduler'&&id){
+      html+='<textarea class="remi-pack-text" id="remiVisReply_'+id+'" aria-label="Update note" placeholder="Update note"></textarea>';
+      html+='<div class="remi-vis-row"><button type="button" class="go" onclick="remiNotesVis1Update(\''+id+'\')">Update note</button></div>';
+    }
+    if(mode==='my'&&id){
+      html+='<div class="remi-crud-actions">';
+      html+='<button type="button" class="edit" onclick="remiNotesVis1BeginEdit(\''+id+'\')">Edit</button>';
+      html+='<button type="button" class="del" onclick="remiNotesVis1AskDelete(\''+id+'\')">Delete</button>';
+      html+='</div>';
+    }
+    if(allowThread&&id)html+='<button type="button" class="remi-linkish" data-remi-notes-open1="v=remi-notes-open1" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
   }
-  if(allowThread&&id)html+='<button type="button" class="remi-linkish" data-remi-notes-open1="v=remi-notes-open1" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
   html+='</div>';
   return html;
 }
@@ -24591,7 +24672,7 @@ function remiNotesVis1Html(){
   var admin=remiNotesVis1IsAdmin();
   var myOn=remiNotesVis1Which!=='scheduler'||!admin;
   if(!admin)myOn=true;
-  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-sched-notes-copy1="v=sched-notes-copy1" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
+  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-sched-notes-copy1="v=sched-notes-copy1" data-remi-rail-crud1="'+remiRailCrud1Mark()+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
     +'<div class="remi-vis-tabs" role="tablist" aria-label="Notes">'
     +'<button type="button" id="remiNotesVisMy" role="tab" class="'+(myOn?'on':'')+'" aria-selected="'+(myOn?'true':'false')+'" onclick="remiNotesVis1Tab(\'my\')">My notes</button>'
     +'<button type="button" id="remiNotesVisSched" role="tab" class="'+(!myOn?'on':'')+'" aria-selected="'+(!myOn?'true':'false')+'"'+(admin?'':' hidden')+' onclick="remiNotesVis1Tab(\'scheduler\')">Scheduler notes</button>'
@@ -24667,6 +24748,7 @@ async function remiNotesOpen1Refetch(noteId){
 }
 function remiNotesVis1PaintPane(rows, err){
   if(!err)remiNotesVis1Remember(rows||[]);
+  remiNotesVis1RowsCache=Array.isArray(rows)?rows.slice():[];
   var pane=remiNotesVis1El('remiNotesVisPane');
   if(!pane)return;
   pane.innerHTML=remiNotesVis1PaneHtml(rows||[], err||'');
@@ -24709,6 +24791,9 @@ function remiNotesVis1Tab(name){
   if(name==='scheduler'&&!remiNotesVis1IsAdmin())return;
   remiNotesVis1Which=name==='scheduler'?'scheduler':'my';
   remiNotesVis1ThreadId='';
+  remiNotesVis1EditId='';
+  remiNotesVis1DeleteId='';
+  if(typeof remiRailCrud1Close==='function')remiRailCrud1Close();
   remiNotesVis1Load().catch(function(){});
 }
 async function remiNotesVis1OpenThread(id){
@@ -24764,6 +24849,60 @@ async function remiNotesVis1Update(noteId){
   await remiNotesVis1Load();
   return got;
 }
+function remiNotesVis1Repaint(){
+  remiNotesVis1PaintPane(remiNotesVis1RowsCache, remiNotesVis1Error||'');
+}
+function remiNotesVis1BeginEdit(id){
+  if(!remiNotesVis1OfficeOk())return;
+  remiRailCrud1Close();
+  remiNotesVis1DeleteId='';
+  remiNotesVis1EditId=remiNotesVis1SafeId(id);
+  remiNotesVis1Repaint();
+}
+function remiNotesVis1CancelEdit(){
+  remiNotesVis1EditId='';
+  remiNotesVis1Repaint();
+}
+async function remiNotesVis1SaveEdit(noteId){
+  if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi notes.'};
+  var id=remiNotesVis1SafeId(noteId||remiNotesVis1EditId);
+  var input=remiNotesVis1El('remiNotesVisEdit');
+  var body=input?String(input.value||'').trim():'';
+  if(!body){
+    if(typeof showTempMsg==='function')showTempMsg('Type a note first.','var(--warn)');
+    return {ok:false, error:'Type a note first.'};
+  }
+  var got=await remiNotesVis1Rpc('remi_edit_my_note', {p_note_id:id, p_body:body});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not save the note.','var(--warn)');
+    return got;
+  }
+  remiNotesVis1EditId='';
+  remiNotesVis1DeleteId='';
+  await remiNotesVis1Load();
+  return got;
+}
+function remiNotesVis1AskDelete(id){
+  if(!remiNotesVis1OfficeOk())return;
+  remiNotesVis1EditId='';
+  remiNotesVis1DeleteId=remiNotesVis1SafeId(id);
+  remiNotesVis1Repaint();
+  remiRailCrud1Open('Delete this note?', 'Removes it from My notes.', function(){return remiNotesVis1ConfirmDelete();});
+}
+async function remiNotesVis1ConfirmDelete(){
+  if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi notes.'};
+  var id=remiNotesVis1SafeId(remiNotesVis1DeleteId);
+  if(!id)return {ok:false, error:'Missing note.'};
+  var got=await remiNotesVis1Rpc('remi_delete_my_note', {p_note_id:id});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not delete the note.','var(--warn)');
+    return got;
+  }
+  remiNotesVis1DeleteId='';
+  remiNotesVis1EditId='';
+  await remiNotesVis1Load();
+  return got;
+}
 // end remi notes vis1 v=remi-notes-vis1
 
 // remi rules1 v=remi-rules1
@@ -24773,6 +24912,7 @@ var REMI_RULES1_OFFICE='is_scheduler_office';
 var remiRules1Cache=[];
 var remiRules1Mode='list';
 var remiRules1EditId='';
+var remiRules1DeleteId='';
 var remiRules1Error='';
 function remiRules1Role(){
   try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
@@ -24876,17 +25016,35 @@ function remiRules1UpdateBody(id, fields){
 }
 function remiRules1ListHtml(){
   var rows=remiRules1Sort(remiRules1Cache);
-  var html='<div class="remi-rules" id="remiRules1" data-remi-rules1="'+REMI_RULES1_MARKER+'">';
+  var html='<div class="remi-rules" id="remiRules1" data-remi-rules1="'+REMI_RULES1_MARKER+'" data-remi-rail-crud1="'+((typeof remiRailCrud1Mark==='function')?remiRailCrud1Mark():'v=remi-rail-crud1')+'">';
   html+='<p class="remi-vis-hint">Rules stick across days \u2014 edit anytime. Saved rules only.</p>';
   if(remiRules1Error)html+='<p class="remi-vis-hint">'+remiRules1Esc(remiRules1Error)+'</p>';
   if(!rows.length&&!remiRules1Error)html+='<p class="remi-vis-hint">No saved rules yet.</p>';
   rows.forEach(function(rule){
     var on=remiRules1On(rule.is_on);
     var id=remiRules1SafeId(rule.id);
-    html+='<div class="remi-rule" data-rule-id="'+remiRules1Esc(id)+'"><div class="top"><strong>'+remiRules1Esc(rule.title||'Rule')+'</strong>';
+    var editing=remiRules1Mode==='edit'&&!!id&&id===remiRules1SafeId(remiRules1EditId);
+    var deleting=!!id&&id===remiRules1SafeId(remiRules1DeleteId);
+    html+='<div class="remi-rule'+(editing||deleting?' is-ring':'')+'" data-rule-id="'+remiRules1Esc(id)+'"><div class="top"><strong>'+remiRules1Esc(editing?'Editing':(rule.title||'Rule'))+'</strong>';
     html+='<button type="button" class="remi-pack-on '+(on?'is-on':'is-off')+'" aria-pressed="'+(on?'true':'false')+'" onclick="remiRules1Toggle(\''+id+'\','+(on?'true':'false')+')">'+(on?'On':'Off')+'</button></div>';
-    html+='<p>'+remiRules1Esc(rule.body||'')+'</p>';
-    html+='<button type="button" class="remi-linkish" onclick="remiRules1Edit(\''+id+'\')">Edit</button></div>';
+    if(editing){
+      html+='<div class="remi-crud-edit remi-pack-form">';
+      html+='<label for="remiRules1Title">Title</label>';
+      html+='<input id="remiRules1Title" type="text" maxlength="120" value="'+remiRules1Esc(rule.title||'')+'" aria-label="Title">';
+      html+='<label for="remiRules1Body">What Remi should do</label>';
+      html+='<textarea id="remiRules1Body" class="remi-pack-text" maxlength="2000" aria-label="What Remi should do">'+remiRules1Esc(rule.body||'')+'</textarea>';
+      html+='<div class="row"><button type="button" class="alt" onclick="remiRules1Cancel()">Cancel</button>';
+      html+='<button type="button" class="go" id="remiRules1Save" onclick="remiRules1Save()">Save</button></div></div>';
+    }else{
+      html+='<p>'+remiRules1Esc(rule.body||'')+'</p>';
+      if(id){
+        html+='<div class="remi-crud-actions">';
+        html+='<button type="button" class="edit" onclick="remiRules1Edit(\''+id+'\')">Edit</button>';
+        html+='<button type="button" class="del" onclick="remiRules1AskDelete(\''+id+'\')">Delete</button>';
+        html+='</div>';
+      }
+    }
+    html+='</div>';
   });
   html+='<button type="button" class="remi-pack-add" id="remiRules1Add" onclick="remiRules1Add()">+ Add rule</button></div>';
   return html;
@@ -24901,7 +25059,7 @@ function remiRules1FormHtml(){
   }
   var title=rule&&rule.title?rule.title:'';
   var body=rule&&rule.body?rule.body:'';
-  var html='<div class="remi-rules remi-pack-form" id="remiRules1" data-remi-rules1="'+REMI_RULES1_MARKER+'">';
+  var html='<div class="remi-rules remi-pack-form" id="remiRules1" data-remi-rules1="'+REMI_RULES1_MARKER+'" data-remi-rail-crud1="'+((typeof remiRailCrud1Mark==='function')?remiRailCrud1Mark():'v=remi-rail-crud1')+'">';
   html+='<h3 style="margin:0;font-size:1rem;color:var(--navy);">'+(editing?'Edit rule':'Add rule')+'</h3>';
   html+='<label for="remiRules1Title">Title</label>';
   html+='<input id="remiRules1Title" type="text" maxlength="120" value="'+remiRules1Esc(title)+'" aria-label="Title">';
@@ -24913,7 +25071,7 @@ function remiRules1FormHtml(){
   return html;
 }
 function remiRules1Html(){
-  if(remiRules1Mode==='add'||remiRules1Mode==='edit')return remiRules1FormHtml();
+  if(remiRules1Mode==='add')return remiRules1FormHtml();
   return remiRules1ListHtml();
 }
 function remiRules1Paint(){
@@ -24930,6 +25088,9 @@ function remiRules1Show(){
   var sheet=remiRules1El('copilotSheet');
   if(sheet)sheet.hidden=false;
   remiRules1Mode='list';
+  remiRules1EditId='';
+  remiRules1DeleteId='';
+  if(typeof remiRailCrud1Close==='function')remiRailCrud1Close();
   remiRules1Paint();
   remiRules1Load().catch(function(){});
 }
@@ -24948,6 +25109,8 @@ function remiRules1Edit(id){
 function remiRules1Cancel(){
   remiRules1Mode='list';
   remiRules1EditId='';
+  remiRules1DeleteId='';
+  if(typeof remiRailCrud1Close==='function')remiRailCrud1Close();
   remiRules1Paint();
 }
 async function remiRules1Load(){
@@ -24999,6 +25162,33 @@ async function remiRules1Toggle(id, isOn){
   await remiRules1Load();
   return got;
 }
+function remiRules1AskDelete(id){
+  if(!remiRules1OfficeOk())return;
+  remiRules1DeleteId=remiRules1SafeId(id);
+  if(remiRules1Mode==='edit'&&remiRules1SafeId(remiRules1EditId)===remiRules1DeleteId){
+    remiRules1Mode='list';
+    remiRules1EditId='';
+  }
+  remiRules1Paint();
+  if(typeof remiRailCrud1Open==='function'){
+    remiRailCrud1Open('Delete this rule?', 'Remi stops using it on future blasts.', function(){return remiRules1ConfirmDelete();});
+  }
+}
+async function remiRules1ConfirmDelete(){
+  if(!remiRules1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi rules.'};
+  var id=remiRules1SafeId(remiRules1DeleteId);
+  if(!id)return {ok:false, error:'Missing rule.'};
+  var got=await remiRules1Rpc('admin_delete_remi_rule', {p_id:id});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not delete the rule.','var(--warn)');
+    return got;
+  }
+  remiRules1DeleteId='';
+  remiRules1EditId='';
+  remiRules1Mode='list';
+  await remiRules1Load();
+  return got;
+}
 async function remiRules1LoadChips(idx){
   if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx])return;
   var msg=copilotChat[idx];
@@ -25022,6 +25212,7 @@ var REMI_SCHED1_DAY_KEY={sunday:'sun',sun:'sun',monday:'mon',mon:'mon',tuesday:'
 var REMI_SCHED1_JOB_KEY={missing_hours_report:'missing_hours_report',hours_nudge:'hours_nudge',manager_digest:'manager_digest',payroll_report:'payroll_report'};
 var remiSched1Cache=[];
 var remiSched1EditId='';
+var remiSched1DeleteId='';
 var remiSched1Error='';
 function remiSched1Role(){
   try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
@@ -25285,6 +25476,54 @@ function remiSched1PayrollJobHidden(job){
   if(kind==='payroll_report')return true;
   return /\bpayroll\b/i.test(String(job.title||''));
 }
+function remiSched1Find(id){
+  var sid=remiSched1SafeId(id);
+  for(var i=0;i<remiSched1Cache.length;i++){
+    if(remiSched1SafeId(remiSched1Cache[i]&&remiSched1Cache[i].id)===sid)return remiSched1Cache[i];
+  }
+  return null;
+}
+function remiSched1RewriteSummary(job, weekday, local){
+  job=job||{};
+  var current=String(job.summary||job.schedule_label||'');
+  var day=REMI_SCHED1_DAY_NAME[weekday]||weekday||'';
+  var time=remiSched1ClockLabel(local);
+  var payroll=job.kind==='payroll_report'||job.job_key==='payroll_report'||job.recurrence==='biweekly';
+  var every=payroll?'Every other ':'Every ';
+  var head=every+day+' \u00B7 '+time+' ET';
+  if(!current)return head+' \u00B7 '+(job.kind==='payroll_report'||job.job_key==='payroll_report'?'payroll report in Remi rail':'posts in Remi rail');
+  var next=current.replace(/^Every other [A-Za-z]+ \u00B7 [^\u00B7]+ ET/, head);
+  if(next===current)next=current.replace(/^Every [A-Za-z]+ \u00B7 [^\u00B7]+ ET/, head);
+  return next;
+}
+function remiSched1UpdateBody(id, fields){
+  fields=fields||{};
+  var job=remiSched1Find(id)||{};
+  var weekday=fields.weekday!=null?String(fields.weekday):String(job.weekday||'');
+  if(weekday.length>3)weekday=REMI_SCHED1_DAY_KEY[weekday.toLowerCase()]||weekday.slice(0,3);
+  var local=fields.local_time!=null?String(fields.local_time).slice(0,5):String(job.local_time||'').slice(0,5);
+  var on=fields.is_on!=null?!!fields.is_on:remiSched1On(job.is_on);
+  var title=fields.title!=null?String(fields.title):String(job.title||'');
+  var summary=fields.summary!=null?String(fields.summary):remiSched1RewriteSummary(job, weekday, local);
+  var payroll=job.kind==='payroll_report'||job.job_key==='payroll_report';
+  var recurrence=job.recurrence||(payroll?'biweekly':'');
+  var anchor=job.anchor_date||(payroll?'2026-09-23':'');
+  if(payroll&&String(anchor).slice(0,10)==='2026-09-24')anchor='2026-09-23';
+  return {
+    p_id:remiSched1SafeId(id),
+    p_title:title,
+    p_weekday:weekday,
+    p_local_time:local,
+    p_is_on:on,
+    p_summary:summary,
+    p_prompt_text:fields.prompt_text!=null?String(fields.prompt_text):String(job.prompt_text||''),
+    p_timezone:fields.timezone!=null?String(fields.timezone):String(job.timezone||'America/New_York'),
+    p_recurrence:recurrence||null,
+    p_interval_days:(recurrence==='biweekly'||job.interval_days)?Number(job.interval_days||14):null,
+    p_anchor_date:anchor?String(anchor).slice(0,10):null,
+    p_range_prefs:(job.range_prefs&&typeof job.range_prefs==='object')?job.range_prefs:null
+  };
+}
 function remiSched1JobHtml(job){
   job=job||{};
   if(remiSched1PayrollJobHidden(job))return '';
@@ -25292,16 +25531,25 @@ function remiSched1JobHtml(job){
   var id=remiSched1SafeId(job.id);
   var weekday=String(job.weekday||'');
   if(weekday.length>3)weekday=REMI_SCHED1_DAY_KEY[weekday.toLowerCase()]||weekday.slice(0,3);
-  var html='<div class="remi-job" data-job-id="'+remiSched1Esc(id)+'"><div class="top"><strong>'+remiSched1Esc(job.title||'Scheduled')+'</strong>';
+  var editing=!!(id&&remiSched1EditId&&remiSched1EditId===id);
+  var deleting=!!(id&&remiSched1DeleteId&&remiSched1DeleteId===id);
+  var html='<div class="remi-job'+(editing||deleting?' is-ring':'')+'" data-job-id="'+remiSched1Esc(id)+'"><div class="top"><strong>'+remiSched1Esc(editing?'Editing':(job.title||'Scheduled'))+'</strong>';
   html+='<button type="button" class="remi-pack-on '+(on?'is-on':'is-off')+'" aria-pressed="'+(on?'true':'false')+'" onclick="remiSched1Toggle(\''+id+'\','+(on?'true':'false')+')">'+(on?'On':'Off')+'</button></div>';
-  html+='<p>'+remiSched1Esc(remiSched1Summary(job))+'</p>';
-  if(remiSched1EditId&&remiSched1EditId===id){
-    html+='<div class="remi-pack-form"><label for="remiSched1JobWeek">Weekday</label>'+remiSched1WeekOptions(weekday, 'remiSched1JobWeek');
+  if(editing){
+    html+='<div class="remi-crud-edit remi-pack-form"><label for="remiSched1JobTitle">Title</label>';
+    html+='<input id="remiSched1JobTitle" type="text" maxlength="120" value="'+remiSched1Esc(job.title||'')+'" aria-label="Title">';
+    html+='<label for="remiSched1JobWeek">Weekday</label>'+remiSched1WeekOptions(weekday, 'remiSched1JobWeek');
     html+='<label for="remiSched1JobClock">Time (ET)</label><input id="remiSched1JobClock" type="time" value="'+remiSched1Esc(String(job.local_time||'09:00').slice(0,5))+'" aria-label="Time">';
     html+='<div class="row"><button type="button" class="alt" onclick="remiSched1CancelEdit()">Cancel</button>';
-    html+='<button type="button" class="go" onclick="remiSched1SaveTime(\''+id+'\')">Save time</button></div></div>';
-  }else if(id){
-    html+='<button type="button" class="remi-linkish" onclick="remiSched1BeginEdit(\''+id+'\')">Change time</button>';
+    html+='<button type="button" class="go" onclick="remiSched1SaveTime(\''+id+'\')">Save</button></div></div>';
+  }else{
+    html+='<p>'+remiSched1Esc(remiSched1Summary(job))+'</p>';
+    if(id){
+      html+='<div class="remi-crud-actions">';
+      html+='<button type="button" class="edit" onclick="remiSched1BeginEdit(\''+id+'\')">Edit</button>';
+      html+='<button type="button" class="del" onclick="remiSched1AskDelete(\''+id+'\')">Delete</button>';
+      html+='</div>';
+    }
   }
   if(typeof remiPayroll1JobExtra==='function'){
     try{html+=remiPayroll1JobExtra(job);}catch(ePay){}
@@ -25315,7 +25563,7 @@ function remiSched1ListHtml(){
     var bo=Number(b&&b.sort_order); if(!isFinite(bo))bo=0;
     return ao-bo;
   });
-  var html='<div class="remi-sched" id="remiSched1" data-remi-sched1="'+REMI_SCHED1_MARKER+'">';
+  var html='<div class="remi-sched" id="remiSched1" data-remi-sched1="'+REMI_SCHED1_MARKER+'" data-remi-rail-crud1="'+((typeof remiRailCrud1Mark==='function')?remiRailCrud1Mark():'v=remi-rail-crud1')+'">';
   html+='<p class="remi-vis-hint">Clocks live in Ace. This desk does not re-seed them.</p>';
   if(remiSched1Error)html+='<p class="remi-vis-hint">'+remiSched1Esc(remiSched1Error)+'</p>';
   if(!rows.length&&!remiSched1Error)html+='<p class="remi-vis-hint">No scheduled jobs yet. Ask in Chat, then Confirm.</p>';
@@ -25337,6 +25585,8 @@ function remiSched1Show(){
   var sheet=remiSched1El('copilotSheet');
   if(sheet)sheet.hidden=false;
   remiSched1EditId='';
+  remiSched1DeleteId='';
+  if(typeof remiRailCrud1Close==='function')remiRailCrud1Close();
   remiSched1Paint();
   remiSched1Load().catch(function(){});
 }
@@ -25354,7 +25604,7 @@ async function remiSched1Load(){
 }
 async function remiSched1Toggle(id, isOn){
   if(!remiSched1OfficeOk())return {ok:false, forbidden:true};
-  var got=await remiSched1Rpc('admin_update_remi_scheduled_job', {p_id:remiSched1SafeId(id), p_is_on:!remiSched1On(isOn)});
+  var got=await remiSched1Rpc('admin_update_remi_scheduled_job', remiSched1UpdateBody(id, {is_on:!remiSched1On(isOn)}));
   if(!got.ok){
     if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not update the schedule.','var(--warn)');
     return got;
@@ -25363,37 +25613,61 @@ async function remiSched1Toggle(id, isOn){
   return got;
 }
 function remiSched1BeginEdit(id){
+  remiSched1DeleteId='';
+  if(typeof remiRailCrud1Close==='function')remiRailCrud1Close();
   remiSched1EditId=remiSched1SafeId(id);
   remiSched1Paint();
 }
 function remiSched1CancelEdit(){
   remiSched1EditId='';
+  remiSched1DeleteId='';
   remiSched1Paint();
 }
 async function remiSched1SaveTime(id){
   if(!remiSched1OfficeOk())return {ok:false, forbidden:true};
   var week=remiSched1El('remiSched1JobWeek');
   var clock=remiSched1El('remiSched1JobClock');
-  var body={p_id:remiSched1SafeId(id)};
-  if(week&&week.value)body.p_weekday=week.value;
-  if(clock&&clock.value)body.p_local_time=String(clock.value).slice(0,5);
-  var cached=null;
-  for(var si=0;si<remiSched1Cache.length;si++){
-    if(remiSched1SafeId(remiSched1Cache[si]&&remiSched1Cache[si].id)===body.p_id){cached=remiSched1Cache[si];break;}
+  var titleEl=remiSched1El('remiSched1JobTitle');
+  var fields={};
+  if(titleEl){
+    var title=String(titleEl.value||'').trim();
+    if(!title){
+      if(typeof showTempMsg==='function')showTempMsg('Add a title.','var(--warn)');
+      return {ok:false, error:'Add a title.'};
+    }
+    fields.title=title;
   }
-  if(cached&&(cached.recurrence==='biweekly'||cached.kind==='payroll_report'||cached.job_key==='payroll_report')){
-    body.p_recurrence=cached.recurrence||'biweekly';
-    body.p_interval_days=cached.interval_days||14;
-    var anchor=cached.anchor_date||((cached.kind==='payroll_report'||cached.job_key==='payroll_report')?'2026-09-23':'');
-    if((cached.kind==='payroll_report'||cached.job_key==='payroll_report')&&String(anchor).slice(0,10)==='2026-09-24')anchor='2026-09-23';
-    if(anchor)body.p_anchor_date=String(anchor).slice(0,10);
-    if(cached.range_prefs&&typeof cached.range_prefs==='object')body.p_range_prefs=cached.range_prefs;
-  }
-  var got=await remiSched1Rpc('admin_update_remi_scheduled_job', body);
+  if(week&&week.value)fields.weekday=week.value;
+  if(clock&&clock.value)fields.local_time=String(clock.value).slice(0,5);
+  var got=await remiSched1Rpc('admin_update_remi_scheduled_job', remiSched1UpdateBody(id, fields));
   if(!got.ok){
     if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not change the time.','var(--warn)');
     return got;
   }
+  remiSched1EditId='';
+  remiSched1DeleteId='';
+  await remiSched1Load();
+  return got;
+}
+function remiSched1AskDelete(id){
+  if(!remiSched1OfficeOk())return;
+  remiSched1EditId='';
+  remiSched1DeleteId=remiSched1SafeId(id);
+  remiSched1Paint();
+  if(typeof remiRailCrud1Open==='function'){
+    remiRailCrud1Open('Delete this scheduled job?', 'Stops the clock run.', function(){return remiSched1ConfirmDelete();});
+  }
+}
+async function remiSched1ConfirmDelete(){
+  if(!remiSched1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi schedules.'};
+  var id=remiSched1SafeId(remiSched1DeleteId);
+  if(!id)return {ok:false, error:'Missing scheduled job.'};
+  var got=await remiSched1Rpc('admin_delete_remi_scheduled_job', {p_id:id});
+  if(!got.ok){
+    if(typeof showTempMsg==='function')showTempMsg(got.error||'Could not delete the scheduled job.','var(--warn)');
+    return got;
+  }
+  remiSched1DeleteId='';
   remiSched1EditId='';
   await remiSched1Load();
   return got;
