@@ -48,6 +48,18 @@ assert.ok(pinFn.includes('loginKbFixedFollowsLayout'), 'composer uses the logink
 assert.ok(pinFn.includes("form.style.position='fixed'"), 'composer is position fixed');
 assert.ok(!pinFn.includes("thread.style.position='fixed'"), 'thread is not position fixed');
 assert.ok(pinFn.includes("getElementById('msgDensePanel')") && pinFn.includes("getElementById('aidechatMessages')"), 'panel and message list shorten above the composer');
+assert.ok(!pinFn.includes("role==='Admin'") && !pinFn.includes('currentAdminRole'), 'the keyboard pin is not Admin-only');
+assert.ok(html.includes('A Scheduler login gets the same keyboard tuck as Admin'), 'Scheduler login is the same tuck');
+const composerTag = html.slice(html.indexOf('id="aidechatComposer"') - 80, html.indexOf('id="aidechatComposer"') + 280);
+assert.ok(composerTag.includes('data-layout-roles="Admin Scheduler"'), 'composer is Admin and Scheduler');
+assert.ok(!composerTag.includes('data-layout-roles="Admin"'), 'composer is not Admin-only');
+const msgNav = html.slice(html.indexOf('id="nav_aidechat"') - 420, html.indexOf('id="nav_aidechat"'));
+assert.ok(msgNav.includes('data-layout-roles="Admin Scheduler"'), 'Messages tab is Admin and Scheduler');
+const msgDesk = html.slice(html.indexOf('id="tab_aidechat"') - 40, html.indexOf('id="tab_aidechat"') + 220);
+assert.ok(msgDesk.includes('data-layout-roles="Admin Scheduler"'), 'Messages desk is Admin and Scheduler');
+const roleFn = html.slice(html.indexOf('function aidechatRoleOk()'), html.indexOf('function aidechatId('));
+assert.ok(roleFn.includes("role==='Nurse'") && roleFn.includes('return false'), 'Nurse stays out of Messages');
+assert.ok(roleFn.includes("role==='Admin'||role==='Scheduler'"), 'Scheduler may open the same Messages desk');
 assert.ok(html.includes("(window.innerWidth||0)<=899"), 'desktop widths at 900px and up do not tuck');
 assert.ok(html.includes('setTimeout(careMsgSafe1PinAide, 80)') && html.includes('setTimeout(careMsgSafe1PinAide, 320)'), 'pin re-runs at 80ms and 320ms');
 assert.ok(html.includes("vv.addEventListener('resize', function(){careMsgSafe1PinAide();"), 'visualViewport resize re-pins');
