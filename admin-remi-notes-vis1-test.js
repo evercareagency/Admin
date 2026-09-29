@@ -312,6 +312,8 @@ async function runBrowser(){
     await page.screenshot({path:path.join(shotDir, 'remi-notes-vis1-phone-my.png')});
 
     await page.evaluate(function(){
+      var dock = document.getElementById('remiNotesDock');
+      if(dock)dock.style.display = '';
       var input = document.getElementById('remiNotesVisInput');
       input.value = 'Check Kim for Tuesday.';
     });

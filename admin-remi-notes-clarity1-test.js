@@ -47,7 +47,9 @@ const notes1 = html.slice(notes1Start, notes1End);
 assert.ok(!notes1.includes('ttl">Reminders'), 'paint does not title a second Reminders pad');
 assert.ok(notes1.includes('id="remiNotes1Keep" data-reminotes1="v=remi-notes1" data-remi-notes-open1b="v=remi-notes-open1b"'), 'keep marker stays');
 assert.ok(notes1.includes('function remiNotesClarity1Fit'), 'keyboard fit lives with notes');
-assert.ok(notes1.includes('msgComposerKb3DockForm'), 'notes fit calls the shared dock');
+assert.ok(notes1.includes('function remiNotesKb1Fit'), 'kb1 sheet pin lives with notes');
+assert.ok(notes1.includes('msgComposerKb3FlushBox'), 'notes pin flushes the sheet');
+assert.ok(!notes1.includes('msgComposerKb3DockForm'), 'notes pin does not fixed-dock the nested composer');
 assert.ok(!/sbRestRpc|supabase\.|fetch\(/.test(notes1), 'local notes stay off Ace');
 
 const visStart = html.indexOf('// remi notes vis1 v=remi-notes-vis1');
@@ -220,6 +222,8 @@ async function runBrowser(){
       var remind = document.getElementById('remiNotesClarityRemind').getBoundingClientRect();
       var head = document.querySelector('#copilotSheet .copilot-top').getBoundingClientRect();
       var bar = document.querySelector('#adminScreen .shell-top').getBoundingClientRect();
+      var sheetEl = document.getElementById('copilotSheet');
+      var compose = document.getElementById('remiNotesClarityCompose');
       return {
         kb: document.documentElement.classList.contains('remi-notes-kb'),
         formBottom: Math.round(form.bottom),
@@ -228,14 +232,19 @@ async function runBrowser(){
         formTop: Math.round(form.top),
         headTop: Math.round(head.top),
         barBottom: Math.round(bar.bottom),
-        viewH: fake.height
+        viewH: fake.height,
+        sheetTop: Math.round(sheetEl.getBoundingClientRect().top),
+        docked: !!(compose && compose.parentNode && compose.parentNode.id==='remiNotesDock'),
+        position: compose ? (window.getComputedStyle(compose).position) : ''
       };
     });
-    assert.strictEqual(kb.kb, true, 'focus docks the notes composer');
+    assert.strictEqual(kb.kb, true, 'focus pins the notes sheet');
+    assert.strictEqual(kb.docked, true, 'composer lives in the sheet dock');
+    assert.notStrictEqual(kb.position, 'fixed', 'composer stays in flex flow');
+    assert.ok(kb.sheetTop <= 2, 'keyboard pins the sheet to the visual viewport '+JSON.stringify(kb));
     assert.ok(kb.formBottom <= kb.viewH + 2, 'composer stays at the visual bottom '+JSON.stringify(kb));
     assert.ok(kb.saveBottom <= kb.viewH + 2 && kb.remindBottom <= kb.viewH + 2, 'Save and Remind me stay above the keyboard');
     assert.ok(kb.formTop < kb.viewH, 'composer is inside the open area');
-    assert.ok(kb.headTop + 1 >= kb.barBottom, 'header stays below the topbar while the keyboard is up');
     await phone.screenshot({path:'/opt/cursor/artifacts/remi-notes-clarity1-keyboard.png'});
 
     await phone.evaluate(async function(){

@@ -349,7 +349,8 @@ async function runBrowser(){
       var recover = document.querySelector('#copilotBody .btn-recover');
       var id = recover ? recover.getAttribute('data-id') : '';
       recover.click();
-      var openText = document.getElementById('copilotBody').innerText;
+      var dock = document.getElementById('remiNotesDock');
+      var openText = document.getElementById('copilotBody').innerText + (dock ? '\n' + dock.innerText : '');
       var openIds = remiNotesOpenList(new Date()).map(function(n){return n.id;});
       return {doneText:doneText, openText:openText, back:openIds.indexOf(id) >= 0, banner:doneText.indexOf('Kept 7 days then auto-delete') >= 0};
     });
