@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Each selected Ace signal (alert.ace) posts the existing admin_resolve_radar_signal {p_id} once per id, the same body as the Ask Resolve button. There is no batch RPC. admin_ack_radar_signal stays the single-card Noted action and is not the hide. admin_dismiss_why_open and admin_dismiss_noshow_rescue stay on their own cards and are not called from this toolbar. A resolved, dismissed, or closed status from admin_list_radar_signals stays off the list. The same browser tab also remembers dismissed ids in sessionStorage evercare_radar_dismiss1 so a Radar refresh does not paint those ids again before Ace drops them. Desk fallback cards that have no Ace id (ace is false) have no resolve target: they hide in that same session store only. That local hide is the last resort and is limited to non-Ace rows and to Ace rows whose resolve call did not confirm. A new Ace signal id of a dismissed kind still shows. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. remi-msg-tab1 was not on main and had no open tip, so this branch does not touch it. Prior markers stay, including v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
+<meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
+<script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
 <!-- aide profile link fix 2026-09-28 v=aide-profile-link-fix ?v=aide-profile-link-fix admin-build 2026-09-28-aide-profile-link-fix. GHOST-AIDE-PROFILE-LINK-FIX-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Supersedes aides-profile-link1 scroll-and-highlight (draft PR #165). View profile is one full page. It is not a scroll or teal outline on the Aides list, and it is not the credentials rollup sitting above the list. From Aides ··· View profile, and from aidesInfo1Follow when deep_link is the string admin/aides?aide_id=<uuid>, Ghost parses a leading #, aides and admin/aides path variants, and query aide_id, then replaces the Aides list (and Manage chrome if it is open) with #aideProfilePage until Back. The page has Back, a header (name, phone, language chip, client chips, next, creds due — the existing aides-info1 profile content), and Credentials through the existing aidecreds paths (admin_list_aide_credentials, edit sheet, add, save). The Aides list, desk tabs, Manage bar, A–Z rail, and credentials rollup stay display:none, including on a phone. Phone CSS must not unhide the list. Back returns to the Active aides-info1 info-card list, the same phone surface as Manage Done: Active and Recently deleted tabs visible, ··· on each card, #nav_aides active, #nav_more and #tab_more not active. It removes aide-creds-on after renderAides and aideCredsAfterAides and keeps #aideCredsRoot hidden so the credentials rollup (No credential records yet, Add credential, A–Z cred rows) does not cover the cards below 900px. On a phone, Active landing with aides-info1 cards — first paint, Refresh, Back, and Manage Done — does not auto-set aide-creds-on. Credentials still open from ··· Credentials and from Manage. Bare tab names and schedule deep-link objects stay as aides-info1 left them. This is not Auth profile_id. More must not end half-active: while this page is open on the Aides bottom tab, #nav_more and #tab_more lose active, and leaving for More closes the page so More is the only active desk. Do not break Manage select/delete, manage-dots-creds1 ··· Credentials-in-Manage, manage-done1 Done exit, aidadel1 Delete, or list-az-sticky1. Prior markers stay, including v=aides-info1, v=aides-profile-link1, v=manage-dots-creds1, v=manage-done1, v=manage-clean1, v=aide-manage-delete1, v=aidadel1, v=aidecreds1, v=aidecreds1b, v=aidecreds1c, v=list-az-sticky1, v=list-az1, v=remi-open-thread1, and v=care-msg-safe1. -->
 <meta name="admin-build" content="2026-09-28-aide-profile-link-fix">
 <script>var AIDE_PROFILE_LINK_FIX_MARKER='v=aide-profile-link-fix';var AIDE_PROFILE_LINK_FIX_BUILD='2026-09-28-aide-profile-link-fix';</script>
@@ -1248,6 +1251,19 @@ html.remi-ask-kb #copilotSheet{z-index:180;}
 .copilot-card{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:14px;padding:14px;min-height:72px;font-family:'DM Sans',sans-serif;color:var(--navy);cursor:pointer;touch-action:manipulation;}
 .copilot-card strong{display:block;font-size:1.02rem;line-height:1.3;}
 .copilot-card span{display:block;margin-top:4px;font-size:0.9rem;line-height:1.35;color:var(--text);}
+/* v=remi-radar-dismiss1 — checkbox, Select all, Unselect, Dismiss selected. Phone sheet and desktop rail. Not a send. */
+.copilot-card.radar-card{display:flex;align-items:flex-start;gap:4px;cursor:default;padding:10px 10px 10px 8px;}
+.copilot-card.radar-card.is-selected{border-color:var(--teal);background:#f4fbfb;box-shadow:0 0 0 1px rgba(42,127,127,.28);}
+#copilotSheet .radar-check{flex:0 0 44px;width:44px;min-width:44px;min-height:44px;margin:0;padding:0;display:flex;align-items:center;justify-content:center;text-transform:none;letter-spacing:0;font-size:1rem;font-weight:600;color:var(--navy);}
+#copilotSheet .radar-check input,#copilotSheet .radar-dismiss-cb{width:22px;height:22px;min-width:22px;min-height:22px;max-width:22px;flex:0 0 22px;margin:0;accent-color:var(--teal);}
+.radar-card-body{flex:1 1 auto;min-width:0;margin:0;padding:6px 2px;border:0;background:transparent;text-align:left;font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation;}
+.radar-dismiss-count{margin:0 0 6px;font-size:0.78rem;font-weight:700;color:var(--muted);line-height:1.3;}
+.radar-dismiss-toolbar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px;min-width:0;max-width:100%;}
+#copilotSheet .radar-dismiss-toolbar .btn{width:auto;flex:1 1 6.5rem;min-width:0;min-height:44px;padding:8px 10px;font-size:0.78rem;line-height:1.15;justify-content:center;white-space:normal;}
+#copilotSheet .radar-dismiss-toolbar .btn.muted:disabled{opacity:1;background:#d5e4e4;color:#5d7070;border-color:#d5e4e4;cursor:default;}
+#copilotSheet .radar-dismiss-toolbar #radarDismissUnselect.is-idle{border-color:var(--navy);color:var(--navy);}
+.radar-dismiss-callout{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#fff8e6;border:1px solid #f0d890;color:#5c4a00;font-size:0.78rem;font-weight:700;line-height:1.35;}
+.radar-dismiss-callout.ok{background:#e7f6ee;border-color:#b7e4c7;color:#1b4332;}
 .copilot-actions{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
 .copilot-actions .btn,#copilotSheet .copilot-back{width:100%;min-height:48px;justify-content:center;font-size:1rem;}
 #copilotSheet input:not([type="checkbox"]),#copilotSheet textarea,#copilotSheet select{font-size:16px;min-height:48px;width:100%;max-width:100%;box-sizing:border-box;}
@@ -3920,7 +3936,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -9909,17 +9925,202 @@ function copilotPaintRadar(){
   if(!host)return;
   copilotView='radar';
   copilotPending=null;
+  var rows=remiRadarDismiss1Filter(copilotAlerts||[]);
+  var selected=remiRadarDismiss1SelectedCount(rows);
   host.innerHTML='<p class="copilot-note">Radar for the Admin desk. Tap an alert. You stay in charge. Nothing is sent until you press Send in Messages or Mail.</p>';
   copilotPaintQuiet(host);
-  var html='<div class="copilot-list" id="copilotList">';
-  (copilotAlerts||[]).forEach(function(a){
-    html+='<button type="button" class="copilot-card" data-copilot-id="'+copilotEsc(a.id)+'" onclick="copilotOpenAsk(\''+copilotEsc(a.id).replace(/'/g,'')+'\')">'
-      +'<strong>'+copilotEsc(a.surface||a.title)+'</strong><span>'+copilotEsc(formatAdminDateCopy(a.detail||a.title))+'</span></button>';
+  host.insertAdjacentHTML('beforeend', remiRadarDismiss1ToolbarHtml(rows.length, selected));
+  var html='<div class="copilot-list" id="copilotList" data-remi-radar-dismiss1="'+copilotEsc(remiRadarDismiss1Marker())+'">';
+  if(!rows.length)html+='<p class="copilot-note" id="radarDismissEmpty">Nothing on Radar.</p>';
+  rows.forEach(function(a){
+    var id=String(a.id||'');
+    var on=!!remiRadarDismiss1Selected[id];
+    var detail=typeof formatAdminDateCopy==='function'?formatAdminDateCopy(a.detail||a.title):String(a.detail||a.title||'');
+    html+='<article class="copilot-card radar-card'+(on?' is-selected':'')+'" data-copilot-id="'+copilotEsc(id)+'">'
+      +'<label class="radar-check"><input type="checkbox" class="radar-dismiss-cb" data-radar-id="'+copilotEsc(id)+'"'+(on?' checked':'')+' aria-label="Select '+copilotEsc(a.surface||a.title||'alert')+'"></label>'
+      +'<button type="button" class="radar-card-body" data-radar-open="'+copilotEsc(id)+'">'
+      +'<strong>'+copilotEsc(a.surface||a.title)+'</strong><span>'+copilotEsc(detail)+'</span></button></article>';
   });
   html+='</div>';
   host.insertAdjacentHTML('beforeend', html);
+  remiRadarDismiss1Bind(host);
   copilotHideConfirm();
   copilotSyncTabs();
+}
+var remiRadarDismiss1Selected={};
+var remiRadarDismiss1Note='';
+var remiRadarDismiss1LastN=0;
+var remiRadarDismiss1Busy=false;
+function remiRadarDismiss1Marker(){
+  return (typeof REMI_RADAR_DISMISS1_MARKER==='string'&&REMI_RADAR_DISMISS1_MARKER)?REMI_RADAR_DISMISS1_MARKER:'v=remi-radar-dismiss1';
+}
+function remiRadarDismiss1StoreKey(){
+  var who='desk';
+  try{
+    if(typeof currentAdminUsername!=='undefined'&&currentAdminUsername)who=String(currentAdminUsername);
+    else if(typeof currentAdminRole!=='undefined'&&currentAdminRole)who=String(currentAdminRole);
+  }catch(e){}
+  return 'evercare_radar_dismiss1:'+who;
+}
+function remiRadarDismiss1Store(){
+  var empty={v:1,ids:{},kinds:{}};
+  var raw='';
+  try{raw=sessionStorage.getItem(remiRadarDismiss1StoreKey())||'';}catch(e){raw='';}
+  if(!raw)return empty;
+  try{
+    var parsed=JSON.parse(raw);
+    var ids={};
+    var kinds={};
+    var idList=parsed&&Array.isArray(parsed.ids)?parsed.ids:[];
+    var kindList=parsed&&Array.isArray(parsed.kinds)?parsed.kinds:[];
+    var i;
+    for(i=0;i<idList.length;i++){
+      var id=String(idList[i]||'').trim();
+      if(id)ids[id]=1;
+    }
+    for(i=0;i<kindList.length;i++){
+      var kind=String(kindList[i]||'').trim();
+      if(kind)kinds[kind]=1;
+    }
+    return {v:1,ids:ids,kinds:kinds};
+  }catch(e2){return empty;}
+}
+function remiRadarDismiss1Write(store){
+  var ids=[];
+  var kinds=[];
+  var idMap=store&&store.ids?store.ids:{};
+  var kindMap=store&&store.kinds?store.kinds:{};
+  var id;
+  var kind;
+  for(id in idMap)if(Object.prototype.hasOwnProperty.call(idMap,id)&&idMap[id])ids.push(id);
+  for(kind in kindMap)if(Object.prototype.hasOwnProperty.call(kindMap,kind)&&kindMap[kind])kinds.push(kind);
+  try{sessionStorage.setItem(remiRadarDismiss1StoreKey(), JSON.stringify({v:1,ids:ids,kinds:kinds}));}catch(e){}
+}
+function remiRadarDismiss1Remember(alert){
+  if(!alert)return;
+  var store=remiRadarDismiss1Store();
+  var id=String(alert.id||'').trim();
+  var kind=String(alert.kind||'').trim();
+  if(id)store.ids[id]=1;
+  if(kind)store.kinds[kind]=1;
+  remiRadarDismiss1Write(store);
+}
+function remiRadarDismiss1StatusHidden(status){
+  var st=String(status||'').toLowerCase();
+  return st==='resolved'||st==='dismissed'||st==='closed';
+}
+function remiRadarDismiss1Hidden(alert){
+  if(!alert)return true;
+  if(remiRadarDismiss1StatusHidden(alert.status))return true;
+  var store=remiRadarDismiss1Store();
+  var id=String(alert.id||'');
+  if(id&&store.ids[id])return true;
+  if(!alert.ace){
+    var kind=String(alert.kind||'');
+    if(kind&&store.kinds[kind])return true;
+  }
+  return false;
+}
+function remiRadarDismiss1Filter(list){
+  return (list||[]).filter(function(a){return a&&!remiRadarDismiss1Hidden(a);});
+}
+function remiRadarDismiss1SelectedCount(rows){
+  var n=0;
+  (rows||[]).forEach(function(a){if(remiRadarDismiss1Selected[String(a.id)])n++;});
+  return n;
+}
+function remiRadarDismiss1StatusLine(count, selected){
+  if(selected>0)return selected+' of '+count+' selected';
+  if(remiRadarDismiss1Note==='done')return count+' alert'+(count===1?'':'s')+' left · '+remiRadarDismiss1LastN+' dismissed';
+  return count+' alert'+(count===1?'':'s')+' · dismiss hides rows only';
+}
+function remiRadarDismiss1ToolbarHtml(count, selected){
+  var dismissOff=selected<1;
+  var callout='';
+  if(remiRadarDismiss1Note==='done'&&selected<1){
+    callout='<p class="radar-dismiss-callout ok" id="radarDismissCallout">Dismissed from Radar · those rows cleared only · not a send</p>';
+  }else if(selected>0){
+    callout='<p class="radar-dismiss-callout" id="radarDismissCallout">Clears selected Radar rows only · not send · does not message anyone</p>';
+  }
+  return '<p class="radar-dismiss-count" id="radarDismissCount">'+copilotEsc(remiRadarDismiss1StatusLine(count, selected))+'</p>'
+    +'<div class="radar-dismiss-toolbar" role="toolbar" aria-label="Radar selection" data-remi-radar-dismiss1="'+copilotEsc(remiRadarDismiss1Marker())+'">'
+    +'<button type="button" class="btn btn-ghost" id="radarDismissSelectAll" onclick="remiRadarDismiss1SelectAll()">Select all</button>'
+    +'<button type="button" class="btn btn-ghost'+(selected>0?'':' is-idle')+'" id="radarDismissUnselect" onclick="remiRadarDismiss1Unselect()">Unselect</button>'
+    +'<button type="button" class="btn btn-teal'+(dismissOff?' muted':'')+'" id="radarDismissGo"'+(dismissOff?' disabled':'')+' onclick="remiRadarDismiss1Dismiss()">Dismiss selected</button>'
+    +'</div>'+callout;
+}
+function remiRadarDismiss1Bind(host){
+  if(!host||host.getAttribute('data-radar-dismiss-bound')==='1')return;
+  host.setAttribute('data-radar-dismiss-bound','1');
+  host.addEventListener('change', function(ev){
+    var t=ev.target;
+    if(!t||!t.classList||!t.classList.contains('radar-dismiss-cb'))return;
+    remiRadarDismiss1Toggle(t.getAttribute('data-radar-id'), !!t.checked);
+  });
+  host.addEventListener('click', function(ev){
+    var t=ev.target;
+    if(!t||!t.closest)return;
+    if(t.closest('.radar-check')||t.closest('.radar-dismiss-cb'))return;
+    var btn=t.closest('[data-radar-open]');
+    if(!btn||!host.contains(btn))return;
+    var id=btn.getAttribute('data-radar-open')||'';
+    if(id&&typeof copilotOpenAsk==='function')copilotOpenAsk(id);
+  });
+}
+function remiRadarDismiss1Toggle(id, on){
+  id=String(id||'');
+  if(!id)return;
+  if(on)remiRadarDismiss1Selected[id]=1;
+  else delete remiRadarDismiss1Selected[id];
+  remiRadarDismiss1Note='';
+  setTimeout(function(){if(copilotView==='radar')copilotPaintRadar();}, 0);
+}
+function remiRadarDismiss1SelectAll(){
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return;
+  remiRadarDismiss1Note='';
+  remiRadarDismiss1Filter(copilotAlerts||[]).forEach(function(a){remiRadarDismiss1Selected[String(a.id)]=1;});
+  if(copilotView==='radar')copilotPaintRadar();
+}
+function remiRadarDismiss1Unselect(){
+  remiRadarDismiss1Selected={};
+  remiRadarDismiss1Note='';
+  if(copilotView==='radar')copilotPaintRadar();
+}
+function remiRadarDismiss1ResolveBody(id){
+  return {p_id:String(id||'')};
+}
+async function remiRadarDismiss1Dismiss(){
+  if(remiRadarDismiss1Busy)return;
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return;
+  var picked=remiRadarDismiss1Filter(copilotAlerts||[]).filter(function(a){return !!remiRadarDismiss1Selected[String(a.id)];});
+  if(!picked.length)return;
+  remiRadarDismiss1Busy=true;
+  var go=document.getElementById('radarDismissGo');
+  if(go)go.disabled=true;
+  var aceFail=0;
+  var signedOut=false;
+  var n;
+  for(n=0;n<picked.length;n++){
+    var alert=picked[n];
+    var id=String(alert.id||'');
+    if(alert.ace&&id){
+      var got=null;
+      try{got=await copilotRpc('resolve', remiRadarDismiss1ResolveBody(id));}catch(e){got=null;}
+      if(got&&got.signedOut)signedOut=true;
+      if(!(got&&got.ok))aceFail++;
+    }
+    alert.status='resolved';
+    remiRadarDismiss1Remember(alert);
+    delete remiRadarDismiss1Selected[id];
+  }
+  remiRadarDismiss1Busy=false;
+  remiRadarDismiss1Note='done';
+  remiRadarDismiss1LastN=picked.length;
+  var toast='Dismissed from Radar';
+  if(signedOut)toast='Dismissed on this phone. Sign in to keep it off Radar.';
+  else if(aceFail)toast='Dismissed from Radar. Ace did not confirm every row, so this phone keeps them hidden.';
+  if(typeof showTempMsg==='function')showTempMsg(toast,'var(--success)');
+  if(copilotView==='radar')copilotPaintRadar();
 }
 function copilotPaintAsk(){
   var host=copilotEl('copilotBody');
@@ -10184,21 +10385,24 @@ async function copilotLoadRadar(){
     for(var n=0;n<list.length;n++){
       var one=copilotMapAceAlert(list[n]);
       if(!one)continue;
-      mapped.push(one);
       if(one.kind)seenKind[one.kind]=1;
+      if(typeof remiRadarDismiss1Hidden==='function'&&remiRadarDismiss1Hidden(one))continue;
+      mapped.push(one);
     }
     local.forEach(function(a){
-      if(!seenKind[a.kind])mapped.push(a);
+      if(seenKind[a.kind])return;
+      if(typeof remiRadarDismiss1Hidden==='function'&&remiRadarDismiss1Hidden(a))return;
+      mapped.push(a);
     });
-    if(mapped.length)local=mapped;
+    if(list.length||mapped.length)local=mapped;
   }
-  copilotAlerts=local;
+  copilotAlerts=(typeof remiRadarDismiss1Filter==='function')?remiRadarDismiss1Filter(local):local;
 }
 async function copilotOpenRadar(){
   if(!copilotRoleOk())return;
   var sheet=copilotEl('copilotSheet');
   if(sheet)sheet.hidden=false;
-  copilotAlerts=copilotDeskAlerts();
+  copilotAlerts=(typeof remiRadarDismiss1Filter==='function')?remiRadarDismiss1Filter(copilotDeskAlerts()):copilotDeskAlerts();
   copilotPaintRadar();
   await copilotLoadQuiet();
   await copilotLoadRadar();
@@ -10886,6 +11090,7 @@ function copilotShowRadar(){
     sheet.style.bottom='';
   }
   if(!copilotAlerts||!copilotAlerts.length)copilotAlerts=copilotDeskAlerts();
+  if(typeof remiRadarDismiss1Filter==='function')copilotAlerts=remiRadarDismiss1Filter(copilotAlerts);
   copilotPaintRadar();
 }
 // Live Ace office RPCs only (sbRestRpc + office access_token). No browser stub. No Sheets exec.
