@@ -35,7 +35,7 @@ assert.ok(cardStart > 0 && cardEnd > cardStart, 'settings card before chat names
 const card = html.slice(cardStart, cardEnd);
 assert.ok(card.includes('data-layout-roles="Admin Scheduler"'), 'Admin and Scheduler share the toggle');
 assert.ok(card.includes('Aide + Remi messages'), 'toggle label');
-assert.ok(card.includes('Phone ping when an aide or Remi writes'), 'toggle hint');
+assert.ok(card.includes('Get a phone notification when an aide or Remi texts you.'), 'toggle hint');
 assert.ok(card.includes('Just the toggle. Flip ON asks Allow automatically.'), 'flip ON copy');
 assert.ok(card.includes('Open the app from your Home Screen, then tap Allow.'), 'home screen hint');
 assert.ok(card.includes('Phone pings on'), 'on state copy');
@@ -55,15 +55,24 @@ assert.ok(roster.includes('Aide notifications'), 'aide roster title stays');
 assert.ok(html.includes('id="nav_notifications"'), 'More notifications row stays');
 assert.ok(html.includes('admin_list_aide_notification_roster'), 'aide roster rpc stays');
 assert.ok(html.includes('get_vapid_public_key'), 'public key rpc');
-assert.ok(html.includes('admin_subscribe_office_staff_push'), 'subscribe hook');
-assert.ok(html.includes('admin_unsubscribe_office_staff_push'), 'unsubscribe hook');
-assert.ok(html.includes('admin_set_office_staff_push_prefs'), 'prefs hook');
+assert.ok(html.includes('office_get_notification_prefs'), 'load prefs rpc');
+assert.ok(html.includes('office_save_notification_prefs'), 'save prefs rpc');
+assert.ok(html.includes('office_upsert_web_push_subscription'), 'upsert subscription rpc');
+assert.ok(html.includes('office_revoke_web_push_subscription'), 'revoke subscription rpc');
+assert.ok(!html.includes('admin_subscribe_office_staff_push'), 'old subscribe hook is gone');
+assert.ok(!html.includes('admin_set_office_staff_push_prefs'), 'old prefs hook is gone');
 assert.ok(!/VAPID_PRIVATE|BEGIN (?:EC )?PRIVATE|private_key\s*[:=]/i.test(html), 'no private key material');
 
 const start = html.indexOf('// admin sched chat push1 v=admin-sched-chat-push1');
 const end = html.indexOf('// end admin sched chat push1 v=admin-sched-chat-push1');
 assert.ok(start > 0 && end > start, 'script block');
 const src = html.slice(start, end);
+assert.ok(src.includes('office_get_notification_prefs'), 'script loads prefs');
+assert.ok(src.includes('office_save_notification_prefs'), 'script saves prefs');
+assert.ok(src.includes('office_upsert_web_push_subscription'), 'script upserts the subscription');
+assert.ok(src.includes('p_p256dh'), 'upsert sends p256dh');
+assert.ok(src.includes('p_auth'), 'upsert sends auth');
+assert.ok(src.includes('p_user_agent'), 'upsert sends optional user agent');
 assert.ok(src.includes("register('sw.js')"), 'worker register has no version query');
 assert.ok(!/register\(['"]sw\.js\?/.test(src), 'register does not force a query');
 assert.ok(!/location\.(search|href)\s*=/.test(src), 'script does not rewrite the address bar');
@@ -71,6 +80,8 @@ assert.ok(!/history\.(replaceState|pushState)/.test(src), 'script does not push 
 assert.ok(!/\bQuo\b|twilio|send_sms/.test(src), 'no Quo or SMS sender');
 assert.ok(!/admin_deliver_office|deliver_push/.test(src), 'deliver stays with Ace');
 assert.ok(sw.includes('#aidechat'), 'tap opens Messages hash');
+assert.ok(sw.includes('from_role'), 'tap keeps from_role');
+assert.ok(sw.includes('deep_link'), 'tap reads deep_link');
 assert.ok(!sw.includes('?v='), 'worker does not force ?v=');
 assert.ok(!/caches\.open|cache\.put/.test(sw), 'worker does not cache the app');
 assert.ok(!/vapid|service worker|pushmanager|lock[- ]screen/i.test(sw), 'worker file has no staff jargon');
@@ -124,6 +135,7 @@ function loadSandbox(){
     permission: 'default',
     requestPermission: function(){
       asks.n += 1;
+      calls.push({name: 'Notification.requestPermission', body: {}});
       Notification.permission = 'granted';
       return Promise.resolve('granted');
     }
@@ -154,6 +166,7 @@ function loadSandbox(){
     Notification: Notification,
     location: {hash: '', search: '', pathname: '/index.html'},
     navigator: {
+      userAgent: 'EverCareTest',
       serviceWorker: {
         register: function(url){
           sandbox.registered = url;
@@ -216,19 +229,29 @@ function staffText(copy){
   assert.strictEqual(nurse.asked, false);
   assert.strictEqual(box.asks.n, 0);
   assert.strictEqual(box.subs.n, 0);
+  assert.strictEqual(box.calls.length, 0, 'Nurse does not call office RPCs');
 
   box.currentAdminRole = 'Admin';
   box.currentAdminUsername = 'moe';
+  const loadMark = box.calls.length;
+  await box.adminSchedChatPush1LoadPrefs();
+  assert.strictEqual(box.calls[loadMark].name, 'office_get_notification_prefs', 'Settings load reads prefs');
   const offKey = await box.adminSchedChatPush1Enable();
   assert.strictEqual(offKey.ok, true);
+  assert.strictEqual(offKey.saved, true);
   assert.strictEqual(offKey.asked, true);
   assert.strictEqual(offKey.skippedSubscribe, true);
   assert.strictEqual(offKey.subscribed, false);
-  assert.strictEqual(box.asks.n, 1, 'flip ON asks Allow');
-  assert.strictEqual(box.subs.n, 0, 'no real subscribe when the public key is not configured');
-  assert.ok(!box.calls.some(function(c){return c.name.indexOf('subscribe_office') >= 0;}), 'no subscribe RPC without a key');
-  const prefOn = box.calls.filter(function(c){return c.name === 'admin_set_office_staff_push_prefs';}).pop();
-  assert.ok(prefOn && prefOn.body.p_aide_remi_messages === true, JSON.stringify(prefOn));
+  assert.strictEqual(box.asks.n, 1, 'flip ON asks Allow when permission is not granted');
+  assert.strictEqual(box.subs.n, 0, 'no real subscribe when configured is false');
+  const soft = box.calls.map(function(c){return c.name;});
+  const saveAt = soft.indexOf('office_save_notification_prefs');
+  const askAt = soft.indexOf('Notification.requestPermission');
+  const keyAt = soft.indexOf('get_vapid_public_key');
+  assert.ok(saveAt >= 0 && askAt > saveAt && keyAt > askAt, soft.join(' > '));
+  assert.strictEqual(box.calls[saveAt].body.p_aide_remi_messages, true);
+  assert.ok(!('p_topic' in box.calls[saveAt].body), 'save sends only the boolean');
+  assert.ok(soft.indexOf('office_upsert_web_push_subscription') < 0, 'no upsert when configured is false');
   const status = box.document.els.staffPushStatus.textContent;
   assert.strictEqual(status, box.ADMIN_SCHED_CHAT_PUSH1_COPY.waiting);
   assert.ok(!JARGON.test(status), status);
@@ -236,14 +259,38 @@ function staffText(copy){
 
   box.Notification.permission = 'default';
   box.vapidOn = true;
+  const mark = box.calls.length;
   const onKey = await box.adminSchedChatPush1Enable();
   assert.strictEqual(onKey.subscribed, true);
   assert.strictEqual(box.subs.n, 1, 'flip ON subscribes when a public key is configured');
   assert.strictEqual(box.registered, 'sw.js');
-  const subCall = box.calls.filter(function(c){return c.name === 'admin_subscribe_office_staff_push';}).pop();
-  assert.ok(subCall && subCall.body.p_topic === 'aide_remi_messages' && subCall.body.p_subscription.endpoint, JSON.stringify(subCall));
+  const live = box.calls.slice(mark).map(function(c){return c.name;});
+  assert.deepStrictEqual(live, [
+    'office_save_notification_prefs',
+    'Notification.requestPermission',
+    'get_vapid_public_key',
+    'office_upsert_web_push_subscription'
+  ]);
+  const subCall = box.calls.filter(function(c){return c.name === 'office_upsert_web_push_subscription';}).pop();
+  assert.strictEqual(subCall.body.p_endpoint, 'https://push.example/sub');
+  assert.strictEqual(subCall.body.p_p256dh, 'aa');
+  assert.strictEqual(subCall.body.p_auth, 'bb');
+  assert.strictEqual(subCall.body.p_user_agent, 'EverCareTest');
   assert.strictEqual(box.document.els.staffPushStatus.textContent, box.ADMIN_SCHED_CHAT_PUSH1_COPY.on);
   assert.strictEqual(box.document.els.staffPushOnNote.hidden, false);
+
+  box.Notification.permission = 'granted';
+  const askedBefore = box.asks.n;
+  const grantedMark = box.calls.length;
+  const again = await box.adminSchedChatPush1Enable();
+  assert.strictEqual(again.asked, false, 'already granted does not ask Allow again');
+  assert.strictEqual(box.asks.n, askedBefore);
+  const againNames = box.calls.slice(grantedMark).map(function(c){return c.name;});
+  assert.deepStrictEqual(againNames, [
+    'office_save_notification_prefs',
+    'get_vapid_public_key',
+    'office_upsert_web_push_subscription'
+  ]);
 
   box.currentAdminRole = 'Scheduler';
   box.currentAdminUsername = 'jaz';
@@ -255,12 +302,15 @@ function staffText(copy){
   assert.ok(box.asks.n > before, 'Scheduler flip ON uses the same Allow path');
   assert.strictEqual(box.document.els.staffPushAideRemiState.textContent, 'ON');
 
+  const offMark = box.calls.length;
   const dropped = await box.adminSchedChatPush1Disable();
   assert.strictEqual(dropped.ok, true);
-  const prefOff = box.calls.filter(function(c){return c.name === 'admin_set_office_staff_push_prefs';}).pop();
-  assert.ok(prefOff && prefOff.body.p_aide_remi_messages === false);
-  const unsub = box.calls.filter(function(c){return c.name === 'admin_unsubscribe_office_staff_push';}).pop();
-  assert.ok(unsub, 'flip OFF posts unsubscribe');
+  const offNames = box.calls.slice(offMark).map(function(c){return c.name;});
+  const saveOff = offNames.indexOf('office_save_notification_prefs');
+  const revokeAt = offNames.indexOf('office_revoke_web_push_subscription');
+  assert.ok(saveOff >= 0 && revokeAt > saveOff, offNames.join(' > '));
+  assert.strictEqual(box.calls.slice(offMark)[saveOff].body.p_aide_remi_messages, false);
+  assert.ok(box.calls.slice(offMark)[revokeAt].body.p_endpoint, 'revoke sends the endpoint when we have one');
   assert.strictEqual(box.document.els.staffPushStatus.textContent, box.ADMIN_SCHED_CHAT_PUSH1_COPY.off);
   assert.ok(!JARGON.test(box.document.els.staffPushStatus.textContent));
 
@@ -303,6 +353,31 @@ function staffText(copy){
   assert.strictEqual(linked.surface, 'thread');
   assert.strictEqual(linked.from, 'remi');
   assert.strictEqual(linked.aideId, MOE);
+  const aceTap = box.adminSchedChatPush1OpenFromPayload({
+    title: 'Aide · moe',
+    body: 'Can I cover Ada AM tomorrow?',
+    thread_id: 'thread-1',
+    message_id: 'msg-1',
+    aide_id: MOE,
+    deep_link: 'admin/messages?aide_id=' + MOE,
+    from_role: 'from_aide',
+    marker: 'admin-sched-chat-push1'
+  });
+  assert.strictEqual(aceTap.deepLink, 'admin/messages?aide_id=' + MOE);
+  assert.strictEqual(aceTap.tab, 'aidechat');
+  assert.strictEqual(aceTap.surface, 'thread');
+  assert.strictEqual(aceTap.aideId, MOE);
+  assert.strictEqual(aceTap.from, 'aide');
+  const remiTap = box.adminSchedChatPush1Route({
+    title: 'Remi',
+    from_role: 'from_remi',
+    aide_id: MOE,
+    deep_link: 'admin/messages?aide_id=' + MOE,
+    marker: 'admin-sched-chat-push1'
+  });
+  assert.strictEqual(remiTap.deepLink, 'admin/messages?aide_id=' + MOE);
+  assert.strictEqual(remiTap.from, 'remi');
+  assert.strictEqual(remiTap.surface, 'thread');
   console.log('admin-sched-chat-push1 unit ok');
   await runBrowser();
 })().catch(function(err){
@@ -431,7 +506,7 @@ async function runBrowser(){
     });
     assert.strictEqual(admin.hidden, false);
     assert.strictEqual(admin.label, 'Aide + Remi messages');
-    assert.strictEqual(admin.hint, 'Phone ping when an aide or Remi writes');
+    assert.strictEqual(admin.hint, 'Get a phone notification when an aide or Remi texts you.');
     assert.ok(admin.roles.indexOf('Admin') >= 0 && admin.roles.indexOf('Scheduler') >= 0);
     assert.strictEqual(admin.search, '');
     assert.ok(admin.href.indexOf('v=admin-sched-chat-push1') < 0, admin.href);
@@ -448,12 +523,14 @@ async function runBrowser(){
         status: document.getElementById('staffPushStatus').textContent,
         on: document.getElementById('staffPushAideRemi').checked,
         search: location.search,
-        subscribeCalls: window.__calls.filter(function(c){return String(c.name).indexOf('subscribe_office') >= 0;}).length
+        subscribeCalls: window.__calls.filter(function(c){return c.name === 'office_upsert_web_push_subscription';}).length,
+        saveOn: window.__calls.filter(function(c){return c.name === 'office_save_notification_prefs' && c.body && c.body.p_aide_remi_messages === true;}).length
       };
     });
     assert.ok(flipped.asks >= 1, 'browser flip ON asks Allow');
     assert.strictEqual(flipped.subs, 0);
     assert.strictEqual(flipped.subscribeCalls, 0);
+    assert.ok(flipped.saveOn >= 1, 'browser flip ON saves the pref first');
     assert.strictEqual(flipped.on, true);
     assert.ok(!/vapid|service worker|pushmanager|lock[- ]screen/i.test(flipped.status), flipped.status);
     assert.strictEqual(flipped.search, '');
@@ -506,7 +583,7 @@ async function runBrowser(){
     });
     assert.strictEqual(scheduler.hidden, false);
     assert.strictEqual(scheduler.label, 'Aide + Remi messages');
-    assert.strictEqual(scheduler.hint, 'Phone ping when an aide or Remi writes');
+    assert.strictEqual(scheduler.hint, 'Get a phone notification when an aide or Remi texts you.');
     assert.strictEqual(scheduler.state, 'OFF');
     assert.strictEqual(scheduler.on, false);
     assert.strictEqual(scheduler.noteHidden, true);

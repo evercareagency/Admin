@@ -28,7 +28,7 @@ function adminSchedChatPush1Hash(payload){
   payload=payload||{};
   var parts=[];
   var aide=String(payload.aide_id||payload.aideId||'').trim();
-  var from=String(payload.from||payload.sender||'').trim();
+  var fromRole=String(payload.from_role||payload.fromRole||payload.from||payload.sender||'').trim().toLowerCase();
   var thread=String(payload.thread_id||payload.threadId||'').trim();
   var deep=String(payload.deep_link||payload.deepLink||'');
   function take(key){
@@ -36,8 +36,12 @@ function adminSchedChatPush1Hash(payload){
     return m?decodeURIComponent(m[1]):'';
   }
   if(!aide)aide=take('aide_id');
-  if(!from)from=take('from');
+  if(!fromRole)fromRole=String(take('from_role')||take('from')||'').toLowerCase();
   if(!thread)thread=take('thread_id');
+  var from='';
+  if(fromRole==='remi'||fromRole==='from_remi')from='remi';
+  else if(fromRole==='aide'||fromRole==='from_aide')from='aide';
+  else from=fromRole;
   if(aide)parts.push('aide_id='+encodeURIComponent(aide));
   if(from)parts.push('from='+encodeURIComponent(from));
   if(thread)parts.push('thread_id='+encodeURIComponent(thread));

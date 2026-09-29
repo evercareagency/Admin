@@ -108,7 +108,7 @@ function pagesCacheFresh1Start(){
 }
 try{pagesCacheFresh1Start();}catch(ePagesCache){}
 </script>
-<!-- admin sched chat push 2026-09-29 v=admin-sched-chat-push1 admin-build 2026-09-29-admin-sched-chat-push1. GHOST-ADMIN-SCHED-CHAT-PUSH1-CONTRACT-v1. Ace CALLABLE when present. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Admin repo only. When an aide or Remi texts Admin or Scheduler, that staffer gets a phone ping too. Admin and Scheduler are one portal and the same Settings chrome. Settings (#tab_settings) holds staff notification prefs: one toggle, Aide + Remi messages, hint Phone ping when an aide or Remi writes. This is not More → Notifications (#tab_notifications), which stays the aide roster (clienthrs1d / vapid1 / aide-notif-search1). Flip ON asks Allow and subscribes in that same step. There is no separate Allow card. Flip OFF unsubscribes and turns the pref off. A phone-ping tap opens Messages (#tab_aidechat): an aide payload opens that aide thread, a Remi payload with no aide opens the Messages inbox, and a Remi payload with aide_id opens that aide thread. Staff-facing copy is plain English only. Never paint a public key, a private key, or worker jargon. Soft hint: Open the app from your Home Screen, then tap Allow. Hooks, used only when the callable answers: get_vapid_public_key (public only), admin_get_office_staff_push_prefs, admin_set_office_staff_push_prefs {p_aide_remi_messages, p_topic aide_remi_messages}, admin_subscribe_office_staff_push {p_subscription, p_topic aide_remi_messages} (alias admin_subscribe_office_push), admin_unsubscribe_office_staff_push {p_endpoint, p_topic aide_remi_messages} (alias admin_unsubscribe_office_push). Deliver on aide or Remi inbound is Ace. The desk does not post a deliver RPC and does not invent Quo or SMS. Payload shape the tap understands: kind aide_remi_message, from aide|remi, aide_id, aide_name, thread_id, title, body, deep_link admin/messages?aide_id= or admin/messages?from=remi. When get_vapid_public_key is missing or configured is false, this desk does not call PushManager.subscribe. The pref can still be saved. sw.js handles the ping tap only and does not cache the app and does not put ?v= on the address bar. Prior admin-build metas stay. The first meta remains 2026-09-27-remi-float-hide1b. No Auth reseal. Dates people read are MM/DD/YYYY. -->
+<!-- admin sched chat push 2026-09-29 v=admin-sched-chat-push1 admin-build 2026-09-29-admin-sched-chat-push1. GHOST-ADMIN-SCHED-CHAT-PUSH1-CONTRACT-v1. Ace CALLABLE LIVE for the office RPCs. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Admin repo only. When an aide or Remi texts Admin or Scheduler, that staffer gets a phone ping too. Admin and Scheduler are one portal and the same Settings chrome. Nurse is out of scope (42501). Settings (#tab_settings) holds one toggle, Aide + Remi messages. Subcopy: Get a phone notification when an aide or Remi texts you. This is not More → Notifications (#tab_notifications), which stays the aide roster (clienthrs1d / vapid1 / aide-notif-search1). Load calls office_get_notification_prefs. Flip ON calls office_save_notification_prefs with p_aide_remi_messages true, then asks Allow only when permission is not granted. There is no separate Allow card. On Allow the desk calls get_vapid_public_key. When configured is false it does not subscribe. When configured is true it subscribes with vapidPublicKey and posts office_upsert_web_push_subscription with p_endpoint, p_p256dh, p_auth, and optional p_user_agent. Flip OFF calls office_save_notification_prefs with p_aide_remi_messages false and office_revoke_web_push_subscription with optional p_endpoint. A tap follows payload.deep_link to admin/messages?aide_id= and opens that Messages thread. Staff-facing copy is plain English only. Never paint a public key, a private key, or worker jargon. Soft hint: Open the app from your Home Screen, then tap Allow. Aide send already queues office_push_jobs. This desk does not invent delivery and does not post a deliver RPC. No text-message sender. When get_vapid_public_key is missing or configured is false, this desk does not subscribe. The pref can still be saved. sw.js handles the ping tap only and does not cache the app and does not put ?v= on the address bar. Prior admin-build metas stay. The first meta remains 2026-09-27-remi-float-hide1b. No Auth reseal. Dates people read are MM/DD/YYYY. -->
 <meta name="admin-build" content="2026-09-29-admin-sched-chat-push1">
 <script>var ADMIN_SCHED_CHAT_PUSH1_MARKER='v=admin-sched-chat-push1';var ADMIN_SCHED_CHAT_PUSH1_BUILD='2026-09-29-admin-sched-chat-push1';</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
@@ -3916,7 +3916,7 @@ Call (216) 377-5991 with any questions.</textarea>
             <span class="staff-push-ico" aria-hidden="true">💬</span>
             <div class="staff-push-copy">
               <div class="staff-push-title" id="staffPushTitle">Aide + Remi messages</div>
-              <div class="staff-push-hint" id="staffPushHint">Phone ping when an aide or Remi writes</div>
+              <div class="staff-push-hint" id="staffPushHint">Get a phone notification when an aide or Remi texts you.</div>
             </div>
             <label class="staff-push-switch">
               <input type="checkbox" id="staffPushAideRemi" role="switch" aria-labelledby="staffPushTitle" onchange="adminSchedChatPush1Toggle()">
@@ -42821,8 +42821,9 @@ if(typeof remiIdeas763Paint==='function'&&!remiIdeas763Paint.__remiFloatHide1b){
 // end remi float hide1b v=remi-float-hide1b
 
 // admin sched chat push1 v=admin-sched-chat-push1
-// Settings toggle for Admin and Scheduler. Phone ping when an aide or Remi writes.
-// Public key RPC only. No private key. No text-message sender. Subscribe is skipped when the key is not configured.
+// Settings toggle for Admin and Scheduler. Nurse is out of scope.
+// Exact RPCs: office_get_notification_prefs, office_save_notification_prefs, get_vapid_public_key, office_upsert_web_push_subscription, office_revoke_web_push_subscription.
+// Public key only. No private key. No text-message sender. Subscribe is skipped when configured is false.
 var ADMIN_SCHED_CHAT_PUSH1_MARKER='v=admin-sched-chat-push1';
 var ADMIN_SCHED_CHAT_PUSH1_BUILD='2026-09-29-admin-sched-chat-push1';
 var ADMIN_SCHED_CHAT_PUSH1_TOPIC='aide_remi_messages';
@@ -42832,7 +42833,7 @@ var ADMIN_SCHED_CHAT_PUSH1_COPY={
   sub:'Just the toggle. Flip ON asks Allow automatically.',
   kicker:'Message pings',
   title:'Aide + Remi messages',
-  hint:'Phone ping when an aide or Remi writes',
+  hint:'Get a phone notification when an aide or Remi texts you.',
   home:'Open the app from your Home Screen, then tap Allow.',
   on:'Phone pings on',
   off:'Phone pings off',
@@ -42841,10 +42842,10 @@ var ADMIN_SCHED_CHAT_PUSH1_COPY={
 };
 var ADMIN_SCHED_CHAT_PUSH1_RPC={
   vapid:'get_vapid_public_key',
-  prefsGet:['admin_get_office_staff_push_prefs'],
-  prefsSet:['admin_set_office_staff_push_prefs'],
-  subscribe:['admin_subscribe_office_staff_push','admin_subscribe_office_push'],
-  unsubscribe:['admin_unsubscribe_office_staff_push','admin_unsubscribe_office_push']
+  prefsGet:'office_get_notification_prefs',
+  prefsSet:'office_save_notification_prefs',
+  upsert:'office_upsert_web_push_subscription',
+  revoke:'office_revoke_web_push_subscription'
 };
 var adminSchedChatPush1Pref=false;
 var adminSchedChatPush1Subscribed=false;
@@ -42894,9 +42895,16 @@ function adminSchedChatPush1WriteStore(){
     }));
   }catch(e){}
 }
+function adminSchedChatPush1Forbidden(got){
+  if(!got)return false;
+  if(got.status===42501||got.code==='42501')return true;
+  var err=String(got.error||got.message||'');
+  return /42501|forbidden:\s*scheduler office only/i.test(err);
+}
 function adminSchedChatPush1RpcMissing(got){
   if(!got)return true;
   if(got.missing)return true;
+  if(adminSchedChatPush1Forbidden(got))return false;
   if(got.status===404)return true;
   var err=String(got.error||got.message||'');
   return /PGRST202|could not find the function|schema cache/i.test(err);
@@ -42919,8 +42927,10 @@ async function adminSchedChatPush1Rpc(names, body){
       if(typeof sbRpcNode==='function'){
         try{node=sbRpcNode(got.data);}catch(e2){node=got.data;}
       }
+      if(adminSchedChatPush1Forbidden(node)||adminSchedChatPush1Forbidden(got))return {ok:false, forbidden:true, status:42501, name:list[i]};
       return {ok:true, data:node, name:list[i]};
     }
+    if(adminSchedChatPush1Forbidden(got))return {ok:false, forbidden:true, status:42501, name:list[i]};
     if(adminSchedChatPush1RpcMissing(got)){
       last={missing:true, error:got&&got.error, name:list[i]};
       continue;
@@ -43080,68 +43090,106 @@ function adminSchedChatPush1PrefOn(data){
   if(flag===false||flag==='false'||flag==='f'||flag===0||flag==='0')return false;
   return null;
 }
+function adminSchedChatPush1ApplyPrefs(data){
+  var flag=adminSchedChatPush1PrefOn(data);
+  if(flag!==null)adminSchedChatPush1Pref=flag;
+  data=data||{};
+  if(data.has_active_subscription===true||data.has_active_subscription==='true'||data.has_active_subscription==='t')adminSchedChatPush1Subscribed=true;
+  if(data.has_active_subscription===false||data.has_active_subscription==='false'||data.has_active_subscription==='f')adminSchedChatPush1Subscribed=false;
+}
+function adminSchedChatPush1UserAgent(){
+  try{return (typeof navigator!=='undefined'&&navigator&&navigator.userAgent)?String(navigator.userAgent):'';}
+  catch(e){return '';}
+}
+function adminSchedChatPush1SubParts(subscription){
+  subscription=subscription||{};
+  var keys=subscription.keys||{};
+  var endpoint=String(subscription.endpoint||adminSchedChatPush1Endpoint||'');
+  if(endpoint)adminSchedChatPush1Endpoint=endpoint;
+  return {
+    endpoint:endpoint,
+    p256dh:String(keys.p256dh||subscription.p256dh||''),
+    auth:String(keys.auth||subscription.auth||'')
+  };
+}
 async function adminSchedChatPush1PostPrefs(on){
-  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.prefsSet, {
-    p_aide_remi_messages:!!on,
-    p_topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC
-  });
+  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.prefsSet, {p_aide_remi_messages:!!on});
 }
-async function adminSchedChatPush1PostSubscribe(subscription){
-  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.subscribe, {
-    p_topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC,
-    p_aide_remi_messages:true,
-    p_subscription:subscription||{},
-    p_endpoint:String((subscription&&subscription.endpoint)||adminSchedChatPush1Endpoint||'')
-  });
+async function adminSchedChatPush1PostUpsert(subscription){
+  var parts=adminSchedChatPush1SubParts(subscription);
+  var body={p_endpoint:parts.endpoint, p_p256dh:parts.p256dh, p_auth:parts.auth};
+  var ua=adminSchedChatPush1UserAgent();
+  if(ua)body.p_user_agent=ua;
+  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.upsert, body);
 }
-async function adminSchedChatPush1PostUnsubscribe(endpoint){
-  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.unsubscribe, {
-    p_topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC,
-    p_aide_remi_messages:false,
-    p_endpoint:String(endpoint||adminSchedChatPush1Endpoint||'')
-  });
+async function adminSchedChatPush1PostRevoke(endpoint){
+  var body={};
+  if(endpoint)body.p_endpoint=String(endpoint);
+  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.revoke, body);
+}
+async function adminSchedChatPush1SubscribeIfAllowed(){
+  var key=await adminSchedChatPush1LoadKey();
+  if(!key){
+    adminSchedChatPush1Subscribed=false;
+    return {subscribed:false, skippedSubscribe:true};
+  }
+  var got=await adminSchedChatPush1PushSubscribe(key);
+  if(!(got&&got.ok))return {subscribed:false, skippedSubscribe:false};
+  await adminSchedChatPush1PostUpsert(got.subscription);
+  adminSchedChatPush1Subscribed=true;
+  adminSchedChatPush1WriteStore();
+  return {subscribed:true, skippedSubscribe:false};
 }
 async function adminSchedChatPush1Enable(){
-  if(!adminSchedChatPush1RoleOk())return {ok:false, reason:'role', asked:false};
+  if(!adminSchedChatPush1RoleOk())return {ok:false, reason:'role', asked:false, saved:false};
   var gen=++adminSchedChatPush1Gen;
-  var allow=await adminSchedChatPush1AskAllow();
-  adminSchedChatPush1LastAllow=allow;
-  if(gen!==adminSchedChatPush1Gen)return {ok:false, reason:'stale', asked:true};
-  if(allow!=='granted'){
+  var saved=await adminSchedChatPush1PostPrefs(true);
+  if(saved&&saved.forbidden){
     adminSchedChatPush1Pref=false;
-    adminSchedChatPush1Subscribed=false;
-    adminSchedChatPush1WriteStore();
     adminSchedChatPush1Paint();
-    adminSchedChatPush1SetStatus(allow==='denied'?ADMIN_SCHED_CHAT_PUSH1_COPY.denied:ADMIN_SCHED_CHAT_PUSH1_COPY.home);
-    return {ok:false, reason:allow, asked:true, subscribed:false};
-  }
-  var key=await adminSchedChatPush1LoadKey();
-  if(gen!==adminSchedChatPush1Gen)return {ok:false, reason:'stale', asked:true};
-  var subscribed=false;
-  if(key){
-    var got=await adminSchedChatPush1PushSubscribe(key);
-    subscribed=!!(got&&got.ok);
-    if(subscribed)await adminSchedChatPush1PostSubscribe(got.subscription);
+    return {ok:false, reason:'forbidden', asked:false, saved:false};
   }
   adminSchedChatPush1Pref=true;
-  adminSchedChatPush1Subscribed=subscribed;
+  if(saved&&saved.ok&&saved.data)adminSchedChatPush1ApplyPrefs(saved.data);
+  adminSchedChatPush1Pref=true;
   adminSchedChatPush1WriteStore();
-  await adminSchedChatPush1PostPrefs(true);
-  if(gen!==adminSchedChatPush1Gen)return {ok:true, asked:true, subscribed:subscribed, skippedSubscribe:!key};
   adminSchedChatPush1Paint();
-  adminSchedChatPush1SetStatus(subscribed?ADMIN_SCHED_CHAT_PUSH1_COPY.on:ADMIN_SCHED_CHAT_PUSH1_COPY.waiting);
-  return {ok:true, asked:true, subscribed:subscribed, skippedSubscribe:!key};
+  if(gen!==adminSchedChatPush1Gen)return {ok:false, reason:'stale', asked:false, saved:true};
+  var already='';
+  try{already=(typeof Notification!=='undefined'&&Notification)?String(Notification.permission||''):'';}catch(e){already='';}
+  var asked=false;
+  var allow=already==='granted'?'granted':'';
+  if(allow!=='granted'){
+    asked=true;
+    allow=await adminSchedChatPush1AskAllow();
+  }
+  adminSchedChatPush1LastAllow=allow;
+  if(gen!==adminSchedChatPush1Gen)return {ok:true, reason:'stale', asked:asked, saved:true};
+  if(allow!=='granted'){
+    adminSchedChatPush1Subscribed=false;
+    adminSchedChatPush1Paint();
+    adminSchedChatPush1SetStatus(allow==='denied'?ADMIN_SCHED_CHAT_PUSH1_COPY.denied:ADMIN_SCHED_CHAT_PUSH1_COPY.home);
+    return {ok:true, reason:allow, asked:asked, saved:true, subscribed:false, skippedSubscribe:true};
+  }
+  var sub=await adminSchedChatPush1SubscribeIfAllowed();
+  if(gen!==adminSchedChatPush1Gen)return {ok:true, asked:asked, saved:true, subscribed:!!(sub&&sub.subscribed), skippedSubscribe:!(sub&&sub.subscribed)};
+  adminSchedChatPush1Paint();
+  adminSchedChatPush1SetStatus(sub&&sub.subscribed?ADMIN_SCHED_CHAT_PUSH1_COPY.on:ADMIN_SCHED_CHAT_PUSH1_COPY.waiting);
+  return {ok:true, asked:asked, saved:true, subscribed:!!(sub&&sub.subscribed), skippedSubscribe:!(sub&&sub.subscribed)};
 }
 async function adminSchedChatPush1Disable(){
   if(!adminSchedChatPush1RoleOk())return {ok:false, reason:'role'};
   var gen=++adminSchedChatPush1Gen;
-  var endpoint=await adminSchedChatPush1PushUnsubscribe();
+  var endpoint=adminSchedChatPush1Endpoint||'';
+  adminSchedChatPush1Pref=false;
+  await adminSchedChatPush1PostPrefs(false);
+  await adminSchedChatPush1PostRevoke(endpoint);
+  var dropped=await adminSchedChatPush1PushUnsubscribe();
+  if(dropped)endpoint=dropped;
   adminSchedChatPush1Pref=false;
   adminSchedChatPush1Subscribed=false;
   adminSchedChatPush1Endpoint='';
   adminSchedChatPush1WriteStore();
-  await adminSchedChatPush1PostUnsubscribe(endpoint);
-  await adminSchedChatPush1PostPrefs(false);
   if(gen!==adminSchedChatPush1Gen)return {ok:true, endpoint:endpoint||''};
   adminSchedChatPush1Paint();
   adminSchedChatPush1SetStatus(ADMIN_SCHED_CHAT_PUSH1_COPY.off);
@@ -43179,15 +43227,8 @@ async function adminSchedChatPush1LoadPrefs(){
     var granted=false;
     try{granted=typeof Notification!=='undefined'&&Notification&&Notification.permission==='granted';}catch(e2){granted=false;}
     if(granted&&!adminSchedChatPush1Subscribed){
-      var key=await adminSchedChatPush1LoadKey();
+      await adminSchedChatPush1SubscribeIfAllowed();
       if(gen!==adminSchedChatPush1Gen)return;
-      if(key){
-        var sub=await adminSchedChatPush1PushSubscribe(key);
-        if(sub&&sub.ok){
-          adminSchedChatPush1Subscribed=true;
-          await adminSchedChatPush1PostSubscribe(sub.subscription);
-        }
-      }
     }
   }
   if(gen!==adminSchedChatPush1Gen)return;
@@ -43235,8 +43276,8 @@ function adminSchedChatPush1Route(raw){
   var aide=String(src.aide_id||src.aideId||'').trim()||adminSchedChatPush1Query(deep, 'aide_id');
   var thread=String(src.thread_id||src.threadId||'').trim()||adminSchedChatPush1Query(deep, 'thread_id');
   var name=String(src.aide_name||src.aideName||src.name||'').trim();
-  var fromRaw=String(src.from||src.sender||adminSchedChatPush1Query(deep, 'from')||'').toLowerCase();
-  var from=fromRaw==='remi'?'remi':'aide';
+  var fromRole=String(src.from_role||src.fromRole||src.from||src.sender||adminSchedChatPush1Query(deep, 'from')||'').toLowerCase();
+  var from=(fromRole==='remi'||fromRole==='from_remi')?'remi':'aide';
   var surface=(aide||thread)?'thread':'messages';
   var body=String(src.body||src.preview||'').trim();
   if(!deep){
