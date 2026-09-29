@@ -16,7 +16,12 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-28-remi-msg-t
 assert.ok(html.includes('GHOST-REMI-MSG-TAB1-CONTRACT-v1'), 'contract');
 assert.ok(html.includes('MERGE HOLD'), 'merge hold stays in the contract');
 assert.ok(html.includes('Do not claim LIVE'), 'do not claim live');
-assert.ok(html.includes('No SQL'), 'no SQL');
+assert.ok(html.includes('No new SQL'), 'no new SQL');
+assert.ok(html.includes('Ace CALLABLE reuse'), 'aide path reuses Ace callables');
+assert.ok(html.includes('Ace GAP'), 'client thread stays an Ace gap');
+assert.ok(html.includes('admin_compose_aide_text'), 'compose callable is named');
+assert.ok(html.includes('admin/messages?aide_id='), 'aide draft opens the messages deep link');
+assert.ok(html.includes('Aides | Clients is pure UI'), 'segment chrome is UI');
 assert.ok(html.includes('No Quo/SMS'), 'no Quo or SMS provider');
 assert.ok(html.includes("var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1'"), 'marker constant');
 assert.ok(html.includes("var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1'"), 'build constant');
@@ -66,9 +71,13 @@ const js = html.slice(jsStart, jsEnd);
 assert.ok(js.includes('function remiMsgTab1Ask'), 'ask function');
 assert.ok(js.includes('function remiMsgTab1OpenDraft'), 'open-draft function');
 assert.ok(js.includes('function remiMsgTab1ClientSend'), 'client send stays a device draft');
+assert.ok(js.includes('aideTextChatCompose'), 'aide draft reuses aide-text-chat1 compose');
+assert.ok(js.includes("source:'remi-msg-tab1'"), 'compose is tagged for this tip');
 assert.ok(!js.includes('client_office_messages'), 'no client office messages RPC');
+assert.ok(!js.includes('admin_compose_client'), 'no invented client compose RPC');
 assert.ok(!js.includes('admin_send_aide_office_message'), 'ask path does not call the aide office send RPC');
-assert.ok(!js.includes('admin_send_aide_text'), 'ask path does not call admin_send_aide_text');
+assert.ok(!js.includes('admin_send_aide_text'), 'ask path does not send; Send stays in aide-text-chat1');
+assert.ok(!/mailto:/.test(js), 'clients do not open mail');
 assert.ok(!/\bquo\b/i.test(js), 'no Quo provider');
 assert.ok(!js.includes('sbRestRpc') && !js.includes('fetch('), 'no new network from the Messages tip');
 assert.ok(!/CREATE TABLE|ALTER TABLE/i.test(js), 'no SQL in the tip');
@@ -141,6 +150,13 @@ const ctx = {
     }
   },
   showTab: function(tab){calls.push('showTab:'+tab);},
+  aideTextChatCompose: async function(opts){
+    opts=opts||{};
+    calls.push('compose:'+String(opts.aideId||'')+':'+String(opts.body||''));
+    var link='admin/messages?aide_id='+encodeURIComponent(String(opts.aideId||''));
+    calls.push('link:'+link);
+    return {ok:true, draft:{link:link, body:opts.body||'', aideId:opts.aideId||'', autoSent:false}};
+  },
   aidechatOpen: async function(){calls.push('aidechatOpen');},
   aidechatOpenThread: async function(id){calls.push('openThread:'+id); ctx.aidechatSelectedId = id;},
   aidechatFindByAide: function(){return null;},
@@ -254,11 +270,11 @@ ctx.currentAdminRole = 'Admin';
 async function runUnitDrafts(){
 calls.length = 0;
 await run("remiMsgTab1OpenDraft("+JSON.stringify(moe.remiMsgTab1)+")");
-assert.ok(calls.indexOf('showTab:aidechat') >= 0, 'aide draft opens Messages');
-assert.ok(calls.some(function(c){return c.indexOf('openThread:')===0;}), 'aide draft opens that thread');
+assert.ok(calls.some(function(c){return c.indexOf('compose:aide-moe:Hi Moe Hart')===0;}), 'aide draft calls compose with the body');
+assert.ok(calls.some(function(c){return c.indexOf('link:admin/messages?aide_id=')===0;}), 'aide draft opens admin/messages?aide_id=');
 assert.strictEqual(els.aidechatReply.value, 'Hi Moe Hart \u2014 ');
 assert.strictEqual(els.remiMsgTab1DraftNote.hidden, false);
-assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0;}), 'opening an aide draft does not send');
+assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0 || c.indexOf('admin_send')===0;}), 'opening an aide draft does not send');
 
 calls.length = 0;
 await run("remiMsgTab1OpenDraft("+JSON.stringify(ada.remiMsgTab1)+")");
@@ -267,6 +283,8 @@ assert.strictEqual(run('remiMsgTab1ClientId'), 'client-ada');
 assert.ok(els.tab_aidechat.classList.contains('is-client-thread'), 'client thread chrome');
 assert.strictEqual(els.aidechatReply.value, 'Hi Ada Cole \u2014 ');
 assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('sms:') >= 0, 'phone on file offers sms');
+assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('tel:') >= 0, 'phone on file offers tel');
+assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('mailto:') < 0, 'client contact does not use mail');
 assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0;}), 'opening a client draft does not send');
 
 calls.length = 0;
@@ -282,10 +300,12 @@ assert.ok(rows.some(function(r){return r.id==='client-ada';}));
 assert.ok(!rows.some(function(r){return r.name==='Old Client';}), 'inactive clients stay off the desk');
 
 run("remiMsgTab1OpenClient('client-ruth', 'Hi Ruth Coleman \u2014 ')");
+assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('mailto:') < 0, 'email on file is not a client contact');
 calls.length = 0;
-run('remiMsgTab1ClientSend({preventDefault:function(){}})');
-assert.ok(calls[0].indexOf('coverGo:mailto:pat@example.com') === 0, 'no phone uses the case manager mailto');
-assert.ok(!calls.some(function(c){return c.indexOf('admin_send')===0;}));
+const ruth = run('remiMsgTab1ClientSend({preventDefault:function(){}})');
+assert.strictEqual(ruth, false);
+assert.ok(calls[0].indexOf('toast:') === 0, 'no phone keeps the draft even when email is on file');
+assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0 || c.indexOf('admin_send')===0;}));
 
 run("allClients=[{id:'c-quiet', name:'Quiet Client', phone:'', email:'', isActive:true}]; remiMsgTab1OpenClient('c-quiet', 'Hi Quiet Client \u2014 ');");
 calls.length = 0;
@@ -354,8 +374,23 @@ async function runBrowser(){
       currentAdminRole = 'Admin';
       currentAdminUsername = 'mo@evercare.test';
       var sends = [];
-      sbRestRpc = async function(name){
-        sends.push(String(name||''));
+      readSbSession = function(){return {access_token:'office-jwt'};};
+      sbRestRpc = async function(name, body){
+        sends.push({name:String(name||''), body:body||{}});
+        if(name==='admin_compose_aide_text'){
+          return {ok:true, data:{
+            draft:{body:(body&&body.p_body)||''},
+            aide_name:'Moe Hart',
+            aide_username:'moe',
+            thread_id:'11111111-1111-4111-8111-111111111111',
+            channel:'in_app_messages',
+            admin_deep_link:'admin/messages?aide_id='+(body&&body.p_aide_id||'')
+          }};
+        }
+        if(name==='admin_get_aide_text_channel'){
+          return {ok:true, data:{channel:'in_app_messages', has_push_subscription:false, phone_required:false, sms_sent:false}};
+        }
+        if(name==='admin_send_aide_text')return {ok:true, data:{channel:'in_app_messages', sms_sent:false, thread_id:'11111111-1111-4111-8111-111111111111'}};
         return {ok:false, status:404, error:'offline'};
       };
       var gone = [];
@@ -364,7 +399,7 @@ async function runBrowser(){
       layoutA1ApplyRoles();
       navEditApply();
       showScreen('adminScreen');
-      loadedAidesList = [{id:'aide-moe', username:'moe', name:'Moe Hart', isActive:true, phone:'2165550142'}];
+      loadedAidesList = [{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', aide_id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', username:'moe', name:'Moe Hart', isActive:true, phone:'2165550142'}];
       allClients = [{id:'client-ada', name:'Ada Cole', phone:'2165550100', email:'ada@example.com', isActive:true}];
       aidechatThreads = [];
       var bar = Array.prototype.map.call(document.querySelectorAll('#bottomNav .bottom-tab'), function(btn){
@@ -384,6 +419,11 @@ async function runBrowser(){
       var aideDraft = document.getElementById('aidechatReply').value;
       var note = document.getElementById('remiMsgTab1DraftNote').hidden;
       var sheetStill = document.getElementById('copilotSheet').hidden;
+      var link = document.documentElement.getAttribute('data-remi-msg-tab1-link') || document.documentElement.getAttribute('data-aide-text-deep-link') || '';
+      var afterCompose = sends.map(function(row){return row.name;});
+      document.getElementById('aidechatSend').click();
+      await new Promise(function(r){setTimeout(r, 60);});
+      var afterAideSend = sends.map(function(row){return row.name;});
       var clientAsk = remiMsgTab1Ask('message Ada Cole');
       await remiMsgTab1OpenDraft(clientAsk.remiMsgTab1);
       await new Promise(function(r){setTimeout(r, 80);});
@@ -401,6 +441,9 @@ async function runBrowser(){
         aideDraft: aideDraft,
         noteHidden: note,
         sheetHidden: sheetStill,
+        link: link,
+        afterCompose: afterCompose,
+        afterAideSend: afterAideSend,
         clientDraft: clientDraft,
         clientThread: clientThread,
         sends: sends,
@@ -415,10 +458,14 @@ async function runBrowser(){
     assert.strictEqual(desk.aideDraft, 'the shift moved');
     assert.strictEqual(desk.noteHidden, false);
     assert.strictEqual(desk.sheetHidden, false, 'Remi Ask stays open');
+    assert.ok(desk.link.indexOf('admin/messages?aide_id=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') >= 0, desk.link);
+    assert.ok(desk.afterCompose.indexOf('admin_compose_aide_text') >= 0, 'compose runs when the draft opens');
+    assert.strictEqual(desk.afterCompose.filter(function(name){return name==='admin_send_aide_text';}).length, 0, 'compose does not send');
+    assert.strictEqual(desk.afterAideSend.filter(function(name){return name==='admin_send_aide_text';}).length, 1, 'aide Send posts admin_send_aide_text once');
     assert.strictEqual(desk.clientDraft, 'Hi Ada Cole \u2014 ');
     assert.strictEqual(desk.clientThread, true);
-    assert.ok(desk.gone.length === 1 && desk.gone[0].indexOf('sms:2165550100') === 0, 'Send opens sms only after the tap');
-    assert.ok(!desk.sends.some(function(name){return name === 'admin_send_aide_office_message' || name === 'admin_send_aide_text';}), 'no aide send RPC');
+    assert.ok(desk.gone.length === 1 && desk.gone[0].indexOf('sms:2165550100') === 0, 'client Send opens sms only after the tap');
+    assert.ok(!desk.sends.some(function(row){return row.name === 'admin_send_aide_office_message' || row.name === 'client_office_messages' || row.name === 'admin_compose_client_text';}), 'no office or client compose RPC');
     console.log('admin-remi-msg-tab1 browser ok');
   }finally{
     await browser.close();
