@@ -18,7 +18,7 @@ assert.ok(html.includes('GHOST-REMI-PAYROLL-INS1-CONTRACT-v1'), 'contract name')
 assert.ok(html.includes('Ace CALLABLE'), 'Ace CALLABLE');
 assert.ok(html.includes('MERGE HOLD'), 'MERGE HOLD');
 assert.ok(html.includes('Do not claim LIVE'), 'do not claim LIVE');
-assert.ok(html.indexOf('v=remi-payroll1 admin-build 2026-09-27-remi-payroll1') < html.indexOf('v=remi-payroll-ins1'), 'ins1 comment follows remi-payroll1');
+assert.ok(html.indexOf('<!-- remi payroll 2026-09-27 v=remi-payroll1 admin-build 2026-09-27-remi-payroll1') < html.indexOf('<!-- remi payroll insurance 2026-09-28 v=remi-payroll-ins1'), 'ins1 comment follows remi-payroll1');
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build stays remi-float-hide1b');
 ['v=remi-payroll1','v=remi-float-hide1b','v=remi-phone-rail1','v=remi-chat-bleed1','v=client-ins1'].forEach(function(mark){
@@ -401,8 +401,9 @@ function runRoleHandoff(){
   box.remiPayrollIns1OpenPage = function(){box.pageOpens++; return {ok:true};};
   const fromRail = box.remiPayrollIns1FromRail();
   assert.strictEqual(box.pageOpens, 0, 'Scheduler rail does not open the own page');
-  assert.strictEqual(box.railShows, 1, 'Scheduler rail stays on remi-payroll1');
-  assert.strictEqual(fromRail.ok, true);
+  assert.strictEqual(box.railShows, 0, 'Scheduler rail does not open remi-payroll1');
+  assert.strictEqual(fromRail.forbidden, true);
+  assert.strictEqual(fromRail.hidden, true);
 
   payroll.classList.add('active');
   payroll.removeAttribute('hidden');
@@ -627,7 +628,8 @@ async function runBrowser(){
         navRoles: nav ? nav.getAttribute('data-layout-roles') : '',
         pageOn: page.classList.contains('active'),
         chips: document.querySelectorAll('#copilotSheet .ins1-chip').length,
-        sheetText: document.getElementById('copilotBody').innerText
+        sheetText: document.getElementById('copilotBody').innerText,
+        tabHidden: !!(document.getElementById('copilotTabPayroll') && document.getElementById('copilotTabPayroll').hidden)
       };
     });
     assert.strictEqual(schedView.navHidden, true, 'Scheduler does not see the payroll page nav');
@@ -635,8 +637,10 @@ async function runBrowser(){
     assert.strictEqual(schedView.navRoles, 'Admin');
     assert.strictEqual(schedView.pageOn, false, 'Scheduler showTab payroll does not open the page');
     assert.strictEqual(schedView.chips, 0, 'Scheduler rail has no insurance chips');
-    assert.ok(schedView.sheetText.indexOf('Payroll report') >= 0, schedView.sheetText);
-    assert.ok(schedView.sheetText.indexOf('36.20') >= 0, schedView.sheetText);
+    assert.strictEqual(schedView.tabHidden, true, 'Scheduler Remi Payroll tab stays hidden');
+    assert.ok(schedView.sheetText.indexOf('Payroll report') < 0, schedView.sheetText);
+    assert.ok(schedView.sheetText.indexOf('Paid shifts') < 0, schedView.sheetText);
+    assert.ok(schedView.sheetText.indexOf('36.20') < 0, schedView.sheetText);
 
     const handoff = await browser.newPage();
     watch(handoff);
@@ -701,13 +705,15 @@ async function runBrowser(){
         pageOn:!!(page && page.classList.contains('active')),
         pageDisplay:page ? getComputedStyle(page).display : '',
         chips:document.querySelectorAll('#copilotSheet .ins1-chip').length,
-        text:body ? body.innerText : ''
+        text:body ? body.innerText : '',
+        tabHidden:!!(document.getElementById('copilotTabPayroll') && document.getElementById('copilotTabPayroll').hidden)
       };
     });
     assert.strictEqual(railAfter.pageOn, false, 'Scheduler Remi payroll does not open the own page');
     assert.strictEqual(railAfter.pageDisplay, 'none');
     assert.strictEqual(railAfter.chips, 0, 'Scheduler Remi payroll has no insurance chips');
-    assert.ok(railAfter.text.indexOf('Payroll report') >= 0, railAfter.text);
+    assert.strictEqual(railAfter.tabHidden, true, 'Scheduler Remi Payroll tab stays hidden');
+    assert.ok(railAfter.text.indexOf('Payroll report') < 0, railAfter.text);
 
     assert.ok(!errors.some(function(line){return /SyntaxError|remiPayrollIns1/.test(line);}), errors.join('\n'));
     console.log('admin-remi-payroll-ins1 browser ok');

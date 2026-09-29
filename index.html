@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- sched payroll hide 2026-09-29 v=sched-payroll-hide1 ?v=sched-payroll-hide1 admin-build 2026-09-29-sched-payroll-hide1. GHOST-SCHED-PAYROLL-HIDE1-CONTRACT-v1. Ace NO CALLABLE. UI gate only. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Standing rule: Admin and Scheduler are one portal except payroll and Mo's notes, which are Admin-only. Mo's notes stay hidden for Scheduler (remi-notes-vis1). This tip hides the Remi Payroll tab (#copilotTabPayroll), the payroll panel (Payroll report, pay-day anchor, Aides, Paid shifts, Paid hours, Covers, Flags, Run, CSV, PDF, Both), and the Scheduled Payroll report job card (title, Open report, Run, pay-day anchor) from Scheduler. schedPayrollHide1UiOk() is the same Admin-only gate for the tab and that card: Scheduler is false, an empty role still paints, and Nurse stays out. data-layout-roles="Admin" on that tab, the same layoutA1 role family as the Admin payroll page and the same Admin-only check as Mo's notes (role Admin) with Nurse still OOS through copilotRoleOk and remiPayroll1OfficeOk. Admin keeps Payroll on the Remi rail. Admin payroll RPCs stay: admin_get_remi_payroll_report, admin_run_remi_payroll_report, admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf. More already has no Payroll for Scheduler. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including admin-sched-chat-push1, pages-cache-fresh1, login-land-schedule1, list-search-az1, remi-payroll1, the payroll insurance tip, and remi-notes-vis1. -->
+<meta name="admin-build" content="2026-09-29-sched-payroll-hide1">
+<script>var SCHED_PAYROLL_HIDE1_MARKER='v=sched-payroll-hide1';var SCHED_PAYROLL_HIDE1_BUILD='2026-09-29-sched-payroll-hide1';</script>
 <!-- remi msg tab 2026-09-28 v=remi-msg-tab1 ?v=remi-msg-tab1 admin-build 2026-09-28-remi-msg-tab1. GHOST-REMI-MSG-TAB1-CONTRACT-v1. Ace CALLABLE reuse. No new SQL. No new RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No Auth reseal. No Quo/SMS. Empty nav storage pins Messages on the primary bar: Timesheets, Schedule, Aides, Messages, plus More. tabbar-8 and Edit tabs stay. Cover and Backup stay in the catalog and start under More until Mo adds them. A saved bar is left as saved. Aide chat stays #tab_aidechat. The unread badge stays on the Messages tab. Standing rule: Admin and Scheduler are one portal. Scheduler sees the same Messages bottom tab, Aides | Clients chrome, and Remi Ask aide draft as Admin. data-layout-roles is Admin Scheduler on the Messages tab, the Aides | Clients segment, Aide chat, and Remi Ask. The role gate reuses aidechat1 and aide-text-chat1 is_scheduler_office. Nurse stays denied for aidechat. Under the Messages header, Aides | Clients is pure UI on one desk. Aides is the existing office inbox (aidechat1, aide-office-vis1, aide-text-chat1, msg-dense1, care-msg-safe1 composer above the tabs). Remi Ask “message <aide name>” reuses aideTextChatCompose: CALLABLE admin_compose_aide_text {p_aide_id, p_body} opens admin/messages?aide_id= with that draft already in the composer. Compose never auto-sends. Mo taps Send, and only that tap posts admin_send_aide_text {p_aide_id, p_body}. It does not call admin_send_aide_office_message on the Ask path. Mo locked Clients: Call / Text (sms: and tel:) only. The Clients Messages in-app widget is skipped. Aides ships in-app in full. Aides | Clients chrome stays. Clients is covercomms-style phone deep links when a phone is on file, not EverCare client chat, and not a new RPC. This tip does not add client_office_messages. The list is the same org clients Schedule and Clients already load (get_clients / allClients). Copy says Call / Text only. Mo presses Send in the phone Messages app. No mailto. Remi Ask “message <client name>” opens that phone draft. Nothing auto-sends. remi-chat-bleed1 stays: Schedule a Remi stays parked off the thread, and the corner chip stays hidden while Messages is active. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-radar-dismiss1, v=aide-profile-link-fix, v=remi-open-thread1, v=care-msg-safe1, v=remi-chat-bleed1, v=aidechat1, v=navedit1, v=tabbar-8, and v=cover-desk1. -->
 <meta name="admin-build" content="2026-09-28-remi-msg-tab1">
 <script>var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1';var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1';</script>
@@ -232,7 +235,7 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <meta name="admin-build" content="2026-09-27-cover-unselect1">
 <!-- remi payroll 2026-09-27 v=remi-payroll1 admin-build 2026-09-27-remi-payroll1. GHOST-REMI-PAYROLL1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Remi payroll stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Scheduled card is Payroll report On, every other Wednesday at 8:00 AM ET, payroll report in this rail, biweekly. Next run reads next_run_at 2026-10-07T12:00:00+00:00 as Wed 10/07/2026 8:00 AM ET. Anchor pay day is Wed 09/23/2026, so 09/30/2026 is skipped. Chat such as run payroll, Sep 13–27, last week, and last 2 weeks posts admin_parse_remi_payroll_range {p_text}. Confirm posts admin_set_remi_payroll_range_prefs {p_start_date, p_end_date} and then admin_get_remi_payroll_report {p_start_date, p_end_date}. Default range is the last 14 days ET or the saved range prefs. Aides start collapsed. The summary line is Aide · Client · hours number only. Expand shows DATE, CLIENT, IN, OUT, HOURS from signed timesheets. Covers stay visible under each aide. Flag chips are missing only: Flag · missing and Flag · unsigned. Flag hours are excluded from paid totals. Tap a flag opens the timesheet deep_link. Chase stays in Aide chat. No Quo/SMS. Export CSV posts admin_export_remi_payroll_csv. Export PDF posts admin_export_remi_payroll_pdf with content_base64 and storage_path {org}/other/{uuid}.pdf under evercare-pdfs. Both posts admin_export_remi_payroll. Run posts admin_run_remi_payroll_report and paints the receipt rail chip. Create and update scheduled jobs accept p_recurrence biweekly, p_interval_days 14, p_anchor_date, and p_range_prefs. Office JWT via sbRestRpc. is_scheduler_office. Nurse is denied (42501). Dates people read are MM/DD/YYYY. No Auth reseal. This tip does not depend on remi-ideas763. Prior markers stay, including v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, and v=coverage-simple1. -->
 <meta name="admin-build" content="2026-09-27-remi-payroll1">
-<!-- remi payroll insurance 2026-09-28 v=remi-payroll-ins1 admin-build 2026-09-28-remi-payroll-ins1. GHOST-REMI-PAYROLL-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Insurance filter on the Remi payroll report. Default is All timesheets. Chips are All, CareSource, Passport, and Other. A filtered frame is labeled with the insurer and has a clear path back, ← All insurers. Collapsed aide cards stay Aide · Client · hours number only, like remi-payroll1. Desktop payroll report is an OWN PAGE: the Admin shell plus full main content in #tab_payroll. It is not the Remi right rail and it is not inside #copilotSheet. Phone uses the Remi sheet with the same filter chips. Office Admin only. data-layout-roles="Admin". Scheduler and Nurse do not get this own page or these insurance chips. Scheduler can still open remi-payroll1 in Remi without this filter. RPCs: admin_list_remi_payroll_insurance_chips, admin_get_remi_payroll_report with optional p_insurance_plan, and the same optional p_insurance_plan on admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf, and admin_run_remi_payroll_report. null, blank, or all means All. caresource, passport, and other are the chip values. Other is null, blank, unknown, or not caresource or passport. Palette: CareSource #6B2D8B, Passport #E6B800, Other #6b7a90. Parse and set range prefs stay remi-payroll1 and is_scheduler_office. This filter gate is current_app_role admin. No Auth reseal. No Quo/SMS. Prior markers stay, including v=remi-payroll1, v=remi-float-hide1b, v=remi-phone-rail1, v=remi-chat-bleed1, and v=client-ins1. -->
+<!-- remi payroll insurance 2026-09-28 v=remi-payroll-ins1 admin-build 2026-09-28-remi-payroll-ins1. GHOST-REMI-PAYROLL-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Insurance filter on the Remi payroll report. Default is All timesheets. Chips are All, CareSource, Passport, and Other. A filtered frame is labeled with the insurer and has a clear path back, ← All insurers. Collapsed aide cards stay Aide · Client · hours number only, like remi-payroll1. Desktop payroll report is an OWN PAGE: the Admin shell plus full main content in #tab_payroll. It is not the Remi right rail and it is not inside #copilotSheet. Phone uses the Remi sheet with the same filter chips. Office Admin only. data-layout-roles="Admin". Scheduler and Nurse do not get this own page or these insurance chips. v=sched-payroll-hide1 hides the Remi Payroll tab and panel from Scheduler. Admin keeps that rail. RPCs: admin_list_remi_payroll_insurance_chips, admin_get_remi_payroll_report with optional p_insurance_plan, and the same optional p_insurance_plan on admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf, and admin_run_remi_payroll_report. null, blank, or all means All. caresource, passport, and other are the chip values. Other is null, blank, unknown, or not caresource or passport. Palette: CareSource #6B2D8B, Passport #E6B800, Other #6b7a90. Parse and set range prefs stay remi-payroll1 and is_scheduler_office. This filter gate is current_app_role admin. No Auth reseal. No Quo/SMS. Prior markers stay, including v=remi-payroll1, v=remi-float-hide1b, v=remi-phone-rail1, v=remi-chat-bleed1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-28-remi-payroll-ins1">
 <!-- client insurance tint 2026-09-27 v=client-ins1 admin-build 2026-09-27-client-ins1. GHOST-CLIENT-INS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Add Client chip picker passes optional p_insurance_plan on admin_add_client and keeps p_weekly_authorized_hours. Catalog chips use admin_list_insurance_plans key, label, and color. Client list selects insurance_plan and tints the name and badge from the locked palette or insurance_color and insurance_label. Schedule week and slots paint insurance_plan, insurance_label, and insurance_color from list_schedule_week and list_schedule_week_slots. Edit uses admin_update_client_insurance or PATCH insurance_plan. Null and legacy plans stay muted. Locked palette: CareSource caresource #6B2D8B, Passport passport #E6B800, Anthem anthem #1E6BB8, Molina molina #C62828, Buckeye buckeye #1B8A3E. No Auth reseal. No Quo/SMS. Nurse writes 42501. Admin dates stay MM/DD/YYYY. Prior markers stay, including v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=clienthrs1d, v=clienthrs1c, v=clienthrs1b, v=clienthrs1a, v=sched1, v=remi-cm-email1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-client-ins1">
@@ -439,6 +442,7 @@ textarea{resize:vertical;min-height:80px;}
 /* v=remi-payroll-ins1 — [hidden] must beat .tab-panel.active so a Scheduler session cannot keep the Admin payroll page. */
 #tab_payroll[hidden]{display:none !important;}
 #nav_payroll[hidden],#remiPayrollIns1TimesheetsOpen[hidden]{display:none !important;}
+#copilotTabPayroll[hidden]{display:none !important;}
 .sched-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;max-width:100%;min-width:0;}
 .sched-toolbar .sched-search{flex:1;min-width:180px;max-width:280px;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.83rem;}
 .sched-week{display:flex;align-items:center;gap:6px;font-weight:600;color:var(--navy);max-width:100%;min-width:0;}
@@ -4181,7 +4185,7 @@ Call (216) 377-5991 with any questions.</textarea>
         <button type="button" class="copilot-tab" id="copilotTabRules" role="tab" aria-selected="false" data-remi-rules1="v=remi-rules1" onclick="remiRules1Show()">Rules</button>
         <button type="button" class="copilot-tab" id="copilotTabSched" role="tab" aria-selected="false" data-remi-sched1="v=remi-sched1" onclick="remiSched1Show()">Scheduled</button>
         <button type="button" class="copilot-tab" id="copilotTabProof" role="tab" aria-selected="false" data-remi-proof1="v=remi-proof1" onclick="remiProof1Show()">Receipts</button>
-        <button type="button" class="copilot-tab" id="copilotTabPayroll" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1FromRail()">Payroll</button>
+        <button type="button" class="copilot-tab" id="copilotTabPayroll" role="tab" aria-selected="false" data-layout-roles="Admin" data-sched-payroll-hide1="v=sched-payroll-hide1" data-remi-float-hide1="v=remi-float-hide1" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="remiPayrollIns1FromRail()">Payroll</button>
         <button type="button" class="copilot-tab" id="copilotTabCover" role="tab" aria-selected="false" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" onclick="remiFloatHide1ShowCoverage()">Coverage</button>
       </div>
       <div id="aideOfficeRail" hidden data-aide-office-vis1="v=aide-office-vis1" aria-live="polite" aria-label="Aide Office"></div>
@@ -5765,6 +5769,7 @@ function layoutA1ApplyRoles(){
     }
     if(typeof copilotSyncRole==='function')copilotSyncRole();
     if(typeof remiPayrollIns1ApplyRoleGate==='function')remiPayrollIns1ApplyRoleGate();
+    if(typeof schedPayrollHide1Apply==='function')schedPayrollHide1Apply();
   }finally{
     layoutA1ApplyRoles._busy=0;
   }
@@ -24300,8 +24305,19 @@ function remiSched1WeekOptions(selected, id){
   html+='</select>';
   return html;
 }
+function remiSched1PayrollJobHidden(job){
+  if(typeof schedPayrollHide1UiOk!=='function'||schedPayrollHide1UiOk())return false;
+  job=job||{};
+  if(typeof remiPayroll1IsPayrollJob==='function'){
+    try{return !!remiPayroll1IsPayrollJob(job);}catch(eJob){}
+  }
+  var kind=String(job.kind||job.job_key||'').toLowerCase();
+  if(kind==='payroll_report')return true;
+  return /\bpayroll\b/i.test(String(job.title||''));
+}
 function remiSched1JobHtml(job){
   job=job||{};
+  if(remiSched1PayrollJobHidden(job))return '';
   var on=remiSched1On(job.is_on);
   var id=remiSched1SafeId(job.id);
   var weekday=String(job.weekday||'');
@@ -24413,6 +24429,53 @@ async function remiSched1SaveTime(id){
   return got;
 }
 // end remi sched1 v=remi-sched1
+
+// sched payroll hide1 v=sched-payroll-hide1
+// UI hide only. Admin payroll RPCs stay. Scheduler does not see the Remi Payroll tab, the payroll panel, or the Scheduled Payroll report job card.
+// Same family as Mo notes Admin-only (role Admin) and Nurse OOS (not Admin, already denied by office).
+var SCHED_PAYROLL_HIDE1_MARKER='v=sched-payroll-hide1';
+var SCHED_PAYROLL_HIDE1_BUILD='2026-09-29-sched-payroll-hide1';
+function schedPayrollHide1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function schedPayrollHide1UiOk(){
+  var role=schedPayrollHide1Role();
+  if(!role)return true;
+  return role.toLowerCase()==='admin';
+}
+function schedPayrollHide1Apply(){
+  var role=schedPayrollHide1Role();
+  if(!role)return;
+  var admin=role.toLowerCase()==='admin';
+  var tab=null;
+  try{tab=document.getElementById('copilotTabPayroll');}catch(eTab){tab=null;}
+  if(tab){
+    if(admin){
+      if(tab.removeAttribute)tab.removeAttribute('hidden');
+      tab.hidden=false;
+    }else{
+      if(tab.setAttribute)tab.setAttribute('hidden','');
+      tab.hidden=true;
+    }
+  }
+  if(admin)return;
+  var onPay=false;
+  try{onPay=String(copilotView||'')==='payroll';}catch(eView){onPay=false;}
+  var host=null;
+  try{host=document.getElementById('copilotBody');}catch(eHost){host=null;}
+  var hasPay=false;
+  try{hasPay=!!(host&&host.querySelector&&host.querySelector('#remiPayroll1,.pay-report'));}catch(eQ){hasPay=false;}
+  if(!onPay&&!hasPay)return;
+  if(host)host.innerHTML='';
+  try{copilotView='radar';}catch(eSet){}
+  var sheet=null;
+  try{sheet=document.getElementById('copilotSheet');}catch(eSheet){sheet=null;}
+  if(sheet&&sheet.classList&&sheet.classList.remove)sheet.classList.remove('is-payroll');
+  if(typeof copilotSyncTabs==='function'){
+    try{copilotSyncTabs();}catch(eSync){}
+  }
+}
+// end sched payroll hide1 v=sched-payroll-hide1
 
 // remi payroll1 v=remi-payroll1
 // MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Right rail only. No full-page Remi.
@@ -24593,6 +24656,9 @@ function remiPayroll1IsRangeAsk(q){
   return false;
 }
 function remiPayroll1FromAsk(q){
+  var hideRole='';
+  try{hideRole=currentAdminRole==null?'':String(currentAdminRole);}catch(eHideAsk){hideRole='';}
+  if(hideRole&&hideRole.toLowerCase()!=='admin')return null;
   if(!remiPayroll1OfficeOk())return null;
   if(typeof remiPayrollIns1FromAsk==='function'){
     var insAsk=null;
@@ -24638,6 +24704,12 @@ function remiPayroll1BubbleHtml(msg, idx){
   return html;
 }
 async function remiPayroll1Confirm(idx){
+  var hideRole='';
+  try{hideRole=currentAdminRole==null?'':String(currentAdminRole);}catch(eHideConfirm){hideRole='';}
+  if(hideRole&&hideRole.toLowerCase()!=='admin'){
+    if(typeof schedPayrollHide1Apply==='function')schedPayrollHide1Apply();
+    return {ok:false, forbidden:true, hidden:true};
+  }
   if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.'};
   if(typeof copilotChat==='undefined'||!copilotChat||!copilotChat[idx]||!copilotChat[idx].payroll)return {ok:false, error:'Nothing to confirm.'};
   var msg=copilotChat[idx];
@@ -24902,6 +24974,12 @@ function remiPayroll1ReportHtml(){
   return html;
 }
 function remiPayroll1Paint(){
+  var hideRole='';
+  try{hideRole=currentAdminRole==null?'':String(currentAdminRole);}catch(eHidePaint){hideRole='';}
+  if(hideRole&&hideRole.toLowerCase()!=='admin'){
+    if(typeof schedPayrollHide1Apply==='function')schedPayrollHide1Apply();
+    return;
+  }
   if(typeof remiPayrollIns1CapturePaint==='function'&&remiPayrollIns1CapturePaint())return;
   if(typeof remiPayrollIns1PreferPage==='function'&&remiPayrollIns1PreferPage()&&typeof remiPayrollIns1OpenPage==='function'){
     return remiPayrollIns1OpenPage();
@@ -24958,6 +25036,12 @@ async function remiPayroll1Load(){
   return got;
 }
 function remiPayroll1Show(){
+  var hideRole='';
+  try{hideRole=currentAdminRole==null?'':String(currentAdminRole);}catch(eHideShow){hideRole='';}
+  if(hideRole&&hideRole.toLowerCase()!=='admin'){
+    if(typeof schedPayrollHide1Apply==='function')schedPayrollHide1Apply();
+    return {ok:false, forbidden:true, hidden:true};
+  }
   if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true};
   if(typeof remiPayrollIns1PreferPage==='function'&&remiPayrollIns1PreferPage()){
     return remiPayrollIns1OpenPage();
@@ -25074,6 +25158,7 @@ async function remiPayroll1Export(which){
   return got;
 }
 function remiPayroll1JobExtra(job){
+  if(typeof schedPayrollHide1UiOk==='function'&&!schedPayrollHide1UiOk())return '';
   if(!remiPayroll1IsPayrollJob(job))return '';
   job=job||{};
   var next=remiPayroll1NextText(job);
@@ -25095,7 +25180,7 @@ function remiPayroll1JobExtra(job){
 // remi payroll ins1 v=remi-payroll-ins1
 // MERGE HOLD. Ace CALLABLE. Do not claim LIVE. Admin only.
 // Desktop payroll report is an OWN PAGE in #tab_payroll (main content). Not inside #copilotSheet.
-// Phone uses the Remi sheet with the same chips. Scheduler keeps remi-payroll1 without this filter.
+// Phone uses the Remi sheet with the same chips. Admin keeps that sheet. Scheduler does not (v=sched-payroll-hide1).
 // Optional p_insurance_plan on admin_get_remi_payroll_report, admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf, and admin_run_remi_payroll_report.
 // null, blank, or all omits p_insurance_plan. caresource, passport, and other are sent.
 // No Auth reseal. No SMS provider.
@@ -25463,6 +25548,12 @@ function remiPayrollIns1OpenPage(){
   return remiPayrollIns1Shown||Promise.resolve({ok:true});
 }
 function remiPayrollIns1FromRail(){
+  var hideRole='';
+  try{hideRole=currentAdminRole==null?'':String(currentAdminRole);}catch(eHideRail){hideRole='';}
+  if(hideRole&&hideRole.toLowerCase()!=='admin'){
+    if(typeof schedPayrollHide1Apply==='function')schedPayrollHide1Apply();
+    return {ok:false, forbidden:true, hidden:true};
+  }
   if(remiPayrollIns1PreferPage())return remiPayrollIns1OpenPage();
   if(typeof remiPayroll1Show==='function')return remiPayroll1Show();
   return {ok:false};
