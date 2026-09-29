@@ -46,23 +46,34 @@ assert.ok(html.includes('without a sticky ?v='), 'pages-cache-fresh1 clean URL s
 assert.strictEqual(buildFile, '2026-09-29-pages-cache-fresh1', 'admin-build.txt stays the pages-cache-fresh1 build');
 assert.ok(html.includes("var PAGES_CACHE_FRESH1_BUILD='2026-09-29-pages-cache-fresh1'"), 'pages-cache build stays');
 assert.ok(html.includes('v=login-land-schedule1') && html.includes('v=list-search-az1') && html.includes('v=pages-cache-fresh1'), 'head markers stay');
+assert.ok(html.includes('v=admin-sched-chat-push1') && html.includes('2026-09-29-admin-sched-chat-push1'), 'admin-sched-chat-push1 stays on main');
+assert.ok(html.includes('v=msg-composer-kb2') && html.includes('2026-09-29-msg-composer-kb2'), 'msg-composer-kb2 stays on main');
 assert.ok(html.includes('v=manage-dots-creds1') && html.includes('v=aidecreds1'), 'prior creds markers stay');
 const buildAt = html.indexOf('<meta name="admin-build"');
 assert.ok(html.slice(buildAt, buildAt + 90).includes('2026-09-27-remi-float-hide1b'), 'first admin-build stays remi-float-hide1b');
 assert.ok(html.indexOf('content="2026-09-29-login-land-schedule1"') < html.indexOf('content="2026-09-29-list-search-az1"'), 'login land stays before list search');
 assert.ok(html.indexOf('content="2026-09-29-list-search-az1"') < html.indexOf('content="2026-09-29-pages-cache-fresh1"'), 'pages-cache-fresh1 stays after list search');
-assert.ok(html.indexOf('content="2026-09-29-pages-cache-fresh1"') < html.indexOf('content="2026-09-29-sched-creds1"'), 'sched-creds1 meta follows pages-cache-fresh1');
+assert.ok(html.indexOf('content="2026-09-29-pages-cache-fresh1"') < html.indexOf('content="2026-09-29-admin-sched-chat-push1"'), 'chat-push meta follows pages-cache-fresh1');
+assert.ok(html.indexOf('content="2026-09-29-admin-sched-chat-push1"') < html.indexOf('content="2026-09-29-msg-composer-kb2"'), 'composer meta follows chat-push');
+assert.ok(html.indexOf('content="2026-09-29-msg-composer-kb2"') < html.indexOf('content="2026-09-29-sched-creds1"'), 'sched-creds1 meta follows the composer');
 
 const openSheet = extractFn(html, 'function aidesInfo1OpenSheet(key)');
-assert.ok(openSheet.includes('schedCreds1Office'), 'menu uses the office gate');
+assert.ok(openSheet.includes('schedCreds1RoleKey'), 'menu uses the shared role key');
 assert.ok(openSheet.includes('aidesInfo1Credentials()'), 'Credentials uses the existing handler');
-assert.ok(extractFn(html, 'function aidesInfo1Credentials()').includes('aideCredOpenFromManageDots'), 'Credentials opens the Admin desk path');
+assert.ok(extractFn(html, 'function aidesInfo1Credentials()').includes('aideCredOpenFromManageDots'), 'Credentials opens the same desk Admin uses');
 const fromDots = extractFn(html, 'async function aideCredOpenFromManageDots(aideId, aideName)');
 assert.ok(fromDots.includes('schedCreds1Office'), 'open path allows the office role');
 assert.ok(fromDots.includes('aideCredOpen(id, aideName)'), 'normal list reuses aideCredOpen with the aide name');
 assert.ok(extractFn(html, 'async function aideCredOpen(aideId, aideName)').includes('schedCreds1Office'), 'desk open allows Scheduler');
 assert.ok(!extractFn(html, 'function aideCredsIsAdmin()').includes('Scheduler'), 'rollup gate stays Admin-only');
-assert.ok(extractFn(html, 'function schedCreds1Office()').includes("role==='Scheduler'"), 'Scheduler shares the menu');
+assert.ok(extractFn(html, 'function schedCreds1RoleKey()').includes("key==='scheduler'"), 'scheduler role key');
+assert.ok(extractFn(html, 'function schedCreds1Office()').includes("key==='scheduler'"), 'Scheduler shares the menu');
+assert.ok(!html.includes('Credentials stay on the Admin desk'), 'Admin-desk denial is gone');
+assert.ok(!html.includes('credentials stay on the Admin desk'), 'no leftover denial copy');
+const profileLoad = extractFn(html, 'async function aideProfileLinkFixLoadCreds(id, name)');
+assert.ok(profileLoad.includes('sbAdminListAideCredentials'), 'View profile loads the credential list');
+assert.ok(!profileLoad.includes('Admin desk'), 'View profile has no Admin-desk card');
+assert.ok(openSheet.indexOf('aidesInfo1ViewProfile()') < openSheet.indexOf('aidesInfo1Credentials()'), 'source order is View profile then Credentials');
 assert.ok(!openSheet.includes("role==='Admin'"), 'Aides ··· builder has no Admin-only role check');
 assert.ok(extractFn(html, 'async function mgrLogin()').includes('startAdminSession'), 'Sign In uses one session for Admin and Scheduler');
 assert.ok(extractFn(html, 'function sbPortalRoleFromProfile(role)').includes("key==='scheduler'"), 'profile role scheduler maps to Scheduler');
@@ -133,17 +144,29 @@ function menuBox(){
   };
   const box = {
     currentAdminRole: schedulerLogin.role,
+    session: null,
+    sb: null,
     aideDesk: 'active',
     manageOn: false,
     aidesInfo1Current: null,
     aidesInfo1ByKey: {jdoe: jane, blank: {id:'', username:'blank', name:'Blank Aide'}},
     document: {getElementById: function(id){return els[id] || null;}},
-    aideCredManageOn: function(){return !!box.manageOn;}
+    aideCredManageOn: function(){return !!box.manageOn;},
+    readAdminSession: function(){return box.session;},
+    readSbSession: function(){return box.sb;},
+    sbPortalRoleFromProfile: function(role){
+      var key = String(role || '').trim().toLowerCase();
+      if(key === 'admin')return 'Admin';
+      if(key === 'scheduler')return 'Scheduler';
+      if(key === 'nurse')return 'Nurse';
+      return '';
+    }
   };
   box.els = els;
   vm.createContext(box);
   vm.runInContext([
     extractFn(html, 'function canManageAides()'),
+    extractFn(html, 'function schedCreds1RoleKey()'),
     extractFn(html, 'function schedCreds1Office()'),
     extractFn(html, 'function aidesInfo1OpenSheet(key)')
   ].join('\n'), box);
@@ -161,8 +184,8 @@ function assertMenu(htmlMenu, who){
   assert.ok(htmlMenu.includes('>Delete<'), who + ' Delete');
   assert.ok(htmlMenu.includes('data-sched-creds1="v=sched-creds1"'), who + ' marker on Credentials');
   assert.ok(htmlMenu.includes('onclick="aidesInfo1Credentials()"'), who + ' same Credentials handler');
-  assert.ok(htmlMenu.indexOf('>Credentials<') < htmlMenu.indexOf('View profile'), who + ' Credentials then View profile');
-  assert.ok(htmlMenu.indexOf('View profile') < htmlMenu.indexOf('Reset temp password'), who + ' View profile then Reset');
+  assert.ok(htmlMenu.indexOf('View profile') < htmlMenu.indexOf('>Credentials<'), who + ' View profile then Credentials');
+  assert.ok(htmlMenu.indexOf('>Credentials<') < htmlMenu.indexOf('Reset temp password'), who + ' Credentials then Reset');
   assert.ok(htmlMenu.indexOf('Reset temp password') < htmlMenu.indexOf('>Delete<'), who + ' Reset then Delete');
 }
 
@@ -194,7 +217,26 @@ assert.ok(!nurseMenu.includes('Credentials'), 'Nurse does not get Credentials');
 assert.ok(!nurseMenu.includes('Reset temp password'), 'Nurse does not get Reset');
 assert.ok(!nurseMenu.includes('>Delete<'), 'Nurse does not get Delete');
 
+sched.currentAdminRole = 'scheduler';
+sched.session = null;
+sched.sb = null;
+sched.aidesInfo1OpenSheet('jdoe');
+assertMenu(labels(sched), 'lowercase scheduler');
+
+sched.currentAdminRole = '';
+sched.session = {role:'Scheduler', username:'Jaz'};
+sched.aidesInfo1OpenSheet('jdoe');
+assertMenu(labels(sched), 'admin_session Scheduler');
+
+sched.currentAdminRole = '';
+sched.session = null;
+sched.sb = {access_token:'sched-creds1-test', profile:{role:'scheduler', display_name:'Jaz'}};
+sched.aidesInfo1OpenSheet('jdoe');
+assertMenu(labels(sched), 'profile role scheduler');
+
 sched.currentAdminRole = 'Scheduler';
+sched.session = null;
+sched.sb = null;
 sched.aidesInfo1OpenSheet('blank');
 assert.ok(!labels(sched).includes('Credentials'), 'no Credentials without an aide id');
 
@@ -222,6 +264,7 @@ const desk = {
 };
 vm.createContext(desk);
 vm.runInContext([
+  extractFn(html, 'function schedCreds1RoleKey()'),
   extractFn(html, 'function schedCreds1Office()'),
   extractFn(html, 'function aideCredsIsAdmin()'),
   extractFn(html, 'function aideCredManageOn()'),
@@ -238,9 +281,54 @@ assert.strictEqual(desk.schedCreds1Office(), true);
 assert.strictEqual(desk.aideCredsIsAdmin(), true);
 desk.currentAdminRole = 'Nurse';
 assert.strictEqual(desk.schedCreds1Office(), false, 'Nurse is out');
+desk.currentAdminRole = 'scheduler';
+assert.strictEqual(desk.schedCreds1Office(), true, 'lowercase scheduler is office');
+assert.strictEqual(desk.aideCredsIsAdmin(), false, 'lowercase scheduler still does not own the rollup');
 desk.currentAdminRole = 'Scheduler';
 
+const profileEls = {
+  aideProfileCreds: node('aideProfileCreds'),
+  tab_aides: node('tab_aides')
+};
+const profileCalls = [];
+const profile = {
+  currentAdminRole: 'scheduler',
+  session: {role:'Scheduler', username:'Jaz'},
+  sb: {access_token:'sched-creds1-test', profile:{role:'scheduler'}},
+  aideCredState: {view:'list', q:'', aides:[], attention:0, recordCount:0, aideId:'', aideName:'', credentials:[], editing:null, sheetOpen:false, pickAide:false, seq:0, error:'', profilePage:false, manageDots:false},
+  document: {getElementById: function(id){return profileEls[id] || null;}},
+  aideCredBind: function(){},
+  aideProfileLinkFixOn: function(){return true;},
+  aideProfileLinkFixEsc: function(s){return String(s==null?'':s);},
+  aideCredRowHtml: function(c){return '<div class="aide-cred-row">'+c.type+'</div>';},
+  readAdminSession: function(){return profile.session;},
+  readSbSession: function(){return profile.sb;},
+  sbAdminListAideCredentials: async function(id){
+    profileCalls.push(id);
+    return {success:true, credentials:[{id:'c-cpr', type:'cpr', label:'CPR', expiry:'2026-10-05', status:'expiring_soon'}]};
+  }
+};
+vm.createContext(profile);
+vm.runInContext([
+  extractFn(html, 'function schedCreds1RoleKey()'),
+  extractFn(html, 'function schedCreds1Office()'),
+  extractFn(html, 'function aideProfileLinkFixPaintCreds(messageHtml)'),
+  extractFn(html, 'async function aideProfileLinkFixLoadCreds(id, name)')
+].join('\n'), profile);
+
 (async function(){
+  await profile.aideProfileLinkFixLoadCreds(JANE, 'Jane Doe');
+  assert.deepStrictEqual(profileCalls, [JANE], 'Scheduler View profile lists that aide');
+  assert.ok(!profileEls.aideProfileCreds.innerHTML.includes('Admin desk'), profileEls.aideProfileCreds.innerHTML);
+  assert.ok(profileEls.aideProfileCreds.innerHTML.includes('cpr'), profileEls.aideProfileCreds.innerHTML);
+  assert.ok(profileEls.aideProfileCreds.innerHTML.includes('data-aide-cred-add'), 'Scheduler can add from the profile');
+  profile.currentAdminRole = 'Nurse';
+  profileCalls.length = 0;
+  await profile.aideProfileLinkFixLoadCreds(JANE, 'Jane Doe');
+  assert.deepStrictEqual(profileCalls, [], 'Nurse profile does not list credentials');
+  assert.ok(!profileEls.aideProfileCreds.innerHTML.includes('Admin desk'));
+  profile.currentAdminRole = 'Scheduler';
+
   await desk.aideCredOpenFromManageDots(JANE, 'Jane Doe');
   assert.deepStrictEqual(credCalls, [JANE], 'Scheduler Credentials lists that aide');
   assert.strictEqual(desk.aideCredState.view, 'detail');
@@ -507,7 +595,7 @@ async function runBrowser(){
   try{
     const phone = await boot(390, 844, 'Scheduler');
     const phoneMenu = await menuItems(phone);
-    assert.deepStrictEqual(phoneMenu.buttons, ['Credentials', 'View profile', 'Reset temp password', 'Delete']);
+    assert.deepStrictEqual(phoneMenu.buttons, ['View profile', 'Credentials', 'Reset temp password', 'Delete']);
     assert.strictEqual(phoneMenu.marker, 'v=sched-creds1');
     assert.strictEqual(phoneMenu.search, '', 'clean URL has no sticky ?v=');
     assert.strictEqual(phoneMenu.rollupHidden, true, 'Scheduler landing still hides the rollup block');
@@ -515,6 +603,32 @@ async function runBrowser(){
     const phoneDesk = await openCreds(phone);
     assert.strictEqual(phoneDesk.manage, false);
     await phone.screenshot({path: path.join(shotDir, 'sched-creds1-phone-desk.png')});
+
+    const profilePage = await boot(390, 844, 'Scheduler');
+    await profilePage.click('#aidesContainer .aide-info-more');
+    await profilePage.waitForFunction(function(){
+      var sheet = document.getElementById('aideInfoSheet');
+      return sheet && !sheet.hidden;
+    }, {timeout:8000});
+    const profileBefore = calls.length;
+    await profilePage.evaluate(function(){
+      var buttons = document.querySelectorAll('#aideInfoSheetActions button');
+      for(var i = 0; i < buttons.length; i++){
+        if(/^View profile$/.test((buttons[i].textContent || '').trim())){buttons[i].click(); return;}
+      }
+      throw new Error('View profile button missing');
+    });
+    await profilePage.waitForFunction(function(){
+      var host = document.getElementById('aideProfileCreds');
+      var text = host ? (host.innerText || '') : '';
+      return host && !host.hidden && /CPR/.test(text) && !/Admin desk/i.test(text);
+    }, {timeout:8000});
+    const profileSeen = calls.slice(profileBefore).filter(function(c){return c.rpc === 'admin_list_aide_credentials';});
+    assert.ok(profileSeen.length >= 1 && profileSeen[0].body.p_aide_id === JANE, 'View profile uses admin_list_aide_credentials');
+    const profileText = await profilePage.evaluate(function(){return document.getElementById('aideProfileCreds').innerText;});
+    assert.ok(!/Admin desk/i.test(profileText), profileText);
+    assert.ok(/CPR/.test(profileText), profileText);
+    await profilePage.screenshot({path: path.join(shotDir, 'sched-creds1-phone-profile.png')});
 
     const deskPage = await boot(1280, 800, 'Scheduler');
     const deskMenu = await menuItems(deskPage);
