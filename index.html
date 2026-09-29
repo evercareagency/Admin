@@ -120,6 +120,9 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <!-- sched creds 2026-09-29 v=sched-creds1 ?v=sched-creds1 admin-build 2026-09-29-sched-creds1. GHOST-SCHED-CREDS1-CONTRACT-v1. Ace N/A. UI parity only. NO new SQL. NO new RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Standing rule: Admin and Scheduler are one portal. No Admin-only chrome on Aides ···. Scheduler login is a soft-check through the same startAdminSession and restoreAdminSession path as Admin (profile role scheduler, username Jaz). The check does not post a password and does not call sbAuthRoleLogin. Nurse is out of scope. Scheduler Aides ···, normal and Manage, includes the same items Admin already has from manage-dots-creds1: View profile, Credentials, Reset temp password, and Delete. There is no Admin-only gate that strips Credentials for Scheduler. The ··· order is View profile, Credentials, Reset temp password, then Delete. View profile loads that aide's credentials on the same list path. Scheduler is not sent to an Admin-only credentials card. A Scheduler login still counts when the role text is scheduler or the stored admin_session or profile role is scheduler. Credentials still closes the ··· sheet and opens that aide's credential detail through aidesInfo1Credentials and aideCredOpenFromManageDots, which calls aideCredOpen when Manage is off. Same desk, same handlers, phone and desktop. The landing credentials rollup stays the aidecreds1 Admin surface, so Scheduler still does not see that block on the Aides list. pages-cache-fresh1 stays: the clean Home Screen URL is not rewritten to a sticky ?v=. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=pages-cache-fresh1, v=login-land-schedule1, v=list-search-az1, v=admin-sched-chat-push1, v=msg-composer-kb2, v=manage-dots-creds1, v=aide-profile-link-fix, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-29-sched-creds1">
 <script>var SCHED_CREDS1_MARKER='v=sched-creds1';var SCHED_CREDS1_BUILD='2026-09-29-sched-creds1';</script>
+<!-- messages bulk delete 2026-09-29 v=msg-bulk-delete1 ?v=msg-bulk-delete1 admin-build 2026-09-29-msg-bulk-delete1. GHOST-MSG-BULK-DELETE1-CONTRACT-v1. Ace CALLABLE for the Aides inbox. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL in this repo. No Auth reseal. No Quo/SMS. No Caregiver. No Nurse Remi. Messages bottom-tab inbox (Aides | Clients) gets Radar-style multi-select: a checkbox on each thread row, and a toolbar Select all, Unselect, and Delete. Delete stays muted until at least one row is checked. Select all and Unselect do not post. Aides Delete posts admin_hide_aide_office_threads once with {p_thread_ids} of the selected aide_office_threads.id UUIDs, capped at 1000. Admin and Scheduler share that RPC. Nurse is 403/42501 and this desk does not call it as Nurse. Soft hide only (office_hidden_at). History stays. A new aide message or an office reply re-shows the thread. After success the selected rows drop immediately and the inbox re-paints from admin_list_aide_office_threads, which already omits hidden threads. A repeat hide is idempotent. It is not a send. It does not message anyone. It does not blast. It does not call admin_send_aide_office_message, admin_send_aide_text, admin_compose_aide_text, sms, or mailto. CLIENT_GAP: no client message, thread, or list RPC exists. Friday confirmed. Clients decision locked: Disable Delete on Clients until Ace ships a client inbox. Checks, Select all, and Unselect stay. Delete stays muted, with the exact plain English “Client inbox delete isn’t live yet”. No local hide for Clients. This desk does not call admin_hide_aide_office_threads from Clients. Admin and Scheduler are one portal and share this chrome. This chrome is not Admin-only. Scheduler login sees the same checkboxes, Select all, Unselect, and Delete as Admin. Nurse stays out through the same aidechat role gate. pages-cache-fresh1 stays the shell: clean Home Screen URL, no sticky ?v= on the address bar, document loads stay network-first. admin-build.txt stays 2026-09-29-pages-cache-fresh1. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=pages-cache-fresh1, v=list-search-az1, v=login-land-schedule1, v=remi-msg-tab1, v=remi-radar-dismiss1, and v=aidechat1. -->
+<meta name="admin-build" content="2026-09-29-msg-bulk-delete1">
+<script>var MSG_BULK_DELETE1_MARKER='v=msg-bulk-delete1';var MSG_BULK_DELETE1_BUILD='2026-09-29-msg-bulk-delete1';</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
@@ -1240,6 +1243,19 @@ html.aidechat-kb #aidechatComposer{position:fixed;left:0;right:0;z-index:220;mar
 #tab_aidechat .msg-draft-note{flex:1 1 100%;margin:0 0 4px;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--teal-dark);}
 #tab_aidechat .msg-dense-panel .aidechat-composer{flex-wrap:wrap;}
 #tab_aidechat.is-client-thread #aidechatThreadAv{background:linear-gradient(135deg,#c4a574,#8b6914);}
+/* v=msg-bulk-delete1 — Radar-style Select all / Unselect / Delete on Messages. Not a send. */
+#tab_aidechat .msg-bulk-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;margin:8px 0 0;background:#e8f4f4;border:1px solid #b7ddd8;border-radius:12px;box-sizing:border-box;max-width:100%;}
+#tab_aidechat .msg-bulk-bar .tb-btn{border:1px solid var(--border);background:#fff;color:var(--navy);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:11px;font-weight:700;min-height:40px;cursor:pointer;touch-action:manipulation;}
+#tab_aidechat .msg-bulk-bar .tb-btn.ghost{background:var(--off);color:var(--muted);}
+#tab_aidechat .msg-bulk-bar .tb-btn.danger{background:#c0392b;color:#fff;border-color:#c0392b;box-shadow:0 2px 6px rgba(192,57,43,.28);}
+#tab_aidechat .msg-bulk-bar .tb-btn.danger[disabled],#tab_aidechat .msg-bulk-bar .tb-btn.danger.off{opacity:.45;box-shadow:none;cursor:default;}
+#tab_aidechat .msg-bulk-count{margin-left:auto;font-size:10px;font-weight:800;color:#1e6060;letter-spacing:.02em;}
+#tab_aidechat .msg-bulk-callout{margin:8px 0;padding:8px 10px;border-radius:10px;background:#e8f6ee;border:1.5px dashed #8bc9a0;color:#1a5c32;font-size:11px;font-weight:700;line-height:1.35;text-align:center;}
+#tab_aidechat .msg-bulk-check{flex:0 0 28px;width:28px;min-width:28px;min-height:44px;margin:0;padding:0;display:flex;align-items:center;justify-content:center;}
+#tab_aidechat .msg-bulk-cb{width:22px;height:22px;min-width:22px;min-height:22px;margin:0;accent-color:#2a7f7f;}
+#tab_aidechat .aidechat-card.is-bulk{border-color:#2a7f7f;background:#e8f4f4;box-shadow:0 0 0 1px rgba(42,127,127,.25);}
+#tab_aidechat .msg-bulk-tag{display:inline-flex;align-items:center;margin-left:6px;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#1e6060;background:#fff;border:1px solid #b8d9d9;padding:1px 6px;border-radius:999px;vertical-align:middle;}
+#tab_aidechat .msg-bulk-tag.is-client{color:#6b4a12;border-color:#e6d4a8;background:#fff8e8;}
 html.aidechat-kb #tab_aidechat.is-open .msg-dense-panel{min-height:0;height:auto;max-height:none;}
 html.remi-ask-kb #copilotSheet{z-index:180;}
 /* v=clienthrs1d — Notifications roster, schedule-send, chat names. Phone-first. No SMS. */
@@ -4047,19 +4063,26 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="notif-note">Nudge = Remi posts in that aide’s Messages (and push if they already allow). Not SMS.</p>
       </div>
 
-      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1" data-remi-chat-bleed1="v=remi-chat-bleed1" data-remi-msg-tab1="v=remi-msg-tab1">
+      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1" data-remi-chat-bleed1="v=remi-chat-bleed1" data-remi-msg-tab1="v=remi-msg-tab1" data-msg-bulk-delete1="v=msg-bulk-delete1">
         <section id="remiLangsMsgCard" class="remi-langs-msg" hidden data-remi-langs1="v=remi-langs1" aria-label="Cover ask preview"></section>
         <div id="aidechatInboxView">
           <div class="page-hdr">
             <div>
               <h1>Messages</h1>
-              <p id="aidechatInboxSub">Aide Office. One thread per aide. Unread shows here and on Remi.</p>
+              <p id="aidechatInboxSub">Select threads. Delete hides them from this inbox. Admin + Scheduler same chrome.</p>
             </div>
           </div>
           <div class="msg-seg" id="msgSeg" role="tablist" aria-label="Inbox segment" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1">
             <button type="button" id="msgSegAides" class="on" role="tab" aria-selected="true" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" onclick="remiMsgTab1SetSegment('aides')">Aides</button>
             <button type="button" id="msgSegClients" role="tab" aria-selected="false" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" onclick="remiMsgTab1SetSegment('clients')">Clients</button>
           </div>
+          <div class="msg-bulk-bar" id="msgBulkToolbar" role="toolbar" aria-label="Message selection" data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1">
+            <button type="button" class="tb-btn ghost" id="msgBulkSelectAll" data-layout-roles="Admin Scheduler" onclick="msgBulkDelete1SelectAll()">Select all</button>
+            <button type="button" class="tb-btn ghost" id="msgBulkUnselect" data-layout-roles="Admin Scheduler" onclick="msgBulkDelete1Unselect()">Unselect</button>
+            <button type="button" class="tb-btn danger off" id="msgBulkDelete" data-layout-roles="Admin Scheduler" disabled onclick="msgBulkDelete1Delete()">Delete</button>
+            <span class="tb-count" id="msgBulkCount" data-layout-roles="Admin Scheduler">0 selected</span>
+          </div>
+          <p class="msg-bulk-callout" id="msgBulkCallout" data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1">Select threads · Delete stays off until at least one check</p>
           <div id="msgClientDesk" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1">
             <p class="aidechat-note" id="msgClientNote">Call / Text only. Not EverCare chat. Same client list as Schedule and Clients. sms: and tel: open when a phone is on file. You press Send in the phone Messages app.</p>
             <div id="msgClientList" class="aidechat-list" aria-label="Client threads"></div>
@@ -12534,6 +12557,220 @@ function aidechatPaintSettings(){
   if(end&&s.end_local)end.value=s.end_local;
   if(note)note.textContent=aidechatWindowSentence();
 }
+// v=msg-bulk-delete1. Aides Delete posts admin_hide_aide_office_threads {p_thread_ids}.
+// Admin and Scheduler share that RPC. Nurse is not called (403/42501).
+// CLIENT_GAP Friday confirmed: Disable Delete on Clients until Ace ships a client inbox. No local hide. Do not call the aide RPC.
+// Select all and Unselect do not post. Delete is not a send.
+var msgBulkDelete1Selected={aides:{},clients:{}};
+var msgBulkDelete1Note='';
+var msgBulkDelete1NoteInbox='';
+var msgBulkDelete1Busy=false;
+var msgBulkDelete1LastN=0;
+function msgBulkDelete1Marker(){
+  return (typeof MSG_BULK_DELETE1_MARKER==='string'&&MSG_BULK_DELETE1_MARKER)?MSG_BULK_DELETE1_MARKER:'v=msg-bulk-delete1';
+}
+function msgBulkDelete1RoleOk(){
+  // Admin and Scheduler are one portal. This chrome is not Admin-only.
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  if(role!=='Admin'&&role!=='Scheduler')return false;
+  if(typeof aidechatRoleOk==='function'&&!aidechatRoleOk())return false;
+  return true;
+}
+function msgBulkDelete1Inbox(){
+  try{
+    if(typeof remiMsgTab1Segment!=='undefined'&&remiMsgTab1Segment==='clients')return 'clients';
+  }catch(e){}
+  return 'aides';
+}
+function msgBulkDelete1Uuid(id){
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id||'').trim());
+}
+function msgBulkDelete1AideIds(rows){
+  var out=[];
+  var seen={};
+  var i;
+  rows=rows||[];
+  for(i=0;i<rows.length;i++){
+    var id=String(rows[i]&&rows[i].id||'').trim();
+    if(!msgBulkDelete1Uuid(id)||seen[id])continue;
+    seen[id]=1;
+    if(out.length>=1000)break;
+    out.push(id);
+  }
+  return out;
+}
+function msgBulkDelete1Rows(){
+  var inbox=msgBulkDelete1Inbox();
+  if(inbox==='clients'){
+    try{return typeof remiMsgTab1ClientRows==='function'?remiMsgTab1ClientRows():[];}catch(e){return [];}
+  }
+  try{return typeof aidechatSorted==='function'?aidechatSorted():[];}catch(e2){return [];}
+}
+function msgBulkDelete1RpcOk(got){
+  if(!got||got.ok!==true)return false;
+  if(got.status===403||got.status===42501)return false;
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{node=sbRpcNode(got.data);}catch(e){node=got.data;}
+  }
+  if(node&&(node.success===false||node.ok===false))return false;
+  var err='';
+  if(typeof sbRpcError==='function'){
+    try{err=sbRpcError(node)||'';}catch(e2){err='';}
+  }
+  if(err)return false;
+  if(node&&(node.code==='42501'||/42501/.test(String(node.message||node.error||''))))return false;
+  return true;
+}
+function msgBulkDelete1DropAides(ids){
+  var hide={};
+  var i;
+  ids=ids||[];
+  for(i=0;i<ids.length;i++)hide[ids[i]]=1;
+  if(typeof aidechatThreads!=='undefined'&&aidechatThreads&&aidechatThreads.filter){
+    aidechatThreads=aidechatThreads.filter(function(t){return !hide[String(t&&t.id||'')];});
+  }
+  if(typeof aidechatSelectedId!=='undefined'&&hide[String(aidechatSelectedId||'')]){
+    aidechatSelectedId='';
+    if(typeof aidechatShow==='function')aidechatShow('inbox');
+  }
+}
+function msgBulkDelete1On(inbox, id){
+  var key=inbox==='clients'?'clients':'aides';
+  var map=msgBulkDelete1Selected[key]||{};
+  return !!map[String(id||'')];
+}
+function msgBulkDelete1Count(){
+  var inbox=msgBulkDelete1Inbox();
+  var map=msgBulkDelete1Selected[inbox]||{};
+  var n=0;
+  msgBulkDelete1Rows().forEach(function(row){
+    if(map[String(row.id)])n++;
+  });
+  return n;
+}
+function msgBulkDelete1Esc(s){
+  if(typeof aidechatEsc==='function')return aidechatEsc(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function msgBulkDelete1CheckHtml(inbox, id, name, on){
+  return '<label class="msg-bulk-check"><input type="checkbox" class="msg-bulk-cb" data-msg-bulk-inbox="'+msgBulkDelete1Esc(inbox)+'" data-msg-bulk-id="'+msgBulkDelete1Esc(id)+'"'+(on?' checked':'')+' aria-label="Select '+msgBulkDelete1Esc(name||'thread')+'"></label>';
+}
+function msgBulkDelete1Callout(n){
+  var inbox=msgBulkDelete1Inbox();
+  if(inbox==='clients')return 'Client inbox delete isn\u2019t live yet';
+  if(msgBulkDelete1Note==='done'&&msgBulkDelete1NoteInbox==='aides'&&n<1)return 'Hidden from this inbox. History stays. A new message from the aide shows it again.';
+  if(n>0)return 'Delete hides the selected aide threads. History stays. Not a send.';
+  return 'Select threads · Delete stays off until at least one check';
+}
+function msgBulkDelete1SyncChrome(){
+  var doc=null;
+  try{doc=document;}catch(e){doc=null;}
+  if(!doc||!doc.getElementById)return;
+  var n=0;
+  try{n=msgBulkDelete1Count();}catch(e2){n=0;}
+  var clients=false;
+  try{clients=msgBulkDelete1Inbox()==='clients';}catch(e3){clients=false;}
+  var off=clients||n<1;
+  var btn=doc.getElementById('msgBulkDelete');
+  var count=doc.getElementById('msgBulkCount');
+  var callout=doc.getElementById('msgBulkCallout');
+  if(btn){
+    btn.disabled=off;
+    if(btn.classList){
+      btn.classList.toggle('off', off);
+      btn.classList.toggle('is-on', !off);
+    }
+  }
+  if(count)count.textContent=n+' selected';
+  if(callout)callout.textContent=msgBulkDelete1Callout(n);
+}
+function msgBulkDelete1Repaint(){
+  var inbox=msgBulkDelete1Inbox();
+  if(inbox==='clients'){
+    if(typeof remiMsgTab1PaintClients==='function')remiMsgTab1PaintClients();
+  }else if(typeof aidechatPaintInbox==='function'){
+    aidechatPaintInbox();
+  }
+  msgBulkDelete1SyncChrome();
+}
+function msgBulkDelete1SelectAll(){
+  if(!msgBulkDelete1RoleOk())return;
+  var inbox=msgBulkDelete1Inbox();
+  if(!msgBulkDelete1Selected[inbox])msgBulkDelete1Selected[inbox]={};
+  msgBulkDelete1Note='';
+  msgBulkDelete1Rows().forEach(function(row){msgBulkDelete1Selected[inbox][String(row.id)]=1;});
+  msgBulkDelete1Repaint();
+}
+function msgBulkDelete1Unselect(){
+  if(!msgBulkDelete1RoleOk())return;
+  var inbox=msgBulkDelete1Inbox();
+  msgBulkDelete1Selected[inbox]={};
+  msgBulkDelete1Note='';
+  msgBulkDelete1Repaint();
+}
+function msgBulkDelete1Toggle(inbox, id, on){
+  if(!msgBulkDelete1RoleOk())return;
+  inbox=inbox==='clients'?'clients':'aides';
+  id=String(id||'');
+  if(!id)return;
+  if(!msgBulkDelete1Selected[inbox])msgBulkDelete1Selected[inbox]={};
+  if(on)msgBulkDelete1Selected[inbox][id]=1;
+  else delete msgBulkDelete1Selected[inbox][id];
+  msgBulkDelete1Note='';
+  if(msgBulkDelete1Inbox()===inbox)msgBulkDelete1Repaint();
+  else msgBulkDelete1SyncChrome();
+}
+async function msgBulkDelete1Delete(){
+  if(msgBulkDelete1Busy)return;
+  if(!msgBulkDelete1RoleOk())return;
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(eRole){role='';}
+  if(role==='Nurse')return;
+  var inbox=msgBulkDelete1Inbox();
+  if(inbox==='clients'){
+    msgBulkDelete1Note='gap';
+    msgBulkDelete1NoteInbox='clients';
+    msgBulkDelete1SyncChrome();
+    return;
+  }
+  if(role!=='Admin'&&role!=='Scheduler')return;
+  var map=msgBulkDelete1Selected.aides||{};
+  var picked=msgBulkDelete1Rows().filter(function(row){return !!map[String(row&&row.id||'')];});
+  var ids=msgBulkDelete1AideIds(picked);
+  if(!ids.length)return;
+  msgBulkDelete1Busy=true;
+  var posted=false;
+  try{
+    var btn=null;
+    try{btn=document.getElementById('msgBulkDelete');}catch(e){btn=null;}
+    if(btn)btn.disabled=true;
+    var got=null;
+    try{got=await sbRestRpc('admin_hide_aide_office_threads', {p_thread_ids:ids});}
+    catch(err){got={ok:false, error:String(err&&err.message||err||'Request failed.')};}
+    if(!msgBulkDelete1RpcOk(got)){
+      var denied=got&&(got.status===403||got.status===42501);
+      if(typeof showTempMsg==='function')showTempMsg(denied?'Nurse cannot hide aide threads.':'Could not hide those threads.','var(--warn)');
+      return;
+    }
+    posted=true;
+    var i;
+    for(i=0;i<ids.length;i++)delete map[ids[i]];
+    msgBulkDelete1Note='done';
+    msgBulkDelete1NoteInbox='aides';
+    msgBulkDelete1LastN=ids.length;
+    msgBulkDelete1DropAides(ids);
+    if(typeof showTempMsg==='function')showTempMsg('Hidden from this inbox','var(--success)');
+    if(typeof aidechatRefresh==='function')await aidechatRefresh();
+  }finally{
+    msgBulkDelete1Busy=false;
+    if(!posted)msgBulkDelete1SyncChrome();
+  }
+  if(posted)msgBulkDelete1Repaint();
+}
 function aidechatPaintInbox(){
   var list=document.getElementById('aidechatList');
   var empty=document.getElementById('aidechatEmpty');
@@ -12548,8 +12785,16 @@ function aidechatPaintInbox(){
     ]);
   }
   if(empty)empty.hidden=rows.length>0;
-  if(!list)return;
-  if(!rows.length){list.innerHTML='';return;}
+  if(!list){
+    if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
+    return;
+  }
+  if(typeof aidechatEnsureBound==='function')aidechatEnsureBound();
+  if(!rows.length){
+    list.innerHTML='';
+    if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
+    return;
+  }
   list.innerHTML=rows.map(function(t){
     var urgent=t.urgent?' is-urgent':'';
     var unread=!!(t.has_unread||Number(t.unread)>0);
@@ -12561,16 +12806,20 @@ function aidechatPaintInbox(){
     var meta='Aide Office'+(when?' · '+when:'')+' · '+(unread?'unread':'read');
     var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(t.name||t.username):'';
     var selected=String(t.id)===String(aidechatSelectedId)?' is-selected':'';
-    return '<button type="button" class="aidechat-card'+(unread?' is-unread':'')+urgent+selected+'" data-aidechat-thread="'+aidechatEsc(t.id)+'" data-aidechat-urgent="'+flag+'" data-aide-office-unread="'+(unread?'1':'0')+'" data-aide-office-vis1="v=aide-office-vis1"'+(selected?' aria-current="true"':'')+'>'
+    var bulkOn=typeof msgBulkDelete1On==='function'&&msgBulkDelete1On('aides', t.id);
+    var who=t.name||t.username||'Aide';
+    return '<div class="aidechat-card'+(unread?' is-unread':'')+urgent+selected+(bulkOn?' is-bulk':'')+'" data-aidechat-thread="'+aidechatEsc(t.id)+'" data-aidechat-urgent="'+flag+'" data-aide-office-unread="'+(unread?'1':'0')+'" data-aide-office-vis1="v=aide-office-vis1" data-msg-bulk-delete1="'+aidechatEsc(typeof msgBulkDelete1Marker==='function'?msgBulkDelete1Marker():'v=msg-bulk-delete1')+'"'+(selected?' aria-current="true"':'')+'>'
+      +(typeof msgBulkDelete1CheckHtml==='function'?msgBulkDelete1CheckHtml('aides', t.id, who, bulkOn):'')
       +'<span class="aide-office-av" aria-hidden="true">'+aidechatEsc(initials)+'</span>'
       +'<span class="aide-office-main">'
-      +'<span class="aidechat-card-top"><strong>'+aidechatEsc(t.name||t.username||'Aide')+'</strong><span class="aidechat-chips">'+aidechatChips(t)+'</span></span>'
+      +'<span class="aidechat-card-top"><strong>'+aidechatEsc(who)+'</strong><span class="msg-bulk-tag">AIDE</span><span class="aidechat-chips">'+aidechatChips(t)+'</span></span>'
       +'<span class="aidechat-preview">'+previewHtml+'</span>'
       +'<span class="aide-office-meta">'+aidechatEsc(meta)+'</span>'
       +'</span>'
       +(unread?'<span class="aide-office-dot" aria-label="unread"></span>':'')
-      +'</button>';
+      +'</div>';
   }).join('');
+  if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
 }
 function aidechatLinkPhones(escaped){
   var phone=aidechatEsc(remiCalloffPhone());
@@ -12705,9 +12954,15 @@ function aidechatEnsureBound(){
   var list=document.getElementById('aidechatList');
   if(!list)return;
   list.addEventListener('click', function(ev){
+    if(ev.target&&ev.target.closest&&ev.target.closest('.msg-bulk-check'))return;
     var card=ev.target&&ev.target.closest?ev.target.closest('[data-aidechat-thread]'):null;
     if(!card)return;
     aidechatOpenThread(card.getAttribute('data-aidechat-thread'));
+  });
+  list.addEventListener('change', function(ev){
+    var t=ev.target;
+    if(!t||!t.classList||!t.classList.contains('msg-bulk-cb'))return;
+    if(typeof msgBulkDelete1Toggle==='function')msgBulkDelete1Toggle(t.getAttribute('data-msg-bulk-inbox'), t.getAttribute('data-msg-bulk-id'), !!t.checked);
   });
 }
 function aidechatWantEscalateOnly(){
@@ -15919,8 +16174,8 @@ function remiMsgTab1ApplyChrome(){
   var sub=document.getElementById('aidechatInboxSub');
   if(sub){
     sub.textContent=clients
-      ?'Call / Text only. Not EverCare chat. You press Send in the phone Messages app.'
-      :'Aide Office. One thread per aide. Unread shows here and on Remi.';
+      ?'Clients inbox. Client inbox delete isn\u2019t live yet. Admin + Scheduler share this chrome. Nurse out.'
+      :'Select threads. Delete hides them from this inbox. Admin + Scheduler same chrome.';
   }
   var reply=document.getElementById('aidechatReply');
   if(reply)reply.placeholder=remiMsgTab1ClientId?'Call / Text draft\u2026':'Type a message\u2026';
@@ -16004,9 +16259,15 @@ function remiMsgTab1BindClients(){
   var list=document.getElementById('msgClientList');
   if(!list)return;
   list.addEventListener('click', function(ev){
+    if(ev.target&&ev.target.closest&&ev.target.closest('.msg-bulk-check'))return;
     var card=ev.target&&ev.target.closest?ev.target.closest('[data-msg-client]'):null;
     if(!card)return;
     remiMsgTab1OpenClient(card.getAttribute('data-msg-client'), '');
+  });
+  list.addEventListener('change', function(ev){
+    var t=ev.target;
+    if(!t||!t.classList||!t.classList.contains('msg-bulk-cb'))return;
+    if(typeof msgBulkDelete1Toggle==='function')msgBulkDelete1Toggle(t.getAttribute('data-msg-bulk-inbox'), t.getAttribute('data-msg-bulk-id'), !!t.checked);
   });
 }
 function remiMsgTab1PaintClients(){
@@ -16016,7 +16277,10 @@ function remiMsgTab1PaintClients(){
   var empty=document.getElementById('msgClientEmpty');
   var rows=remiMsgTab1ClientRows();
   if(empty)empty.hidden=rows.length>0;
-  if(!list)return;
+  if(!list){
+    if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
+    return;
+  }
   if(!rows.length){
     list.innerHTML='';
     if(!remiMsgTab1ClientLoadTried){
@@ -16025,18 +16289,22 @@ function remiMsgTab1PaintClients(){
         if(remiMsgTab1Segment==='clients'&&!remiMsgTab1ClientId)remiMsgTab1PaintClients();
       });
     }
+    if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
     return;
   }
   list.innerHTML=rows.map(function(c){
     var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(c.name):'';
     var preview=c.phone?'Call / Text':'No phone on file';
-    return '<button type="button" class="aidechat-card" data-msg-client="'+remiMsgTab1Esc(c.id)+'" data-remi-msg-tab1="v=remi-msg-tab1">'
+    var bulkOn=typeof msgBulkDelete1On==='function'&&msgBulkDelete1On('clients', c.id);
+    return '<div class="aidechat-card'+(bulkOn?' is-bulk':'')+'" data-msg-client="'+remiMsgTab1Esc(c.id)+'" data-remi-msg-tab1="v=remi-msg-tab1" data-msg-bulk-delete1="v=msg-bulk-delete1">'
+      +(typeof msgBulkDelete1CheckHtml==='function'?msgBulkDelete1CheckHtml('clients', c.id, c.name, bulkOn):'')
       +'<span class="aide-office-av" aria-hidden="true">'+remiMsgTab1Esc(initials||'C')+'</span>'
       +'<span class="aide-office-main">'
-      +'<span class="aidechat-card-top"><strong>'+remiMsgTab1Esc(c.name)+'</strong><span class="msg-client-tag">Call/Text</span></span>'
+      +'<span class="aidechat-card-top"><strong>'+remiMsgTab1Esc(c.name)+'</strong><span class="msg-bulk-tag is-client">CLIENT</span><span class="msg-client-tag">Call/Text</span></span>'
       +'<span class="aidechat-preview">'+remiMsgTab1Esc(preview)+'</span>'
-      +'</span></button>';
+      +'</span></div>';
   }).join('');
+  if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
 }
 function remiMsgTab1ContactHtml(person){
   person=person||{};
