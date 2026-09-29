@@ -30,7 +30,9 @@ assert.ok(html.includes('covercomms-style'), 'clients links follow covercomms');
 assert.ok(html.includes('No Quo/SMS'), 'no Quo or SMS provider');
 const contract = html.slice(html.indexOf('GHOST-REMI-MSG-TAB1-CONTRACT-v1'), html.indexOf('content="2026-09-28-remi-msg-tab1"'));
 assert.ok(contract.includes('Admin and Scheduler'), 'contract names Admin and Scheduler');
-assert.ok(contract.includes('not Admin-only'), 'Messages is not Admin-only');
+assert.ok(contract.includes('one portal'), 'Admin and Scheduler are one portal');
+assert.ok(contract.includes('Aides | Clients chrome'), 'segment chrome is in the standing rule');
+assert.ok(contract.includes('not Admin-only') || contract.includes('same Messages bottom tab'), 'Messages is not Admin-only');
 assert.ok(contract.includes('is_scheduler_office'), 'role gate reuses is_scheduler_office');
 assert.ok(contract.includes('Nurse stays denied for aidechat'), 'Nurse stays denied');
 function layoutRoles(id){
@@ -40,7 +42,7 @@ function layoutRoles(id){
   const m = tag.match(/data-layout-roles="([^"]*)"/);
   return m ? m[1].split(/\s+/) : [];
 }
-['nav_aidechat','tab_aidechat','copilotFab','copilotSheet','copilotTabAsk','msgSeg','aidechatComposer'].forEach(function(id){
+['nav_aidechat','tab_aidechat','copilotFab','copilotSheet','copilotTabAsk','msgSeg','msgSegAides','msgSegClients','msgClientDesk','aidechatComposer'].forEach(function(id){
   const roles = layoutRoles(id);
   assert.ok(roles.indexOf('Admin') >= 0 && roles.indexOf('Scheduler') >= 0, id+' data-layout-roles includes Admin and Scheduler');
   assert.ok(roles.indexOf('Nurse') < 0, id+' does not list Nurse');
@@ -581,6 +583,67 @@ async function runBrowser(){
     assert.strictEqual(roles.nurseAsk, null);
     assert.strictEqual(roles.nurseNavHidden, true);
     assert.strictEqual(roles.nurseAskHidden, true);
+    const chrome = await page.evaluate(async function(){
+      function shown(id){
+        var el = document.getElementById(id);
+        if(!el)return false;
+        var node = el;
+        while(node){
+          if(node.hidden)return false;
+          node = node.parentElement;
+        }
+        var cs = getComputedStyle(el);
+        return cs.display !== 'none' && cs.visibility !== 'hidden';
+      }
+      async function snap(role){
+        currentAdminRole = role;
+        currentAdminUsername = role === 'Scheduler' ? 'jaz@evercare.test' : 'mo@evercare.test';
+        try{localStorage.removeItem(navEditStorageKey());}catch(eKey){}
+        layoutA1ApplyRoles();
+        navEditApply();
+        showTab('aidechat');
+        await new Promise(function(r){setTimeout(r, 40);});
+        if(remiMsgTab1RoleOk()){
+          var sheet = document.getElementById('copilotSheet');
+          if(sheet)sheet.hidden = false;
+        }
+        remiMsgTab1SetSegment('aides');
+        var row = {
+          bar: Array.prototype.map.call(document.querySelectorAll('#bottomNav .bottom-tab'), function(btn){
+            return btn.hidden ? '' : btn.id;
+          }).filter(Boolean),
+          messages: shown('nav_aidechat'),
+          seg: shown('msgSeg'),
+          aidesLabel: document.getElementById('msgSegAides').textContent,
+          clientsLabel: document.getElementById('msgSegClients').textContent,
+          aidesOn: shown('msgSegAides'),
+          clientsOn: shown('msgSegClients'),
+          ask: shown('copilotTabAsk'),
+          roleOk: remiMsgTab1RoleOk()
+        };
+        remiMsgTab1SetSegment('clients');
+        row.clientDesk = shown('msgClientDesk');
+        row.clientNote = document.getElementById('msgClientNote').textContent;
+        return row;
+      }
+      return {admin: await snap('Admin'), scheduler: await snap('Scheduler'), nurse: await snap('Nurse')};
+    });
+    assert.deepStrictEqual(chrome.scheduler, chrome.admin, 'Scheduler sees the same Messages chrome as Admin');
+    assert.deepStrictEqual(chrome.admin.bar, ['nav_timesheets','nav_schedule','nav_aides','nav_aidechat','nav_more']);
+    assert.strictEqual(chrome.admin.messages, true);
+    assert.strictEqual(chrome.admin.seg, true);
+    assert.strictEqual(chrome.admin.aidesOn, true);
+    assert.strictEqual(chrome.admin.clientsOn, true);
+    assert.strictEqual(chrome.admin.aidesLabel, 'Aides');
+    assert.strictEqual(chrome.admin.clientsLabel, 'Clients');
+    assert.strictEqual(chrome.admin.clientDesk, true);
+    assert.ok(chrome.admin.clientNote.indexOf('Call / Text only') >= 0, chrome.admin.clientNote);
+    assert.strictEqual(chrome.admin.ask, true);
+    assert.strictEqual(chrome.admin.roleOk, true);
+    assert.strictEqual(chrome.nurse.roleOk, false);
+    assert.strictEqual(chrome.nurse.messages, false);
+    assert.strictEqual(chrome.nurse.seg, false);
+    assert.ok(chrome.nurse.bar.indexOf('nav_aidechat') < 0, 'Nurse does not get the Messages tab');
     console.log('admin-remi-msg-tab1 browser ok');
   }finally{
     await browser.close();
