@@ -277,7 +277,10 @@ async function runBrowser(){
       };
     });
     assert.deepStrictEqual(pov.who, ['Remi AI','Jazmine (Scheduler)','Sara','Moe (Manager)']);
-    assert.ok(pov.meta.indexOf('Moe (Manager)') >= 0, pov.meta);
+    assert.ok(pov.meta.indexOf('@sara') >= 0, pov.meta);
+    assert.ok(pov.meta.indexOf('Aide') >= 0, pov.meta);
+    assert.ok(pov.meta.indexOf('signed in as') < 0, pov.meta);
+    assert.ok(pov.meta.indexOf('Moe (Manager)') < 0, pov.meta);
     assert.ok(/tomorrow 7:00 AM ET/.test(pov.queued), pov.queued);
     assert.ok(pov.queued.indexOf('Sara') >= 0);
     assert.strictEqual(pov.disabled, true);
