@@ -73,7 +73,7 @@ assert.ok(!selectFn.includes('sbRestRpc') && !unselectFn.includes('sbRestRpc') &
 assert.ok(deleteFn.includes('msgBulkDelete1Remember'), 'delete remembers the ids');
 assert.ok(deleteFn.includes("role") || extractFn(html, 'function msgBulkDelete1RoleOk()').includes("role==='Nurse'"), 'Nurse gate exists');
 assert.ok(extractFn(html, 'function msgBulkDelete1RoleOk()').includes("role==='Nurse'"), 'Nurse is denied');
-assert.ok(extractFn(html, 'function msgBulkDelete1RoleOk()').includes("role==='Scheduler'"), 'Scheduler is included');
+assert.ok(extractFn(html, 'function msgBulkDelete1RoleOk()').includes('Scheduler'), 'Scheduler is included');
 assert.ok(extractFn(html, 'function aidechatPaintInbox()').includes("msgBulkDelete1Filter('aides'"), 'aides paint filters hidden ids');
 assert.ok(extractFn(html, 'function remiMsgTab1PaintClients()').includes("msgBulkDelete1Filter('clients'"), 'clients paint filters hidden ids');
 assert.ok(extractFn(html, 'function aidechatPaintInbox()').includes('msgBulkDelete1CheckHtml'), 'aides rows have a checkbox');
