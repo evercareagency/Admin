@@ -129,7 +129,7 @@ function run(code){
 }
 
 assert.strictEqual(run('MAX_BAR_TABS'), 8);
-assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','coverage','backups'], 'empty storage pins Cover on the default bar');
+assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','aidechat'], 'empty storage pins Messages on the default bar');
 const eight = ['timesheets','schedule','aides','clients','coverage','aidechat','inservices','backups'];
 assert.deepStrictEqual(run('navEditSanitize(' + JSON.stringify(eight) + ')'), eight, 'eight pins stay on the bar');
 const nine = eight.concat(['broadcast']);
@@ -140,8 +140,8 @@ const seven = eight.slice(0, 7);
 assert.deepStrictEqual(run('navEditSanitize(' + JSON.stringify(seven) + ')'), seven, 'moving one off does not backfill to 8');
 assert.deepStrictEqual(
   run("navEditSanitize(['nope','settings','more','clients','clients'])"),
-  ['clients','timesheets','schedule','aides','coverage'],
-  'short lists still fill toward the default bar, including Cover'
+  ['clients','timesheets','schedule','aides'],
+  'a short junk list fills to the four-slot floor; a saved bar at that length stays'
 );
 assert.strictEqual(run('navEditPool(' + JSON.stringify(eight) + ').indexOf("settings")'), -1, 'settings stays out of the picker');
 assert.ok(run('navEditPool(' + JSON.stringify(eight) + ').indexOf("broadcast")') >= 0, 'overflow stays in More');

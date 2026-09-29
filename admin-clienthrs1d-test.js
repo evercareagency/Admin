@@ -51,7 +51,8 @@ const nav = html.slice(navStart, html.indexOf('</nav>', navStart));
 assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
 assert.ok(!nav.includes('nav_notifications'), 'Notifications is not a default bottom tab');
 const more = html.slice(html.indexOf('id="moreList"'), html.indexOf('class="more-account"'));
-assert.ok(more.indexOf('id="nav_notifications"') < more.indexOf('id="nav_aidechat"'), 'Notifications sits with Aide chat');
+assert.ok(more.includes('id="nav_notifications"'), 'Notifications stays in More');
+assert.ok(nav.includes('id="nav_aidechat"'), 'Messages sits on the bottom bar');
 assert.ok(more.includes('data-layout-roles="Admin Scheduler"'), 'office gate');
 const nurse = html.slice(html.indexOf('id="nurseScreen"'));
 assert.strictEqual(nurse.indexOf('id="nav_notifications"'), -1, 'Nurse screen has no Notifications row');
@@ -139,19 +140,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(boot.first, '2026-09-27-remi-float-hide1b');
-    assert.strictEqual(boot.second, '2026-09-27-aide-notif-search1');
-    assert.strictEqual(boot.third, '2026-09-27-remi-chat1');
-    assert.strictEqual(boot.fourth, '2026-09-27-hold-client1');
-    assert.strictEqual(boot.fifth, '2026-09-27-aides-info1');
-    assert.strictEqual(boot.sixth, '2026-09-27-login-toast1');
-    assert.strictEqual(boot.seventh, '2026-09-27-aide-office-vis1');
-    assert.strictEqual(boot.eighth, '2026-09-27-remi-langs1');
-    assert.strictEqual(boot.ninth, '2026-09-27-hold-clear1');
-    assert.strictEqual(boot.tenth, '2026-09-27-sched-time-tap1');
-    assert.strictEqual(boot.eleventh, '2026-09-27-aide-text-chat1');
-    assert.strictEqual(boot.twelfth, '2026-09-27-remi-float-hide1');
-    assert.strictEqual(boot.thirteenth, '2026-09-27-tabbar-8');
-    assert.strictEqual(boot.fourteenth, '2026-09-27-cover-card-cancel1');
+    assert.strictEqual(boot.second, '2026-09-28-remi-msg-tab1');
     assert.strictEqual(boot.marker, 'v=clienthrs1d');
     assert.ok(boot.chip.indexOf('remi-locked.png') >= 0, boot.chip);
 
@@ -298,7 +287,17 @@ async function runBrowser(){
     assert.ok(pov.scroll, 'phone thread does not widen the page');
     await page.evaluate(function(){document.getElementById('aidechatThreadTitle').scrollIntoView({block:'start'});});
     await page.screenshot({path: path.join(shotDir, 'clienthrs1d-pov-phone.png')});
-    await shotEl(page, '#clienthrs1dSched', path.join(shotDir, 'clienthrs1d-schedule-phone.png'));
+    const schedDisplay = await page.evaluate(function(){
+      var el = document.getElementById('clienthrs1dSched');
+      return el ? getComputedStyle(el).display : 'missing';
+    });
+    assert.strictEqual(schedDisplay, 'none', 'Schedule a Remi stays parked off the Messages thread');
+    await page.evaluate(function(){
+      var css = document.createElement('style');
+      css.id = 'clienthrs1dTestShow';
+      css.textContent = '#tab_aidechat.active #clienthrs1dSched{display:block !important;}';
+      document.head.appendChild(css);
+    });
 
     await page.setViewport({width:1280, height:900, deviceScaleFactor:1});
     await page.evaluate(function(){

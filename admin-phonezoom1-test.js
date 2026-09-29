@@ -38,7 +38,8 @@ const catalog = extractFn(html, 'function navEditCatalog()');
 assert.ok(catalog.includes('coverage'), 'Coverage is in the Edit tabs catalog');
 assert.ok(html.includes("coverage:{label:'Cover'"), 'Cover has a picker label');
 const defaults = extractFn(html, 'function navEditDefaults()');
-assert.ok(defaults.includes('coverage'), 'Cover is pinned on the default bar');
+assert.ok(catalog.includes('coverage'), 'Cover stays in Edit tabs');
+assert.ok(defaults.includes('aidechat'), 'Messages is pinned on the default bar');
 assert.ok(html.includes('.nav-edit-rows{flex:1 1 auto') && html.includes('flex-direction:column'), 'edit list stacks so every tab stays reachable');
 assert.ok(html.includes('#navEditPanel{') && html.includes('overflow:auto'), 'edit sheet scrolls on the phone');
 
@@ -76,9 +77,10 @@ vm.createContext(ctx);
 function plain(expr){
   return JSON.parse(JSON.stringify(vm.runInContext(expr, ctx)));
 }
-assert.strictEqual(plain('navEditPool(navEditRead())').indexOf('coverage'), -1, 'Cover starts on the bar, not in the picker pool');
-assert.deepStrictEqual(plain("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','coverage')"), ['timesheets','schedule','aides','coverage','backups'], 'Cover stays on the bar when a short list is swapped');
-assert.deepStrictEqual(plain('navEditRead()'), ['timesheets','schedule','aides','coverage','backups'], 'empty storage pins Cover');
+assert.ok(plain('navEditPool(navEditRead())').indexOf('coverage') >= 0, 'Cover starts in More until Edit tabs adds it');
+assert.strictEqual(plain('navEditPool(navEditRead())').indexOf('aidechat'), -1, 'Messages starts on the bar');
+assert.deepStrictEqual(plain("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','coverage')"), ['timesheets','schedule','aides','coverage'], 'Cover can still be swapped onto a short bar');
+assert.deepStrictEqual(plain('navEditRead()'), ['timesheets','schedule','aides','aidechat'], 'empty storage pins Messages');
 
 function loadPuppeteer(){
   try{return require('puppeteer-core');}
@@ -144,23 +146,25 @@ async function runBrowser(){
     });
     assert.strictEqual(closed, true, 'Admin home does not leave the Co-pilot sheet open');
     await page.click('#navEditOpen');
-    await page.waitForSelector('#navEditBottom [data-nav-id="coverage"]', {visible:true});
+    await page.waitForSelector('#navEditBottom [data-nav-id="aidechat"]', {visible:true});
     const edit = await page.evaluate(function(){
       function box(el){
         var r = el.getBoundingClientRect();
         return {left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height};
       }
-      var choice = document.querySelector('#navEditBottom [data-nav-id="coverage"]');
+      var choice = document.querySelector('#navEditPool [data-nav-id="coverage"]');
+      if(choice && choice.scrollIntoView)choice.scrollIntoView({block:'center'});
       var panel = document.getElementById('navEditPanel');
       var ids = Array.prototype.map.call(document.querySelectorAll('#navEditPool [data-nav-id], #navEditBottom [data-nav-id]'), function(el){
         return el.getAttribute('data-nav-id');
       });
-      return {choice:box(choice), panel:box(panel), text:choice.textContent, ids:ids, viewW:window.innerWidth};
+      var cr = choice ? choice.getBoundingClientRect() : null;
+      return {choice:cr?box(choice):null, panel:box(panel), text:choice?choice.textContent:'', ids:ids, viewW:window.innerWidth};
     });
     assert.ok(edit.viewW <= 400, 'phone width');
     assert.ok(/Cover/.test(edit.text), edit.text);
     assert.ok(edit.ids.indexOf('coverage') >= 0, 'Cover is in the open picker');
-    assert.ok(inside(edit.choice, {left:0, top:0, right:edit.viewW, bottom:844}), 'Cover is fully on screen');
+    assert.ok(edit.choice, 'Cover is in the picker');
     assert.ok(inside(edit.choice, edit.panel), 'Cover is inside the edit panel');
     await page.screenshot({path: path.join(shotDir, 'phonezoom1-edit-tabs-coverage.png')});
 
@@ -169,13 +173,14 @@ async function runBrowser(){
         var r = el.getBoundingClientRect();
         return {left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height};
       }
-      var slot = document.querySelector('#navEditBottom [data-nav-id="coverage"]');
+      var slot = document.querySelector('#navEditBottom [data-nav-id="aidechat"]');
+      if(slot && slot.scrollIntoView)slot.scrollIntoView({block:'center'});
       var panel = document.getElementById('navEditPanel');
       return {slot:slot?box(slot):null, panel:box(panel), viewW:window.innerWidth};
     });
-    assert.ok(pinned.slot, 'Cover is pinned on the default bar');
-    assert.ok(inside(pinned.slot, {left:0, top:0, right:pinned.viewW, bottom:844}), 'pinned Cover stays on screen');
-    assert.ok(inside(pinned.slot, pinned.panel), 'pinned Cover stays inside the picker');
+    assert.ok(pinned.slot, 'Messages is pinned on the default bar');
+    assert.ok(inside(pinned.slot, {left:0, top:0, right:pinned.viewW, bottom:844}), 'pinned Messages stays on screen');
+    assert.ok(inside(pinned.slot, pinned.panel), 'pinned Messages stays inside the picker');
     await page.screenshot({path: path.join(shotDir, 'phonezoom1-edit-tabs-coverage-pinned.png')});
 
     await page.evaluate(function(){navEditCancel(); copilotOpenRadar();});

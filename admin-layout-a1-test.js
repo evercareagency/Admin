@@ -27,12 +27,13 @@ assert.ok(admin.includes('class="ts-sheet"'), 'spreadsheet remains in the DOM fo
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
 let at = -1;
-['nav_timesheets', 'nav_schedule', 'nav_aides', 'nav_backups', 'nav_more'].forEach(function(id){
+['nav_timesheets', 'nav_schedule', 'nav_aides', 'nav_aidechat', 'nav_more'].forEach(function(id){
   const i = nav.indexOf('id="' + id + '"');
   assert.ok(i > at, 'bottom nav order ' + id);
   at = i;
 });
-assert.ok(nav.includes('Timesheets') && nav.includes('> Schedule') && nav.includes('> Aides') && nav.includes('> Backup') && nav.includes('> More'), 'locked tab labels');
+assert.ok(nav.includes('Timesheets') && nav.includes('> Schedule') && nav.includes('> Aides') && nav.includes('> Messages') && nav.includes('> More'), 'locked tab labels');
+assert.ok(admin.includes('id="nav_backups"'), 'Backup stays in the shell');
 assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'five bottom tabs');
 
 const bak = admin.slice(admin.indexOf('id="tab_backups"'), admin.indexOf('id="tab_aides"'));
