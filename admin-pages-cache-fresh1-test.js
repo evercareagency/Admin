@@ -35,7 +35,8 @@ assert.ok(html.indexOf('content="2026-09-29-list-search-az1"') < html.indexOf('c
 assert.ok(sw.includes('self.skipWaiting()'), 'skipWaiting');
 assert.ok(sw.includes('self.clients.claim()'), 'clientsClaim');
 assert.ok(sw.includes("cache:'no-store'"), 'document fetch is no-store');
-assert.ok(!sw.includes("addEventListener('push'"), 'no push handler');
+assert.ok(sw.includes("addEventListener('notificationclick'"), 'ping tap is notificationclick');
+assert.ok(!sw.includes('?v='), 'worker does not stick ?v=');
 assert.ok(!sw.includes('caches.put') && !sw.includes('caches.open'), 'index is not stored in the Cache API');
 assert.ok(sw.includes('pagesCacheFresh1IsNav'), 'navigation gate');
 assert.ok(html.includes("updateViaCache:'none'"), 'worker script is not stuck in HTTP cache');
