@@ -120,7 +120,7 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <!-- sched creds 2026-09-29 v=sched-creds1 ?v=sched-creds1 admin-build 2026-09-29-sched-creds1. GHOST-SCHED-CREDS1-CONTRACT-v1. Ace N/A. UI parity only. NO new SQL. NO new RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Standing rule: Admin and Scheduler are one portal. No Admin-only chrome on Aides ···. Scheduler login is a soft-check through the same startAdminSession and restoreAdminSession path as Admin (profile role scheduler, username Jaz). The check does not post a password and does not call sbAuthRoleLogin. Nurse is out of scope. Scheduler Aides ···, normal and Manage, includes the same items Admin already has from manage-dots-creds1: View profile, Credentials, Reset temp password, and Delete. There is no Admin-only gate that strips Credentials for Scheduler. The ··· order is View profile, Credentials, Reset temp password, then Delete. View profile loads that aide's credentials on the same list path. Scheduler is not sent to an Admin-only credentials card. A Scheduler login still counts when the role text is scheduler or the stored admin_session or profile role is scheduler. Credentials still closes the ··· sheet and opens that aide's credential detail through aidesInfo1Credentials and aideCredOpenFromManageDots, which calls aideCredOpen when Manage is off. Same desk, same handlers, phone and desktop. The landing credentials rollup stays the aidecreds1 Admin surface, so Scheduler still does not see that block on the Aides list. pages-cache-fresh1 stays: the clean Home Screen URL is not rewritten to a sticky ?v=. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=pages-cache-fresh1, v=login-land-schedule1, v=list-search-az1, v=admin-sched-chat-push1, v=msg-composer-kb2, v=manage-dots-creds1, v=aide-profile-link-fix, and v=aidecreds1. -->
 <meta name="admin-build" content="2026-09-29-sched-creds1">
 <script>var SCHED_CREDS1_MARKER='v=sched-creds1';var SCHED_CREDS1_BUILD='2026-09-29-sched-creds1';</script>
-<!-- messages bulk delete 2026-09-29 v=msg-bulk-delete1 ?v=msg-bulk-delete1 admin-build 2026-09-29-msg-bulk-delete1. GHOST-MSG-BULK-DELETE1-CONTRACT-v1. Ace CALLABLE for the Aides inbox. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL in this repo. No Auth reseal. No Quo/SMS. No Caregiver. No Nurse Remi. Messages bottom-tab inbox (Aides | Clients) gets Radar-style multi-select: a checkbox on each thread row, and a toolbar Select all, Unselect, and Delete. Delete stays muted until at least one row is checked. Select all and Unselect do not post. Aides Delete posts admin_hide_aide_office_threads once with {p_thread_ids} of the selected aide_office_threads.id UUIDs, capped at 1000. Admin and Scheduler share that RPC. Nurse is 403/42501 and this desk does not call it as Nurse. Soft hide only (office_hidden_at). History stays. A new aide message or an office reply re-shows the thread. After success the selected rows drop immediately and the inbox re-paints from admin_list_aide_office_threads, which already omits hidden threads. A repeat hide is idempotent. It is not a send. It does not message anyone. It does not blast. It does not call admin_send_aide_office_message, admin_send_aide_text, admin_compose_aide_text, sms, or mailto. CLIENT_GAP: no client message, thread, or list RPC exists. Friday confirmed. Clients decision locked: Disable Delete on Clients until Ace ships a client inbox. Checks, Select all, and Unselect stay. Delete stays muted, with the exact plain English “Client inbox delete isn’t live yet”. No local hide for Clients. This desk does not call admin_hide_aide_office_threads from Clients. Admin and Scheduler are one portal and share this chrome. This chrome is not Admin-only. Scheduler login sees the same checkboxes, Select all, Unselect, and Delete as Admin. Nurse stays out through the same aidechat role gate. pages-cache-fresh1 stays the shell: clean Home Screen URL, no sticky ?v= on the address bar, document loads stay network-first. admin-build.txt stays 2026-09-29-pages-cache-fresh1. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=pages-cache-fresh1, v=list-search-az1, v=login-land-schedule1, v=remi-msg-tab1, v=remi-radar-dismiss1, and v=aidechat1. -->
+<!-- messages bulk delete 2026-09-29 v=msg-bulk-delete1 ?v=msg-bulk-delete1 admin-build 2026-09-29-msg-bulk-delete1. GHOST-MSG-BULK-DELETE1-CONTRACT-v1. Ace CALLABLE for the Aides inbox. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL in this repo. No Auth reseal. No Quo/SMS. No Caregiver. No Nurse Remi. Messages bottom-tab inbox (Aides | Clients) gets Radar-style multi-select: a checkbox on each thread row, and a toolbar Select all, Unselect, and Delete. Delete stays muted until at least one row is checked. Select all and Unselect do not post. Aides Delete posts admin_hide_aide_office_threads once with {p_thread_ids} of the selected aide_office_threads.id UUIDs, capped at 1000. Admin and Scheduler share that RPC. Nurse is 403/42501 and this desk does not call it as Nurse. Soft hide only (office_hidden_at). History stays. A new aide message or an office reply re-shows the thread. After success the selected rows drop immediately and the inbox re-paints from admin_list_aide_office_threads, which already omits hidden threads. A repeat hide is idempotent. It is not a send. It does not message anyone. It does not blast. It does not call admin_send_aide_office_message, admin_send_aide_text, admin_compose_aide_text, sms, or mailto. Clients inbox hide shipped in client-msg-delete1. Checks, Select all, and Unselect stay. This desk does not call admin_hide_aide_office_threads from Clients. Admin and Scheduler are one portal and share this chrome. This chrome is not Admin-only. Scheduler login sees the same checkboxes, Select all, Unselect, and Delete as Admin. Nurse stays out through the same aidechat role gate. pages-cache-fresh1 stays the shell: clean Home Screen URL, no sticky ?v= on the address bar, document loads stay network-first. admin-build.txt stays 2026-09-29-pages-cache-fresh1. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=pages-cache-fresh1, v=list-search-az1, v=login-land-schedule1, v=remi-msg-tab1, v=remi-radar-dismiss1, and v=aidechat1. -->
 <meta name="admin-build" content="2026-09-29-msg-bulk-delete1">
 <script>var MSG_BULK_DELETE1_MARKER='v=msg-bulk-delete1';var MSG_BULK_DELETE1_BUILD='2026-09-29-msg-bulk-delete1';</script>
 <!-- msg composer kb 2026-09-29 v=msg-composer-kb3 ?v=msg-composer-kb3 admin-build 2026-09-29-msg-composer-kb3. GHOST-MSG-COMPOSER-KB3-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone only, 899px and under. Nurse stays out of Messages. Extends careMsgSafe1PinAide and v=msg-composer-kb2. Focusing Type a message (#aidechatReply) or Send (#aidechatSend) adds html.aidechat-kb immediately, with no keyboard-gap wait. While html.aidechat-kb or html.remi-ask-kb is on, #bottomNav is display none. loginLandSchedule1FitNav is a no-op under those classes: it does not apply --login-land-vv-lift or #bottomNav style bottom. The pin still calls FitNav, then loginLandSchedule1ClearLift, so that call cannot re-lift the bar. Only #aidechatComposer is position fixed, docked to the visual viewport bottom (vv.offsetTop + vv.height, the same fixed-origin check as v=loginkb1). If layoutH minus dock leaves the composer floating in the white gap, the pin measures form.getBoundingClientRect().bottom and corrects bottom until it matches the visual viewport bottom within 2px. Margin below the form stays zero so no white band sits above the Safari Done and URL chrome. #aidechatThreadView stays in normal flow. #msgDensePanel and #aidechatMessages shorten to the space above the composer only. The pin runs again at 80ms and 320ms and on visualViewport resize and scroll. Blur and leaving Messages clear the tuck. Remi Ask still waits for a keyboard gap of at least 80 before html.remi-ask-kb, and that sheet also flushes to the visual viewport bottom with no void. Desktop at 900px and up does not tuck. Admin and Scheduler are one portal. The pin does not check for an Admin-only role. The composer carries data-msg-composer-kb3. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=msg-bulk-delete1, v=sched-payroll-hide1, v=msg-composer-kb2, v=sched-creds1, v=care-msg-safe1, v=aides-info1, v=admin-sched-chat-push1, v=login-land-schedule1, v=pages-cache-fresh1, and v=loginkb1. -->
@@ -129,6 +129,9 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <!-- aide thread header 2026-09-29 v=aide-thread-header1 ?v=aide-thread-header1 admin-build 2026-09-29-aide-thread-header1. GHOST-AIDE-THREAD-HEADER1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Aide threads only. remiMsgTab1PaintClientThread stays the Clients path. #aidechatThreadTitle is thread.name, the full name, then username, then Aide. #aidechatThreadMeta is @username · Aide · status (Open, Urgent, and the thread status). It never paints signed in as Moe or Jaz and it never calls clienthrs1dSignedLabel for this header. #aidechatThreadChips paints under the meta from the existing aides-info1 cache (aidesInfo1ByKey / the admin_list_aides_info row for thread.aide_id). Chip text reuses aidesInfo1Clients plus an insurance label already on that client when present (CareSource, Passport, and any insurance_label on the row). No new RPC. No clients hides the chips row. Chips wrap. Pills are teal-light. The header flex aligns start. data-aide-thread-header1 sits on the head. Admin and Scheduler are one portal. Nurse stays out of Messages. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=msg-composer-kb3, v=msg-bulk-delete1, v=sched-payroll-hide1, v=msg-composer-kb2, v=sched-creds1, v=care-msg-safe1, v=aides-info1, and v=admin-sched-chat-push1. -->
 <meta name="admin-build" content="2026-09-29-aide-thread-header1">
 <script>var AIDE_THREAD_HEADER1_MARKER='v=aide-thread-header1';var AIDE_THREAD_HEADER1_BUILD='2026-09-29-aide-thread-header1';</script>
+<!-- client inbox delete 2026-09-29 v=client-msg-delete1 ?v=client-msg-delete1 admin-build 2026-09-29-client-msg-delete1. GHOST-CLIENT-MSG-DELETE1-CONTRACT-v1. Ace CALLABLE LIVE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL in this repo. No Auth reseal. No Quo/SMS. No Caregiver. No Nurse Remi. Closes the Clients gap from msg-bulk-delete1. Messages to Clients Delete unmutes when at least one row is checked, the same enable rule as Aides. Clients Delete posts admin_hide_client_message_threads once with {p_client_ids} of the selected client_id UUIDs, capped at 1000. It never calls admin_hide_aide_office_threads from Clients. Admin and Scheduler share that RPC through is_scheduler_office. Nurse is 403/42501 and this desk does not call it as Nurse. Hide is office inbox only. It does not set clients.is_active false. The client stays in Manage Clients. history_deleted stays false. There is no in-app client chat, compose, or history, and no Quo/SMS send. List load posts admin_list_client_message_threads with {}. The answer is a direct JSON array. Each row maps client_id to the bulk-select id. Phone paints preview Call / Text only with sms_link and tel_link. No phone paints preview no phone on file and both links null. Newest first. Active org clients except client_office_inbox_hides. After success the selected rows drop immediately and the inbox re-lists so a reload keeps them omitted. A repeat hide is idempotent. Select all and Unselect do not post. It is not a send. Aides Delete still posts admin_hide_aide_office_threads. pages-cache-fresh1 stays the shell: clean Home Screen URL, no sticky ?v= on the address bar. admin-build.txt stays 2026-09-29-pages-cache-fresh1. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=msg-bulk-delete1, v=aide-thread-header1, v=msg-composer-kb3, v=pages-cache-fresh1, v=remi-msg-tab1, and v=aidechat1. -->
+<meta name="admin-build" content="2026-09-29-client-msg-delete1">
+<script>var CLIENT_MSG_DELETE1_MARKER='v=client-msg-delete1';var CLIENT_MSG_DELETE1_BUILD='2026-09-29-client-msg-delete1';</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
@@ -4092,15 +4095,15 @@ Call (216) 377-5991 with any questions.</textarea>
             <button type="button" id="msgSegAides" class="on" role="tab" aria-selected="true" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" onclick="remiMsgTab1SetSegment('aides')">Aides</button>
             <button type="button" id="msgSegClients" role="tab" aria-selected="false" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" onclick="remiMsgTab1SetSegment('clients')">Clients</button>
           </div>
-          <div class="msg-bulk-bar" id="msgBulkToolbar" role="toolbar" aria-label="Message selection" data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1">
+          <div class="msg-bulk-bar" id="msgBulkToolbar" role="toolbar" aria-label="Message selection" data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1" data-client-msg-delete1="v=client-msg-delete1">
             <button type="button" class="tb-btn ghost" id="msgBulkSelectAll" data-layout-roles="Admin Scheduler" onclick="msgBulkDelete1SelectAll()">Select all</button>
             <button type="button" class="tb-btn ghost" id="msgBulkUnselect" data-layout-roles="Admin Scheduler" onclick="msgBulkDelete1Unselect()">Unselect</button>
             <button type="button" class="tb-btn danger off" id="msgBulkDelete" data-layout-roles="Admin Scheduler" disabled onclick="msgBulkDelete1Delete()">Delete</button>
             <span class="tb-count" id="msgBulkCount" data-layout-roles="Admin Scheduler">0 selected</span>
           </div>
-          <p class="msg-bulk-callout" id="msgBulkCallout" data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1">Select threads · Delete stays off until at least one check</p>
-          <div id="msgClientDesk" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1">
-            <p class="aidechat-note" id="msgClientNote">Call / Text only. Not EverCare chat. Same client list as Schedule and Clients. sms: and tel: open when a phone is on file. You press Send in the phone Messages app.</p>
+          <p class="msg-bulk-callout" id="msgBulkCallout" data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1" data-client-msg-delete1="v=client-msg-delete1">Select threads · Delete stays off until at least one check</p>
+          <div id="msgClientDesk" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" data-client-msg-delete1="v=client-msg-delete1">
+            <p class="aidechat-note" id="msgClientNote">Call / Text only. Not EverCare chat. sms: and tel: open when a phone is on file. You press Send in the phone Messages app. Delete hides a client from this inbox. The client stays in Manage.</p>
             <div id="msgClientList" class="aidechat-list" aria-label="Client threads"></div>
             <div id="msgClientEmpty" class="empty-state"><p>No clients on this desk yet.</p></div>
           </div>
@@ -12577,13 +12580,19 @@ function aidechatPaintSettings(){
 }
 // v=msg-bulk-delete1. Aides Delete posts admin_hide_aide_office_threads {p_thread_ids}.
 // Admin and Scheduler share that RPC. Nurse is not called (403/42501).
-// CLIENT_GAP Friday confirmed: Disable Delete on Clients until Ace ships a client inbox. No local hide. Do not call the aide RPC.
+// v=client-msg-delete1. Clients Delete posts admin_hide_client_message_threads {p_client_ids}.
+// Admin and Scheduler share that RPC. Nurse is not called (403/42501).
+// Hide is this inbox only. The client stays active in Manage Clients. Do not call the aide RPC from Clients.
 // Select all and Unselect do not post. Delete is not a send.
 var msgBulkDelete1Selected={aides:{},clients:{}};
 var msgBulkDelete1Note='';
 var msgBulkDelete1NoteInbox='';
 var msgBulkDelete1Busy=false;
 var msgBulkDelete1LastN=0;
+var clientMsgDelete1Rows=[];
+var clientMsgDelete1Loaded=false;
+var clientMsgDelete1Gen=0;
+var clientMsgDelete1Kick=false;
 function msgBulkDelete1Marker(){
   return (typeof MSG_BULK_DELETE1_MARKER==='string'&&MSG_BULK_DELETE1_MARKER)?MSG_BULK_DELETE1_MARKER:'v=msg-bulk-delete1';
 }
@@ -12623,7 +12632,10 @@ function msgBulkDelete1AideIds(rows){
 function msgBulkDelete1Rows(){
   var inbox=msgBulkDelete1Inbox();
   if(inbox==='clients'){
-    try{return typeof remiMsgTab1ClientRows==='function'?remiMsgTab1ClientRows():[];}catch(e){return [];}
+    try{
+      if(typeof clientMsgDelete1InboxRows==='function')return clientMsgDelete1InboxRows();
+      return typeof remiMsgTab1ClientRows==='function'?remiMsgTab1ClientRows():[];
+    }catch(e){return [];}
   }
   try{return typeof aidechatSorted==='function'?aidechatSorted():[];}catch(e2){return [];}
 }
@@ -12656,6 +12668,122 @@ function msgBulkDelete1DropAides(ids){
     if(typeof aidechatShow==='function')aidechatShow('inbox');
   }
 }
+function msgBulkDelete1DropClients(ids){
+  var hide={};
+  var i;
+  ids=ids||[];
+  for(i=0;i<ids.length;i++)hide[String(ids[i])]=1;
+  var base=[];
+  if(clientMsgDelete1Loaded&&Array.isArray(clientMsgDelete1Rows))base=clientMsgDelete1Rows;
+  else if(typeof clientMsgDelete1InboxRows==='function'){
+    try{base=clientMsgDelete1InboxRows()||[];}catch(eBase){base=[];}
+  }
+  var next=[];
+  for(i=0;i<base.length;i++){
+    var id=String(base[i]&&(base[i].id||base[i].client_id)||'');
+    if(!hide[id])next.push(base[i]);
+  }
+  clientMsgDelete1Rows=next;
+  clientMsgDelete1Loaded=true;
+  if(typeof remiMsgTab1ClientId!=='undefined'&&hide[String(remiMsgTab1ClientId||'')]){
+    remiMsgTab1ClientId='';
+    if(typeof aidechatShow==='function')aidechatShow('inbox');
+  }
+}
+function clientMsgDelete1Marker(){
+  return (typeof CLIENT_MSG_DELETE1_MARKER==='string'&&CLIENT_MSG_DELETE1_MARKER)?CLIENT_MSG_DELETE1_MARKER:'v=client-msg-delete1';
+}
+function clientMsgDelete1MapRow(raw){
+  raw=raw||{};
+  var id=String(raw.client_id||raw.id||'').trim();
+  var phone=raw.phone==null?'':String(raw.phone).trim();
+  var name=String(raw.display_name||raw.name||'').trim();
+  if(!name)name='Unnamed client';
+  var sms=raw.sms_link==null||String(raw.sms_link).trim()===''?null:String(raw.sms_link);
+  var tel=raw.tel_link==null||String(raw.tel_link).trim()===''?null:String(raw.tel_link);
+  var preview='';
+  if(phone){
+    preview='Call / Text only';
+    if(!sms){
+      sms=typeof coverPhoneHref==='function'?coverPhoneHref('sms', phone):('sms:'+phone);
+      if(!sms)sms=null;
+    }
+    if(!tel){
+      tel=typeof coverPhoneHref==='function'?coverPhoneHref('tel', phone):('tel:'+phone);
+      if(!tel)tel=null;
+    }
+  }else{
+    preview='no phone on file';
+    sms=null;
+    tel=null;
+  }
+  return {
+    id:id,
+    client_id:id,
+    name:name,
+    phone:phone,
+    preview:preview,
+    updated_at:raw.updated_at||raw.sort_key||'',
+    sort_key:raw.sort_key||raw.updated_at||'',
+    sms_link:sms,
+    tel_link:tel
+  };
+}
+function clientMsgDelete1MapList(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return [];}
+  }
+  if(!Array.isArray(node))return [];
+  var out=[];
+  var seen={};
+  var i;
+  for(i=0;i<node.length;i++){
+    var row=clientMsgDelete1MapRow(node[i]);
+    if(!row.id||seen[row.id])continue;
+    seen[row.id]=1;
+    out.push(row);
+  }
+  return out;
+}
+function clientMsgDelete1InboxRows(){
+  if(clientMsgDelete1Loaded&&Array.isArray(clientMsgDelete1Rows))return clientMsgDelete1Rows.slice();
+  try{return typeof remiMsgTab1ClientRows==='function'?remiMsgTab1ClientRows():[];}catch(e){return [];}
+}
+async function clientMsgDelete1Refresh(){
+  if(typeof msgBulkDelete1RoleOk==='function'&&!msgBulkDelete1RoleOk())return false;
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(eRole){role='';}
+  if(role==='Nurse')return false;
+  if(typeof sbRestRpc!=='function')return false;
+  var gen=++clientMsgDelete1Gen;
+  var got=null;
+  try{got=await sbRestRpc('admin_list_client_message_threads', {});}
+  catch(err){got={ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  if(gen!==clientMsgDelete1Gen)return false;
+  if(!got||got.ok!==true)return false;
+  if(got.status===403||got.status===42501)return false;
+  var data=got.data;
+  if(typeof data==='string'){
+    try{data=JSON.parse(data);}catch(eParse){return false;}
+  }
+  if(!Array.isArray(data))return false;
+  clientMsgDelete1Rows=clientMsgDelete1MapList(data);
+  clientMsgDelete1Loaded=true;
+  return true;
+}
+function clientMsgDelete1KickLoad(){
+  if(clientMsgDelete1Loaded||clientMsgDelete1Kick)return;
+  if(typeof clientMsgDelete1Refresh!=='function')return;
+  clientMsgDelete1Kick=true;
+  clientMsgDelete1Refresh().then(function(ok){
+    clientMsgDelete1Kick=false;
+    if(!ok)return;
+    try{
+      if(typeof remiMsgTab1Segment!=='undefined'&&remiMsgTab1Segment==='clients'&&!remiMsgTab1ClientId&&typeof remiMsgTab1PaintClients==='function')remiMsgTab1PaintClients();
+    }catch(e){}
+  });
+}
 function msgBulkDelete1On(inbox, id){
   var key=inbox==='clients'?'clients':'aides';
   var map=msgBulkDelete1Selected[key]||{};
@@ -12679,7 +12807,11 @@ function msgBulkDelete1CheckHtml(inbox, id, name, on){
 }
 function msgBulkDelete1Callout(n){
   var inbox=msgBulkDelete1Inbox();
-  if(inbox==='clients')return 'Client inbox delete isn\u2019t live yet';
+  if(inbox==='clients'){
+    if(msgBulkDelete1Note==='done'&&msgBulkDelete1NoteInbox==='clients'&&n<1)return 'Hidden from this inbox. Client stays active in Manage Clients.';
+    if(n>0)return 'Delete hides the selected clients from this inbox. Client stays in Manage. Not a send.';
+    return 'Select threads · Delete stays off until at least one check';
+  }
   if(msgBulkDelete1Note==='done'&&msgBulkDelete1NoteInbox==='aides'&&n<1)return 'Hidden from this inbox. History stays. A new message from the aide shows it again.';
   if(n>0)return 'Delete hides the selected aide threads. History stays. Not a send.';
   return 'Select threads · Delete stays off until at least one check';
@@ -12690,9 +12822,7 @@ function msgBulkDelete1SyncChrome(){
   if(!doc||!doc.getElementById)return;
   var n=0;
   try{n=msgBulkDelete1Count();}catch(e2){n=0;}
-  var clients=false;
-  try{clients=msgBulkDelete1Inbox()==='clients';}catch(e3){clients=false;}
-  var off=clients||n<1;
+  var off=n<1;
   var btn=doc.getElementById('msgBulkDelete');
   var count=doc.getElementById('msgBulkCount');
   var callout=doc.getElementById('msgBulkCallout');
@@ -12750,9 +12880,40 @@ async function msgBulkDelete1Delete(){
   if(role==='Nurse')return;
   var inbox=msgBulkDelete1Inbox();
   if(inbox==='clients'){
-    msgBulkDelete1Note='gap';
-    msgBulkDelete1NoteInbox='clients';
-    msgBulkDelete1SyncChrome();
+    if(role!=='Admin'&&role!=='Scheduler')return;
+    var cmap=msgBulkDelete1Selected.clients||{};
+    var cpicked=msgBulkDelete1Rows().filter(function(row){return !!cmap[String(row&&row.id||'')];});
+    var cids=msgBulkDelete1AideIds(cpicked);
+    if(!cids.length)return;
+    msgBulkDelete1Busy=true;
+    var cposted=false;
+    try{
+      var cbtn=null;
+      try{cbtn=document.getElementById('msgBulkDelete');}catch(eBtn){cbtn=null;}
+      if(cbtn)cbtn.disabled=true;
+      var cgot=null;
+      try{cgot=await sbRestRpc('admin_hide_client_message_threads', {p_client_ids:cids});}
+      catch(cerr){cgot={ok:false, error:String(cerr&&cerr.message||cerr||'Request failed.')};}
+      if(!msgBulkDelete1RpcOk(cgot)){
+        var cdenied=cgot&&(cgot.status===403||cgot.status===42501);
+        if(typeof showTempMsg==='function')showTempMsg(cdenied?'Nurse cannot hide client inbox rows.':'Could not hide those clients.','var(--warn)');
+        return;
+      }
+      cposted=true;
+      var ci;
+      for(ci=0;ci<cids.length;ci++)delete cmap[cids[ci]];
+      msgBulkDelete1Note='done';
+      msgBulkDelete1NoteInbox='clients';
+      msgBulkDelete1LastN=cids.length;
+      msgBulkDelete1DropClients(cids);
+      if(typeof showTempMsg==='function')showTempMsg('Hidden from this inbox','var(--success)');
+      msgBulkDelete1Repaint();
+      if(typeof clientMsgDelete1Refresh==='function')await clientMsgDelete1Refresh();
+    }finally{
+      msgBulkDelete1Busy=false;
+      if(!cposted)msgBulkDelete1SyncChrome();
+    }
+    if(cposted)msgBulkDelete1Repaint();
     return;
   }
   if(role!=='Admin'&&role!=='Scheduler')return;
@@ -16363,7 +16524,7 @@ function remiMsgTab1ApplyChrome(){
   var sub=document.getElementById('aidechatInboxSub');
   if(sub){
     sub.textContent=clients
-      ?'Clients inbox. Client inbox delete isn\u2019t live yet. Admin + Scheduler share this chrome. Nurse out.'
+      ?'Clients inbox. Delete hides a client from this inbox. The client stays in Manage. Admin + Scheduler share this chrome. Nurse out.'
       :'Select threads. Delete hides them from this inbox. Admin + Scheduler same chrome.';
   }
   var reply=document.getElementById('aidechatReply');
@@ -16384,8 +16545,10 @@ function remiMsgTab1SetSegment(which){
   if(note)note.hidden=true;
   remiMsgTab1ApplyChrome();
   if(typeof aidechatShow==='function')aidechatShow('inbox');
-  if(remiMsgTab1Segment==='clients')remiMsgTab1PaintClients();
-  else if(typeof aidechatPaintInbox==='function')aidechatPaintInbox();
+  if(remiMsgTab1Segment==='clients'){
+    remiMsgTab1PaintClients();
+    if(typeof clientMsgDelete1KickLoad==='function')clientMsgDelete1KickLoad();
+  }else if(typeof aidechatPaintInbox==='function')aidechatPaintInbox();
 }
 function remiMsgTab1ClientRows(){
   var out=[];
@@ -16427,8 +16590,13 @@ function remiMsgTab1ClientRows(){
 }
 function remiMsgTab1ClientById(id){
   id=String(id||'');
-  var rows=remiMsgTab1ClientRows();
+  var rows=[];
   var i;
+  if(typeof clientMsgDelete1InboxRows==='function'){
+    try{rows=clientMsgDelete1InboxRows()||[];}catch(e){rows=[];}
+    for(i=0;i<rows.length;i++)if(String(rows[i].id)===id)return rows[i];
+  }
+  rows=remiMsgTab1ClientRows();
   for(i=0;i<rows.length;i++)if(String(rows[i].id)===id)return rows[i];
   return null;
 }
@@ -16448,7 +16616,7 @@ function remiMsgTab1BindClients(){
   var list=document.getElementById('msgClientList');
   if(!list)return;
   list.addEventListener('click', function(ev){
-    if(ev.target&&ev.target.closest&&ev.target.closest('.msg-bulk-check'))return;
+    if(ev.target&&ev.target.closest&&(ev.target.closest('.msg-bulk-check')||ev.target.closest('a')))return;
     var card=ev.target&&ev.target.closest?ev.target.closest('[data-msg-client]'):null;
     if(!card)return;
     remiMsgTab1OpenClient(card.getAttribute('data-msg-client'), '');
@@ -16464,7 +16632,8 @@ function remiMsgTab1PaintClients(){
   remiMsgTab1ApplyChrome();
   var list=document.getElementById('msgClientList');
   var empty=document.getElementById('msgClientEmpty');
-  var rows=remiMsgTab1ClientRows();
+  var rows=typeof clientMsgDelete1InboxRows==='function'?clientMsgDelete1InboxRows():remiMsgTab1ClientRows();
+  if(typeof clientMsgDelete1Loaded!=='undefined'&&!clientMsgDelete1Loaded&&typeof clientMsgDelete1KickLoad==='function')clientMsgDelete1KickLoad();
   if(empty)empty.hidden=rows.length>0;
   if(!list){
     if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
@@ -16472,25 +16641,24 @@ function remiMsgTab1PaintClients(){
   }
   if(!rows.length){
     list.innerHTML='';
-    if(!remiMsgTab1ClientLoadTried){
-      remiMsgTab1ClientLoadTried=true;
-      remiMsgTab1EnsureClients().then(function(){
-        if(remiMsgTab1Segment==='clients'&&!remiMsgTab1ClientId)remiMsgTab1PaintClients();
-      });
-    }
     if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
     return;
   }
   list.innerHTML=rows.map(function(c){
     var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(c.name):'';
-    var preview=c.phone?'Call / Text':'No phone on file';
+    var preview=String(c.preview||'').trim();
+    if(preview!=='Call / Text only'&&preview!=='no phone on file')preview=c.phone?'Call / Text only':'no phone on file';
+    var links='';
+    if(c.tel_link)links+=' <a class="aidechat-phone" href="'+remiMsgTab1Esc(c.tel_link)+'">Call</a>';
+    if(c.sms_link)links+=' <a class="aidechat-phone" href="'+remiMsgTab1Esc(c.sms_link)+'">Text</a>';
     var bulkOn=typeof msgBulkDelete1On==='function'&&msgBulkDelete1On('clients', c.id);
-    return '<div class="aidechat-card'+(bulkOn?' is-bulk':'')+'" data-msg-client="'+remiMsgTab1Esc(c.id)+'" data-remi-msg-tab1="v=remi-msg-tab1" data-msg-bulk-delete1="v=msg-bulk-delete1">'
+    var mark=typeof clientMsgDelete1Marker==='function'?clientMsgDelete1Marker():'v=client-msg-delete1';
+    return '<div class="aidechat-card'+(bulkOn?' is-bulk':'')+'" data-msg-client="'+remiMsgTab1Esc(c.id)+'" data-remi-msg-tab1="v=remi-msg-tab1" data-msg-bulk-delete1="v=msg-bulk-delete1" data-client-msg-delete1="'+remiMsgTab1Esc(mark)+'">'
       +(typeof msgBulkDelete1CheckHtml==='function'?msgBulkDelete1CheckHtml('clients', c.id, c.name, bulkOn):'')
       +'<span class="aide-office-av" aria-hidden="true">'+remiMsgTab1Esc(initials||'C')+'</span>'
       +'<span class="aide-office-main">'
       +'<span class="aidechat-card-top"><strong>'+remiMsgTab1Esc(c.name)+'</strong><span class="msg-bulk-tag is-client">CLIENT</span><span class="msg-client-tag">Call/Text</span></span>'
-      +'<span class="aidechat-preview">'+remiMsgTab1Esc(preview)+'</span>'
+      +'<span class="aidechat-preview">'+remiMsgTab1Esc(preview)+links+'</span>'
       +'</span></div>';
   }).join('');
   if(typeof msgBulkDelete1SyncChrome==='function')msgBulkDelete1SyncChrome();
