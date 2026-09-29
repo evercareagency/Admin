@@ -127,7 +127,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(boot.first, '2026-09-27-remi-float-hide1b');
-    assert.strictEqual(boot.second, '2026-09-27-aide-notif-search1');
+    assert.strictEqual(boot.second, '2026-09-28-remi-msg-tab1');
     assert.strictEqual(boot.marker, 'v=aide-notif-search1');
     assert.strictEqual(boot.prior, 'v=clienthrs1d');
 

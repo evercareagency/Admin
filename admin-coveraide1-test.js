@@ -31,7 +31,7 @@ const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
 assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
 assert.ok(!nav.includes('nav_coverage'), 'Coverage is not a bottom tab');
-assert.ok(nav.includes('id="nav_backups"'), 'Backup tab stays');
+assert.ok(admin.includes('id="nav_backups"'), 'Backup tab stays');
 
 const more = admin.slice(admin.indexOf('id="moreList"'), admin.indexOf('class="more-account"'));
 assert.ok(more.includes('id="nav_coverage"'), 'Coverage row stays in the More list');
@@ -122,12 +122,15 @@ const local = vm.runInContext('coverMapShift({id:"local-1", clientName:"Ada", so
 assert.strictEqual(local.source, 'local');
 assert.strictEqual(local.intakeSource, 'office');
 
-const now = Date.parse('2026-09-25T12:00:00Z');
-const officeChip = vm.runInContext('coverSourceChips({intakeSource:"office", status:"open", startsAt:"2026-09-26T08:00:00Z", endsAt:"2026-09-26T16:00:00Z"})', ctx);
+const soonStart = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
+const soonEnd = new Date(Date.now() + 10 * 60 * 60 * 1000).toISOString();
+const laterStart = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+const laterEnd = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000).toISOString();
+const officeChip = vm.runInContext('coverSourceChips({intakeSource:"office", status:"open", startsAt:"'+soonStart+'", endsAt:"'+soonEnd+'"})', ctx);
 assert.ok(officeChip.includes('>Office<'), 'office chip copy');
 assert.ok(officeChip.includes('cover-chip-office'), 'office chip class');
 assert.ok(officeChip.includes('>Within 48h<'), 'urgency chip still paints beside source');
-const aideChip = vm.runInContext('coverSourceChips({intakeSource:"aide", status:"open", startsAt:"2026-09-28T13:00:00Z", endsAt:"2026-09-28T17:00:00Z"})', ctx);
+const aideChip = vm.runInContext('coverSourceChips({intakeSource:"aide", status:"open", startsAt:"'+laterStart+'", endsAt:"'+laterEnd+'"})', ctx);
 assert.ok(aideChip.includes('>Aide<'), 'aide chip copy');
 assert.ok(aideChip.includes('cover-chip-aide'), 'aide chip class');
 assert.ok(!aideChip.includes('Within 48h'), 'a later shift does not get the urgency chip');

@@ -28,11 +28,10 @@ const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nur
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
 assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
-assert.ok(!nav.includes('nav_aidechat'), 'Aide chat is not a default bottom tab');
+assert.ok(nav.includes('id="nav_aidechat"'), 'Messages is a default bottom tab');
 const more = admin.slice(admin.indexOf('id="moreList"'), admin.indexOf('class="more-account"'));
-assert.ok(more.includes('id="nav_aidechat"'), 'Aide chat is under More');
-assert.ok(more.includes('data-layout-roles="Admin Scheduler"'), 'Aide chat uses the Admin Scheduler gate');
-assert.ok(more.indexOf('id="nav_coverage"') < more.indexOf('id="nav_aidechat"'), 'Coverage stays before Aide chat');
+assert.ok(!more.includes('id="nav_aidechat"'), 'Messages is not only under More');
+assert.ok(admin.includes('data-layout-roles="Admin Scheduler"'), 'Aide chat uses the Admin Scheduler gate');
 assert.ok(more.indexOf('id="nav_coverage"') < more.indexOf('id="nav_clients"'), 'Coverage stays before Clients');
 assert.ok(admin.includes('id="tab_aidechat"'), 'inbox panel is on the Admin screen');
 assert.ok(admin.indexOf('id="tab_coverage"') < admin.indexOf('id="tab_backups"'), 'coverage panel stays ahead of Backup');
@@ -158,17 +157,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(boot.first, '2026-09-27-remi-float-hide1b');
-    assert.strictEqual(boot.second, '2026-09-27-aide-notif-search1');
-    assert.strictEqual(boot.third, '2026-09-27-remi-chat1');
-    assert.strictEqual(boot.fourth, '2026-09-27-hold-client1');
-    assert.strictEqual(boot.fifth, '2026-09-27-aides-info1');
-    assert.strictEqual(boot.sixth, '2026-09-27-login-toast1');
-    assert.strictEqual(boot.seventh, '2026-09-27-aide-office-vis1');
-    assert.strictEqual(boot.eighth, '2026-09-27-remi-langs1');
-    assert.strictEqual(boot.ninth, '2026-09-27-hold-clear1');
-    assert.strictEqual(boot.tenth, '2026-09-27-sched-time-tap1');
-    assert.strictEqual(boot.eleventh, '2026-09-27-aide-text-chat1');
-    assert.strictEqual(boot.twelfth, '2026-09-27-remi-float-hide1');
+    assert.strictEqual(boot.second, '2026-09-28-remi-msg-tab1');
     assert.strictEqual(boot.marker, 'v=aidechat1');
     assert.strictEqual(boot.ask, 'v=remiask1');
 

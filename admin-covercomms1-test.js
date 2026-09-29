@@ -49,7 +49,7 @@ const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nur
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
 assert.ok(!nav.includes('nav_coverage'), 'Coverage stays off the bottom bar');
-assert.ok(nav.includes('id="nav_backups"'), 'Backup tab stays');
+assert.ok(admin.includes('id="nav_backups"'), 'Backup tab stays');
 
 const more = admin.slice(admin.indexOf('id="moreList"'), admin.indexOf('class="more-account"'));
 assert.ok(more.includes('id="nav_coverage"'), 'Coverage stays under More');

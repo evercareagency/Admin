@@ -25,7 +25,7 @@ const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
 assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
 assert.ok(!nav.includes('nav_coverage'), 'Coverage is not a bottom tab');
-assert.ok(nav.includes('id="nav_backups"'), 'Backup tab stays');
+assert.ok(admin.includes('id="nav_backups"'), 'Backup tab stays');
 
 const more = admin.slice(admin.indexOf('id="moreList"'), admin.indexOf('class="more-account"'));
 assert.ok(more.includes('id="nav_coverage"'), 'Coverage row stays in the More list');

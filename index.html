@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- remi msg tab 2026-09-28 v=remi-msg-tab1 ?v=remi-msg-tab1 admin-build 2026-09-28-remi-msg-tab1. GHOST-REMI-MSG-TAB1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Empty nav storage pins Messages on the primary bar: Timesheets, Schedule, Aides, Messages, plus More. tabbar-8 and Edit tabs stay. Cover and Backup stay in the catalog and start under More until Mo adds them. A saved bar is left as saved. Aide chat stays #tab_aidechat. The unread badge stays on the Messages tab. Nurse is still denied. Under the Messages header, Aides | Clients is one desk. Aides is the existing office inbox (aidechat1, aide-office-vis1, msg-dense1, care-msg-safe1 composer above the tabs). Clients lists the same org clients Schedule and Clients already load (get_clients / allClients). There is no client in-app chat table and this tip does not add client_office_messages or any client send RPC. A client thread is draft-only: sms:, tel:, and mailto: when a phone or email is on file. Send does not auto-fire and does not call a text provider. Remi Ask “message <aide or client name>” opens that person’s Messages thread and leaves a draft in the composer. Mo taps Send. Nothing auto-sends. It does not call admin_send_aide_office_message or admin_send_aide_text. remi-chat-bleed1 stays: Schedule a Remi stays parked off the thread, and the corner chip stays hidden while Messages is active. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=aide-profile-link-fix, v=remi-open-thread1, v=care-msg-safe1, v=remi-chat-bleed1, v=aidechat1, v=navedit1, v=tabbar-8, and v=cover-desk1. -->
+<meta name="admin-build" content="2026-09-28-remi-msg-tab1">
+<script>var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1';var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1';</script>
 <!-- aide profile link fix 2026-09-28 v=aide-profile-link-fix ?v=aide-profile-link-fix admin-build 2026-09-28-aide-profile-link-fix. GHOST-AIDE-PROFILE-LINK-FIX-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Supersedes aides-profile-link1 scroll-and-highlight (draft PR #165). View profile is one full page. It is not a scroll or teal outline on the Aides list, and it is not the credentials rollup sitting above the list. From Aides ··· View profile, and from aidesInfo1Follow when deep_link is the string admin/aides?aide_id=<uuid>, Ghost parses a leading #, aides and admin/aides path variants, and query aide_id, then replaces the Aides list (and Manage chrome if it is open) with #aideProfilePage until Back. The page has Back, a header (name, phone, language chip, client chips, next, creds due — the existing aides-info1 profile content), and Credentials through the existing aidecreds paths (admin_list_aide_credentials, edit sheet, add, save). The Aides list, desk tabs, Manage bar, A–Z rail, and credentials rollup stay display:none, including on a phone. Phone CSS must not unhide the list. Back returns to the Active aides-info1 info-card list, the same phone surface as Manage Done: Active and Recently deleted tabs visible, ··· on each card, #nav_aides active, #nav_more and #tab_more not active. It removes aide-creds-on after renderAides and aideCredsAfterAides and keeps #aideCredsRoot hidden so the credentials rollup (No credential records yet, Add credential, A–Z cred rows) does not cover the cards below 900px. On a phone, Active landing with aides-info1 cards — first paint, Refresh, Back, and Manage Done — does not auto-set aide-creds-on. Credentials still open from ··· Credentials and from Manage. Bare tab names and schedule deep-link objects stay as aides-info1 left them. This is not Auth profile_id. More must not end half-active: while this page is open on the Aides bottom tab, #nav_more and #tab_more lose active, and leaving for More closes the page so More is the only active desk. Do not break Manage select/delete, manage-dots-creds1 ··· Credentials-in-Manage, manage-done1 Done exit, aidadel1 Delete, or list-az-sticky1. Prior markers stay, including v=aides-info1, v=aides-profile-link1, v=manage-dots-creds1, v=manage-done1, v=manage-clean1, v=aide-manage-delete1, v=aidadel1, v=aidecreds1, v=aidecreds1b, v=aidecreds1c, v=list-az-sticky1, v=list-az1, v=remi-open-thread1, and v=care-msg-safe1. -->
 <meta name="admin-build" content="2026-09-28-aide-profile-link-fix">
 <script>var AIDE_PROFILE_LINK_FIX_MARKER='v=aide-profile-link-fix';var AIDE_PROFILE_LINK_FIX_BUILD='2026-09-28-aide-profile-link-fix';</script>
@@ -1081,6 +1084,26 @@ html.aidechat-kb,html.aidechat-kb body,
 html.remi-ask-kb,html.remi-ask-kb body{overflow:hidden;height:100%;}
 html.aidechat-kb #aidechatThreadView{position:static;top:auto;right:auto;bottom:auto;left:auto;width:auto;height:auto;max-height:none;background:#f4f8fb;}
 html.aidechat-kb #aidechatComposer{position:fixed;left:0;right:0;z-index:220;margin:0;background:#fff;border-top:1px solid var(--border);box-sizing:border-box;box-shadow:0 -8px 18px rgba(26,39,68,.08);}
+/* v=remi-msg-tab1 — Aides | Clients under the Messages header. Client thread is a draft. */
+#tab_aidechat .msg-seg{display:flex;gap:6px;margin-top:10px;background:var(--off);padding:4px;border-radius:12px;border:1px solid var(--border);}
+#tab_aidechat .msg-seg button{flex:1;border:0;background:transparent;font-family:inherit;font-size:12px;font-weight:700;color:var(--muted);padding:8px 10px;border-radius:9px;min-height:40px;cursor:pointer;}
+#tab_aidechat .msg-seg button.on{background:var(--teal);color:#fff;box-shadow:0 2px 6px rgba(42,127,127,.28);}
+#tab_aidechat #msgClientDesk{display:none;}
+#tab_aidechat.is-clients #msgClientDesk{display:block;}
+#tab_aidechat.is-clients #aidechatSourceNote,
+#tab_aidechat.is-clients #aidechatListLabel,
+#tab_aidechat.is-clients #aidechatList,
+#tab_aidechat.is-clients #aidechatEmpty,
+#tab_aidechat.is-clients #aidechatSettings{display:none !important;}
+#tab_aidechat.is-client-thread #clienthrs1dSched,
+#tab_aidechat.is-client-thread #aidechatUrgentBanner,
+#tab_aidechat.is-client-thread #coverSimpleDraft,
+#tab_aidechat.is-client-thread #aideTextChatSub,
+#tab_aidechat.is-client-thread #aideTextChatChips{display:none !important;}
+#tab_aidechat .msg-client-tag{display:inline-flex;align-items:center;margin-left:6px;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#6b4a12;background:#fff8e8;border:1px solid #e6d4a8;padding:1px 6px;border-radius:999px;vertical-align:middle;}
+#tab_aidechat .msg-draft-note{flex:1 1 100%;margin:0 0 4px;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--teal-dark);}
+#tab_aidechat .msg-dense-panel .aidechat-composer{flex-wrap:wrap;}
+#tab_aidechat.is-client-thread #aidechatThreadAv{background:linear-gradient(135deg,#c4a574,#8b6914);}
 html.aidechat-kb #tab_aidechat.is-open .msg-dense-panel{min-height:0;}
 html.remi-ask-kb #copilotSheet{z-index:180;}
 /* v=clienthrs1d — Notifications roster, schedule-send, chat names. Phone-first. No SMS. */
@@ -2786,11 +2809,11 @@ bindLoginKeyboard();
         </div>
       </div>
     </header>
-    <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1">
+    <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1" data-remi-msg-tab1="v=remi-msg-tab1">
       <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
-      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('backups')" id="nav_backups" aria-label="Backup"><span class="ni">☁️</span> Backup</button>
+      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-remi-msg-tab1="v=remi-msg-tab1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('more')" id="nav_more" aria-label="More"><span class="ni">☰</span> More <span class="nav-badge" id="aideOfficeMoreBadge" hidden>0</span></button>
     </nav>
     <div class="main-content">
@@ -2913,8 +2936,8 @@ bindLoginKeyboard();
         <div class="more-list" id="moreList">
           <button type="button" class="nav-item more-row" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="showTab('payroll')" id="nav_payroll"><span class="ni">💵</span> Payroll report</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-cover-desk1="v=cover-desk1" onclick="showTab('coverage')" id="nav_coverage"><span class="ni">🛟</span> Cover</button>
+          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('backups')" id="nav_backups" aria-label="Backup"><span class="ni">☁️</span> Backup</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d" onclick="showTab('notifications')" id="nav_notifications"><span class="ni">🔔</span> Notifications</button>
-          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('clients')" id="nav_clients"><span class="ni">🏠</span> Clients</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('nurse')" id="nav_nurse" aria-label="Nurse"><span class="ni">🩺</span> Nurse <span class="nav-badge" id="nav_nurse_badge" hidden>0</span></button>
           <button type="button" class="nav-item more-row" id="nav_completes" aria-label="Completed intakes" aria-hidden="true" onclick="showTab('completes')"><span class="ni">📄</span> Completed intakes</button>
@@ -3811,14 +3834,23 @@ Call (216) 377-5991 with any questions.</textarea>
         <p class="notif-note">Nudge = Remi posts in that aide’s Messages (and push if they already allow). Not SMS.</p>
       </div>
 
-      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1" data-remi-chat-bleed1="v=remi-chat-bleed1">
+      <div class="tab-panel" id="tab_aidechat" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b" data-more-hide1="v=more-hide1" data-remi-chat-bleed1="v=remi-chat-bleed1" data-remi-msg-tab1="v=remi-msg-tab1">
         <section id="remiLangsMsgCard" class="remi-langs-msg" hidden data-remi-langs1="v=remi-langs1" aria-label="Cover ask preview"></section>
         <div id="aidechatInboxView">
           <div class="page-hdr">
             <div>
               <h1>Messages</h1>
-              <p>Aide Office. One thread per aide. Unread shows here and on Remi.</p>
+              <p id="aidechatInboxSub">Aide Office. One thread per aide. Unread shows here and on Remi.</p>
             </div>
+          </div>
+          <div class="msg-seg" id="msgSeg" role="tablist" aria-label="Inbox segment" data-remi-msg-tab1="v=remi-msg-tab1">
+            <button type="button" id="msgSegAides" class="on" role="tab" aria-selected="true" onclick="remiMsgTab1SetSegment('aides')">Aides</button>
+            <button type="button" id="msgSegClients" role="tab" aria-selected="false" onclick="remiMsgTab1SetSegment('clients')">Clients</button>
+          </div>
+          <div id="msgClientDesk" data-remi-msg-tab1="v=remi-msg-tab1">
+            <p class="aidechat-note" id="msgClientNote">Clients from the same list as Schedule and Clients. No in-app client thread on this desk. The draft stays until you tap Send.</p>
+            <div id="msgClientList" class="aidechat-list" aria-label="Client threads"></div>
+            <div id="msgClientEmpty" class="empty-state"><p>No clients on this desk yet.</p></div>
           </div>
           <p class="aidechat-note" id="aidechatSourceNote">Aide message callables are not on this desk yet. Threads stay on this phone until admin_list_aide_office_threads answers. Nothing here sends a text or an email.</p>
           <p class="msg-dense-list-label" id="aidechatListLabel" data-msg-dense1="v=msg-dense1" data-msg-dense1b="v=msg-dense1b">Aide Office</p>
@@ -3911,6 +3943,7 @@ Call (216) 377-5991 with any questions.</textarea>
             <div id="clienthrs1dQueued"></div>
           </section>
           <form id="aidechatComposer" class="aidechat-composer" onsubmit="aidechatSendOffice(event); return false;">
+            <p id="remiMsgTab1DraftNote" class="msg-draft-note" data-remi-msg-tab1="v=remi-msg-tab1" hidden>Draft ready · not sent</p>
             <textarea id="aidechatReply" maxlength="1000" placeholder="Type a message…" aria-label="Reply as office" autocomplete="off"></textarea>
             <button type="submit" class="btn btn-teal" id="aidechatSend">Send</button>
           </form>
@@ -5361,7 +5394,7 @@ function layoutA1Primary(tab){
       if(picked)return picked;
     }catch(e){}
   }
-  if(tab==='timesheets'||tab==='schedule'||tab==='aides'||tab==='backups')return tab;
+  if(tab==='timesheets'||tab==='schedule'||tab==='aides'||tab==='backups'||tab==='aidechat')return tab;
   return 'more';
 }
 function layoutA1ToggleAvatar(ev){
@@ -5544,7 +5577,7 @@ var navEditFresh={};
 var navEditDrag=null;
 var navEditIgnoreClick=false;
 function navEditDefaults(){
-  return ['timesheets','schedule','aides','coverage','backups'];
+  return ['timesheets','schedule','aides','aidechat'];
 }
 function navEditCatalog(){
   return ['timesheets','schedule','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity','aidechat','notifications'];
@@ -10865,6 +10898,9 @@ function copilotChatSubmit(ev){
   else if(ans.loadRanks&&typeof remiWiderFetchRanks==='function')remiWiderFetchRanks(ans.shiftId, q, ans.widerIntent||'talk');
   else if(ans.loadList&&typeof remiWiderRefreshList==='function')remiWiderRefreshList();
   else if(ans.loadMail&&typeof remiWiderFetchMail==='function')remiWiderFetchMail(ans.shiftId, ans.mailFamily, ans.mailReason, ans.mailOther);
+  if(ans.remiMsgTab1&&typeof remiMsgTab1OpenDraft==='function'){
+    try{remiMsgTab1OpenDraft(ans.remiMsgTab1);}catch(eMsgTab){}
+  }
   return false;
 }
 function copilotShowChat(){
@@ -12153,6 +12189,10 @@ function aidechatBannerText(t){
   return 'Open · Urgent.';
 }
 function aidechatPaintThread(){
+  if(typeof remiMsgTab1ClientId!=='undefined'&&remiMsgTab1ClientId){
+    if(typeof remiMsgTab1PaintClientThread==='function')remiMsgTab1PaintClientThread();
+    return;
+  }
   var thread=aidechatFind(aidechatSelectedId);
   var title=document.getElementById('aidechatThreadTitle');
   var meta=document.getElementById('aidechatThreadMeta');
@@ -12243,14 +12283,20 @@ function aidechatShow(which){
   }
   if(typeof msgDense1Fit==='function')msgDense1Fit();
   if(typeof remiChatBleed1Sync==='function')remiChatBleed1Sync();
+  if(typeof remiMsgTab1ApplyChrome==='function')remiMsgTab1ApplyChrome();
   try{window.scrollTo(0,0);}catch(e){}
 }
 function aidechatShowInbox(){
   if(!aidechatRoleOk())return;
   if(typeof aideTextChatClearDraft==='function')aideTextChatClearDraft();
   aidechatSelectedId='';
+  if(typeof remiMsgTab1ClientId!=='undefined')remiMsgTab1ClientId='';
+  if(typeof remiMsgTab1DraftLive!=='undefined')remiMsgTab1DraftLive=false;
+  var draftNote=document.getElementById('remiMsgTab1DraftNote');
+  if(draftNote)draftNote.hidden=true;
   aidechatShow('inbox');
-  aidechatPaintInbox();
+  if(typeof remiMsgTab1Segment!=='undefined'&&remiMsgTab1Segment==='clients'&&typeof remiMsgTab1PaintClients==='function')remiMsgTab1PaintClients();
+  else aidechatPaintInbox();
 }
 function aidechatEnsureBound(){
   if(aidechatBound)return;
@@ -12305,6 +12351,8 @@ async function aidechatRefresh(){
   if(gen!==aidechatGen)return;
   if(got.ok){
     var incoming=aidechatDedupe(aidechatThreadsFrom(got.data));
+    var pinnedDraft=null;
+    if(typeof remiMsgTab1DraftLive!=='undefined'&&remiMsgTab1DraftLive&&aidechatSelectedId)pinnedDraft=aidechatFind(aidechatSelectedId);
     if((aidechatThreads||[]).length){
       incoming.forEach(function(t){
         var prev=aidechatFind(t.id)||aidechatFindByAide(t);
@@ -12312,12 +12360,15 @@ async function aidechatRefresh(){
       });
     }
     aidechatThreads=incoming;
+    if(pinnedDraft&&!aidechatFind(pinnedDraft.id))aidechatThreads.unshift(pinnedDraft);
     aidechatSource='ace';
   }else{
     if(!aidechatThreads.length)aidechatThreads=aidechatReadSession();
     aidechatSource=got.signedOut?'signed-out':'local';
   }
-  if(aidechatView==='thread')aidechatPaintThread();
+  if(typeof remiMsgTab1ClientId!=='undefined'&&remiMsgTab1ClientId&&typeof remiMsgTab1PaintClientThread==='function')remiMsgTab1PaintClientThread();
+  else if(aidechatView==='thread')aidechatPaintThread();
+  else if(typeof remiMsgTab1Segment!=='undefined'&&remiMsgTab1Segment==='clients'&&typeof remiMsgTab1PaintClients==='function')remiMsgTab1PaintClients();
   else aidechatPaintInbox();
 }
 async function aidechatOpen(){
@@ -12333,7 +12384,7 @@ async function aidechatOpen(){
   if(panelOk&&!panelOk.classList.contains('active'))return;
   if(panelOk)panelOk.removeAttribute('hidden');
   aidechatEnsureBound();
-  aidechatShow('inbox');
+  if(!(typeof remiMsgTab1Hold!=='undefined'&&remiMsgTab1Hold))aidechatShow('inbox');
   await aidechatLoadSettings();
   await aidechatRefresh();
   if(typeof clienthrs1dLoadNames==='function')clienthrs1dLoadNames();
@@ -12448,6 +12499,7 @@ async function aidechatIngestAideMessage(input){
 async function aidechatSendOffice(ev){
   if(ev&&ev.preventDefault)ev.preventDefault();
   if(!aidechatRoleOk())return false;
+  if(typeof remiMsgTab1ClientId!=='undefined'&&remiMsgTab1ClientId&&typeof remiMsgTab1ClientSend==='function')return remiMsgTab1ClientSend(ev);
   var box=document.getElementById('aidechatReply');
   var text=String(box&&box.value||'').trim();
   if(!text)return false;
@@ -12464,6 +12516,9 @@ async function aidechatSendOffice(ev){
   thread.last_message=text;
   thread.last_at=msg.created_at;
   if(box)box.value='';
+  remiMsgTab1DraftLive=false;
+  var draftNote=document.getElementById('remiMsgTab1DraftNote');
+  if(draftNote)draftNote.hidden=true;
   aidechatPaintThread();
   if(typeof aideTextChatConsumeSend==='function'){
     var routed=await aideTextChatConsumeSend(thread, text);
@@ -15409,10 +15464,418 @@ function remiAskSlotMarks(q, s){
   var use=remiAskPickSlots(s, slots, sameFocus);
   return 'YES. '+shownName+' on '+shown+' \u2014 '+use.map(remiAskSlotLine).join('; ')+'.';
 }
+// v=remi-msg-tab1 Messages on the bar, Aides | Clients, Remi Ask draft. No new RPC. Nothing auto-sends.
+var remiMsgTab1Segment='aides';
+var remiMsgTab1ClientId='';
+var remiMsgTab1Hold=0;
+var remiMsgTab1Seq=0;
+var remiMsgTab1DraftLive=false;
+var remiMsgTab1ClientsBound=false;
+var remiMsgTab1ClientLoadTried=false;
+function remiMsgTab1Norm(s){
+  return String(s||'').toLowerCase().replace(/['\u2019]/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function remiMsgTab1Esc(s){
+  if(typeof aidechatEsc==='function')return aidechatEsc(s);
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function remiMsgTab1ApplyChrome(){
+  var panel=document.getElementById('tab_aidechat');
+  var clients=remiMsgTab1Segment==='clients';
+  if(panel){
+    panel.classList.toggle('is-clients', clients);
+    panel.classList.toggle('is-client-thread', !!remiMsgTab1ClientId);
+  }
+  var aidesBtn=document.getElementById('msgSegAides');
+  var clientsBtn=document.getElementById('msgSegClients');
+  if(aidesBtn){
+    aidesBtn.classList.toggle('on', !clients);
+    aidesBtn.setAttribute('aria-selected', clients?'false':'true');
+  }
+  if(clientsBtn){
+    clientsBtn.classList.toggle('on', clients);
+    clientsBtn.setAttribute('aria-selected', clients?'true':'false');
+  }
+  var sub=document.getElementById('aidechatInboxSub');
+  if(sub){
+    sub.textContent=clients
+      ?'Same Messages desk. Clients on file. A draft stays here until you tap Send.'
+      :'Aide Office. One thread per aide. Unread shows here and on Remi.';
+  }
+}
+function remiMsgTab1SetSegment(which){
+  if(typeof aidechatRoleOk==='function'&&!aidechatRoleOk())return;
+  remiMsgTab1Segment=which==='clients'?'clients':'aides';
+  remiMsgTab1ClientId='';
+  remiMsgTab1DraftLive=false;
+  var note=document.getElementById('remiMsgTab1DraftNote');
+  if(note)note.hidden=true;
+  remiMsgTab1ApplyChrome();
+  if(typeof aidechatShow==='function')aidechatShow('inbox');
+  if(remiMsgTab1Segment==='clients')remiMsgTab1PaintClients();
+  else if(typeof aidechatPaintInbox==='function')aidechatPaintInbox();
+}
+function remiMsgTab1ClientRows(){
+  var out=[];
+  var seen={};
+  function add(row){
+    if(!row)return;
+    var name=String(row.name||row.clientName||row.client_name||'').trim();
+    if(!name)name=[row.firstName||row.first_name, row.lastName||row.last_name].filter(Boolean).join(' ').trim();
+    if(!name)return;
+    var id=String(row.id||row.client_id||row.clientId||name);
+    var key=remiMsgTab1Norm(id)||remiMsgTab1Norm(name);
+    if(!key||seen[key])return;
+    if(typeof clientOnDesk==='function'){
+      try{if(!clientOnDesk(row, 'active'))return;}catch(e){}
+    }else if(row.isActive===false||row.is_active===false)return;
+    seen[key]=1;
+    var ownEmail=String(row.email||row.client_email||'').trim();
+    var cmEmail=String(row.caseManagerEmail||row.case_manager_email||'').trim();
+    out.push({
+      id:id,
+      name:name,
+      phone:String(row.phone||row.client_phone||'').trim(),
+      email:ownEmail||cmEmail,
+      emailKind:ownEmail?'client':(cmEmail?'case_manager':'')
+    });
+  }
+  var list=[];
+  try{list=(typeof allClients!=='undefined'&&allClients)?allClients:[];}catch(e){list=[];}
+  list.forEach(add);
+  if(!out.length){
+    var week=[];
+    try{week=(typeof schedWeekRows!=='undefined'&&schedWeekRows)?schedWeekRows:[];}catch(e2){week=[];}
+    week.forEach(add);
+  }
+  if(typeof listAz1Apply==='function'&&typeof listAz1On==='function'&&listAz1On()){
+    out=listAz1Apply(out,[function(c){return c.name;}, function(c){return c.id;}]);
+  }
+  return out;
+}
+function remiMsgTab1ClientById(id){
+  id=String(id||'');
+  var rows=remiMsgTab1ClientRows();
+  var i;
+  for(i=0;i<rows.length;i++)if(String(rows[i].id)===id)return rows[i];
+  return null;
+}
+async function remiMsgTab1EnsureClients(){
+  var have=false;
+  try{have=typeof allClients!=='undefined'&&allClients&&allClients.length;}catch(e){have=false;}
+  if(have)return;
+  if(typeof apiGetCached!=='function')return;
+  try{
+    var data=await apiGetCached('get_clients');
+    if(data&&data.success&&typeof allClients!=='undefined')allClients=data.data||[];
+  }catch(e2){}
+}
+function remiMsgTab1BindClients(){
+  if(remiMsgTab1ClientsBound)return;
+  remiMsgTab1ClientsBound=true;
+  var list=document.getElementById('msgClientList');
+  if(!list)return;
+  list.addEventListener('click', function(ev){
+    var card=ev.target&&ev.target.closest?ev.target.closest('[data-msg-client]'):null;
+    if(!card)return;
+    remiMsgTab1OpenClient(card.getAttribute('data-msg-client'), '');
+  });
+}
+function remiMsgTab1PaintClients(){
+  remiMsgTab1BindClients();
+  remiMsgTab1ApplyChrome();
+  var list=document.getElementById('msgClientList');
+  var empty=document.getElementById('msgClientEmpty');
+  var rows=remiMsgTab1ClientRows();
+  if(empty)empty.hidden=rows.length>0;
+  if(!list)return;
+  if(!rows.length){
+    list.innerHTML='';
+    if(!remiMsgTab1ClientLoadTried){
+      remiMsgTab1ClientLoadTried=true;
+      remiMsgTab1EnsureClients().then(function(){
+        if(remiMsgTab1Segment==='clients'&&!remiMsgTab1ClientId)remiMsgTab1PaintClients();
+      });
+    }
+    return;
+  }
+  list.innerHTML=rows.map(function(c){
+    var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(c.name):'';
+    var preview=c.phone?'Phone on file':'No phone on file';
+    if(c.email)preview+=' · email on file';
+    return '<button type="button" class="aidechat-card" data-msg-client="'+remiMsgTab1Esc(c.id)+'" data-remi-msg-tab1="v=remi-msg-tab1">'
+      +'<span class="aide-office-av" aria-hidden="true">'+remiMsgTab1Esc(initials||'C')+'</span>'
+      +'<span class="aide-office-main">'
+      +'<span class="aidechat-card-top"><strong>'+remiMsgTab1Esc(c.name)+'</strong><span class="msg-client-tag">client</span></span>'
+      +'<span class="aidechat-preview">'+remiMsgTab1Esc(preview)+'</span>'
+      +'</span></button>';
+  }).join('');
+}
+function remiMsgTab1ContactHtml(person){
+  person=person||{};
+  var bits=[];
+  var phone=String(person.phone||'').trim();
+  var email=String(person.email||'').trim();
+  if(phone){
+    var tel=typeof coverPhoneHref==='function'?coverPhoneHref('tel', phone):'';
+    var sms=typeof coverPhoneHref==='function'?coverPhoneHref('sms', phone):'';
+    if(tel)bits.push('<a class="aidechat-phone" href="'+remiMsgTab1Esc(tel)+'">Call</a>');
+    if(sms)bits.push('<a class="aidechat-phone" href="'+remiMsgTab1Esc(sms)+'">Text</a>');
+  }
+  if(email){
+    var mail=typeof coverMailHref==='function'?coverMailHref(email, 'EverCare', ''):('mailto:'+email);
+    var label=person.emailKind==='case_manager'?'Email case manager':'Email';
+    bits.push('<a class="aidechat-phone" href="'+remiMsgTab1Esc(mail)+'">'+label+'</a>');
+  }
+  if(!bits.length)return 'No phone or email on file. This draft stays here. Send does not go out.';
+  return 'Draft only · '+bits.join(' · ')+'. Send opens that draft. Nothing goes out until you tap.';
+}
+function remiMsgTab1PaintClientThread(){
+  var person=remiMsgTab1ClientById(remiMsgTab1ClientId);
+  if(!person){
+    remiMsgTab1ClientId='';
+    if(typeof aidechatShowInbox==='function')aidechatShowInbox();
+    return;
+  }
+  remiMsgTab1ApplyChrome();
+  var av=document.getElementById('aidechatThreadAv');
+  var title=document.getElementById('aidechatThreadTitle');
+  var meta=document.getElementById('aidechatThreadMeta');
+  var box=document.getElementById('aidechatMessages');
+  var banner=document.getElementById('aidechatUrgentBanner');
+  if(banner)banner.hidden=true;
+  if(av){
+    var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(person.name):'';
+    av.textContent=initials||'C';
+  }
+  if(title)title.textContent=person.name||'Client';
+  if(meta)meta.innerHTML=remiMsgTab1ContactHtml(person);
+  if(box)box.innerHTML='<p class="aidechat-note">No in-app client thread on this desk. The words below are a draft. They are not sent.</p>';
+  if(typeof aidechatShow==='function')aidechatShow('thread');
+}
+function remiMsgTab1OpenClient(id, draft){
+  if(typeof aidechatRoleOk==='function'&&!aidechatRoleOk())return;
+  remiMsgTab1Segment='clients';
+  remiMsgTab1ClientId=String(id||'');
+  if(typeof aidechatSelectedId!=='undefined')aidechatSelectedId='';
+  remiMsgTab1PaintClientThread();
+  if(draft)remiMsgTab1StageDraft(draft);
+}
+function remiMsgTab1ClientSend(ev){
+  if(ev&&ev.preventDefault)ev.preventDefault();
+  var box=document.getElementById('aidechatReply');
+  var text=String(box&&box.value||'').trim();
+  if(!text)return false;
+  var person=remiMsgTab1ClientById(remiMsgTab1ClientId)||{};
+  var href='';
+  if(person.phone&&typeof coverSmsHref==='function')href=coverSmsHref(person.phone, text);
+  else if(person.email&&typeof coverMailHref==='function')href=coverMailHref(person.email, 'EverCare', text);
+  if(!href){
+    if(typeof showTempMsg==='function')showTempMsg('No phone or email on file. The draft stays here. Nothing was sent.','var(--warn)');
+    return false;
+  }
+  if(typeof coverGo==='function')coverGo(href);
+  return false;
+}
+function remiMsgTab1StageDraft(text){
+  var box=document.getElementById('aidechatReply');
+  if(box)box.value=String(text||'');
+  var note=document.getElementById('remiMsgTab1DraftNote');
+  if(note){
+    note.hidden=false;
+    note.textContent='Draft ready \u00b7 not sent';
+  }
+  remiMsgTab1DraftLive=true;
+}
+function remiMsgTab1Aides(){
+  var out=[];
+  var seen={};
+  function add(row){
+    if(!row)return;
+    var name=String(row.name||row.full_name||row.fullName||row.aide_name||'').trim();
+    var username=String(row.username||'').trim();
+    if(!name&&!username)return;
+    var id=String(row.aide_id||row.id||username||name);
+    var key=remiMsgTab1Norm(id+'|'+username+'|'+name);
+    if(seen[key])return;
+    seen[key]=1;
+    out.push({kind:'aide', id:id, aideId:String(row.aide_id||row.id||''), name:name||username, username:username});
+  }
+  var loaded=[];
+  try{loaded=(typeof loadedAidesList!=='undefined'&&loadedAidesList)?loadedAidesList:[];}catch(e){loaded=[];}
+  loaded.forEach(add);
+  var threads=[];
+  try{threads=(typeof aidechatThreads!=='undefined'&&aidechatThreads)?aidechatThreads:[];}catch(e2){threads=[];}
+  threads.forEach(add);
+  return out;
+}
+function remiMsgTab1ClientsAsPeople(){
+  return remiMsgTab1ClientRows().map(function(c){
+    return {kind:'client', id:c.id, name:c.name, username:'', phone:c.phone, email:c.email, emailKind:c.emailKind};
+  });
+}
+function remiMsgTab1Score(person, phrase){
+  var q=remiMsgTab1Norm(phrase);
+  if(!q||!person)return 0;
+  var name=remiMsgTab1Norm(person.name);
+  var user=remiMsgTab1Norm(person.username);
+  if(user&&q===user)return 120;
+  if(name&&q===name)return 110;
+  if(user&&(q===user||q.indexOf(user+' ')===0))return 100;
+  if(name&&(q===name||q.indexOf(name+' ')===0))return 100;
+  var tok=q.split(' ')[0];
+  if(user&&tok===user)return 90;
+  if(name){
+    var first=name.split(' ')[0];
+    if(first&&tok===first&&tok.length>=3)return 70;
+  }
+  if(typeof remiAskPersonHit==='function'&&remiAskPersonHit(phrase, person.name||person.username))return 40;
+  return 0;
+}
+function remiMsgTab1Best(list, phrase){
+  var best=null;
+  var score=0;
+  var ties=0;
+  (list||[]).forEach(function(person){
+    var n=remiMsgTab1Score(person, phrase);
+    if(n>score){score=n;best=person;ties=1;}
+    else if(n&&n===score)ties+=1;
+  });
+  return {person:score?best:null, score:score, ties:ties};
+}
+function remiMsgTab1Remainder(person, phrase){
+  var raw=String(phrase||'').trim();
+  var labels=[person&&person.name, person&&person.username].filter(Boolean);
+  var best='';
+  var i;
+  for(i=0;i<labels.length;i++){
+    var lab=String(labels[i]).trim();
+    if(!lab)continue;
+    var re=new RegExp('^'+lab.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i');
+    var m=raw.match(re);
+    if(m&&m[0].length>best.length)best=m[0];
+  }
+  if(!best){
+    var first=raw.split(/\s+/)[0]||'';
+    var token=remiMsgTab1Norm(first);
+    var user=remiMsgTab1Norm(person&&person.username);
+    var name0=remiMsgTab1Norm(person&&person.name).split(' ')[0];
+    if(token&&(token===user||token===name0))best=first;
+  }
+  return best?raw.slice(best.length).replace(/^[\s,:\-]+/,'').trim():'';
+}
+function remiMsgTab1Starter(person, rest){
+  if(rest)return rest;
+  var who=(person&&(person.name||person.username))||'there';
+  return 'Hi '+who+' \u2014 ';
+}
+function remiMsgTab1Parse(q){
+  var raw=String(q||'').replace(/[?.!]+$/g,'').trim();
+  var m=raw.match(/^(?:please\s+)?(?:can you\s+|could you\s+|would you\s+)?(?:message|msg)\s+(.+)$/i);
+  if(!m)return null;
+  var rest=String(m[1]||'').replace(/\s+/g,' ').trim();
+  if(!rest)return null;
+  var kind='';
+  var tagged=rest.match(/^(aide|client|caregiver)\s+(.+)$/i);
+  if(tagged){
+    kind=tagged[1].toLowerCase()==='client'?'client':'aide';
+    rest=String(tagged[2]||'').trim();
+  }
+  if(!rest)return null;
+  return {kind:kind, rest:rest};
+}
+function remiMsgTab1Ask(q){
+  if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
+  if(typeof aidechatRoleOk==='function'&&!aidechatRoleOk())return null;
+  var parsed=remiMsgTab1Parse(q);
+  if(!parsed)return null;
+  var aides=parsed.kind==='client'?[]:remiMsgTab1Aides();
+  var clients=parsed.kind==='aide'?[]:remiMsgTab1ClientsAsPeople();
+  var aideHit=remiMsgTab1Best(aides, parsed.rest);
+  var clientHit=remiMsgTab1Best(clients, parsed.rest);
+  var chosen=null;
+  if(aideHit.person&&clientHit.person){
+    if(aideHit.score===clientHit.score){
+      return {sec:true, kind:'', actions:[], text:'More than one person matches '+parsed.rest+'. Say message aide '+parsed.rest+' or message client '+parsed.rest+'. Nothing was sent.'};
+    }
+    chosen=aideHit.score>clientHit.score?aideHit.person:clientHit.person;
+  }else chosen=aideHit.person||clientHit.person;
+  if(!chosen||((aideHit.person&&aideHit.ties>1&&aideHit.score>=clientHit.score)||(clientHit.person&&clientHit.ties>1&&clientHit.score>aideHit.score))){
+    if(chosen&&((chosen.kind==='aide'&&aideHit.ties>1)||(chosen.kind==='client'&&clientHit.ties>1))){
+      return {sec:true, kind:'', actions:[], text:'More than one '+chosen.kind+' matches. Say the full name. Nothing was sent.'};
+    }
+  }
+  if(!chosen){
+    return {sec:true, kind:'', actions:[], text:'I don\u2019t have '+parsed.rest+' loaded on Aides or Clients. Nothing was drafted and nothing was sent.'};
+  }
+  var rest=remiMsgTab1Remainder(chosen, parsed.rest);
+  var draft=remiMsgTab1Starter(chosen, rest);
+  var who=chosen.name||chosen.username||'them';
+  return {
+    sec:true,
+    kind:'',
+    actions:[],
+    text:'Opened '+who+'\u2019s thread with a draft ready in the composer. You tap Send when you\u2019re set \u2014 I won\u2019t auto-send.',
+    remiMsgTab1:{kind:chosen.kind, id:chosen.id, aideId:chosen.aideId||'', username:chosen.username||'', name:chosen.name||'', draft:draft}
+  };
+}
+async function remiMsgTab1RevealAide(spec){
+  spec=spec||{};
+  remiMsgTab1Segment='aides';
+  remiMsgTab1ClientId='';
+  var aide={id:spec.aideId||spec.id, aide_id:spec.aideId||spec.id, username:spec.username||'', name:spec.name||''};
+  var thread=typeof aidechatFindByAide==='function'?aidechatFindByAide(aide):null;
+  if(!thread&&typeof aidechatThreads!=='undefined'&&aidechatThreads){
+    thread={
+      id:spec.id||(typeof aidechatId==='function'?aidechatId('t'):String(spec.id||'t')),
+      aide_id:spec.aideId||spec.id||'',
+      username:spec.username||'',
+      name:spec.name||'Aide',
+      urgent:false,
+      urgent_reason:'',
+      heads_up:'',
+      status:'open',
+      last_message:'',
+      last_at:'',
+      messages:[]
+    };
+    aidechatThreads.push(thread);
+  }
+  remiMsgTab1ApplyChrome();
+  if(thread&&typeof aidechatOpenThread==='function'){
+    try{await aidechatOpenThread(thread.id);}catch(e){}
+  }
+  if(thread&&typeof aidechatShow==='function')aidechatShow('thread');
+  if(typeof aidechatPaintThread==='function')aidechatPaintThread();
+  remiMsgTab1StageDraft(spec.draft||'');
+}
+async function remiMsgTab1OpenDraft(spec){
+  spec=spec||{};
+  if(typeof aidechatRoleOk==='function'&&!aidechatRoleOk())return;
+  var gen=++remiMsgTab1Seq;
+  remiMsgTab1Hold=gen;
+  if(spec.kind==='client'){
+    try{await remiMsgTab1EnsureClients();}catch(e){}
+  }
+  if(typeof showTab==='function')showTab('aidechat');
+  if(typeof aidechatOpen==='function'){
+    try{await aidechatOpen();}catch(e2){}
+  }
+  if(remiMsgTab1Hold!==gen)return;
+  if(spec.kind==='client')remiMsgTab1OpenClient(spec.id, spec.draft||'');
+  else{
+    try{await remiMsgTab1RevealAide(spec);}catch(e3){}
+  }
+  setTimeout(function(){if(remiMsgTab1Hold===gen)remiMsgTab1Hold=0;}, 500);
+}
 function remiAskAnswer(q){
   if(typeof copilotRoleOk==='function'&&!copilotRoleOk())return null;
   var s=remiAskFold(q);
   if(!s)return null;
+  if(typeof remiMsgTab1Ask==='function'){
+    var drafted=remiMsgTab1Ask(q);
+    if(drafted)return drafted;
+  }
   if(remiAskIsMark(s))return remiAskPack(remiAskSlotMarks(q,s));
   if(remiAskSkip(s))return null;
   if(/\bpassword\b/.test(s)){
