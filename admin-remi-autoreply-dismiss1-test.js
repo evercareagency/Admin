@@ -43,6 +43,10 @@ assert.ok(html.includes('id="aidechatSettingsOpen"'), 'reopen control');
 assert.ok(html.includes('id="aidechatSettingsTitle">Remi auto-reply</h2>'), 'header title');
 assert.ok(html.includes('onchange="aidechatSettingsChanged()"'), 'On/Off still calls aidechatSettingsChanged');
 assert.ok(html.includes('min-height:44px'), 'tap target stays at least 44px');
+assert.ok(html.indexOf('id="aidechatSettings"') < html.indexOf('id="aidechatList"'), 'settings sits under the header, before the list');
+assert.ok(html.includes('#tab_aidechat #aidechatSettings{position:static;'), 'settings stays in normal flow');
+assert.ok(html.includes('#aidechatSettings:not([hidden]) ~ #aidechatList'), 'open settings does not leave the list under the card');
+assert.ok(!/#aidechatSettings\{[^}]*position:\s*(fixed|absolute|sticky)/.test(html), 'settings is not a fixed or sticky overlay');
 
 const secStart = html.indexOf('id="aidechatSettings"');
 const secEnd = html.indexOf('id="aidechatThreadView"', secStart);
@@ -177,18 +181,21 @@ async function runBrowser(){
       showScreen('adminScreen');
       showTab('aidechat');
       if(typeof remiMsgTab1SetSegment === 'function')remiMsgTab1SetSegment('aides');
-      aidechatThreads = [{
-        id: 't-ada',
-        aide_id: 'ada-id',
-        username: 'ada',
-        name: 'Ada Cole',
-        preview_from_aide: 'I can cover tomorrow morning.',
-        last_message: 'I can cover tomorrow morning.',
-        last_message_at: '2026-09-29T14:05:00.000Z',
-        has_unread: true,
-        unread: 1,
-        messages: []
-      }];
+      var names = ['Ada Cole', 'Bea Lin', 'Cam Brooks', 'Dee Hart', 'Eve Cho', 'Fay Ortiz'];
+      aidechatThreads = names.map(function(name, i){
+        return {
+          id: 't-' + i,
+          aide_id: 'id-' + i,
+          username: name.split(' ')[0].toLowerCase(),
+          name: name,
+          preview_from_aide: 'I can cover tomorrow morning.',
+          last_message: 'I can cover tomorrow morning.',
+          last_message_at: '2026-09-29T14:0' + i + ':00.000Z',
+          has_unread: true,
+          unread: 1,
+          messages: []
+        };
+      });
       aidechatPaintInbox();
     });
     await page.waitForSelector('#aidechatSettings', {visible: true, timeout: 8000});
@@ -217,9 +224,26 @@ async function runBrowser(){
     assert.ok(openBox.doneH >= 44, 'Done is at least 44px, got ' + openBox.doneH);
     assert.ok(openBox.reopenH >= 44, 'reopen is at least 44px, got ' + openBox.reopenH);
     assert.strictEqual(openBox.title, 'Remi auto-reply');
-    await page.evaluate(function(){
-      document.getElementById('aidechatSettings').scrollIntoView({block: 'start'});
+    const openLay = await page.evaluate(function(){
+      var box = document.getElementById('aidechatSettings');
+      var list = document.getElementById('aidechatList');
+      var br = box.getBoundingClientRect();
+      var lr = list.getBoundingClientRect();
+      var ox = Math.max(0, Math.min(br.right, lr.right) - Math.max(br.left, lr.left));
+      var oy = Math.max(0, Math.min(br.bottom, lr.bottom) - Math.max(br.top, lr.top));
+      var hdr = document.querySelector('#aidechatInboxView .page-hdr').getBoundingClientRect();
+      return {
+        pos: getComputedStyle(box).position,
+        listDisplay: getComputedStyle(list).display,
+        overlap: ox * oy,
+        settingsTop: br.top,
+        headerBottom: hdr.bottom
+      };
     });
+    assert.strictEqual(openLay.pos, 'static', 'settings is not an overlay');
+    assert.strictEqual(openLay.listDisplay, 'none', 'list is not under the open card');
+    assert.strictEqual(openLay.overlap, 0, 'open card does not overlap the list');
+    assert.ok(openLay.settingsTop >= openLay.headerBottom - 2, 'settings sits under the Messages header');
     await page.screenshot({path: path.join(shotDir, 'remi-autoreply-dismiss1-open.png')});
 
     await page.click('#aidechatSettingsClose');
@@ -233,7 +257,7 @@ async function runBrowser(){
         hidden: box.hidden,
         display: cs.display,
         listDisplay: listCs.display,
-        card: card ? card.textContent : '',
+        card: list.textContent || '',
         expanded: document.getElementById('aidechatSettingsOpen').getAttribute('aria-expanded'),
         on: document.getElementById('aidechatOn').checked
       };
@@ -241,8 +265,33 @@ async function runBrowser(){
     assert.strictEqual(closed.hidden, true, 'X sets hidden');
     assert.strictEqual(closed.display, 'none', 'hidden rule hides the panel');
     assert.notStrictEqual(closed.listDisplay, 'none', 'inbox list stays painted');
-    assert.ok(closed.card.indexOf('Ada Cole') >= 0, 'thread stays on the list');
+    assert.ok(closed.card.indexOf('Ada Cole') >= 0 && closed.card.indexOf('Fay Ortiz') >= 0, 'threads stay on the list');
     assert.strictEqual(closed.expanded, 'false');
+    const inboxLay = await page.evaluate(function(){
+      var box = document.getElementById('aidechatSettings');
+      var list = document.getElementById('aidechatList');
+      var br = box.getBoundingClientRect();
+      var lr = list.getBoundingClientRect();
+      var ox = Math.max(0, Math.min(br.right, lr.right) - Math.max(br.left, lr.left));
+      var oy = Math.max(0, Math.min(br.bottom, lr.bottom) - Math.max(br.top, lr.top));
+      var card = list.querySelector('.aidechat-card');
+      card.scrollIntoView({block: 'center'});
+      var cr = card.getBoundingClientRect();
+      var hit = document.elementFromPoint(cr.left + cr.width / 2, cr.top + cr.height / 2);
+      var cards = list.querySelectorAll('.aidechat-card').length;
+      return {
+        overlap: ox * oy,
+        settingsDisplay: getComputedStyle(box).display,
+        cards: cards,
+        hitSettings: !!(hit && hit.closest && hit.closest('#aidechatSettings')),
+        scrollable: list.scrollHeight >= list.clientHeight
+      };
+    });
+    assert.strictEqual(inboxLay.overlap, 0, 'dismissed card does not overlap the list');
+    assert.strictEqual(inboxLay.settingsDisplay, 'none', 'dismissed card is out of the layout');
+    assert.ok(inboxLay.cards >= 6, 'full aides list is painted');
+    assert.strictEqual(inboxLay.hitSettings, false, 'a thread tap does not hit the settings card');
+    assert.strictEqual(inboxLay.scrollable, true, 'inbox list is scrollable');
     await page.screenshot({path: path.join(shotDir, 'remi-autoreply-dismiss1-inbox.png')});
 
     await page.click('#aidechatSettingsOpen');
