@@ -281,7 +281,7 @@ vm.runInContext(html.slice(notesStart, notesEnd), notesBox);
 notesBox.remiNotesVis1ResetTab();
 const schedNotes = notesBox.remiNotesVis1Html();
 assert.ok(/id="remiNotesVisSched"[^>]*\shidden/.test(schedNotes), 'Mo notes Scheduler tab stays hidden');
-assert.strictEqual(notesBox.remiNotesVis1Hint(), 'Admin My notes never appear here.');
+assert.strictEqual(notesBox.remiNotesVis1Hint(), 'Your notes only');
 assert.strictEqual(notesBox.remiNotesVis1IsAdmin(), false);
 notesBox.currentAdminRole = 'Admin';
 notesBox.remiNotesVis1ResetTab();

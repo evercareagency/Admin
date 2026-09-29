@@ -17,6 +17,13 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-29-remi-notes
 assert.ok(html.includes('<!-- remi notes open thread 2026-09-29 v=remi-notes-open1 ?v=remi-notes-open1 admin-build 2026-09-29-remi-notes-open1'), 'comment');
 assert.ok(html.includes("var REMI_NOTES_OPEN1_MARKER='v=remi-notes-open1'"), 'script marker');
 assert.ok(html.includes("var REMI_NOTES_OPEN1_BUILD='2026-09-29-remi-notes-open1'"), 'script build');
+assert.ok(html.includes('v=sched-notes-copy1'), 'sched notes copy marker');
+assert.ok(html.includes('<meta name="admin-build" content="2026-09-29-sched-notes-copy1">'), 'sched notes copy meta');
+assert.ok(html.includes("var SCHED_NOTES_COPY1_MARKER='v=sched-notes-copy1'"), 'sched notes copy script marker');
+assert.ok(html.includes("var SCHED_NOTES_COPY1_BUILD='2026-09-29-sched-notes-copy1'"), 'sched notes copy script build');
+assert.ok(html.includes('data-sched-notes-copy1="v=sched-notes-copy1"'), 'sched notes copy data attr');
+assert.ok(html.includes("return 'Your notes only'"), 'scheduler hint copy');
+assert.ok(!html.includes('Admin My notes never appear here.'), 'old scheduler hint is gone');
 assert.ok(html.includes('GHOST-REMI-NOTES-OPEN1-CONTRACT-v1'), 'contract');
 assert.ok(html.includes('Ace NO CALLABLE'), 'no new callable');
 assert.ok(html.includes('MERGE HOLD'), 'MERGE HOLD');
@@ -94,6 +101,15 @@ function wire(sandbox){
   assert.strictEqual(sandbox.REMI_NOTES_VIS1_MARKER, 'v=remi-notes-vis1');
   const shell = sandbox.remiNotesVis1Html();
   assert.ok(shell.includes('data-remi-notes-open1="v=remi-notes-open1"'), shell);
+  assert.ok(shell.includes('data-sched-notes-copy1="v=sched-notes-copy1"'), shell);
+  assert.strictEqual(sandbox.remiNotesVis1Hint(), 'Save \u2192 only on My notes. Scheduler never sees this tab.');
+  sandbox.currentAdminRole = 'Scheduler';
+  sandbox.remiNotesVis1Which = 'my';
+  assert.strictEqual(sandbox.remiNotesVis1Hint(), 'Your notes only');
+  sandbox.remiNotesVis1Which = 'scheduler';
+  assert.strictEqual(sandbox.remiNotesVis1Hint(), 'This tab only. Your My notes stay off her screen.');
+  sandbox.currentAdminRole = 'Admin';
+  sandbox.remiNotesVis1Which = 'my';
   assert.ok(shell.includes('>My notes<') && shell.includes('>Scheduler notes<'), 'tabs stay');
   const card = sandbox.remiNotesVis1CardHtml({
     id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
