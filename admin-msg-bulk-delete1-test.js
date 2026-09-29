@@ -39,6 +39,8 @@ assert.ok(html.includes('evercare_msg_bulk_delete1_aides'), 'aides session key')
 assert.ok(html.includes('evercare_msg_bulk_delete1_clients'), 'clients session key');
 assert.ok(html.includes('It is not a send'), 'delete is not a send');
 assert.ok(html.includes('Admin and Scheduler are one portal'), 'one portal');
+assert.ok(html.includes('This chrome is not Admin-only'), 'not Admin-only');
+assert.ok(html.includes('Scheduler login sees the same checkboxes, Select all, Unselect, and Delete as Admin'), 'Scheduler login copy');
 assert.ok(html.includes('Nurse stays out'), 'Nurse out of scope');
 assert.ok(!fs.existsSync(path.join(__dirname, 'patches/msg-bulk-delete1-v1.sql')), 'no SQL patch');
 assert.strictEqual(buildFile, '2026-09-29-pages-cache-fresh1', 'admin-build.txt stays the pages-cache shell');
@@ -61,19 +63,35 @@ assert.ok(html.includes('id="msgBulkCount">0 selected'), 'count starts at 0 sele
 assert.ok(html.includes('class="msg-bulk-cb"'), 'checkbox class');
 assert.ok(html.includes('data-msg-bulk-delete1="v=msg-bulk-delete1"'), 'desk marker');
 assert.ok(html.includes('data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1"'), 'toolbar is Admin and Scheduler');
+function openTag(id){
+  const at = html.indexOf('id="'+id+'"');
+  assert.ok(at > 0, 'missing '+id);
+  return html.slice(html.lastIndexOf('<', at), html.indexOf('>', at) + 1);
+}
+['msgBulkToolbar','msgBulkSelectAll','msgBulkUnselect','msgBulkDelete','msgBulkCount','msgBulkCallout'].forEach(function(id){
+  const roles = (openTag(id).match(/data-layout-roles="([^"]*)"/) || [])[1];
+  assert.strictEqual(roles, 'Admin Scheduler', id+' shares Admin and Scheduler chrome');
+});
 
 const selectFn = extractFn(html, 'function msgBulkDelete1SelectAll()');
 const unselectFn = extractFn(html, 'function msgBulkDelete1Unselect()');
 const deleteFn = extractFn(html, 'async function msgBulkDelete1Delete()');
+const roleFn = extractFn(html, 'function msgBulkDelete1RoleOk()');
 assert.ok(!selectFn.includes('sessionStorage') && !unselectFn.includes('sessionStorage'), 'Select all and Unselect do not store');
 assert.ok(!selectFn.includes('sbRestRpc') && !unselectFn.includes('sbRestRpc') && !deleteFn.includes('sbRestRpc'), 'toolbar does not post');
 ['admin_send_aide_office_message','admin_send_aide_text','admin_compose_aide_text','sms:','mailto:','quo','archive_client','admin_deactivate'].forEach(function(name){
   assert.ok(!deleteFn.includes(name), 'delete does not call ' + name);
 });
 assert.ok(deleteFn.includes('msgBulkDelete1Remember'), 'delete remembers the ids');
-assert.ok(deleteFn.includes("role") || extractFn(html, 'function msgBulkDelete1RoleOk()').includes("role==='Nurse'"), 'Nurse gate exists');
-assert.ok(extractFn(html, 'function msgBulkDelete1RoleOk()').includes("role==='Nurse'"), 'Nurse is denied');
-assert.ok(extractFn(html, 'function msgBulkDelete1RoleOk()').includes('Scheduler'), 'Scheduler is included');
+assert.ok(roleFn.includes("role==='Nurse'"), 'Nurse is denied');
+assert.ok(roleFn.includes('Scheduler'), 'Scheduler is included');
+assert.ok(roleFn.includes('This chrome is not Admin-only'), 'role gate says the chrome is shared');
+assert.ok(roleFn.includes("role!=='Admin'&&role!=='Scheduler'"), 'Admin and Scheduler pass the same gate');
+assert.ok(!/if\s*\(\s*role\s*===\s*'Admin'\s*\)/.test(roleFn), 'role gate is not Admin-only');
+[selectFn, unselectFn, deleteFn].forEach(function(fn){
+  assert.ok(fn.includes('msgBulkDelete1RoleOk()'), 'action uses the shared gate');
+  assert.ok(!fn.includes("role==='Admin'"), 'action is not Admin-only');
+});
 assert.ok(extractFn(html, 'function aidechatPaintInbox()').includes("msgBulkDelete1Filter('aides'"), 'aides paint filters hidden ids');
 assert.ok(extractFn(html, 'function remiMsgTab1PaintClients()').includes("msgBulkDelete1Filter('clients'"), 'clients paint filters hidden ids');
 assert.ok(extractFn(html, 'function aidechatPaintInbox()').includes('msgBulkDelete1CheckHtml'), 'aides rows have a checkbox');
@@ -189,15 +207,25 @@ async function runVm(){
   assert.strictEqual(vm.runInContext('msgBulkDelete1Hidden("clients","c-ada")', ctx), false);
   assert.strictEqual(vm.runInContext('toasts[0]', ctx), 'Cleared from this inbox');
 
-  vm.runInContext('currentAdminRole="Scheduler"; currentAdminUsername="scheduler"; remiMsgTab1Segment="aides"; msgBulkDelete1Busy=false; msgBulkDelete1Selected={aides:{},clients:{}};', ctx);
-  assert.strictEqual(vm.runInContext('msgBulkDelete1RoleOk()', ctx), true, 'Scheduler shares the inbox');
+  delete store.evercare_msg_bulk_delete1_aides;
+  delete store.evercare_msg_bulk_delete1_clients;
+  vm.runInContext('currentAdminRole="Scheduler"; currentAdminUsername="scheduler"; remiMsgTab1Segment="aides"; msgBulkDelete1Busy=false; msgBulkDelete1Selected={aides:{},clients:{}}; msgBulkDelete1Note=""; msgBulkDelete1NoteInbox="";', ctx);
+  assert.strictEqual(vm.runInContext('msgBulkDelete1RoleOk()', ctx), true, 'Scheduler login shares the inbox');
   vm.runInContext('msgBulkDelete1SelectAll();', ctx);
-  assert.strictEqual(vm.runInContext('msgBulkDelete1Count()', ctx), 1, 'Scheduler Select all checks the visible aide only');
-  vm.runInContext('msgBulkDelete1Unselect(); msgBulkDelete1Selected.aides={"a-sara":1};', ctx);
+  assert.strictEqual(vm.runInContext('msgBulkDelete1Count()', ctx), 3, 'Scheduler Select all checks every aide');
+  assert.strictEqual(store.evercare_msg_bulk_delete1_aides, undefined, 'Scheduler Select all does not store');
+  vm.runInContext('msgBulkDelete1Unselect();', ctx);
+  assert.strictEqual(vm.runInContext('msgBulkDelete1Count()', ctx), 0, 'Scheduler Unselect clears aides');
+  assert.strictEqual(store.evercare_msg_bulk_delete1_aides, undefined, 'Scheduler Unselect does not store');
+  vm.runInContext('msgBulkDelete1Selected.aides={"a-moe":1,"a-jordan":1};', ctx);
   await vm.runInContext('msgBulkDelete1Delete()', ctx);
-  assert.strictEqual(vm.runInContext('msgBulkDelete1Hidden("aides","a-sara")', ctx), true, 'Scheduler delete hides that aide');
-  assert.deepStrictEqual(plain('msgBulkDelete1Filter("aides", aideRows).map(function(r){return r.id;})'), [], 'Scheduler inbox drops the deleted aide on refresh');
-  assert.strictEqual(vm.runInContext('msgBulkDelete1Hidden("clients","c-ada")', ctx), false, 'Scheduler aide delete still leaves Ada');
+  assert.deepStrictEqual(plain('msgBulkDelete1Filter("aides", aideRows).map(function(r){return r.id;})'), ['a-sara'], 'Scheduler Aides delete removes only the checked rows');
+  assert.deepStrictEqual(plain('msgBulkDelete1Filter("clients", clientRows).map(function(r){return r.id;})'), ['c-bowlax','c-ada','c-rita'], 'Scheduler Aides delete leaves Clients alone');
+  vm.runInContext('remiMsgTab1Segment="clients"; msgBulkDelete1Selected={aides:{},clients:{"c-bowlax":1}}; msgBulkDelete1Busy=false;', ctx);
+  await vm.runInContext('msgBulkDelete1Delete()', ctx);
+  assert.deepStrictEqual(plain('msgBulkDelete1Filter("clients", clientRows).map(function(r){return r.id;})'), ['c-ada','c-rita'], 'Scheduler Clients delete removes only the checked client');
+  assert.deepStrictEqual(plain('msgBulkDelete1Filter("aides", aideRows).map(function(r){return r.id;})'), ['a-sara'], 'Scheduler Clients delete leaves the remaining aide');
+  assert.strictEqual(vm.runInContext('msgBulkDelete1Hidden("clients","c-ada")', ctx), false, 'Scheduler leaves Ada');
 
   vm.runInContext('currentAdminRole="Nurse"; msgBulkDelete1Busy=false; remiMsgTab1Segment="clients"; msgBulkDelete1Selected={aides:{},clients:{"c-ada":1}};', ctx);
   const beforeNurse = store.evercare_msg_bulk_delete1_clients;
@@ -398,40 +426,169 @@ async function runBrowser(){
     assert.deepStrictEqual(refresh.aides, ['Sara Alvarez'], 'refresh keeps deleted aides hidden');
     assert.deepStrictEqual(refresh.clients, ['Ada Cole','Rita Morales'], 'refresh keeps the deleted client hidden');
 
-    const scheduler = await page.evaluate(async function(){
+    const schedPage = await browser.newPage();
+    await schedPage.setViewport({width:390, height:844, isMobile:true, hasTouch:true});
+    await schedPage.goto('http://127.0.0.1:'+port+'/', {waitUntil:'domcontentloaded', timeout:60000});
+    const schedBoot = await schedPage.evaluate(async function(){
+      window.__rpc=[];
+      readSbSession=function(){return {access_token:'office-jwt', email:'scheduler@evercare.test'};};
+      sbRestRpc=async function(name, body){
+        window.__rpc.push({name:name, body:body||{}});
+        return {ok:true, data:{success:true, threads:[], messages:[], enabled:false, start_local:'14:00', end_local:'08:00'}};
+      };
+      startAdminSession({role:'Scheduler', username:'scheduler', name:'Scheduler'});
+      showScreen('adminScreen');
+      showTab('aidechat');
+      await aidechatOpen();
       sessionStorage.removeItem('evercare_msg_bulk_delete1_aides');
       sessionStorage.removeItem('evercare_msg_bulk_delete1_clients');
-      currentAdminRole='Scheduler';
-      currentAdminUsername='scheduler';
-      if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
+      aidechatThreads=[
+        {id:'a-moe', aide_id:'a-moe', username:'moe', name:'moe', status:'open', last_message:'Can I swap Sunday with Sara?', last_at:'2026-09-29T12:00:00Z', messages:[], preview_from_aide:'Can I swap Sunday with Sara?'},
+        {id:'a-sara', aide_id:'a-sara', username:'sara', name:'Sara Alvarez', status:'open', last_message:'Done', last_at:'2026-09-29T11:00:00Z', messages:[], preview_from_aide:'Done'},
+        {id:'a-jordan', aide_id:'a-jordan', username:'jordan', name:'Jordan Kim', status:'open', last_message:'Timesheet week of 9/21', last_at:'2026-09-29T10:00:00Z', messages:[], preview_from_aide:'Timesheet week of 9/21'}
+      ];
+      allClients=[
+        {id:'c-bowlax', name:'Bowlax Abib', phone:'(216) 555-0142', isActive:true},
+        {id:'c-ada', name:'Ada Cole', phone:'(216) 555-0199', isActive:true},
+        {id:'c-rita', name:'Rita Morales', phone:'', isActive:true}
+      ];
       remiMsgTab1Segment='aides';
-      msgBulkDelete1Selected={aides:{},clients:{}};
       aidechatPaintInbox();
-      var bar=document.getElementById('msgBulkToolbar').textContent;
-      msgBulkDelete1SelectAll();
-      var allCount=document.getElementById('msgBulkCount').textContent;
-      var checks=document.querySelectorAll('#aidechatList .msg-bulk-cb:checked').length;
-      msgBulkDelete1Unselect();
-      msgBulkDelete1Toggle('aides','a-sara', true);
-      await msgBulkDelete1Delete();
-      remiMsgTab1SetSegment('clients');
-      var clientNames=Array.prototype.map.call(document.querySelectorAll('#msgClientList .aidechat-card strong'), function(n){return n.textContent;});
-      remiMsgTab1SetSegment('aides');
+      if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
+      function chrome(id){
+        var el=document.getElementById(id);
+        var st=el?getComputedStyle(el):null;
+        return {
+          roles:el?el.getAttribute('data-layout-roles'):'',
+          hidden:!(el&&!el.hasAttribute('hidden')&&st&&st.display!=='none'&&st.visibility!=='hidden')
+        };
+      }
+      var ids=['msgBulkToolbar','msgBulkSelectAll','msgBulkUnselect','msgBulkDelete','msgBulkCount','msgBulkCallout'];
+      var pieces={};
+      ids.forEach(function(id){pieces[id]=chrome(id);});
+      var del=document.getElementById('msgBulkDelete');
       return {
-        bar:bar,
-        allCount:allCount,
-        checks:checks,
-        aides:Array.prototype.map.call(document.querySelectorAll('#aidechatList .aidechat-card strong'), function(n){return n.textContent;}),
-        clients:clientNames,
-        roleOk:msgBulkDelete1RoleOk()
+        role:currentAdminRole,
+        roleOk:msgBulkDelete1RoleOk(),
+        checks:document.querySelectorAll('#aidechatList .msg-bulk-cb').length,
+        names:Array.prototype.map.call(document.querySelectorAll('#aidechatList .aidechat-card strong'), function(n){return n.textContent;}),
+        disabled:!!del.disabled,
+        count:document.getElementById('msgBulkCount').textContent,
+        labels:document.getElementById('msgBulkToolbar').textContent,
+        pieces:pieces
       };
     });
-    assert.strictEqual(scheduler.roleOk, true, 'Scheduler role gate');
-    assert.ok(scheduler.bar.indexOf('Select all')>=0 && scheduler.bar.indexOf('Delete')>=0, scheduler.bar);
-    assert.strictEqual(scheduler.allCount, '3 selected', 'Scheduler Select all');
-    assert.strictEqual(scheduler.checks, 3);
-    assert.deepStrictEqual(scheduler.aides, ['moe','Jordan Kim'], 'Scheduler delete removes only Sara');
-    assert.deepStrictEqual(scheduler.clients, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Scheduler aide delete leaves clients');
+    assert.strictEqual(schedBoot.role, 'Scheduler', 'Scheduler login');
+    assert.strictEqual(schedBoot.roleOk, true, 'Scheduler role gate');
+    assert.strictEqual(schedBoot.checks, 3, 'Scheduler aides rows have checks');
+    assert.deepStrictEqual(schedBoot.names, ['moe','Sara Alvarez','Jordan Kim']);
+    assert.strictEqual(schedBoot.disabled, true, 'Scheduler Delete muted until select');
+    assert.strictEqual(schedBoot.count, '0 selected');
+    assert.ok(schedBoot.labels.indexOf('Select all')>=0 && schedBoot.labels.indexOf('Unselect')>=0 && schedBoot.labels.indexOf('Delete')>=0, schedBoot.labels);
+    Object.keys(schedBoot.pieces).forEach(function(id){
+      assert.strictEqual(schedBoot.pieces[id].roles, 'Admin Scheduler', id+' is shared chrome');
+      assert.strictEqual(schedBoot.pieces[id].hidden, false, id+' stays visible for Scheduler login');
+    });
+    await schedPage.screenshot({path:path.join(outDir, '05-scheduler-aides-idle.png')});
+
+    await schedPage.click('#aidechatList .msg-bulk-cb[data-msg-bulk-id="a-moe"]');
+    const schedOne = await schedPage.evaluate(function(){
+      var del=document.getElementById('msgBulkDelete');
+      return {
+        disabled:!!del.disabled,
+        count:document.getElementById('msgBulkCount').textContent,
+        threadHidden:document.getElementById('aidechatThreadView').hidden,
+        checked:document.querySelector('#aidechatList .msg-bulk-cb[data-msg-bulk-id="a-moe"]').checked
+      };
+    });
+    assert.strictEqual(schedOne.checked, true, 'Scheduler check selects the row');
+    assert.strictEqual(schedOne.disabled, false, 'Scheduler Delete enables after one check');
+    assert.strictEqual(schedOne.count, '1 selected');
+    assert.strictEqual(schedOne.threadHidden, true, 'Scheduler checkbox does not open the thread');
+
+    await schedPage.evaluate(function(){window.__rpc=[];});
+    await schedPage.click('#msgBulkSelectAll');
+    const schedAll = await schedPage.evaluate(function(){
+      var on=0;
+      Array.prototype.forEach.call(document.querySelectorAll('#aidechatList .msg-bulk-cb'), function(box){if(box.checked)on++;});
+      return {on:on, rpc:window.__rpc.map(function(row){return row.name;}), count:document.getElementById('msgBulkCount').textContent};
+    });
+    assert.strictEqual(schedAll.on, 3, 'Scheduler Select all checks every aide');
+    assert.strictEqual(schedAll.count, '3 selected');
+    assert.ok(!schedAll.rpc.some(function(name){return /send|hide|archive|delete|blast|compose/i.test(name);}), 'Scheduler Select all does not post '+schedAll.rpc.join(','));
+    await schedPage.evaluate(function(){window.__rpc=[];});
+    await schedPage.click('#msgBulkUnselect');
+    const schedNone = await schedPage.evaluate(function(){
+      var on=0;
+      Array.prototype.forEach.call(document.querySelectorAll('#aidechatList .msg-bulk-cb'), function(box){if(box.checked)on++;});
+      return {on:on, disabled:document.getElementById('msgBulkDelete').disabled, rpc:window.__rpc.map(function(row){return row.name;})};
+    });
+    assert.strictEqual(schedNone.on, 0, 'Scheduler Unselect clears checks');
+    assert.strictEqual(schedNone.disabled, true);
+    assert.ok(!schedNone.rpc.some(function(name){return /send|hide|archive|delete|blast|compose/i.test(name);}), 'Scheduler Unselect does not post '+schedNone.rpc.join(','));
+
+    await schedPage.click('#aidechatList .msg-bulk-cb[data-msg-bulk-id="a-moe"]');
+    await schedPage.click('#aidechatList .msg-bulk-cb[data-msg-bulk-id="a-jordan"]');
+    await schedPage.screenshot({path:path.join(outDir, '06-scheduler-aides-selected.png')});
+    await schedPage.evaluate(function(){window.__rpc=[];});
+    await schedPage.click('#msgBulkDelete');
+    const schedAides = await schedPage.evaluate(function(){
+      return {
+        names:Array.prototype.map.call(document.querySelectorAll('#aidechatList .aidechat-card strong'), function(n){return n.textContent;}),
+        rpc:window.__rpc.map(function(row){return row.name;}),
+        count:document.getElementById('msgBulkCount').textContent,
+        disabled:document.getElementById('msgBulkDelete').disabled,
+        clientsKey:sessionStorage.getItem('evercare_msg_bulk_delete1_clients')
+      };
+    });
+    assert.deepStrictEqual(schedAides.names, ['Sara Alvarez'], 'Scheduler Delete removes only the checked aides');
+    assert.strictEqual(schedAides.count, '0 selected');
+    assert.strictEqual(schedAides.disabled, true);
+    assert.strictEqual(schedAides.clientsKey, null, 'Scheduler Aides delete does not write the clients key');
+    assert.ok(!schedAides.rpc.some(function(name){return /send|hide|archive|delete|blast|compose/i.test(name);}), schedAides.rpc.join(','));
+
+    await schedPage.click('#msgSegClients');
+    const schedClientsOn = await schedPage.evaluate(function(){
+      return {
+        names:Array.prototype.map.call(document.querySelectorAll('#msgClientList .aidechat-card strong'), function(n){return n.textContent;}),
+        checks:document.querySelectorAll('#msgClientList .msg-bulk-cb').length,
+        disabled:document.getElementById('msgBulkDelete').disabled,
+        count:document.getElementById('msgBulkCount').textContent,
+        roles:document.getElementById('msgBulkToolbar').getAttribute('data-layout-roles')
+      };
+    });
+    assert.deepStrictEqual(schedClientsOn.names, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Scheduler Clients tab is untouched');
+    assert.strictEqual(schedClientsOn.checks, 3, 'Scheduler Clients rows have checks');
+    assert.strictEqual(schedClientsOn.disabled, true, 'Scheduler Clients Delete starts muted');
+    assert.strictEqual(schedClientsOn.count, '0 selected');
+    assert.strictEqual(schedClientsOn.roles, 'Admin Scheduler');
+    await schedPage.evaluate(function(){window.__rpc=[];});
+    await schedPage.click('#msgBulkSelectAll');
+    const schedClientsAll = await schedPage.evaluate(function(){
+      var on=0;
+      Array.prototype.forEach.call(document.querySelectorAll('#msgClientList .msg-bulk-cb'), function(box){if(box.checked)on++;});
+      return {on:on, count:document.getElementById('msgBulkCount').textContent, rpc:window.__rpc.map(function(row){return row.name;})};
+    });
+    assert.strictEqual(schedClientsAll.on, 3, 'Scheduler Select all checks every client');
+    assert.strictEqual(schedClientsAll.count, '3 selected');
+    assert.ok(!schedClientsAll.rpc.some(function(name){return /send|hide|archive|delete|blast|compose/i.test(name);}), 'Scheduler client Select all does not post');
+    await schedPage.click('#msgBulkUnselect');
+    await schedPage.click('#msgClientList .msg-bulk-cb[data-msg-bulk-id="c-bowlax"]');
+    await schedPage.screenshot({path:path.join(outDir, '07-scheduler-clients-selected.png')});
+    await schedPage.evaluate(function(){window.__rpc=[];});
+    await schedPage.click('#msgBulkDelete');
+    const schedAfter = await schedPage.evaluate(function(){
+      remiMsgTab1SetSegment('aides');
+      return {
+        clients:Array.prototype.map.call(document.querySelectorAll('#msgClientList .aidechat-card strong'), function(n){return n.textContent;}),
+        aides:Array.prototype.map.call(document.querySelectorAll('#aidechatList .aidechat-card strong'), function(n){return n.textContent;}),
+        rpc:window.__rpc.map(function(row){return row.name;})
+      };
+    });
+    assert.deepStrictEqual(schedAfter.clients, ['Ada Cole','Rita Morales'], 'Scheduler Clients delete removes only Bowlax');
+    assert.deepStrictEqual(schedAfter.aides, ['Sara Alvarez'], 'Scheduler Clients delete leaves Aides alone');
+    assert.ok(!schedAfter.rpc.some(function(name){return /send|hide|archive|delete|blast|compose/i.test(name);}), schedAfter.rpc.join(','));
+    await schedPage.close();
 
     const nurse = await page.evaluate(async function(){
       var before=sessionStorage.getItem('evercare_msg_bulk_delete1_aides');
