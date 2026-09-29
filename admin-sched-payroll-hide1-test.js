@@ -203,6 +203,55 @@ assert.strictEqual(tab.hidden, true, 'Show does not itself unhide; role apply do
 sandbox.schedPayrollHide1Apply();
 assert.strictEqual(tab.hidden, false, 'Admin role apply shows the payroll tab');
 
+const schedStart = html.indexOf('// remi sched1 v=remi-sched1');
+const schedEnd = html.indexOf('// end remi sched1 v=remi-sched1');
+assert.ok(schedStart > 0 && schedEnd > schedStart, 'sched script block');
+vm.runInContext(html.slice(schedStart, schedEnd), sandbox);
+const PAY_JOB = {
+  id:'pay1', title:'Payroll report', kind:'payroll_report', job_key:'payroll_report', is_on:true, weekday:'wed', local_time:'08:00',
+  recurrence:'biweekly', interval_days:14, anchor_date:'2026-09-23', sort_order:5,
+  schedule_label:'Every other Wednesday \u00B7 8:00 AM ET \u00B7 payroll report in Remi rail',
+  next_run_at:'2026-10-07T12:00:00+00:00'
+};
+const HOURS_JOB = {
+  id:'miss1', title:'Missing hours report', kind:'missing_hours_report', job_key:'missing_hours_report', is_on:true, weekday:'mon', local_time:'09:00',
+  sort_order:10, schedule_label:'Every Monday \u00B7 9:00 AM ET \u00B7 posts in Remi rail'
+};
+sandbox.remiSched1Cache = [PAY_JOB, HOURS_JOB];
+sandbox.currentAdminRole = 'Scheduler';
+const schedList = sandbox.remiSched1ListHtml();
+assert.ok(schedList.indexOf('Missing hours report') >= 0, 'Scheduler keeps other scheduled jobs');
+assert.ok(schedList.indexOf('Payroll report') < 0, schedList);
+assert.ok(schedList.indexOf('Open report') < 0, schedList);
+assert.ok(schedList.indexOf('>Run<') < 0, schedList);
+assert.ok(schedList.indexOf('Anchor pay day') < 0, schedList);
+assert.ok(schedList.indexOf('09/23/2026') < 0, schedList);
+assert.ok(schedList.indexOf('payroll report in Remi rail') < 0, schedList);
+assert.strictEqual(sandbox.remiSched1JobHtml(PAY_JOB), '', 'Scheduler payroll job card is not painted');
+assert.strictEqual(sandbox.remiPayroll1JobExtra(PAY_JOB), '', 'Scheduler payroll job extra is empty');
+const titleOnly = Object.assign({}, PAY_JOB, {kind:'', job_key:'', title:'Weekly payroll'});
+assert.strictEqual(sandbox.remiSched1JobHtml(titleOnly), '', 'Scheduler title-only payroll card is not painted');
+
+sandbox.currentAdminRole = 'Admin';
+const adminCard = sandbox.remiSched1JobHtml(PAY_JOB);
+const adminList = sandbox.remiSched1ListHtml();
+assert.ok(adminCard.indexOf('Payroll report') >= 0, adminCard);
+assert.ok(adminCard.indexOf('Open report') >= 0, adminCard);
+assert.ok(adminCard.indexOf('>Run<') >= 0, adminCard);
+assert.ok(adminCard.indexOf('Anchor pay day') >= 0, adminCard);
+assert.ok(adminCard.indexOf('09/23/2026') >= 0, adminCard);
+assert.ok(adminList.indexOf('Missing hours report') >= 0, adminList);
+assert.ok(adminList.indexOf('Payroll report') >= 0, adminList);
+assert.ok(sandbox.remiPayroll1JobExtra(PAY_JOB).indexOf('Open report') >= 0, 'Admin job extra stays');
+
+sandbox.currentAdminRole = 'Nurse';
+assert.strictEqual(sandbox.remiSched1JobHtml(PAY_JOB), '', 'Nurse payroll job card stays out');
+assert.ok(sandbox.remiSched1JobHtml(HOURS_JOB).indexOf('Missing hours report') >= 0, 'Nurse hours card is unchanged');
+
+sandbox.currentAdminRole = '';
+assert.strictEqual(sandbox.schedPayrollHide1UiOk(), true, 'empty role still paints');
+assert.ok(sandbox.remiSched1JobHtml(PAY_JOB).indexOf('Payroll report') >= 0, 'empty role still paints the payroll card');
+
 const fromRail = extractFn(html, 'function remiPayrollIns1FromRail()');
 vm.runInContext(fromRail, sandbox);
 sandbox.currentAdminRole = 'Scheduler';
