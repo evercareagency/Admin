@@ -476,6 +476,62 @@ async function runBrowser(){
     assert.strictEqual(backList.moreActive, false);
     assert.strictEqual(backList.morePanel, false);
     await page.screenshot({path: path.join(shotDir, 'aide-profile-link-fix-back-list.png')});
+    await page.evaluate(function(){return renderAides(false);});
+    await page.waitForFunction(function(){
+      function shown(el){
+        if(!el)return false;
+        var cs = getComputedStyle(el);
+        if(cs.display === 'none' || cs.visibility === 'hidden')return false;
+        var r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }
+      var tab = document.getElementById('tab_aides');
+      var root = document.getElementById('aideCredsRoot');
+      var desk = document.getElementById('aideDesk');
+      var more = document.querySelector('#aidesContainer .aide-info-more');
+      return tab && !tab.classList.contains('aide-creds-on')
+        && shown(desk) && shown(more)
+        && root && !shown(root);
+    }, {timeout:8000});
+    await page.screenshot({path: path.join(shotDir, 'aide-profile-link-fix-active-cards.png')});
+    await page.click('#aideCredManageBtn');
+    await page.waitForFunction(function(){
+      return document.getElementById('tab_aides').classList.contains('aide-manage-on');
+    }, {timeout:8000});
+    await page.click('#aidesContainer .aide-info-more');
+    await page.waitForFunction(function(){
+      var actions = document.getElementById('aideInfoSheetActions');
+      return actions && /Credentials/.test(actions.innerText);
+    }, {timeout:8000});
+    await page.evaluate(function(){
+      var buttons = document.querySelectorAll('#aideInfoSheetActions .aide-info-act');
+      for(var i = 0; i < buttons.length; i++){
+        if(/^Credentials$/.test((buttons[i].textContent || '').trim())){buttons[i].click(); return;}
+      }
+    });
+    await page.waitForFunction(function(){
+      var tab = document.getElementById('tab_aides');
+      var detail = document.getElementById('aideCredDetail');
+      return tab && tab.classList.contains('aide-manage-on') && tab.classList.contains('aide-manage-creds')
+        && detail && !detail.hidden && /Credentials/.test(detail.innerText || '');
+    }, {timeout:8000});
+    await page.click('#aideManageDoneBtn');
+    await page.waitForFunction(function(){
+      function shown(el){
+        if(!el)return false;
+        var cs = getComputedStyle(el);
+        if(cs.display === 'none' || cs.visibility === 'hidden')return false;
+        var r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+      }
+      var tab = document.getElementById('tab_aides');
+      var root = document.getElementById('aideCredsRoot');
+      var desk = document.getElementById('aideDesk');
+      var more = document.querySelector('#aidesContainer .aide-info-more');
+      return tab && !tab.classList.contains('aide-manage-on') && !tab.classList.contains('aide-creds-on')
+        && shown(desk) && shown(more)
+        && root && !shown(root);
+    }, {timeout:8000});
     await page.evaluate(function(){aidesInfo1OpenSheet('sokonkwo'); aidesInfo1ViewProfile();});
     await page.waitForFunction(function(){
       return document.getElementById('aideProfileName') && document.getElementById('aideProfileName').textContent === 'Sam Okonkwo';
