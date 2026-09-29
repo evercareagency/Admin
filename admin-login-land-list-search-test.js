@@ -57,7 +57,8 @@ const homeFn = html.slice(html.indexOf('function openPortalHome'), html.indexOf(
 const nurseBranch = homeFn.slice(homeFn.indexOf("if(role==='Nurse')"), homeFn.indexOf('}else{'));
 assert.ok(nurseBranch.includes("showNurseTab('compliance')"), 'Nurse still opens compliance');
 assert.ok(!nurseBranch.includes('loginLandSchedule1Apply'), 'Nurse home does not take the Schedule land');
-assert.ok(homeFn.includes('loginLandSchedule1Apply(fresh)'), 'Admin and Scheduler apply the Schedule land');
+assert.ok(homeFn.includes('loginLandSchedule1Apply(fresh, landDeep)'), 'Admin and Scheduler apply the Schedule land');
+assert.ok(homeFn.indexOf('loginLandSchedule1Deep') < homeFn.indexOf('layoutA1RevealRoute'), 'deep link is read before reveal can flatten the hash');
 assert.ok(html.includes("showScreen('nurseScreen')"), 'Nurse screen stays');
 
 const aidesHdr = html.slice(html.indexOf('id="tab_aides"'), html.indexOf('id="aideDesk"'));
@@ -158,6 +159,8 @@ assert.strictEqual(sandbox.loginLandSchedule1RoleOk('Scheduler'), true);
 assert.strictEqual(sandbox.loginLandSchedule1RoleOk('Nurse'), false);
 assert.strictEqual(sandbox.loginLandSchedule1Deep('#schedule?client_id=abc&on_date=2026-09-29', ''), true);
 assert.strictEqual(sandbox.loginLandSchedule1Deep('#aides?aide_id=uuid', ''), true);
+assert.strictEqual(sandbox.loginLandSchedule1Deep('#aides?aide_id=550e8400-e29b-41d4-a716-446655440000', ''), true, 'UUID aide_id is a deep link');
+assert.strictEqual(sandbox.loginLandSchedule1Deep('#aides', '?aide_id=550e8400-e29b-41d4-a716-446655440000'), true, 'query aide_id is a deep link');
 assert.strictEqual(sandbox.loginLandSchedule1Deep('#more', ''), false);
 
 sandbox.location.hash = '#more';
@@ -174,6 +177,9 @@ assert.strictEqual(sandbox.loginLandSchedule1Should(false, 'Scheduler'), false, 
 assert.strictEqual(sandbox.loginLandSchedule1Should(true, 'Admin'), true, 'fresh login still prefers Schedule');
 sandbox.location.hash = '#schedule?client_id=1&on_date=2026-09-29';
 assert.strictEqual(sandbox.loginLandSchedule1Should(true, 'Scheduler'), false, 'schedule deep link stays');
+sandbox.location.hash = '#aides?aide_id=550e8400-e29b-41d4-a716-446655440000';
+assert.strictEqual(sandbox.loginLandSchedule1Should(true, 'Admin'), false, 'fresh #aides?aide_id= does not land Schedule');
+assert.strictEqual(sandbox.loginLandSchedule1Should(true, 'Scheduler'), false, 'Scheduler aide deep link stays');
 
 shown.length = 0;
 sandbox.location.hash = '#more';
@@ -188,6 +194,36 @@ shown.length = 0;
 sandbox.loginLandSchedule1Apply._loaded = 0;
 assert.strictEqual(sandbox.loginLandSchedule1Apply(false), false, 'Clients hash is kept');
 assert.deepStrictEqual(shown, [], 'kept desk does not showTab schedule');
+
+const aideUuid = '550e8400-e29b-41d4-a716-446655440000';
+sandbox.location.hash = '#aides?aide_id=' + aideUuid;
+shown.length = 0;
+sandbox.loginLandSchedule1Apply._loaded = 0;
+sandbox.active = 'aides';
+assert.strictEqual(sandbox.loginLandSchedule1Apply(true), false, 'fresh aide deep link skips Schedule');
+assert.deepStrictEqual(shown, [], 'aide deep link does not showTab schedule');
+assert.strictEqual(sandbox.loginLandSchedule1Apply(true, true), false, 'a deep link noted before reveal still skips Schedule');
+assert.deepStrictEqual(shown, [], 'pre-reveal deep flag does not showTab schedule');
+
+const memFn = extractFn(html, 'function layoutA1RememberTab');
+const kept = {hash: '#aides?aide_id=' + aideUuid, search: '', pathname: '/Admin/'};
+const memSandbox = {
+  location: kept,
+  history: {
+    state: null,
+    replaceState: function(_s, _t, url){
+      const hashAt = String(url).indexOf('#');
+      kept.hash = hashAt >= 0 ? String(url).slice(hashAt) : '';
+    }
+  }
+};
+vm.createContext(memSandbox);
+vm.runInContext(memFn + '\nlayoutA1RememberTab("aides");', memSandbox);
+assert.ok(kept.hash.indexOf('aide_id=' + aideUuid) >= 0, 'remembering Aides keeps aide_id');
+assert.ok(kept.hash.indexOf('#schedule') < 0, 'remembering Aides does not write #schedule');
+kept.hash = '#schedule?client_id=abc&on_date=2026-09-29';
+vm.runInContext('layoutA1RememberTab("schedule");', memSandbox);
+assert.ok(kept.hash.indexOf('client_id=abc') >= 0 && kept.hash.indexOf('on_date=2026-09-29') >= 0, 'schedule deep link hash stays');
 
 assert.strictEqual(sandbox.loginLandSchedule1VvGap({height: 700, offsetTop: 0}, 800), 100, 'visual viewport gap lifts the bar');
 assert.strictEqual(sandbox.loginLandSchedule1VvGap({height: 800, offsetTop: 0}, 800), 0, 'no gap when the viewports match');

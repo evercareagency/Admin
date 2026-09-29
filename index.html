@@ -12,7 +12,7 @@
 <!-- remi msg tab 2026-09-28 v=remi-msg-tab1 ?v=remi-msg-tab1 admin-build 2026-09-28-remi-msg-tab1. GHOST-REMI-MSG-TAB1-CONTRACT-v1. Ace CALLABLE reuse. No new SQL. No new RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No Auth reseal. No Quo/SMS. Empty nav storage pins Messages on the primary bar: Timesheets, Schedule, Aides, Messages, plus More. tabbar-8 and Edit tabs stay. Cover and Backup stay in the catalog and start under More until Mo adds them. A saved bar is left as saved. Aide chat stays #tab_aidechat. The unread badge stays on the Messages tab. Standing rule: Admin and Scheduler are one portal. Scheduler sees the same Messages bottom tab, Aides | Clients chrome, and Remi Ask aide draft as Admin. data-layout-roles is Admin Scheduler on the Messages tab, the Aides | Clients segment, Aide chat, and Remi Ask. The role gate reuses aidechat1 and aide-text-chat1 is_scheduler_office. Nurse stays denied for aidechat. Under the Messages header, Aides | Clients is pure UI on one desk. Aides is the existing office inbox (aidechat1, aide-office-vis1, aide-text-chat1, msg-dense1, care-msg-safe1 composer above the tabs). Remi Ask “message <aide name>” reuses aideTextChatCompose: CALLABLE admin_compose_aide_text {p_aide_id, p_body} opens admin/messages?aide_id= with that draft already in the composer. Compose never auto-sends. Mo taps Send, and only that tap posts admin_send_aide_text {p_aide_id, p_body}. It does not call admin_send_aide_office_message on the Ask path. Mo locked Clients: Call / Text (sms: and tel:) only. The Clients Messages in-app widget is skipped. Aides ships in-app in full. Aides | Clients chrome stays. Clients is covercomms-style phone deep links when a phone is on file, not EverCare client chat, and not a new RPC. This tip does not add client_office_messages. The list is the same org clients Schedule and Clients already load (get_clients / allClients). Copy says Call / Text only. Mo presses Send in the phone Messages app. No mailto. Remi Ask “message <client name>” opens that phone draft. Nothing auto-sends. remi-chat-bleed1 stays: Schedule a Remi stays parked off the thread, and the corner chip stays hidden while Messages is active. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-radar-dismiss1, v=aide-profile-link-fix, v=remi-open-thread1, v=care-msg-safe1, v=remi-chat-bleed1, v=aidechat1, v=navedit1, v=tabbar-8, and v=cover-desk1. -->
 <meta name="admin-build" content="2026-09-28-remi-msg-tab1">
 <script>var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1';var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1';</script>
-<!-- login land schedule 2026-09-29 v=login-land-schedule1 ?v=login-land-schedule1 admin-build 2026-09-29-login-land-schedule1. GHOST-LOGIN-LAND-SCHEDULE1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. After sign-in, Admin and Scheduler land on Schedule: #tab_schedule is the desk and #nav_schedule is the active bottom tab. They do not land on More. Fresh login ignores a leftover desk hash and calls showTab('schedule'), except an explicit deep link (schedule client_id plus on_date, or aide_id). A cold open with an empty hash, and a reload of #more, also opens Schedule. More is not the home. A reload that names another desk, such as Aides or Clients, still opens that hash. Nurse stays on the nurse home and showNurseTab('compliance'). #bottomNav clears Safari URL and toolbar chrome: padding-bottom is env(safe-area-inset-bottom), and visualViewport sets --login-land-vv-lift so the bar sits on the visual viewport bottom (vv.offsetTop + vv.height versus window.innerHeight, the same fixed-origin check as v=loginkb1). Admin and Scheduler share this bar. Nurse has no #bottomNav. Prior markers stay, including v=list-search-az1, v=remi-msg-tab1, v=punch-leftovers1, v=loginkb1, and v=care-msg-safe1. -->
+<!-- login land schedule 2026-09-29 v=login-land-schedule1 ?v=login-land-schedule1 admin-build 2026-09-29-login-land-schedule1. GHOST-LOGIN-LAND-SCHEDULE1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. After sign-in, Admin and Scheduler land on Schedule: #tab_schedule is the desk and #nav_schedule is the active bottom tab. They do not land on More. Fresh login ignores a leftover desk hash and calls showTab('schedule'), except an explicit deep link (schedule client_id plus on_date, or aide_id including a UUID). #aides?aide_id= stays on Aides: the land check reads that hash before reveal, layoutA1RememberTab does not flatten it, and showTab('schedule') is not called. The same skip holds when aide_id is in the query string. A cold open with an empty hash, and a reload of #more, also opens Schedule. More is not the home. A reload that names another desk, such as Aides or Clients, still opens that hash. Nurse stays on the nurse home and showNurseTab('compliance'). #bottomNav clears Safari URL and toolbar chrome: padding-bottom is env(safe-area-inset-bottom), and visualViewport sets --login-land-vv-lift so the bar sits on the visual viewport bottom (vv.offsetTop + vv.height versus window.innerHeight, the same fixed-origin check as v=loginkb1). Admin and Scheduler share this bar. Nurse has no #bottomNav. Prior markers stay, including v=list-search-az1, v=remi-msg-tab1, v=punch-leftovers1, v=loginkb1, and v=care-msg-safe1. -->
 <meta name="admin-build" content="2026-09-29-login-land-schedule1">
 <script>var LOGIN_LAND_SCHEDULE1_MARKER='v=login-land-schedule1';var LOGIN_LAND_SCHEDULE1_BUILD='2026-09-29-login-land-schedule1';</script>
 <!-- list search az 2026-09-29 v=list-search-az1 ?v=list-search-az1 admin-build 2026-09-29-list-search-az1. GHOST-LIST-SEARCH-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Aides and Clients lists keep the A–Z chip and evercare_list_order. The title stays the title. Under it, an always-visible search row (#aidesListSearch, #clientsListSearch) sits beside that chip, for Admin and Scheduler, data-layout-roles Admin Scheduler. Placeholders are Find an aide and Find a client. The field is not inside the h1. Search filters the painted list and does not change the A–Z preference. When A–Z is on, listAz1Apply still sorts first and the search only narrows that order. When usual, today’s order stays and search still filters. Aides match name, username, and phone. Clients match name and phone. No matches say No aides match that search or No clients match that search. The old #clientSearch stays in the card for the existing paint path and is not the header field. The 16px page-hdr chip rule stays. The search-row chip matches the field height. Prior markers stay, including v=login-land-schedule1, v=list-az-sticky1, v=list-az1, v=aides-info1, and v=client-phone1. -->
@@ -5594,6 +5594,12 @@ function layoutA1RememberTab(tab){
   try{
     var cur=String(location.hash||'');
     if(tab==='schedule'&&/client_id=/.test(cur)&&/on_date=/.test(cur))return;
+    var search='';
+    try{search=String(location.search||'');}catch(eSearch){search='';}
+    var blob=cur+'&'+search;
+    var curDesk=cur.replace(/^#/,'').split('?')[0].split('&')[0].trim().toLowerCase();
+    if(curDesk===String(tab||'').toLowerCase()&&/(?:^|[?&#])aide_id=/.test(blob))return;
+    if(curDesk===String(tab||'').toLowerCase()&&/client_id=/.test(blob)&&/on_date=/.test(blob))return;
     var next='#'+tab;
     if(cur===next)return;
     history.replaceState(history.state,'',location.pathname+(location.search||'')+next);
@@ -28516,14 +28522,22 @@ function loginLandSchedule1Should(fresh, role){
   // Empty hash and the More menu are not a chosen desk. Other hashes still stick.
   return !tab||tab==='more';
 }
-function loginLandSchedule1Apply(fresh){
+function loginLandSchedule1Apply(fresh, deepAlready){
   var role='';
   try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
   loginLandSchedule1Note();
-  if(!loginLandSchedule1Should(!!fresh, role)){
+  var deep=deepAlready===true;
+  if(!deep){
+    var hash='';
+    var search='';
+    try{hash=String(location.hash||'');}catch(eDeep){hash='';}
+    try{search=String(location.search||'');}catch(eDeep2){search='';}
+    try{deep=!!loginLandSchedule1Deep(hash, search);}catch(eDeep3){deep=false;}
+  }
+  if(deep||!loginLandSchedule1Should(!!fresh, role)){
     var tab='';
     try{tab=typeof layoutA1HashTab==='function'?(layoutA1HashTab()||''):'';}catch(e2){tab='';}
-    if(tab==='schedule'&&typeof loadAdminSchedule==='function'&&!loginLandSchedule1Apply._loaded){
+    if(!deep&&tab==='schedule'&&typeof loadAdminSchedule==='function'&&!loginLandSchedule1Apply._loaded){
       loginLandSchedule1Apply._loaded=1;
       try{loadAdminSchedule();}catch(e3){}
     }
@@ -28677,8 +28691,12 @@ function openPortalHome(sess, opts){
     if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
     if(typeof navEditApply==='function')navEditApply();
     showScreen('adminScreen');
+    var landDeep=false;
+    try{
+      if(typeof loginLandSchedule1Deep==='function')landDeep=!!loginLandSchedule1Deep(String(location.hash||''), String(location.search||''));
+    }catch(eLandDeep){landDeep=false;}
     if(typeof layoutA1RevealRoute==='function')layoutA1RevealRoute();
-    if(typeof loginLandSchedule1Apply==='function')loginLandSchedule1Apply(fresh);
+    if(typeof loginLandSchedule1Apply==='function')loginLandSchedule1Apply(fresh, landDeep);
     if(typeof loginLandSchedule1BindNav==='function')loginLandSchedule1BindNav();
   }
   const btn=document.getElementById('mgrLoginBtn');
