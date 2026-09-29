@@ -46,8 +46,11 @@ assert.ok(html.includes("if(role==='Nurse')return false"), 'Nurse stays out of R
 assert.ok(html.includes('id="copilotFab"') && html.includes('data-layout-roles="Admin Scheduler"'), 'Remi chip stays Admin and Scheduler');
 
 const dismissFn = extractFn(html, 'async function remiRadarDismiss1Dismiss()');
-assert.ok(dismissFn.includes("copilotRpc('resolve', remiRadarDismiss1ResolveBody(id))"), 'ace rows resolve one id at a time');
+assert.ok(dismissFn.includes("copilotRpc('resolve', remiRadarDismiss1ResolveBody(id))"), 'checked rows resolve one id at a time');
+assert.ok(!dismissFn.includes('alert.ace'), 'every checked row is resolved, not only Ace-flagged rows');
+assert.ok(dismissFn.includes('copilotAlerts=(copilotAlerts||[]).filter'), 'dismiss removes those rows from the Radar list');
 assert.ok(dismissFn.includes('remiRadarDismiss1Remember'), 'dismiss is remembered for refresh');
+assert.ok(html.includes('Ack stays on the Radar list'), 'ack stays on the list');
 ['admin_blast_cover_request','admin_confirm_cover_send','admin_dismiss_noshow_rescue','admin_dismiss_why_open','admin_ack_radar_signal','sms:','mailto:','quo'].forEach(function(name){
   assert.ok(!dismissFn.includes(name), 'dismiss does not call ' + name);
 });
@@ -117,6 +120,8 @@ function plain(expr){
 assert.deepStrictEqual(plain('remiRadarDismiss1ResolveBody("sig-1")'), {p_id:'sig-1'});
 assert.strictEqual(vm.runInContext('remiRadarDismiss1StatusHidden("resolved")', ctx), true);
 assert.strictEqual(vm.runInContext('remiRadarDismiss1StatusHidden("open")', ctx), false);
+assert.strictEqual(vm.runInContext('remiRadarDismiss1StatusHidden("acked")', ctx), false, 'ack stays on the list');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sig-ack", ace:true, status:"acked", kind:"schedule_gap"})', ctx), false, 'an acked row is still a Radar row');
 
 const rows = [
   {id:'sig-fri', kind:'schedule_gap', ace:true, status:'open', surface:'Fri mark still open', detail:'Ada Cole · 2026-09-26 still open'},
@@ -141,11 +146,11 @@ assert.strictEqual(rpc.length, 2, 'one resolve per selected Ace id');
 assert.deepStrictEqual(rpc.map(function(row){return row.kind;}), ['resolve','resolve']);
 assert.deepStrictEqual(rpc.map(function(row){return row.body;}), [{p_id:'sig-fri'},{p_id:'sig-wed'}]);
 assert.strictEqual(vm.runInContext('toasts[0]', ctx), 'Dismissed from Radar');
-const left = plain('remiRadarDismiss1Filter(copilotAlerts).map(function(a){return a.id;})');
-assert.deepStrictEqual(left, [], 'selected Ace rows and the desk card of that kind are cleared');
-assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sig-fri", ace:true, status:"open", kind:"schedule_gap"})', ctx), true, 'same Ace id stays hidden');
-assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sig-new", ace:true, status:"open", kind:"coverage_open"})', ctx), false, 'a new Ace id of a dismissed kind still shows');
-assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"coverage_open", kind:"coverage_open", surface:"Coverage"})', ctx), true, 'desk fallback of a dismissed kind stays down this tab');
+const left = plain('copilotAlerts.map(function(a){return a.id;})');
+assert.deepStrictEqual(left, ['coverage_open'], 'only the checked rows leave Radar');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sig-fri", ace:true, status:"open", kind:"schedule_gap"})', ctx), true, 'same id stays hidden on refresh');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"sig-new", ace:true, status:"open", kind:"coverage_open"})', ctx), false, 'a different id stays');
+assert.strictEqual(vm.runInContext('remiRadarDismiss1Hidden({id:"coverage_open", kind:"coverage_open", surface:"Coverage"})', ctx), false, 'an unchecked row of the same kind stays');
 
 vm.runInContext('copilotAlerts=[{id:"sig-fri", ace:true, status:"resolved", kind:"schedule_gap"},{id:"timesheet_late", kind:"timesheet_late", surface:"Timesheets", detail:"Nothing flagged."}]; rpc.length=0; remiRadarDismiss1Selected={};', ctx);
 const reloaded = plain('remiRadarDismiss1Filter(copilotAlerts).map(function(a){return a.id;})');
@@ -158,8 +163,8 @@ assert.strictEqual(vm.runInContext('copilotRoleOk()', ctx), false, 'Nurse is den
 
 vm.runInContext('currentAdminRole="Admin"; copilotAlerts=[{id:"desk-1", kind:"login_fail", surface:"Login fails", detail:"Nothing flagged."},{id:"desk-2", kind:"broadcast_needed", surface:"Broadcast", detail:"You send it."}]; remiRadarDismiss1Selected={"desk-1":1}; rpc.length=0; toasts.length=0;', ctx);
 await vm.runInContext('remiRadarDismiss1Dismiss()', ctx);
-assert.strictEqual(vm.runInContext('rpc.length', ctx), 0, 'a desk card with no Ace id does not invent an RPC');
-assert.deepStrictEqual(plain('remiRadarDismiss1Filter(copilotAlerts).map(function(a){return a.id;})'), ['desk-2']);
+assert.deepStrictEqual(plain('rpc'), [{kind:'resolve', body:{p_id:'desk-1'}}], 'a checked desk row still resolves by p_id');
+assert.deepStrictEqual(plain('copilotAlerts.map(function(a){return a.id;})'), ['desk-2']);
 assert.strictEqual(vm.runInContext('toasts[0]', ctx), 'Dismissed from Radar');
 }
 

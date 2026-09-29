@@ -9,7 +9,7 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
-<!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Each selected Ace signal (alert.ace) posts the existing admin_resolve_radar_signal {p_id} once per id, the same body as the Ask Resolve button. There is no batch RPC. admin_ack_radar_signal stays the single-card Noted action and is not the hide. admin_dismiss_why_open and admin_dismiss_noshow_rescue stay on their own cards and are not called from this toolbar. A resolved, dismissed, or closed status from admin_list_radar_signals stays off the list. The same browser tab also remembers dismissed ids in sessionStorage evercare_radar_dismiss1 so a Radar refresh does not paint those ids again before Ace drops them. Desk fallback cards that have no Ace id (ace is false) have no resolve target: they hide in that same session store only. That local hide is the last resort and is limited to non-Ace rows and to Ace rows whose resolve call did not confirm. A new Ace signal id of a dismissed kind still shows. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. remi-msg-tab1 was not on main and had no open tip, so this branch does not touch it. Prior markers stay, including v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
+<!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. remi-msg-tab1 was not on main and had no open tip, so this branch does not touch it. Prior markers stay, including v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
 <!-- aide profile link fix 2026-09-28 v=aide-profile-link-fix ?v=aide-profile-link-fix admin-build 2026-09-28-aide-profile-link-fix. GHOST-AIDE-PROFILE-LINK-FIX-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Supersedes aides-profile-link1 scroll-and-highlight (draft PR #165). View profile is one full page. It is not a scroll or teal outline on the Aides list, and it is not the credentials rollup sitting above the list. From Aides ··· View profile, and from aidesInfo1Follow when deep_link is the string admin/aides?aide_id=<uuid>, Ghost parses a leading #, aides and admin/aides path variants, and query aide_id, then replaces the Aides list (and Manage chrome if it is open) with #aideProfilePage until Back. The page has Back, a header (name, phone, language chip, client chips, next, creds due — the existing aides-info1 profile content), and Credentials through the existing aidecreds paths (admin_list_aide_credentials, edit sheet, add, save). The Aides list, desk tabs, Manage bar, A–Z rail, and credentials rollup stay display:none, including on a phone. Phone CSS must not unhide the list. Back returns to the Active aides-info1 info-card list, the same phone surface as Manage Done: Active and Recently deleted tabs visible, ··· on each card, #nav_aides active, #nav_more and #tab_more not active. It removes aide-creds-on after renderAides and aideCredsAfterAides and keeps #aideCredsRoot hidden so the credentials rollup (No credential records yet, Add credential, A–Z cred rows) does not cover the cards below 900px. On a phone, Active landing with aides-info1 cards — first paint, Refresh, Back, and Manage Done — does not auto-set aide-creds-on. Credentials still open from ··· Credentials and from Manage. Bare tab names and schedule deep-link objects stay as aides-info1 left them. This is not Auth profile_id. More must not end half-active: while this page is open on the Aides bottom tab, #nav_more and #tab_more lose active, and leaving for More closes the page so More is the only active desk. Do not break Manage select/delete, manage-dots-creds1 ··· Credentials-in-Manage, manage-done1 Done exit, aidadel1 Delete, or list-az-sticky1. Prior markers stay, including v=aides-info1, v=aides-profile-link1, v=manage-dots-creds1, v=manage-done1, v=manage-clean1, v=aide-manage-delete1, v=aidadel1, v=aidecreds1, v=aidecreds1b, v=aidecreds1c, v=list-az-sticky1, v=list-az1, v=remi-open-thread1, and v=care-msg-safe1. -->
@@ -9963,50 +9963,40 @@ function remiRadarDismiss1StoreKey(){
   return 'evercare_radar_dismiss1:'+who;
 }
 function remiRadarDismiss1Store(){
-  var empty={v:1,ids:{},kinds:{}};
+  var empty={v:1,ids:{}};
   var raw='';
   try{raw=sessionStorage.getItem(remiRadarDismiss1StoreKey())||'';}catch(e){raw='';}
   if(!raw)return empty;
   try{
     var parsed=JSON.parse(raw);
     var ids={};
-    var kinds={};
     var idList=parsed&&Array.isArray(parsed.ids)?parsed.ids:[];
-    var kindList=parsed&&Array.isArray(parsed.kinds)?parsed.kinds:[];
     var i;
     for(i=0;i<idList.length;i++){
       var id=String(idList[i]||'').trim();
       if(id)ids[id]=1;
     }
-    for(i=0;i<kindList.length;i++){
-      var kind=String(kindList[i]||'').trim();
-      if(kind)kinds[kind]=1;
-    }
-    return {v:1,ids:ids,kinds:kinds};
+    return {v:1,ids:ids};
   }catch(e2){return empty;}
 }
 function remiRadarDismiss1Write(store){
   var ids=[];
-  var kinds=[];
   var idMap=store&&store.ids?store.ids:{};
-  var kindMap=store&&store.kinds?store.kinds:{};
   var id;
-  var kind;
   for(id in idMap)if(Object.prototype.hasOwnProperty.call(idMap,id)&&idMap[id])ids.push(id);
-  for(kind in kindMap)if(Object.prototype.hasOwnProperty.call(kindMap,kind)&&kindMap[kind])kinds.push(kind);
-  try{sessionStorage.setItem(remiRadarDismiss1StoreKey(), JSON.stringify({v:1,ids:ids,kinds:kinds}));}catch(e){}
+  try{sessionStorage.setItem(remiRadarDismiss1StoreKey(), JSON.stringify({v:1,ids:ids}));}catch(e){}
 }
 function remiRadarDismiss1Remember(alert){
-  if(!alert)return;
+  var id=typeof alert==='string'?alert:String(alert&&alert.id||'');
+  id=id.trim();
+  if(!id)return;
   var store=remiRadarDismiss1Store();
-  var id=String(alert.id||'').trim();
-  var kind=String(alert.kind||'').trim();
-  if(id)store.ids[id]=1;
-  if(kind)store.kinds[kind]=1;
+  store.ids[id]=1;
   remiRadarDismiss1Write(store);
 }
 function remiRadarDismiss1StatusHidden(status){
   var st=String(status||'').toLowerCase();
+  if(st==='acked'||st==='ack'||st==='noted')return false;
   return st==='resolved'||st==='dismissed'||st==='closed';
 }
 function remiRadarDismiss1Hidden(alert){
@@ -10015,10 +10005,6 @@ function remiRadarDismiss1Hidden(alert){
   var store=remiRadarDismiss1Store();
   var id=String(alert.id||'');
   if(id&&store.ids[id])return true;
-  if(!alert.ace){
-    var kind=String(alert.kind||'');
-    if(kind&&store.kinds[kind])return true;
-  }
   return false;
 }
 function remiRadarDismiss1Filter(list){
@@ -10097,28 +10083,28 @@ async function remiRadarDismiss1Dismiss(){
   remiRadarDismiss1Busy=true;
   var go=document.getElementById('radarDismissGo');
   if(go)go.disabled=true;
-  var aceFail=0;
+  var fail=0;
   var signedOut=false;
+  var drop={};
   var n;
   for(n=0;n<picked.length;n++){
-    var alert=picked[n];
-    var id=String(alert.id||'');
-    if(alert.ace&&id){
-      var got=null;
-      try{got=await copilotRpc('resolve', remiRadarDismiss1ResolveBody(id));}catch(e){got=null;}
-      if(got&&got.signedOut)signedOut=true;
-      if(!(got&&got.ok))aceFail++;
-    }
-    alert.status='resolved';
-    remiRadarDismiss1Remember(alert);
+    var id=String(picked[n].id||'');
+    if(!id)continue;
+    var got=null;
+    try{got=await copilotRpc('resolve', remiRadarDismiss1ResolveBody(id));}catch(e){got=null;}
+    if(got&&got.signedOut)signedOut=true;
+    if(!(got&&got.ok))fail++;
+    remiRadarDismiss1Remember(id);
+    drop[id]=1;
     delete remiRadarDismiss1Selected[id];
   }
+  copilotAlerts=(copilotAlerts||[]).filter(function(a){return !drop[String(a&&a.id||'')];});
   remiRadarDismiss1Busy=false;
   remiRadarDismiss1Note='done';
   remiRadarDismiss1LastN=picked.length;
   var toast='Dismissed from Radar';
   if(signedOut)toast='Dismissed on this phone. Sign in to keep it off Radar.';
-  else if(aceFail)toast='Dismissed from Radar. Ace did not confirm every row, so this phone keeps them hidden.';
+  else if(fail)toast='Dismissed from Radar. Ace did not confirm every row, so this phone keeps them hidden.';
   if(typeof showTempMsg==='function')showTempMsg(toast,'var(--success)');
   if(copilotView==='radar')copilotPaintRadar();
 }
@@ -10316,6 +10302,7 @@ async function copilotSaveDirections(){
     showTempMsg(got&&got.signedOut?'Sign in to save the directions.':'admin_log_copilot_choice did not save. Nothing was stored on this phone.','var(--warn)');
   }
 }
+// Ack stays on the Radar list. Dismiss selected loops admin_resolve_radar_signal, not ack.
 async function copilotAckSignal(){
   var alert=copilotFind(copilotAskId);
   if(!alert||!alert.ace||!alert.id)return;
