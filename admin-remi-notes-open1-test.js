@@ -46,19 +46,21 @@ const openFn = html.slice(openStart, openEnd);
 assert.ok(openStart > 0 && openFn.length > 80, 'open helpers present');
 assert.ok(openFn.includes('remiNotesVis1SafeId'), 'resolves the note id safely');
 assert.ok(openFn.includes('remiNotesVis1Cache') || html.includes('remiNotesVis1FindCached'), 'uses the list cache');
-assert.ok(openFn.includes("copilotClose()"), 'closes Remi');
-assert.ok(openFn.includes("showTab('aidechat')"), 'showTab to aidechat');
-assert.ok(openFn.includes('remiOpenThread1Desk()'), 'clears the More selection');
-assert.ok(openFn.includes('aideOfficeVis1OpenAide'), 'opens the office thread');
+assert.ok(!openFn.includes("copilotClose()"), 'notes open does not close Remi');
+assert.ok(!openFn.includes("showTab('aidechat')"), 'notes open does not showTab aidechat');
+assert.ok(!openFn.includes('remiOpenThread1Desk()'), 'notes open does not jump to the Messages desk');
+assert.ok(!openFn.includes('aideOfficeVis1OpenAide'), 'notes open does not open the office thread');
 assert.ok(!openFn.includes("showTab('more')"), 'does not showTab more');
-assert.ok(openFn.includes('if(!linked)return remiNotesOpen1Stay()'), 'unlinked stays before any hop');
-assert.ok(openFn.indexOf('if(!linked)return remiNotesOpen1Stay()')<openFn.indexOf('remiNotesOpen1Messages();'), 'messages hop is only after the linked check');
+assert.ok(openFn.includes('if(!linked)return remiNotesOpen1Stay()'), 'unlinked stays');
+assert.ok(openFn.includes('remiNotesOpen1Stay()'), 'linked path stays in Remi');
+assert.ok(!openFn.includes('remiNotesOpen1Messages();'), 'messages hop is not called');
 assert.ok(!openFn.includes('No linked Messages thread on this note.'), 'unlinked tap does not toast a dead thread');
 assert.ok(openFn.includes("remiNotesVis1ThreadId=''"), 'does not stay in the in-notes thread');
 const refetch = html.slice(html.indexOf('async function remiNotesOpen1Refetch'), html.indexOf('function remiNotesVis1PaintPane'));
 assert.ok(refetch.includes('remi_list_my_notes') && refetch.includes('remi_list_scheduler_notes'), 're-fetches the existing list');
 assert.ok(!refetch.includes('remi_list_my_note_thread'), 'open path does not post the in-notes thread rpc');
-assert.ok(html.includes('data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" onclick="remiNotesVis1OpenThread('), 'button keeps the onclick name');
+assert.ok(!html.includes('onclick="remiNotesVis1OpenThread('), 'Open thread onclick is gone');
+assert.ok(html.includes('onclick="remiNotesStay1bOpen('), 'tap opens in-rail detail');
 assert.ok(html.includes('async function remiNotesVis1Save'), 'save stays');
 assert.ok(html.includes('async function remiNotesVis1Update'), 'update stays');
 assert.ok(html.includes('function remiNotesVis1CloseThread'), 'back from an in-notes thread stays');
@@ -119,16 +121,17 @@ function wire(sandbox){
     aide_id:'sara-id',
     updates:[]
   }, 'my', true);
-  assert.ok(card.includes('data-remi-notes-open1="v=remi-notes-open1"'), card);
-  assert.ok(card.includes('data-remi-notes-open1b="v=remi-notes-open1b"'), card);
-  assert.ok(card.includes("onclick=\"remiNotesVis1OpenThread('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')\""), card);
-  assert.ok(card.includes('>Open thread<'), card);
+  assert.ok(card.includes('data-remi-notes-stay1b="v=remi-notes-stay1b"'), card);
+  assert.ok(card.includes("onclick=\"remiNotesStay1bOpen('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')\""), card);
+  assert.ok(!card.includes('Open thread'), card);
+  assert.ok(card.includes('>Edit<') && card.includes('>Delete<'), card);
   const plainCard = sandbox.remiNotesVis1CardHtml({
     id:'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
     body:'remind me in 10 mins',
     updates:[]
   }, 'my', true);
   assert.ok(!plainCard.includes('Open thread'), plainCard);
+  assert.ok(plainCard.includes("onclick=\"remiNotesStay1bOpen('cccccccc-cccc-4ccc-8ccc-cccccccccccc')\""), plainCard);
 
   sandbox.remiNotesVis1PaintPane([
     {id:'n-linked', body:'Test', aide_id:'sara-id', thread_id:'t-sara'},
@@ -142,20 +145,18 @@ function wire(sandbox){
   const calls = wire(sandbox);
   let got = await sandbox.remiNotesVis1OpenThread('n-linked');
   assert.strictEqual(got.linked, true);
+  assert.strictEqual(got.stayed, true);
   assert.strictEqual(got.aideId, 'sara-id');
   assert.strictEqual(got.threadId, 't-sara');
-  assert.ok(calls.indexOf('close')>=0, 'closes remi');
-  assert.ok(calls.indexOf('tab:aidechat')>=0, 'messages tab');
-  assert.ok(calls.indexOf('desk')>=0, 'desk helper');
-  assert.ok(calls.indexOf('open:sara-id:t-sara')>=0, calls.join(','));
-  assert.ok(!calls.some(function(c){return c==='tab:more';}), 'no more tab');
-  assert.ok(!calls.some(function(c){return c.indexOf('toast:')===0;}), 'no toast when linked');
-  assert.strictEqual(sandbox.remiNotesVis1ThreadId, '', 'does not stay inside notes');
+  assert.strictEqual(sandbox.remiNotesVis1EditId, 'n-linked', 'linked tap opens in-rail edit');
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c==='desk'||c==='tab:more'||c.indexOf('open:')===0||c.indexOf('toast:')===0;}), calls.join(','));
+  assert.strictEqual(sandbox.remiNotesVis1ThreadId, '', 'does not open an in-notes messages thread');
 
   calls.length = 0;
   got = await sandbox.remiNotesVis1OpenThread('n-deep');
   assert.strictEqual(got.aideId, 'jaz-id');
-  assert.ok(calls.indexOf('open:jaz-id:')>=0, calls.join(','));
+  assert.strictEqual(got.stayed, true);
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c.indexOf('open:')===0;}), calls.join(','));
 
   calls.length = 0;
   got = await sandbox.remiNotesVis1OpenThread('n-obj');
@@ -172,7 +173,9 @@ function wire(sandbox){
   calls.length = 0;
   got = await sandbox.remiNotesVis1OpenThread('n-office');
   assert.strictEqual(got.linked, true);
-  assert.ok(calls.indexOf('open::t-office')>=0, calls.join(','));
+  assert.strictEqual(got.stayed, true);
+  assert.strictEqual(got.threadId, 't-office');
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c.indexOf('open:')===0;}), calls.join(','));
 
   const link = sandbox.remiNotesOpen1Link({
     linked_aide_id:' aide-2 ',
@@ -198,7 +201,8 @@ function wire(sandbox){
   assert.strictEqual(rpc[0].body.p_limit, 50);
   assert.strictEqual(got.aideId, 'miss-aide');
   assert.strictEqual(got.threadId, 't-miss');
-  assert.ok(calls.indexOf('open:miss-aide:t-miss')>=0, calls.join(','));
+  assert.strictEqual(got.stayed, true);
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c.indexOf('open:')===0;}), calls.join(','));
 
   rpc.length = 0;
   calls.length = 0;
@@ -214,7 +218,8 @@ function wire(sandbox){
   got = await sandbox.remiNotesVis1OpenThread('n-sched');
   assert.strictEqual(rpc[0].name, 'remi_list_scheduler_notes');
   assert.strictEqual(got.aideId, 'sched-aide');
-  assert.ok(calls.indexOf('open:sched-aide:t-sched')>=0);
+  assert.strictEqual(got.stayed, true);
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c.indexOf('open:')===0;}), calls.join(','));
 
   sandbox.currentAdminRole = 'Scheduler';
   sandbox.remiNotesVis1Which = 'my';
@@ -222,8 +227,8 @@ function wire(sandbox){
   calls.length = 0;
   got = await sandbox.remiNotesVis1OpenThread('n-jaz');
   assert.strictEqual(got.linked, true);
-  assert.ok(calls.indexOf('open:sara-id:')>=0, 'scheduler uses the same open path');
-  assert.ok(calls.indexOf('tab:aidechat')>=0);
+  assert.strictEqual(got.stayed, true);
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c.indexOf('open:')===0;}), 'scheduler stays in Remi');
 
   sandbox.currentAdminRole = 'Nurse';
   calls.length = 0;
@@ -375,53 +380,58 @@ async function runBrowser(){
       await remiNotesVis1Load();
     });
     const before = await phone.evaluate(function(){
-      var btn = document.querySelector('#remiNotesVis1 [data-note-id="note-test"] [data-remi-notes-open1]');
+      var card = document.querySelector('#remiNotesVis1 [data-note-id="note-test"]');
+      var btn = card ? card.querySelector('.remi-stay-body') : null;
+      var open = card ? card.querySelector('[data-remi-notes-open1], [data-remi-notes-open1b]') : null;
       var sheet = document.getElementById('copilotSheet');
+      var schedTab = document.getElementById('tab_schedule');
       return {
         label: btn ? btn.textContent : '',
-        marker: btn ? btn.getAttribute('data-remi-notes-open1') : '',
+        marker: btn ? btn.getAttribute('data-remi-notes-stay1b') : '',
         onclick: btn ? btn.getAttribute('onclick') : '',
+        openThread: card ? card.textContent.indexOf('Open thread') : -1,
+        openButton: !!open,
         sheetHidden: sheet ? !!sheet.hidden : true,
-        root: document.getElementById('remiNotesVis1') ? document.getElementById('remiNotesVis1').getAttribute('data-remi-notes-open1') : ''
+        scheduleActive: !!(schedTab && schedTab.classList.contains('active')),
+        root: document.getElementById('remiNotesVis1') ? document.getElementById('remiNotesVis1').getAttribute('data-remi-notes-stay1b') : '',
+        chip: document.querySelector('#remiNotesVis1 .remi-stay-chip') ? document.querySelector('#remiNotesVis1 .remi-stay-chip').textContent : ''
       };
     });
-    assert.strictEqual(before.label, 'Open thread');
-    assert.strictEqual(before.marker, 'v=remi-notes-open1');
-    assert.ok(before.onclick.indexOf("remiNotesVis1OpenThread('note-test')")>=0, before.onclick);
+    assert.strictEqual(before.label, 'Test');
+    assert.strictEqual(before.marker, 'v=remi-notes-stay1b');
+    assert.ok(before.onclick.indexOf("remiNotesStay1bOpen('note-test')")>=0, before.onclick);
+    assert.ok(before.openThread<0, 'linked note has no Open thread');
+    assert.strictEqual(before.openButton, false);
     assert.strictEqual(before.sheetHidden, false, 'notes sheet starts open');
-    assert.strictEqual(before.root, 'v=remi-notes-open1');
-    await phone.click('#remiNotesVis1 [data-note-id="note-test"] [data-remi-notes-open1]');
-    await phone.waitForFunction(function(){
-      var title = document.getElementById('aidechatThreadTitle');
-      var sheet = document.getElementById('copilotSheet');
-      var chat = document.getElementById('tab_aidechat');
-      return title && title.textContent.indexOf('Sara Alvarez')>=0 && sheet && sheet.hidden && chat && chat.classList.contains('active');
-    }, {timeout:15000});
+    assert.strictEqual(before.scheduleActive, true, 'Schedule tab stays active behind Remi');
+    assert.strictEqual(before.root, 'v=remi-notes-stay1b');
+    assert.ok(before.chip.indexOf('Notes stay here')>=0, before.chip);
+    await phone.click('#remiNotesVis1 [data-note-id="note-test"] .remi-stay-body');
     const linked = await phone.evaluate(function(){
       var chat = document.getElementById('tab_aidechat');
-      var more = document.getElementById('tab_more');
-      var moreNav = document.getElementById('nav_more');
-      var chatNav = document.getElementById('nav_aidechat');
-      var thread = document.getElementById('aidechatThreadView');
-      var toast = document.getElementById('nciToast');
+      var sched = document.getElementById('tab_schedule');
+      var sheet = document.getElementById('copilotSheet');
+      var edit = document.getElementById('remiNotesVisEdit');
       var names = (window.__calls||[]).map(function(c){return c.name;});
       return {
         chatActive: !!(chat && chat.classList.contains('active')),
-        moreActive: !!(more && more.classList.contains('active')),
-        moreNav: !!(moreNav && moreNav.classList.contains('active')),
-        chatNav: !!(chatNav && chatNav.classList.contains('active')),
-        threadHidden: thread ? !!thread.hidden : true,
-        toast: toast && toast.style.display!=='none' ? toast.textContent : '',
-        threadRpc: names.indexOf('remi_list_my_note_thread')>=0
+        scheduleActive: !!(sched && sched.classList.contains('active')),
+        sheetHidden: sheet ? !!sheet.hidden : true,
+        view: copilotView,
+        editing: !!(edit && edit.value.indexOf('Test')>=0),
+        save: !!document.querySelector('#remiNotesVis1 .remi-crud-edit .go'),
+        threadRpc: names.indexOf('remi_list_my_note_thread')>=0,
+        openThread: document.getElementById('remiNotesVis1') ? document.getElementById('remiNotesVis1').textContent.indexOf('Open thread') : -1
       };
     });
-    assert.strictEqual(linked.chatActive, true, 'messages tab active');
-    assert.strictEqual(linked.moreActive, false, 'more panel not selected');
-    assert.strictEqual(linked.moreNav, false, 'more nav not selected');
-    assert.strictEqual(linked.chatNav, true, 'messages nav selected');
-    assert.strictEqual(linked.threadHidden, false, 'thread is open');
-    assert.ok(linked.toast.indexOf('No linked')<0, linked.toast);
-    assert.strictEqual(linked.threadRpc, false, 'linked open does not post the in-notes thread rpc');
+    assert.strictEqual(linked.chatActive, false, 'messages tab stays inactive');
+    assert.strictEqual(linked.scheduleActive, true, 'Schedule stays the desk');
+    assert.strictEqual(linked.sheetHidden, false, 'Remi stays open');
+    assert.strictEqual(linked.view, 'notes');
+    assert.strictEqual(linked.editing, true, 'tap opens in-rail edit');
+    assert.strictEqual(linked.save, true, 'Save stays');
+    assert.strictEqual(linked.threadRpc, false, 'tap does not post the in-notes thread rpc');
+    assert.ok(linked.openThread<0, 'Open thread stays absent after tap');
 
     await phone.evaluate(async function(){
       remiNotesShow();
@@ -430,7 +440,7 @@ async function runBrowser(){
       await remiNotesVis1Load();
     });
     const plain = await phone.evaluate(async function(){
-      var btn = document.querySelector('#remiNotesVis1 [data-note-id="note-plain"] [data-remi-notes-open1]');
+      var btn = document.querySelector('#remiNotesVis1 [data-note-id="note-plain"] [data-remi-notes-open1], #remiNotesVis1 [data-note-id="note-plain"] [data-remi-notes-open1b]');
       var sheet = document.getElementById('copilotSheet');
       var ask = document.getElementById('copilotTabAsk');
       window.__tabs = [];
@@ -449,7 +459,7 @@ async function runBrowser(){
         tabs: window.__tabs.slice()
       };
     });
-    assert.strictEqual(plain.button, false, 'unlinked note hides Open thread');
+    assert.strictEqual(plain.button, false, 'unlinked note has no Open thread');
     assert.strictEqual(plain.linked, false);
     assert.strictEqual(plain.stayed, true);
     assert.strictEqual(plain.sheetHidden, false, 'stays inside Remi Notes');
@@ -467,17 +477,34 @@ async function runBrowser(){
     });
     const sched = await phone.evaluate(function(){
       var tab = document.getElementById('remiNotesVisSched');
-      var btn = document.querySelector('#remiNotesVis1 [data-remi-notes-open1]');
-      return {schedHidden: tab ? !!tab.hidden : true, label: btn ? btn.textContent : ''};
+      var card = document.querySelector('#remiNotesVis1 [data-note-id="note-test"]');
+      var btn = card ? card.querySelector('.remi-stay-body') : null;
+      return {
+        schedHidden: tab ? !!tab.hidden : true,
+        openThread: card ? card.textContent.indexOf('Open thread') : -1,
+        onclick: btn ? btn.getAttribute('onclick') : '',
+        hint: document.getElementById('remiNotesVisHint') ? document.getElementById('remiNotesVisHint').textContent : ''
+      };
     });
     assert.strictEqual(sched.schedHidden, true, 'scheduler has no Scheduler notes tab');
-    assert.strictEqual(sched.label, 'Open thread');
-    await phone.click('#remiNotesVis1 [data-remi-notes-open1]');
-    await phone.waitForFunction(function(){
-      var title = document.getElementById('aidechatThreadTitle');
+    assert.ok(sched.openThread<0, 'scheduler note has no Open thread');
+    assert.ok(sched.onclick.indexOf("remiNotesStay1bOpen('note-test')")>=0, sched.onclick);
+    assert.strictEqual(sched.hint, 'Your notes only');
+    await phone.click('#remiNotesVis1 [data-note-id="note-test"] .remi-stay-body');
+    const schedStay = await phone.evaluate(function(){
       var sheet = document.getElementById('copilotSheet');
-      return title && title.textContent.indexOf('Sara Alvarez')>=0 && sheet && sheet.hidden;
-    }, {timeout:15000});
+      var chat = document.getElementById('tab_aidechat');
+      return {
+        sheetHidden: sheet ? !!sheet.hidden : true,
+        chatActive: !!(chat && chat.classList.contains('active')),
+        view: copilotView,
+        editing: !!document.getElementById('remiNotesVisEdit')
+      };
+    });
+    assert.strictEqual(schedStay.sheetHidden, false, 'scheduler tap stays in Remi');
+    assert.strictEqual(schedStay.chatActive, false, 'scheduler tap does not open Messages');
+    assert.strictEqual(schedStay.view, 'notes');
+    assert.strictEqual(schedStay.editing, true, 'scheduler tap opens in-rail edit');
 
     const nurse = await phone.evaluate(async function(){
       currentAdminRole = 'Nurse';

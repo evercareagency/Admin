@@ -44,11 +44,13 @@ assert.ok(notes1.includes('Never paint Open thread here'), 'reminders stay marke
 assert.ok(notes1.includes('id="remiNotes1Keep" data-reminotes1="v=remi-notes1" data-remi-notes-open1b="v=remi-notes-open1b"'), 'reminders marker has no button');
 
 const goFn = html.slice(html.indexOf('function remiNotesOpen1Go('), html.indexOf('async function remiNotesOpen1Refetch'));
-assert.ok(goFn.includes('if(!linked)return remiNotesOpen1Stay()'), 'unlinked returns before the hop');
-assert.ok(goFn.indexOf('if(!linked)return remiNotesOpen1Stay()') < goFn.indexOf('remiNotesOpen1Messages();'), 'messages hop is the linked path');
+assert.ok(goFn.includes('if(!linked)return remiNotesOpen1Stay()'), 'unlinked stays');
+assert.ok(goFn.includes('remiNotesOpen1Stay()'), 'linked stays in Remi');
+assert.ok(!goFn.includes('remiNotesOpen1Messages();'), 'go does not call the messages hop');
 assert.ok(!goFn.includes("showTab('aidechat')"), 'go itself does not open Messages');
-assert.ok(!goFn.includes('copilotShowChat') && !goFn.includes('copilotPaintAsk') && !goFn.includes("copilotView='ask'") && !goFn.includes("copilotView='chat'"), 'unlinked path does not open Ask');
-assert.ok(goFn.includes('aideOfficeVis1OpenAide'), 'linked path still opens the office thread');
+assert.ok(!goFn.includes('copilotClose'), 'go does not close Remi');
+assert.ok(!goFn.includes('aideOfficeVis1OpenAide'), 'go does not open the office thread');
+assert.ok(!goFn.includes('copilotShowChat') && !goFn.includes('copilotPaintAsk') && !goFn.includes("copilotView='ask'") && !goFn.includes("copilotView='chat'"), 'notes path does not open Ask');
 
 const start = html.indexOf('// remi notes vis1 v=remi-notes-vis1');
 const end = html.indexOf('// end remi notes vis1 v=remi-notes-vis1');
@@ -105,6 +107,7 @@ function wire(sandbox){
   }, 'my', true);
   assert.ok(!unlinked.includes('Open thread'), unlinked);
   assert.ok(!unlinked.includes('remiNotesVis1OpenThread'), unlinked);
+  assert.ok(unlinked.includes("onclick=\"remiNotesStay1bOpen('note-plain')\""), unlinked);
 
   const linked = sandbox.remiNotesVis1CardHtml({
     id:'note-test',
@@ -113,9 +116,10 @@ function wire(sandbox){
     thread_id:'t-sara',
     updates:[]
   }, 'my', true);
-  assert.ok(linked.includes('>Open thread<'), linked);
-  assert.ok(linked.includes('data-remi-notes-open1b="v=remi-notes-open1b"'), linked);
-  assert.ok(linked.includes("onclick=\"remiNotesVis1OpenThread('note-test')\""), linked);
+  assert.ok(!linked.includes('Open thread'), linked);
+  assert.ok(linked.includes('data-remi-notes-stay1b="v=remi-notes-stay1b"'), linked);
+  assert.ok(linked.includes("onclick=\"remiNotesStay1bOpen('note-test')\""), linked);
+  assert.ok(linked.includes('>Edit<') && linked.includes('>Delete<'), linked);
 
   const deep = sandbox.remiNotesVis1CardHtml({
     id:'note-deep',
@@ -123,7 +127,8 @@ function wire(sandbox){
     deep_link:'admin/messages?aide_id=jaz-id',
     updates:[]
   }, 'my', true);
-  assert.ok(deep.includes('>Open thread<'), deep);
+  assert.ok(!deep.includes('Open thread'), deep);
+  assert.ok(deep.includes("onclick=\"remiNotesStay1bOpen('note-deep')\""), deep);
 
   const objectLink = sandbox.remiNotesVis1CardHtml({
     id:'note-obj',
@@ -146,10 +151,12 @@ function wire(sandbox){
     {id:'note-plain', body:'remind me in 10 mins', updates:[]},
     {id:'note-office', body:'Office only', office_thread_id:'t-office', updates:[]}
   ], '');
-  assert.strictEqual(pane.split('>Open thread<').length - 1, 2, pane);
-  assert.ok(pane.indexOf("remiNotesVis1OpenThread('note-plain')")<0, pane);
-  assert.ok(pane.indexOf("remiNotesVis1OpenThread('note-test')")>=0, pane);
-  assert.ok(pane.indexOf("remiNotesVis1OpenThread('note-office')")>=0, pane);
+  assert.strictEqual(pane.split('>Open thread<').length - 1, 0, pane);
+  assert.ok(pane.indexOf('Notes stay here')>=0, pane);
+  assert.ok(pane.indexOf("remiNotesVis1OpenThread(")<0, pane);
+  assert.ok(pane.indexOf("remiNotesStay1bOpen('note-plain')")>=0, pane);
+  assert.ok(pane.indexOf("remiNotesStay1bOpen('note-test')")>=0, pane);
+  assert.ok(pane.indexOf("remiNotesStay1bOpen('note-office')")>=0, pane);
 
   sandbox.remiNotesVis1Cache = [
     {id:'note-plain', body:'remind me in 10mins'},
@@ -182,15 +189,18 @@ function wire(sandbox){
   sandbox.copilotView = 'notes';
   got = await sandbox.remiNotesVis1OpenThread('note-test');
   assert.strictEqual(got.linked, true);
+  assert.strictEqual(got.stayed, true);
   assert.strictEqual(got.aideId, 'sara-id');
   assert.strictEqual(got.threadId, 't-sara');
-  assert.ok(calls.indexOf('close')>=0 && calls.indexOf('tab:aidechat')>=0 && calls.indexOf('desk')>=0 && calls.indexOf('open:sara-id:t-sara')>=0, calls.join(','));
+  assert.strictEqual(sandbox.remiNotesVis1EditId, 'note-test');
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c==='desk'||c==='ask'||c.indexOf('open:')===0;}), calls.join(','));
 
   calls.length = 0;
   got = await sandbox.remiNotesVis1OpenThread('note-deep');
   assert.strictEqual(got.linked, true);
+  assert.strictEqual(got.stayed, true);
   assert.strictEqual(got.aideId, 'jaz-id');
-  assert.ok(calls.indexOf('open:jaz-id:t-jaz')>=0, calls.join(','));
+  assert.ok(!calls.some(function(c){return c==='close'||c==='tab:aidechat'||c.indexOf('open:')===0;}), calls.join(','));
 
   sandbox.currentAdminRole = 'Nurse';
   calls.length = 0;
@@ -313,17 +323,20 @@ async function runBrowser(){
     });
     const painted = await phone.evaluate(function(){
       var plain = document.querySelector('#remiNotesVis1 [data-note-id="note-plain"]');
-      var linked = document.querySelector('#remiNotesVis1 [data-note-id="note-test"] [data-remi-notes-open1b]');
-      var deep = document.querySelector('#remiNotesVis1 [data-note-id="note-deep"] [data-remi-notes-open1b]');
+      var linked = document.querySelector('#remiNotesVis1 [data-note-id="note-test"] .remi-stay-body');
+      var deep = document.querySelector('#remiNotesVis1 [data-note-id="note-deep"] .remi-stay-body');
       var keep = document.getElementById('remiNotes1Keep');
       var buttons = keep ? Array.prototype.map.call(keep.querySelectorAll('button'), function(b){return b.textContent;}) : [];
       return {
         plainButton: plain ? !!plain.querySelector('[data-remi-notes-open1], [data-remi-notes-open1b]') : false,
+        plainOpen: plain ? plain.textContent.indexOf('Open thread') : -1,
         plainText: plain ? plain.textContent : '',
         linkedLabel: linked ? linked.textContent : '',
         linkedOnclick: linked ? linked.getAttribute('onclick') : '',
         deepLabel: deep ? deep.textContent : '',
+        deepOpen: deep ? (deep.closest('[data-note-id]') ? deep.closest('[data-note-id]').textContent.indexOf('Open thread') : -1) : -1,
         keepMarker: keep ? keep.getAttribute('data-remi-notes-open1b') : '',
+        keepStay: keep ? keep.getAttribute('data-remi-notes-stay1b') : '',
         reminderButtons: buttons,
         reminderOpen: keep ? keep.textContent.indexOf('Open thread') : -1,
         view: copilotView,
@@ -331,11 +344,14 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(painted.plainButton, false, 'unlinked Ace note has no Open thread');
+    assert.ok(painted.plainOpen<0, 'unlinked card text has no Open thread');
     assert.ok(painted.plainText.indexOf('remind me in 10mins')>=0, painted.plainText);
-    assert.strictEqual(painted.linkedLabel, 'Open thread');
-    assert.ok(painted.linkedOnclick.indexOf("remiNotesVis1OpenThread('note-test')")>=0, painted.linkedOnclick);
-    assert.strictEqual(painted.deepLabel, 'Open thread');
+    assert.strictEqual(painted.linkedLabel, 'Cover note');
+    assert.ok(painted.linkedOnclick.indexOf("remiNotesStay1bOpen('note-test')")>=0, painted.linkedOnclick);
+    assert.strictEqual(painted.deepLabel, 'Deep link');
+    assert.ok(painted.deepOpen<0, 'deep link note has no Open thread');
     assert.strictEqual(painted.keepMarker, 'v=remi-notes-open1b');
+    assert.strictEqual(painted.keepStay, 'v=remi-notes-stay1b');
     assert.ok(painted.reminderButtons.indexOf('Open thread')<0, painted.reminderButtons.join(','));
     assert.ok(painted.reminderOpen<0, 'local reminder has no Open thread');
     assert.strictEqual(painted.view, 'notes');
@@ -383,18 +399,25 @@ async function runBrowser(){
     assert.strictEqual(unlinked.chatActive, false, 'no Messages hop');
     assert.ok(unlinked.keepOpen<0, 'reminder still has no Open thread');
 
-    await phone.click('#remiNotesVis1 [data-note-id="note-test"] [data-remi-notes-open1b]');
-    await phone.waitForFunction(function(){
-      var title = document.getElementById('aidechatThreadTitle');
-      var sheet = document.getElementById('copilotSheet');
-      var chat = document.getElementById('tab_aidechat');
-      return title && title.textContent.indexOf('Sara Alvarez')>=0 && sheet && sheet.hidden && chat && chat.classList.contains('active');
-    }, {timeout:15000});
+    await phone.click('#remiNotesVis1 [data-note-id="note-test"] .remi-stay-body');
     const opened = await phone.evaluate(function(){
       var thread = document.getElementById('aidechatThreadView');
-      return {threadHidden: thread ? !!thread.hidden : true};
+      var sheet = document.getElementById('copilotSheet');
+      var chat = document.getElementById('tab_aidechat');
+      var edit = document.getElementById('remiNotesVisEdit');
+      return {
+        threadHidden: thread ? !!thread.hidden : true,
+        sheetHidden: sheet ? !!sheet.hidden : true,
+        chatActive: !!(chat && chat.classList.contains('active')),
+        editing: !!(edit && edit.value.indexOf('Cover note')>=0),
+        view: copilotView
+      };
     });
-    assert.strictEqual(opened.threadHidden, false, 'linked Open thread still opens Messages');
+    assert.strictEqual(opened.threadHidden, true, 'linked tap does not open a Messages thread');
+    assert.strictEqual(opened.sheetHidden, false, 'linked tap stays in Remi');
+    assert.strictEqual(opened.chatActive, false, 'linked tap does not hop to Messages');
+    assert.strictEqual(opened.editing, true, 'linked tap opens in-rail edit');
+    assert.strictEqual(opened.view, 'notes');
     assert.strictEqual(errors.length, 0, errors.join('\n'));
     console.log('admin-remi-notes-open1b browser ok');
   }finally{
