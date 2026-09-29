@@ -111,6 +111,9 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <!-- admin sched chat push 2026-09-29 v=admin-sched-chat-push1 admin-build 2026-09-29-admin-sched-chat-push1. GHOST-ADMIN-SCHED-CHAT-PUSH1-CONTRACT-v1. Ace CALLABLE LIVE for the office RPCs. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Admin repo only. When an aide or Remi texts Admin or Scheduler, that staffer gets a phone ping too. Admin and Scheduler are one portal and the same Settings chrome. Nurse is out of scope (42501). Settings (#tab_settings) holds one toggle, Aide + Remi messages. Subcopy: Get a phone notification when an aide or Remi texts you. This is not More → Notifications (#tab_notifications), which stays the aide roster (clienthrs1d / vapid1 / aide-notif-search1). Load calls office_get_notification_prefs. Flip ON calls office_save_notification_prefs with p_aide_remi_messages true, then asks Allow only when permission is not granted. There is no separate Allow card. On Allow the desk calls get_vapid_public_key. When configured is false it does not subscribe. When configured is true it subscribes with vapidPublicKey and posts office_upsert_web_push_subscription with p_endpoint, p_p256dh, p_auth, and optional p_user_agent. Flip OFF calls office_save_notification_prefs with p_aide_remi_messages false and office_revoke_web_push_subscription with optional p_endpoint. A tap follows payload.deep_link to admin/messages?aide_id= and opens that Messages thread. Staff-facing copy is plain English only. Never paint a public key, a private key, or worker jargon. Soft hint: Open the app from your Home Screen, then tap Allow. Aide send already queues office_push_jobs. This desk does not invent delivery and does not post a deliver RPC. No text-message sender. When get_vapid_public_key is missing or configured is false, this desk does not subscribe. The pref can still be saved. sw.js handles the ping tap only and does not cache the app and does not put ?v= on the address bar. Prior admin-build metas stay. The first meta remains 2026-09-27-remi-float-hide1b. No Auth reseal. Dates people read are MM/DD/YYYY. -->
 <meta name="admin-build" content="2026-09-29-admin-sched-chat-push1">
 <script>var ADMIN_SCHED_CHAT_PUSH1_MARKER='v=admin-sched-chat-push1';var ADMIN_SCHED_CHAT_PUSH1_BUILD='2026-09-29-admin-sched-chat-push1';</script>
+<!-- msg composer kb 2026-09-29 v=msg-composer-kb2 ?v=msg-composer-kb2 admin-build 2026-09-29-msg-composer-kb2. GHOST-MSG-COMPOSER-KB2-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Phone only, 899px and under. Nurse stays out of Messages. Focusing Type a message (#aidechatReply) or Send (#aidechatSend) adds html.aidechat-kb immediately, with no keyboard-gap wait. While html.aidechat-kb or html.remi-ask-kb is on, #bottomNav is display none and loginLandSchedule1FitNav does not apply --login-land-vv-lift or #bottomNav style bottom. It clears that lift. Only #aidechatComposer is position fixed, docked to the visual viewport bottom with the same fixed-origin check as v=loginkb1 and v=care-msg-safe1, so Type a message and Send sit above the keyboard and the Safari Done and URL bar. #aidechatThreadView stays in normal flow. #msgDensePanel and #aidechatMessages shorten to the space above the composer so the bubbles scroll there and the page does not show a blank white gap. The pin runs again at 80ms and 320ms and on visualViewport resize and scroll. Blur and leaving Messages (more-hide1) clear the tuck and let the Schedule bar lift return. Remi Ask still waits for a keyboard gap of at least 80 before html.remi-ask-kb, and that class also tucks the tab bar and skips the login-land lift. Desktop at 900px and up does not tuck. Admin and Scheduler are one portal. A Scheduler login gets the same keyboard tuck as Admin: the pin does not check for an Admin-only role, and Messages, the composer, and the bottom tab stay data-layout-roles Admin Scheduler. Nurse stays out. Prior markers stay, including v=admin-sched-chat-push1, v=login-land-schedule1, v=list-search-az1, v=pages-cache-fresh1, v=care-msg-safe1, v=remi-open-thread1, and v=loginkb1. -->
+<meta name="admin-build" content="2026-09-29-msg-composer-kb2">
+<script>var MSG_COMPOSER_KB2_MARKER='v=msg-composer-kb2';var MSG_COMPOSER_KB2_BUILD='2026-09-29-msg-composer-kb2';</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
@@ -1199,6 +1202,13 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 }
 html.aidechat-kb #adminScreen .bottom-nav,
 html.remi-ask-kb #adminScreen .bottom-nav{display:none !important;}
+/* v=msg-composer-kb2 — keyboard tuck wins over the login-land Safari lift. The bar stays fully hidden. The page padding does not keep a keyboard-sized gap. */
+html.aidechat-kb,
+html.remi-ask-kb{--login-land-vv-lift:0px !important;}
+html.aidechat-kb #adminScreen #bottomNav,
+html.remi-ask-kb #adminScreen #bottomNav{display:none !important;bottom:auto !important;}
+html.aidechat-kb #adminScreen .main-content,
+html.remi-ask-kb #adminScreen .main-content{padding-bottom:8px;}
 html.aidechat-kb,html.aidechat-kb body,
 html.remi-ask-kb,html.remi-ask-kb body{overflow:hidden;height:100%;}
 html.aidechat-kb #aidechatThreadView{position:static;top:auto;right:auto;bottom:auto;left:auto;width:auto;height:auto;max-height:none;background:#f4f8fb;}
@@ -1223,7 +1233,7 @@ html.aidechat-kb #aidechatComposer{position:fixed;left:0;right:0;z-index:220;mar
 #tab_aidechat .msg-draft-note{flex:1 1 100%;margin:0 0 4px;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--teal-dark);}
 #tab_aidechat .msg-dense-panel .aidechat-composer{flex-wrap:wrap;}
 #tab_aidechat.is-client-thread #aidechatThreadAv{background:linear-gradient(135deg,#c4a574,#8b6914);}
-html.aidechat-kb #tab_aidechat.is-open .msg-dense-panel{min-height:0;}
+html.aidechat-kb #tab_aidechat.is-open .msg-dense-panel{min-height:0;height:auto;max-height:none;}
 html.remi-ask-kb #copilotSheet{z-index:180;}
 /* v=clienthrs1d — Notifications roster, schedule-send, chat names. Phone-first. No SMS. */
 #tab_notifications{max-width:100%;min-width:0;}
@@ -4138,7 +4148,7 @@ Call (216) 377-5991 with any questions.</textarea>
             <p class="clienthrs1d-hint" id="clienthrs1dSchedNote">Remi delivers in Messages. Push goes out only when this aide already allows it. Not SMS.</p>
             <div id="clienthrs1dQueued"></div>
           </section>
-          <form id="aidechatComposer" class="aidechat-composer" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" onsubmit="aidechatSendOffice(event); return false;">
+          <form id="aidechatComposer" class="aidechat-composer" data-layout-roles="Admin Scheduler" data-remi-msg-tab1="v=remi-msg-tab1" data-msg-composer-kb2="v=msg-composer-kb2" onsubmit="aidechatSendOffice(event); return false;">
             <p id="remiMsgTab1DraftNote" class="msg-draft-note" data-remi-msg-tab1="v=remi-msg-tab1" hidden>Draft ready · not sent</p>
             <textarea id="aidechatReply" maxlength="1000" placeholder="Type a message…" aria-label="Reply as office" autocomplete="off"></textarea>
             <button type="submit" class="btn btn-teal" id="aidechatSend">Send</button>
@@ -10714,6 +10724,7 @@ function copilotChatViewport(){
   function clearKb(){
     document.documentElement.classList.remove('remi-ask-kb');
     if(document.body)document.body.classList.remove('remi-ask-kb');
+    try{if(typeof loginLandSchedule1FitNav==='function')loginLandSchedule1FitNav();}catch(eLift){}
   }
   if(!chatting&&!ask){
     clearKb();
@@ -10729,6 +10740,7 @@ function copilotChatViewport(){
   if(ask&&focused&&gap>=80&&vv){
     document.documentElement.classList.add('remi-ask-kb');
     if(document.body)document.body.classList.add('remi-ask-kb');
+    try{if(typeof loginLandSchedule1FitNav==='function')loginLandSchedule1FitNav();}catch(eLift2){}
     var top=0;
     if(typeof loginKbFixedFollowsLayout==='function'&&loginKbFixedFollowsLayout(vv))top=vv.offsetTop||0;
     var h=Math.max(200, Math.round(vv.height||0));
@@ -13096,6 +13108,7 @@ function careMsgSafe1ClearAidePin(){
   careMsgSafe1ClearThreadPin();
   careMsgSafe1ClearComposer();
   careMsgSafe1ClearListPin();
+  try{if(typeof loginLandSchedule1FitNav==='function')loginLandSchedule1FitNav();}catch(eLand){}
 }
 function careMsgSafe1HoldDesk(){
   var tab=document.getElementById('tab_aidechat');
@@ -13121,6 +13134,7 @@ function careMsgSafe1PinAide(){
   careMsgSafe1HoldDesk();
   document.documentElement.classList.add('aidechat-kb');
   if(document.body)document.body.classList.add('aidechat-kb');
+  try{if(typeof loginLandSchedule1FitNav==='function')loginLandSchedule1FitNav();}catch(eLand){}
   careMsgSafe1ClearThreadPin();
   var view=careMsgSafe1ReadVv();
   var viewH=view&&isFinite(view.height)?view.height:(window.innerHeight||0);
@@ -13151,6 +13165,10 @@ function careMsgSafe1PinAide(){
   if(panel){
     var panelTop=panel.getBoundingClientRect().top;
     var formTop=form?form.getBoundingClientRect().top:(dock-56);
+    var formH=form?Math.ceil(form.getBoundingClientRect().height):56;
+    if(!(formH>=40))formH=56;
+    var expectTop=Math.round(origin+viewH-formH);
+    if(isFinite(expectTop)&&formTop>expectTop+24)formTop=expectTop;
     var room=Math.round(formTop-8-panelTop);
     if(!(room>=48))room=48;
     panel.style.minHeight='0px';
@@ -28613,6 +28631,25 @@ function loginLandSchedule1Note(){
   }catch(e){}
   return true;
 }
+function loginLandSchedule1KbOn(){
+  try{
+    var root=document.documentElement;
+    var body=document.body;
+    function on(el){
+      return !!(el&&el.classList&&typeof el.classList.contains==='function'&&(el.classList.contains('aidechat-kb')||el.classList.contains('remi-ask-kb')));
+    }
+    return on(root)||on(body);
+  }catch(e){return false;}
+}
+function loginLandSchedule1ClearLift(){
+  var nav=null;
+  var root=null;
+  try{nav=document.getElementById('bottomNav');}catch(e){nav=null;}
+  try{root=document.documentElement;}catch(e2){root=null;}
+  if(root&&root.style&&root.style.setProperty)root.style.setProperty('--login-land-vv-lift', '0px');
+  if(nav&&nav.style)nav.style.bottom='';
+  return 0;
+}
 function loginLandSchedule1VvGap(view, innerHeight){
   var inner=Number(innerHeight);
   if(!isFinite(inner)||inner<0)inner=0;
@@ -28626,6 +28663,7 @@ function loginLandSchedule1VvGap(view, innerHeight){
   return Math.round(gap);
 }
 function loginLandSchedule1FitNav(){
+  if(loginLandSchedule1KbOn())return loginLandSchedule1ClearLift();
   var nav=null;
   try{nav=document.getElementById('bottomNav');}catch(e){nav=null;}
   var root=null;
