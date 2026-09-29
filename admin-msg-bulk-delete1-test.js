@@ -59,7 +59,7 @@ assert.ok(html.includes('id="msgBulkSelectAll"') && html.includes('>Select all<'
 assert.ok(html.includes('id="msgBulkUnselect"') && html.includes('>Unselect<'), 'Unselect');
 assert.ok(html.includes('id="msgBulkDelete"') && html.includes('>Delete<'), 'Delete');
 assert.ok(/id="msgBulkDelete"[^>]*disabled/.test(html), 'Delete starts muted');
-assert.ok(html.includes('id="msgBulkCount">0 selected'), 'count starts at 0 selected');
+assert.ok(/id="msgBulkCount"[^>]*>0 selected</.test(html), 'count starts at 0 selected');
 assert.ok(html.includes('class="msg-bulk-cb"'), 'checkbox class');
 assert.ok(html.includes('data-msg-bulk-delete1="v=msg-bulk-delete1"'), 'desk marker');
 assert.ok(html.includes('data-layout-roles="Admin Scheduler" data-msg-bulk-delete1="v=msg-bulk-delete1"'), 'toolbar is Admin and Scheduler');
@@ -592,20 +592,23 @@ async function runBrowser(){
 
     const nurse = await page.evaluate(async function(){
       var before=sessionStorage.getItem('evercare_msg_bulk_delete1_aides');
+      var saraBefore=msgBulkDelete1Hidden('aides','a-sara');
       currentAdminRole='Nurse';
-      msgBulkDelete1Selected={aides:{'a-moe':1}, clients:{}};
+      msgBulkDelete1Selected={aides:{'a-sara':1}, clients:{}};
       msgBulkDelete1Busy=false;
       await msgBulkDelete1Delete();
       msgBulkDelete1SelectAll();
       return {
         roleOk:msgBulkDelete1RoleOk(),
         same:sessionStorage.getItem('evercare_msg_bulk_delete1_aides')===before,
-        hidden:msgBulkDelete1Hidden('aides','a-moe')
+        saraBefore:saraBefore,
+        hidden:msgBulkDelete1Hidden('aides','a-sara')
       };
     });
     assert.strictEqual(nurse.roleOk, false, 'Nurse denied');
     assert.strictEqual(nurse.same, true, 'Nurse delete does not write');
-    assert.strictEqual(nurse.hidden, false, 'moe was not hidden by Nurse');
+    assert.strictEqual(nurse.saraBefore, false, 'Sara is still in the Admin inbox');
+    assert.strictEqual(nurse.hidden, false, 'Nurse does not hide Sara');
     await page.screenshot({path:path.join(outDir, '04-toolbar.png')});
   }finally{
     await browser.close();
