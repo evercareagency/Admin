@@ -258,8 +258,9 @@ async function runBrowser(){
       remiNotesShow();
       var box = document.getElementById('copilotSheet').getBoundingClientRect();
       var check = document.querySelector('#copilotBody .check');
+      var save = document.getElementById('remiNotesVisSave');
+      var remind = document.getElementById('remiNotesClarityRemind');
       var add = document.getElementById('remiNotesAdd');
-      var chip = document.getElementById('remiNotesChip30');
       return {
         selected: document.getElementById('copilotTabNotes').getAttribute('aria-selected'),
         ask: document.getElementById('copilotTabAsk').getAttribute('aria-selected'),
@@ -270,8 +271,10 @@ async function runBrowser(){
         viewW: window.innerWidth,
         viewH: window.innerHeight,
         checkH: check ? check.getBoundingClientRect().height : 0,
+        saveH: save ? save.getBoundingClientRect().height : 0,
+        remindH: remind ? remind.getBoundingClientRect().height : 0,
         addH: add ? add.getBoundingClientRect().height : 0,
-        chipH: chip ? chip.getBoundingClientRect().height : 0,
+        composers: document.querySelectorAll('#copilotSheet textarea, #copilotSheet input#remiNotesInput').length,
         openCount: remiNotesOpenList(now).length
       };
     });
@@ -288,7 +291,8 @@ async function runBrowser(){
     assert.ok(seeded.text.indexOf('in 30 min') >= 0, seeded.text);
     assert.ok(seeded.text.indexOf('tomorrow 9am') >= 0, seeded.text);
     assert.ok(seeded.text.indexOf('Recently done') >= 0, seeded.text);
-    assert.ok(seeded.checkH >= 44 && seeded.addH >= 44 && seeded.chipH >= 44, 'tappable ' + [seeded.checkH, seeded.addH, seeded.chipH].join(','));
+    assert.ok(seeded.checkH >= 44 && seeded.saveH >= 44 && seeded.remindH >= 44, 'tappable ' + [seeded.checkH, seeded.saveH, seeded.remindH].join(','));
+    assert.strictEqual(seeded.addH, 0, 'the second Add note pad stays hidden');
     assert.strictEqual(seeded.openCount, 3);
     await page.screenshot({path:path.join(shotDir, 'remi-notes1-phone.png')});
 
@@ -319,8 +323,11 @@ async function runBrowser(){
     assert.ok(preview.indexOf('3:25 PM') >= 0, preview);
     await page.screenshot({path:path.join(shotDir, 'remi-notes1-picker-phone.png')});
     await page.click('#remiNotesSetRemind');
-    await page.type('#remiNotesInput', 'Picker probe');
-    await page.click('#remiNotesAdd');
+    await page.evaluate(function(){
+      var input = document.getElementById('remiNotesVisInput');
+      input.value = 'Picker probe';
+    });
+    await page.click('#remiNotesVisSave');
     const pickedNote = await page.evaluate(function(){
       var list = remiNotesOpenList(new Date());
       var hit = null;
@@ -349,11 +356,13 @@ async function runBrowser(){
     assert.strictEqual(flowed.banner, true, flowed.doneText);
     assert.ok(flowed.doneText.indexOf('Recover') >= 0, flowed.doneText);
     assert.strictEqual(flowed.back, true, 'recover returns the note to open');
-    assert.ok(flowed.openText.indexOf('Open notes') >= 0, flowed.openText);
+    assert.ok(flowed.openText.indexOf('Remind me') >= 0, flowed.openText);
 
-    await page.click('#remiNotesChip30');
-    await page.type('#remiNotesInput', 'Chip half hour');
-    await page.click('#remiNotesAdd');
+    await page.evaluate(function(){
+      remiNotesChip('30min');
+      document.getElementById('remiNotesVisInput').value = 'Chip half hour';
+    });
+    await page.click('#remiNotesVisSave');
     const chipNote = await page.evaluate(function(){
       var now = Date.now();
       var list = remiNotesOpenList(new Date());
@@ -436,7 +445,7 @@ async function runBrowser(){
     assert.ok(wide.sheetLeft > wide.viewW * 0.5, 'rail stays on the right ' + wide.sheetLeft);
     assert.ok(wide.sheetRight <= wide.viewW + 1);
     assert.ok(wide.mainLeft < wide.sheetLeft, 'desk stays beside the rail');
-    assert.ok(wide.text.indexOf('Open notes') >= 0, wide.text);
+    assert.ok(wide.text.indexOf('Call CM about Bowlax cover') >= 0, wide.text);
     await desk.screenshot({path:path.join(shotDir, 'remi-notes1-desktop.png')});
 
     const nurse = await browser.newPage();

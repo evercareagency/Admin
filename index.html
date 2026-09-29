@@ -21,6 +21,9 @@
 <!-- remi notes stay 2026-09-29 v=remi-notes-stay1b ?v=remi-notes-stay1b admin-build 2026-09-29-remi-notes-stay1b. GHOST-REMI-NOTES-STAY1B-CONTRACT-v1. Follow-up to v=remi-notes-open1b. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Mo LOCK: remove Open thread entirely from Remi Notes. My notes, Scheduler notes, on-phone Reminders, linked notes, and unlinked notes never paint an Open thread control. Notes never leave Remi for Messages. There is no card-tap hop and no post-save hop. Tap a note stays in the same Remi room and opens note detail or edit in-rail, reusing the remi-rail-crud1 Edit textarea with Cancel and Save on My notes. Scheduler notes keep Update note on the same card. Edit, Delete, and Save stay. remiNotesStay1bOpen, remiNotesVis1OpenThread, remiNotesOpen1Go, and remiNotesOpen1Messages do not call copilotClose, do not showTab('aidechat'), do not remiOpenThread1Desk, and do not aideOfficeVis1OpenAide. They do not open Remi Ask. A soft chip says Notes stay here. Admin and Scheduler are one portal and share this Notes behavior. Nurse stays out. Radar Open thread on aide office alerts is unchanged. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1b, v=remi-notes-open1, v=remi-rail-crud1, v=remi-notes-vis1, v=remi-notes1, and v=remi-open-thread1. -->
 <meta name="admin-build" content="2026-09-29-remi-notes-stay1b">
 <script>var REMI_NOTES_STAY1B_MARKER='v=remi-notes-stay1b';var REMI_NOTES_STAY1B_BUILD='2026-09-29-remi-notes-stay1b';</script>
+<!-- remi notes clarity 2026-09-29 v=remi-notes-clarity1 ?v=remi-notes-clarity1 admin-build 2026-09-29-remi-notes-clarity1. GHOST-REMI-NOTES-CLARITY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Admin and Scheduler are one portal. Nurse stays out. ONE notes area: My notes and on-phone Reminders share one list and one composer. There is no Reminders pad, no Add note composer, and no My notes | Reminders subtabs. Sticky office notes wear a NOTE chip. Timed local reminders wear a REMIND chip. Edit and Delete stay on both. Remind me is a chip inside that one composer. When it is on, a time chip (in 30 min, in 1 hour, Tomorrow, or Pick date) sits beside it and Save writes a local reminder through the existing remiNotesCreate path. When it is off, Save still posts remi_save_my_note. Scheduler soft copy stays Your notes only. Admin may still say My notes on the historical My notes | Scheduler notes tabs. The Remi sheet header sits fully below the phone status bar and the EverCare shell-top: phone top is safe-area plus the measured topbar, and the keyboard path does not pull the sheet back under that chrome. Focusing the notes composer docks that one composer with msgComposerKb3DockForm and msgComposerRect1FlushBottom on visualViewport, the same inset helpers as the message and Remi Ask composers, so the textarea, Remind me chip, and Save stay above the software keyboard. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-stay1b, v=remi-notes-open1b, v=remi-notes-vis1, v=remi-notes1, v=remi-rail-crud1, v=sched-notes-copy1, and v=msg-composer-kb3. -->
+<meta name="admin-build" content="2026-09-29-remi-notes-clarity1">
+<script>var REMI_NOTES_CLARITY1_MARKER='v=remi-notes-clarity1';var REMI_NOTES_CLARITY1_BUILD='2026-09-29-remi-notes-clarity1';</script>
 <!-- sched notes copy 2026-09-29 v=sched-notes-copy1 ?v=sched-notes-copy1 admin-build 2026-09-29-sched-notes-copy1. GHOST-SCHED-NOTES-COPY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI copy. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Same Remi Notes surface as v=remi-notes-open1. Admin and Scheduler are one portal. This string change is Scheduler-facing only. remiNotesVis1Hint() for role Scheduler paints Your notes only. It does not say Admin. Admin My notes and the Scheduler notes tab keep their hints: This tab only. Your My notes stay off her screen. and Save → only on My notes. Scheduler never sees this tab. Scheduler still has no Scheduler notes tab. Nurse stays out. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1, v=remi-notes-vis1, v=remi-open-thread1, and v=sched-payroll-hide1. -->
 <meta name="admin-build" content="2026-09-29-sched-notes-copy1">
 <script>var SCHED_NOTES_COPY1_MARKER='v=sched-notes-copy1';var SCHED_NOTES_COPY1_BUILD='2026-09-29-sched-notes-copy1';</script>
@@ -1740,6 +1743,32 @@ html.remi-ask-kb #copilotSheet{padding-bottom:0;}
 #remiRailCrud1Confirm .alt{background:#fff;color:#6b7a90;border:1px solid var(--border);}
 #remiRailCrud1Confirm .del{background:#fff;color:#c0392b;border:1.5px solid #e7a0ad;}
 #remiNotes1Keep{margin-top:14px;padding-top:8px;border-top:1px dashed var(--border);}
+/* v=remi-notes-clarity1 — one notes list and one composer. Sheet head clears status bar + EverCare topbar. */
+#copilotSheet.is-notes #remiNotesComposer{display:none !important;}
+#copilotSheet.is-notes #remiNotesDock{border-top:0;padding-top:0;gap:0;background:transparent;}
+#copilotSheet.is-notes #remiNotes1Keep{margin-top:0;padding-top:0;border-top:0;}
+#copilotSheet.is-notes-done #remiNotesClarityCompose{display:none !important;}
+#copilotSheet .remi-clarity-compose{margin-top:4px;}
+#copilotSheet .remi-clarity-ping{margin:6px 0 0;font-size:0.72rem;font-weight:700;color:var(--teal-dark);line-height:1.35;}
+#copilotSheet .remi-clarity-ping[hidden]{display:none !important;}
+#copilotSheet .remi-clarity-row{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+#copilotSheet .remi-clarity-remind,#copilotSheet .remi-clarity-when{min-height:44px;border-radius:999px;padding:8px 12px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.78rem;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-clarity-remind{background:#fff;color:var(--teal-dark);border:1.5px solid var(--teal);}
+#copilotSheet .remi-clarity-remind.on,#copilotSheet .remi-clarity-when{background:var(--teal);color:#fff;border-color:var(--teal);}
+#copilotSheet .remi-clarity-when[hidden]{display:none !important;}
+#copilotSheet .remi-clarity-row .go{margin-left:auto;min-height:44px;min-width:72px;border:0;border-radius:10px;background:var(--teal);color:#fff;padding:8px 16px;font-weight:800;font-family:'DM Sans',sans-serif;font-size:0.9rem;cursor:pointer;touch-action:manipulation;}
+#copilotSheet .remi-clarity-kind{display:inline-flex;align-items:center;margin-left:6px;font-size:0.62rem;font-weight:800;letter-spacing:.04em;padding:2px 6px;border-radius:999px;background:#e8f4f4;color:#1e6060;vertical-align:middle;}
+#copilotSheet .remi-clarity-kind.is-remind{background:#fff3e0;color:#9a3412;}
+#copilotSheet .remi-clarity-soft{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#e6f7ed;color:#1e7a45;font-size:0.78rem;font-weight:800;text-align:center;}
+#copilotSheet .remi-clarity-row-card .remi-crud-actions{margin-top:8px;}
+@media(max-width:899px){
+  #copilotSheet{top:calc(env(safe-area-inset-top, 0px) + 72px);}
+}
+html.remi-notes-kb #adminScreen .bottom-nav,
+html.remi-notes-kb #adminScreen #bottomNav{display:none !important;bottom:auto !important;}
+html.remi-notes-kb{--login-land-vv-lift:0px !important;}
+html.remi-notes-kb,html.remi-notes-kb body{overflow:hidden;height:100%;}
+html.remi-notes-kb #remiNotesClarityCompose{background:#fff;border-top:1px solid var(--border);box-shadow:0 -8px 18px rgba(26,39,68,.08);padding:8px 12px;box-sizing:border-box;}
 #copilotSheet .remi-proof{min-width:0;max-width:100%;}
 #copilotSheet .remi-proof h3{font-size:0.95rem;color:var(--navy);margin:0 0 8px;}
 #copilotSheet .remi-proof-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;min-width:0;}
@@ -1939,6 +1968,9 @@ html.remi-ask-kb #copilotSheet{padding-bottom:0;}
 #copilotSheet .pay-back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:6px;background:transparent;border:0;color:var(--teal);font-weight:800;font-family:'DM Sans',sans-serif;padding:0;cursor:pointer;touch-action:manipulation;}
 @media(max-width:899px){
   #copilotSheet{top:72px;border-radius:22px 22px 0 0;box-shadow:0 -16px 40px rgba(26,39,68,.28);}
+}
+@media(max-width:899px){
+  #copilotSheet{top:calc(env(safe-area-inset-top, 0px) + 72px);}
 }
 /* v=remi-payroll-ins1 — Admin payroll report own page. Phone chips sit in the Remi sheet. Desktop report is #tab_payroll, not the rail. */
 #tab_payroll .ins1-own-note{display:inline-flex;align-items:center;margin:0 0 10px;padding:4px 10px;border-radius:999px;background:#efe6f5;color:#6B2D8B;font-size:0.72rem;font-weight:800;}
@@ -4339,7 +4371,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="v=remi-notes-stay1b" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="v=remi-notes-stay1b" data-remi-notes-clarity1="v=remi-notes-clarity1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -10835,6 +10867,7 @@ function copilotClose(){
     sheet.style.maxHeight='';
     sheet.style.bottom='';
   }
+  try{if(typeof remiNotesClarity1ClearKb==='function')remiNotesClarity1ClearKb();}catch(eKb){}
   copilotPending=null;
   copilotView='radar';
   var dock=copilotEl('copilotComposer');
@@ -10879,6 +10912,7 @@ function copilotSyncTabs(){
     else sheet.classList.remove('is-payroll');
   }
   if(!onNotes&&typeof remiNotesClosePicker==='function')remiNotesClosePicker();
+  if(!onNotes&&typeof remiNotesClarity1ClearKb==='function')remiNotesClarity1ClearKb();
 }
 function copilotHideConfirm(){
   copilotPending=null;
@@ -10908,6 +10942,10 @@ function remiPhoneRail1NavReserve(vv, navRect){
 function copilotChatViewport(){
   var sheet=copilotEl('copilotSheet');
   if(!sheet)return;
+  if(typeof copilotView!=='undefined'&&copilotView==='notes'&&!sheet.hidden&&typeof remiNotesClarity1Fit==='function'){
+    remiNotesClarity1Fit();
+    return;
+  }
   var vv=window.visualViewport;
   var phone=(window.innerWidth||0)<=899;
   var ask=(copilotView==='chat')&&!sheet.hidden&&phone;
@@ -24242,10 +24280,12 @@ function remiNotesRowHtml(n, mode, now){
   }
   var act=editing
     ? '<button type="button" class="note-edit" data-id="'+id+'" onclick="remiNotesSaveEdit(this)">Save</button>'
-    : '<button type="button" class="note-edit" data-id="'+id+'" onclick="remiNotesEdit(this)">Edit</button>';
-  return '<div class="note-row" data-note-id="'+id+'">'
+    : '<div class="remi-crud-actions"><button type="button" class="edit" data-id="'+id+'" onclick="remiNotesEdit(this)">Edit</button><button type="button" class="del" data-id="'+id+'" onclick="remiNotesClarity1Delete(this)">Delete</button></div>';
+  var kind=n.remind_at?'REMIND':'NOTE';
+  var kindCls=kind==='REMIND'?'is-remind':'is-note';
+  return '<div class="note-row remi-vis-card remi-clarity-row-card" data-note-id="'+id+'" data-remi-notes-clarity1="v=remi-notes-clarity1">'
     +'<button type="button" class="check" data-id="'+id+'" aria-label="Mark done" onclick="remiNotesDone(this)"><span></span></button>'
-    +'<div class="note-meta">'+title+remiNotesRemindHtml(n, now)+'</div>'
+    +'<div class="note-meta"><div class="remi-vis-meta"><strong>You</strong> <span class="remi-clarity-kind '+kindCls+'">'+kind+'</span></div>'+title+remiNotesRemindHtml(n, now)+'</div>'
     +act+'</div>';
 }
 function remiNotesOpenHtml(now){
@@ -24285,6 +24325,270 @@ function remiNotesSyncChips(){
     hint.innerHTML='Ask Remi to remind you \u2014 e.g. <em>remind me in 30 mins</em>';
   }
 }
+var remiNotesClarity1On=false;
+function remiNotesClarity1Mark(){
+  return (typeof REMI_NOTES_CLARITY1_MARKER==='string'&&REMI_NOTES_CLARITY1_MARKER)||'v=remi-notes-clarity1';
+}
+function remiNotesClarity1OpenRows(now){
+  var list=remiNotesOpenList(now);
+  var html='';
+  for(var i=0;i<list.length;i++)html+=remiNotesRowHtml(list[i], 'open', now);
+  html+='<button type="button" class="recent-link" id="remiNotesRecent" onclick="remiNotesShowDone()"><span>Recently done \u2192</span><span class="recent-keep">7d</span></button>';
+  return html;
+}
+function remiNotesClarity1Delete(el){
+  if(!remiNotesRoleOk())return;
+  var id=remiNotesIdOf(el);
+  if(remiNotesEditing===id)remiNotesEditing='';
+  remiNotesComplete(id, new Date());
+  remiNotesPaint();
+}
+function remiNotesClarity1WhenLabel(){
+  var kind=remiNotesPending&&remiNotesPending.kind;
+  if(kind==='30min')return 'in 30 min';
+  if(kind==='1hour')return 'in 1 hour';
+  if(kind==='tomorrow')return 'Tomorrow';
+  if(remiNotesPending&&remiNotesPending.remind_at&&typeof remiNotesSpeak==='function')return remiNotesSpeak(remiNotesPending.remind_at, new Date());
+  return 'in 30 min';
+}
+function remiNotesClarity1SyncRemind(){
+  var on=!!(remiNotesClarity1On&&remiNotesPending&&remiNotesPending.remind_at);
+  var btn=null, when=null, ping=null;
+  try{btn=document.getElementById('remiNotesClarityRemind');}catch(e){btn=null;}
+  try{when=document.getElementById('remiNotesClarityWhen');}catch(e2){when=null;}
+  try{ping=document.getElementById('remiNotesClarityPing');}catch(e3){ping=null;}
+  if(btn){
+    if(btn.classList){if(on)btn.classList.add('on');else btn.classList.remove('on');}
+    if(btn.setAttribute)btn.setAttribute('aria-pressed', on?'true':'false');
+  }
+  if(when){
+    when.hidden=!on;
+    if(on)when.textContent=remiNotesClarity1WhenLabel();
+  }
+  if(ping)ping.hidden=!on;
+}
+function remiNotesClarity1ToggleRemind(){
+  if(!remiNotesRoleOk())return;
+  remiNotesClarity1On=!remiNotesClarity1On;
+  if(remiNotesClarity1On){
+    if(!remiNotesPending||!remiNotesPending.remind_at){
+      var at=remiNotesChipAt('30min', new Date());
+      remiNotesPending=at?{kind:'30min', remind_at:at.toISOString()}:null;
+    }
+  }else{
+    remiNotesPending=null;
+    if(typeof remiNotesClosePicker==='function')remiNotesClosePicker();
+  }
+  remiNotesClarity1SyncRemind();
+  if(typeof remiNotesSyncChips==='function')remiNotesSyncChips();
+}
+function remiNotesClarity1CycleWhen(){
+  if(!remiNotesRoleOk())return;
+  var order=['30min','1hour','tomorrow','custom'];
+  var kind=remiNotesPending&&remiNotesPending.kind?remiNotesPending.kind:'30min';
+  var i=order.indexOf(kind);
+  var next=order[(i+1)%order.length];
+  remiNotesClarity1On=true;
+  if(next==='custom'){
+    remiNotesOpenPicker();
+    return;
+  }
+  remiNotesChip(next);
+}
+function remiNotesClarity1Routed(){
+  var pending=remiNotesPending&&remiNotesPending.remind_at;
+  if(!remiNotesClarity1On&&!pending)return null;
+  if(!pending)return null;
+  var input=null;
+  try{input=document.getElementById('remiNotesVisInput')||document.getElementById('remiNotesInput');}catch(e){input=null;}
+  var text=input?String(input.value||'').trim():'';
+  if(!text){
+    if(typeof showTempMsg==='function')showTempMsg('Type a note first.','var(--warn)');
+    return {ok:false, error:'Type a note first.', clarity:true};
+  }
+  var note=remiNotesCreate(text, pending, new Date());
+  if(input)input.value='';
+  remiNotesPending=null;
+  remiNotesClarity1On=false;
+  remiNotesView='open';
+  remiNotesEditing='';
+  remiNotesPaint();
+  return {ok:!!note, clarity:true, note:note};
+}
+function remiNotesClarity1Place(){
+  var pane=null, keep=null;
+  try{pane=document.getElementById('remiNotesVisPane');}catch(e){pane=null;}
+  try{keep=document.getElementById('remiNotes1Keep');}catch(e2){keep=null;}
+  if(!pane||!keep)return;
+  var sched=false;
+  try{
+    sched=(typeof remiNotesVis1Which!=='undefined'&&remiNotesVis1Which==='scheduler'&&typeof remiNotesVis1IsAdmin==='function'&&remiNotesVis1IsAdmin());
+  }catch(e3){sched=false;}
+  if(sched){
+    keep.hidden=true;
+    return;
+  }
+  keep.hidden=false;
+  var card=null;
+  try{card=document.getElementById('remiNotesClarityCompose');}catch(e4){card=null;}
+  if(card&&card.parentNode===pane)pane.insertBefore(keep, card);
+  else pane.appendChild(keep);
+  if(keep.querySelector&&keep.querySelector('.note-row')){
+    var hints=pane.querySelectorAll?pane.querySelectorAll('.remi-vis-hint'):[];
+    for(var hi=0;hi<hints.length;hi++){
+      if(hints[hi]&&hints[hi].id!=='remiNotesVisHint'&&hints[hi].textContent==='No notes yet.')hints[hi].hidden=true;
+    }
+  }
+  remiNotesClarity1SyncRemind();
+}
+function remiNotesClarity1SafeTop(){
+  var probe=null;
+  try{probe=document.getElementById('remiNotesClarity1Safe');}catch(e){probe=null;}
+  if(!probe&&document.body&&document.createElement){
+    probe=document.createElement('div');
+    probe.id='remiNotesClarity1Safe';
+    probe.setAttribute('aria-hidden','true');
+    probe.style.cssText='position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top,0px);margin:0;padding:0;border:0;pointer-events:none;visibility:hidden;';
+    document.body.appendChild(probe);
+  }
+  if(!probe||!probe.getBoundingClientRect)return 0;
+  var h=0;
+  try{h=probe.getBoundingClientRect().height;}catch(e2){h=0;}
+  return isFinite(h)?Math.round(h):0;
+}
+function remiNotesClarity1SheetTop(){
+  var barBottom=72;
+  try{
+    var bar=document.querySelector('#adminScreen .shell-top');
+    if(bar&&bar.getBoundingClientRect){
+      var r=bar.getBoundingClientRect();
+      if(r&&isFinite(r.bottom)&&r.bottom>=48)barBottom=Math.round(r.bottom);
+    }
+  }catch(e){}
+  var safe=0;
+  try{safe=remiNotesClarity1SafeTop();}catch(e2){safe=0;}
+  return Math.max(barBottom, safe, 64);
+}
+function remiNotesClarity1Composer(){
+  try{return document.getElementById('remiNotesClarityCompose');}catch(e){return null;}
+}
+function remiNotesClarity1Focused(){
+  var el=null;
+  try{el=document.activeElement;}catch(e){el=null;}
+  if(!el||!el.id)return false;
+  return el.id==='remiNotesVisInput';
+}
+function remiNotesClarity1ClearComposer(form){
+  if(!form||!form.style)return;
+  form.style.position='';
+  form.style.left='';
+  form.style.right='';
+  form.style.top='';
+  form.style.bottom='';
+  form.style.width='';
+  form.style.margin='';
+  form.style.marginBottom='';
+  form.style.zIndex='';
+  form.style.display='';
+  form.style.gridTemplateColumns='';
+  form.style.flexWrap='';
+  form.style.maxWidth='';
+  form.style.boxSizing='';
+  var body=null;
+  try{body=document.getElementById('copilotBody');}catch(e){body=null;}
+  if(body&&body.style)body.style.paddingBottom='';
+}
+function remiNotesClarity1ClearKb(){
+  try{document.documentElement.classList.remove('remi-notes-kb');}catch(e){}
+  if(document.body&&document.body.classList)document.body.classList.remove('remi-notes-kb');
+  remiNotesClarity1ClearComposer(remiNotesClarity1Composer());
+}
+function remiNotesClarity1Fit(){
+  var sheet=null;
+  try{sheet=document.getElementById('copilotSheet');}catch(e){sheet=null;}
+  if(!sheet||sheet.hidden)return;
+  var phone=(window.innerWidth||0)<=899;
+  var onNotes=typeof copilotView==='undefined'||copilotView==='notes';
+  if(!phone||!onNotes){
+    if(!onNotes)remiNotesClarity1ClearKb();
+    if(!phone){
+      sheet.style.top='';
+      sheet.style.height='';
+      sheet.style.maxHeight='';
+      sheet.style.bottom='';
+    }
+    return;
+  }
+  var top=remiNotesClarity1SheetTop();
+  sheet.style.top=top+'px';
+  var form=remiNotesClarity1Composer();
+  var focused=remiNotesClarity1Focused()&&form&&!form.hidden;
+  var vv=null;
+  try{vv=window.visualViewport||null;}catch(eVv){vv=null;}
+  if(!focused){
+    remiNotesClarity1ClearKb();
+    sheet.style.top=top+'px';
+    sheet.style.height='';
+    sheet.style.maxHeight='';
+    sheet.style.bottom='';
+    return;
+  }
+  document.documentElement.classList.add('remi-notes-kb');
+  if(document.body)document.body.classList.add('remi-notes-kb');
+  try{if(typeof loginLandSchedule1FitNav==='function')loginLandSchedule1FitNav();}catch(eLift){}
+  try{if(typeof loginLandSchedule1ClearLift==='function')loginLandSchedule1ClearLift();}catch(eClear){}
+  var view=vv||{height:window.innerHeight||0, offsetTop:0};
+  var follows=typeof loginKbFixedFollowsLayout!=='function'||!!loginKbFixedFollowsLayout(view);
+  var vvBottom=(view.offsetTop||0)+(view.height||0);
+  var h=Math.max(200, Math.round(vvBottom-top));
+  sheet.style.bottom='auto';
+  sheet.style.height=h+'px';
+  sheet.style.maxHeight=h+'px';
+  if(typeof msgComposerKb3DockForm==='function')msgComposerKb3DockForm(form, view, follows);
+  if(typeof msgComposerRect1FlushBottom==='function')msgComposerRect1FlushBottom(form, view);
+  form.style.display='';
+  form.style.gridTemplateColumns='';
+  form.style.flexWrap='';
+  var body=null;
+  try{body=document.getElementById('copilotBody');}catch(eBody){body=null;}
+  if(body&&form.getBoundingClientRect){
+    var fh=0;
+    try{fh=Math.ceil(form.getBoundingClientRect().height)||0;}catch(eH){fh=0;}
+    if(!(fh>=44))fh=120;
+    body.style.paddingBottom=(fh+12)+'px';
+  }
+}
+function remiNotesClarity1Bind(){
+  if(remiNotesClarity1Bind.done)return;
+  remiNotesClarity1Bind.done=true;
+  if(!document.addEventListener)return;
+  document.addEventListener('focusin', function(ev){
+    var t=ev&&ev.target;
+    if(!t||!t.id)return;
+    if(t.id==='remiNotesVisInput'){
+      remiNotesClarity1Fit();
+      setTimeout(remiNotesClarity1Fit, 80);
+      setTimeout(remiNotesClarity1Fit, 320);
+    }
+  });
+  document.addEventListener('focusout', function(){
+    setTimeout(function(){
+      if(typeof copilotView!=='undefined'&&copilotView==='notes')remiNotesClarity1Fit();
+    }, 60);
+  });
+  var vv=null;
+  try{vv=window.visualViewport;}catch(eVv){vv=null;}
+  if(vv&&vv.addEventListener){
+    vv.addEventListener('resize', function(){if(typeof copilotView!=='undefined'&&copilotView==='notes')remiNotesClarity1Fit();});
+    vv.addEventListener('scroll', function(){if(typeof copilotView!=='undefined'&&copilotView==='notes')remiNotesClarity1Fit();});
+  }
+}
+try{
+  if(typeof document!=='undefined'){
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded', remiNotesClarity1Bind);
+    else remiNotesClarity1Bind();
+  }
+}catch(eBind){}
 function remiNotesPaint(){
   if(!remiNotesRoleOk())return;
   copilotView='notes';
@@ -24294,8 +24598,8 @@ function remiNotesPaint(){
   if(host){
     var vis='';
     try{if(typeof remiNotesVis1Html==='function')vis=String(remiNotesVis1Html()||'');}catch(eVis){vis='';}
-    var keep=remiNotesView==='done'?remiNotesDoneHtml(now):remiNotesOpenHtml(now);
-    host.innerHTML=vis+'<div id="remiNotes1Keep" data-reminotes1="v=remi-notes1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="v=remi-notes-stay1b"><div class="notes-head"><span class="ttl">Reminders</span><span class="cnt">on this phone</span></div>'+keep+'</div>';
+    var keep=remiNotesView==='done'?remiNotesDoneHtml(now):remiNotesClarity1OpenRows(now);
+    host.innerHTML=vis+'<div id="remiNotes1Keep" data-reminotes1="v=remi-notes1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="v=remi-notes-stay1b" data-remi-notes-clarity1="'+remiNotesClarity1Mark()+'">'+keep+'</div>';
   }
   var composer=remiNotesEl('remiNotesComposer');
   var foot=remiNotesEl('remiNotesDoneFoot');
@@ -24305,8 +24609,11 @@ function remiNotesPaint(){
   if(sheet&&sheet.classList){
     if(copilotView==='notes')sheet.classList.add('is-notes');
     else sheet.classList.remove('is-notes');
+    if(remiNotesView==='done')sheet.classList.add('is-notes-done');
+    else sheet.classList.remove('is-notes-done');
   }
   remiNotesSyncChips();
+  try{remiNotesClarity1Place();}catch(ePlace){}
   try{if(typeof remiNotesVis1Mount==='function')remiNotesVis1Mount();}catch(eMount){}
   if(typeof copilotHideConfirm==='function')copilotHideConfirm();
   if(typeof copilotSyncTabs==='function')copilotSyncTabs();
@@ -24373,7 +24680,9 @@ function remiNotesChip(kind){
   var at=remiNotesChipAt(kind, new Date());
   if(!at)return;
   remiNotesPending={kind:kind, remind_at:at.toISOString()};
+  remiNotesClarity1On=true;
   remiNotesClosePicker();
+  remiNotesClarity1SyncRemind();
 }
 function remiNotesReadHour(){
   var hEl=remiNotesEl('remiNotesHour');
@@ -24507,7 +24816,9 @@ function remiNotesCommitPicker(){
     return;
   }
   remiNotesPending={kind:'custom', remind_at:at.toISOString()};
+  remiNotesClarity1On=true;
   remiNotesClosePicker();
+  remiNotesClarity1SyncRemind();
 }
 function remiNotesAddSubmit(ev){
   if(ev&&ev.preventDefault)ev.preventDefault();
@@ -24717,7 +25028,9 @@ function remiNotesVis1CardHtml(note, mode){
   var deleting=mode==='my'&&!!id&&remiNotesVis1DeleteId===id;
   var detailing=!!id&&remiNotesVis1DetailId===id;
   var html='<div class="remi-vis-card'+(mode==='scheduler'?' replying':'')+(editing||deleting||detailing?' is-ring':'')+'" data-note-id="'+remiNotesVis1Esc(id)+'" data-remi-notes-stay1b="'+remiNotesStay1bMark()+'">';
-  html+='<div class="remi-vis-meta"><strong>'+remiNotesVis1Esc(who)+'</strong>'+(editing?' \u00B7 editing':(when?' \u00B7 '+remiNotesVis1Esc(when):''))+'</div>';
+  html+='<div class="remi-vis-meta"><strong>'+remiNotesVis1Esc(who)+'</strong>';
+  if(mode==='my')html+=' <span class="remi-clarity-kind is-note" data-remi-notes-clarity1="v=remi-notes-clarity1">NOTE</span>';
+  html+=(editing?' \u00B7 editing':(when?' \u00B7 '+remiNotesVis1Esc(when):''))+'</div>';
   if(editing){
     html+='<div class="remi-crud-edit remi-pack-form"><label for="remiNotesVisEdit">Note</label>';
     html+='<textarea id="remiNotesVisEdit" class="remi-pack-text" maxlength="4000" aria-label="Note">'+remiNotesVis1Esc(note.body||'')+'</textarea>';
@@ -24753,7 +25066,11 @@ function remiNotesVis1Hint(){
 }
 function remiNotesVis1PaneHtml(rows, err){
   var mode=remiNotesVis1Which==='scheduler'?'scheduler':'my';
-  var html='<p class="remi-stay-chip" data-remi-notes-stay1b="'+remiNotesStay1bMark()+'">Notes stay here</p>';
+  var html='';
+  if(mode==='my'&&remiNotesVis1Role()==='Scheduler'){
+    html+='<p class="remi-clarity-soft" data-remi-notes-clarity1="v=remi-notes-clarity1">Your notes only</p>';
+  }
+  html+='<p class="remi-stay-chip" data-remi-notes-stay1b="'+remiNotesStay1bMark()+'">Notes stay here</p>';
   if(remiNotesVis1ThreadId)html+='<button type="button" class="remi-linkish" onclick="remiNotesVis1CloseThread()">\u2190 Back</button>';
   if(err)html+='<p class="remi-vis-hint">'+remiNotesVis1Esc(err)+'</p>';
   if(!rows.length&&!err)html+='<p class="remi-vis-hint">No notes yet.</p>';
@@ -24761,8 +25078,14 @@ function remiNotesVis1PaneHtml(rows, err){
     html+=remiNotesVis1CardHtml(note, mode, false);
   });
   if(mode==='my'&&!remiNotesVis1ThreadId){
-    html+='<div class="remi-vis-card"><textarea id="remiNotesVisInput" class="remi-pack-text" maxlength="4000" placeholder="Type normally\u2026" aria-label="My note"></textarea>';
-    html+='<div class="remi-vis-row"><button type="button" class="go" id="remiNotesVisSave" onclick="remiNotesVis1Save()">Save</button></div></div>';
+    html+='<div class="remi-vis-card remi-clarity-compose" id="remiNotesClarityCompose" data-remi-notes-clarity1="v=remi-notes-clarity1">';
+    html+='<textarea id="remiNotesVisInput" class="remi-pack-text" maxlength="4000" placeholder="Write a note\u2026" aria-label="Write a note"></textarea>';
+    html+='<p id="remiNotesClarityPing" class="remi-clarity-ping" hidden>Timed ping \u00B7 lands in this same list</p>';
+    html+='<div class="remi-clarity-row">';
+    html+='<button type="button" class="remi-clarity-remind" id="remiNotesClarityRemind" aria-pressed="false" onclick="remiNotesClarity1ToggleRemind()">Remind me</button>';
+    html+='<button type="button" class="remi-clarity-when" id="remiNotesClarityWhen" hidden onclick="remiNotesClarity1CycleWhen()">in 30 min</button>';
+    html+='<button type="button" class="go" id="remiNotesVisSave" onclick="remiNotesVis1Save()">Save</button>';
+    html+='</div></div>';
   }
   html+='<p class="remi-vis-hint" id="remiNotesVisHint">'+remiNotesVis1Esc(remiNotesVis1Hint())+'</p>';
   return html;
@@ -24771,11 +25094,11 @@ function remiNotesVis1Html(){
   var admin=remiNotesVis1IsAdmin();
   var myOn=remiNotesVis1Which!=='scheduler'||!admin;
   if(!admin)myOn=true;
-  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="'+remiNotesStay1bMark()+'" data-sched-notes-copy1="v=sched-notes-copy1" data-remi-rail-crud1="'+remiRailCrud1Mark()+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
+  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="'+remiNotesStay1bMark()+'" data-remi-notes-clarity1="v=remi-notes-clarity1" data-sched-notes-copy1="v=sched-notes-copy1" data-remi-rail-crud1="'+remiRailCrud1Mark()+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
     +'<div class="remi-vis-tabs" role="tablist" aria-label="Notes">'
     +'<button type="button" id="remiNotesVisMy" role="tab" class="'+(myOn?'on':'')+'" aria-selected="'+(myOn?'true':'false')+'" onclick="remiNotesVis1Tab(\'my\')">My notes</button>'
     +'<button type="button" id="remiNotesVisSched" role="tab" class="'+(!myOn?'on':'')+'" aria-selected="'+(!myOn?'true':'false')+'"'+(admin?'':' hidden')+' onclick="remiNotesVis1Tab(\'scheduler\')">Scheduler notes</button>'
-    +'</div><div id="remiNotesVisPane">Loading notes\u2026</div></div>';
+    +'</div><div id="remiNotesVisPane">'+remiNotesVis1PaneHtml([], '')+'</div></div>';
 }
 function remiNotesVis1Remember(rows){
   remiNotesVis1Cache=Array.isArray(rows)?rows.slice():[];
@@ -24857,7 +25180,13 @@ function remiNotesVis1PaintPane(rows, err){
   remiNotesVis1RowsCache=Array.isArray(rows)?rows.slice():[];
   var pane=remiNotesVis1El('remiNotesVisPane');
   if(!pane)return;
+  var keep=remiNotesVis1El('remiNotes1Keep');
+  if(keep&&keep.parentNode===pane){
+    var host=remiNotesVis1El('copilotBody');
+    if(host)host.appendChild(keep);
+  }
   pane.innerHTML=remiNotesVis1PaneHtml(rows||[], err||'');
+  try{if(typeof remiNotesClarity1Place==='function')remiNotesClarity1Place();}catch(ePlace){}
   var my=remiNotesVis1El('remiNotesVisMy');
   var sc=remiNotesVis1El('remiNotesVisSched');
   var onSched=remiNotesVis1Which==='scheduler'&&remiNotesVis1IsAdmin();
@@ -24938,6 +25267,11 @@ function remiNotesVis1CloseThread(){
 }
 async function remiNotesVis1Save(){
   if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi notes.'};
+  if(typeof remiNotesClarity1Routed==='function'){
+    var routed=null;
+    try{routed=remiNotesClarity1Routed();}catch(eRoute){routed=null;}
+    if(routed)return routed;
+  }
   var input=remiNotesVis1El('remiNotesVisInput');
   var body=input?String(input.value||'').trim():'';
   if(!body){
