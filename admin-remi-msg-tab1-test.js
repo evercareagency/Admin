@@ -28,6 +28,23 @@ assert.ok(html.includes('Call / Text only. Not EverCare chat.'), 'clients copy i
 assert.ok(html.includes('You press Send in the phone Messages app.'), 'Mo sends in the phone Messages app');
 assert.ok(html.includes('covercomms-style'), 'clients links follow covercomms');
 assert.ok(html.includes('No Quo/SMS'), 'no Quo or SMS provider');
+const contract = html.slice(html.indexOf('GHOST-REMI-MSG-TAB1-CONTRACT-v1'), html.indexOf('content="2026-09-28-remi-msg-tab1"'));
+assert.ok(contract.includes('Admin and Scheduler'), 'contract names Admin and Scheduler');
+assert.ok(contract.includes('not Admin-only'), 'Messages is not Admin-only');
+assert.ok(contract.includes('is_scheduler_office'), 'role gate reuses is_scheduler_office');
+assert.ok(contract.includes('Nurse stays denied for aidechat'), 'Nurse stays denied');
+function layoutRoles(id){
+  const at = html.indexOf('id="'+id+'"');
+  assert.ok(at > 0, id);
+  const tag = html.slice(html.lastIndexOf('<', at), html.indexOf('>', at));
+  const m = tag.match(/data-layout-roles="([^"]*)"/);
+  return m ? m[1].split(/\s+/) : [];
+}
+['nav_aidechat','tab_aidechat','copilotFab','copilotSheet','copilotTabAsk','msgSeg','aidechatComposer'].forEach(function(id){
+  const roles = layoutRoles(id);
+  assert.ok(roles.indexOf('Admin') >= 0 && roles.indexOf('Scheduler') >= 0, id+' data-layout-roles includes Admin and Scheduler');
+  assert.ok(roles.indexOf('Nurse') < 0, id+' does not list Nurse');
+});
 assert.ok(html.includes("var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1'"), 'marker constant');
 assert.ok(html.includes("var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1'"), 'build constant');
 
@@ -74,6 +91,9 @@ const jsStart = html.indexOf('// v=remi-msg-tab1 Messages');
 const jsEnd = html.indexOf('function remiAskAnswer(q)');
 const js = html.slice(jsStart, jsEnd);
 assert.ok(js.includes('function remiMsgTab1Ask'), 'ask function');
+assert.ok(js.includes('function remiMsgTab1RoleOk'), 'role gate lives on this tip');
+assert.ok(js.includes("var REMI_MSG_TAB1_OFFICE='is_scheduler_office'"), 'office gate matches aidechat1');
+assert.ok(js.includes("role!=='Admin'&&role!=='Scheduler'"), 'Scheduler is on the compose gate');
 assert.ok(js.includes('function remiMsgTab1OpenDraft'), 'open-draft function');
 assert.ok(js.includes('function remiMsgTab1ClientSend'), 'client send stays a device draft');
 assert.ok(js.includes('aideTextChatCompose'), 'aide draft reuses aide-text-chat1 compose');
@@ -239,6 +259,11 @@ assert.deepStrictEqual(
   'empty storage pins Messages'
 );
 assert.ok(vm.runInContext("navEditCatalog().indexOf('coverage')>=0 && navEditCatalog().indexOf('backups')>=0", navCtx), 'Cover and Backup stay in the catalog');
+navCtx.currentAdminRole = 'Scheduler';
+assert.strictEqual(vm.runInContext("navEditRoleOk('aidechat')", navCtx), true, 'Scheduler can keep Messages on the bar');
+navCtx.currentAdminRole = 'Nurse';
+assert.strictEqual(vm.runInContext("navEditRoleOk('aidechat')", navCtx), false, 'Nurse cannot keep Messages on the bar');
+navCtx.currentAdminRole = 'Admin';
 
 assert.strictEqual(run("remiMsgTab1Parse('hello remi')"), null, 'a greeting is not a message intent');
 assert.strictEqual(run("remiMsgTab1Parse('text moe')"), null, 'text is not the message intent');
@@ -269,7 +294,13 @@ const missing = run("remiMsgTab1Ask('message nobody')");
 assert.ok(!missing.remiMsgTab1, 'unknown name does not open a draft');
 assert.ok(/nothing was sent/i.test(missing.text));
 
+ctx.currentAdminRole = 'Scheduler';
+assert.strictEqual(run('remiMsgTab1RoleOk()'), true, 'Scheduler passes the Messages gate');
+const schedAsk = run("remiMsgTab1Ask('message moe the Wednesday shift moved')");
+assert.strictEqual(schedAsk.remiMsgTab1.kind, 'aide');
+assert.strictEqual(schedAsk.remiMsgTab1.draft, 'the Wednesday shift moved');
 ctx.currentAdminRole = 'Nurse';
+assert.strictEqual(run('remiMsgTab1RoleOk()'), false, 'Nurse fails the Messages gate');
 assert.strictEqual(run("remiMsgTab1Ask('message moe')"), null, 'Nurse stays denied');
 ctx.currentAdminRole = 'Admin';
 
@@ -282,6 +313,17 @@ assert.strictEqual(els.aidechatReply.value, 'Hi Moe Hart \u2014 ');
 assert.strictEqual(els.remiMsgTab1DraftNote.hidden, false);
 assert.ok(els.remiMsgTab1DraftNote.textContent.indexOf('Draft ready') >= 0, 'aide draft stays an in-app composer draft');
 assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0 || c.indexOf('admin_send')===0;}), 'opening an aide draft does not send');
+
+calls.length = 0;
+ctx.currentAdminRole = 'Scheduler';
+await run("remiMsgTab1OpenDraft("+JSON.stringify(schedAsk.remiMsgTab1)+")");
+assert.ok(calls.some(function(c){return c.indexOf('compose:aide-moe:the Wednesday shift moved')===0;}), 'Scheduler compose uses the same aide draft path');
+assert.ok(!calls.some(function(c){return c.indexOf('admin_send')===0 || c.indexOf('coverGo:')===0;}), 'Scheduler compose does not send');
+calls.length = 0;
+ctx.currentAdminRole = 'Nurse';
+await run("remiMsgTab1OpenDraft("+JSON.stringify(moe.remiMsgTab1)+")");
+assert.deepStrictEqual(calls, [], 'Nurse compose does not open a draft');
+ctx.currentAdminRole = 'Admin';
 
 calls.length = 0;
 await run("remiMsgTab1OpenDraft("+JSON.stringify(ada.remiMsgTab1)+")");
@@ -465,6 +507,49 @@ async function runBrowser(){
         gone: gone
       };
     });
+    const roles = await page.evaluate(async function(){
+      currentAdminRole = 'Scheduler';
+      currentAdminUsername = 'jaz@evercare.test';
+      layoutA1ApplyRoles();
+      var sends = [];
+      sbRestRpc = async function(name, body){
+        sends.push(String(name||''));
+        if(name==='admin_compose_aide_text'){
+          return {ok:true, data:{draft:{body:(body&&body.p_body)||''}, aide_name:'Moe Hart', aide_username:'moe', admin_deep_link:'admin/messages?aide_id='+(body&&body.p_aide_id||''), channel:'in_app_messages'}};
+        }
+        if(name==='admin_get_aide_text_channel')return {ok:true, data:{channel:'in_app_messages', has_push_subscription:false}};
+        return {ok:false, status:404, error:'offline'};
+      };
+      function gate(id){
+        var el = document.getElementById(id);
+        return {hidden: !!(el && el.hidden), roles: el ? String(el.getAttribute('data-layout-roles')||'') : ''};
+      }
+      var asked = remiMsgTab1Ask('message moe the shift moved');
+      await remiMsgTab1OpenDraft(asked && asked.remiMsgTab1);
+      await new Promise(function(r){setTimeout(r, 80);});
+      var sched = {
+        roleOk: remiMsgTab1RoleOk(),
+        nav: gate('nav_aidechat'),
+        tab: gate('tab_aidechat'),
+        ask: gate('copilotTabAsk'),
+        seg: gate('msgSeg'),
+        composer: gate('aidechatComposer'),
+        sheet: gate('copilotSheet'),
+        kind: asked && asked.remiMsgTab1 && asked.remiMsgTab1.kind,
+        draft: document.getElementById('aidechatReply').value,
+        sends: sends.slice()
+      };
+      currentAdminRole = 'Nurse';
+      layoutA1ApplyRoles();
+      var nurseAsk = remiMsgTab1Ask('message moe');
+      return {
+        sched: sched,
+        nurseRoleOk: remiMsgTab1RoleOk(),
+        nurseAsk: nurseAsk,
+        nurseNavHidden: !!document.getElementById('nav_aidechat').hidden,
+        nurseAskHidden: !!document.getElementById('copilotTabAsk').hidden
+      };
+    });
     assert.strictEqual(desk.marker, 'v=remi-msg-tab1');
     assert.strictEqual(desk.build, '2026-09-28-remi-msg-tab1');
     assert.deepStrictEqual(desk.bar, ['nav_timesheets','nav_schedule','nav_aides','nav_aidechat','nav_more']);
@@ -483,6 +568,19 @@ async function runBrowser(){
     assert.strictEqual(desk.clientSend, 'Text');
     assert.ok(desk.gone.length === 1 && desk.gone[0].indexOf('sms:2165550100') === 0, 'client Send opens sms only after the tap');
     assert.ok(!desk.sends.some(function(row){return row.name === 'admin_send_aide_office_message' || row.name === 'client_office_messages' || row.name === 'admin_compose_client_text';}), 'no office or client compose RPC');
+    assert.strictEqual(roles.sched.roleOk, true);
+    ['nav','tab','ask','seg','composer','sheet'].forEach(function(key){
+      assert.ok(roles.sched[key].roles.indexOf('Admin') >= 0 && roles.sched[key].roles.indexOf('Scheduler') >= 0, key);
+      assert.strictEqual(roles.sched[key].hidden, false, key+' stays visible for Scheduler');
+    });
+    assert.strictEqual(roles.sched.kind, 'aide');
+    assert.strictEqual(roles.sched.draft, 'the shift moved');
+    assert.ok(roles.sched.sends.indexOf('admin_compose_aide_text') >= 0, 'Scheduler compose posts admin_compose_aide_text');
+    assert.ok(roles.sched.sends.indexOf('admin_send_aide_text') < 0, 'Scheduler compose does not send');
+    assert.strictEqual(roles.nurseRoleOk, false);
+    assert.strictEqual(roles.nurseAsk, null);
+    assert.strictEqual(roles.nurseNavHidden, true);
+    assert.strictEqual(roles.nurseAskHidden, true);
     console.log('admin-remi-msg-tab1 browser ok');
   }finally{
     await browser.close();
