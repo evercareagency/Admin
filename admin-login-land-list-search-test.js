@@ -61,7 +61,11 @@ assert.ok(homeFn.includes('loginLandSchedule1Apply(fresh)'), 'Admin and Schedule
 assert.ok(html.includes("showScreen('nurseScreen')"), 'Nurse screen stays');
 
 const aidesHdr = html.slice(html.indexOf('id="tab_aides"'), html.indexOf('id="aideDesk"'));
+assert.ok(aidesHdr.includes('<h1>Aides</h1>'), 'Aides title stays the title');
+assert.ok(aidesHdr.includes('class="list-search-az1-row"'), 'Aides search is its own row');
+assert.ok(aidesHdr.indexOf('<h1>Aides</h1>') < aidesHdr.indexOf('id="aidesListSearch"'), 'Aides search sits under the title');
 assert.ok(aidesHdr.includes('id="aidesListSearch"'), 'Aides search is in the header');
+assert.ok(aidesHdr.includes('placeholder="Find an aide..."'), 'Aides placeholder matches the shot');
 assert.ok(aidesHdr.includes('id="aidesAzChip"'), 'Aides A–Z chip stays');
 assert.ok(aidesHdr.indexOf('id="aidesListSearch"') < aidesHdr.indexOf('id="aidesAzChip"'), 'Aides search sits beside the A–Z chip');
 assert.ok(aidesHdr.includes('data-layout-roles="Admin Scheduler"'), 'Aides search is Admin and Scheduler');
@@ -70,13 +74,17 @@ assert.ok(aidesHdr.includes('class="sched-az-chip list-az-chip"'), 'Aides chip c
 assert.ok(!aidesHdr.includes('data-layout-roles="Admin"'), 'Aides search is not Admin-only');
 
 const clientsHdr = html.slice(html.indexOf('id="tab_clients"'), html.indexOf('id="clientSearch"'));
+assert.ok(clientsHdr.includes('<h1>Clients</h1>'), 'Clients title stays the title');
+assert.ok(clientsHdr.includes('class="list-search-az1-row"'), 'Clients search is its own row');
 assert.ok(clientsHdr.includes('id="clientsListSearch"'), 'Clients search is in the header');
+assert.ok(clientsHdr.includes('placeholder="Find a client..."'), 'Clients placeholder matches the shot');
 assert.ok(clientsHdr.includes('id="clientsAzChip"'), 'Clients A–Z chip stays');
 assert.ok(clientsHdr.indexOf('id="clientsListSearch"') < clientsHdr.indexOf('id="clientsAzChip"'), 'Clients search sits beside the A–Z chip');
 assert.ok(clientsHdr.includes('data-layout-roles="Admin Scheduler"'), 'Clients search is Admin and Scheduler');
 assert.ok(clientsHdr.includes('oninput="listSearchAz1OnClients()"'), 'Clients search filters the list');
 assert.ok(html.includes('id="clientSearch"'), 'existing client search id stays');
-assert.ok(html.includes('height:16px;min-height:16px;max-height:16px'), 'A–Z chip stays 16px');
+assert.ok(html.includes('height:16px;min-height:16px;max-height:16px'), 'page-hdr A–Z chip rule stays 16px');
+assert.ok(html.includes('#tab_aides .list-search-az1-row .list-az-chip') && html.includes('height:44px;min-height:44px'), 'search-row chip matches the field');
 assert.ok(html.includes('evercare_list_order'), 'A–Z preference stays');
 
 function extractFn(src, sig){
