@@ -41,7 +41,7 @@ assert.ok(html.includes('id="aidechatSettingsDone"'), 'done control');
 assert.ok(html.includes('>Done<'), 'done label');
 assert.ok(html.includes('id="aidechatSettingsOpen"'), 'reopen control');
 assert.ok(html.includes('id="aidechatSettingsTitle">Remi auto-reply</h2>'), 'header title');
-assert.ok(html.includes('onclick="aidechatSettingsChanged()"'), 'On/Off still calls aidechatSettingsChanged');
+assert.ok(html.includes('onchange="aidechatSettingsChanged()"'), 'On/Off still calls aidechatSettingsChanged');
 assert.ok(html.includes('min-height:44px'), 'tap target stays at least 44px');
 
 const secStart = html.indexOf('id="aidechatSettings"');
@@ -165,7 +165,7 @@ async function runBrowser(){
   try{
     const page = await browser.newPage();
     page.on('pageerror', function(err){errors.push(String(err && err.message || err));});
-    await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
+    await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 1});
     await page.goto('http://127.0.0.1:' + port + '/index.html?v=remi-autoreply-dismiss1', {waitUntil: 'domcontentloaded', timeout: 20000});
     await page.evaluate(function(){
       localStorage.clear();
@@ -278,6 +278,9 @@ async function runBrowser(){
     assert.strictEqual(fields.endLocal, '07:15');
     await page.screenshot({path: path.join(shotDir, 'remi-autoreply-dismiss1-reopen.png')});
 
+    await page.evaluate(function(){
+      document.getElementById('aidechatSettingsDone').scrollIntoView({block: 'center'});
+    });
     await page.click('#aidechatSettingsDone');
     const done = await page.$eval('#aidechatSettings', function(el){return el.hidden;});
     assert.strictEqual(done, true, 'Done hides the panel');
