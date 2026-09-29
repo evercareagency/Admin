@@ -22,6 +22,9 @@ assert.ok(html.includes('Ace GAP'), 'client thread stays an Ace gap');
 assert.ok(html.includes('admin_compose_aide_text'), 'compose callable is named');
 assert.ok(html.includes('admin/messages?aide_id='), 'aide draft opens the messages deep link');
 assert.ok(html.includes('Aides | Clients is pure UI'), 'segment chrome is UI');
+assert.ok(html.includes('Phone SMS draft. Not EverCare chat.'), 'clients copy is a phone SMS draft');
+assert.ok(html.includes('You press Send in the phone Messages app.'), 'Mo sends in the phone Messages app');
+assert.ok(html.includes('covercomms-style'), 'clients links follow covercomms');
 assert.ok(html.includes('No Quo/SMS'), 'no Quo or SMS provider');
 assert.ok(html.includes("var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1'"), 'marker constant');
 assert.ok(html.includes("var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1'"), 'build constant');
@@ -254,6 +257,7 @@ assert.strictEqual(ada.actions.length, 0);
 assert.strictEqual(ada.remiMsgTab1.kind, 'client');
 assert.strictEqual(ada.remiMsgTab1.id, 'client-ada');
 assert.strictEqual(ada.remiMsgTab1.draft, 'Hi Ada Cole \u2014 ');
+assert.ok(/phone SMS draft/i.test(ada.text) && /not EverCare chat/i.test(ada.text) && /phone Messages app/i.test(ada.text), ada.text);
 
 const tagged = run("remiMsgTab1Ask('message client Ruth Coleman confirm the visit')");
 assert.strictEqual(tagged.remiMsgTab1.kind, 'client');
@@ -274,6 +278,7 @@ assert.ok(calls.some(function(c){return c.indexOf('compose:aide-moe:Hi Moe Hart'
 assert.ok(calls.some(function(c){return c.indexOf('link:admin/messages?aide_id=')===0;}), 'aide draft opens admin/messages?aide_id=');
 assert.strictEqual(els.aidechatReply.value, 'Hi Moe Hart \u2014 ');
 assert.strictEqual(els.remiMsgTab1DraftNote.hidden, false);
+assert.ok(els.remiMsgTab1DraftNote.textContent.indexOf('Draft ready') >= 0, 'aide draft stays an in-app composer draft');
 assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0 || c.indexOf('admin_send')===0;}), 'opening an aide draft does not send');
 
 calls.length = 0;
@@ -284,7 +289,11 @@ assert.ok(els.tab_aidechat.classList.contains('is-client-thread'), 'client threa
 assert.strictEqual(els.aidechatReply.value, 'Hi Ada Cole \u2014 ');
 assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('sms:') >= 0, 'phone on file offers sms');
 assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('tel:') >= 0, 'phone on file offers tel');
+assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('Phone SMS draft') >= 0, 'client thread is labeled a phone SMS draft');
+assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('not EverCare chat') >= 0, 'client thread is not EverCare chat');
 assert.ok(els.aidechatThreadMeta.innerHTML.indexOf('mailto:') < 0, 'client contact does not use mail');
+assert.strictEqual(els.aidechatSend.textContent, 'Open SMS');
+assert.ok(els.remiMsgTab1DraftNote.textContent.indexOf('Phone SMS draft') >= 0);
 assert.ok(!calls.some(function(c){return c.indexOf('coverGo:')===0;}), 'opening a client draft does not send');
 
 calls.length = 0;
@@ -429,6 +438,8 @@ async function runBrowser(){
       await new Promise(function(r){setTimeout(r, 80);});
       var clientDraft = document.getElementById('aidechatReply').value;
       var clientThread = document.getElementById('tab_aidechat').classList.contains('is-client-thread');
+      var clientMeta = document.getElementById('aidechatThreadMeta').textContent;
+      var clientSend = document.getElementById('aidechatSend').textContent;
       document.getElementById('aidechatSend').click();
       await new Promise(function(r){setTimeout(r, 40);});
       coverGo = realGo;
@@ -446,6 +457,8 @@ async function runBrowser(){
         afterAideSend: afterAideSend,
         clientDraft: clientDraft,
         clientThread: clientThread,
+        clientMeta: clientMeta,
+        clientSend: clientSend,
         sends: sends,
         gone: gone
       };
@@ -464,6 +477,8 @@ async function runBrowser(){
     assert.strictEqual(desk.afterAideSend.filter(function(name){return name==='admin_send_aide_text';}).length, 1, 'aide Send posts admin_send_aide_text once');
     assert.strictEqual(desk.clientDraft, 'Hi Ada Cole \u2014 ');
     assert.strictEqual(desk.clientThread, true);
+    assert.ok(desk.clientMeta.indexOf('Phone SMS draft') >= 0 && desk.clientMeta.indexOf('not EverCare chat') >= 0, desk.clientMeta);
+    assert.strictEqual(desk.clientSend, 'Open SMS');
     assert.ok(desk.gone.length === 1 && desk.gone[0].indexOf('sms:2165550100') === 0, 'client Send opens sms only after the tap');
     assert.ok(!desk.sends.some(function(row){return row.name === 'admin_send_aide_office_message' || row.name === 'client_office_messages' || row.name === 'admin_compose_client_text';}), 'no office or client compose RPC');
     console.log('admin-remi-msg-tab1 browser ok');

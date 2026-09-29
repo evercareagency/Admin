@@ -9,7 +9,7 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
-<!-- remi msg tab 2026-09-28 v=remi-msg-tab1 ?v=remi-msg-tab1 admin-build 2026-09-28-remi-msg-tab1. GHOST-REMI-MSG-TAB1-CONTRACT-v1. Ace CALLABLE reuse. No new SQL. No new RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No Auth reseal. No Quo/SMS. Empty nav storage pins Messages on the primary bar: Timesheets, Schedule, Aides, Messages, plus More. tabbar-8 and Edit tabs stay. Cover and Backup stay in the catalog and start under More until Mo adds them. A saved bar is left as saved. Aide chat stays #tab_aidechat. The unread badge stays on the Messages tab. Nurse is still denied. Under the Messages header, Aides | Clients is pure UI on one desk. Aides is the existing office inbox (aidechat1, aide-office-vis1, aide-text-chat1, msg-dense1, care-msg-safe1 composer above the tabs). Remi Ask “message <aide name>” reuses aideTextChatCompose: CALLABLE admin_compose_aide_text {p_aide_id, p_body} opens admin/messages?aide_id= with that draft already in the composer. Compose never auto-sends. Mo taps Send, and only that tap posts admin_send_aide_text {p_aide_id, p_body}. It does not call admin_send_aide_office_message on the Ask path. Client in-app thread is an Ace GAP. There is no client compose RPC. This tip does not add client_office_messages. Clients lists the same org clients Schedule and Clients already load (get_clients / allClients). Contact is phone sms: and tel: only when a phone is on file. No mailto. Send does not auto-fire and does not call a text provider. Remi Ask “message <client name>” opens that client draft the same way. Mo taps Send. Nothing auto-sends. remi-chat-bleed1 stays: Schedule a Remi stays parked off the thread, and the corner chip stays hidden while Messages is active. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=aide-profile-link-fix, v=remi-open-thread1, v=care-msg-safe1, v=remi-chat-bleed1, v=aidechat1, v=navedit1, v=tabbar-8, and v=cover-desk1. -->
+<!-- remi msg tab 2026-09-28 v=remi-msg-tab1 ?v=remi-msg-tab1 admin-build 2026-09-28-remi-msg-tab1. GHOST-REMI-MSG-TAB1-CONTRACT-v1. Ace CALLABLE reuse. No new SQL. No new RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No Auth reseal. No Quo/SMS. Empty nav storage pins Messages on the primary bar: Timesheets, Schedule, Aides, Messages, plus More. tabbar-8 and Edit tabs stay. Cover and Backup stay in the catalog and start under More until Mo adds them. A saved bar is left as saved. Aide chat stays #tab_aidechat. The unread badge stays on the Messages tab. Nurse is still denied. Under the Messages header, Aides | Clients is pure UI on one desk. Aides is the existing office inbox (aidechat1, aide-office-vis1, aide-text-chat1, msg-dense1, care-msg-safe1 composer above the tabs). Remi Ask “message <aide name>” reuses aideTextChatCompose: CALLABLE admin_compose_aide_text {p_aide_id, p_body} opens admin/messages?aide_id= with that draft already in the composer. Compose never auto-sends. Mo taps Send, and only that tap posts admin_send_aide_text {p_aide_id, p_body}. It does not call admin_send_aide_office_message on the Ask path. Clients is an Ace GAP, interim until Mo says HOLD or Ace builds client chat. The Aides | Clients chrome stays painted, so this tip is not blocked on that decision. A later HOLD can hide Clients. Clients is covercomms-style phone sms: and tel: when a phone is on file. It is not an EverCare in-app thread and not a new RPC. This tip does not add client_office_messages. The list is the same org clients Schedule and Clients already load (get_clients / allClients). Copy says phone SMS draft: Mo presses Send in the phone Messages app. No mailto. Remi Ask “message <client name>” opens that phone draft. Nothing auto-sends. remi-chat-bleed1 stays: Schedule a Remi stays parked off the thread, and the corner chip stays hidden while Messages is active. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=aide-profile-link-fix, v=remi-open-thread1, v=care-msg-safe1, v=remi-chat-bleed1, v=aidechat1, v=navedit1, v=tabbar-8, and v=cover-desk1. -->
 <meta name="admin-build" content="2026-09-28-remi-msg-tab1">
 <script>var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1';var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1';</script>
 <!-- aide profile link fix 2026-09-28 v=aide-profile-link-fix ?v=aide-profile-link-fix admin-build 2026-09-28-aide-profile-link-fix. GHOST-AIDE-PROFILE-LINK-FIX-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Supersedes aides-profile-link1 scroll-and-highlight (draft PR #165). View profile is one full page. It is not a scroll or teal outline on the Aides list, and it is not the credentials rollup sitting above the list. From Aides ··· View profile, and from aidesInfo1Follow when deep_link is the string admin/aides?aide_id=<uuid>, Ghost parses a leading #, aides and admin/aides path variants, and query aide_id, then replaces the Aides list (and Manage chrome if it is open) with #aideProfilePage until Back. The page has Back, a header (name, phone, language chip, client chips, next, creds due — the existing aides-info1 profile content), and Credentials through the existing aidecreds paths (admin_list_aide_credentials, edit sheet, add, save). The Aides list, desk tabs, Manage bar, A–Z rail, and credentials rollup stay display:none, including on a phone. Phone CSS must not unhide the list. Back returns to the Active aides-info1 info-card list, the same phone surface as Manage Done: Active and Recently deleted tabs visible, ··· on each card, #nav_aides active, #nav_more and #tab_more not active. It removes aide-creds-on after renderAides and aideCredsAfterAides and keeps #aideCredsRoot hidden so the credentials rollup (No credential records yet, Add credential, A–Z cred rows) does not cover the cards below 900px. On a phone, Active landing with aides-info1 cards — first paint, Refresh, Back, and Manage Done — does not auto-set aide-creds-on. Credentials still open from ··· Credentials and from Manage. Bare tab names and schedule deep-link objects stay as aides-info1 left them. This is not Auth profile_id. More must not end half-active: while this page is open on the Aides bottom tab, #nav_more and #tab_more lose active, and leaving for More closes the page so More is the only active desk. Do not break Manage select/delete, manage-dots-creds1 ··· Credentials-in-Manage, manage-done1 Done exit, aidadel1 Delete, or list-az-sticky1. Prior markers stay, including v=aides-info1, v=aides-profile-link1, v=manage-dots-creds1, v=manage-done1, v=manage-clean1, v=aide-manage-delete1, v=aidadel1, v=aidecreds1, v=aidecreds1b, v=aidecreds1c, v=list-az-sticky1, v=list-az1, v=remi-open-thread1, and v=care-msg-safe1. -->
@@ -3848,7 +3848,7 @@ Call (216) 377-5991 with any questions.</textarea>
             <button type="button" id="msgSegClients" role="tab" aria-selected="false" onclick="remiMsgTab1SetSegment('clients')">Clients</button>
           </div>
           <div id="msgClientDesk" data-remi-msg-tab1="v=remi-msg-tab1">
-            <p class="aidechat-note" id="msgClientNote">Clients from the same list as Schedule and Clients. No in-app client thread. Call and text use the phone on file. The draft stays until you tap Send.</p>
+            <p class="aidechat-note" id="msgClientNote">Phone SMS draft. Not EverCare chat. Same client list as Schedule and Clients. Call and text open when a phone is on file. You press Send in the phone Messages app.</p>
             <div id="msgClientList" class="aidechat-list" aria-label="Client threads"></div>
             <div id="msgClientEmpty" class="empty-state"><p>No clients on this desk yet.</p></div>
           </div>
@@ -15499,8 +15499,16 @@ function remiMsgTab1ApplyChrome(){
   var sub=document.getElementById('aidechatInboxSub');
   if(sub){
     sub.textContent=clients
-      ?'Same Messages desk. Clients on file. A draft stays here until you tap Send.'
+      ?'Phone SMS draft. Not EverCare chat. You press Send in the phone Messages app.'
       :'Aide Office. One thread per aide. Unread shows here and on Remi.';
+  }
+  var reply=document.getElementById('aidechatReply');
+  if(reply)reply.placeholder=remiMsgTab1ClientId?'Phone SMS draft\u2026':'Type a message\u2026';
+  var send=document.getElementById('aidechatSend');
+  if(send){
+    if(remiMsgTab1ClientId)send.textContent='Open SMS';
+    else if(typeof aideTextChatSyncSendLabel==='function')aideTextChatSyncSendLabel();
+    else send.textContent='Send';
   }
 }
 function remiMsgTab1SetSegment(which){
@@ -15601,11 +15609,11 @@ function remiMsgTab1PaintClients(){
   }
   list.innerHTML=rows.map(function(c){
     var initials=typeof aideOfficeVis1Initials==='function'?aideOfficeVis1Initials(c.name):'';
-    var preview=c.phone?'Phone on file':'No phone on file';
+    var preview=c.phone?'Phone SMS draft':'No phone on file';
     return '<button type="button" class="aidechat-card" data-msg-client="'+remiMsgTab1Esc(c.id)+'" data-remi-msg-tab1="v=remi-msg-tab1">'
       +'<span class="aide-office-av" aria-hidden="true">'+remiMsgTab1Esc(initials||'C')+'</span>'
       +'<span class="aide-office-main">'
-      +'<span class="aidechat-card-top"><strong>'+remiMsgTab1Esc(c.name)+'</strong><span class="msg-client-tag">client</span></span>'
+      +'<span class="aidechat-card-top"><strong>'+remiMsgTab1Esc(c.name)+'</strong><span class="msg-client-tag">SMS</span></span>'
       +'<span class="aidechat-preview">'+remiMsgTab1Esc(preview)+'</span>'
       +'</span></button>';
   }).join('');
@@ -15620,8 +15628,8 @@ function remiMsgTab1ContactHtml(person){
     if(tel)bits.push('<a class="aidechat-phone" href="'+remiMsgTab1Esc(tel)+'">Call</a>');
     if(sms)bits.push('<a class="aidechat-phone" href="'+remiMsgTab1Esc(sms)+'">Text</a>');
   }
-  if(!bits.length)return 'No phone on file. This draft stays here. Send does not go out.';
-  return 'Draft only · '+bits.join(' · ')+'. Send opens the text. Nothing goes out until you tap.';
+  if(!bits.length)return 'No phone on file. This stays a draft. Nothing opens in the phone Messages app.';
+  return 'Phone SMS draft \u00b7 not EverCare chat \u00b7 '+bits.join(' \u00b7 ')+'. Open SMS hands this to your phone. You press Send there.';
 }
 function remiMsgTab1PaintClientThread(){
   var person=remiMsgTab1ClientById(remiMsgTab1ClientId);
@@ -15643,7 +15651,7 @@ function remiMsgTab1PaintClientThread(){
   }
   if(title)title.textContent=person.name||'Client';
   if(meta)meta.innerHTML=remiMsgTab1ContactHtml(person);
-  if(box)box.innerHTML='<p class="aidechat-note">No in-app client thread. There is no client compose. The words below are a draft. They are not sent.</p>';
+  if(box)box.innerHTML='<p class="aidechat-note">Phone SMS draft. Not EverCare chat. Nothing is sent until you open it and press Send in the phone Messages app.</p>';
   if(typeof aidechatShow==='function')aidechatShow('thread');
 }
 function remiMsgTab1OpenClient(id, draft){
@@ -15663,7 +15671,7 @@ function remiMsgTab1ClientSend(ev){
   var href='';
   if(person.phone&&typeof coverSmsHref==='function')href=coverSmsHref(person.phone, text);
   if(!href){
-    if(typeof showTempMsg==='function')showTempMsg('No phone on file. The draft stays here. Nothing was sent.','var(--warn)');
+    if(typeof showTempMsg==='function')showTempMsg('No phone on file. This stays a draft. Nothing opens in the phone Messages app.','var(--warn)');
     return false;
   }
   if(typeof coverGo==='function')coverGo(href);
@@ -15675,7 +15683,7 @@ function remiMsgTab1StageDraft(text){
   var note=document.getElementById('remiMsgTab1DraftNote');
   if(note){
     note.hidden=false;
-    note.textContent='Draft ready \u00b7 not sent';
+    note.textContent=remiMsgTab1ClientId?'Phone SMS draft \u00b7 press Send in Messages':'Draft ready \u00b7 not sent';
   }
   remiMsgTab1DraftLive=true;
 }
@@ -15803,11 +15811,14 @@ function remiMsgTab1Ask(q){
   var rest=remiMsgTab1Remainder(chosen, parsed.rest);
   var draft=remiMsgTab1Starter(chosen, rest);
   var who=chosen.name||chosen.username||'them';
+  var text=chosen.kind==='client'
+    ?'Opened '+who+'\u2019s phone SMS draft. This is not EverCare chat. You press Send in the phone Messages app \u2014 I won\u2019t auto-send.'
+    :'Opened '+who+'\u2019s thread with a draft ready in the composer. You tap Send when you\u2019re set \u2014 I won\u2019t auto-send.';
   return {
     sec:true,
     kind:'',
     actions:[],
-    text:'Opened '+who+'\u2019s thread with a draft ready in the composer. You tap Send when you\u2019re set \u2014 I won\u2019t auto-send.',
+    text:text,
     remiMsgTab1:{kind:chosen.kind, id:chosen.id, aideId:chosen.aideId||'', username:chosen.username||'', name:chosen.name||'', draft:draft}
   };
 }
