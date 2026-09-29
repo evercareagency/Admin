@@ -18,6 +18,96 @@
 <!-- list search az 2026-09-29 v=list-search-az1 ?v=list-search-az1 admin-build 2026-09-29-list-search-az1. GHOST-LIST-SEARCH-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Aides and Clients lists keep the A–Z chip and evercare_list_order. The title stays the title. Under it, an always-visible search row (#aidesListSearch, #clientsListSearch) sits beside that chip, for Admin and Scheduler, data-layout-roles Admin Scheduler. Placeholders are Find an aide and Find a client. The field is not inside the h1. Search filters the painted list and does not change the A–Z preference. When A–Z is on, listAz1Apply still sorts first and the search only narrows that order. When usual, today’s order stays and search still filters. Aides match name, username, and phone. Clients match name and phone. No matches say No aides match that search or No clients match that search. The old #clientSearch stays in the card for the existing paint path and is not the header field. The 16px page-hdr chip rule stays. The search-row chip matches the field height. Prior markers stay, including v=login-land-schedule1, v=list-az-sticky1, v=list-az1, v=aides-info1, and v=client-phone1. -->
 <meta name="admin-build" content="2026-09-29-list-search-az1">
 <script>var LIST_SEARCH_AZ1_MARKER='v=list-search-az1';var LIST_SEARCH_AZ1_BUILD='2026-09-29-list-search-az1';</script>
+<!-- pages cache fresh 2026-09-29 v=pages-cache-fresh1 ?v=pages-cache-fresh1 admin-build 2026-09-29-pages-cache-fresh1. GHOST-PAGES-CACHE-FRESH1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Admin only. Caregiver ships separately. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No push. The clean Home Screen URL https://evercareagency.github.io/Admin/ gets the latest deploy without a sticky ?v= link. This page does not rewrite the address to ?v=. A lightweight sw.js registers from index with updateViaCache none, skipWaiting, and clients.claim. controllerchange reloads once per session so the new worker takes the document. Navigation and document GETs are network-only with cache no-store. index.html is not stored in the Cache API. Other requests are left alone. After load, admin-build.txt is fetched with cache no-store and compared to the embedded pages-cache-fresh1 build. A mismatch hard-reloads once. login-land-schedule1 and list-search-az1 stay in admin-build meta. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=list-search-az1 and v=login-land-schedule1. -->
+<meta name="admin-build" content="2026-09-29-pages-cache-fresh1">
+<meta name="pages-cache-fresh1" content="2026-09-29-pages-cache-fresh1">
+<script>
+var PAGES_CACHE_FRESH1_MARKER='v=pages-cache-fresh1';
+var PAGES_CACHE_FRESH1_BUILD='2026-09-29-pages-cache-fresh1';
+var pagesCacheFresh1ReloadKey='pagesCacheFresh1Reloads';
+function pagesCacheFresh1Base(path){
+  path=String(path==null?'':path);
+  if(!path)return '/';
+  if(path.charAt(path.length-1)==='/')return path;
+  var cut=path.lastIndexOf('/');
+  return cut<0?'/':path.slice(0,cut+1);
+}
+function pagesCacheFresh1Mismatch(embedded, remote){
+  remote=String(remote==null?'':remote).replace(/^\s+|\s+$/g,'');
+  embedded=String(embedded==null?'':embedded).replace(/^\s+|\s+$/g,'');
+  if(!remote||!embedded)return false;
+  return remote!==embedded;
+}
+function pagesCacheFresh1ReloadCount(){
+  try{return Number(sessionStorage.getItem(pagesCacheFresh1ReloadKey)||'0')||0;}catch(e){return 0;}
+}
+function pagesCacheFresh1CanReload(){
+  return pagesCacheFresh1ReloadCount()<1;
+}
+function pagesCacheFresh1MarkReload(){
+  try{sessionStorage.setItem(pagesCacheFresh1ReloadKey, String(pagesCacheFresh1ReloadCount()+1));}catch(e){}
+}
+function pagesCacheFresh1ReloadOnce(){
+  if(!pagesCacheFresh1CanReload())return false;
+  pagesCacheFresh1MarkReload();
+  try{location.reload();}catch(e){return false;}
+  return true;
+}
+function pagesCacheFresh1OnControllerChange(){
+  if(pagesCacheFresh1OnControllerChange.done)return false;
+  pagesCacheFresh1OnControllerChange.done=true;
+  return pagesCacheFresh1ReloadOnce();
+}
+function pagesCacheFresh1OnBuild(remote){
+  pagesCacheFresh1OnBuild.remote=remote;
+  if(!pagesCacheFresh1Mismatch(PAGES_CACHE_FRESH1_BUILD, remote))return false;
+  var sw=null;
+  try{sw=navigator.serviceWorker||null;}catch(e){sw=null;}
+  if(sw&&!sw.controller&&!pagesCacheFresh1OnBuild.swFailed)return false;
+  return pagesCacheFresh1ReloadOnce();
+}
+function pagesCacheFresh1Note(){
+  try{
+    if(typeof document==='undefined'||!document.documentElement)return false;
+    document.documentElement.setAttribute('data-pages-cache-fresh1', PAGES_CACHE_FRESH1_MARKER);
+  }catch(e){}
+  return true;
+}
+function pagesCacheFresh1Check(){
+  var base='/';
+  try{base=pagesCacheFresh1Base(location.pathname);}catch(e){base='/';}
+  if(typeof fetch!=='function')return;
+  fetch(base+'admin-build.txt', {cache:'no-store', credentials:'same-origin'}).then(function(r){
+    if(!r||!r.ok)return '';
+    return r.text();
+  }).then(function(text){
+    pagesCacheFresh1OnBuild(text);
+  }).catch(function(){});
+}
+function pagesCacheFresh1Start(){
+  try{pagesCacheFresh1Note();}catch(e){}
+  var base='/';
+  try{base=pagesCacheFresh1Base(location.pathname);}catch(e2){base='/';}
+  var sw=null;
+  try{sw=navigator.serviceWorker||null;}catch(e3){sw=null;}
+  if(sw&&typeof sw.register==='function'){
+    try{sw.addEventListener('controllerchange', function(){pagesCacheFresh1OnControllerChange();});}catch(e4){}
+    try{
+      sw.register(base+'sw.js', {scope:base, updateViaCache:'none'}).catch(function(){
+        pagesCacheFresh1OnBuild.swFailed=true;
+        if(pagesCacheFresh1OnBuild.remote!=null)pagesCacheFresh1OnBuild(pagesCacheFresh1OnBuild.remote);
+      });
+    }catch(e5){
+      pagesCacheFresh1OnBuild.swFailed=true;
+    }
+  }else{
+    pagesCacheFresh1OnBuild.swFailed=true;
+  }
+  try{pagesCacheFresh1Check();}catch(e6){}
+  return true;
+}
+try{pagesCacheFresh1Start();}catch(ePagesCache){}
+</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
