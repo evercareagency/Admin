@@ -41,7 +41,8 @@ assert.ok(html.includes('CLIENT_GAP'), 'client gap is named');
 assert.ok(html.includes('Friday confirmed'), 'Friday confirmed the Clients choice');
 assert.ok(html.includes('Disable Delete on Clients until Ace ships a client inbox'), 'Clients Delete stays disabled');
 assert.ok(html.includes('No local hide for Clients'), 'no local client hide');
-assert.ok(html.includes('Client inbox delete is not live yet'), 'clients delete stays muted in copy');
+const CLIENT_GAP_COPY='Client inbox delete isn\u2019t live yet';
+assert.ok(html.includes(CLIENT_GAP_COPY), 'exact Clients hint');
 assert.ok(!html.includes('evercare_msg_bulk_delete1_aides') && !html.includes('evercare_msg_bulk_delete1_clients'), 'no local hide keys');
 assert.ok(html.includes('It is not a send'), 'delete is not a send');
 assert.ok(html.includes('Admin and Scheduler are one portal'), 'one portal');
@@ -229,7 +230,7 @@ async function runVm(){
 
   const rpcAfterAides = hideCalls().length;
   vm.runInContext('remiMsgTab1Segment="clients"; msgBulkDelete1Selected.clients={"c-bowlax":1}; toasts.length=0; paints.length=0;', ctx);
-  assert.ok(vm.runInContext('msgBulkDelete1Callout(1)', ctx).includes('not live yet'), 'Clients callout names the gap');
+  assert.strictEqual(vm.runInContext('msgBulkDelete1Callout(1)', ctx), CLIENT_GAP_COPY, 'Clients hint is the locked line');
   await vm.runInContext('msgBulkDelete1Delete()', ctx);
   assert.strictEqual(hideCalls().length, rpcAfterAides, 'Clients Delete does not call the aide hide RPC');
   assert.deepStrictEqual(idsOf('clientRows'), ['c-bowlax','c-ada','c-rita'], 'Clients stay on the desk');
@@ -456,7 +457,7 @@ async function runBrowser(){
       };
     });
     assert.strictEqual(clientsGap.disabled, true, 'Clients Delete stays muted after a check');
-    assert.ok(clientsGap.callout.indexOf('not live yet')>=0, clientsGap.callout);
+    assert.strictEqual(clientsGap.callout, 'Client inbox delete isn\u2019t live yet', clientsGap.callout);
     assert.strictEqual(clientsGap.count, '1 selected');
     await page.screenshot({path:path.join(outDir, '03-clients-selected.png')});
     await page.evaluate(function(){window.__rpc=[];});
@@ -643,7 +644,7 @@ async function runBrowser(){
     assert.strictEqual(schedClientsAll.on, 3, 'Scheduler Select all checks every client');
     assert.strictEqual(schedClientsAll.count, '3 selected');
     assert.strictEqual(schedClientsAll.disabled, true, 'Scheduler Clients Delete stays muted');
-    assert.ok(schedClientsAll.callout.indexOf('not live yet')>=0, schedClientsAll.callout);
+    assert.strictEqual(schedClientsAll.callout, 'Client inbox delete isn\u2019t live yet', schedClientsAll.callout);
     assert.ok(!schedClientsAll.rpc.some(function(name){return name==='admin_hide_aide_office_threads'||/send|archive|blast|compose/i.test(name);}), 'Scheduler client Select all does not post');
     await schedPage.click('#msgBulkUnselect');
     await schedPage.click('#msgClientList .msg-bulk-cb[data-msg-bulk-id="c-bowlax"]');
