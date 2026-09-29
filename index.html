@@ -108,6 +108,9 @@ function pagesCacheFresh1Start(){
 }
 try{pagesCacheFresh1Start();}catch(ePagesCache){}
 </script>
+<!-- admin sched chat push 2026-09-29 v=admin-sched-chat-push1 admin-build 2026-09-29-admin-sched-chat-push1. GHOST-ADMIN-SCHED-CHAT-PUSH1-CONTRACT-v1. Ace CALLABLE when present. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Admin repo only. When an aide or Remi texts Admin or Scheduler, that staffer gets a phone ping too. Admin and Scheduler are one portal and the same Settings chrome. Settings (#tab_settings) holds staff notification prefs: one toggle, Aide + Remi messages, hint Phone ping when an aide or Remi writes. This is not More → Notifications (#tab_notifications), which stays the aide roster (clienthrs1d / vapid1 / aide-notif-search1). Flip ON asks Allow and subscribes in that same step. There is no separate Allow card. Flip OFF unsubscribes and turns the pref off. A phone-ping tap opens Messages (#tab_aidechat): an aide payload opens that aide thread, a Remi payload with no aide opens the Messages inbox, and a Remi payload with aide_id opens that aide thread. Staff-facing copy is plain English only. Never paint a public key, a private key, or worker jargon. Soft hint: Open the app from your Home Screen, then tap Allow. Hooks, used only when the callable answers: get_vapid_public_key (public only), admin_get_office_staff_push_prefs, admin_set_office_staff_push_prefs {p_aide_remi_messages, p_topic aide_remi_messages}, admin_subscribe_office_staff_push {p_subscription, p_topic aide_remi_messages} (alias admin_subscribe_office_push), admin_unsubscribe_office_staff_push {p_endpoint, p_topic aide_remi_messages} (alias admin_unsubscribe_office_push). Deliver on aide or Remi inbound is Ace. The desk does not post a deliver RPC and does not invent Quo or SMS. Payload shape the tap understands: kind aide_remi_message, from aide|remi, aide_id, aide_name, thread_id, title, body, deep_link admin/messages?aide_id= or admin/messages?from=remi. When get_vapid_public_key is missing or configured is false, this desk does not call PushManager.subscribe. The pref can still be saved. sw.js handles the ping tap only and does not cache the app and does not put ?v= on the address bar. Prior admin-build metas stay. The first meta remains 2026-09-27-remi-float-hide1b. No Auth reseal. Dates people read are MM/DD/YYYY. -->
+<meta name="admin-build" content="2026-09-29-admin-sched-chat-push1">
+<script>var ADMIN_SCHED_CHAT_PUSH1_MARKER='v=admin-sched-chat-push1';var ADMIN_SCHED_CHAT_PUSH1_BUILD='2026-09-29-admin-sched-chat-push1';</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
@@ -1250,6 +1253,33 @@ html.remi-ask-kb #copilotSheet{z-index:180;}
 .notif-set{color:var(--muted);font-size:0.75rem;font-weight:600;}
 .notif-note,.notif-vapid{margin-top:12px;font-size:0.82rem;color:var(--muted);line-height:1.45;}
 .notif-status{margin-top:8px;font-size:0.85rem;color:var(--teal-dark);font-weight:650;}
+/* v=admin-sched-chat-push1 — Settings staff phone pings. Admin and Scheduler. Not the aide roster. */
+#staffPushPrefs{max-width:100%;min-width:0;}
+#staffPushPrefs[hidden]{display:none !important;}
+.staff-push-head h2{margin:0;font-family:'Playfair Display',Georgia,serif;font-size:1.55rem;color:var(--navy);font-weight:700;}
+.staff-push-head p{margin:6px 0 0;color:var(--muted);font-size:0.92rem;line-height:1.4;}
+.staff-push-kicker{margin:16px 0 8px;font-size:0.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.staff-push-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:12px 14px;min-width:0;box-shadow:0 1px 0 rgba(26,39,68,.03);}
+.staff-push-ico{width:42px;height:42px;border-radius:12px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.staff-push-copy{flex:1;min-width:0;}
+.staff-push-title{font-weight:800;color:var(--navy);font-size:1rem;line-height:1.25;}
+.staff-push-hint{color:var(--muted);font-size:0.84rem;line-height:1.35;margin-top:2px;}
+.staff-push-switch{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:52px;min-height:44px;cursor:pointer;}
+.staff-push-switch input{position:absolute;opacity:0;width:52px;height:32px;margin:0;top:0;left:0;}
+.staff-push-track{width:52px;height:32px;border-radius:999px;background:#d5dde8;position:relative;display:block;}
+.staff-push-switch input:focus-visible + .staff-push-track{outline:2px solid var(--teal);outline-offset:2px;}
+.staff-push-switch input:checked + .staff-push-track{background:var(--teal);}
+.staff-push-track i{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(26,39,68,.25);transition:transform .15s ease;}
+.staff-push-switch input:checked + .staff-push-track i{transform:translateX(20px);}
+.staff-push-state{font-size:0.68rem;font-weight:800;letter-spacing:.04em;color:var(--muted);}
+.staff-push-switch input:checked ~ .staff-push-state{color:var(--teal-dark);}
+.staff-push-home{margin:12px 2px 0;font-size:0.88rem;line-height:1.4;color:var(--muted);}
+.staff-push-home[hidden]{display:none !important;}
+.staff-push-on{display:flex;align-items:center;gap:8px;background:#e7f6ee;color:#1e7a45;border-radius:12px;padding:10px 12px;font-weight:700;margin-top:12px;}
+.staff-push-on[hidden]{display:none !important;}
+.staff-push-on:before{content:'';width:8px;height:8px;border-radius:50%;background:#27ae60;flex-shrink:0;}
+.staff-push-status{margin:8px 2px 0;font-size:0.88rem;line-height:1.4;color:var(--teal-dark);font-weight:650;}
+.staff-push-status:empty{display:none;}
 @media(max-width:800px){
   .notif-scroll{overflow:visible;border:0;background:transparent;}
   .notif-head{display:none;}
@@ -3875,6 +3905,29 @@ Call (216) 377-5991 with any questions.</textarea>
 
       <div class="tab-panel" id="tab_settings">
         <div class="page-hdr"><div><h1>Settings</h1><p>Account management — <span id="currentRoleLabel">Logged in</span></p></div></div>
+
+        <section class="card" id="staffPushPrefs" data-layout-roles="Admin Scheduler" data-admin-sched-chat-push1="v=admin-sched-chat-push1" aria-label="Notifications">
+          <div class="staff-push-head">
+            <h2>Notifications</h2>
+            <p>Just the toggle. Flip ON asks Allow automatically.</p>
+          </div>
+          <p class="staff-push-kicker">Message pings</p>
+          <div class="staff-push-row" id="staffPushRow">
+            <span class="staff-push-ico" aria-hidden="true">💬</span>
+            <div class="staff-push-copy">
+              <div class="staff-push-title" id="staffPushTitle">Aide + Remi messages</div>
+              <div class="staff-push-hint" id="staffPushHint">Phone ping when an aide or Remi writes</div>
+            </div>
+            <label class="staff-push-switch">
+              <input type="checkbox" id="staffPushAideRemi" role="switch" aria-labelledby="staffPushTitle" onchange="adminSchedChatPush1Toggle()">
+              <span class="staff-push-track" aria-hidden="true"><i></i></span>
+              <span class="staff-push-state" id="staffPushAideRemiState">OFF</span>
+            </label>
+          </div>
+          <p class="staff-push-home" id="staffPushHomeHint">Open the app from your Home Screen, then tap Allow.</p>
+          <p class="staff-push-on" id="staffPushOnNote" hidden>Phone pings on</p>
+          <p class="staff-push-status" id="staffPushStatus" aria-live="polite"></p>
+        </section>
 
         <div class="card" id="chatNamesCard" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d">
           <div class="card-title"><span class="ico">💬</span> Chat names</div>
@@ -6763,6 +6816,7 @@ function showTab(tab){
     document.getElementById('adminOnlyPwdCard').style.display=isAdmin?'block':'none';
     document.getElementById('schedulerNoAccessCard').style.display=isAdmin?'none':'block';
     if(typeof clienthrs1dOpenNames==='function')clienthrs1dOpenNames();
+    if(typeof adminSchedChatPush1Open==='function')adminSchedChatPush1Open();
   }
   if(tab==='timesheets'){
     try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(eTs){}
@@ -12720,6 +12774,7 @@ async function aidechatOpen(){
     aideTextChatDraft.forceOpen=false;
     await aideTextChatReveal();
   }
+  if(typeof adminSchedChatPush1AfterMessages==='function')adminSchedChatPush1AfterMessages();
 }
 async function aidechatMaybeRemi(thread, now){
   if(!thread||!aidechatRoleOk())return;
@@ -42765,8 +42820,573 @@ if(typeof remiIdeas763Paint==='function'&&!remiIdeas763Paint.__remiFloatHide1b){
 }
 // end remi float hide1b v=remi-float-hide1b
 
+// admin sched chat push1 v=admin-sched-chat-push1
+// Settings toggle for Admin and Scheduler. Phone ping when an aide or Remi writes.
+// Public key RPC only. No private key. No text-message sender. Subscribe is skipped when the key is not configured.
+var ADMIN_SCHED_CHAT_PUSH1_MARKER='v=admin-sched-chat-push1';
+var ADMIN_SCHED_CHAT_PUSH1_BUILD='2026-09-29-admin-sched-chat-push1';
+var ADMIN_SCHED_CHAT_PUSH1_TOPIC='aide_remi_messages';
+var ADMIN_SCHED_CHAT_PUSH1_STORE='evercare_office_staff_push';
+var ADMIN_SCHED_CHAT_PUSH1_COPY={
+  heading:'Notifications',
+  sub:'Just the toggle. Flip ON asks Allow automatically.',
+  kicker:'Message pings',
+  title:'Aide + Remi messages',
+  hint:'Phone ping when an aide or Remi writes',
+  home:'Open the app from your Home Screen, then tap Allow.',
+  on:'Phone pings on',
+  off:'Phone pings off',
+  denied:'Phone pings stay off until you tap Allow.',
+  waiting:'Saved. This phone will ping once the office is ready.'
+};
+var ADMIN_SCHED_CHAT_PUSH1_RPC={
+  vapid:'get_vapid_public_key',
+  prefsGet:['admin_get_office_staff_push_prefs'],
+  prefsSet:['admin_set_office_staff_push_prefs'],
+  subscribe:['admin_subscribe_office_staff_push','admin_subscribe_office_push'],
+  unsubscribe:['admin_unsubscribe_office_staff_push','admin_unsubscribe_office_push']
+};
+var adminSchedChatPush1Pref=false;
+var adminSchedChatPush1Subscribed=false;
+var adminSchedChatPush1Endpoint='';
+var adminSchedChatPush1Busy=false;
+var adminSchedChatPush1Painting=false;
+var adminSchedChatPush1Gen=0;
+var adminSchedChatPush1Pending=null;
+var adminSchedChatPush1LastOpen=null;
+var adminSchedChatPush1LastAllow='';
+
+function adminSchedChatPush1RoleOk(){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  if(role==='Nurse')return false;
+  if(!role)return true;
+  return role==='Admin'||role==='Scheduler';
+}
+function adminSchedChatPush1Who(){
+  var role='';
+  var who='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  try{who=currentAdminUsername==null?'':String(currentAdminUsername);}catch(e2){who='';}
+  return role+'|'+who;
+}
+function adminSchedChatPush1StoreKey(){
+  return ADMIN_SCHED_CHAT_PUSH1_STORE+':'+adminSchedChatPush1Who();
+}
+function adminSchedChatPush1ReadStore(){
+  adminSchedChatPush1Pref=false;
+  adminSchedChatPush1Endpoint='';
+  try{
+    var raw=localStorage.getItem(adminSchedChatPush1StoreKey());
+    if(!raw)return;
+    var data=JSON.parse(raw);
+    if(!data||typeof data!=='object')return;
+    adminSchedChatPush1Pref=data.aide_remi_messages===true;
+    adminSchedChatPush1Endpoint=String(data.endpoint||'');
+  }catch(e){}
+}
+function adminSchedChatPush1WriteStore(){
+  try{
+    localStorage.setItem(adminSchedChatPush1StoreKey(), JSON.stringify({
+      v:1,
+      aide_remi_messages:!!adminSchedChatPush1Pref,
+      endpoint:adminSchedChatPush1Endpoint||''
+    }));
+  }catch(e){}
+}
+function adminSchedChatPush1RpcMissing(got){
+  if(!got)return true;
+  if(got.missing)return true;
+  if(got.status===404)return true;
+  var err=String(got.error||got.message||'');
+  return /PGRST202|could not find the function|schema cache/i.test(err);
+}
+async function adminSchedChatPush1Rpc(names, body){
+  if(typeof sbRestRpc!=='function'||typeof readSbSession!=='function')return {missing:true};
+  var sess=null;
+  try{sess=readSbSession();}catch(e){sess=null;}
+  if(!sess||!sess.access_token)return {signedOut:true};
+  var list=Array.isArray(names)?names:[names];
+  var i;
+  var last={missing:true};
+  for(i=0;i<list.length;i++){
+    if(!list[i])continue;
+    var got=null;
+    try{got=await sbRestRpc(list[i], body||{});}
+    catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+    if(got&&got.ok===true){
+      var node=got.data;
+      if(typeof sbRpcNode==='function'){
+        try{node=sbRpcNode(got.data);}catch(e2){node=got.data;}
+      }
+      return {ok:true, data:node, name:list[i]};
+    }
+    if(adminSchedChatPush1RpcMissing(got)){
+      last={missing:true, error:got&&got.error, name:list[i]};
+      continue;
+    }
+    return {ok:false, error:(got&&got.error)||'Request failed.', status:got&&got.status, name:list[i]};
+  }
+  return last;
+}
+function adminSchedChatPush1KeyFrom(data){
+  data=data||{};
+  var on=data.configured===true||data.configured==='true'||data.configured==='t';
+  var key=String(data.vapidPublicKey||data.publicKey||data.public_key||'').trim();
+  if(!on||!key)return '';
+  return key;
+}
+function adminSchedChatPush1KeyBytes(key){
+  var raw=String(key||'').trim();
+  var padLen=(4-(raw.length%4))%4;
+  var pad='';
+  var n;
+  for(n=0;n<padLen;n++)pad+='=';
+  var b64=raw.replace(/-/g,'+').replace(/_/g,'/')+pad;
+  var bin=atob(b64);
+  var out=new Uint8Array(bin.length);
+  var i;
+  for(i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
+  return out;
+}
+function adminSchedChatPush1SetStatus(text){
+  var el=null;
+  try{el=document.getElementById('staffPushStatus');}catch(e){el=null;}
+  if(el)el.textContent=text||'';
+}
+function adminSchedChatPush1Paint(){
+  adminSchedChatPush1Painting=true;
+  try{
+    var on=!!adminSchedChatPush1Pref;
+    var box=null;
+    var state=null;
+    var row=null;
+    var note=null;
+    var home=null;
+    try{box=document.getElementById('staffPushAideRemi');}catch(e){box=null;}
+    try{state=document.getElementById('staffPushAideRemiState');}catch(e2){state=null;}
+    try{row=document.getElementById('staffPushRow');}catch(e3){row=null;}
+    try{note=document.getElementById('staffPushOnNote');}catch(e4){note=null;}
+    try{home=document.getElementById('staffPushHomeHint');}catch(e5){home=null;}
+    if(box)box.checked=on;
+    if(state)state.textContent=on?'ON':'OFF';
+    if(row){
+      if(on)row.classList.add('is-on');
+      else row.classList.remove('is-on');
+    }
+    var granted=false;
+    try{granted=typeof Notification!=='undefined'&&Notification&&Notification.permission==='granted';}catch(e6){granted=false;}
+    var live=on&&granted&&!!adminSchedChatPush1Subscribed;
+    if(note)note.hidden=!live;
+    if(home)home.hidden=!!(on&&granted);
+  }finally{
+    adminSchedChatPush1Painting=false;
+  }
+}
+async function adminSchedChatPush1AskAllow(){
+  if(typeof Notification==='undefined'||!Notification)return 'unsupported';
+  var perm='';
+  try{perm=String(Notification.permission||'');}catch(e){perm='';}
+  if(perm==='granted')return 'granted';
+  if(perm==='denied')return 'denied';
+  if(typeof Notification.requestPermission!=='function')return 'unsupported';
+  try{
+    var next=await Notification.requestPermission();
+    return String(next||'default');
+  }catch(e2){
+    return 'denied';
+  }
+}
+async function adminSchedChatPush1Registration(){
+  var sw=null;
+  try{sw=(typeof navigator!=='undefined'&&navigator)?navigator.serviceWorker:null;}catch(e){sw=null;}
+  if(!sw||typeof sw.register!=='function')return null;
+  try{await sw.register('sw.js');}
+  catch(e2){return null;}
+  try{
+    if(sw.ready&&typeof sw.ready.then==='function')return await sw.ready;
+  }catch(e3){}
+  return null;
+}
+async function adminSchedChatPush1PushSubscribe(publicKey){
+  if(!publicKey)return {skipped:true, reason:'not-configured'};
+  var reg=await adminSchedChatPush1Registration();
+  var pm=reg&&reg.pushManager;
+  if(!pm||typeof pm.subscribe!=='function')return {skipped:true, reason:'unsupported'};
+  try{
+    var sub=await pm.subscribe({
+      userVisibleOnly:true,
+      applicationServerKey:adminSchedChatPush1KeyBytes(publicKey)
+    });
+    var json=sub&&typeof sub.toJSON==='function'?sub.toJSON():(sub||{});
+    var endpoint=String((json&&json.endpoint)||(sub&&sub.endpoint)||'');
+    if(endpoint)adminSchedChatPush1Endpoint=endpoint;
+    return {ok:true, subscription:json};
+  }catch(e){
+    return {ok:false, skipped:true, reason:'subscribe-failed'};
+  }
+}
+async function adminSchedChatPush1PushUnsubscribe(){
+  var endpoint=adminSchedChatPush1Endpoint||'';
+  var reg=null;
+  try{
+    var sw=(typeof navigator!=='undefined'&&navigator)?navigator.serviceWorker:null;
+    if(sw&&typeof sw.getRegistration==='function')reg=await sw.getRegistration();
+  }catch(e){reg=null;}
+  var pm=reg&&reg.pushManager;
+  if(!pm||typeof pm.getSubscription!=='function'){
+    adminSchedChatPush1Subscribed=false;
+    return endpoint;
+  }
+  try{
+    var sub=await pm.getSubscription();
+    if(sub){
+      endpoint=String(sub.endpoint||endpoint||'');
+      if(typeof sub.unsubscribe==='function')await sub.unsubscribe();
+    }
+  }catch(e2){}
+  adminSchedChatPush1Subscribed=false;
+  adminSchedChatPush1Endpoint=endpoint;
+  return endpoint;
+}
+async function adminSchedChatPush1SyncSubscription(){
+  var reg=null;
+  try{
+    var sw=(typeof navigator!=='undefined'&&navigator)?navigator.serviceWorker:null;
+    if(sw&&typeof sw.getRegistration==='function')reg=await sw.getRegistration();
+  }catch(e){reg=null;}
+  var pm=reg&&reg.pushManager;
+  if(!pm||typeof pm.getSubscription!=='function')return false;
+  try{
+    var sub=await pm.getSubscription();
+    adminSchedChatPush1Subscribed=!!sub;
+    if(sub&&sub.endpoint)adminSchedChatPush1Endpoint=String(sub.endpoint);
+    return !!sub;
+  }catch(e2){
+    return false;
+  }
+}
+async function adminSchedChatPush1LoadKey(){
+  var got=await adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.vapid, {});
+  if(!(got&&got.ok&&got.data))return '';
+  return adminSchedChatPush1KeyFrom(got.data);
+}
+function adminSchedChatPush1PrefOn(data){
+  data=data||{};
+  var flag=data.aide_remi_messages;
+  if(flag==null&&data.prefs&&typeof data.prefs==='object')flag=data.prefs.aide_remi_messages;
+  if(flag==null&&data.p_aide_remi_messages!=null)flag=data.p_aide_remi_messages;
+  if(flag===true||flag==='true'||flag==='t'||flag===1||flag==='1')return true;
+  if(flag===false||flag==='false'||flag==='f'||flag===0||flag==='0')return false;
+  return null;
+}
+async function adminSchedChatPush1PostPrefs(on){
+  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.prefsSet, {
+    p_aide_remi_messages:!!on,
+    p_topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC
+  });
+}
+async function adminSchedChatPush1PostSubscribe(subscription){
+  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.subscribe, {
+    p_topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC,
+    p_aide_remi_messages:true,
+    p_subscription:subscription||{},
+    p_endpoint:String((subscription&&subscription.endpoint)||adminSchedChatPush1Endpoint||'')
+  });
+}
+async function adminSchedChatPush1PostUnsubscribe(endpoint){
+  return adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.unsubscribe, {
+    p_topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC,
+    p_aide_remi_messages:false,
+    p_endpoint:String(endpoint||adminSchedChatPush1Endpoint||'')
+  });
+}
+async function adminSchedChatPush1Enable(){
+  if(!adminSchedChatPush1RoleOk())return {ok:false, reason:'role', asked:false};
+  var gen=++adminSchedChatPush1Gen;
+  var allow=await adminSchedChatPush1AskAllow();
+  adminSchedChatPush1LastAllow=allow;
+  if(gen!==adminSchedChatPush1Gen)return {ok:false, reason:'stale', asked:true};
+  if(allow!=='granted'){
+    adminSchedChatPush1Pref=false;
+    adminSchedChatPush1Subscribed=false;
+    adminSchedChatPush1WriteStore();
+    adminSchedChatPush1Paint();
+    adminSchedChatPush1SetStatus(allow==='denied'?ADMIN_SCHED_CHAT_PUSH1_COPY.denied:ADMIN_SCHED_CHAT_PUSH1_COPY.home);
+    return {ok:false, reason:allow, asked:true, subscribed:false};
+  }
+  var key=await adminSchedChatPush1LoadKey();
+  if(gen!==adminSchedChatPush1Gen)return {ok:false, reason:'stale', asked:true};
+  var subscribed=false;
+  if(key){
+    var got=await adminSchedChatPush1PushSubscribe(key);
+    subscribed=!!(got&&got.ok);
+    if(subscribed)await adminSchedChatPush1PostSubscribe(got.subscription);
+  }
+  adminSchedChatPush1Pref=true;
+  adminSchedChatPush1Subscribed=subscribed;
+  adminSchedChatPush1WriteStore();
+  await adminSchedChatPush1PostPrefs(true);
+  if(gen!==adminSchedChatPush1Gen)return {ok:true, asked:true, subscribed:subscribed, skippedSubscribe:!key};
+  adminSchedChatPush1Paint();
+  adminSchedChatPush1SetStatus(subscribed?ADMIN_SCHED_CHAT_PUSH1_COPY.on:ADMIN_SCHED_CHAT_PUSH1_COPY.waiting);
+  return {ok:true, asked:true, subscribed:subscribed, skippedSubscribe:!key};
+}
+async function adminSchedChatPush1Disable(){
+  if(!adminSchedChatPush1RoleOk())return {ok:false, reason:'role'};
+  var gen=++adminSchedChatPush1Gen;
+  var endpoint=await adminSchedChatPush1PushUnsubscribe();
+  adminSchedChatPush1Pref=false;
+  adminSchedChatPush1Subscribed=false;
+  adminSchedChatPush1Endpoint='';
+  adminSchedChatPush1WriteStore();
+  await adminSchedChatPush1PostUnsubscribe(endpoint);
+  await adminSchedChatPush1PostPrefs(false);
+  if(gen!==adminSchedChatPush1Gen)return {ok:true, endpoint:endpoint||''};
+  adminSchedChatPush1Paint();
+  adminSchedChatPush1SetStatus(ADMIN_SCHED_CHAT_PUSH1_COPY.off);
+  return {ok:true, endpoint:endpoint||''};
+}
+async function adminSchedChatPush1Toggle(){
+  if(adminSchedChatPush1Painting||adminSchedChatPush1Busy)return;
+  if(!adminSchedChatPush1RoleOk())return;
+  var box=null;
+  try{box=document.getElementById('staffPushAideRemi');}catch(e){box=null;}
+  var want=!!(box&&box.checked);
+  adminSchedChatPush1Busy=true;
+  try{
+    if(want)return await adminSchedChatPush1Enable();
+    return await adminSchedChatPush1Disable();
+  }finally{
+    adminSchedChatPush1Busy=false;
+  }
+}
+async function adminSchedChatPush1LoadPrefs(){
+  var gen=adminSchedChatPush1Gen;
+  adminSchedChatPush1ReadStore();
+  var got=await adminSchedChatPush1Rpc(ADMIN_SCHED_CHAT_PUSH1_RPC.prefsGet, {});
+  if(gen!==adminSchedChatPush1Gen)return;
+  if(got&&got.ok&&got.data){
+    var flag=adminSchedChatPush1PrefOn(got.data);
+    if(flag!==null){
+      adminSchedChatPush1Pref=flag;
+      adminSchedChatPush1WriteStore();
+    }
+  }
+  if(adminSchedChatPush1Pref){
+    try{await adminSchedChatPush1SyncSubscription();}catch(e){}
+    if(gen!==adminSchedChatPush1Gen)return;
+    var granted=false;
+    try{granted=typeof Notification!=='undefined'&&Notification&&Notification.permission==='granted';}catch(e2){granted=false;}
+    if(granted&&!adminSchedChatPush1Subscribed){
+      var key=await adminSchedChatPush1LoadKey();
+      if(gen!==adminSchedChatPush1Gen)return;
+      if(key){
+        var sub=await adminSchedChatPush1PushSubscribe(key);
+        if(sub&&sub.ok){
+          adminSchedChatPush1Subscribed=true;
+          await adminSchedChatPush1PostSubscribe(sub.subscription);
+        }
+      }
+    }
+  }
+  if(gen!==adminSchedChatPush1Gen)return;
+  if(!adminSchedChatPush1Pref)adminSchedChatPush1Subscribed=false;
+  adminSchedChatPush1Paint();
+  if(adminSchedChatPush1Pref&&adminSchedChatPush1Subscribed)adminSchedChatPush1SetStatus(ADMIN_SCHED_CHAT_PUSH1_COPY.on);
+  else if(!adminSchedChatPush1Pref)adminSchedChatPush1SetStatus('');
+}
+function adminSchedChatPush1Open(){
+  var card=null;
+  try{card=document.getElementById('staffPushPrefs');}catch(e){card=null;}
+  if(!adminSchedChatPush1RoleOk()){
+    if(card)card.setAttribute('hidden','');
+    return;
+  }
+  if(card)card.removeAttribute('hidden');
+  adminSchedChatPush1ReadStore();
+  if(!adminSchedChatPush1Pref)adminSchedChatPush1Subscribed=false;
+  adminSchedChatPush1Paint();
+  var pending=adminSchedChatPush1LoadPrefs();
+  if(pending&&typeof pending.then==='function')pending.then(function(){}, function(){});
+}
+function adminSchedChatPush1Unwrap(raw){
+  if(raw==null)return {};
+  if(typeof raw==='string'){
+    var text=raw;
+    try{raw=JSON.parse(text);}catch(e){return {body:text};}
+  }
+  if(typeof raw!=='object')return {};
+  var note=raw.notification&&typeof raw.notification==='object'?raw.notification:null;
+  var noteData=note&&note.data&&typeof note.data==='object'?note.data:null;
+  if(noteData)return noteData;
+  if(raw.data&&typeof raw.data==='object'&&(raw.data.deep_link||raw.data.deepLink||raw.data.aide_id||raw.data.aideId||raw.data.from||raw.data.kind))return raw.data;
+  if(raw.payload&&typeof raw.payload==='object')return raw.payload;
+  return raw;
+}
+function adminSchedChatPush1Query(deep, key){
+  var m=String(deep||'').match(new RegExp('[?&]'+key+'=([^&]+)'));
+  if(!m)return '';
+  try{return decodeURIComponent(m[1]);}catch(e){return m[1];}
+}
+function adminSchedChatPush1Route(raw){
+  var src=adminSchedChatPush1Unwrap(raw);
+  var deep=String(src.deep_link||src.deepLink||src.url||'').trim();
+  var aide=String(src.aide_id||src.aideId||'').trim()||adminSchedChatPush1Query(deep, 'aide_id');
+  var thread=String(src.thread_id||src.threadId||'').trim()||adminSchedChatPush1Query(deep, 'thread_id');
+  var name=String(src.aide_name||src.aideName||src.name||'').trim();
+  var fromRaw=String(src.from||src.sender||adminSchedChatPush1Query(deep, 'from')||'').toLowerCase();
+  var from=fromRaw==='remi'?'remi':'aide';
+  var surface=(aide||thread)?'thread':'messages';
+  var body=String(src.body||src.preview||'').trim();
+  if(!deep){
+    if(aide)deep='admin/messages?aide_id='+encodeURIComponent(aide);
+    else if(from==='remi')deep='admin/messages?from=remi';
+    else deep='admin/messages';
+  }
+  return {
+    tab:'aidechat',
+    surface:surface,
+    from:from,
+    aideId:aide,
+    threadId:thread,
+    aideName:name,
+    body:body,
+    deepLink:deep,
+    kind:'aide_remi_message'
+  };
+}
+function adminSchedChatPush1NotificationPayload(input){
+  input=input||{};
+  var from=String(input.from||input.sender||'aide').toLowerCase()==='remi'?'remi':'aide';
+  var aide=String(input.aide_id||input.aideId||'').trim();
+  var name=String(input.aide_name||input.aideName||'').trim();
+  var thread=String(input.thread_id||input.threadId||'').trim();
+  var body=String(input.body||input.preview||'').trim();
+  var deep=String(input.deep_link||input.deepLink||'').trim();
+  if(!deep){
+    if(aide)deep='admin/messages?aide_id='+encodeURIComponent(aide);
+    else if(from==='remi')deep='admin/messages?from=remi';
+    else deep='admin/messages';
+  }
+  if(!body){
+    if(from==='remi')body='Remi';
+    else body='Aide'+(name?(' · '+name):'');
+  }
+  return {
+    kind:'aide_remi_message',
+    from:from,
+    aide_id:aide,
+    aide_name:name,
+    thread_id:thread,
+    title:'EverCare',
+    body:body,
+    deep_link:deep,
+    topic:ADMIN_SCHED_CHAT_PUSH1_TOPIC
+  };
+}
+function adminSchedChatPush1EnsureThread(route){
+  if(!route||!(route.aideId||route.threadId))return null;
+  if(typeof aidechatFindByAide==='function'&&route.aideId){
+    var hit=aidechatFindByAide({id:route.aideId, aide_id:route.aideId, name:route.aideName||''});
+    if(hit)return hit;
+  }
+  if(typeof aidechatFind==='function'&&route.threadId){
+    var byId=aidechatFind(route.threadId);
+    if(byId)return byId;
+  }
+  var row={
+    id:route.threadId||route.aideId,
+    aide_id:route.aideId||'',
+    name:route.aideName||(route.from==='remi'?'Remi':'Aide'),
+    username:'',
+    messages:[],
+    urgent:false,
+    last_message:route.body||'',
+    last_at:''
+  };
+  if(!route.threadId&&typeof aidechatId==='function')row.id=aidechatId('t');
+  if(typeof aidechatThreads!=='undefined'&&aidechatThreads&&aidechatThreads.push)aidechatThreads.push(row);
+  return row;
+}
+function adminSchedChatPush1AfterMessages(){
+  var route=adminSchedChatPush1Pending;
+  if(!route)return;
+  adminSchedChatPush1Pending=null;
+  if(route.surface!=='thread')return;
+  var thread=adminSchedChatPush1EnsureThread(route);
+  if(thread&&typeof aidechatOpenThread==='function'){
+    var opened=aidechatOpenThread(thread.id);
+    if(opened&&typeof opened.then==='function')opened.then(function(){}, function(){});
+  }
+}
+function adminSchedChatPush1OpenFromPayload(raw){
+  var route=adminSchedChatPush1Route(raw);
+  adminSchedChatPush1LastOpen=route;
+  if(!adminSchedChatPush1RoleOk())return route;
+  adminSchedChatPush1Pending=route;
+  if(typeof showTab==='function')showTab('aidechat');
+  else adminSchedChatPush1AfterMessages();
+  return route;
+}
+function adminSchedChatPush1LocationPayload(){
+  var hash='';
+  var path='';
+  var search='';
+  try{hash=String(location.hash||'');}catch(e){hash='';}
+  try{path=String(location.pathname||'');}catch(e2){path='';}
+  try{search=String(location.search||'');}catch(e3){search='';}
+  var blob=hash;
+  if(/messages/i.test(path))blob+='&'+search;
+  if(!/aidechat|messages/i.test(hash)&&!/messages/i.test(path))return null;
+  var aide=adminSchedChatPush1Query(blob, 'aide_id');
+  var from=adminSchedChatPush1Query(blob, 'from');
+  var thread=adminSchedChatPush1Query(blob, 'thread_id');
+  if(!aide&&!from&&!thread)return null;
+  return adminSchedChatPush1NotificationPayload({
+    from:from||(aide?'aide':''),
+    aide_id:aide,
+    thread_id:thread,
+    deep_link:aide?('admin/messages?aide_id='+encodeURIComponent(aide)):(String(from).toLowerCase()==='remi'?'admin/messages?from=remi':'admin/messages')
+  });
+}
+function adminSchedChatPush1ConsumeLocation(){
+  var payload=adminSchedChatPush1Pending||adminSchedChatPush1LocationPayload();
+  if(!payload)return;
+  if(!adminSchedChatPush1RoleOk())return;
+  adminSchedChatPush1OpenFromPayload(payload);
+}
+function adminSchedChatPush1OnWorkerMessage(ev){
+  var data=ev&&ev.data?ev.data:{};
+  if(!data||data.type!=='admin-sched-chat-push1-open')return;
+  adminSchedChatPush1OpenFromPayload(data.payload||{});
+}
+function adminSchedChatPush1Boot(){
+  if(adminSchedChatPush1Boot._done)return;
+  adminSchedChatPush1Boot._done=1;
+  try{
+    var sw=(typeof navigator!=='undefined'&&navigator)?navigator.serviceWorker:null;
+    if(sw&&typeof sw.addEventListener==='function')sw.addEventListener('message', adminSchedChatPush1OnWorkerMessage);
+  }catch(e){}
+  if(typeof window!=='undefined'&&window.addEventListener){
+    window.addEventListener('hashchange', function(){
+      var next=adminSchedChatPush1LocationPayload();
+      if(next)adminSchedChatPush1Pending=next;
+    });
+  }
+  var payload=adminSchedChatPush1LocationPayload();
+  if(payload)adminSchedChatPush1Pending=payload;
+}
+if(typeof window!=='undefined'&&typeof document!=='undefined'){
+  if(document.readyState==='loading'&&document.addEventListener)document.addEventListener('DOMContentLoaded', adminSchedChatPush1Boot);
+  else adminSchedChatPush1Boot();
+}
+// end admin sched chat push1 v=admin-sched-chat-push1
 try{if(typeof loginLandSchedule1BindNav==='function')loginLandSchedule1BindNav();}catch(eLandNav){}
 bootAdminPortal();
+if(typeof adminSchedChatPush1ConsumeLocation==='function'){
+  try{adminSchedChatPush1ConsumeLocation();}catch(ePushBoot){}
+}
 window.addEventListener('pageshow',function(){enforceAdminSessionTimeout();});
 document.addEventListener('visibilitychange',function(){
   if(document.visibilityState==='visible')enforceAdminSessionTimeout();
