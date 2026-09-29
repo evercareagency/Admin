@@ -33,7 +33,11 @@ assert.ok(html.includes("var SCHED_CREDS1_MARKER='v=sched-creds1'"), 'script mar
 assert.ok(html.includes("var SCHED_CREDS1_BUILD='2026-09-29-sched-creds1'"), 'script build');
 assert.ok(html.includes('Ace N/A'), 'Ace N/A');
 assert.ok(html.includes('UI parity only'), 'UI parity only');
-assert.ok(html.includes('one portal'), 'Admin and Scheduler are one portal');
+assert.ok(html.includes('Standing rule: Admin and Scheduler are one portal'), 'standing rule');
+assert.ok(html.includes('No Admin-only chrome'), 'no Admin-only chrome');
+assert.ok(html.includes('Scheduler login is a soft-check'), 'soft-check is named');
+assert.ok(html.includes('startAdminSession') && html.includes('restoreAdminSession'), 'same login session path');
+assert.ok(html.includes('does not post a password') && html.includes('does not call sbAuthRoleLogin'), 'soft-check skips the password grant');
 assert.ok(html.includes('Nurse is out of scope') || html.includes('Nurse out of scope'), 'Nurse out of scope');
 assert.ok(html.includes('MERGE HOLD') && html.includes('Do not claim LIVE') && html.includes('Do not squash-merge'), 'merge hold');
 assert.ok(html.includes('No new RPC') && html.includes('No SQL'), 'no new rpc or sql');
@@ -59,6 +63,11 @@ assert.ok(fromDots.includes('aideCredOpen(id, aideName)'), 'normal list reuses a
 assert.ok(extractFn(html, 'async function aideCredOpen(aideId, aideName)').includes('schedCreds1Office'), 'desk open allows Scheduler');
 assert.ok(!extractFn(html, 'function aideCredsIsAdmin()').includes('Scheduler'), 'rollup gate stays Admin-only');
 assert.ok(extractFn(html, 'function schedCreds1Office()').includes("role==='Scheduler'"), 'Scheduler shares the menu');
+assert.ok(!openSheet.includes("role==='Admin'"), 'Aides ··· builder has no Admin-only role check');
+assert.ok(extractFn(html, 'async function mgrLogin()').includes('startAdminSession'), 'Sign In uses one session for Admin and Scheduler');
+assert.ok(extractFn(html, 'function sbPortalRoleFromProfile(role)').includes("key==='scheduler'"), 'profile role scheduler maps to Scheduler');
+assert.ok(!extractFn(html, 'function startAdminSession(data)').includes('sbAuthRoleLogin'), 'session start does not grant a password');
+assert.ok(!extractFn(html, 'function restoreAdminSession()').includes('sbPasswordGrant'), 'restore does not grant a password');
 const freshStart = html.slice(html.indexOf('function pagesCacheFresh1Start'), html.indexOf('try{pagesCacheFresh1Start()'));
 assert.ok(!freshStart.includes('?v='), 'pages-cache-fresh1 start does not stick a ?v=');
 
@@ -81,6 +90,41 @@ function node(id){
 const JANE = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1';
 const jane = {id:JANE, username:'jdoe', name:'Jane Doe', fullName:'Jane Doe'};
 
+function softCheckSchedulerLogin(){
+  const mem = {};
+  const box = {
+    currentAdminRole: null,
+    currentAdminUsername: null,
+    currentNurseName: null,
+    ADMIN_SESSION_KEY: 'admin_session',
+    store: {
+      get: function(k){return Object.prototype.hasOwnProperty.call(mem, k) ? JSON.parse(mem[k]) : null;},
+      set: function(k, v){mem[k] = JSON.stringify(v);}
+    }
+  };
+  vm.createContext(box);
+  vm.runInContext([
+    extractFn(html, 'function isPortalRole(role)'),
+    extractFn(html, 'function writeAdminSession(sess)'),
+    extractFn(html, 'function applyAdminSession(sess)'),
+    extractFn(html, 'function startAdminSession(data)'),
+    extractFn(html, 'function sbPortalRoleFromProfile(role)'),
+    extractFn(html, 'function roleAccountSbEmail(role)')
+  ].join('\n'), box);
+  const mapped = box.sbPortalRoleFromProfile('scheduler');
+  assert.strictEqual(mapped, 'Scheduler', 'soft-check maps the Scheduler profile');
+  assert.strictEqual(box.roleAccountSbEmail('Scheduler'), 'scheduler@roles.evercare.local', 'Scheduler login account');
+  assert.strictEqual(box.roleAccountSbEmail('Admin'), 'admin@roles.evercare.local', 'Admin login account stays');
+  const sess = box.startAdminSession({role: mapped, username: 'Jaz', name: 'Jaz'});
+  assert.strictEqual(sess.role, 'Scheduler');
+  assert.strictEqual(box.currentAdminRole, 'Scheduler', 'soft-check Scheduler login sets the portal role');
+  assert.strictEqual(box.currentAdminUsername, 'Jaz', 'soft-check Scheduler login is Jaz');
+  assert.ok(mem.admin_session && JSON.parse(mem.admin_session).role === 'Scheduler', 'session stored for restore');
+  return sess;
+}
+const schedulerLogin = softCheckSchedulerLogin();
+assert.strictEqual(schedulerLogin.role, 'Scheduler');
+
 function menuBox(){
   const els = {
     aideInfoSheet: node('aideInfoSheet'),
@@ -88,7 +132,7 @@ function menuBox(){
     aideInfoSheetActions: node('aideInfoSheetActions')
   };
   const box = {
-    currentAdminRole: 'Scheduler',
+    currentAdminRole: schedulerLogin.role,
     aideDesk: 'active',
     manageOn: false,
     aidesInfo1Current: null,
@@ -341,28 +385,71 @@ async function runBrowser(){
       req.respond({status:200, contentType:'application/json', headers:cors, body:JSON.stringify(payload)});
     });
   }
+  const authGrants = [];
   async function boot(width, height, role){
     const page = await browser.newPage();
     await page.setViewport({width:width, height:height, isMobile:width < 900, hasTouch:width < 900, deviceScaleFactor:1});
     await page.setRequestInterception(true);
     arm(page);
-    await page.evaluateOnNewDocument(function(roleName){
+    page.on('request', function(req){
+      if(/\/auth\/v1\/token/.test(req.url()))authGrants.push(req.url());
+    });
+    const grantMark = authGrants.length;
+    const username = role === 'Scheduler' ? 'Jaz' : (role === 'Nurse' ? 'Nurse' : 'Mo');
+    await page.evaluateOnNewDocument(function(roleName, userName){
       try{sessionStorage.setItem('pagesCacheFresh1Reloads', '1');}catch(e){}
+      localStorage.setItem('admin_session', JSON.stringify({
+        role: roleName,
+        username: userName,
+        name: roleName === 'Nurse' ? 'Nurse' : '',
+        loginAt: Date.now()
+      }));
+      var email = roleName === 'Scheduler' ? 'scheduler@roles.evercare.local' : (roleName === 'Nurse' ? 'nurse@roles.evercare.local' : 'admin@roles.evercare.local');
       localStorage.setItem('evercare_sb_session', JSON.stringify({
         access_token: 'sched-creds1-test',
         refresh_token: 'sched-creds1-refresh',
-        profile: {org_id:'4f97f4d3-6635-4544-904c-6b06aa02d40b', role: roleName}
+        email: email,
+        profile: {org_id:'4f97f4d3-6635-4544-904c-6b06aa02d40b', role: String(roleName).toLowerCase(), display_name: userName, email: email}
       }));
-    }, role);
+    }, role, username);
     await page.goto('http://127.0.0.1:' + port + '/index.html', {waitUntil:'domcontentloaded', timeout:20000});
-    await page.evaluate(function(roleName){
-      currentAdminRole = roleName;
-      document.getElementById('loginScreen').classList.remove('active');
-      document.getElementById('adminScreen').classList.add('active');
-      if(typeof layoutA1ApplyRoles === 'function')layoutA1ApplyRoles();
-      showTab('aides');
-    }, role);
+    const signed = await page.evaluate(function(){
+      var sess = typeof readAdminSession === 'function' ? readAdminSession() : null;
+      return {
+        role: currentAdminRole,
+        username: currentAdminUsername,
+        sessionRole: sess && sess.role,
+        adminOn: !!(document.getElementById('adminScreen') && document.getElementById('adminScreen').classList.contains('active'))
+      };
+    });
+    assert.strictEqual(signed.role, role, 'restoreAdminSession applied the login role');
+    assert.strictEqual(signed.sessionRole, role, 'admin_session is the login record');
+    assert.strictEqual(signed.username, username, 'soft-check keeps the signed-in name');
+    assert.strictEqual(authGrants.length, grantMark, 'soft-check does not post a password grant');
+    if(role === 'Nurse'){
+      const nurseHome = await page.evaluate(function(){
+        return {
+          nurseOn: document.getElementById('nurseScreen').classList.contains('active'),
+          adminOn: document.getElementById('adminScreen').classList.contains('active')
+        };
+      });
+      assert.strictEqual(nurseHome.nurseOn, true, 'Nurse stays on the nurse home');
+      assert.strictEqual(nurseHome.adminOn, false, 'Nurse does not get Admin chrome');
+      return page;
+    }
+    assert.strictEqual(signed.adminOn, true, 'Admin and Scheduler share the portal');
+    await page.evaluate(function(){showTab('aides');});
     await page.waitForSelector('#aidesContainer .aide-info-more', {timeout:8000});
+    const chrome = await page.evaluate(function(){
+      var search = document.getElementById('aidesListSearch');
+      var manage = document.getElementById('aideCredManageBtn');
+      return {
+        searchRoles: search ? search.getAttribute('data-layout-roles') : '',
+        manageHidden: !manage || manage.hidden === true
+      };
+    });
+    assert.ok(chrome.searchRoles.indexOf('Admin') >= 0 && chrome.searchRoles.indexOf('Scheduler') >= 0, 'Aides search chrome is Admin Scheduler');
+    assert.strictEqual(chrome.manageHidden, false, 'Manage is office chrome');
     return page;
   }
   async function menuItems(page){
@@ -458,11 +545,8 @@ async function runBrowser(){
     await openCreds(admin);
 
     const nurse = await boot(390, 844, 'Nurse');
-    const nurseMenu = await menuItems(nurse);
-    assert.ok(nurseMenu.buttons.indexOf('View profile') >= 0);
-    assert.ok(nurseMenu.buttons.indexOf('Credentials') < 0, 'Nurse menu has no Credentials');
-    assert.ok(nurseMenu.buttons.indexOf('Reset temp password') < 0);
-    assert.ok(nurseMenu.buttons.indexOf('Delete') < 0);
+    const nurseRole = await nurse.evaluate(function(){return currentAdminRole;});
+    assert.strictEqual(nurseRole, 'Nurse', 'Nurse login stays Nurse');
 
     console.log('admin-sched-creds1-test: phone and desktop ok');
   }finally{
