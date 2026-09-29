@@ -49,7 +49,8 @@ assert.ok(notes1.includes('id="remiNotes1Keep" data-reminotes1="v=remi-notes1" d
 assert.ok(notes1.includes('function remiNotesClarity1Fit'), 'keyboard fit lives with notes');
 assert.ok(notes1.includes('function remiNotesKb1Fit'), 'kb1 sheet pin lives with notes');
 assert.ok(notes1.includes('msgComposerKb3FlushBox'), 'notes pin flushes the sheet');
-assert.ok(!notes1.includes('msgComposerKb3DockForm'), 'notes pin does not fixed-dock the nested composer');
+assert.ok(notes1.includes('msgComposerKb3DockForm(pin, view)'), 'kb2 fixed-docks the notes dock');
+assert.ok(!notes1.includes("form.style.position='fixed'"), 'nested composer is not position fixed inline');
 assert.ok(!/sbRestRpc|supabase\.|fetch\(/.test(notes1), 'local notes stay off Ace');
 
 const visStart = html.indexOf('// remi notes vis1 v=remi-notes-vis1');

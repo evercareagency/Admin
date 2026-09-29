@@ -51,22 +51,25 @@ assert.ok(notes1.includes('msgComposerRect1FlushHeight(sheet, view)'), 'sheet he
 assert.ok(notes1.includes('remiNotesClarity1SheetTop'), 'resting sheet top still clears chrome');
 assert.ok(notes1.includes('setTimeout(fit, 80)') && notes1.includes('setTimeout(fit, 320)'), 'focus retries');
 assert.ok(notes1.includes("t.id==='remiNotesVisInput'"), 'focusin watches the notes textarea');
-assert.ok(!notes1.includes('msgComposerKb3DockForm'), 'notes path does not fixed-dock the nested composer');
-assert.ok(!notes1.includes("form.style.position='fixed'"), 'composer is not position fixed');
+assert.ok(notes1.includes('function remiNotesKb2Fit'), 'kb2 fit lives with notes');
+assert.ok(notes1.includes('msgComposerKb3DockForm'), 'kb2 fixed-docks the notes dock');
+assert.ok(notes1.includes('msgComposerRect1FlushBottom'), 'kb2 flushes the dock to the visual bottom');
+assert.ok(!notes1.includes("form.style.position='fixed'"), 'composer card is not position fixed inline');
 
-const fitStart = notes1.indexOf('function remiNotesKb1Fit()');
-const fitEnd = notes1.indexOf('function remiNotesClarity1Fit()');
+const fitStart = notes1.indexOf('function remiNotesKb2Fit()');
+const fitEnd = notes1.indexOf('function remiNotesKb1Fit()');
 const fitSrc = notes1.slice(fitStart, fitEnd);
 assert.ok(fitSrc.includes("sheet.style.bottom='auto'"), 'sheet bottom is auto while the keyboard is up');
 assert.ok(fitSrc.includes('view.height'), 'sheet height uses the visual viewport');
-assert.ok(!fitSrc.includes('msgComposerRect1FlushBottom'), 'flush runs on the sheet, not a fixed composer');
+assert.ok(fitSrc.includes('msgComposerRect1FlushBottom'), 'dock flush uses the rect helper');
+assert.ok(notes1.slice(notes1.indexOf('function remiNotesKb1Fit()'), notes1.indexOf('function remiNotesClarity1Fit()')).includes('remiNotesKb2Fit()'), 'kb1 fit calls kb2');
 
 const askFn = html.slice(html.indexOf('function copilotChatViewport()'), html.indexOf('function copilotChatBindViewport()'));
 assert.ok(askFn.includes('remiNotesKb1Fit'), 'notes view uses the sheet pin');
 assert.ok(askFn.includes('msgComposerKb3FlushBox'), 'Ask flush stays');
 
 const css = html.slice(html.indexOf('html.remi-notes-kb #copilotSheet{'), html.indexOf('#copilotSheet .remi-proof{'));
-assert.ok(css.includes('padding-bottom:0'), 'sheet padding clears while the keyboard class is on');
+assert.ok(css.includes('--remi-notes-dock-h'), 'sheet padding reserves the fixed dock');
 assert.ok(css.includes('flex-shrink:0'), 'composer does not shrink');
 assert.ok(css.includes('background:#fff'), 'composer background is solid');
 assert.ok(css.includes('z-index:180'), 'sheet stays at least at the Ask keyboard layer');
