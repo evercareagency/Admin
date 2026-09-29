@@ -38,6 +38,9 @@ assert.ok(html.includes('Ace CALLABLE for the Aides inbox'), 'Aides hide is call
 assert.ok(html.includes('admin_hide_aide_office_threads'), 'hide RPC');
 assert.ok(html.includes('p_thread_ids'), 'thread id payload');
 assert.ok(html.includes('CLIENT_GAP'), 'client gap is named');
+assert.ok(html.includes('Friday confirmed'), 'Friday confirmed the Clients choice');
+assert.ok(html.includes('Disable Delete on Clients until Ace ships a client inbox'), 'Clients Delete stays disabled');
+assert.ok(html.includes('No local hide for Clients'), 'no local client hide');
 assert.ok(html.includes('Client inbox delete is not live yet'), 'clients delete stays muted in copy');
 assert.ok(!html.includes('evercare_msg_bulk_delete1_aides') && !html.includes('evercare_msg_bulk_delete1_clients'), 'no local hide keys');
 assert.ok(html.includes('It is not a send'), 'delete is not a send');
