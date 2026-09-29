@@ -12,6 +12,102 @@
 <!-- remi msg tab 2026-09-28 v=remi-msg-tab1 ?v=remi-msg-tab1 admin-build 2026-09-28-remi-msg-tab1. GHOST-REMI-MSG-TAB1-CONTRACT-v1. Ace CALLABLE reuse. No new SQL. No new RPC. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No Auth reseal. No Quo/SMS. Empty nav storage pins Messages on the primary bar: Timesheets, Schedule, Aides, Messages, plus More. tabbar-8 and Edit tabs stay. Cover and Backup stay in the catalog and start under More until Mo adds them. A saved bar is left as saved. Aide chat stays #tab_aidechat. The unread badge stays on the Messages tab. Standing rule: Admin and Scheduler are one portal. Scheduler sees the same Messages bottom tab, Aides | Clients chrome, and Remi Ask aide draft as Admin. data-layout-roles is Admin Scheduler on the Messages tab, the Aides | Clients segment, Aide chat, and Remi Ask. The role gate reuses aidechat1 and aide-text-chat1 is_scheduler_office. Nurse stays denied for aidechat. Under the Messages header, Aides | Clients is pure UI on one desk. Aides is the existing office inbox (aidechat1, aide-office-vis1, aide-text-chat1, msg-dense1, care-msg-safe1 composer above the tabs). Remi Ask “message <aide name>” reuses aideTextChatCompose: CALLABLE admin_compose_aide_text {p_aide_id, p_body} opens admin/messages?aide_id= with that draft already in the composer. Compose never auto-sends. Mo taps Send, and only that tap posts admin_send_aide_text {p_aide_id, p_body}. It does not call admin_send_aide_office_message on the Ask path. Mo locked Clients: Call / Text (sms: and tel:) only. The Clients Messages in-app widget is skipped. Aides ships in-app in full. Aides | Clients chrome stays. Clients is covercomms-style phone deep links when a phone is on file, not EverCare client chat, and not a new RPC. This tip does not add client_office_messages. The list is the same org clients Schedule and Clients already load (get_clients / allClients). Copy says Call / Text only. Mo presses Send in the phone Messages app. No mailto. Remi Ask “message <client name>” opens that phone draft. Nothing auto-sends. remi-chat-bleed1 stays: Schedule a Remi stays parked off the thread, and the corner chip stays hidden while Messages is active. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-radar-dismiss1, v=aide-profile-link-fix, v=remi-open-thread1, v=care-msg-safe1, v=remi-chat-bleed1, v=aidechat1, v=navedit1, v=tabbar-8, and v=cover-desk1. -->
 <meta name="admin-build" content="2026-09-28-remi-msg-tab1">
 <script>var REMI_MSG_TAB1_MARKER='v=remi-msg-tab1';var REMI_MSG_TAB1_BUILD='2026-09-28-remi-msg-tab1';</script>
+<!-- login land schedule 2026-09-29 v=login-land-schedule1 ?v=login-land-schedule1 admin-build 2026-09-29-login-land-schedule1. GHOST-LOGIN-LAND-SCHEDULE1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. After sign-in, Admin and Scheduler land on Schedule: #tab_schedule is the desk and #nav_schedule is the active bottom tab. They do not land on More. Fresh login ignores a leftover desk hash and calls showTab('schedule'), except an explicit deep link (schedule client_id plus on_date, or aide_id including a UUID). #aides?aide_id= stays on Aides: the land check reads that hash before reveal, layoutA1RememberTab does not flatten it, and showTab('schedule') is not called. The same skip holds when aide_id is in the query string. A cold open with an empty hash, and a reload of #more, also opens Schedule. More is not the home. A reload that names another desk, such as Aides or Clients, still opens that hash. Nurse stays on the nurse home and showNurseTab('compliance'). #bottomNav clears Safari URL and toolbar chrome: padding-bottom is env(safe-area-inset-bottom), and visualViewport sets --login-land-vv-lift so the bar sits on the visual viewport bottom (vv.offsetTop + vv.height versus window.innerHeight, the same fixed-origin check as v=loginkb1). Admin and Scheduler share this bar. Nurse has no #bottomNav. Prior markers stay, including v=list-search-az1, v=remi-msg-tab1, v=punch-leftovers1, v=loginkb1, and v=care-msg-safe1. -->
+<meta name="admin-build" content="2026-09-29-login-land-schedule1">
+<script>var LOGIN_LAND_SCHEDULE1_MARKER='v=login-land-schedule1';var LOGIN_LAND_SCHEDULE1_BUILD='2026-09-29-login-land-schedule1';</script>
+<!-- list search az 2026-09-29 v=list-search-az1 ?v=list-search-az1 admin-build 2026-09-29-list-search-az1. GHOST-LIST-SEARCH-AZ1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Aides and Clients lists keep the A–Z chip and evercare_list_order. The title stays the title. Under it, an always-visible search row (#aidesListSearch, #clientsListSearch) sits beside that chip, for Admin and Scheduler, data-layout-roles Admin Scheduler. Placeholders are Find an aide and Find a client. The field is not inside the h1. Search filters the painted list and does not change the A–Z preference. When A–Z is on, listAz1Apply still sorts first and the search only narrows that order. When usual, today’s order stays and search still filters. Aides match name, username, and phone. Clients match name and phone. No matches say No aides match that search or No clients match that search. The old #clientSearch stays in the card for the existing paint path and is not the header field. The 16px page-hdr chip rule stays. The search-row chip matches the field height. Prior markers stay, including v=login-land-schedule1, v=list-az-sticky1, v=list-az1, v=aides-info1, and v=client-phone1. -->
+<meta name="admin-build" content="2026-09-29-list-search-az1">
+<script>var LIST_SEARCH_AZ1_MARKER='v=list-search-az1';var LIST_SEARCH_AZ1_BUILD='2026-09-29-list-search-az1';</script>
+<!-- pages cache fresh 2026-09-29 v=pages-cache-fresh1 ?v=pages-cache-fresh1 admin-build 2026-09-29-pages-cache-fresh1. GHOST-PAGES-CACHE-FRESH1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Admin only. Caregiver ships separately. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No push. The clean Home Screen URL https://evercareagency.github.io/Admin/ gets the latest deploy without a sticky ?v= link. This page does not rewrite the address to ?v=. A lightweight sw.js registers from index with updateViaCache none, skipWaiting, and clients.claim. controllerchange reloads once per session so the new worker takes the document. Navigation and document GETs are network-only with cache no-store. index.html is not stored in the Cache API. Other requests are left alone. After load, admin-build.txt is fetched with cache no-store and compared to the embedded pages-cache-fresh1 build. A mismatch hard-reloads once. login-land-schedule1 and list-search-az1 stay in admin-build meta. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including v=list-search-az1 and v=login-land-schedule1. -->
+<meta name="admin-build" content="2026-09-29-pages-cache-fresh1">
+<meta name="pages-cache-fresh1" content="2026-09-29-pages-cache-fresh1">
+<script>
+var PAGES_CACHE_FRESH1_MARKER='v=pages-cache-fresh1';
+var PAGES_CACHE_FRESH1_BUILD='2026-09-29-pages-cache-fresh1';
+var pagesCacheFresh1ReloadKey='pagesCacheFresh1Reloads';
+function pagesCacheFresh1Base(path){
+  path=String(path==null?'':path);
+  if(!path)return '/';
+  if(path.charAt(path.length-1)==='/')return path;
+  var cut=path.lastIndexOf('/');
+  return cut<0?'/':path.slice(0,cut+1);
+}
+function pagesCacheFresh1Mismatch(embedded, remote){
+  remote=String(remote==null?'':remote).replace(/^\s+|\s+$/g,'');
+  embedded=String(embedded==null?'':embedded).replace(/^\s+|\s+$/g,'');
+  if(!remote||!embedded)return false;
+  return remote!==embedded;
+}
+function pagesCacheFresh1ReloadCount(){
+  try{return Number(sessionStorage.getItem(pagesCacheFresh1ReloadKey)||'0')||0;}catch(e){return 0;}
+}
+function pagesCacheFresh1CanReload(){
+  return pagesCacheFresh1ReloadCount()<1;
+}
+function pagesCacheFresh1MarkReload(){
+  try{sessionStorage.setItem(pagesCacheFresh1ReloadKey, String(pagesCacheFresh1ReloadCount()+1));}catch(e){}
+}
+function pagesCacheFresh1ReloadOnce(){
+  if(!pagesCacheFresh1CanReload())return false;
+  pagesCacheFresh1MarkReload();
+  try{location.reload();}catch(e){return false;}
+  return true;
+}
+function pagesCacheFresh1OnControllerChange(){
+  if(pagesCacheFresh1OnControllerChange.done)return false;
+  pagesCacheFresh1OnControllerChange.done=true;
+  return pagesCacheFresh1ReloadOnce();
+}
+function pagesCacheFresh1OnBuild(remote){
+  pagesCacheFresh1OnBuild.remote=remote;
+  if(!pagesCacheFresh1Mismatch(PAGES_CACHE_FRESH1_BUILD, remote))return false;
+  var sw=null;
+  try{sw=navigator.serviceWorker||null;}catch(e){sw=null;}
+  if(sw&&!sw.controller&&!pagesCacheFresh1OnBuild.swFailed)return false;
+  return pagesCacheFresh1ReloadOnce();
+}
+function pagesCacheFresh1Note(){
+  try{
+    if(typeof document==='undefined'||!document.documentElement)return false;
+    document.documentElement.setAttribute('data-pages-cache-fresh1', PAGES_CACHE_FRESH1_MARKER);
+  }catch(e){}
+  return true;
+}
+function pagesCacheFresh1Check(){
+  var base='/';
+  try{base=pagesCacheFresh1Base(location.pathname);}catch(e){base='/';}
+  if(typeof fetch!=='function')return;
+  fetch(base+'admin-build.txt', {cache:'no-store', credentials:'same-origin'}).then(function(r){
+    if(!r||!r.ok)return '';
+    return r.text();
+  }).then(function(text){
+    pagesCacheFresh1OnBuild(text);
+  }).catch(function(){});
+}
+function pagesCacheFresh1Start(){
+  try{pagesCacheFresh1Note();}catch(e){}
+  var base='/';
+  try{base=pagesCacheFresh1Base(location.pathname);}catch(e2){base='/';}
+  var sw=null;
+  try{sw=navigator.serviceWorker||null;}catch(e3){sw=null;}
+  if(sw&&typeof sw.register==='function'){
+    try{sw.addEventListener('controllerchange', function(){pagesCacheFresh1OnControllerChange();});}catch(e4){}
+    try{
+      sw.register(base+'sw.js', {scope:base, updateViaCache:'none'}).catch(function(){
+        pagesCacheFresh1OnBuild.swFailed=true;
+        if(pagesCacheFresh1OnBuild.remote!=null)pagesCacheFresh1OnBuild(pagesCacheFresh1OnBuild.remote);
+      });
+    }catch(e5){
+      pagesCacheFresh1OnBuild.swFailed=true;
+    }
+  }else{
+    pagesCacheFresh1OnBuild.swFailed=true;
+  }
+  try{pagesCacheFresh1Check();}catch(e6){}
+  return true;
+}
+try{pagesCacheFresh1Start();}catch(ePagesCache){}
+</script>
 <!-- remi radar dismiss 2026-09-28 v=remi-radar-dismiss1 ?v=remi-radar-dismiss1 admin-build 2026-09-28-remi-radar-dismiss1. GHOST-REMI-RADAR-DISMISS1-CONTRACT-v1. Ace CALLABLE via the existing single-id resolve. NO new SQL. NO new RPC. NO bulk RPC. NO Auth reseal. NO Quo/SMS. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Remi Radar alert cards on the corner chip, the phone sheet, and the desktop right rail gain a checkbox, plus Select all, Unselect, and Dismiss selected. Dismiss selected clears those Radar rows only. It is not a send. It does not message anyone, does not blast Cover, and does not call admin_blast_cover_request, admin_confirm_cover_send, sms:, or mailto:. Select all and Unselect do not post. Dismiss selected stays disabled until at least one card is checked. Dismiss selected loops admin_resolve_radar_signal {p_id} once per checked row. It does not call admin_ack_radar_signal. Ack stays on the list. There is no bulk RPC. After that loop, those rows are removed from the Radar UI only. Schedule, Cover, and messages stay. It is not a send. A resolved, dismissed, or closed status from admin_list_radar_signals stays off Radar. An acked status stays on Radar. This tab remembers the dismissed ids in sessionStorage evercare_radar_dismiss1 so a refresh does not paint those same ids again. Other rows, including a desk card of the same kind, stay. Admin and Scheduler are one portal. Radar checkboxes, Select all, Unselect, and Dismiss selected are the same loop for both: admin_resolve_radar_signal {p_id} once per checked row. This chrome is not Admin-only. Nurse stays out of Remi and Radar through copilotRoleOk. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-msg-tab1, v=remi-open-thread1, v=aide-profile-link-fix, v=eca-copilot1, v=remi-phone-rail1, v=aide-office-vis1, and v=remi-float-hide1b. -->
 <meta name="admin-build" content="2026-09-28-remi-radar-dismiss1">
 <script>var REMI_RADAR_DISMISS1_MARKER='v=remi-radar-dismiss1';var REMI_RADAR_DISMISS1_BUILD='2026-09-28-remi-radar-dismiss1';</script>
@@ -351,6 +447,17 @@ textarea{resize:vertical;min-height:80px;}
 .sched-az-chip[aria-pressed="true"]{background:rgba(255,255,255,.2);border-color:#fff;}
 #tab_aides .page-hdr .list-az-chip,#tab_clients .page-hdr .list-az-chip{height:16px;min-height:16px;max-height:16px;margin:0 0 2px 8px;padding:0 5px;border-radius:4px;border:1px solid var(--teal);background:#fff;color:var(--navy);font-size:10px;font-weight:700;line-height:1;vertical-align:middle;box-shadow:none;}
 #tab_aides .page-hdr .list-az-chip[aria-pressed="true"],#tab_clients .page-hdr .list-az-chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;}
+/* v=list-search-az1 — search row under the title, field always visible beside the A–Z chip. The 16px page-hdr rule stays above. */
+#tab_aides .page-hdr,#tab_clients .page-hdr{margin-bottom:10px;}
+.list-search-az1-row{display:flex;align-items:center;gap:10px;margin:0 0 14px;max-width:100%;min-width:0;}
+.list-search-az1-field{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#f4f7fb;}
+.list-search-az1-ico{flex:0 0 auto;width:18px;height:18px;color:var(--muted);}
+#tab_aides .list-search-az1-input,#tab_clients .list-search-az1-input{flex:1 1 auto;min-width:0;width:100%;height:42px;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--navy);font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;box-sizing:border-box;outline:none;-webkit-appearance:none;appearance:none;}
+#tab_aides .list-search-az1-input::placeholder,#tab_clients .list-search-az1-input::placeholder{color:var(--muted);font-weight:400;}
+#tab_aides .list-search-az1-row .list-az-chip,#tab_clients .list-search-az1-row .list-az-chip{height:44px;min-height:44px;max-height:none;margin:0;padding:0 12px;min-width:64px;border-radius:12px;border:1.5px solid var(--teal);background:#fff;color:var(--navy);font-size:0.92rem;font-weight:700;line-height:1;box-shadow:none;}
+#tab_aides .list-search-az1-row .list-az-chip[aria-pressed="true"],#tab_clients .list-search-az1-row .list-az-chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff;}
+#tab_aides .list-search-az1-input[hidden],#tab_clients .list-search-az1-input[hidden]{display:none !important;}
+#tab_clients .card > .search-bar{display:none;}
 .sched-grid td.sched-name{z-index:1;background:#fff;font-weight:600;border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;}
 .sched-grid tr.is-jump td.sched-name{background:#e8f4f4;}
 .sched-grid td.sched-slot{min-width:7.6rem;padding:4px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top;}
@@ -606,6 +713,12 @@ tr.client-on-hold td.sched-name{background:#fcfaff;}
   #adminScreen .bottom-tab{font-size:0.78rem;min-height:64px;flex-direction:row;gap:6px;}
   #adminScreen .bottom-nav.is-tight .bottom-tab{flex-direction:column;font-size:11px;letter-spacing:-0.03em;gap:2px;min-height:64px;padding:6px 1px;white-space:nowrap;}
   #adminScreen .bottom-nav.is-tight .bottom-tab .ni{font-size:15px;}
+}
+/* v=login-land-schedule1 — #bottomNav clears Safari URL/toolbar chrome. env(safe-area-inset-bottom) plus the visualViewport lift. Nurse has no #bottomNav. */
+#adminScreen #bottomNav{bottom:var(--login-land-vv-lift,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+#adminScreen .main-content{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px) + var(--login-land-vv-lift,0px));}
+@media(min-width:900px){
+  #adminScreen .main-content{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px) + var(--login-land-vv-lift,0px));}
 }
 #tab_timesheets .stats-grid.stats-slim{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px;}
 #tab_timesheets .ts-sheet{display:none;}
@@ -2825,9 +2938,9 @@ bindLoginKeyboard();
         </div>
       </div>
     </header>
-    <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1" data-remi-msg-tab1="v=remi-msg-tab1">
-      <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
-      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
+    <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1" data-remi-msg-tab1="v=remi-msg-tab1" data-login-land-schedule1="v=login-land-schedule1" data-list-search-az1="v=list-search-az1">
+      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
+      <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-remi-msg-tab1="v=remi-msg-tab1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('more')" id="nav_more" aria-label="More"><span class="ni">☰</span> More <span class="nav-badge" id="aideOfficeMoreBadge" hidden>0</span></button>
@@ -2835,7 +2948,7 @@ bindLoginKeyboard();
     <div class="main-content">
 
       <!-- TIMESHEETS TAB -->
-      <div class="tab-panel active" id="tab_timesheets" data-aide-manage-delete1="v=aide-manage-delete1">
+      <div class="tab-panel" id="tab_timesheets" data-aide-manage-delete1="v=aide-manage-delete1">
         <p id="tsManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <section id="payReady" data-payready="v=payready1" data-payready1b="v=payready1b" data-payready1c="v=payready1c" data-payready1d="v=payready1d" aria-label="Pay readiness">
           <div id="payReadyListView">
@@ -3237,13 +3350,20 @@ bindLoginKeyboard();
         </div>
         <p id="aideManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
-          <div><h1>Aides<button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
+          <div><h1>Aides</h1><p id="aideDeskSub">Registered caregivers — username, assigned clients, and temp-password status</p></div>
           <div class="page-actions">
             <button class="btn btn-ghost" id="aideCredManageBtn" type="button" hidden onclick="aideCredToggleManage()" aria-pressed="false">Manage</button>
             <button class="btn btn-navy" id="aideManageDoneBtn" type="button" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" hidden onclick="aideManageDone1Exit()">Done</button>
             <button class="btn btn-ghost" id="aideRefreshBtn" type="button" onclick="renderAides(true)">🔄 Refresh</button>
             <button class="btn btn-teal" id="addAideBtn" onclick="showAddAideModal()">+ Aide</button>
           </div>
+        </div>
+        <div class="list-search-az1-row" data-list-search-az1="v=list-search-az1" data-layout-roles="Admin Scheduler">
+          <label class="list-search-az1-field" for="aidesListSearch">
+            <svg class="list-search-az1-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16.5L20 20.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="search" id="aidesListSearch" class="list-search-az1-input" data-list-search-az1="v=list-search-az1" data-layout-roles="Admin Scheduler" placeholder="Find an aide..." aria-label="Search aides" autocomplete="off" enterkeyhint="search" oninput="listSearchAz1OnAides()">
+          </label>
+          <button type="button" class="sched-az-chip list-az-chip" id="aidesAzChip" data-list-az1="v=list-az1" data-list-search-az1="v=list-search-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button>
         </div>
         <section id="remiLangsAideCard" class="remi-langs-card" hidden data-remi-langs1="v=remi-langs1" aria-label="Preferred language">
           <span class="remi-langs-who" id="remiLangsWho">Admin · English</span>
@@ -3336,13 +3456,20 @@ bindLoginKeyboard();
       <div class="tab-panel" id="tab_clients" data-client-ins1="v=client-ins1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1">
         <p id="clientManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
         <div class="page-hdr">
-          <div><h1>Clients<button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button></h1><p id="clientDeskSub">Manage client addresses and assign aides for location verification</p></div>
+          <div><h1>Clients</h1><p id="clientDeskSub">Manage client addresses and assign aides for location verification</p></div>
           <div class="page-actions" style="display:flex;gap:8px">
             <button class="btn btn-ghost" id="clientManageBtn" type="button" onclick="clientManageDelete1ToggleManage()" aria-pressed="false">Manage</button>
             <button class="btn btn-navy" id="clientManageDoneBtn" type="button" data-manage-done1="v=manage-done1" hidden onclick="clientManageDelete1ToggleManage(false)">Done</button>
             <button class="btn btn-ghost" id="clientRefreshBtn" type="button" onclick="renderClients(true)">🔄 Refresh</button>
             <button class="btn btn-teal" onclick="showAddClientModal()">+ Add Client</button>
           </div>
+        </div>
+        <div class="list-search-az1-row" data-list-search-az1="v=list-search-az1" data-layout-roles="Admin Scheduler">
+          <label class="list-search-az1-field" for="clientsListSearch">
+            <svg class="list-search-az1-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16.5L20 20.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="search" id="clientsListSearch" class="list-search-az1-input" data-list-search-az1="v=list-search-az1" data-layout-roles="Admin Scheduler" placeholder="Find a client..." aria-label="Search clients" autocomplete="off" enterkeyhint="search" oninput="listSearchAz1OnClients()">
+          </label>
+          <button type="button" class="sched-az-chip list-az-chip" id="clientsAzChip" data-list-az1="v=list-az1" data-list-search-az1="v=list-search-az1" aria-pressed="false" aria-label="Sort lists A to Z" onclick="listAz1Toggle(event)">A–Z</button>
         </div>
         <div class="ts-desk" id="clientDesk" role="tablist" aria-label="Clients list">
           <button type="button" class="on" data-client-desk="active" role="tab" aria-selected="true" onclick="setClientDesk('active')">Active</button>
@@ -3447,7 +3574,7 @@ bindLoginKeyboard();
       </div>
 
       <!-- SCHEDULE TAB (Admin + Scheduler edit). Usual week is set once; a cell is an exception for that date. -->
-      <div class="tab-panel" id="tab_schedule" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1" data-client-ins1="v=client-ins1" data-sched-time-tap1="v=sched-time-tap1" data-hold-client1="v=hold-client1" data-hold-autosave1="v=hold-autosave1">
+      <div class="tab-panel active" id="tab_schedule" data-login-land-schedule1="v=login-land-schedule1" data-clienthrs1b="v=clienthrs1b" data-clienthrs1c="v=clienthrs1c" data-shift-slim1="v=shift-slim1" data-client-ins1="v=client-ins1" data-sched-time-tap1="v=sched-time-tap1" data-hold-client1="v=hold-client1" data-hold-autosave1="v=hold-autosave1">
         <div class="page-hdr">
           <div>
             <h1>Schedule</h1>
@@ -5467,6 +5594,12 @@ function layoutA1RememberTab(tab){
   try{
     var cur=String(location.hash||'');
     if(tab==='schedule'&&/client_id=/.test(cur)&&/on_date=/.test(cur))return;
+    var search='';
+    try{search=String(location.search||'');}catch(eSearch){search='';}
+    var blob=cur+'&'+search;
+    var curDesk=cur.replace(/^#/,'').split('?')[0].split('&')[0].trim().toLowerCase();
+    if(curDesk===String(tab||'').toLowerCase()&&/(?:^|[?&#])aide_id=/.test(blob))return;
+    if(curDesk===String(tab||'').toLowerCase()&&/client_id=/.test(blob)&&/on_date=/.test(blob))return;
     var next='#'+tab;
     if(cur===next)return;
     history.replaceState(history.state,'',location.pathname+(location.search||'')+next);
@@ -28362,6 +28495,179 @@ function loginToast1OnJwtFail(){
   loginToast1OnJwtFail._done=true;
   if(typeof adminLogout==='function')adminLogout('session');
 }
+// v=login-land-schedule1 — Admin and Scheduler open on Schedule. #bottomNav tracks the visual viewport.
+// v=list-search-az1 — search beside A–Z. Sort stays listAz1; search only filters.
+var listSearchAz1AideRows=null;
+var listSearchAz1FallbackRows=null;
+function loginLandSchedule1RoleOk(role){
+  role=role==null?'':String(role);
+  return role==='Admin'||role==='Scheduler';
+}
+function loginLandSchedule1Deep(hash, search){
+  var blob=String(hash||'')+'&'+String(search||'');
+  if(/client_id=/.test(blob)&&/on_date=/.test(blob))return true;
+  if(/(?:^|[?&#])aide_id=/.test(blob))return true;
+  return false;
+}
+function loginLandSchedule1Should(fresh, role){
+  if(!loginLandSchedule1RoleOk(role))return false;
+  var hash='';
+  var search='';
+  try{hash=String(location.hash||'');}catch(e){hash='';}
+  try{search=String(location.search||'');}catch(e2){search='';}
+  if(loginLandSchedule1Deep(hash, search))return false;
+  if(fresh)return true;
+  var tab='';
+  try{tab=typeof layoutA1HashTab==='function'?(layoutA1HashTab()||''):'';}catch(e3){tab='';}
+  // Empty hash and the More menu are not a chosen desk. Other hashes still stick.
+  return !tab||tab==='more';
+}
+function loginLandSchedule1Apply(fresh, deepAlready){
+  var role='';
+  try{role=currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  loginLandSchedule1Note();
+  var deep=deepAlready===true;
+  if(!deep){
+    var hash='';
+    var search='';
+    try{hash=String(location.hash||'');}catch(eDeep){hash='';}
+    try{search=String(location.search||'');}catch(eDeep2){search='';}
+    try{deep=!!loginLandSchedule1Deep(hash, search);}catch(eDeep3){deep=false;}
+  }
+  if(deep||!loginLandSchedule1Should(!!fresh, role)){
+    var tab='';
+    try{tab=typeof layoutA1HashTab==='function'?(layoutA1HashTab()||''):'';}catch(e2){tab='';}
+    if(!deep&&tab==='schedule'&&typeof loadAdminSchedule==='function'&&!loginLandSchedule1Apply._loaded){
+      loginLandSchedule1Apply._loaded=1;
+      try{loadAdminSchedule();}catch(e3){}
+    }
+    return false;
+  }
+  loginLandSchedule1Apply._loaded=1;
+  if(typeof showTab==='function')showTab('schedule');
+  return true;
+}
+function loginLandSchedule1QueryOn(){
+  try{return /(?:^|[?&])v=login-land-schedule1(?:&|$)/.test(String(location.search||''));}catch(e){return false;}
+}
+function loginLandSchedule1Note(){
+  try{
+    if(typeof document==='undefined'||!document.documentElement)return false;
+    document.documentElement.setAttribute('data-login-land-schedule1', LOGIN_LAND_SCHEDULE1_MARKER);
+    if(loginLandSchedule1QueryOn())document.documentElement.setAttribute('data-login-land-schedule1-q', LOGIN_LAND_SCHEDULE1_MARKER);
+  }catch(e){}
+  return true;
+}
+function loginLandSchedule1VvGap(view, innerHeight){
+  var inner=Number(innerHeight);
+  if(!isFinite(inner)||inner<0)inner=0;
+  if(!view)return 0;
+  var h=Number(view.height);
+  var top=Number(view.offsetTop);
+  if(!isFinite(h))h=inner;
+  if(!isFinite(top)||top<0)top=0;
+  var gap=inner-(h+top);
+  if(!isFinite(gap)||gap<1)return 0;
+  return Math.round(gap);
+}
+function loginLandSchedule1FitNav(){
+  var nav=null;
+  try{nav=document.getElementById('bottomNav');}catch(e){nav=null;}
+  var root=null;
+  try{root=document.documentElement;}catch(e2){root=null;}
+  var vv=null;
+  var inner=0;
+  try{vv=window.visualViewport||null;}catch(e3){vv=null;}
+  try{inner=window.innerHeight||0;}catch(e4){inner=0;}
+  var follows=true;
+  if(vv&&typeof loginKbFixedFollowsLayout==='function'){
+    try{follows=!!loginKbFixedFollowsLayout(vv);}catch(e5){follows=true;}
+  }
+  var lift=follows?loginLandSchedule1VvGap(vv, inner):0;
+  if(root&&root.style&&root.style.setProperty)root.style.setProperty('--login-land-vv-lift', lift+'px');
+  if(nav&&nav.style)nav.style.bottom=lift?(lift+'px'):'';
+  return lift;
+}
+function loginLandSchedule1BindNav(){
+  if(loginLandSchedule1BindNav.done)return;
+  loginLandSchedule1BindNav.done=true;
+  function fit(){try{loginLandSchedule1FitNav();}catch(e){}}
+  fit();
+  try{
+    if(window.visualViewport&&window.visualViewport.addEventListener){
+      window.visualViewport.addEventListener('resize', fit);
+      window.visualViewport.addEventListener('scroll', fit);
+    }
+  }catch(e2){}
+  try{if(window.addEventListener)window.addEventListener('resize', fit);}catch(e3){}
+  try{if(window.addEventListener)window.addEventListener('orientationchange', fit);}catch(e4){}
+}
+function listSearchAz1Norm(q){
+  return String(q==null?'':q).replace(/^\s+|\s+$/g,'').toLowerCase();
+}
+function listSearchAz1Hit(q, parts){
+  q=listSearchAz1Norm(q);
+  if(!q)return true;
+  var i;
+  for(i=0;i<(parts||[]).length;i++){
+    if(String(parts[i]==null?'':parts[i]).toLowerCase().indexOf(q)>=0)return true;
+  }
+  return false;
+}
+function listSearchAz1FilterRows(rows, partsOf, q){
+  rows=rows||[];
+  q=listSearchAz1Norm(q);
+  if(!q)return rows.slice();
+  var out=[];
+  var i;
+  for(i=0;i<rows.length;i++){
+    var parts=typeof partsOf==='function'?partsOf(rows[i]):[];
+    if(listSearchAz1Hit(q, parts))out.push(rows[i]);
+  }
+  return out;
+}
+function listSearchAz1Query(id){
+  var el=null;
+  try{el=document.getElementById(id);}catch(e){el=null;}
+  return listSearchAz1Norm(el&&el.value);
+}
+function listSearchAz1ClientQuery(){
+  var el=null;
+  try{el=document.getElementById('clientsListSearch');}catch(e){el=null;}
+  if(el)return listSearchAz1Norm(el.value);
+  try{el=document.getElementById('clientSearch');}catch(e2){el=null;}
+  return listSearchAz1Norm(el&&el.value);
+}
+function listSearchAz1AideParts(u){
+  return [u&&(u.name||u.fullName||u.full_name), u&&u.username, u&&u.phone];
+}
+function listSearchAz1ClientParts(c){
+  return [c&&c.name, c&&(c.phone||c.phone_display)];
+}
+function listSearchAz1QueryOn(){
+  try{return /(?:^|[?&])v=list-search-az1(?:&|$)/.test(String(location.search||''));}catch(e){return false;}
+}
+function listSearchAz1Note(){
+  try{
+    if(typeof document==='undefined'||!document.documentElement)return false;
+    document.documentElement.setAttribute('data-list-search-az1', LIST_SEARCH_AZ1_MARKER);
+    if(listSearchAz1QueryOn())document.documentElement.setAttribute('data-list-search-az1-q', LIST_SEARCH_AZ1_MARKER);
+  }catch(e){}
+  return true;
+}
+function listSearchAz1OnAides(){
+  var container=null;
+  try{container=document.getElementById('aidesContainer');}catch(e){container=null;}
+  if(listSearchAz1AideRows&&container&&typeof aidesInfo1PaintRows==='function'){
+    aidesInfo1PaintRows(container, listSearchAz1AideRows);
+    return;
+  }
+  if(typeof renderAides==='function')renderAides(false);
+}
+function listSearchAz1OnClients(){
+  if(typeof paintClients==='function')paintClients();
+}
+try{loginLandSchedule1Note();listSearchAz1Note();}catch(eLand){}
 function openPortalHome(sess, opts){
   if(!sess||!isPortalRole(sess.role))return;
   if(typeof loginToast1Quiet==='function')loginToast1Quiet();
@@ -28385,7 +28691,13 @@ function openPortalHome(sess, opts){
     if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();
     if(typeof navEditApply==='function')navEditApply();
     showScreen('adminScreen');
+    var landDeep=false;
+    try{
+      if(typeof loginLandSchedule1Deep==='function')landDeep=!!loginLandSchedule1Deep(String(location.hash||''), String(location.search||''));
+    }catch(eLandDeep){landDeep=false;}
     if(typeof layoutA1RevealRoute==='function')layoutA1RevealRoute();
+    if(typeof loginLandSchedule1Apply==='function')loginLandSchedule1Apply(fresh, landDeep);
+    if(typeof loginLandSchedule1BindNav==='function')loginLandSchedule1BindNav();
   }
   const btn=document.getElementById('mgrLoginBtn');
   if(btn){btn.disabled=false;btn.textContent='Sign In →';}
@@ -32686,21 +32998,37 @@ async function aidesInfo1TryPaint(container, force){
     try{loadedAidesList=users.filter(function(u){return u.username;});}catch(e){}
     try{if(typeof allAidesForAssign!=='undefined')allAidesForAssign=loadedAidesList.slice();}catch(e2){}
   }
+  listSearchAz1AideRows=users.slice();
+  listSearchAz1FallbackRows=null;
+  aidesInfo1PaintRows(container, users);
+  return true;
+}
+function aidesInfo1PaintRows(container, users){
+  if(!container)return;
+  var q='';
+  try{q=typeof listSearchAz1Query==='function'?listSearchAz1Query('aidesListSearch'):'';}catch(eQ){q='';}
+  var shown=users||[];
+  if(typeof listSearchAz1FilterRows==='function'){
+    shown=listSearchAz1FilterRows(shown, function(u){
+      return [u&&(u.name||u.fullName||u.full_name), u&&u.username, u&&u.phone];
+    }, q);
+  }
   try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
-  if(!users.length){
-    container.innerHTML=typeof aideEmptyHtml==='function'?aideEmptyHtml():'';
+  if(!shown.length){
+    container.innerHTML=q
+      ?'<div class="empty-state"><p>No aides match that search.</p></div>'
+      :(typeof aideEmptyHtml==='function'?aideEmptyHtml():'');
   }else if(typeof listAzSticky1On==='function'&&listAzSticky1On()&&typeof listAzSticky1StageHtml==='function'){
-    var azPairs=users.map(function(user){
+    var azPairs=shown.map(function(user){
       return {name:(user&&(user.name||user.fullName||user.full_name))||'', html:aidesInfo1CardHtml(user)};
     });
     container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+listAzSticky1StageHtml(azPairs)+'</div>';
     if(typeof listAzSticky1Bind==='function')listAzSticky1Bind(container);
   }else{
-    container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+users.map(aidesInfo1CardHtml).join('')+'</div>';
+    container.innerHTML='<div class="aide-info-cards" data-aides-info1="v=aides-info1" aria-label="Aides">'+shown.map(aidesInfo1CardHtml).join('')+'</div>';
   }
   if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
   try{if(typeof aideProfileLinkFixAfterPaint==='function')aideProfileLinkFixAfterPaint();}catch(eProfile){}
-  return true;
 }
 // end v=aides-info1
 
@@ -33096,8 +33424,19 @@ async function renderAides(force){
       loadedAidesList=raw.filter(function(u){return aideOnDesk(u,'active');});
       if(typeof allAidesForAssign!=='undefined')allAidesForAssign=loadedAidesList.slice();
     }
+    listSearchAz1FallbackRows=aides.slice();
+    listSearchAz1AideRows=null;
+    var aideSearchQ='';
+    try{aideSearchQ=typeof listSearchAz1Query==='function'?listSearchAz1Query('aidesListSearch'):'';}catch(eAzQ){aideSearchQ='';}
+    if(typeof listSearchAz1FilterRows==='function'){
+      aides=listSearchAz1FilterRows(aides, function(u){
+        return [u&&(u.name||u.fullName||u.full_name), u&&u.username, u&&u.phone];
+      }, aideSearchQ);
+    }
     if(!aides.length){
-      container.innerHTML=aideEmptyHtml();
+      container.innerHTML=aideSearchQ
+        ?'<div class="empty-state"><p>No aides match that search.</p></div>'
+        :aideEmptyHtml();
       if(typeof aideCredsAfterAides==='function'){try{aideCredsAfterAides();}catch(err){}}
       return;
     }
@@ -37846,7 +38185,7 @@ function paintClients(){
   const container=document.getElementById('clientsContainer');
   try{if(typeof listAzSticky1SyncChips==='function')listAzSticky1SyncChips();}catch(eChip){}
   if(!container)return;
-  const q=(document.getElementById('clientSearch')?.value||'').toLowerCase();
+  const q=typeof listSearchAz1ClientQuery==='function'?listSearchAz1ClientQuery():(document.getElementById('clientSearch')?.value||'').toLowerCase();
   let list=clientDesk==='deleted'?clientDeletedList:allClients;
   list=(list||[]).filter(function(c){return clientOnDesk(c, clientDesk);});
   if(typeof listAz1Apply==='function'&&listAz1On()){
@@ -37855,12 +38194,20 @@ function paintClients(){
       function(c){return c&&c.id||'';}
     ]);
   }
-  if(q)list=list.filter(c=>(c.name||'').toLowerCase().includes(q));
+  if(q){
+    if(typeof listSearchAz1FilterRows==='function'){
+      list=listSearchAz1FilterRows(list, function(c){return [c&&c.name, c&&(c.phone||c.phone_display)];}, q);
+    }else{
+      list=list.filter(c=>(c.name||'').toLowerCase().includes(q));
+    }
+  }
 
   if(!list.length){
-    container.innerHTML=clientDesk==='deleted'
+    container.innerHTML=q
+      ?'<div class="empty-state"><p>No clients match that search.</p></div>'
+      :(clientDesk==='deleted'
       ?'<div class="empty-state"><p>No clients in Recently deleted.</p></div>'
-      :'<div class="empty-state"><p>&#127968; No clients added yet. Click "+ Add Client" to get started.</p></div>';
+      :'<div class="empty-state"><p>&#127968; No clients added yet. Click "+ Add Client" to get started.</p></div>');
     if(typeof clientManageDelete1Sync==='function')clientManageDelete1Sync();
     return;
   }
@@ -42418,6 +42765,7 @@ if(typeof remiIdeas763Paint==='function'&&!remiIdeas763Paint.__remiFloatHide1b){
 }
 // end remi float hide1b v=remi-float-hide1b
 
+try{if(typeof loginLandSchedule1BindNav==='function')loginLandSchedule1BindNav();}catch(eLandNav){}
 bootAdminPortal();
 window.addEventListener('pageshow',function(){enforceAdminSessionTimeout();});
 document.addEventListener('visibilitychange',function(){
