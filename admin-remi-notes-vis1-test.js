@@ -92,7 +92,7 @@ function runSlice(){
   sandbox.remiNotesVis1ResetTab();
   const schedShell = sandbox.remiNotesVis1Html();
   assert.ok(/id="remiNotesVisSched"[^>]*\shidden/.test(schedShell), 'scheduler has no Scheduler notes tab');
-  assert.strictEqual(sandbox.remiNotesVis1Hint(), 'Admin My notes never appear here.');
+  assert.strictEqual(sandbox.remiNotesVis1Hint(), 'Your notes only');
   const denied = await sandbox.remiNotesVis1Rpc('remi_list_scheduler_notes', {p_limit:50});
   assert.strictEqual(denied.forbidden, true, 'scheduler cannot list admin scheduler tab');
   const calls = [];
@@ -379,7 +379,7 @@ async function runBrowser(){
     });
     assert.strictEqual(schedRole.hidden, true, 'scheduler does not get the Scheduler notes tab');
     assert.strictEqual(schedRole.listedScheduler, false);
-    assert.ok(schedRole.text.indexOf('Admin My notes never appear here.') >= 0, schedRole.text);
+    assert.ok(schedRole.text.indexOf('Your notes only') >= 0, schedRole.text);
 
     const nurse = await browser.newPage();
     await nurse.setViewport({width:390, height:844, isMobile:true, hasTouch:true, deviceScaleFactor:1});

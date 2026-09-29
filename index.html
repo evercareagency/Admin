@@ -9,6 +9,12 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- remi notes open thread 2026-09-29 v=remi-notes-open1 ?v=remi-notes-open1 admin-build 2026-09-29-remi-notes-open1. GHOST-REMI-NOTES-OPEN1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi Notes cards (My notes and Scheduler notes) paint Open thread, and the tap was a silent no-op: remiNotesVis1OpenThread only set remiNotesVis1ThreadId and posted remi_list_my_note_thread, so Mo stayed inside Remi Notes. This tip keeps that function name so the existing onclick keeps working. It resolves the note id with remiNotesVis1SafeId, finds the note on remiNotesVis1Cache (filled from remiNotesVis1PaintPane and Load) or re-fetches the existing notes list briefly, and reads link fields Ace may already return: aide_id, linked_aide_id, thread_id, office_thread_id, and deep_link. deep_link is a string such as admin/messages?aide_id=<uuid>. The query is parsed. An object is ignored. It closes Remi the same way as Radar Open thread, through copilotClose on the remi-open-thread1 path. It does not showTab('more'). It does not leave #nav_more or #tab_more selected. It navigates to Messages with showTab('aidechat') and remiOpenThread1Desk when that helper is present, and opens the aide office thread through aideOfficeVis1OpenAide(aideId, threadId) when an aide_id or a parsed deep_link exists. A thread_id or office_thread_id alone is still a linked thread. When the note has no linked aide or thread, it still leaves Notes and lands on the Messages inbox, with one soft toast: No linked Messages thread on this note. Admin and Scheduler are one portal and share this Open thread behavior. Nurse stays out through remiNotesVis1OfficeOk and the aidechat gates. Save, Update, the My notes and Scheduler notes tabs, and remi-notes1 reminders stay. remiNotesVis1CloseThread stays for any residual in-Notes thread UI. Open thread's primary action is Messages. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-vis1, v=remi-open-thread1, v=remi-msg-tab1, v=aide-office-vis1, v=remi-notes1, and v=care-msg-safe1. -->
+<meta name="admin-build" content="2026-09-29-remi-notes-open1">
+<script>var REMI_NOTES_OPEN1_MARKER='v=remi-notes-open1';var REMI_NOTES_OPEN1_BUILD='2026-09-29-remi-notes-open1';</script>
+<!-- sched notes copy 2026-09-29 v=sched-notes-copy1 ?v=sched-notes-copy1 admin-build 2026-09-29-sched-notes-copy1. GHOST-SCHED-NOTES-COPY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI copy. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Same Remi Notes surface as v=remi-notes-open1. Admin and Scheduler are one portal. This string change is Scheduler-facing only. remiNotesVis1Hint() for role Scheduler paints Your notes only. It does not say Admin. Admin My notes and the Scheduler notes tab keep their hints: This tab only. Your My notes stay off her screen. and Save → only on My notes. Scheduler never sees this tab. Scheduler still has no Scheduler notes tab. Nurse stays out. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1, v=remi-notes-vis1, v=remi-open-thread1, and v=sched-payroll-hide1. -->
+<meta name="admin-build" content="2026-09-29-sched-notes-copy1">
+<script>var SCHED_NOTES_COPY1_MARKER='v=sched-notes-copy1';var SCHED_NOTES_COPY1_BUILD='2026-09-29-sched-notes-copy1';</script>
 <!-- sched payroll hide 2026-09-29 v=sched-payroll-hide1 ?v=sched-payroll-hide1 admin-build 2026-09-29-sched-payroll-hide1. GHOST-SCHED-PAYROLL-HIDE1-CONTRACT-v1. Ace NO CALLABLE. UI gate only. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Standing rule: Admin and Scheduler are one portal except payroll and Mo's notes, which are Admin-only. Mo's notes stay hidden for Scheduler (remi-notes-vis1). This tip hides the Remi Payroll tab (#copilotTabPayroll), the payroll panel (Payroll report, pay-day anchor, Aides, Paid shifts, Paid hours, Covers, Flags, Run, CSV, PDF, Both), and the Scheduled Payroll report job card (title, Open report, Run, pay-day anchor) from Scheduler. schedPayrollHide1UiOk() is the same Admin-only gate for the tab and that card: Scheduler is false, an empty role still paints, and Nurse stays out. data-layout-roles="Admin" on that tab, the same layoutA1 role family as the Admin payroll page and the same Admin-only check as Mo's notes (role Admin) with Nurse still OOS through copilotRoleOk and remiPayroll1OfficeOk. Admin keeps Payroll on the Remi rail. Admin payroll RPCs stay: admin_get_remi_payroll_report, admin_run_remi_payroll_report, admin_export_remi_payroll, admin_export_remi_payroll_csv, admin_export_remi_payroll_pdf. More already has no Payroll for Scheduler. The first admin-build meta stays 2026-09-27-remi-float-hide1b. Prior markers stay, including admin-sched-chat-push1, pages-cache-fresh1, login-land-schedule1, list-search-az1, remi-payroll1, the payroll insurance tip, and remi-notes-vis1. -->
 <meta name="admin-build" content="2026-09-29-sched-payroll-hide1">
 <script>var SCHED_PAYROLL_HIDE1_MARKER='v=sched-payroll-hide1';var SCHED_PAYROLL_HIDE1_BUILD='2026-09-29-sched-payroll-hide1';</script>
@@ -4226,7 +4232,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -24314,6 +24320,7 @@ var REMI_NOTES_VIS1_OFFICE='is_scheduler_office';
 var remiNotesVis1Which='my';
 var remiNotesVis1ThreadId='';
 var remiNotesVis1Error='';
+var remiNotesVis1Cache=[];
 function remiNotesVis1Role(){
   try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
 }
@@ -24411,14 +24418,14 @@ function remiNotesVis1CardHtml(note, mode, allowThread){
     html+='<textarea class="remi-pack-text" id="remiVisReply_'+id+'" aria-label="Update note" placeholder="Update note"></textarea>';
     html+='<div class="remi-vis-row"><button type="button" class="go" onclick="remiNotesVis1Update(\''+id+'\')">Update note</button></div>';
   }
-  if(allowThread&&id)html+='<button type="button" class="remi-linkish" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
+  if(allowThread&&id)html+='<button type="button" class="remi-linkish" data-remi-notes-open1="v=remi-notes-open1" onclick="remiNotesVis1OpenThread(\''+id+'\')">Open thread</button>';
   html+='</div>';
   return html;
 }
 function remiNotesVis1Hint(){
   var role=remiNotesVis1Role();
   if(remiNotesVis1Which==='scheduler')return 'This tab only. Your My notes stay off her screen.';
-  if(role==='Scheduler')return 'Admin My notes never appear here.';
+  if(role==='Scheduler')return 'Your notes only';
   return 'Save \u2192 only on My notes. Scheduler never sees this tab.';
 }
 function remiNotesVis1PaneHtml(rows, err){
@@ -24441,13 +24448,82 @@ function remiNotesVis1Html(){
   var admin=remiNotesVis1IsAdmin();
   var myOn=remiNotesVis1Which!=='scheduler'||!admin;
   if(!admin)myOn=true;
-  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
+  return '<div class="remi-vis" id="remiNotesVis1" data-remi-notes-vis1="'+REMI_NOTES_VIS1_MARKER+'" data-remi-notes-open1="v=remi-notes-open1" data-sched-notes-copy1="v=sched-notes-copy1" data-tab="'+(myOn?'my_notes':'scheduler_notes')+'">'
     +'<div class="remi-vis-tabs" role="tablist" aria-label="Notes">'
     +'<button type="button" id="remiNotesVisMy" role="tab" class="'+(myOn?'on':'')+'" aria-selected="'+(myOn?'true':'false')+'" onclick="remiNotesVis1Tab(\'my\')">My notes</button>'
     +'<button type="button" id="remiNotesVisSched" role="tab" class="'+(!myOn?'on':'')+'" aria-selected="'+(!myOn?'true':'false')+'"'+(admin?'':' hidden')+' onclick="remiNotesVis1Tab(\'scheduler\')">Scheduler notes</button>'
     +'</div><div id="remiNotesVisPane">Loading notes\u2026</div></div>';
 }
+function remiNotesVis1Remember(rows){
+  remiNotesVis1Cache=Array.isArray(rows)?rows.slice():[];
+}
+function remiNotesVis1FindCached(id){
+  var want=remiNotesVis1SafeId(id);
+  if(!want)return null;
+  var list=remiNotesVis1Cache||[];
+  var i;
+  for(i=0;i<list.length;i++){
+    var row=list[i];
+    if(!row)continue;
+    if(remiNotesVis1SafeId(row.id)===want)return row;
+    if(remiNotesVis1SafeId(row.note_id)===want)return row;
+  }
+  return null;
+}
+function remiNotesOpen1Clean(v){
+  var s=String(v==null?'':v).replace(/^\s+|\s+$/g,'');
+  if(!s||s==='null'||s==='undefined')return '';
+  return s.replace(/[\u0000-\u001f\u007f]/g,'');
+}
+function remiNotesOpen1Query(deep, key){
+  if(typeof deep!=='string'||!deep)return '';
+  var re=new RegExp('[?&]'+key+'=([^&#]+)');
+  var m=deep.match(re);
+  if(!m)return '';
+  try{return remiNotesOpen1Clean(decodeURIComponent(m[1]));}catch(e){return remiNotesOpen1Clean(m[1]);}
+}
+function remiNotesOpen1Link(note){
+  note=note||{};
+  var aide=remiNotesOpen1Clean(note.aide_id)||remiNotesOpen1Clean(note.linked_aide_id);
+  var thread=remiNotesOpen1Clean(note.thread_id)||remiNotesOpen1Clean(note.office_thread_id);
+  var deep=note.deep_link;
+  if(!aide)aide=remiNotesOpen1Query(deep, 'aide_id');
+  if(!thread)thread=remiNotesOpen1Query(deep, 'thread_id')||remiNotesOpen1Query(deep, 'office_thread_id');
+  return {aideId:aide, threadId:thread, linked:!!(aide||thread)};
+}
+function remiNotesOpen1Messages(){
+  if(typeof copilotClose==='function'){try{copilotClose();}catch(eClose){}}
+  if(typeof showTab==='function'){try{showTab('aidechat');}catch(eTab){}}
+  if(typeof remiOpenThread1Desk==='function'){try{remiOpenThread1Desk();}catch(eDesk){}}
+}
+function remiNotesOpen1Go(link){
+  link=link||{};
+  var aide=remiNotesOpen1Clean(link.aideId);
+  var thread=remiNotesOpen1Clean(link.threadId);
+  var linked=!!(aide||thread);
+  remiNotesOpen1Messages();
+  var office=typeof aideOfficeVis1OfficeOk!=='function'||aideOfficeVis1OfficeOk();
+  if(linked&&office&&typeof aideOfficeVis1OpenAide==='function'){
+    try{
+      var pending=aideOfficeVis1OpenAide(aide, thread);
+      if(pending&&typeof pending.then==='function')pending.then(function(){}, function(){});
+    }catch(eOpen){}
+  }else if(!linked&&typeof showTempMsg==='function'){
+    try{showTempMsg('No linked Messages thread on this note.');}catch(eToast){}
+  }
+  return {ok:true, linked:linked, aideId:aide, threadId:thread};
+}
+async function remiNotesOpen1Refetch(noteId){
+  if(!remiNotesVis1OfficeOk())return null;
+  var name=(remiNotesVis1Which==='scheduler'&&remiNotesVis1IsAdmin())?'remi_list_scheduler_notes':'remi_list_my_notes';
+  var got=await remiNotesVis1Rpc(name, {p_limit:50});
+  if(!got||!got.ok)return remiNotesVis1FindCached(noteId);
+  var rows=remiNotesVis1Rows(got.data);
+  remiNotesVis1Remember(rows);
+  return remiNotesVis1FindCached(noteId);
+}
 function remiNotesVis1PaintPane(rows, err){
+  if(!err)remiNotesVis1Remember(rows||[]);
   var pane=remiNotesVis1El('remiNotesVisPane');
   if(!pane)return;
   pane.innerHTML=remiNotesVis1PaneHtml(rows||[], err||'');
@@ -24477,7 +24553,9 @@ async function remiNotesVis1Load(){
     return got||{ok:false};
   }
   remiNotesVis1Error='';
-  remiNotesVis1PaintPane(remiNotesVis1Rows(got.data), '');
+  var rows=remiNotesVis1Rows(got.data);
+  remiNotesVis1Remember(rows);
+  remiNotesVis1PaintPane(rows, '');
   return got;
 }
 function remiNotesVis1Mount(){
@@ -24490,10 +24568,18 @@ function remiNotesVis1Tab(name){
   remiNotesVis1ThreadId='';
   remiNotesVis1Load().catch(function(){});
 }
-function remiNotesVis1OpenThread(id){
-  if(!remiNotesVis1OfficeOk())return;
-  remiNotesVis1ThreadId=remiNotesVis1SafeId(id);
-  remiNotesVis1Load().catch(function(){});
+async function remiNotesVis1OpenThread(id){
+  if(!remiNotesVis1OfficeOk())return {ok:false, forbidden:true};
+  var noteId=remiNotesVis1SafeId(id);
+  var note=null;
+  if(noteId){
+    note=remiNotesVis1FindCached(noteId);
+    if(!note){
+      try{note=await remiNotesOpen1Refetch(noteId);}catch(eRef){note=remiNotesVis1FindCached(noteId);}
+    }
+  }
+  remiNotesVis1ThreadId='';
+  return remiNotesOpen1Go(remiNotesOpen1Link(note));
 }
 function remiNotesVis1CloseThread(){
   remiNotesVis1ThreadId='';
