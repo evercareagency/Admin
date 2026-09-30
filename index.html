@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- compliance bulk 2026-09-30 v=compliance-bulk1b ?v=compliance-bulk1b admin-build 2026-09-30-compliance-bulk1b. GHOST-COMPLIANCE-BULK1B-CONTRACT-v1. Follow-up to compliance-bulk1 squash 966f1487 (#196 tip 4c8c9bb8). Mo morning smoke 2026-09-30 FAIL: Compliance Select all / Unselect left 0 selected while the banner said Currently assigned … — 3 aides. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Two causes. The *Btn ids from bulk1 stay, and Select all, Unselect all, Delete selected, and row checkboxes bind with addEventListener so a click never resolves to an HTMLElement. No element id or name equals isComplianceSelectAll, isComplianceUnselectAll, onISComplianceToggle, confirmDeleteISSelected, or isComplianceSelected. Banner paint and row inAssignmentScope share one topic key and one aide list: 1, "1", "01", "1.0", and "1 " are the same topic; username objects, JSON strings, and postgres arrays unwrap to the same names; null aide_usernames means all aides; an empty array means nobody and the banner says 0 aides, not all aides. If the banner says N aides for topic T, those N aide×topic-T rows are selectable and Select all yields N selected · M skipped. Non-assigned Not Completed rows stay non-deletable. Delete still uses admin_unassign_inservice_aide. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #isComplianceCard keeps data-compliance-bulk1 and adds data-compliance-bulk1b. Prior markers stay, including v=compliance-bulk1, v=isdash1b, v=isdel1, and v=isclear1. -->
+<meta name="admin-build" content="2026-09-30-compliance-bulk1b">
+<script>var COMPLIANCE_BULK1B_MARKER='v=compliance-bulk1b';var COMPLIANCE_BULK1B_BUILD='2026-09-30-compliance-bulk1b';</script>
 <!-- remi autoreply dismiss 2026-09-29 v=remi-autoreply-dismiss1 ?v=remi-autoreply-dismiss1 admin-build 2026-09-29-remi-autoreply-dismiss1. GHOST-REMI-AUTOREPLY-DISMISS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Admin and Scheduler are one portal. Phone-first. Dates people read are MM/DD/YYYY. Messages (#tab_aidechat) Remi auto-reply (#aidechatSettings, aria-label Remi auto-reply) had no Back, Close, or Dismiss, so a phone stayed on that card. This tip adds a header row titled Remi auto-reply with an X (aria-label Close, min 44px) and a full-width Done button (min-height 44px). Both call remiAutoreplyDismiss1Close, which sets hidden on #aidechatSettings and leaves the Aides inbox list (#aidechatList) visible and scrollable. The card sits in normal document flow under the Messages header. It is position static, not fixed, absolute, or sticky, and it does not paint on top of #aidechatList. While the card is open on Aides (and not a desktop thread sidebar), the list, empty state, and bulk bar are not shown under it. Dismiss clears that so the full list is usable with zero overlap. It does not set style.display on #aidechatSettings. #tab_aidechat [hidden]{display:none !important} already hides it. #tab_aidechat.is-clients #aidechatSettings{display:none !important} stays. Reopen is a ghost button Remi auto-reply in #aidechatInboxView .page-hdr (#aidechatSettingsOpen) calling remiAutoreplyDismiss1Open, which clears hidden. The panel stays visible on first load. On/Off, From, Until, and aidechatSettingsChanged are unchanged. No Ace RPC. Do not tweak msg-composer-rect1, the composer flex row, or the keyboard pin. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. The settings section carries data-remi-autoreply-dismiss1. Prior markers stay, including v=msg-composer-rect1, v=aidechat1, v=remi-msg-tab1, v=pages-cache-fresh1, and v=care-msg-safe1. -->
 <meta name="admin-build" content="2026-09-29-remi-autoreply-dismiss1">
 <script>var REMI_AUTOREPLY_DISMISS1_MARKER='v=remi-autoreply-dismiss1';var REMI_AUTOREPLY_DISMISS1_BUILD='2026-09-29-remi-autoreply-dismiss1';</script>
@@ -4043,7 +4046,7 @@ bindLoginKeyboard();
         </div>
 
         <!-- COMPLIANCE DASHBOARD -->
-        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b" data-compliance-bulk1="v=compliance-bulk1">
+        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b" data-compliance-bulk1="v=compliance-bulk1" data-compliance-bulk1b="v=compliance-bulk1b">
           <div class="card-title"><span class="ico">&#9989;</span> Compliance Dashboard</div>
           <p class="is-compliance-note">Every aide and every topic. Search filters by aide name. An empty search shows the full roster. Select all and Unselect all stay together. Delete selected only removes rows that already allow Delete (assigned or Completed). Send Reminder stays on each row. Completed if there is a result, otherwise Not Completed. Select Topic only chooses what Assign and Clear apply to.</p>
           <div class="is-bulk-toolbar">
@@ -4051,10 +4054,11 @@ bindLoginKeyboard();
             <span class="is-bulk-pair" role="group" aria-label="Selection">
               <span class="is-bulk-pair-label">Selection</span>
               <!-- GHOST-COMPLIANCE-BULK1 | compliance-bulk1 -->
-              <button type="button" class="btn btn-sm" id="isComplianceSelectAllBtn" onclick="isComplianceSelectAll()">Select all</button>
-              <button type="button" class="btn btn-sm" id="isComplianceUnselectAllBtn" onclick="isComplianceUnselectAll()">Unselect all</button>
+              <!-- GHOST-COMPLIANCE-BULK1B | compliance-bulk1b -->
+              <button type="button" class="btn btn-sm" id="isComplianceSelectAllBtn">Select all</button>
+              <button type="button" class="btn btn-sm" id="isComplianceUnselectAllBtn">Unselect all</button>
             </span>
-            <button type="button" class="btn btn-sm is-bulk-delete" id="isComplianceDeleteSelected" onclick="confirmDeleteISSelected()" disabled>Delete selected</button>
+            <button type="button" class="btn btn-sm is-bulk-delete" id="isComplianceDeleteSelected" disabled>Delete selected</button>
             <span class="is-bulk-count" id="isComplianceSelCount">0 selected</span>
           </div>
           <div id="isComplianceScroll" class="is-bulk-desk" style="overflow-x:auto">
@@ -38742,6 +38746,7 @@ The only known way to prevent LCS is by not getting COVID-19 infection. Vaccinat
 var ISDASH1_MARKER='v=isdash1';
 var ISDASH1B_MARKER='v=isdash1b';
 var COMPLIANCE_BULK1_MARKER='v=compliance-bulk1';
+var COMPLIANCE_BULK1B_MARKER='v=compliance-bulk1b';
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
 let isAssignTopicTouched=false;
@@ -38785,17 +38790,26 @@ async function refreshIsAssignTarget(){
 
 function sbDisplayedAssignment(data){
   if(!data||data.success===false)return data;
-  var list=Array.isArray(data.assignments)?data.assignments:null;
-  if(!list)return data;
+  var list=Array.isArray(data.assignments)?data.assignments.filter(Boolean):null;
+  if((!list||!list.length)&&data.data&&data.data!==data&&Array.isArray(data.data.assignments)&&data.data.assignments.length){
+    return sbDisplayedAssignment(data.data);
+  }
+  if(!list||!list.length){
+    var lone=isComplianceNormalizeAssignment(data);
+    if(!lone&&data.data&&data.data!==data)lone=isComplianceNormalizeAssignment(data.data);
+    if(!lone)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
+    return {success:true,topicId:lone.topicId,aideUsernames:lone.aideUsernames,assignAll:lone.assignAll===true};
+  }
   var sel=document.getElementById('assignTopicSel');
-  var preferred=sel&&sel.value!=null&&String(sel.value).trim()!==''?String(sel.value):'';
+  var preferred=sel&&sel.value!=null&&String(sel.value).trim()!==''?isComplianceTopicKey(sel.value):'';
   var hit=null;
   if(preferred){
     for(var i=0;i<list.length;i++){
-      if(String(list[i].topicId)===preferred){hit=list[i];break;}
+      var norm=isComplianceNormalizeAssignment(list[i]);
+      if(norm&&norm.topicId===preferred){hit=norm;break;}
     }
   }
-  if(!hit&&!isAssignTopicTouched&&list.length)hit=list[0];
+  if(!hit&&!isAssignTopicTouched&&list.length)hit=isComplianceNormalizeAssignment(list[0]);
   if(!hit)return {success:true,topicId:null,aideUsernames:null,assignAll:false};
   return {success:true,topicId:hit.topicId,aideUsernames:hit.aideUsernames,assignAll:hit.assignAll===true};
 }
@@ -38911,22 +38925,24 @@ function isAssignTopicIdFrom(data){
 
 function isAssignUsernamesFrom(data){
   if(!data)return [];
-  const raw=data.aideUsernames||data.usernames||data.selectedUsernames||data.aides||data.aideIds;
-  if(!Array.isArray(raw))return [];
-  return raw.map(v=>String(v==null?'':v).trim()).filter(Boolean);
+  var names=isComplianceReadAideList(data);
+  return Array.isArray(names)?names.slice():[];
 }
 
 function paintIsCurrentAssignment(data){
   const assignEl=document.getElementById('currentAssignment');
   if(!assignEl)return;
-  const topicId=isAssignTopicIdFrom(data);
-  const topic=INSERVICES.find(i=>i.id==topicId);
+  const norm=isComplianceNormalizeAssignment(data);
+  const topicId=norm?norm.topicId:isAssignTopicIdFrom(data);
+  const topic=(typeof INSERVICES!=='undefined'&&INSERVICES)?INSERVICES.find(function(i){
+    return isComplianceTopicKey(i.id)===isComplianceTopicKey(topicId);
+  }):null;
   if(!(data&&data.success&&topicId&&topic)){
     assignEl.textContent='No topic currently assigned.';
     return;
   }
-  const names=isAssignUsernamesFrom(data);
-  const assignAll=data.assignAll===true||(data.assignAll!==false&&!names.length);
+  const assignAll=!!(norm&&norm.assignAll===true);
+  const names=(norm&&Array.isArray(norm.aideUsernames))?norm.aideUsernames:[];
   const extra=assignAll?' — all aides':' — '+names.length+' aide'+(names.length===1?'':'s');
   assignEl.innerHTML='<span style="background:var(--teal-light);color:var(--teal-dark);padding:4px 12px;border-radius:20px;font-weight:600">Currently assigned: '+escapeHtml(topic.title)+extra+'</span>';
 }
@@ -39342,7 +39358,7 @@ function isComplianceCheckHtml(row, i){
   }
   var key=isCompliancePairKey(row.username, row.topicId);
   var checked=isComplianceSelectionSet().has(key)?' checked':'';
-  return '<input type="checkbox" class="is-compliance-cb"'+checked+' aria-label="Select '+escapeAttr(name)+'" onchange="onISComplianceToggle('+i+',this.checked)">';
+  return '<input type="checkbox" class="is-compliance-cb"'+checked+' data-row-index="'+i+'" aria-label="Select '+escapeAttr(name)+'">';
 }
 function isComplianceCardMeta(row){
   var topic=row.topicShort||row.topicTitle||'';
@@ -39450,6 +39466,45 @@ function isComplianceUnselectAll(){
   isComplianceSelectionSet().clear();
   paintISComplianceBoard();
 }
+function bindISComplianceBulk1b(){
+  if(bindISComplianceBulk1b.done)return;
+  if(typeof document==='undefined'||!document.getElementById)return;
+  var selectBtn=document.getElementById('isComplianceSelectAllBtn');
+  var clearBtn=document.getElementById('isComplianceUnselectAllBtn');
+  if(!selectBtn||!clearBtn)return;
+  bindISComplianceBulk1b.done=true;
+  selectBtn.addEventListener('click', function(ev){
+    if(ev&&ev.preventDefault)ev.preventDefault();
+    isComplianceSelectAll();
+  });
+  clearBtn.addEventListener('click', function(ev){
+    if(ev&&ev.preventDefault)ev.preventDefault();
+    isComplianceUnselectAll();
+  });
+  var delBtn=document.getElementById('isComplianceDeleteSelected');
+  if(delBtn)delBtn.addEventListener('click', function(ev){
+    if(ev&&ev.preventDefault)ev.preventDefault();
+    confirmDeleteISSelected();
+  });
+  function onRowToggle(ev){
+    var t=ev&&ev.target;
+    if(!t||!t.classList||!t.classList.contains('is-compliance-cb')||t.disabled)return;
+    var index=Number(t.getAttribute('data-row-index'));
+    if(isNaN(index))return;
+    onISComplianceToggle(index, !!t.checked);
+  }
+  var body=document.getElementById('isComplianceBody');
+  var cards=document.getElementById('isComplianceCards');
+  if(body)body.addEventListener('change', onRowToggle);
+  if(cards)cards.addEventListener('change', onRowToggle);
+}
+try{
+  window.isComplianceSelectAll=isComplianceSelectAll;
+  window.isComplianceUnselectAll=isComplianceUnselectAll;
+  window.onISComplianceToggle=onISComplianceToggle;
+  window.confirmDeleteISSelected=confirmDeleteISSelected;
+}catch(eBulk1b){}
+bindISComplianceBulk1b();
 function isComplianceDeleteJobs(){
   var jobs=[];
   (isComplianceRows||[]).forEach(function(row, i){
@@ -39493,34 +39548,117 @@ async function deleteISSelected(){
   if(!okN)paintISComplianceBoard();
 }
 
+function isComplianceTopicKey(id){
+  if(id==null)return '';
+  var s=String(id).trim();
+  if(!s)return '';
+  if(/^[+-]?\d+$/.test(s)||/^[+-]?\d+\.0+$/.test(s)){
+    var n=Number(s);
+    if(!isNaN(n))return String(n);
+  }
+  return s;
+}
+function isComplianceAideToken(item){
+  if(item==null)return '';
+  if(typeof item==='object'){
+    item=item.username!=null?item.username:(item.userName!=null?item.userName:(item.user!=null?item.user:(item.name!=null?item.name:(item.id!=null?item.id:''))));
+  }
+  var s=String(item==null?'':item).trim();
+  if(s.length>=2&&((s.charAt(0)==='"'&&s.charAt(s.length-1)==='"')||(s.charAt(0)==="'"&&s.charAt(s.length-1)==="'"))){
+    s=s.slice(1,-1).trim();
+  }
+  return s;
+}
+function isComplianceCoerceAideList(raw){
+  if(raw==null)return null;
+  if(typeof raw==='string'){
+    var s=raw.trim();
+    if(!s)return [];
+    if(s.charAt(0)==='['){
+      try{
+        var parsed=JSON.parse(s);
+        if(Array.isArray(parsed))return isComplianceCoerceAideList(parsed);
+      }catch(e){}
+    }
+    if(s.charAt(0)==='{'&&s.charAt(s.length-1)==='}')s=s.slice(1,-1);
+    var out=[];
+    s.split(/[,;|]/).forEach(function(part){
+      var token=isComplianceAideToken(part);
+      if(token&&out.indexOf(token)<0)out.push(token);
+    });
+    return out;
+  }
+  if(Array.isArray(raw)){
+    var list=[];
+    raw.forEach(function(item){
+      var token=isComplianceAideToken(item);
+      if(token&&list.indexOf(token)<0)list.push(token);
+    });
+    return list;
+  }
+  var one=isComplianceAideToken(raw);
+  return one?[one]:[];
+}
+function isComplianceReadAideList(raw){
+  if(!raw||typeof raw!=='object')return null;
+  var keys=['aideUsernames','aide_usernames','usernames','selectedUsernames','aides','aideIds'];
+  for(var i=0;i<keys.length;i++){
+    if(raw[keys[i]]!==undefined)return isComplianceCoerceAideList(raw[keys[i]]);
+  }
+  return null;
+}
+function isComplianceNormalizeAssignment(raw){
+  if(!raw||typeof raw!=='object')return null;
+  var topic=isComplianceTopicKey(raw.topicId!=null?raw.topicId:(raw.topic_id!=null?raw.topic_id:(raw.inserviceId!=null?raw.inserviceId:(raw.TopicId!=null?raw.TopicId:''))));
+  if(!topic)return null;
+  var explicitAll=raw.assignAll===true||raw.assign_all===true;
+  var names=isComplianceReadAideList(raw);
+  // null aide_usernames means every aide. [] means nobody. Do not treat [] as all aides.
+  if(explicitAll||names==null)return {topicId:topic,aideUsernames:null,assignAll:true};
+  return {topicId:topic,aideUsernames:names,assignAll:false};
+}
 function isComplianceAssignmentViews(data){
   if(!data||data.success===false)return [];
-  if(Array.isArray(data.assignments))return data.assignments.filter(Boolean);
-  if(data.topicId!=null&&String(data.topicId).trim()!==''){
-    return [{topicId:data.topicId,aideUsernames:data.aideUsernames,assignAll:data.assignAll===true}];
+  var list=Array.isArray(data.assignments)?data.assignments.filter(Boolean):null;
+  if((!list||!list.length)&&data.data&&data.data!==data&&typeof data.data==='object'){
+    if(Array.isArray(data.data.assignments)&&data.data.assignments.length)return isComplianceAssignmentViews(data.data);
   }
-  return [];
+  if(list&&list.length){
+    var out=[];
+    for(var i=0;i<list.length;i++){
+      var norm=isComplianceNormalizeAssignment(list[i]);
+      if(norm)out.push(norm);
+    }
+    if(out.length)return out;
+  }
+  var one=isComplianceNormalizeAssignment(data);
+  if(!one&&data.data&&data.data!==data)one=isComplianceNormalizeAssignment(data.data);
+  return one?[one]:[];
 }
 function isComplianceAssignmentForTopic(list, topicId){
-  var want=String(topicId);
+  var want=isComplianceTopicKey(topicId);
+  if(!want)return null;
   var hit=null;
   for(var i=0;i<(list||[]).length;i++){
     var row=list[i];
-    if(row&&String(row.topicId)===want)hit=row;
+    if(!row)continue;
+    var key=isComplianceTopicKey(row.topicId!=null?row.topicId:(row.topic_id!=null?row.topic_id:row.inserviceId));
+    if(key&&key===want)hit=row;
   }
   return hit;
 }
 function isAideInComplianceAssignment(assign, username){
-  // No assignment row means catalog-only. aide_usernames null = all aides.
+  // No assignment row means catalog-only. aide_usernames null = all aides. [] = nobody.
   if(!assign)return false;
-  if(assign.assignAll===true)return true;
-  var names=assign.aideUsernames;
+  var norm=isComplianceNormalizeAssignment(assign)||assign;
+  if(norm.assignAll===true)return true;
+  var names=norm.aideUsernames;
   if(names==null)return true;
-  if(!Array.isArray(names))return false;
+  if(!Array.isArray(names)||!names.length)return false;
   var key=String(username||'').trim().toLowerCase();
   if(!key)return false;
   for(var i=0;i<names.length;i++){
-    if(String(names[i]||'').trim().toLowerCase()===key)return true;
+    if(isComplianceAideToken(names[i]).toLowerCase()===key)return true;
   }
   return false;
 }
@@ -39565,7 +39703,9 @@ async function loadISCompliance(force){
         // Active result for this pair = Completed. Every catalog pair is still painted.
         row.isCompleted=!!completion||isISCompletedRecord(completion);
         const scope=isComplianceAssignmentForTopic(assignments, topic.id);
-        row.inAssignmentScope=isAideInComplianceAssignment(scope, a.username);
+        row.inAssignmentScope=isAideInComplianceAssignment(scope, a.username)
+          ||isAideInComplianceAssignment(scope, a.name)
+          ||isAideInComplianceAssignment(scope, a.id);
         rows.push(row);
       });
     });
