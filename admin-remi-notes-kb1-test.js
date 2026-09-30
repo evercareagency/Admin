@@ -323,33 +323,33 @@ async function runBrowser(){
       var vv = window.visualViewport || {height: 844, offsetTop: 0};
       return {
         kb: document.documentElement.classList.contains('remi-notes-kb'),
-        body: document.body.classList.contains('remi-notes-kb'),
+        fs: document.documentElement.classList.contains('remi-notes-fs'),
+        body: document.body.classList.contains('remi-notes-fs'),
         replaced: replaced,
         parent: compose.parentNode.id,
         position: window.getComputedStyle(compose).position,
         formBottom: Math.round(form.bottom),
-        saveBottom: Math.round(save.bottom),
+        saveBottom: Math.round(document.getElementById('remiNotesFsSave').getBoundingClientRect().bottom),
         remindBottom: Math.round(remind.bottom),
         sheetBottom: Math.round(sheet.bottom),
         sheetTop: Math.round(sheet.top),
         height: sheetEl.style.height,
         bottom: sheetEl.style.bottom,
-        viewH: vv.height
+        viewH: vv.height,
+        title: document.getElementById('remiNotesFsTitle').textContent
       };
     });
     await phone.screenshot({path: '/opt/cursor/artifacts/remi-notes-kb1-keyboard.png'});
-    assert.strictEqual(kb.kb, true, 'focus adds the keyboard class');
-    assert.strictEqual(kb.body, true, 'body gets the same class');
+    assert.strictEqual(kb.fs, true, 'focus opens fullscreen compose');
+    assert.strictEqual(kb.kb, false, 'kb dock class stays off');
+    assert.strictEqual(kb.body, true, 'body gets remi-notes-fs');
     assert.strictEqual(kb.parent, 'remiNotesDock');
-    assert.notStrictEqual(kb.position, 'fixed', 'composer is not position fixed ' + JSON.stringify(kb));
-    assert.strictEqual(kb.bottom, 'auto');
-    assert.ok(kb.formBottom <= kb.sheetBottom + 2, 'composer stays inside the sheet ' + JSON.stringify(kb));
-    assert.ok(kb.saveBottom <= kb.formBottom + 2 && kb.remindBottom <= kb.formBottom + 2, 'Save and Remind me stay in the composer');
+    assert.strictEqual(kb.position, 'fixed', 'compose panel is pinned ' + JSON.stringify(kb));
+    assert.strictEqual(kb.title, 'New note');
+    assert.strictEqual(kb.height, '', 'sheet height stays with the safe header');
     assert.ok(kb.formBottom <= kb.viewH + 2, 'composer stays at the visual bottom ' + JSON.stringify(kb));
-    if(kb.replaced){
-      assert.ok(kb.sheetTop <= 2, 'fake keyboard pins the sheet to the visual viewport');
-      assert.strictEqual(kb.height, '420px');
-    }
+    assert.ok(kb.saveBottom <= kb.formBottom + 2 && kb.remindBottom <= kb.formBottom + 2, 'Save and Remind me stay in the composer ' + JSON.stringify(kb));
+    assert.ok(kb.sheetTop > 40, 'phone-safe header stays while composing ' + JSON.stringify(kb));
 
     const rested = await phone.evaluate(function(){
       var input = document.getElementById('remiNotesVisInput');
@@ -359,12 +359,16 @@ async function runBrowser(){
       var bar = document.querySelector('#adminScreen .shell-top').getBoundingClientRect();
       return {
         kb: document.documentElement.classList.contains('remi-notes-kb'),
+        fs: document.documentElement.classList.contains('remi-notes-fs'),
+        view: copilotView,
         sheetTop: sheet.top,
         barBottom: bar.bottom,
         height: document.getElementById('copilotSheet').style.height
       };
     });
-    assert.strictEqual(rested.kb, false, 'blur clears the keyboard class');
+    assert.strictEqual(rested.kb, false, 'blur does not use the kb dock class');
+    assert.strictEqual(rested.fs, true, 'blur alone stays in compose');
+    assert.strictEqual(rested.view, 'notes');
     assert.strictEqual(rested.height, '');
     assert.ok(rested.sheetTop + 1 >= rested.barBottom, 'header clears chrome again ' + JSON.stringify(rested));
 

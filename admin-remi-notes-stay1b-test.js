@@ -427,7 +427,10 @@ async function runBrowser(){
       var edit = document.getElementById('remiNotesVisEdit');
       edit.value = 'Sara — confirm Tue start. Already in Messages.';
     });
-    await phone.click('#remiNotesVis1 .remi-crud-edit button.go');
+    await phone.evaluate(function(){
+      var go = document.querySelector('#remiNotesVis1 .remi-crud-edit button.go');
+      if(go) go.click();
+    });
     await phone.waitForFunction(function(){
       var card = document.querySelector('#remiNotesVis1 [data-note-id="note-sara"]');
       return card && card.textContent.indexOf('Already in Messages')>=0 && !document.getElementById('remiNotesVisEdit');

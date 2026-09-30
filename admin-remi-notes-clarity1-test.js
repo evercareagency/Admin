@@ -227,8 +227,9 @@ async function runBrowser(){
       var compose = document.getElementById('remiNotesClarityCompose');
       return {
         kb: document.documentElement.classList.contains('remi-notes-kb'),
+        fs: document.documentElement.classList.contains('remi-notes-fs'),
         formBottom: Math.round(form.bottom),
-        saveBottom: Math.round(save.bottom),
+        saveBottom: Math.round(document.getElementById('remiNotesFsSave').getBoundingClientRect().bottom),
         remindBottom: Math.round(remind.bottom),
         formTop: Math.round(form.top),
         headTop: Math.round(head.top),
@@ -236,13 +237,18 @@ async function runBrowser(){
         viewH: fake.height,
         sheetTop: Math.round(sheetEl.getBoundingClientRect().top),
         docked: !!(compose && compose.parentNode && compose.parentNode.id==='remiNotesDock'),
-        position: compose ? (window.getComputedStyle(compose).position) : ''
+        position: compose ? (window.getComputedStyle(compose).position) : '',
+        title: document.getElementById('remiNotesFsTitle').textContent
       };
     });
-    assert.strictEqual(kb.kb, true, 'focus pins the notes sheet');
+    assert.strictEqual(kb.fs, true, 'focus opens in-Remi compose');
+    assert.strictEqual(kb.kb, false, 'messages dock class stays off');
     assert.strictEqual(kb.docked, true, 'composer lives in the sheet dock');
-    assert.notStrictEqual(kb.position, 'fixed', 'composer stays in flex flow');
-    assert.ok(kb.sheetTop <= 2, 'keyboard pins the sheet to the visual viewport '+JSON.stringify(kb));
+    assert.strictEqual(kb.position, 'fixed', 'compose panel is pinned above the keyboard');
+    assert.strictEqual(kb.title, 'New note');
+    assert.ok(kb.sheetTop + 1 >= kb.barBottom, 'phone-safe header stays '+JSON.stringify(kb));
+    assert.ok(kb.headTop + 1 >= kb.barBottom, 'Remi header stays clear of chrome');
+    assert.ok(kb.formTop + 1 >= kb.headTop, 'compose starts under the Remi header');
     assert.ok(kb.formBottom <= kb.viewH + 2, 'composer stays at the visual bottom '+JSON.stringify(kb));
     assert.ok(kb.saveBottom <= kb.viewH + 2 && kb.remindBottom <= kb.viewH + 2, 'Save and Remind me stay above the keyboard');
     assert.ok(kb.formTop < kb.viewH, 'composer is inside the open area');
