@@ -12,6 +12,9 @@
 <!-- compliance bulk 2026-09-30 v=compliance-bulk1b ?v=compliance-bulk1b admin-build 2026-09-30-compliance-bulk1b. GHOST-COMPLIANCE-BULK1B-CONTRACT-v1. Follow-up to compliance-bulk1 squash 966f1487 (#196 tip 4c8c9bb8). Mo morning smoke 2026-09-30 FAIL: Compliance Select all / Unselect left 0 selected while the banner said Currently assigned … — 3 aides. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Two causes. The *Btn ids from bulk1 stay, and Select all, Unselect all, Delete selected, and row checkboxes bind with addEventListener so a click never resolves to an HTMLElement. No element id or name equals isComplianceSelectAll, isComplianceUnselectAll, onISComplianceToggle, confirmDeleteISSelected, or isComplianceSelected. Banner paint and row inAssignmentScope share one topic key and one aide list: 1, "1", "01", "1.0", and "1 " are the same topic; username objects, JSON strings, and postgres arrays unwrap to the same names; null aide_usernames means all aides; an empty array means nobody and the banner says 0 aides, not all aides. If the banner says N aides for topic T, those N aide×topic-T rows are selectable and Select all yields N selected · M skipped. Non-assigned Not Completed rows stay non-deletable. Delete still uses admin_unassign_inservice_aide. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #isComplianceCard keeps data-compliance-bulk1 and adds data-compliance-bulk1b. Prior markers stay, including v=compliance-bulk1, v=isdash1b, v=isdel1, and v=isclear1. -->
 <meta name="admin-build" content="2026-09-30-compliance-bulk1b">
 <script>var COMPLIANCE_BULK1B_MARKER='v=compliance-bulk1b';var COMPLIANCE_BULK1B_BUILD='2026-09-30-compliance-bulk1b';</script>
+<!-- compliance bulk 2026-09-30 v=compliance-bulk1c ?v=compliance-bulk1c admin-build 2026-09-30-compliance-bulk1c. GHOST-COMPLIANCE-BULK1C-CONTRACT-v1. Follow-up to compliance-bulk1b tip 134c915e (#197). Probe A3 FAIL: Select all stayed 0 selected while the banner read Currently assigned: Complications of Diabetes… — 3 aides, and all 12 row checkboxes were disabled. The desk painted only get_users (moe × every topic). The assignment named aides who are not on that desk (stale, soft-deleted, or not returned by get_users), so inAssignmentScope stayed false and Select all added nothing. This tip merges those assignment usernames into the compliance roster. After get_users × INSERVICES, walk isComplianceAssignmentViews. For each assignment that is not assignAll, each aide username token missing from the desk is synthesized as {username, name: token}, with id when the raw aide record has one. EmpName is the username until a richer name exists. Those topic×username rows are inAssignmentScope for that topic, with an enabled checkbox and the same isdel1 row Delete through admin_unassign_inservice_aide. Desk aides stay. Matching stays username / name / id, casefold, plus aide token unwrap. assignAll and null aide_usernames still mean every desk aide for that topic. An empty aide list still means nobody. Banner and board share one normalized list from unscoped get_assigned_topic (full assignments[]). A board fetch that is empty or unusable while that shared list already names aides does not paint a roster whose checkboxes are all disabled. Not-assigned Not Completed Delete uses is-compliance-delete-off (muted background, opacity) so it is not the same hot pink as an enabled Delete. When the banner says Diabetes — 3 aides, those three aide×Diabetes rows are on the board and Select all yields 3 selected · M skipped. Unselect returns to 0. Delete selected enables at N≥1. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. No Messages, Remi notes, or Caregiver login changes. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #isComplianceCard keeps data-compliance-bulk1 and data-compliance-bulk1b and adds data-compliance-bulk1c. Prior markers stay, including v=compliance-bulk1b, v=compliance-bulk1, v=isdash1b, and v=isdel1. -->
+<meta name="admin-build" content="2026-09-30-compliance-bulk1c">
+<script>var COMPLIANCE_BULK1C_MARKER='v=compliance-bulk1c';var COMPLIANCE_BULK1C_BUILD='2026-09-30-compliance-bulk1c';</script>
 <!-- remi autoreply dismiss 2026-09-29 v=remi-autoreply-dismiss1 ?v=remi-autoreply-dismiss1 admin-build 2026-09-29-remi-autoreply-dismiss1. GHOST-REMI-AUTOREPLY-DISMISS1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Admin and Scheduler are one portal. Phone-first. Dates people read are MM/DD/YYYY. Messages (#tab_aidechat) Remi auto-reply (#aidechatSettings, aria-label Remi auto-reply) had no Back, Close, or Dismiss, so a phone stayed on that card. This tip adds a header row titled Remi auto-reply with an X (aria-label Close, min 44px) and a full-width Done button (min-height 44px). Both call remiAutoreplyDismiss1Close, which sets hidden on #aidechatSettings and leaves the Aides inbox list (#aidechatList) visible and scrollable. The card sits in normal document flow under the Messages header. It is position static, not fixed, absolute, or sticky, and it does not paint on top of #aidechatList. While the card is open on Aides (and not a desktop thread sidebar), the list, empty state, and bulk bar are not shown under it. Dismiss clears that so the full list is usable with zero overlap. It does not set style.display on #aidechatSettings. #tab_aidechat [hidden]{display:none !important} already hides it. #tab_aidechat.is-clients #aidechatSettings{display:none !important} stays. Reopen is a ghost button Remi auto-reply in #aidechatInboxView .page-hdr (#aidechatSettingsOpen) calling remiAutoreplyDismiss1Open, which clears hidden. The panel stays visible on first load. On/Off, From, Until, and aidechatSettingsChanged are unchanged. No Ace RPC. Do not tweak msg-composer-rect1, the composer flex row, or the keyboard pin. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. The settings section carries data-remi-autoreply-dismiss1. Prior markers stay, including v=msg-composer-rect1, v=aidechat1, v=remi-msg-tab1, v=pages-cache-fresh1, and v=care-msg-safe1. -->
 <meta name="admin-build" content="2026-09-29-remi-autoreply-dismiss1">
 <script>var REMI_AUTOREPLY_DISMISS1_MARKER='v=remi-autoreply-dismiss1';var REMI_AUTOREPLY_DISMISS1_BUILD='2026-09-29-remi-autoreply-dismiss1';</script>
@@ -2769,6 +2772,16 @@ body.ts-print-open{overflow:hidden;}
 #isComplianceTable{min-width:40rem;}
 .is-compliance-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
 .is-compliance-actions .btn{min-height:44px;}
+/* v=compliance-bulk1c — not-assigned Not Completed Delete is muted, not the hot pink of a working Delete. */
+.is-compliance-actions .is-compliance-delete-off,
+.is-compliance-actions button.is-compliance-delete-off:disabled{
+  background:#eef1f4;
+  color:#8b95a1;
+  border:1.5px solid #d5dbe3;
+  opacity:0.45;
+  cursor:not-allowed;
+  box-shadow:none;
+}
 .is-compliance-score{font-weight:700;color:var(--navy);white-space:nowrap;}
 /* v=compliance-bulk1 — phone cards first; desk table from 900px. Select all stays beside Unselect all. */
 .is-bulk-toolbar{display:flex;flex-direction:column;gap:8px;margin:0 0 12px;}
@@ -4046,7 +4059,7 @@ bindLoginKeyboard();
         </div>
 
         <!-- COMPLIANCE DASHBOARD -->
-        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b" data-compliance-bulk1="v=compliance-bulk1" data-compliance-bulk1b="v=compliance-bulk1b">
+        <div class="card" id="isComplianceCard" data-isdash1="v=isdash1" data-isdash1b="v=isdash1b" data-compliance-bulk1="v=compliance-bulk1" data-compliance-bulk1b="v=compliance-bulk1b" data-compliance-bulk1c="v=compliance-bulk1c">
           <div class="card-title"><span class="ico">&#9989;</span> Compliance Dashboard</div>
           <p class="is-compliance-note">Every aide and every topic. Search filters by aide name. An empty search shows the full roster. Select all and Unselect all stay together. Delete selected only removes rows that already allow Delete (assigned or Completed). Send Reminder stays on each row. Completed if there is a result, otherwise Not Completed. Select Topic only chooses what Assign and Clear apply to.</p>
           <div class="is-bulk-toolbar">
@@ -4055,6 +4068,7 @@ bindLoginKeyboard();
               <span class="is-bulk-pair-label">Selection</span>
               <!-- GHOST-COMPLIANCE-BULK1 | compliance-bulk1 -->
               <!-- GHOST-COMPLIANCE-BULK1B | compliance-bulk1b -->
+              <!-- GHOST-COMPLIANCE-BULK1C | compliance-bulk1c -->
               <button type="button" class="btn btn-sm" id="isComplianceSelectAllBtn">Select all</button>
               <button type="button" class="btn btn-sm" id="isComplianceUnselectAllBtn">Unselect all</button>
             </span>
@@ -38747,11 +38761,13 @@ var ISDASH1_MARKER='v=isdash1';
 var ISDASH1B_MARKER='v=isdash1b';
 var COMPLIANCE_BULK1_MARKER='v=compliance-bulk1';
 var COMPLIANCE_BULK1B_MARKER='v=compliance-bulk1b';
+var COMPLIANCE_BULK1C_MARKER='v=compliance-bulk1c';
 let isAssignAideRoster=[];
 let isAssignAideSelected=new Set();
 let isAssignTopicTouched=false;
 let isComplianceRows=[];
 let isComplianceSelected=new Set();
+let isComplianceAssignmentSource=[];
 let isComplianceBulkBusy=false;
 let isComplianceDeleteQuiet=false;
 let isResultsState={rowIndex:-1,row:null,questions:[],editing:false};
@@ -38789,6 +38805,7 @@ async function refreshIsAssignTarget(){
 }
 
 function sbDisplayedAssignment(data){
+  if(typeof isComplianceRememberAssignmentPayload==='function')isComplianceRememberAssignmentPayload(data);
   if(!data||data.success===false)return data;
   var list=Array.isArray(data.assignments)?data.assignments.filter(Boolean):null;
   if((!list||!list.length)&&data.data&&data.data!==data&&Array.isArray(data.data.assignments)&&data.data.assignments.length){
@@ -39001,14 +39018,13 @@ async function renderInservices(force){
     cacheInvalidate('get_assigned_topic');
     cacheInvalidate('get_users');
   }
-  const topicExtra=sbAssignTopicQuery();
-  // Compliance is every topic. The badge below is only the SELECT TOPIC assign target.
+  // Compliance is every topic. Banner and board share the unscoped assignments[] list.
   loadISCompliance(force===true);
   if(getIsAssignMode()==='choose')loadAidesForInserviceAssign(force===true);
   const assignEl=document.getElementById('currentAssignment');
   if(assignEl)assignEl.textContent='Loading...';
   try{
-    const data=await apiGetCached('get_assigned_topic',topicExtra,force===true);
+    const data=await apiGetCached('get_assigned_topic',null,force===true);
     const view=sbDisplayedAssignment(data);
     if(!isAssignTopicTouched&&sel&&view&&view.success&&view.topicId!=null&&String(view.topicId)!==''){
       const want=String(view.topicId);
@@ -39281,7 +39297,7 @@ function isPendingActionsHtml(i){
   const remind='<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>';
   const del=row.inAssignmentScope===true
     ?'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISAssignment('+i+')">Delete</button>'
-    :'<button type="button" class="btn btn-sm" disabled title="Not assigned — nothing to remove" style="background:#fde8e8;color:var(--danger)">Delete</button>';
+    :'<button type="button" class="btn btn-sm is-compliance-delete-off" disabled title="Not assigned — nothing to remove" style="background:#eef1f4;color:#8b95a1;opacity:0.45;cursor:not-allowed">Delete</button>';
   return '<div class="actions is-compliance-actions">'+remind+del+'</div>';
 }
 function isAideOnCurrentISAssignment(assignView, username){
@@ -39665,6 +39681,103 @@ function isAideInComplianceAssignment(assign, username){
 function isCompliancePairKey(username, topicId){
   return String(username||'').trim().toLowerCase()+'|'+String(topicId==null?'':topicId);
 }
+function isComplianceRememberAssignmentPayload(data){
+  if(typeof isComplianceAssignmentSource==='undefined'||!isComplianceAssignmentSource)isComplianceAssignmentSource=[];
+  if(!data||data.success===false)return isComplianceAssignmentSource.slice();
+  var views=isComplianceAssignmentViews(data);
+  var list=null;
+  if(Array.isArray(data.assignments))list=data.assignments;
+  else if(data.data&&data.data!==data&&Array.isArray(data.data.assignments))list=data.data.assignments;
+  if(list){
+    if(!list.length&&!views.length){
+      isComplianceAssignmentSource=[];
+      return [];
+    }
+    if(views.length){
+      isComplianceAssignmentSource=views;
+      return views.slice();
+    }
+  }
+  if(views.length===1&&!list){
+    var next=isComplianceAssignmentSource.slice();
+    var key=String(views[0].topicId);
+    var replaced=false;
+    for(var i=0;i<next.length;i++){
+      if(next[i]&&String(next[i].topicId)===key){next[i]=views[0];replaced=true;break;}
+    }
+    if(!replaced)next.push(views[0]);
+    isComplianceAssignmentSource=next;
+    return next.slice();
+  }
+  if(views.length>1){
+    isComplianceAssignmentSource=views;
+    return views.slice();
+  }
+  if(isComplianceAssignmentSource.length)return isComplianceAssignmentSource.slice();
+  return views||[];
+}
+function isComplianceAssignmentListForBoard(data, views){
+  var remembered=isComplianceRememberAssignmentPayload(data);
+  if(views&&views.length)return views;
+  return remembered||[];
+}
+function isComplianceMergeAssignmentAides(aides, assignments, raw){
+  var desk=Array.isArray(aides)?aides:[];
+  function onDesk(token){
+    var key=isComplianceAideToken(token).toLowerCase();
+    if(!key)return true;
+    for(var i=0;i<desk.length;i++){
+      var a=desk[i]||{};
+      if(String(a.username||'').trim().toLowerCase()===key)return true;
+      if(String(a.name||'').trim().toLowerCase()===key)return true;
+      if(a.id!=null&&String(a.id).trim().toLowerCase()===key)return true;
+    }
+    return false;
+  }
+  function recordFor(token){
+    var key=String(token||'').trim().toLowerCase();
+    if(!key||!raw||typeof raw!=='object')return null;
+    var lists=[];
+    function take(node){
+      if(!node||typeof node!=='object')return;
+      ['aideUsernames','aide_usernames','usernames','selectedUsernames','aides','aideIds'].forEach(function(k){
+        if(Array.isArray(node[k]))lists.push(node[k]);
+      });
+      if(Array.isArray(node.assignments))node.assignments.forEach(take);
+      if(node.data&&node.data!==node)take(node.data);
+    }
+    take(raw);
+    for(var i=0;i<lists.length;i++){
+      var list=lists[i];
+      for(var j=0;j<list.length;j++){
+        var item=list[j];
+        if(!item||typeof item!=='object')continue;
+        if(isComplianceAideToken(item).toLowerCase()!==key)continue;
+        return item;
+      }
+    }
+    return null;
+  }
+  (assignments||[]).forEach(function(assign){
+    if(!assign||assign.assignAll===true)return;
+    var names=assign.aideUsernames;
+    if(names==null||!Array.isArray(names))return;
+    names.forEach(function(item){
+      var token=isComplianceAideToken(item);
+      if(!token||onDesk(token))return;
+      var aide={username:token, name:token, complianceSynth:true};
+      var rec=recordFor(token);
+      if(rec){
+        var id=rec.id!=null?rec.id:(rec.aideId!=null?rec.aideId:(rec.aide_id!=null?rec.aide_id:''));
+        if(id!=null&&String(id).trim()!=='')aide.id=String(id).trim();
+        var nm=rec.name||rec.empName||rec.emp_name;
+        if(nm!=null&&String(nm).trim()!=='')aide.name=String(nm).trim();
+      }
+      desk.push(aide);
+    });
+  });
+  return desk;
+}
 async function loadISCompliance(force){
   const tbody=document.getElementById('isComplianceBody');
   const empty=document.getElementById('isComplianceEmpty');
@@ -39680,8 +39793,13 @@ async function loadISCompliance(force){
       apiPost({action:'get_inservices'}), // no includeArchived — Ace skips Status=Archived
       apiGetCached('get_assigned_topic',null,force===true)
     ]);
+    var assignmentViews=isComplianceAssignmentViews(assignData);
+    var assignments=isComplianceAssignmentListForBoard(assignData, assignmentViews);
     if(evercareSbEnabled()){
-      const sbFail=(usersData&&usersData.success===false&&(usersData.error||usersData.message))||(isData&&isData.success===false&&(isData.error||isData.message))||(assignData&&assignData.success===false&&(assignData.error||assignData.message));
+      var usersFail=usersData&&usersData.success===false&&(usersData.error||usersData.message);
+      var isFail=isData&&isData.success===false&&(isData.error||isData.message);
+      var assignFail=assignData&&assignData.success===false&&(assignData.error||assignData.message);
+      var sbFail=usersFail||isFail||(assignFail&&!(assignments&&assignments.length));
       if(sbFail){
         if(empty)empty.style.display='none';
         isComplianceRows=[];
@@ -39694,7 +39812,7 @@ async function loadISCompliance(force){
       return String(c&&(c.status||c.Status)||'').toLowerCase()!=='archived';
     });
     const topics=Array.isArray(INSERVICES)?INSERVICES:[];
-    const assignments=isComplianceAssignmentViews(assignData);
+    isComplianceMergeAssignmentAides(aides, assignments, assignData);
     const rows=[];
     aides.forEach(function(a){
       topics.forEach(function(topic){
@@ -39706,6 +39824,7 @@ async function loadISCompliance(force){
         row.inAssignmentScope=isAideInComplianceAssignment(scope, a.username)
           ||isAideInComplianceAssignment(scope, a.name)
           ||isAideInComplianceAssignment(scope, a.id);
+        if(a.complianceSynth===true&&scope&&scope.assignAll===true)row.inAssignmentScope=false;
         rows.push(row);
       });
     });

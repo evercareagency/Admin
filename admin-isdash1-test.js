@@ -189,6 +189,9 @@ const src = [
   extractFn(html, 'function isComplianceAssignmentForTopic(list, topicId)'),
   extractFn(html, 'function isAideInComplianceAssignment(assign, username)'),
   extractFn(html, 'function isCompliancePairKey(username, topicId)'),
+  extractFn(html, 'function isComplianceRememberAssignmentPayload(data)'),
+  extractFn(html, 'function isComplianceAssignmentListForBoard(data, views)'),
+  extractFn(html, 'function isComplianceMergeAssignmentAides(aides, assignments, raw)'),
   loadIS,
   onChange,
   refresh
