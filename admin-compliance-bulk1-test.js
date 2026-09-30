@@ -56,8 +56,10 @@ assert.ok(bar.includes('placeholder="Search aide by name…"'), 'search placehol
 assert.ok(bar.includes('id="isComplianceSearch"'), 'search field');
 assert.ok(bar.includes('role="group"') && bar.includes('aria-label="Selection"'), 'selection pair group');
 assert.ok(bar.indexOf('>Select all<') < bar.indexOf('>Unselect all<'), 'Unselect all sits beside Select all');
-assert.ok(bar.includes('id="isComplianceSelectAll"') && bar.includes('isComplianceSelectAll()'), 'Select all control');
-assert.ok(bar.includes('id="isComplianceUnselectAll"') && bar.includes('isComplianceUnselectAll()'), 'Unselect all control');
+assert.ok(bar.includes('id="isComplianceSelectAllBtn"') && bar.includes('onclick="isComplianceSelectAll()"'), 'Select all control');
+assert.ok(bar.includes('id="isComplianceUnselectAllBtn"') && bar.includes('onclick="isComplianceUnselectAll()"'), 'Unselect all control');
+assert.ok(!/id="isComplianceSelectAll"(?!Btn)/.test(bar), 'Select all id does not collide with the function');
+assert.ok(!/id="isComplianceUnselectAll"(?!Btn)/.test(bar), 'Unselect all id does not collide with the function');
 assert.ok(bar.includes('>Delete selected<'), 'Delete selected label');
 assert.ok(bar.includes('id="isComplianceDeleteSelected"') && bar.includes('disabled'), 'empty selection disables Delete selected');
 assert.ok(!bar.includes('Select all visible'), 'compliance pair is Select all, not Select all visible');

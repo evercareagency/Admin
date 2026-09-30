@@ -29,7 +29,7 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-float
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-phone-rail1">'), 'phone rail meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-remi-chat-bleed1">'), 'chat bleed meta stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-27-client-ins1">'), 'client-ins1 meta stays');
-assert.ok(html.includes('id="isComplianceSelectAll"') && html.includes('id="isComplianceUnselectAll"'), 'Select all and Unselect all stay a pair');
+assert.ok(html.includes('id="isComplianceSelectAllBtn"') && html.includes('id="isComplianceUnselectAllBtn"'), 'Select all and Unselect all stay a pair');
 
 const pageAt = html.indexOf('id="tab_payroll"');
 const sheetAt = html.indexOf('id="copilotSheet"');

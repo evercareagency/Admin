@@ -4050,8 +4050,9 @@ bindLoginKeyboard();
             <input class="is-bulk-search" id="isComplianceSearch" type="search" placeholder="Search aide by name…" aria-label="Search aide by name" autocomplete="off" oninput="onISComplianceSearch()">
             <span class="is-bulk-pair" role="group" aria-label="Selection">
               <span class="is-bulk-pair-label">Selection</span>
-              <button type="button" class="btn btn-sm" id="isComplianceSelectAll" onclick="isComplianceSelectAll()">Select all</button>
-              <button type="button" class="btn btn-sm" id="isComplianceUnselectAll" onclick="isComplianceUnselectAll()">Unselect all</button>
+              <!-- GHOST-COMPLIANCE-BULK1 | compliance-bulk1 -->
+              <button type="button" class="btn btn-sm" id="isComplianceSelectAllBtn" onclick="isComplianceSelectAll()">Select all</button>
+              <button type="button" class="btn btn-sm" id="isComplianceUnselectAllBtn" onclick="isComplianceUnselectAll()">Unselect all</button>
             </span>
             <button type="button" class="btn btn-sm is-bulk-delete" id="isComplianceDeleteSelected" onclick="confirmDeleteISSelected()" disabled>Delete selected</button>
             <span class="is-bulk-count" id="isComplianceSelCount">0 selected</span>
