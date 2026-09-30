@@ -219,7 +219,7 @@ async function runBrowser(){
     assert.strictEqual(kb.inBody, false, 'composer stays out of the scroll body');
     assert.strictEqual(kb.listHidden, 'hidden', 'list hides while composing');
     assert.notStrictEqual(kb.dockPosition, 'fixed', 'dock-pin does not fight ' + JSON.stringify(kb));
-    assert.strictEqual(kb.composePosition, 'fixed', 'compose panel is pinned ' + JSON.stringify(kb));
+    assert.strictEqual(kb.composePosition, 'absolute', 'compose panel covers the Remi visual box ' + JSON.stringify(kb));
     assert.strictEqual(kb.title, 'New note');
     assert.strictEqual(kb.nav, 'none', 'bottom nav hides while composing');
     assert.ok(kb.formTop >= 48, 'panel starts under the Remi header ' + JSON.stringify(kb));

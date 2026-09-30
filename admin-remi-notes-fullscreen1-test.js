@@ -205,7 +205,7 @@ async function runBrowser(){
     assert.strictEqual(compose.list, 'hidden', 'list hidden while composing');
     assert.strictEqual(compose.nav, 'none');
     assert.notStrictEqual(compose.dockPos, 'fixed');
-    assert.strictEqual(compose.panelPos, 'fixed');
+    assert.strictEqual(compose.panelPos, 'absolute');
     assert.ok(compose.panelTop + 1 >= compose.tabsBottom, 'panel starts under the tabs ' + JSON.stringify(compose));
     assert.ok(compose.headTop > 40, 'Remi header stays');
     assert.ok(compose.panelBottom <= compose.vvBottom + 2 && compose.panelBottom >= compose.vvBottom - 48, 'panel bottom sits on the visual viewport ' + JSON.stringify(compose));

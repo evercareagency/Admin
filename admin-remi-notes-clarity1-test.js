@@ -244,7 +244,7 @@ async function runBrowser(){
     assert.strictEqual(kb.fs, true, 'focus opens in-Remi compose');
     assert.strictEqual(kb.kb, false, 'messages dock class stays off');
     assert.strictEqual(kb.docked, true, 'composer lives in the sheet dock');
-    assert.strictEqual(kb.position, 'fixed', 'compose panel is pinned above the keyboard');
+    assert.strictEqual(kb.position, 'absolute', 'compose panel covers the Remi visual box');
     assert.strictEqual(kb.title, 'New note');
     assert.ok(kb.sheetTop + 1 >= kb.barBottom, 'phone-safe header stays '+JSON.stringify(kb));
     assert.ok(kb.headTop + 1 >= kb.barBottom, 'Remi header stays clear of chrome');

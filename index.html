@@ -33,6 +33,9 @@
 <!-- remi notes fullscreen 2026-09-29 v=remi-notes-fullscreen1 ?v=remi-notes-fullscreen1 admin-build 2026-09-29-remi-notes-fullscreen1. GHOST-REMI-NOTES-FULLSCREEN1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Friday SHIP GO and Mo LOCK. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Admin and Scheduler are one portal and share this compose. Nurse stays out. Prefer this over the dock-pin kb3 path. Resting Notes stays the one clarity1 area: the list in #copilotBody and the docked Write a note composer in #remiNotesDock. Tap or focus #remiNotesVisInput enters compose mode. It does not call msgComposerKb3DockForm, msgComposerRect1FlushBottom, or the Messages dock helpers. html.remi-notes-fs hides #bottomNav. The compose panel covers the Notes list and stays inside the Remi sheet: Cancel on the left, title New note or Edit note, Save on the right, a large textarea, and the existing Remind me chip. When Remind me is on, time chips (in 10 min, in 30 min, in 1 hr, Tomorrow 9am) use the existing remiNotesChip / remiNotesCreate path. remiNotesFullscreen1Pin reads visualViewport and sets the panel height to the viewport height minus the Remi header and tabs, with the panel bottom on the visual viewport bottom and a 44px accessory pad when the keyboard already shortens the viewport. Remi sheet header and tabs stay. The list is hidden while composing. Cancel leaves compose mode and stays on Remi Notes. It does not hop to Messages. Save still posts remi_save_my_note or writes through remiNotesCreate, and edit posts remi_edit_my_note or remiNotesUpdateText, then returns to the list in the Remi Notes sheet (stay1b). Blur alone does not leave Remi and does not leave compose mode. phone-safe-header1 sheet top stays while resting and while the header is up. remiNotesKb1Fit and remiNotesKb2Fit defer to remiNotesFullscreen1Fit when that helper is present so the old dock-fixed path does not fight. Scheduler soft copy stays Your notes only on the same compose. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. The sheet and compose card carry data-remi-notes-fullscreen1. Prior markers stay, including v=remi-notes-kb2, v=remi-notes-kb1, v=remi-notes-clarity1, v=remi-notes-stay1b, v=phone-safe-header1, v=msg-composer-kb3, and v=msg-composer-rect1. -->
 <meta name="admin-build" content="2026-09-29-remi-notes-fullscreen1">
 <script>var REMI_NOTES_FULLSCREEN1_MARKER='v=remi-notes-fullscreen1';var REMI_NOTES_FULLSCREEN1_BUILD='2026-09-29-remi-notes-fullscreen1';</script>
+<!-- remi notes fullscreen 2026-09-29 v=remi-notes-fullscreen2 ?v=remi-notes-fullscreen2 admin-build 2026-09-29-remi-notes-fullscreen2. GHOST-REMI-NOTES-FULLSCREEN2-CONTRACT-v1. Lineage GHOST-REMI-NOTES-FULLSCREEN1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Friday NO MERGE until this phone fix. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Admin and Scheduler are one portal and share this compose. Nurse stays out. Phone fail of fullscreen1: the Notes list stayed up, Cancel / New note / Save sat under the soft keyboard, and the Admin homepage scrolled behind Remi. While #copilotSheet is open on a phone, remiNotesFullscreen2Lock saves scrollY and sets html.remi-sheet-lock with body position fixed, overflow hidden, and an overscroll trap so the page behind cannot bleed-scroll. Write a note / Edit still uses remiNotesFullscreen1* (kb1 and kb2 keep deferring). The compose card stays in #remiNotesDock and is position absolute inside the sheet, which is sized to visualViewport, so Cancel, the title, Save, the textarea, and Remind me sit above the keyboard without scrolling the list. It does not call msgComposerKb3DockForm, msgComposerRect1FlushBottom, or the Messages dock helpers. Resting Notes stays one list plus Write a note. Cancel and Save leave compose and stay on Remi Notes. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior fullscreen1 markers stay. -->
+<meta name="admin-build" content="2026-09-29-remi-notes-fullscreen2">
+<script>var REMI_NOTES_FULLSCREEN2_MARKER='v=remi-notes-fullscreen2';var REMI_NOTES_FULLSCREEN2_BUILD='2026-09-29-remi-notes-fullscreen2';</script>
 <!-- sched notes copy 2026-09-29 v=sched-notes-copy1 ?v=sched-notes-copy1 admin-build 2026-09-29-sched-notes-copy1. GHOST-SCHED-NOTES-COPY1-CONTRACT-v1. Ace NO CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI copy. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Same Remi Notes surface as v=remi-notes-open1. Admin and Scheduler are one portal. This string change is Scheduler-facing only. remiNotesVis1Hint() for role Scheduler paints Your notes only. It does not say Admin. Admin My notes and the Scheduler notes tab keep their hints: This tab only. Your My notes stay off her screen. and Save → only on My notes. Scheduler never sees this tab. Scheduler still has no Scheduler notes tab. Nurse stays out. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Prior markers stay, including v=remi-notes-open1, v=remi-notes-vis1, v=remi-open-thread1, and v=sched-payroll-hide1. -->
 <meta name="admin-build" content="2026-09-29-sched-notes-copy1">
 <script>var SCHED_NOTES_COPY1_MARKER='v=sched-notes-copy1';var SCHED_NOTES_COPY1_BUILD='2026-09-29-sched-notes-copy1';</script>
@@ -1796,7 +1799,10 @@ html.remi-notes-fs #adminScreen .bottom-nav,
 html.remi-notes-fs #adminScreen #bottomNav{display:none !important;bottom:auto !important;}
 html.remi-notes-fs #copilotBody{visibility:hidden !important;pointer-events:none !important;}
 html.remi-notes-fs #remiNotesDock{position:static !important;border:0 !important;background:transparent !important;box-shadow:none !important;padding:0 !important;}
-html.remi-notes-fs #remiNotesClarityCompose{display:flex !important;flex-direction:column;gap:4px;background:#fff;border:0;border-radius:0;box-shadow:none;margin:0 !important;padding:4px 12px 6px;box-sizing:border-box;overflow:hidden;z-index:230;}
+html.remi-sheet-lock,html.remi-sheet-lock body{overflow:hidden !important;overscroll-behavior:none;height:100%;}
+html.remi-sheet-lock body{position:fixed !important;width:100%;left:0;right:0;}
+html.remi-notes-fs #copilotSheet{overflow:hidden !important;}
+html.remi-notes-fs #remiNotesClarityCompose{display:flex !important;flex-direction:column;gap:4px;position:absolute;left:0;right:0;bottom:0;background:#fff;border:0;border-radius:0;box-shadow:none;margin:0 !important;padding:4px 12px 6px;box-sizing:border-box;overflow:hidden;z-index:230;}
 html.remi-notes-fs #remiNotesFsBar{display:flex;align-items:center;gap:8px;flex:0 0 auto;min-height:40px;}
 html.remi-notes-fs #remiNotesFsTitle{flex:1;margin:0;text-align:center;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:800;color:var(--navy);}
 html.remi-notes-fs #remiNotesFsCancel{flex:0 0 auto;min-height:44px;min-width:72px;padding:8px 4px;border:0;background:transparent;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:800;text-align:left;cursor:pointer;touch-action:manipulation;}
@@ -4413,7 +4419,7 @@ Call (216) 377-5991 with any questions.</textarea>
     </div>
     <div class="aide-office-toast" id="aideOfficeToast" data-aide-office-vis1="v=aide-office-vis1" hidden><div class="t">REMI · AIDE OFFICE</div><div id="aideOfficeToastBody"></div></div>
     <button type="button" class="copilot-fab" id="copilotFab" data-layout-roles="Admin Scheduler" data-remiface1="v=remiface1" data-aide-office-vis1="v=aide-office-vis1" data-remi-chat-bleed1="v=remi-chat-bleed1" onclick="copilotOpenRadar()" aria-label="Remi"><img class="remi-chip-face" src="assets/remi-locked.png?v=remiface1" alt="" width="72" height="72"><span class="remi-chip-pill">Remi</span><span class="aide-office-rb" id="aideOfficeChipBadge" hidden>0</span></button>
-    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="v=remi-notes-stay1b" data-remi-notes-clarity1="v=remi-notes-clarity1" data-remi-notes-fullscreen1="v=remi-notes-fullscreen1" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
+    <div id="copilotSheet" class="remi-phone-rail" hidden data-layout-roles="Admin Scheduler" data-remi-phone-rail1="v=remi-phone-rail1" data-aide-office-vis1="v=aide-office-vis1" data-remi-langs1="v=remi-langs1" data-remi-float-hide1="v=remi-float-hide1" data-remi-float-hide1b="v=remi-float-hide1b" data-nosvc-reason-draft1="v=nosvc-reason-draft1" data-cancel-shift1="cancel-shift1" data-remi-payroll1="v=remi-payroll1" data-remi-ideas763="v=remi-ideas763" data-remi-cm-email1="v=remi-cm-email1" data-remi-notes-vis1="v=remi-notes-vis1" data-remi-notes-open1="v=remi-notes-open1" data-remi-notes-open1b="v=remi-notes-open1b" data-remi-notes-stay1b="v=remi-notes-stay1b" data-remi-notes-clarity1="v=remi-notes-clarity1" data-remi-notes-fullscreen1="v=remi-notes-fullscreen1" data-remi-notes-fullscreen2="v=remi-notes-fullscreen2" data-remi-rules1="v=remi-rules1" data-remi-sched1="v=remi-sched1" data-remi-rail-crud1="v=remi-rail-crud1" data-remi-proof1="v=remi-proof1" data-remi-float-noshow1="v=remi-float-noshow1" data-remi-radar-dismiss1="v=remi-radar-dismiss1" role="dialog" aria-modal="true" aria-labelledby="copilotTitle">
       <div class="copilot-top">
         <div class="copilot-id">
           <img class="remi-rail-face" src="assets/remi-locked.png?v=remiface1" alt="" width="40" height="40" data-remiface1="v=remiface1">
@@ -10886,6 +10892,7 @@ async function copilotOpenRadar(){
   if(!copilotRoleOk())return;
   var sheet=copilotEl('copilotSheet');
   if(sheet)sheet.hidden=false;
+  try{if(typeof remiNotesFullscreen2Sync==='function')remiNotesFullscreen2Sync();}catch(eFsLock){}
   copilotAlerts=(typeof remiRadarDismiss1Filter==='function')?remiRadarDismiss1Filter(copilotDeskAlerts()):copilotDeskAlerts();
   copilotPaintRadar();
   await copilotLoadQuiet();
@@ -10898,6 +10905,7 @@ function copilotOpenAsk(id){
   copilotPending=null;
   var sheet=copilotEl('copilotSheet');
   if(sheet)sheet.hidden=false;
+  try{if(typeof remiNotesFullscreen2Sync==='function')remiNotesFullscreen2Sync();}catch(eFsLock){}
   copilotPaintAsk();
 }
 function copilotClose(){
@@ -10911,6 +10919,7 @@ function copilotClose(){
   }
   try{if(typeof remiNotesClarity1ClearKb==='function')remiNotesClarity1ClearKb();}catch(eKb){}
   try{if(typeof remiNotesFullscreen1Close==='function')remiNotesFullscreen1Close();}catch(eFsClose){}
+  try{if(typeof remiNotesFullscreen2Sync==='function')remiNotesFullscreen2Sync();}catch(eFsLock){}
   copilotPending=null;
   copilotView='radar';
   var dock=copilotEl('copilotComposer');
@@ -10957,6 +10966,7 @@ function copilotSyncTabs(){
   if(!onNotes&&typeof remiNotesClosePicker==='function')remiNotesClosePicker();
   if(!onNotes&&typeof remiNotesClarity1ClearKb==='function')remiNotesClarity1ClearKb();
   if(!onNotes&&typeof remiNotesFullscreen1Close==='function')remiNotesFullscreen1Close();
+  try{if(typeof remiNotesFullscreen2Sync==='function')remiNotesFullscreen2Sync();}catch(eFsLock){}
 }
 function copilotHideConfirm(){
   copilotPending=null;
@@ -24807,6 +24817,9 @@ function remiNotesClarity1Bind(){
   document.addEventListener('focusin', function(ev){
     var t=ev&&ev.target;
     if(!t||!t.id)return;
+    if(t.id==='remiNotesVisInput'){
+      try{remiNotesFullscreen2Arm(t);}catch(eArm){}
+    }
     if(t.id==='remiNotesVisInput'||t.id==='remiNotesClarityRemind'||t.id==='remiNotesClarityWhen'||t.id==='remiNotesVisSave'){
       fit();
       setTimeout(fit, 80);
@@ -24827,8 +24840,14 @@ function remiNotesClarity1Bind(){
 }
 try{
   if(typeof document!=='undefined'){
-    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded', remiNotesClarity1Bind);
-    else remiNotesClarity1Bind();
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded', function(){
+      remiNotesClarity1Bind();
+      try{remiNotesFullscreen2Bind();}catch(eFs2){}
+    });
+    else{
+      remiNotesClarity1Bind();
+      try{remiNotesFullscreen2Bind();}catch(eFs2){}
+    }
   }
 }catch(eBind){}
 function remiNotesPaint(){
@@ -25099,6 +25118,109 @@ function remiNotesFromAsk(q, now){
 var remiNotesFullscreen1On=false;
 var remiNotesFullscreen1Mode='new';
 var remiNotesFullscreen1Preserve=false;
+var remiNotesFullscreen2ScrollY=0;
+function remiNotesFullscreen2Mark(){
+  return (typeof REMI_NOTES_FULLSCREEN2_MARKER==='string'&&REMI_NOTES_FULLSCREEN2_MARKER)||'v=remi-notes-fullscreen2';
+}
+function remiNotesFullscreen2Phone(){
+  try{return (window.innerWidth||0)<=899;}catch(e){return false;}
+}
+function remiNotesFullscreen2Sheet(){
+  try{return document.getElementById('copilotSheet');}catch(e){return null;}
+}
+function remiNotesFullscreen2Lock(){
+  if(!remiNotesFullscreen2Phone()){
+    remiNotesFullscreen2Unlock();
+    return;
+  }
+  var sheet=remiNotesFullscreen2Sheet();
+  if(!sheet||sheet.hidden){
+    remiNotesFullscreen2Unlock();
+    return;
+  }
+  if(document.documentElement.classList.contains('remi-sheet-lock'))return;
+  var y=0;
+  try{y=window.scrollY||document.documentElement.scrollTop||document.body.scrollTop||0;}catch(e){y=0;}
+  if(!isFinite(y)||y<0)y=0;
+  remiNotesFullscreen2ScrollY=y;
+  try{document.documentElement.classList.add('remi-sheet-lock');}catch(e2){}
+  if(document.body&&document.body.classList)document.body.classList.add('remi-sheet-lock');
+  if(document.body&&document.body.style){
+    document.body.style.position='fixed';
+    document.body.style.top=(-y)+'px';
+    document.body.style.left='0';
+    document.body.style.right='0';
+    document.body.style.width='100%';
+    document.body.style.overflow='hidden';
+  }
+  try{document.documentElement.style.overflow='hidden';}catch(e3){}
+}
+function remiNotesFullscreen2Unlock(){
+  if(!document.documentElement.classList.contains('remi-sheet-lock')&&!(document.body&&document.body.classList&&document.body.classList.contains('remi-sheet-lock')))return;
+  var y=remiNotesFullscreen2ScrollY||0;
+  try{document.documentElement.classList.remove('remi-sheet-lock');}catch(e){}
+  if(document.body&&document.body.classList)document.body.classList.remove('remi-sheet-lock');
+  if(document.body&&document.body.style){
+    document.body.style.position='';
+    document.body.style.top='';
+    document.body.style.left='';
+    document.body.style.right='';
+    document.body.style.width='';
+    document.body.style.overflow='';
+  }
+  try{document.documentElement.style.overflow='';}catch(e2){}
+  try{window.scrollTo(0, y);}catch(e3){}
+}
+function remiNotesFullscreen2Sync(){
+  var sheet=remiNotesFullscreen2Sheet();
+  if(sheet&&!sheet.hidden&&remiNotesFullscreen2Phone())remiNotesFullscreen2Lock();
+  else remiNotesFullscreen2Unlock();
+}
+function remiNotesFullscreen2Trap(ev){
+  if(!remiNotesFullscreen2Phone())return;
+  var sheet=remiNotesFullscreen2Sheet();
+  if(!sheet||sheet.hidden)return;
+  remiNotesFullscreen2Lock();
+  var t=ev&&ev.target;
+  try{if(t&&sheet.contains&&sheet.contains(t))return;}catch(e){}
+  try{if(ev&&ev.cancelable)ev.preventDefault();}catch(e2){}
+}
+function remiNotesFullscreen2Arm(el){
+  if(!el||el.id!=='remiNotesVisInput')return;
+  var sheet=remiNotesFullscreen2Sheet();
+  if(!sheet||sheet.hidden)return;
+  if(typeof copilotView!=='undefined'&&copilotView!=='notes')return;
+  remiNotesFullscreen2Lock();
+  if(typeof remiNotesVis1EditId!=='undefined'&&remiNotesVis1EditId)remiNotesFullscreen1Mode='edit-office';
+  else if(typeof remiNotesEditing!=='undefined'&&remiNotesEditing)remiNotesFullscreen1Mode='edit-local';
+  else if(!remiNotesFullscreen1On)remiNotesFullscreen1Mode='new';
+  remiNotesFullscreen1On=true;
+  if(typeof remiNotesFullscreen1Fit==='function')remiNotesFullscreen1Fit();
+  try{el.focus({preventScroll:true});}catch(eFocus){try{el.focus();}catch(eFocus2){}}
+}
+function remiNotesFullscreen2Bind(){
+  if(remiNotesFullscreen2Bind.done)return;
+  remiNotesFullscreen2Bind.done=true;
+  if(!document.addEventListener)return;
+  document.addEventListener('touchstart', function(ev){
+    var t=ev&&ev.target;
+    if(t&&t.id==='remiNotesVisInput')remiNotesFullscreen2Arm(t);
+  }, true);
+  document.addEventListener('pointerdown', function(ev){
+    var t=ev&&ev.target;
+    if(t&&t.id==='remiNotesVisInput')remiNotesFullscreen2Arm(t);
+  }, true);
+  document.addEventListener('touchmove', remiNotesFullscreen2Trap, {capture:true, passive:false});
+  document.addEventListener('wheel', remiNotesFullscreen2Trap, {capture:true, passive:false});
+  var sheet=remiNotesFullscreen2Sheet();
+  if(sheet&&window.MutationObserver){
+    try{
+      var obs=new MutationObserver(function(){remiNotesFullscreen2Sync();});
+      obs.observe(sheet, {attributes:true, attributeFilter:['hidden']});
+    }catch(eObs){}
+  }
+  remiNotesFullscreen2Sync();
+}
 function remiNotesFullscreen1Mark(){
   return (typeof REMI_NOTES_FULLSCREEN1_MARKER==='string'&&REMI_NOTES_FULLSCREEN1_MARKER)||'v=remi-notes-fullscreen1';
 }
@@ -25175,7 +25297,13 @@ function remiNotesFullscreen1ApplyChrome(){
   }
   var card=null;
   try{card=document.getElementById('remiNotesClarityCompose');}catch(e3){card=null;}
-  if(card&&card.setAttribute){try{card.setAttribute('data-remi-notes-fullscreen1', remiNotesFullscreen1Mark());}catch(e4){}}
+  if(card&&card.setAttribute){
+    try{card.setAttribute('data-remi-notes-fullscreen1', remiNotesFullscreen1Mark());}catch(e4){}
+    try{card.setAttribute('data-remi-notes-fullscreen2', remiNotesFullscreen2Mark());}catch(e4b){}
+  }
+  var sheetMark=null;
+  try{sheetMark=document.getElementById('copilotSheet');}catch(eSheet){sheetMark=null;}
+  if(sheetMark&&sheetMark.setAttribute){try{sheetMark.setAttribute('data-remi-notes-fullscreen2', remiNotesFullscreen2Mark());}catch(eSheet2){}}
   try{document.documentElement.classList.add('remi-notes-fs');}catch(e5){}
   if(document.body&&document.body.classList)document.body.classList.add('remi-notes-fs');
   try{document.documentElement.classList.remove('remi-notes-kb');}catch(e6){}
@@ -25211,40 +25339,66 @@ function remiNotesFullscreen1AccessoryPad(view){
 function remiNotesFullscreen1Pin(sheet){
   var panel=null;
   try{panel=document.getElementById('remiNotesClarityCompose');}catch(e){panel=null;}
-  if(!panel||!panel.style||!sheet)return;
+  if(!panel||!panel.style||!sheet||!sheet.style)return;
   var view=remiNotesFullscreen1View();
-  var tabs=null;
-  try{tabs=sheet.querySelector?sheet.querySelector('.copilot-tabs'):null;}catch(e2){tabs=null;}
-  var headerBottom=0;
-  if(tabs&&tabs.getBoundingClientRect){
-    try{headerBottom=Math.round(tabs.getBoundingClientRect().bottom);}catch(e3){headerBottom=0;}
-  }
+  var phone=false;
+  try{phone=remiNotesFullscreen2Phone();}catch(ePhone){phone=(window.innerWidth||0)<=899;}
   var minTop=72;
   try{minTop=remiNotesClarity1SheetTop();}catch(e4){minTop=72;}
-  if(!(headerBottom>=minTop+24))headerBottom=minTop+120;
   var vvTop=Math.round(view.offsetTop||0);
   var vvH=Math.round(view.height||window.innerHeight||0);
   var vvBottom=vvTop+vvH;
-  var panelTop=headerBottom;
-  if(panelTop<vvTop)panelTop=vvTop;
-  if(panelTop<minTop)panelTop=minTop;
-  var room=vvBottom-panelTop;
+  var sheetTop=minTop;
+  if(sheetTop<vvTop)sheetTop=vvTop;
+  var room=vvBottom-sheetTop;
   var pad=room>=320?remiNotesFullscreen1AccessoryPad(view):0;
-  var panelBottom=vvBottom-pad;
-  var h=panelBottom-panelTop;
-  if(!(h>=120))h=120;
-  var sr=null;
-  try{sr=sheet.getBoundingClientRect?sheet.getBoundingClientRect():null;}catch(e5){sr=null;}
-  var left=sr?Math.round(sr.left):0;
-  var width=sr&&sr.width?Math.round(sr.width):(window.innerWidth||0);
-  if(!(width>=120))width=window.innerWidth||width;
-  panel.style.position='fixed';
-  panel.style.left=left+'px';
-  panel.style.right='auto';
-  panel.style.top=panelTop+'px';
+  var sheetH=vvBottom-pad-sheetTop;
+  if(!(sheetH>=220)){pad=0;sheetH=vvBottom-sheetTop;}
+  if(!(sheetH>=160))sheetH=160;
+  if(phone){
+    sheet.style.top=Math.round(sheetTop)+'px';
+    sheet.style.height=Math.round(sheetH)+'px';
+    sheet.style.maxHeight=Math.round(sheetH)+'px';
+    sheet.style.bottom='auto';
+    sheet.style.left='0px';
+    sheet.style.right='0px';
+    sheet.style.width='100%';
+  }
+  var tabs=null;
+  try{tabs=sheet.querySelector?sheet.querySelector('.copilot-tabs'):null;}catch(e2){tabs=null;}
+  var sheetRect=null;
+  try{sheetRect=sheet.getBoundingClientRect?sheet.getBoundingClientRect():null;}catch(e5){sheetRect=null;}
+  var sheetVisualTop=sheetRect&&isFinite(sheetRect.top)?sheetRect.top:sheetTop;
+  var headerBottom=0;
+  if(tabs&&tabs.getBoundingClientRect){
+    try{headerBottom=tabs.getBoundingClientRect().bottom;}catch(e3){headerBottom=0;}
+  }
+  var localTop=Math.round(headerBottom-sheetVisualTop);
+  if(!(localTop>=minTop*0.2))localTop=120;
+  if(localTop<48)localTop=48;
+  if(phone&&pad>0&&(sheetH-localTop)<240){
+    pad=0;
+    sheetH=vvBottom-sheetTop;
+    if(!(sheetH>=160))sheetH=160;
+    sheet.style.height=Math.round(sheetH)+'px';
+    sheet.style.maxHeight=Math.round(sheetH)+'px';
+    try{sheetRect=sheet.getBoundingClientRect?sheet.getBoundingClientRect():sheetRect;}catch(e6){}
+    sheetVisualTop=sheetRect&&isFinite(sheetRect.top)?sheetRect.top:sheetTop;
+    if(tabs&&tabs.getBoundingClientRect){
+      try{headerBottom=tabs.getBoundingClientRect().bottom;}catch(e7){}
+    }
+    localTop=Math.round(headerBottom-sheetVisualTop);
+    if(!(localTop>=48))localTop=48;
+  }
+  var panelH=Math.round((sheetRect&&sheetRect.height?sheetRect.height:sheetH)-localTop);
+  if(!(panelH>=120))panelH=120;
+  panel.style.position='absolute';
+  panel.style.left='0px';
+  panel.style.right='0px';
+  panel.style.top=localTop+'px';
   panel.style.bottom='auto';
-  panel.style.height=Math.round(h)+'px';
-  panel.style.width=width+'px';
+  panel.style.height=panelH+'px';
+  panel.style.width='100%';
   panel.style.margin='0px';
   panel.style.zIndex='230';
   panel.style.boxSizing='border-box';
@@ -25255,6 +25409,7 @@ function remiNotesFullscreen1Fit(){
   try{sheet=document.getElementById('copilotSheet');}catch(e){sheet=null;}
   if(!sheet||sheet.hidden){
     if(remiNotesFullscreen1On)remiNotesFullscreen1Close();
+    try{remiNotesFullscreen2Sync();}catch(eLock){}
     return;
   }
   var onNotes=typeof copilotView==='undefined'||copilotView==='notes';
@@ -25268,6 +25423,7 @@ function remiNotesFullscreen1Fit(){
   var phone=(window.innerWidth||0)<=899;
   var topRest=72;
   try{topRest=remiNotesClarity1SheetTop();}catch(eTop){topRest=72;}
+  try{remiNotesFullscreen2Sync();}catch(eLock){}
   remiNotesFullscreen1MaybeOpen();
   if(!remiNotesFullscreen1On){
     try{document.documentElement.classList.remove('remi-notes-fs');}catch(eFs){}
@@ -25280,18 +25436,30 @@ function remiNotesFullscreen1Fit(){
     remiNotesFullscreen1Wipe(resting);
     if(typeof remiNotesClarity1ClearComposer==='function')remiNotesClarity1ClearComposer(resting);
     if(typeof remiNotesKb1ClearSheet==='function')remiNotesKb1ClearSheet(sheet);
-    if(phone)sheet.style.top=topRest+'px';
+    if(phone){
+      var restView=null;
+      try{restView=remiNotesFullscreen1View();}catch(eView){restView=null;}
+      var restTop=topRest;
+      var restVvTop=Math.round(restView&&restView.offsetTop||0);
+      var restVvH=Math.round(restView&&restView.height||window.innerHeight||0);
+      var restBottom=restVvTop+restVvH;
+      if(restTop<restVvTop)restTop=restVvTop;
+      var restGap=0;
+      try{restGap=Math.round((window.innerHeight||0)-restBottom);}catch(eGap){restGap=0;}
+      var restNav=restGap>=80?0:72;
+      var restPad=restGap>=80?44:0;
+      var restH=restBottom-restPad-restTop-restNav;
+      if(!(restH>=200))restH=200;
+      sheet.style.top=Math.round(restTop)+'px';
+      sheet.style.height=Math.round(restH)+'px';
+      sheet.style.maxHeight=Math.round(restH)+'px';
+      sheet.style.bottom='auto';
+    }
     return;
   }
   if(typeof remiNotesKb2ClearPin==='function')remiNotesKb2ClearPin();
   remiNotesFullscreen1ApplyChrome();
-  if(phone){
-    sheet.style.top=topRest+'px';
-    sheet.style.height='';
-    sheet.style.maxHeight='';
-    sheet.style.bottom='';
-    sheet.style.paddingBottom='';
-  }
+  if(phone)sheet.style.paddingBottom='';
   remiNotesFullscreen1Pin(sheet);
 }
 function remiNotesFullscreen1SyncRemind(){
@@ -25659,7 +25827,7 @@ function remiNotesVis1PaneHtml(rows, err){
     html+=remiNotesVis1CardHtml(note, mode, false);
   });
   if(mode==='my'&&!remiNotesVis1ThreadId){
-    html+='<div class="remi-vis-card remi-clarity-compose" id="remiNotesClarityCompose" data-remi-notes-clarity1="v=remi-notes-clarity1" data-remi-notes-kb1="v=remi-notes-kb1" data-remi-notes-kb2="v=remi-notes-kb2" data-remi-notes-fullscreen1="v=remi-notes-fullscreen1">';
+    html+='<div class="remi-vis-card remi-clarity-compose" id="remiNotesClarityCompose" data-remi-notes-clarity1="v=remi-notes-clarity1" data-remi-notes-kb1="v=remi-notes-kb1" data-remi-notes-kb2="v=remi-notes-kb2" data-remi-notes-fullscreen1="v=remi-notes-fullscreen1" data-remi-notes-fullscreen2="v=remi-notes-fullscreen2">';
     html+='<div class="remi-fs-bar" id="remiNotesFsBar">';
     html+='<button type="button" class="remi-fs-cancel" id="remiNotesFsCancel" onclick="remiNotesFullscreen1Cancel()">Cancel</button>';
     html+='<h3 id="remiNotesFsTitle">New note</h3>';

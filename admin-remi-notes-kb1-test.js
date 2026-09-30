@@ -344,9 +344,9 @@ async function runBrowser(){
     assert.strictEqual(kb.kb, false, 'kb dock class stays off');
     assert.strictEqual(kb.body, true, 'body gets remi-notes-fs');
     assert.strictEqual(kb.parent, 'remiNotesDock');
-    assert.strictEqual(kb.position, 'fixed', 'compose panel is pinned ' + JSON.stringify(kb));
+    assert.strictEqual(kb.position, 'absolute', 'compose panel covers the Remi visual box ' + JSON.stringify(kb));
     assert.strictEqual(kb.title, 'New note');
-    assert.strictEqual(kb.height, '', 'sheet height stays with the safe header');
+    assert.ok(kb.sheetBottom <= kb.viewH + 2, 'sheet stops at the visual viewport ' + JSON.stringify(kb));
     assert.ok(kb.formBottom <= kb.viewH + 2, 'composer stays at the visual bottom ' + JSON.stringify(kb));
     assert.ok(kb.saveBottom <= kb.formBottom + 2 && kb.remindBottom <= kb.formBottom + 2, 'Save and Remind me stay in the composer ' + JSON.stringify(kb));
     assert.ok(kb.sheetTop > 40, 'phone-safe header stays while composing ' + JSON.stringify(kb));
@@ -369,7 +369,7 @@ async function runBrowser(){
     assert.strictEqual(rested.kb, false, 'blur does not use the kb dock class');
     assert.strictEqual(rested.fs, true, 'blur alone stays in compose');
     assert.strictEqual(rested.view, 'notes');
-    assert.strictEqual(rested.height, '');
+    assert.ok(parseInt(rested.height, 10) > 160, 'compose sheet stays on the visual viewport ' + JSON.stringify(rested));
     assert.ok(rested.sheetTop + 1 >= rested.barBottom, 'header clears chrome again ' + JSON.stringify(rested));
 
     await phone.evaluate(async function(){
