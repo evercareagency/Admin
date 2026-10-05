@@ -34,6 +34,14 @@ assert.ok(html.includes("var NURSE_COMPLIANCE_SB1_MARKER='v=nurse-compliance-sb1
 assert.ok(html.includes("var NURSE_COMPLIANCE_SB1_BUILD='2026-10-05-nurse-compliance-sb1'"), 'script build');
 assert.ok(html.includes('<meta name="admin-build" content="2026-10-05-nurse-compliance-sb1">'), 'tip admin-build meta');
 assert.ok(html.includes('data-nurse-compliance-sb1="v=nurse-compliance-sb1"'), 'compliance list marker');
+assert.ok(html.includes('v=nurse-compliance-sb1b'), 'phone scroll tip');
+assert.ok(html.includes('?v=nurse-compliance-sb1b'), 'phone scroll query marker');
+assert.ok(html.includes("var NURSE_COMPLIANCE_SB1B_MARKER='v=nurse-compliance-sb1b'"), 'sb1b script marker');
+assert.ok(html.includes('data-nurse-compliance-sb1b="v=nurse-compliance-sb1b"'), 'scroll wrapper marker');
+assert.ok(html.includes('id="nurseComplianceScroll"'), 'compliance scroll wrapper');
+assert.ok(html.includes('#nurseComplianceTable th,#nurseComplianceTable td{white-space:nowrap;'), 'compliance cells do not letter-wrap');
+assert.ok(html.includes('#nurseComplianceScroll{overflow-x:auto;'), 'compliance wrapper scrolls sideways');
+assert.ok(html.includes('Sign in as Nurse to load compliance.'), 'Sign in as Nurse placeholder stays');
 assert.ok(html.includes('data-nurse-alerts-sb1="v=nurse-compliance-sb1"'), 'nurse alerts badge marker');
 assert.ok(html.includes('MERGE HOLD'), 'merge hold');
 assert.ok(html.includes("sbRestRpc('get_supervisory_compliance', {})"), 'compliance RPC body is empty');
