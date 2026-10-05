@@ -76,7 +76,7 @@ assert.ok(anonFn.includes('p_role:role') && anonFn.includes('p_new_password:newP
   'Forgot body uses the contract arg names');
 assert.ok(acceptedFn.includes('row.ok!==true||row.success!==true'), 'success requires both ok and success');
 
-const mutate = extractFn(html, 'async function sbRestMutate(method, table, pairs, body, prefer, refreshed)');
+const mutate = extractFn(html, 'async function sbRestMutate(method, table, pairs, body, prefer, refreshed, signal)');
 assert.ok(mutate.includes('apikey:SUPABASE_ANON_KEY') && mutate.includes("Authorization:'Bearer '+sess.access_token"),
   'session RPC reuses sbRestMutate Admin access_token');
 

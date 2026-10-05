@@ -63,6 +63,18 @@ const fns = [
   'async function sbRefreshSession(sess)',
   'async function sbRestGet(table, pairs, refreshed)',
   'async function sbApiList(payload)',
+  'function sbAsJsonObject(v)',
+  'function sbRpcNode(data)',
+  'function sbRpcError(node)',
+  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed, signal)',
+  'async function sbRestRpc(fnName, body, signal)',
+  'function sbIsNurseComplianceAction(action)',
+  'function sbIsNurseAlertRpcAction(action)',
+  'function sbNurseOfficeUsername(payload)',
+  'function sbComplianceRows(node)',
+  'function sbNurseAlertItems(node)',
+  'async function sbNurseComplianceDispatch(payload)',
+  'async function sbNurseAlertsDispatch(payload, signal)',
   'function _cacheKey(action)',
   'function cacheGet(action)',
   'function cacheSet(action,v)',
@@ -303,8 +315,9 @@ Promise.all([
 
   assert.strictEqual(compliance.success, true);
   assert.strictEqual(other.calls.length, 1);
-  assert.strictEqual(other.calls[0].url, sheetsUrl);
-  assert.deepStrictEqual(JSON.parse(other.calls[0].init.body), {action: 'get_supervisory_compliance'});
+  assert.ok(other.calls[0].url.indexOf('/rest/v1/rpc/get_supervisory_compliance') > 0, other.calls[0].url);
+  assert.deepStrictEqual(JSON.parse(other.calls[0].init.body), {});
+  assert.notStrictEqual(other.calls[0].url, sheetsUrl, 'compliance leaves sheets when the cut is on');
 
   assert.strictEqual(afterRefresh.success, true);
   assert.strictEqual(afterRefresh.data[0].username, 'jdoe');

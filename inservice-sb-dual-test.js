@@ -83,7 +83,7 @@ const names = [
   'async function sbRestGet(table, pairs, refreshed)',
   'function sbInserviceAction(action)',
   'function sbOrgId()',
-  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed)',
+  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed, signal)',
   'function sbMapInserviceRow(r)',
   'function sbGradeInservice(topicId,answers)',
   'async function sbListInserviceResults()',

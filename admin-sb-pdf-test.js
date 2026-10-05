@@ -76,7 +76,7 @@ const fns = [
   'function sbRememberTimesheetPdfPath(row, objectPath)',
   'function sbUuid(v)',
   'function sbOrgId()',
-  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed)',
+  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed, signal)',
   'async function sbUploadTimesheetPdf(row, pdfBytes, refreshed)',
   'function sbBytesToText(bytes, cap)',
   'async function sbResponseBytes(res)',
