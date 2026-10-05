@@ -71,7 +71,19 @@ const sigs = [
   'async function sbSupervisoryArchive(payload)',
   'async function sbSupervisoryPdf(payload)',
   'async function sbApiSupervisory(payload)',
-  'async function sbNurseSupervisoryDispatch(payload)'
+  'async function sbNurseSupervisoryDispatch(payload)',
+  'function sbAsJsonObject(v)',
+  'function sbRpcNode(data)',
+  'function sbRpcError(node)',
+  'async function sbRestMutate(method, table, pairs, body, prefer, refreshed, signal)',
+  'async function sbRestRpc(fnName, body, signal)',
+  'function sbIsNurseComplianceAction(action)',
+  'function sbIsNurseAlertRpcAction(action)',
+  'function sbNurseOfficeUsername(payload)',
+  'function sbComplianceRows(node)',
+  'function sbNurseAlertItems(node)',
+  'async function sbNurseComplianceDispatch(payload)',
+  'async function sbNurseAlertsDispatch(payload, signal)'
 ];
 const fns = sigs.map(function(sig){
   const fn = extractFn(html, sig);
@@ -306,6 +318,8 @@ const defaultOn = harness({
 });
 const nurseAlerts = harness({
   search: '',
+  role: 'Admin',
+  session: session,
   responses: [{status: 200, raw: JSON.stringify({success: true, items: []})}]
 });
 
@@ -473,7 +487,9 @@ Promise.all([
 
   assert.strictEqual(complianceOut.success, true);
   assert.strictEqual(compliance.calls.length, 1);
-  assert.strictEqual(compliance.calls[0].url, sheetsUrl, 'compliance stays on sheets');
+  assert.ok(compliance.calls[0].url.indexOf('/rest/v1/rpc/get_supervisory_compliance') > 0, compliance.calls[0].url);
+  assert.deepStrictEqual(JSON.parse(compliance.calls[0].init.body), {});
+  assert.notStrictEqual(compliance.calls[0].url, sheetsUrl, 'compliance leaves sheets when the cut is on');
 
   assert.strictEqual(refreshedOut.success, true);
   assert.strictEqual(refreshedOut.data[0].contactId, visitId);
@@ -491,7 +507,9 @@ Promise.all([
   assert.ok(defaultOn.calls[0].url.indexOf('/rest/v1/supervisory_contacts') > 0, 'default office list is supabase without ?sb=1');
   assert.ok(!defaultOn.calls.some(function(c){return c.url === sheetsUrl;}), 'default office list must not dual-write sheets');
   assert.strictEqual(nurseAlerts.calls.length, 1);
-  assert.strictEqual(nurseAlerts.calls[0].url, sheetsUrl, 'nurse alerts stay on sheets');
+  assert.ok(nurseAlerts.calls[0].url.indexOf('/rest/v1/rpc/list_nurse_alerts') > 0, nurseAlerts.calls[0].url);
+  assert.deepStrictEqual(JSON.parse(nurseAlerts.calls[0].init.body), {p_username: 'admin'});
+  assert.notStrictEqual(nurseAlerts.calls[0].url, sheetsUrl, 'nurse alerts leave sheets when the cut is on');
 
   assert.strictEqual(off.box.sbUuid('not-a-uuid'), false);
   assert.strictEqual(off.box.sbUuid(visitId), true);
