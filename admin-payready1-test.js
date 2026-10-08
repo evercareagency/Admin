@@ -105,6 +105,7 @@ const box = {
     if(box.mode==='hold' && name==='admin_set_timesheet_pay_hold')return {ok:true, data:{timesheet_id:body.p_timesheet_id, pay_hold:true, pay_status:'held'}};
     return {ok:false, status:404, error:'Could not find the function'};
   },
+  currentAdminRole:'Admin',
   mode:'miss',
   aceData:null,
   exportData:null,

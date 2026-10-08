@@ -96,6 +96,7 @@ const box = {
     return {ok:false, status:404, error:'Could not find the function'};
   },
   showTempMsg: function(m){box.msgs.push(String(m));},
+  currentAdminRole:'Admin',
   exportData:null,
   downloaded:'',
   downloads:0,
