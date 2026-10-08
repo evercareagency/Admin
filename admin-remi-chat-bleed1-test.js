@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -103,7 +104,7 @@ async function runBrowser(){
   const errors = [];
   function seed(){
     var bodies = [
-      'Hi — can I cover Bowlax Sunday 9–1?',
+      'Hi — can I cover Test Client Alpha Sunday 9–1?',
       'Yes if you can start at 9 sharp.',
       'I can. Confirming now.',
       'Perfect. Thanks.'

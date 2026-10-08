@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -52,7 +53,7 @@ assert.ok(src.includes('is_scheduler_office'), 'is_scheduler_office path');
 assert.ok(src.includes('sbRestRpc'), 'office JWT via sbRestRpc');
 assert.ok(src.includes('Open full proof'), 'open proof label');
 assert.ok(src.includes('list_summary') && src.includes('finished_label') && src.includes('chip_summary'), 'paints receipt fields');
-assert.ok(!src.includes('Bowlax'), 'Bowlax is not invented in the rail');
+assert.ok(!src.includes('Test Client Alpha'), 'Test Client Alpha is not invented in the rail');
 assert.ok(!src.includes(DEMO), 'probe seed is not hardcoded in the script');
 assert.ok(!/reset_aide_temp_password|admin_set_role_password|mossier/.test(src), 'no Auth reseal');
 assert.ok(!/\bQuo\b|twilio|send_sms/.test(src), 'no Quo or SMS');
@@ -70,8 +71,8 @@ const COVER = {
   kind: 'cover',
   title: 'Coverage receipt',
   status: 'Covered',
-  subtitle: 'Bowlax · Tomorrow 9:00–1:00 · call-off Maria',
-  client_name: 'Bowlax',
+  subtitle: 'Test Client Alpha · Tomorrow 9:00–1:00 · call-off Maria',
+  client_name: 'Test Client Alpha',
   blasted_count: 12,
   said_yes_count: 3,
   assigned_aide_name: 'Devon',
@@ -83,7 +84,7 @@ const COVER = {
     {at_label: '9:41', label: 'Schedule marked Covered · Devon'}
   ],
   chip_summary: 'Blasted 12 · 3 yes · Devon covered · 9:41',
-  list_summary: 'Bowlax cover · Devon · Covered'
+  list_summary: 'Test Client Alpha cover · Devon · Covered'
 };
 const NUDGE = {id: 'b1b1b1b1-b1b1-41b1-81b1-b1b1b1b1b1b1', kind: 'hours_nudge', title: 'Hours nudge', status: 'Sent', list_summary: 'Hours nudge · 8 aides · Sent', finished_label: 'Sat 4:12', chip_summary: 'Hours nudge · 8 aides · Sent'};
 const DIGEST = {id: 'c2c2c2c2-c2c2-42c2-82c2-c2c2c2c2c2c2', kind: 'manager_digest', title: 'Manager digest', status: 'Sent', list_summary: 'Manager digest · 3 missing', finished_label: 'Fri 2:01', chip_summary: 'Manager digest · 3 missing'};
@@ -100,14 +101,14 @@ function runSlice(){
   assert.strictEqual(sandbox.REMI_PROOF1_MARKER, 'v=remi-proof1');
   assert.strictEqual(sandbox.REMI_PROOF1_OFFICE, 'is_scheduler_office');
   assert.strictEqual(sandbox.remiProof1FromAsk('tell me a joke about the weather'), null);
-  const ask = sandbox.remiProof1FromAsk('show me the Bowlax receipt');
-  assert.ok(ask && ask.proofQuery === 'show me the Bowlax receipt', JSON.stringify(ask));
+  const ask = sandbox.remiProof1FromAsk('show me the Test Client Alpha receipt');
+  assert.ok(ask && ask.proofQuery === 'show me the Test Client Alpha receipt', JSON.stringify(ask));
   assert.strictEqual(sandbox.remiProof1IsReceiptAsk('receipt for Devon'), true);
 
   const card = sandbox.remiProof1CardHtml(COVER);
   assert.ok(card.includes('Coverage receipt'), card);
   assert.ok(card.includes('Covered'), card);
-  assert.ok(card.includes('Bowlax · Tomorrow 9:00–1:00 · call-off Maria'), card);
+  assert.ok(card.includes('Test Client Alpha · Tomorrow 9:00–1:00 · call-off Maria'), card);
   assert.ok(card.includes('12 aides'), card);
   assert.ok(card.includes('>3<'), card);
   assert.ok(card.includes('Devon'), card);
@@ -128,7 +129,7 @@ function runSlice(){
   const list = sandbox.remiProof1ListHtml();
   assert.ok(list.includes('Recent receipts'), list);
   assert.ok(list.includes('Today 9:41 AM ET'), list);
-  assert.ok(list.includes('Bowlax cover · Devon · Covered'), list);
+  assert.ok(list.includes('Test Client Alpha cover · Devon · Covered'), list);
   assert.ok(list.includes('Hours nudge · 8 aides · Sent'), list);
   assert.ok(list.includes('Manager digest · 3 missing'), list);
   assert.ok(list.includes('Sat 4:12'), list);
@@ -152,7 +153,7 @@ function runSlice(){
   assert.strictEqual(rpc[0].name, 'admin_finalize_remi_cover_receipt');
   assert.strictEqual(rpc[0].body.p_open_shift_id, 'shift-1');
   assert.deepStrictEqual(rpc[0].body.p_said_yes_aide_ids, ['aide-devon', 'aide-lina']);
-  assert.ok(sandbox.copilotChat[0].text.indexOf('Done — Bowlax is Covered with Devon.') >= 0, sandbox.copilotChat[0].text);
+  assert.ok(sandbox.copilotChat[0].text.indexOf('Done — Test Client Alpha is Covered with Devon.') >= 0, sandbox.copilotChat[0].text);
   assert.strictEqual(sandbox.copilotChat[0].proof.summary, COVER.chip_summary);
 
   rpc.length = 0;
@@ -161,12 +162,12 @@ function runSlice(){
   assert.ok(!Object.prototype.hasOwnProperty.call(rpc[0].body, 'p_said_yes_aide_ids'), 'omit said-yes when Ace should read the yes thread');
 
   rpc.length = 0;
-  sandbox.copilotChat = [{role: 'remi', text: '', proofQuery: 'show me the Bowlax receipt', sec: true}];
+  sandbox.copilotChat = [{role: 'remi', text: '', proofQuery: 'show me the Test Client Alpha receipt', sec: true}];
   sandbox.copilotView = 'chat';
   const found = await sandbox.remiProof1Lookup(0);
   assert.strictEqual(found.ok, true);
   assert.strictEqual(rpc[0].name, 'admin_find_remi_receipt');
-  assert.strictEqual(rpc[0].body.p_query, 'show me the Bowlax receipt');
+  assert.strictEqual(rpc[0].body.p_query, 'show me the Test Client Alpha receipt');
   assert.strictEqual(sandbox.copilotChat[0].proof.receipt_id, DEMO);
 
   rpc.length = 0;
@@ -185,7 +186,7 @@ function runSlice(){
 
   sandbox.currentAdminRole = 'Nurse';
   rpc.length = 0;
-  assert.strictEqual(sandbox.remiProof1FromAsk('show me the Bowlax receipt'), null);
+  assert.strictEqual(sandbox.remiProof1FromAsk('show me the Test Client Alpha receipt'), null);
   const nurse = await sandbox.remiProof1Rpc('admin_get_remi_receipt', {p_id: DEMO});
   assert.strictEqual(nurse.forbidden, true);
   const nurseCover = await sandbox.remiProof1AfterCover('shift-1', {});
@@ -262,7 +263,7 @@ async function runBrowser(){
       if(typeof showScreen === 'function')showScreen('adminScreen');
       window.__cover = {
         id: demoId, kind: 'cover', title: 'Coverage receipt', status: 'Covered',
-        subtitle: 'Bowlax · Tomorrow 9:00–1:00 · call-off Maria', client_name: 'Bowlax',
+        subtitle: 'Test Client Alpha · Tomorrow 9:00–1:00 · call-off Maria', client_name: 'Test Client Alpha',
         blasted_count: 12, said_yes_count: 3, assigned_aide_name: 'Devon',
         finished_label: 'Today 9:41 AM ET',
         timeline: [
@@ -272,7 +273,7 @@ async function runBrowser(){
           {at_label: '9:41', label: 'Schedule marked Covered · Devon'}
         ],
         chip_summary: 'Blasted 12 · 3 yes · Devon covered · 9:41',
-        list_summary: 'Bowlax cover · Devon · Covered'
+        list_summary: 'Test Client Alpha cover · Devon · Covered'
       };
       window.__rows = [
         window.__cover,
@@ -312,7 +313,7 @@ async function runBrowser(){
     assert.strictEqual(listView.overflow, true);
     assert.ok(listView.miniH >= 44, 'receipt row tap ' + listView.miniH);
     assert.ok(listView.text.indexOf('Recent receipts') >= 0, listView.text);
-    assert.ok(listView.text.indexOf('Bowlax cover · Devon · Covered') >= 0, listView.text);
+    assert.ok(listView.text.indexOf('Test Client Alpha cover · Devon · Covered') >= 0, listView.text);
     assert.ok(listView.text.indexOf('Hours nudge · 8 aides · Sent') >= 0, listView.text);
     assert.ok(listView.text.indexOf('Manager digest · 3 missing') >= 0, listView.text);
     await page.screenshot({path: path.join(shotDir, 'remi-proof1-phone-list.png')});
@@ -331,7 +332,7 @@ async function runBrowser(){
 
     await page.evaluate(async function(){
       copilotShowChat();
-      document.getElementById('copilotChatInput').value = 'show me the Bowlax receipt';
+      document.getElementById('copilotChatInput').value = 'show me the Test Client Alpha receipt';
       copilotChatSubmit({preventDefault: function(){}});
       await remiProof1Lookup(copilotChat.length - 1);
     });
@@ -351,13 +352,13 @@ async function runBrowser(){
     await page.screenshot({path: path.join(shotDir, 'remi-proof1-phone-chip.png')});
 
     const finalized = await page.evaluate(function(){
-      return remiProof1AfterCover('shift-bowlax', {said_yes_aide_ids: ['devon-id']}).then(function(){
+      return remiProof1AfterCover('shift-testClientAlpha', {said_yes_aide_ids: ['devon-id']}).then(function(){
         var hit = null;
         window.__rpc.forEach(function(row){if(row.name === 'admin_finalize_remi_cover_receipt')hit = row.body;});
         return hit;
       });
     });
-    assert.ok(finalized && finalized.p_open_shift_id === 'shift-bowlax', JSON.stringify(finalized));
+    assert.ok(finalized && finalized.p_open_shift_id === 'shift-testClientAlpha', JSON.stringify(finalized));
     assert.deepStrictEqual(finalized.p_said_yes_aide_ids, ['devon-id']);
 
     const desk = await browser.newPage();
@@ -381,12 +382,12 @@ async function runBrowser(){
       if(typeof showScreen === 'function')showScreen('adminScreen');
       var cover = {
         id: demoId, title: 'Coverage receipt', status: 'Covered',
-        subtitle: 'Bowlax · Tomorrow 9:00–1:00 · call-off Maria',
-        client_name: 'Bowlax', blasted_count: 12, said_yes_count: 3,
+        subtitle: 'Test Client Alpha · Tomorrow 9:00–1:00 · call-off Maria',
+        client_name: 'Test Client Alpha', blasted_count: 12, said_yes_count: 3,
         assigned_aide_name: 'Devon', finished_label: 'Today 9:41 AM ET',
         timeline: [{at_label: '9:41', label: 'Schedule marked Covered · Devon'}],
         chip_summary: 'Blasted 12 · 3 yes · Devon covered · 9:41',
-        list_summary: 'Bowlax cover · Devon · Covered'
+        list_summary: 'Test Client Alpha cover · Devon · Covered'
       };
       sbRestRpc = async function(name){
         if(name === 'admin_get_remi_receipt')return {ok: true, data: {success: true, receipt: cover}};

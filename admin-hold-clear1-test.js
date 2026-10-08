@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -171,7 +172,7 @@ function heldPayload(){
     week_start: '2026-09-07',
     clients: [{
       client_id: ada,
-      client_name: 'Bowlax',
+      client_name: 'Test Client Alpha',
       weekly_authorized_hours: 40,
       holds: [{hold_id: holdId, start_date: '2026-09-10', end_date: '', note: 'ER', open_ended: true, is_active: true}],
       days: days
@@ -193,7 +194,7 @@ function clearedPayload(){
     week_start: '2026-09-07',
     clients: [{
       client_id: ada,
-      client_name: 'Bowlax',
+      client_name: 'Test Client Alpha',
       weekly_authorized_hours: 40,
       holds: [],
       days: days

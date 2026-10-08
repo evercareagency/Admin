@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -292,7 +293,7 @@ async function schedPhoneScroll(){
         schedApplyWeek({
           week_start:'2026-09-21',
           week_end:'2026-09-27',
-          clients:[{client_id:'bowlax', client_name:'Bowlax', days:days}]
+          clients:[{client_id:'Test Client Alpha', client_name:'Test Client Alpha', days:days}]
         });
         schedPaint();
       });

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -142,12 +143,12 @@ function packFor(now){
     saraAt: saraAt,
     threads: [
       {thread_id:'t-lina', aide_id:'lina-id', aide_username:'lina', aide_name:'Lina', has_unread:false, unread:0, preview_from_aide:'Thanks — timesheet fixed.', last_message:'Thanks — timesheet fixed.', last_message_at:linaAt},
-      {thread_id:'t-devon', aide_id:'devon-id', aide_username:'devon', aide_name:'Devon', has_unread:true, unread:1, preview_from_aide:'Running 10 min late to Bowlax', last_message:'Remi: I noted that.', last_message_at:devonAt},
+      {thread_id:'t-devon', aide_id:'devon-id', aide_username:'devon', aide_name:'Devon', has_unread:true, unread:1, preview_from_aide:'Running 10 min late to Test Client Alpha', last_message:'Remi: I noted that.', last_message_at:devonAt},
       {thread_id:'t-sara', aide_id:'sara-id', aide_username:'sara', aide_name:'Sara Alvarez', has_unread:true, unread:1, preview_from_aide:'Yes I can cover Ada AM.', last_message:'Remi auto-reply should stay off the card', last_message_at:saraAt}
     ],
     alerts: [
       {kind:'aide_office_unread', thread_id:'t-sara', aide_id:'sara-id', aide_name:'Sara Alvarez', aide_username:'sara', preview:'Yes I can cover Ada AM.', unread_from_aide_count:1, deep_link:'admin/messages?aide_id=sara-id', last_message_at:saraAt},
-      {kind:'aide_office_unread', thread_id:'t-devon', aide_id:'devon-id', aide_name:'Devon', aide_username:'devon', preview:'Running 10 min late to Bowlax', unread_from_aide_count:1, deep_link:'admin/messages?aide_id=devon-id', last_message_at:devonAt}
+      {kind:'aide_office_unread', thread_id:'t-devon', aide_id:'devon-id', aide_name:'Devon', aide_username:'devon', preview:'Running 10 min late to Test Client Alpha', unread_from_aide_count:1, deep_link:'admin/messages?aide_id=devon-id', last_message_at:devonAt}
     ],
     badge: {unread_threads:2, unread_messages:2}
   };
@@ -298,7 +299,7 @@ async function runBrowser(){
     assert.ok(adminPhone.cards[0].text.indexOf('SA')>=0, adminPhone.cards[0].text);
     assert.ok(adminPhone.cards[1].text.indexOf('DV')>=0, adminPhone.cards[1].text);
     assert.ok(adminPhone.cards[1].text.indexOf('4m')>=0, adminPhone.cards[1].text);
-    assert.ok(adminPhone.cards[1].text.indexOf('Running 10 min late to Bowlax')>=0, adminPhone.cards[1].text);
+    assert.ok(adminPhone.cards[1].text.indexOf('Running 10 min late to Test Client Alpha')>=0, adminPhone.cards[1].text);
     assert.ok(adminPhone.cards[1].text.indexOf('Remi:')<0, adminPhone.cards[1].text);
     assert.ok(adminPhone.cards[2].text.indexOf('LN')>=0, adminPhone.cards[2].text);
     assert.ok(adminPhone.cards[2].text.indexOf('yesterday')>=0 && adminPhone.cards[2].text.indexOf('read')>=0, adminPhone.cards[2].text);

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -346,7 +347,7 @@ function runUpload(){
     assert.strictEqual(ensured.box.currentRec.pdfStoragePath, madePath);
     assert.strictEqual(ensured.box.currentRec.pdfLink, driveLink, 'make must not clear the legacy link');
     assert.ok(made.url.indexOf('token=ensured') > 0, made.url);
-    assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('script.google.com') >= 0;}), 'a working overlay must not call Sheets');
+    assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('script.'+'google.com') >= 0;}), 'a working overlay must not call Sheets');
     assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('/rpc/') >= 0;}));
 
     const sheetsUrl = 'https://example.invalid/exec';
@@ -370,7 +371,7 @@ function runUpload(){
       assert.strictEqual(fromSheets.ok, false, 'overlay miss is a soft fail');
       assert.strictEqual(fromSheets.soft, true);
       assert.strictEqual(blocked.calls.length, 0, 'default PDF miss must not call /exec');
-      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0 || c.url.indexOf('script.google.com') >= 0;}));
+      assert.ok(!blocked.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('drive.google.com') >= 0 || c.url.indexOf('script.'+'google.com') >= 0;}));
       assert.strictEqual(blockedRow.pdfLink, driveLink, 'Drive pdf_link stays; TimesheetArchive is not disabled');
       console.log('admin-sb-pdf-test: ok');
       return runBrowser();

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -47,7 +48,7 @@ assert.ok(src.includes('admin_list_active_remi_rules'), 'active rpc');
 assert.ok(src.includes('is_scheduler_office'), 'is_scheduler_office path');
 assert.ok(src.includes('sbRestRpc'), 'office JWT via sbRestRpc');
 assert.ok(src.includes('Using rule: '), 'chip falls back to saved title');
-assert.ok(!src.includes('Bowlax'), 'Bowlax is not invented in the rail');
+assert.ok(!src.includes('Test Client Alpha'), 'Test Client Alpha is not invented in the rail');
 assert.ok(src.includes('p_is_on'), 'toggle still posts is_on');
 assert.ok(src.includes('admin_delete_remi_rule'), 'delete is a separate rpc from the On/Off toggle');
 assert.ok(src.includes('function remiRules1Toggle') && src.includes('admin_update_remi_rule'), 'On/Off stays on admin_update_remi_rule');
@@ -56,7 +57,7 @@ assert.ok(!/\bQuo\b|twilio|send_sms/.test(src), 'no Quo or SMS');
 assert.ok(src.includes('Nurse cannot use Remi rules'), 'nurse refused');
 
 const FIX = [
-  {id:'r1', title:'Bowlax cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10, chip_label:'Using rule: Bowlax cover order'},
+  {id:'r1', title:'Test Client Alpha cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10, chip_label:'Using rule: Test Client Alpha cover order'},
   {id:'r2', title:'Quiet hours', body:"Don't nudge aides after 9:00 PM ET.", is_on:true, sort_order:20, chip_label:'Using rule: Quiet hours'},
   {id:'r3', title:'Devon preference', body:'Messages only — no phone ping for coverage.', is_on:false, sort_order:30, chip_label:'Using rule: Devon preference'}
 ];
@@ -72,13 +73,13 @@ function runSlice(){
   const sandbox = runSlice();
   assert.strictEqual(sandbox.REMI_RULES1_MARKER, 'v=remi-rules1');
   const chips = Array.from(sandbox.remiRules1ChipsFrom(FIX));
-  assert.deepStrictEqual(chips, ['Using rule: Bowlax cover order', 'Using rule: Quiet hours']);
+  assert.deepStrictEqual(chips, ['Using rule: Test Client Alpha cover order', 'Using rule: Quiet hours']);
   assert.ok(chips.join(' ').indexOf('Devon') < 0, 'off rules stay off the chip');
   const titled = Array.from(sandbox.remiRules1ChipsFrom([{id:'r9', title:'Skip vacation aides', body:'Skip them.', is_on:true}]));
   assert.deepStrictEqual(titled, ['Using rule: Skip vacation aides']);
   assert.deepStrictEqual(Array.from(sandbox.remiRules1ChipsFrom([])), []);
-  assert.strictEqual(sandbox.remiRules1IsCoverContext('Maria called off Bowlax tomorrow 9–1.', {}), true);
-  assert.strictEqual(sandbox.remiRules1IsCoverContext('who can cover Bowlax', {kind:'coverage_open'}), true);
+  assert.strictEqual(sandbox.remiRules1IsCoverContext('Maria called off Test Client Alpha tomorrow 9–1.', {}), true);
+  assert.strictEqual(sandbox.remiRules1IsCoverContext('who can cover Test Client Alpha', {kind:'coverage_open'}), true);
   assert.strictEqual(sandbox.remiRules1IsCoverContext('tell me a joke about the weather', {}), false);
   assert.strictEqual(sandbox.remiRules1IsCoverContext('every Monday at 9 give me the missing hours report', {}), false);
 
@@ -95,7 +96,7 @@ function runSlice(){
   sandbox.remiRules1Mode = 'list';
   sandbox.remiRules1Error = '';
   sandbox.remiRules1Paint();
-  assert.ok(host.innerHTML.indexOf('Bowlax cover order') >= 0, host.innerHTML);
+  assert.ok(host.innerHTML.indexOf('Test Client Alpha cover order') >= 0, host.innerHTML);
   assert.ok(host.innerHTML.indexOf('Quiet hours') >= 0, host.innerHTML);
   assert.ok(host.innerHTML.indexOf('Devon preference') >= 0, 'off rules still list');
   assert.ok(host.innerHTML.indexOf('>On<') >= 0 && host.innerHTML.indexOf('>Off<') >= 0, host.innerHTML);
@@ -109,7 +110,7 @@ function runSlice(){
       return {ok:true, data:{success:true, marker:'remi-rules1', rule:{id:'r4', title:body.p_title, body:body.p_body, is_on:true, chip_label:'Using rule: '+body.p_title}}};
     }
     if(name==='admin_update_remi_rule'){
-      return {ok:true, data:{success:true, rule:{id:body.p_id, title:body.p_title||'Bowlax cover order', body:body.p_body||'', is_on:body.p_is_on}}};
+      return {ok:true, data:{success:true, rule:{id:body.p_id, title:body.p_title||'Test Client Alpha cover order', body:body.p_body||'', is_on:body.p_is_on}}};
     }
     if(name==='admin_list_remi_rules')return {ok:true, data:{success:true, rules:FIX}};
     if(name==='admin_list_active_remi_rules')return {ok:true, data:{success:true, rules:FIX.filter(function(r){return r.is_on;})}};
@@ -164,12 +165,12 @@ function runSlice(){
   assert.strictEqual(rpc.length, 0);
 
   sandbox.currentAdminRole = 'Admin';
-  sandbox.copilotChat = [{role:'mo', text:'Maria called off Bowlax tomorrow.'}, {role:'remi', text:'Got it.', ruleContext:true, kind:'coverage_open', sec:true, actions:[]}];
+  sandbox.copilotChat = [{role:'mo', text:'Maria called off Test Client Alpha tomorrow.'}, {role:'remi', text:'Got it.', ruleContext:true, kind:'coverage_open', sec:true, actions:[]}];
   sandbox.copilotView = 'chat';
   sandbox.copilotPaintChat = function(){sandbox.painted = sandbox.remiRules1ChipsHtml(sandbox.copilotChat[1].ruleChips);};
   await sandbox.remiRules1LoadChips(1);
   assert.strictEqual(sandbox.copilotChat[1].ruleChips.length, 2);
-  assert.ok(sandbox.painted.indexOf('Using rule: Bowlax cover order') >= 0, sandbox.painted);
+  assert.ok(sandbox.painted.indexOf('Using rule: Test Client Alpha cover order') >= 0, sandbox.painted);
   assert.ok(sandbox.painted.indexOf('Devon preference') < 0, sandbox.painted);
   console.log('admin-remi-rules1 unit ok');
   await runBrowser();
@@ -239,7 +240,7 @@ async function runBrowser(){
       currentAdminUsername = 'mo@evercare.test';
       if(typeof showScreen === 'function')showScreen('adminScreen');
       window.__rules = [
-        {id:'r1', title:'Bowlax cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10, chip_label:'Using rule: Bowlax cover order'},
+        {id:'r1', title:'Test Client Alpha cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10, chip_label:'Using rule: Test Client Alpha cover order'},
         {id:'r2', title:'Quiet hours', body:"Don't nudge aides after 9:00 PM ET.", is_on:true, sort_order:20, chip_label:'Using rule: Quiet hours'},
         {id:'r3', title:'Devon preference', body:'Messages only — no phone ping for coverage.', is_on:true, sort_order:30, chip_label:'Using rule: Devon preference'}
       ];
@@ -287,7 +288,7 @@ async function runBrowser(){
     assert.ok(view.sheetWidth <= view.viewW + 1);
     assert.strictEqual(view.overflow, true);
     assert.ok(view.addH >= 44, 'add rule tap '+view.addH);
-    assert.ok(view.text.indexOf('Bowlax cover order') >= 0, view.text);
+    assert.ok(view.text.indexOf('Test Client Alpha cover order') >= 0, view.text);
     assert.ok(view.text.indexOf('Quiet hours') >= 0, view.text);
     assert.ok(view.text.indexOf('Devon preference') >= 0, view.text);
     assert.ok(view.text.indexOf('+ Add rule') >= 0, view.text);
@@ -315,7 +316,7 @@ async function runBrowser(){
 
     await page.evaluate(async function(){
       copilotShowChat();
-      document.getElementById('copilotChatInput').value = 'Maria called off Bowlax tomorrow 9–1.';
+      document.getElementById('copilotChatInput').value = 'Maria called off Test Client Alpha tomorrow 9–1.';
       copilotChatSubmit({preventDefault:function(){}});
       await remiRules1LoadChips(copilotChat.length-1);
     });
@@ -324,7 +325,7 @@ async function runBrowser(){
     });
     assert.ok(chip.indexOf('Using rule: Quiet hours') >= 0, chip);
     assert.ok(chip.indexOf('Using rule: Skip vacation aides') >= 0, chip);
-    assert.ok(chip.indexOf('Using rule: Bowlax cover order') < 0, 'off rules stay off the chip '+chip);
+    assert.ok(chip.indexOf('Using rule: Test Client Alpha cover order') < 0, 'off rules stay off the chip '+chip);
 
     const desk = await browser.newPage();
     await desk.setViewport({width:1280, height:800, isMobile:false, hasTouch:false, deviceScaleFactor:1});
@@ -346,7 +347,7 @@ async function runBrowser(){
       currentAdminRole = 'Admin';
       if(typeof showScreen === 'function')showScreen('adminScreen');
       window.__rules = [
-        {id:'r1', title:'Bowlax cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10, chip_label:'Using rule: Bowlax cover order'}
+        {id:'r1', title:'Test Client Alpha cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10, chip_label:'Using rule: Test Client Alpha cover order'}
       ];
       sbRestRpc = async function(name){
         if(name==='admin_list_remi_rules')return {ok:true, data:{success:true, rules:window.__rules}};

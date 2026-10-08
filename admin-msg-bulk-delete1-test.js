@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -181,7 +182,7 @@ const aides = [
   {id:JORDAN, name:'Jordan Kim'}
 ];
 const clients = [
-  {id:'c-bowlax', name:'Bowlax Abib'},
+  {id:'c-testClientAlpha', name:'Test Client Alpha'},
   {id:'c-ada', name:'Ada Cole'},
   {id:'c-rita', name:'Rita Morales'}
 ];
@@ -223,14 +224,14 @@ async function runVm(){
   assert.strictEqual(vm.runInContext('toasts[0]', ctx), 'Hidden from this inbox');
   assert.ok(vm.runInContext('refreshes', ctx) >= 1, 'Delete refreshes the aide list');
   assert.deepStrictEqual(idsOf('aideRows'), [SARA], 'Aides delete removes only the checked threads');
-  assert.deepStrictEqual(idsOf('clientRows'), ['c-bowlax','c-ada','c-rita'], 'Aides delete leaves Clients alone');
+  assert.deepStrictEqual(idsOf('clientRows'), ['c-testClientAlpha','c-ada','c-rita'], 'Aides delete leaves Clients alone');
 
   const rpcAfterAides = hideCalls().length;
-  vm.runInContext('remiMsgTab1Segment="clients"; msgBulkDelete1Selected.clients={"c-bowlax":1}; toasts.length=0; paints.length=0;', ctx);
+  vm.runInContext('remiMsgTab1Segment="clients"; msgBulkDelete1Selected.clients={"c-testClientAlpha":1}; toasts.length=0; paints.length=0;', ctx);
   assert.strictEqual(vm.runInContext('msgBulkDelete1Callout(1)', ctx), 'Delete hides the selected clients from this inbox. Client stays in Manage. Not a send.', 'Clients selection callout');
   await vm.runInContext('msgBulkDelete1Delete()', ctx);
   assert.strictEqual(hideCalls().length, rpcAfterAides, 'Clients Delete does not call the aide hide RPC');
-  assert.deepStrictEqual(idsOf('clientRows'), ['c-bowlax','c-ada','c-rita'], 'Clients stay on the desk');
+  assert.deepStrictEqual(idsOf('clientRows'), ['c-testClientAlpha','c-ada','c-rita'], 'Clients stay on the desk');
   assert.deepStrictEqual(idsOf('aideRows'), [SARA], 'Clients Delete leaves the remaining aide');
 
   resetDesk('Scheduler');
@@ -242,10 +243,10 @@ async function runVm(){
   await vm.runInContext('msgBulkDelete1Delete()', ctx);
   assert.deepStrictEqual(hideCalls()[0].body, {p_thread_ids:[MOE, JORDAN]}, 'Scheduler uses the same hide RPC');
   assert.deepStrictEqual(idsOf('aideRows'), [SARA], 'Scheduler Aides delete removes only the checked threads');
-  vm.runInContext('remiMsgTab1Segment="clients"; msgBulkDelete1Selected={aides:{},clients:{"c-bowlax":1}}; msgBulkDelete1Busy=false; rpcs.length=0;', ctx);
+  vm.runInContext('remiMsgTab1Segment="clients"; msgBulkDelete1Selected={aides:{},clients:{"c-testClientAlpha":1}}; msgBulkDelete1Busy=false; rpcs.length=0;', ctx);
   await vm.runInContext('msgBulkDelete1Delete()', ctx);
   assert.strictEqual(hideCalls().length, 0, 'Scheduler Clients Delete does not post');
-  assert.deepStrictEqual(idsOf('clientRows'), ['c-bowlax','c-ada','c-rita'], 'Scheduler leaves every client');
+  assert.deepStrictEqual(idsOf('clientRows'), ['c-testClientAlpha','c-ada','c-rita'], 'Scheduler leaves every client');
 
   const beforeNurse = hideCalls().length;
   vm.runInContext('currentAdminRole="Nurse"; msgBulkDelete1Busy=false; remiMsgTab1Segment="aides"; msgBulkDelete1Selected={aides:{},clients:{}}; msgBulkDelete1Selected.aides['+JSON.stringify(SARA)+']=1;', ctx);
@@ -346,7 +347,7 @@ async function runBrowser(){
         {id:'33333333-3333-4333-8333-333333333333', aide_id:'a-jordan', username:'jordan', name:'Jordan Kim', status:'open', last_message:'Timesheet week of 9/21', last_at:'2026-09-29T10:00:00Z', messages:[], preview_from_aide:'Timesheet week of 9/21'}
       ];
       allClients=[
-        {id:'c-bowlax', name:'Bowlax Abib', phone:'(216) 555-0142', isActive:true},
+        {id:'c-testClientAlpha', name:'Test Client Alpha', phone:'(216) 555-0142', isActive:true},
         {id:'c-ada', name:'Ada Cole', phone:'(216) 555-0199', isActive:true},
         {id:'c-rita', name:'Rita Morales', phone:'', isActive:true}
       ];
@@ -440,11 +441,11 @@ async function runBrowser(){
         count:document.getElementById('msgBulkCount').textContent
       };
     });
-    assert.deepStrictEqual(clientsOn.names, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Clients tab is untouched');
+    assert.deepStrictEqual(clientsOn.names, ['Test Client Alpha','Ada Cole','Rita Morales'], 'Clients tab is untouched');
     assert.strictEqual(clientsOn.checks, 3, 'Clients rows have checks');
     assert.strictEqual(clientsOn.disabled, true, 'Clients Delete stays muted');
     assert.strictEqual(clientsOn.count, '0 selected');
-    await page.click('#msgClientList .msg-bulk-cb[data-msg-bulk-id="c-bowlax"]');
+    await page.click('#msgClientList .msg-bulk-cb[data-msg-bulk-id="c-testClientAlpha"]');
     const clientsGap = await page.evaluate(function(){
       var del=document.getElementById('msgBulkDelete');
       return {
@@ -467,7 +468,7 @@ async function runBrowser(){
         hide:window.__rpc.filter(function(row){return row.name==='admin_hide_aide_office_threads';}).length
       };
     });
-    assert.deepStrictEqual(afterClients.clients, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Clients Delete does not remove clients');
+    assert.deepStrictEqual(afterClients.clients, ['Test Client Alpha','Ada Cole','Rita Morales'], 'Clients Delete does not remove clients');
     assert.deepStrictEqual(afterClients.aides, ['Sara Alvarez'], 'Clients Delete leaves Aides alone');
     assert.strictEqual(afterClients.hide, 0, 'Clients Delete does not post the aide hide RPC');
 
@@ -481,7 +482,7 @@ async function runBrowser(){
       };
     });
     assert.deepStrictEqual(refresh.aides, ['Sara Alvarez'], 'refresh keeps deleted aides hidden');
-    assert.deepStrictEqual(refresh.clients, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Clients stay painted. Delete is not live on that inbox');
+    assert.deepStrictEqual(refresh.clients, ['Test Client Alpha','Ada Cole','Rita Morales'], 'Clients stay painted. Delete is not live on that inbox');
 
     const schedPage = await browser.newPage();
     await schedPage.setViewport({width:390, height:844, isMobile:true, hasTouch:true});
@@ -515,7 +516,7 @@ async function runBrowser(){
         {id:'33333333-3333-4333-8333-333333333333', aide_id:'a-jordan', username:'jordan', name:'Jordan Kim', status:'open', last_message:'Timesheet week of 9/21', last_at:'2026-09-29T10:00:00Z', messages:[], preview_from_aide:'Timesheet week of 9/21'}
       ];
       allClients=[
-        {id:'c-bowlax', name:'Bowlax Abib', phone:'(216) 555-0142', isActive:true},
+        {id:'c-testClientAlpha', name:'Test Client Alpha', phone:'(216) 555-0142', isActive:true},
         {id:'c-ada', name:'Ada Cole', phone:'(216) 555-0199', isActive:true},
         {id:'c-rita', name:'Rita Morales', phone:'', isActive:true}
       ];
@@ -625,7 +626,7 @@ async function runBrowser(){
         roles:document.getElementById('msgBulkToolbar').getAttribute('data-layout-roles')
       };
     });
-    assert.deepStrictEqual(schedClientsOn.names, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Scheduler Clients tab is untouched');
+    assert.deepStrictEqual(schedClientsOn.names, ['Test Client Alpha','Ada Cole','Rita Morales'], 'Scheduler Clients tab is untouched');
     assert.strictEqual(schedClientsOn.checks, 3, 'Scheduler Clients rows have checks');
     assert.strictEqual(schedClientsOn.disabled, true, 'Scheduler Clients Delete starts muted');
     assert.strictEqual(schedClientsOn.count, '0 selected');
@@ -644,7 +645,7 @@ async function runBrowser(){
     assert.strictEqual(schedClientsAll.callout, 'Delete hides the selected clients from this inbox. Client stays in Manage. Not a send.', schedClientsAll.callout);
     assert.ok(!schedClientsAll.rpc.some(function(name){return name==='admin_hide_aide_office_threads'||/send|archive|blast|compose/i.test(name);}), 'Scheduler client Select all does not post');
     await schedPage.click('#msgBulkUnselect');
-    await schedPage.click('#msgClientList .msg-bulk-cb[data-msg-bulk-id="c-bowlax"]');
+    await schedPage.click('#msgClientList .msg-bulk-cb[data-msg-bulk-id="c-testClientAlpha"]');
     await schedPage.screenshot({path:path.join(outDir, '07-scheduler-clients-selected.png')});
     await schedPage.evaluate(function(){window.__rpc=[];});
     await schedPage.evaluate(function(){return msgBulkDelete1Delete();});
@@ -656,7 +657,7 @@ async function runBrowser(){
         hide:window.__rpc.filter(function(row){return row.name==='admin_hide_aide_office_threads';}).length
       };
     });
-    assert.deepStrictEqual(schedAfter.clients, ['Bowlax Abib','Ada Cole','Rita Morales'], 'Scheduler Clients Delete does not remove clients');
+    assert.deepStrictEqual(schedAfter.clients, ['Test Client Alpha','Ada Cole','Rita Morales'], 'Scheduler Clients Delete does not remove clients');
     assert.deepStrictEqual(schedAfter.aides, ['Sara Alvarez'], 'Scheduler Clients Delete leaves Aides alone');
     assert.strictEqual(schedAfter.hide, 0, 'Scheduler Clients Delete does not post the aide hide RPC');
     await schedPage.close();

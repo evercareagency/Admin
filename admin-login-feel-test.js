@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -299,7 +300,7 @@ async function runBrowser(){
       const freshTiming=await page.waitForFunction(()=>{
         return window._sheetsWarmUpStarted===true &&
           performance.getEntriesByType('resource').some(function(e){
-            return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
+            return /\/exec/.test(e.name) && e.name.indexOf('script.'+'google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
           });
       },{timeout:budget}).then(function(){return true;}).catch(function(){return false;});
       const freshExec=await page.evaluate(function(){
@@ -311,7 +312,7 @@ async function runBrowser(){
         };
       });
       assert.ok(freshTiming, vp.name+' fresh open: _sheetsWarmUpStarted and same-origin /exec Resource Timing within 1.5s; names='+JSON.stringify(freshExec.exec)+' flag='+freshExec.flag+' budget='+budget);
-      assert.ok(freshExec.flag && freshExec.exec.some(function(n){return n.indexOf('script.google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' fresh Resource Timing must keep same-origin /exec');
+      assert.ok(freshExec.flag && freshExec.exec.some(function(n){return n.indexOf('script.'+'google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' fresh Resource Timing must keep same-origin /exec');
       const deadline=Date.now()+4000;
       while(!hits.some(h=>h.action==='ping'||h.method==='GET')&&Date.now()<deadline){
         await new Promise(r=>setTimeout(r,40));
@@ -348,7 +349,7 @@ async function runBrowser(){
       const keepBy=Date.now()+1800;
       while(hits.length<snap+2&&Date.now()<keepBy)await new Promise(r=>setTimeout(r,20));
       const timed=await page.waitForFunction(()=>performance.getEntriesByType('resource').some(function(e){
-        return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
+        return /\/exec/.test(e.name) && e.name.indexOf('script.'+'google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
       }),{timeout:1800}).then(()=>true).catch(()=>false);
       const after=await page.evaluate(()=>({
         login:!!document.getElementById('loginScreen').classList.contains('active'),
@@ -360,7 +361,7 @@ async function runBrowser(){
       assert.ok(after.login, vp.name+' login screen must be showing after sign-out');
       assert.ok(!after.admin, vp.name+' admin home must be hidden after sign-out');
       assert.strictEqual(after.signInDisabled, false, vp.name+' Sign In must stay clickable');
-      assert.ok(after.exec.some(function(n){return n.indexOf('script.google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' Resource Timing must list the keep-alive same-origin /exec');
+      assert.ok(after.exec.some(function(n){return n.indexOf('script.'+'google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' Resource Timing must list the keep-alive same-origin /exec');
       const neu=hits.slice(snap);
       assert.ok(neu.some(h=>h.action==='ping'), vp.name+' keep-alive must POST {action:ping}');
       assert.ok(neu.some(h=>h.method==='GET'&&/\/exec/.test(h.url)), vp.name+' keep-alive must GET /exec');

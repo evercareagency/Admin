@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -128,7 +129,7 @@ sandbox.currentAdminUsername = 'mo@evercare.test';
 assert.strictEqual(sandbox.remiNotesOpenList(sat).length, 1, 'same email sees the note');
 
 sandbox.currentAdminUsername = 'desk@evercare.test';
-const open = sandbox.remiNotesCreate('Call CM about Bowlax cover', new Date(sat.getTime() + 30 * 60 * 1000).toISOString(), sat);
+const open = sandbox.remiNotesCreate('Call CM about Test Client Alpha cover', new Date(sat.getTime() + 30 * 60 * 1000).toISOString(), sat);
 assert.strictEqual(sandbox.remiNotesOpenList(sat).length, 1);
 sandbox.remiNotesComplete(open.id, sat);
 assert.strictEqual(sandbox.remiNotesOpenList(sat).length, 0, 'checking moves it out of open');
@@ -251,7 +252,7 @@ async function runBrowser(){
       currentAdminRole = 'Admin';
       currentAdminUsername = 'mo@evercare.test';
       var now = new Date();
-      remiNotesCreate('Call CM about Bowlax cover', new Date(now.getTime() + 30 * 60 * 1000).toISOString(), now);
+      remiNotesCreate('Call CM about Test Client Alpha cover', new Date(now.getTime() + 30 * 60 * 1000).toISOString(), now);
       remiNotesCreate('Confirm Kim for Ada Tue AM', remiNotesChipAt('tomorrow', now).toISOString(), now);
       var mon = remiNotesParseAsk('remind me Monday at 3:25pm', now);
       remiNotesCreate('Finish shortfall notes before noon', mon.remind_at, now);
@@ -285,7 +286,7 @@ async function runBrowser(){
     assert.ok(seeded.sheetTop >= 60, 'phone Remi is a sheet, not a full-page zoom ' + seeded.sheetTop);
     assert.ok(seeded.sheetBottom <= seeded.viewH + 1, 'sheet stays on the phone');
     assert.ok(seeded.sheetWidth <= seeded.viewW + 1);
-    assert.ok(seeded.text.indexOf('Call CM about Bowlax cover') >= 0, seeded.text);
+    assert.ok(seeded.text.indexOf('Call CM about Test Client Alpha cover') >= 0, seeded.text);
     assert.ok(seeded.text.indexOf('Confirm Kim for Ada Tue AM') >= 0, seeded.text);
     assert.ok(seeded.text.indexOf('Finish shortfall notes before noon') >= 0, seeded.text);
     assert.ok(seeded.text.indexOf('in 30 min') >= 0, seeded.text);
@@ -421,7 +422,7 @@ async function runBrowser(){
         try{showTab('schedule');}catch(e){}
       }
       var now = new Date();
-      remiNotesCreate('Call CM about Bowlax cover', new Date(now.getTime() + 30 * 60 * 1000).toISOString(), now);
+      remiNotesCreate('Call CM about Test Client Alpha cover', new Date(now.getTime() + 30 * 60 * 1000).toISOString(), now);
       remiNotesCreate('Confirm Kim for Ada Tue AM', remiNotesChipAt('tomorrow', now).toISOString(), now);
       var mon = remiNotesParseAsk('remind me Monday at 3:25pm', now);
       remiNotesCreate('Finish shortfall notes before noon', mon.remind_at, now);
@@ -446,7 +447,7 @@ async function runBrowser(){
     assert.ok(wide.sheetLeft > wide.viewW * 0.5, 'rail stays on the right ' + wide.sheetLeft);
     assert.ok(wide.sheetRight <= wide.viewW + 1);
     assert.ok(wide.mainLeft < wide.sheetLeft, 'desk stays beside the rail');
-    assert.ok(wide.text.indexOf('Call CM about Bowlax cover') >= 0, wide.text);
+    assert.ok(wide.text.indexOf('Call CM about Test Client Alpha cover') >= 0, wide.text);
     await desk.screenshot({path:path.join(shotDir, 'remi-notes1-desktop.png')});
 
     const nurse = await browser.newPage();

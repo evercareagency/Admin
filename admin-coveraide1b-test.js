@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -92,8 +93,8 @@ vm.createContext(ctx);
 
 const morning = {
   id:'os-am',
-  clientId:'bowlax',
-  clientName:'Bowlax',
+  clientId:'Test Client Alpha',
+  clientName:'Test Client Alpha',
   aideId:'moe',
   aideName:'moe',
   startsAt:'2026-09-27T12:00:00.000Z',
@@ -104,8 +105,8 @@ const morning = {
   justRecorded:false
 };
 const afternoonDraft = {
-  clientId:'bowlax',
-  clientName:'Bowlax',
+  clientId:'Test Client Alpha',
+  clientName:'Test Client Alpha',
   aideId:'moe',
   aideName:'moe',
   startsAt:'2026-09-27T17:00:00.000Z',
@@ -118,7 +119,7 @@ ctx.coverShifts = [Object.assign({}, morning)];
 const fromIdOnly = vm.runInContext('coverRecordedShift({success:true, open_shift_id:"os-pm", status:"open", urgency_within_48h:false, schedule_exception_id:"ex-pm"}, this.draft)', Object.assign(ctx, {draft:afternoonDraft}));
 assert.strictEqual(fromIdOnly.id, 'os-pm');
 assert.strictEqual(fromIdOnly.startsAt, afternoonDraft.startsAt, 'record payload without times keeps the hours just entered');
-assert.strictEqual(fromIdOnly.clientName, 'Bowlax');
+assert.strictEqual(fromIdOnly.clientName, 'Test Client Alpha');
 assert.strictEqual(fromIdOnly.intakeSource, 'office');
 ctx.coverShifts = [Object.assign({}, morning)];
 vm.runInContext('coverMergeRecorded(this.created)', Object.assign(ctx, {created:fromIdOnly}));
@@ -136,8 +137,8 @@ assert.ok(vm.runInContext('coverListVisible(coverShifts[0])', ctx), 'outside the
 
 ctx.coverShifts = [Object.assign({}, morning), {
   id:'os-pm',
-  clientId:'bowlax',
-  clientName:'Bowlax',
+  clientId:'Test Client Alpha',
+  clientName:'Test Client Alpha',
   aideName:'moe',
   startsAt:afternoonDraft.startsAt,
   endsAt:afternoonDraft.endsAt,
@@ -154,7 +155,7 @@ const bare = vm.runInContext('coverEnvelopeId("6f1b1c2a-3d4e-4f5a-8b6c-7d8e9f0a1
 assert.strictEqual(bare, '6f1b1c2a-3d4e-4f5a-8b6c-7d8e9f0a1b2c');
 
 ctx.coverShifts = [Object.assign({}, morning)];
-const wrongFirst = vm.runInContext('coverRecordedShift({success:true, open_shift_id:"os-pm", shifts:[{open_shift_id:"os-am", client_name:"Bowlax", shift_start:"2026-09-27T12:00:00.000Z", shift_end:"2026-09-27T16:00:00.000Z", status:"open", source:"office"}]}, this.draft)', Object.assign(ctx, {draft:afternoonDraft}));
+const wrongFirst = vm.runInContext('coverRecordedShift({success:true, open_shift_id:"os-pm", shifts:[{open_shift_id:"os-am", client_name:"Test Client Alpha", shift_start:"2026-09-27T12:00:00.000Z", shift_end:"2026-09-27T16:00:00.000Z", status:"open", source:"office"}]}, this.draft)', Object.assign(ctx, {draft:afternoonDraft}));
 assert.strictEqual(wrongFirst.id, 'os-pm', 'the created id wins over an older shifts[0]');
 assert.strictEqual(wrongFirst.startsAt, afternoonDraft.startsAt);
 ctx.coverShifts = [Object.assign({}, morning)];
@@ -173,8 +174,8 @@ assert.strictEqual(ctx.coverShifts[1].startsAt, morning.startsAt);
 
 const aideRow = {
   id:'os-aide',
-  clientId:'bowlax',
-  clientName:'Bowlax',
+  clientId:'Test Client Alpha',
+  clientName:'Test Client Alpha',
   aideName:'moe',
   startsAt:'2026-09-28T13:00:00.000Z',
   endsAt:'2026-09-28T14:00:00.000Z',

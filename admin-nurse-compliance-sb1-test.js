@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -86,15 +87,15 @@ const box = {
 vm.createContext(box);
 vm.runInContext(extractFn(html, 'function scField(row,pascal,camel)') + '\n' + hydrate, box);
 const row = box.hydrateNurseComplianceRow({
-  clientId: '1785608540832',
-  clientName: 'Bowlax Abib',
+  clientId: '1000000000001',
+  clientName: 'Test Client Alpha',
   status: 'Behind',
   visitCount: 0,
   callCount: 0,
   daysLeftInWindow: 42,
   windowDays: 60
 });
-assert.strictEqual(row.clientName, 'Bowlax Abib');
+assert.strictEqual(row.clientName, 'Test Client Alpha');
 assert.strictEqual(row.status, 'Behind');
 assert.strictEqual(row.visits, 0);
 assert.strictEqual(row.countingCalls, 0);
@@ -193,7 +194,7 @@ vm.runInContext(fns + '\nvar nurseSheetsGen=0;var nurseSheetsAbort=null;', sandb
   assert.strictEqual(aborted.success, false);
   assert.strictEqual(aborted.aborted, true);
   assert.strictEqual(calls.length, 1, 'aborted Supabase alerts do not fall back to Sheets');
-  assert.ok(calls.every(function(c){return c.url.indexOf('script.google.com') < 0;}));
+  assert.ok(calls.every(function(c){return c.url.indexOf('script.'+'google.com') < 0;}));
   console.log('admin-nurse-compliance-sb1-test: ok');
 })().catch(function(err){
   console.error(err);

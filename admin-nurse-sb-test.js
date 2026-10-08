@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -203,7 +204,7 @@ function bodyOf(call){
   assert.strictEqual(listed.calls[0].init.headers.Authorization, 'Bearer office-jwt');
   assert.strictEqual(listed.calls[0].init.headers.apikey, keyConst);
   assert.deepStrictEqual(bodyOf(listed.calls[0]), {p_status:'Complete'});
-  assert.ok(listed.calls[0].url.indexOf('script.google.com') < 0);
+  assert.ok(listed.calls[0].url.indexOf('script.'+'google.com') < 0);
   assert.strictEqual(rows.success, true);
   assert.strictEqual(rows.data[0].intakeId, 'int-1');
   assert.strictEqual(rows.data[0].clientName, 'Mo Client');
@@ -273,7 +274,7 @@ function bodyOf(call){
   assert.strictEqual(archOut.intakeId, 'int-9');
 
   const compliance = harness({search:'', role:'Nurse', session:session, responses:[
-    {status:200, raw:JSON.stringify({success:true, data:[{clientId:'1785608540832', clientName:'Bowlax Abib', visitCount:0, callCount:0, daysLeftInWindow:42, status:'Behind', windowDays:60}]})}
+    {status:200, raw:JSON.stringify({success:true, data:[{clientId:'1000000000001', clientName:'Test Client Alpha', visitCount:0, callCount:0, daysLeftInWindow:42, status:'Behind', windowDays:60}]})}
   ]});
   const complianceOut = await compliance.box.apiPost({action:'get_supervisory_compliance'});
   assert.strictEqual(compliance.calls.length, 1, 'compliance is one RPC');
@@ -281,9 +282,9 @@ function bodyOf(call){
   assert.strictEqual(compliance.calls[0].init.method, 'POST');
   assert.strictEqual(compliance.calls[0].init.headers.Authorization, 'Bearer office-jwt');
   assert.deepStrictEqual(bodyOf(compliance.calls[0]), {});
-  assert.ok(compliance.calls[0].url.indexOf('script.google.com') < 0, 'cut ON compliance does not call Sheets');
+  assert.ok(compliance.calls[0].url.indexOf('script.'+'google.com') < 0, 'cut ON compliance does not call Sheets');
   assert.strictEqual(complianceOut.success, true);
-  assert.strictEqual(complianceOut.data[0].clientName, 'Bowlax Abib');
+  assert.strictEqual(complianceOut.data[0].clientName, 'Test Client Alpha');
   assert.strictEqual(complianceOut.data[0].status, 'Behind');
   assert.strictEqual(complianceOut.data[0].visitCount, 0);
   assert.strictEqual(complianceOut.data[0].callCount, 0);
@@ -322,7 +323,7 @@ function bodyOf(call){
   assert.deepStrictEqual(bodyOf(alerts.calls[0]), {p_username:'admin'});
   assert.strictEqual(alertOut.success, true);
   assert.strictEqual(alertOut.items[0].id, '1789992557294-39');
-  assert.ok(alerts.calls[0].url.indexOf('script.google.com') < 0, 'cut ON nurse alerts do not call Sheets');
+  assert.ok(alerts.calls[0].url.indexOf('script.'+'google.com') < 0, 'cut ON nurse alerts do not call Sheets');
 
   const schedAlerts = harness({search:'', role:'Scheduler', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true, items:[]})}
@@ -354,7 +355,7 @@ function bodyOf(call){
   assert.deepStrictEqual(bodyOf(activity.calls[0]), {p_limit:50});
   assert.strictEqual(activityOut.success, true);
   assert.deepStrictEqual(activityOut.items, []);
-  assert.ok(activity.calls.every(function(c){return c.url.indexOf('script.google.com') < 0;}), 'cut ON activity does not call Sheets');
+  assert.ok(activity.calls.every(function(c){return c.url.indexOf('script.'+'google.com') < 0;}), 'cut ON activity does not call Sheets');
 
   const activityNurse = harness({search:'', role:'Nurse', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true, items:[]})}

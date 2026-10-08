@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -134,7 +135,7 @@ function run(){
 
   sandbox.currentAdminRole = 'Admin';
   sandbox.remiRules1Cache = [
-    {id:'r1', title:'Bowlax cover order', body:'Always try Maria first.', is_on:true, sort_order:10},
+    {id:'r1', title:'Test Client Alpha cover order', body:'Always try Maria first.', is_on:true, sort_order:10},
     {id:'r2', title:'Quiet hours', body:"Don't nudge aides after 9:00 PM ET.", is_on:true, sort_order:20}
   ];
   sandbox.remiRules1Mode = 'list';
@@ -294,7 +295,7 @@ async function runBrowser(){
       if(typeof showScreen === 'function')showScreen('adminScreen');
       window.__notes = [{id:'n1', body:'Devon pay hold — check Monday.', created_at:'2026-09-29T12:40:00.000Z', updates:[]}];
       window.__rules = [
-        {id:'r1', title:'Bowlax cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10},
+        {id:'r1', title:'Test Client Alpha cover order', body:'Always try Maria first, then Devon, then open blast.', is_on:true, sort_order:10},
         {id:'r2', title:'Quiet hours', body:"Don't nudge aides after 9:00 PM ET.", is_on:false, sort_order:20}
       ];
       window.__jobs = [
@@ -423,7 +424,7 @@ async function runBrowser(){
     const ruleEdit = await page.evaluate(function(){
       return {title:document.getElementById('remiRules1Title').value, text:document.getElementById('copilotBody').innerText};
     });
-    assert.strictEqual(ruleEdit.title, 'Bowlax cover order');
+    assert.strictEqual(ruleEdit.title, 'Test Client Alpha cover order');
     assert.ok(ruleEdit.text.indexOf('Quiet hours') >= 0, ruleEdit.text);
     assert.ok(ruleEdit.text.indexOf('Off') >= 0, ruleEdit.text);
     await page.screenshot({path:path.join(shotDir, 'remi-rail-crud1-rules-editing.png')});
@@ -443,7 +444,7 @@ async function runBrowser(){
     });
     assert.strictEqual(ruleGone.hit.p_id, 'r1');
     assert.strictEqual(ruleGone.toggled.p_is_on, true);
-    assert.ok(ruleGone.text.indexOf('Bowlax cover order') < 0, ruleGone.text);
+    assert.ok(ruleGone.text.indexOf('Test Client Alpha cover order') < 0, ruleGone.text);
     assert.ok(ruleGone.text.indexOf('Quiet hours') >= 0, ruleGone.text);
 
     await page.evaluate(async function(){

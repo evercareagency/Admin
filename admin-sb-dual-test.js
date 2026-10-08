@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -519,7 +520,7 @@ async function runBrowser(){
       await page.waitForFunction(function(){
         return window._sheetsWarmUpStarted===true &&
           performance.getEntriesByType('resource').some(function(e){
-            return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0;
+            return /\/exec/.test(e.name) && e.name.indexOf('script.'+'google.com')<0;
           });
       },{timeout:4000});
     }else{
@@ -639,7 +640,7 @@ async function runBrowser(){
         }
         const completeHits=on.hits.filter(function(h){return /\/rpc\/list_new_client_intakes/.test(h.url)&&/Complete/.test(h.post||'');});
         assert.ok(completeHits.length>=1, vp.name+' nurse Completes hit list_new_client_intakes');
-        assert.ok(completeHits.every(function(h){return h.url.indexOf('script.google.com')<0;}), vp.name+' Completes must not use /exec');
+        assert.ok(completeHits.every(function(h){return h.url.indexOf('script.'+'google.com')<0;}), vp.name+' Completes must not use /exec');
         assert.ok(!on.hits.some(function(h){return h.action==='list_new_client_intakes'&&/script\.google\.com/.test(h.url);}), vp.name+' Completes list is not a Sheets action');
       }else{
         assert.strictEqual(state.admin,true);

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -356,13 +357,13 @@ function sessionWindow(){
   assign.calls.length = 0;
   assignmentRows.length = 0;
   assignmentRows.push({org_id:ORG, topic_id:'1', aide_usernames:['bbj'], updated_at:'2026-09-01T00:00:00Z'});
-  const topicB = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'2', aideUsernames:['bowlax19']});
+  const topicB = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'2', aideUsernames:['testClientAlpha19']});
   assert.strictEqual(topicB.success, true);
   assert.strictEqual(topicB.topicId, '2');
-  assert.strictEqual(JSON.stringify(topicB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(JSON.stringify(topicB.aideUsernames), JSON.stringify(['testClientAlpha19']));
   assert.strictEqual(topicB.assignAll, false);
   const multiBody = JSON.parse(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().init.body);
-  assert.deepStrictEqual(multiBody, {org_id:ORG, topic_id:'2', aide_usernames:['bowlax19']});
+  assert.deepStrictEqual(multiBody, {org_id:ORG, topic_id:'2', aide_usernames:['testClientAlpha19']});
   assert.ok(assignmentQuery(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().url).indexOf('on_conflict=org_id,topic_id')>=0);
   assert.deepStrictEqual(assignmentRows.map(function(r){return r.topic_id;}).sort(), ['1','2']);
   assert.deepStrictEqual(assignmentRows.find(function(r){return r.topic_id==='1';}).aide_usernames, ['bbj']);
@@ -377,7 +378,7 @@ function sessionWindow(){
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('select=id,org_id,topic_id,aide_usernames,updated_at')>=0);
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('order=topic_id')>=0);
   const stillB = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
-  assert.strictEqual(JSON.stringify(stillB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(JSON.stringify(stillB.aideUsernames), JSON.stringify(['testClientAlpha19']));
 
   assign.calls.length = 0;
   const clearA = await assign.box.apiPost({action:'clear_assigned_topic', topicId:'1'});
@@ -399,12 +400,12 @@ function sessionWindow(){
   assert.strictEqual(afterClearA.assignAll, false);
   const keptB = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
   assert.strictEqual(keptB.topicId, '2');
-  assert.strictEqual(JSON.stringify(keptB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(JSON.stringify(keptB.aideUsernames), JSON.stringify(['testClientAlpha19']));
 
   assign.calls.length = 0;
   const listedTopics = await assign.box.apiPost({action:'get_assigned_topic'});
   assert.strictEqual(listedTopics.topicId, '2');
-  assert.strictEqual(JSON.stringify(listedTopics.assignments), JSON.stringify([{topicId:'2', aideUsernames:['bowlax19'], assignAll:false}]));
+  assert.strictEqual(JSON.stringify(listedTopics.assignments), JSON.stringify([{topicId:'2', aideUsernames:['testClientAlpha19'], assignAll:false}]));
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('select=id,org_id,topic_id,aide_usernames,updated_at')>=0);
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('order=topic_id')>=0);
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('org_id=eq.'+ORG)>=0);
@@ -413,7 +414,7 @@ function sessionWindow(){
   assignmentRows.push({org_id:ORG, topic_id:null, aide_usernames:null});
   assignmentRows.push({org_id:ORG, topic_id:'9', aide_usernames:{v:2, topics:{'9':{aides:['old']}}}});
   const legacyRead = await assign.box.apiPost({action:'get_assigned_topic'});
-  assert.strictEqual(JSON.stringify(legacyRead.assignments), JSON.stringify([{topicId:'2', aideUsernames:['bowlax19'], assignAll:false}]), 'legacy null-topic and non-array rows are not rewritten or listed');
+  assert.strictEqual(JSON.stringify(legacyRead.assignments), JSON.stringify([{topicId:'2', aideUsernames:['testClientAlpha19'], assignAll:false}]), 'legacy null-topic and non-array rows are not rewritten or listed');
   assert.ok(assignmentRows.some(function(r){return r.topic_id==='9';}), 'non-array aide_usernames row is left in place');
   assign.calls.length = 0;
   const nobody = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'4', aideUsernames:[]});

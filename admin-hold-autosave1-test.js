@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -39,7 +40,7 @@ assert.ok(html.includes('No Quo/SMS'), 'no Quo/SMS');
 const holdTipStart = html.indexOf('GHOST-HOLD-AUTOSAVE1-CONTRACT-v1');
 const holdTip = html.slice(holdTipStart, html.indexOf('-->', holdTipStart));
 assert.ok(holdTip.includes('No Auth reseal') && !holdTip.includes('mossier'), 'hold-autosave1 does not reseal auth');
-assert.ok(!html.includes('af44b579-5881-46ea-8cb8-83a33c0af200'), 'does not auto-clear Bowlax');
+assert.ok(!html.includes('af44b579-5881-46ea-8cb8-83a33c0af200'), 'does not auto-clear Test Client Alpha');
 
 const schedStart = html.indexOf('// admin schedule v=sched1');
 const schedEnd = html.indexOf('// end admin schedule v=sched1');
@@ -208,7 +209,7 @@ function slot(on, key, extra){
     v: 'hold-client1',
     clients: [{
       client_id: ada,
-      client_name: 'Bowlax Abib',
+      client_name: 'Test Client Alpha',
       weekly_authorized_hours: 60,
       holds: [],
       days: emptyDays('2026-09-21')
@@ -275,7 +276,7 @@ function slot(on, key, extra){
   }
   sandbox.schedApplySlotWeek({
     week_start: '2026-09-21',
-    clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: [], days: workedDays}]
+    clients: [{client_id: ada, client_name: 'Test Client Alpha', weekly_authorized_hours: 60, holds: [], days: workedDays}]
   });
   sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
   assert.ok(els.schedSlotCards.innerHTML.includes('Assumed worked'), 'saved week paints assumed worked');
@@ -304,7 +305,7 @@ function slot(on, key, extra){
     marker: 'hold-client1',
     clients: [{
       client_id: ada,
-      client_name: 'Bowlax Abib',
+      client_name: 'Test Client Alpha',
       holds: [{hold_id: holdId, start_date: '2026-10-03', end_date: '', note: '', open_ended: true, is_active: true}],
       days: openDays
     }]
@@ -320,7 +321,7 @@ function slot(on, key, extra){
   sandbox.schedWeekStart = '2026-09-21';
   sandbox.schedApplySlotWeek({
     week_start: '2026-09-21',
-    clients: [{client_id: ada, client_name: 'Bowlax Abib', holds: [], days: workedDays}]
+    clients: [{client_id: ada, client_name: 'Test Client Alpha', holds: [], days: workedDays}]
   });
   sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
   sandbox.schedSlotMarkOpen = 'hold:s1';
@@ -368,7 +369,7 @@ function slot(on, key, extra){
       var weekHolds = (staleWeek ? stackHolds : listedHolds).map(function(h){ return Object.assign({}, h); });
       return Promise.resolve({ok: true, data: {
         week_start: '2026-09-21',
-        clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: weekHolds, days: stackDays}]
+        clients: [{client_id: ada, client_name: 'Test Client Alpha', weekly_authorized_hours: 60, holds: weekHolds, days: stackDays}]
       }});
     }
     return Promise.resolve({ok: true, data: {ok: true}});
@@ -377,7 +378,7 @@ function slot(on, key, extra){
   sandbox.schedHoldTargetId = '';
   sandbox.schedApplySlotWeek({
     week_start: '2026-09-21',
-    clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: stackHolds, days: stackDays}]
+    clients: [{client_id: ada, client_name: 'Test Client Alpha', weekly_authorized_hours: 60, holds: stackHolds, days: stackDays}]
   });
   sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
   sandbox.schedPaint();
@@ -419,7 +420,7 @@ function slot(on, key, extra){
     week_start: '2026-10-05',
     clients: [{
       client_id: ada,
-      client_name: 'Bowlax Abib',
+      client_name: 'Test Client Alpha',
       weekly_authorized_hours: 60,
       holds: [
         {hold_id: holdA, start_date: '2026-09-21', end_date: '2026-09-28', note: 'Hospital', is_active: true},
@@ -429,7 +430,7 @@ function slot(on, key, extra){
     }]
   });
   sandbox.schedPaint();
-  assert.ok(!els.schedBody.innerHTML.includes('Bowlax'), 'On hold filter skips later weeks after every hold was ended');
+  assert.ok(!els.schedBody.innerHTML.includes('Test Client Alpha'), 'On hold filter skips later weeks after every hold was ended');
   assert.ok(!els.schedBody.innerHTML.includes('On hold'), 'an ended stack does not paint a later week');
   sandbox.schedFilterHold = false;
   staleWeek = false;
@@ -438,7 +439,7 @@ function slot(on, key, extra){
   sandbox.schedHoldTargetId = '';
   sandbox.schedApplySlotWeek({
     week_start: '2026-09-21',
-    clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: [stackHolds[0]], days: stackDays}]
+    clients: [{client_id: ada, client_name: 'Test Client Alpha', weekly_authorized_hours: 60, holds: [stackHolds[0]], days: stackDays}]
   });
   sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
   els['schedHoldStart-s1'].value = '09/21/2026';
@@ -462,7 +463,7 @@ function slot(on, key, extra){
   sandbox.schedFilterHold = false;
   sandbox.schedApplySlotWeek({
     week_start: '2026-09-21',
-    clients: [{client_id: ada, client_name: 'Bowlax Abib', weekly_authorized_hours: 60, holds: listedHolds.slice(), days: clearDays}]
+    clients: [{client_id: ada, client_name: 'Test Client Alpha', weekly_authorized_hours: 60, holds: listedHolds.slice(), days: clearDays}]
   });
   sandbox.schedSelectSlotDay(ada, '2026-09-21', 1, 's1');
   rpc.length = 0;
@@ -718,7 +719,7 @@ async function shots(){
           v: 'hold-client1',
           clients: [{
             client_id: adaId,
-            client_name: 'Bowlax Abib',
+            client_name: 'Test Client Alpha',
             weekly_authorized_hours: 60,
             holds: window.__phase === 'held' ? [{hold_id: hold, start_date: '2026-09-21', end_date: '2026-09-27', note: 'Hospital', is_active: true}] : [],
             days: days('2026-09-21', window.__phase !== 'empty')
@@ -788,7 +789,7 @@ async function shots(){
     assert.strictEqual(saved.assumed, 'Assumed worked');
     assert.strictEqual(saved.hrs, '10 hrs');
     assert.strictEqual(saved.holdChips, 0);
-    assert.ok(saved.who.indexOf('Bowlax') >= 0, saved.who);
+    assert.ok(saved.who.indexOf('Test Client Alpha') >= 0, saved.who);
     assert.ok(saved.when.indexOf('09/21/2026') >= 0, saved.when);
     await phone.evaluate(function(){
       var mark = document.querySelector('.sched-mark.is-assumed');
@@ -952,7 +953,7 @@ async function shots(){
         week_start: '2026-10-05',
         clients: [{
           client_id: adaId,
-          client_name: 'Bowlax Abib',
+          client_name: 'Test Client Alpha',
           weekly_authorized_hours: 60,
           holds: [
             {hold_id: holdA, start_date: '2026-09-21', end_date: '2026-09-28', note: 'Hospital', is_active: true},
@@ -967,7 +968,7 @@ async function shots(){
     }, holdA, holdB, ada);
     await phone.waitForFunction(function(){
       var body = document.getElementById('schedBody');
-      return body && body.innerText.indexOf('Bowlax') < 0 && body.innerText.indexOf('On hold') < 0;
+      return body && body.innerText.indexOf('Test Client Alpha') < 0 && body.innerText.indexOf('On hold') < 0;
     });
     await phone.screenshot({path: path.join(outDir, 'hold-autosave1-phone-end-clears-stacked.png')});
     console.log('hold-autosave1 phone shots ok');

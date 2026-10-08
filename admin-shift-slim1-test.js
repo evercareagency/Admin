@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -176,7 +177,7 @@ sandbox.schedApplySlotWeek({
   week_start: '2026-09-07',
   clients: [{
     client_id: ada,
-    client_name: 'Bowlax',
+    client_name: 'Test Client Alpha',
     weekly_authorized_hours: 63,
     days: emptyDays('2026-09-07')
   }]
@@ -256,7 +257,7 @@ sandbox.schedSlotAddAnother = false;
 sandbox.schedSlotFormStamp = '';
 const holdWeek = {
   week_start: '2026-09-07',
-  clients: [{client_id: ada, client_name: 'Bowlax', weekly_authorized_hours: 63, days: days}]
+  clients: [{client_id: ada, client_name: 'Test Client Alpha', weekly_authorized_hours: 63, days: days}]
 };
 sandbox.schedApplySlotWeek(holdWeek);
 sandbox.schedSelectSlotDay(ada, '2026-09-10', 4, 'am');
@@ -385,7 +386,7 @@ async function shots(){
       }
       schedApplySlotWeek({
         week_start: '2026-09-07',
-        clients: [{client_id: adaId, client_name: 'Bowlax', weekly_authorized_hours: 63, days: days}]
+        clients: [{client_id: adaId, client_name: 'Test Client Alpha', weekly_authorized_hours: 63, days: days}]
       });
       schedSelectSlotDay(adaId, '2026-09-07', 1, 'am');
       schedSetSlotFormMode('edit');

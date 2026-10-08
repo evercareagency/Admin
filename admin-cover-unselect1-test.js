@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -165,7 +166,7 @@ async function runBrowser(){
   const shift = {
     open_shift_id: shiftId,
     client_id: clientId,
-    client_name: 'Bowlax',
+    client_name: 'Test Client Alpha',
     client_home_address: '100 Public Square, Downtown, OH 44114',
     regular_aide_id: kimId,
     regular_aide_name: 'Kim Lee',
@@ -194,7 +195,7 @@ async function runBrowser(){
       if(rpc)calls.push({rpc: rpc, body: body});
       let payload = {success: true};
       if(u.indexOf('/rest/v1/clients') >= 0){
-        payload = [{id: clientId, name: 'Bowlax', address: '100 Public Square, Downtown, OH 44114', is_active: true}];
+        payload = [{id: clientId, name: 'Test Client Alpha', address: '100 Public Square, Downtown, OH 44114', is_active: true}];
       }else if(u.indexOf('/rest/v1/aides') >= 0){
         payload = aideRows;
       }else if(rpc === 'admin_list_open_shifts'){
