@@ -104,7 +104,7 @@ assert.strictEqual(vm.runInContext("sbTimesheetOnDesk({is_active:true,status:'ba
 
 const pending = extractFn(html, 'function isPendingActionsHtml(i)');
 const completed = extractFn(html, 'function isCompletedActionsHtml(i)');
-assert.ok(pending.includes('Send Reminder'));
+assert.ok(pending.includes("Reminders aren\\'t available yet."));
 assert.ok(!pending.includes('View Cert') && !pending.includes('Print Cert'));
 assert.ok(completed.includes('View Cert') && completed.includes('Print Cert'));
 assert.ok(html.includes('Personal Care / Home Making'));

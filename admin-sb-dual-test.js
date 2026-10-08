@@ -54,10 +54,8 @@ const payload = JSON.parse(Buffer.from(keyConst.split('.')[1], 'base64').toStrin
 assert.strictEqual(payload.role, 'anon');
 assert.strictEqual(payload.ref, 'zealkptwgifnkbkuavvp');
 
-const warm = extractFn(html, 'function warmUpSheets()');
-assert.ok(warm && !/supabase/i.test(warm), 'warm path must not touch supabase');
-const keep = extractFn(html, 'function startLoginWarmKeepAlive()');
-assert.ok(keep && !/supabase/i.test(keep), 'login keep-alive must not touch supabase');
+assert.ok(!html.includes('function warmUpSheets('), 'warm-up is gone');
+assert.ok(!html.includes('function startLoginWarmKeepAlive('), 'login keep-alive is gone');
 
 const authFns = [
   'function evercareSbEnabled()',
@@ -82,7 +80,7 @@ const authFns = [
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(!login.includes("action:'admin_login'"), 'sheets rollback does not post the legacy password login');
-assert.ok(login.includes('Sheets sign-in is no longer available. Contact the office administrator.'), 'sheets rollback fails closed');
+assert.ok(!login.includes('Sheets sign-in is no longer available. Contact the office administrator.'), 'login has no sheets branch');
 assert.ok(login.includes("showScreen('loginScreen')"), 'sheets rollback stays on the login screen');
 assert.ok(!login.includes('softSbDualVerify'), 'soft probe must not run after sheets success');
 assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('sbAuthRoleLogin('), 'sb cut login does not warm before the flag branch');
@@ -186,7 +184,7 @@ function sheetsLoginHarness(opts){
       getElementById: function(id){return els[id] || null;},
       querySelector: function(){return els.mgrLoginBtn;}
     },
-    SHEETS_URL: 'https://script.google.com/macros/s/test/exec',
+    SHEETS_URL: '',
     warmUpSheets: function(){warmed.push(true);},
     evercareSbEnabled: function(){return !!opts.flag;},
     sbAuthRoleLogin: function(role, password){
@@ -229,9 +227,9 @@ assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('')), true, 'd
 assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=0')), true, 'missing sb=1 does not select Sheets');
 assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=1')), true, 'old sb=1 query stays on');
 assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('', {evercare_sb:'1'})), true, 'old evercare_sb key is not required');
-assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sheets=1')), false, 'query rollback');
-assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?v=1', {evercare_sheets:'1'})), false, 'storage rollback');
-assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=1', {evercare_sheets:'1'})), false, 'sheets force wins');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sheets=1')), true, 'sheets query stays on supabase');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?v=1', {evercare_sheets:'1'})), true, 'sheets storage key stays on supabase');
+assert.strictEqual(vm.runInContext('evercareSbEnabled()', flagBox('?sb=1', {evercare_sheets:'1'})), true, 'sheets storage key does not force a rollback');
 
 Promise.all([
   runAuth({role:'Admin', password:'pw', search:'?sheets=1'}),
@@ -276,9 +274,9 @@ Promise.all([
   sheetsLoginHarness({flag:true, role:'Scheduler', password:'x', authResult:{ok:false, network:true, error:'offline'}})
 ]).then(function(results){
   const off = results[0];
-  assert.strictEqual(off.calls.length, 0, 'flag off makes zero supabase calls');
-  assert.strictEqual(off.out.skipped, true);
-  assert.strictEqual(off.win.__sbDual, undefined);
+  assert.strictEqual(off.calls.length, 1, 'a sheets query still uses the password grant');
+  assert.notStrictEqual(off.out.skipped, true);
+  assert.strictEqual(off.out.ok, false);
 
   const sched = results[1];
   assert.strictEqual(sched.calls.length, 2, 'password grant then profile');
@@ -340,9 +338,9 @@ Promise.all([
   assert.strictEqual(htmlErr.mem.evercare_sb_session, undefined);
 
   const bothOff = results[6];
-  assert.strictEqual(bothOff.calls.length, 0, 'sheets=1 and evercare_sheets=1 stay off');
-  assert.strictEqual(bothOff.out.skipped, true);
-  assert.strictEqual(bothOff.mem.evercare_sb_session, '{"access_token":"keep"}', 'flag off does not clear a stored jwt');
+  assert.strictEqual(bothOff.calls.length, 1, 'sheets storage key still uses the password grant');
+  assert.notStrictEqual(bothOff.out.skipped, true);
+  assert.strictEqual(bothOff.mem.evercare_sb_session, undefined, 'a failed grant clears a stored jwt');
 
   const aide = results[7];
   assert.strictEqual(aide.calls.length, 0, 'non-role accounts do not call supabase');
@@ -368,8 +366,8 @@ Promise.all([
   assert.strictEqual(sheetsOff.box.auth, undefined, 'flag off does not call auth');
   assert.strictEqual(sheetsOff.sheets.length, 0, 'flag off does not post the legacy password login');
   assert.strictEqual(sheetsOff.box.home, undefined, 'flag off does not open the portal');
-  assert.strictEqual(sheetsOff.els.mgrErr.style.display, 'block');
-  assert.strictEqual(sheetsOff.els.mgrErr.textContent, 'Sheets sign-in is no longer available. Contact the office administrator.');
+  assert.strictEqual(sheetsOff.els.mgrErr.style.display, 'none');
+  assert.strictEqual(sheetsOff.els.mgrErr.textContent, '');
   assert.strictEqual(sheetsOff.els.mgrLoginBtn.disabled, false);
   assert.strictEqual(sheetsOff.els.mgrLoginBtn.textContent, 'Sign In →');
   assert.strictEqual(sheetsOff.box.window._mgrLoginInFlight, false);

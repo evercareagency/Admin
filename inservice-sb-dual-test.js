@@ -31,7 +31,7 @@ assert.ok(html.includes('inservice_results'), 'results table');
 assert.ok(html.includes('inservice_topic_assignment'), 'assignment table');
 assert.ok(html.includes('score_pct'), 'score field is score_pct');
 assert.ok(!html.includes('lvaglmztnlnsrhlluayz'), 'abandoned project ref must not appear');
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(!html.includes('evercare_sb_jwt'), 'inservice uses the auth session, not a second jwt key');
 assert.ok(!html.includes('function sbRememberAdminJwt'), 'no parallel token store');
 
@@ -70,7 +70,8 @@ assert.ok(sbClearBranch.indexOf('sbClearAssignedTopic(topicId)')<sbClearBranch.l
 assert.ok(extractFn(html, 'function sbAssignTopicQuery()').includes('isAssignTopicTouched'), 'refresh follows the topic the user selected');
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
-assert.ok(apiPost.indexOf('evercareSbEnabled()') < apiPost.indexOf('SHEETS_URL'), 'flag check precedes Sheets');
+assert.ok(apiPost.includes('evercareSbEnabled()'), 'flag check stays');
+assert.ok(!apiPost.includes('fetch('), 'apiPost does not fetch the legacy web app');
 assert.ok(apiPost.includes("sbInserviceDispatch(payload)"), 'flag on dispatches inservice actions');
 
 const names = [
@@ -114,7 +115,7 @@ function harness(opts){
     SUPABASE_URL: url,
     SUPABASE_ANON_KEY: anon,
     EVERCARE_ORG_ID: ORG,
-    SHEETS_URL: 'https://script.google.com/macros/s/TEST/exec',
+    SHEETS_URL: '',
     GAS_HEADERS: {'Content-Type':'text/plain;charset=utf-8'},
     SB_SESSION_KEY: 'evercare_sb_session',
     INSERVICES: opts.topics || [{
@@ -166,17 +167,16 @@ function sessionWindow(){
 (async function(){
   const off = harness({search:'?sheets=1'});
   const offData = await off.box.apiPost({action:'get_inservices'});
-  assert.strictEqual(off.calls.length, 1, 'flag off makes one Sheets call');
-  assert.ok(off.calls[0].url.indexOf('script.google.com')>=0, 'flag off stays on /exec');
-  assert.ok(off.calls[0].url.indexOf('supabase.co')<0, 'flag off does not call supabase');
-  assert.strictEqual(JSON.parse(off.calls[0].init.body).action, 'get_inservices');
-  assert.deepStrictEqual(offData, []);
+  assert.strictEqual(off.calls.length, 0, 'a sheets query does not call the legacy web app');
+  assert.strictEqual(offData.success, false);
+  assert.ok(/not signed in/i.test(offData.error));
 
   const stored = harness({storage:{evercare_sb:'1'}});
   stored.calls.length = 0;
-  await stored.box.apiPost({action:'get_activity_log'});
-  assert.ok(stored.calls[0].url.indexOf('script.google.com')>=0, 'non-inservice actions stay on Sheets');
-  assert.strictEqual(stored.calls.filter(function(c){return c.url.indexOf('supabase.co')>=0;}).length, 0);
+  const storedLog = await stored.box.apiPost({action:'get_activity_log'});
+  assert.strictEqual(stored.calls.length, 0, 'activity log is not a legacy web-app post');
+  assert.strictEqual(storedLog.success, false);
+  assert.strictEqual(storedLog.error, 'Not available on this desk.');
 
   const missingDefault = harness({search:''});
   const missDefault = await missingDefault.box.apiPost({action:'get_inservices'});
@@ -495,8 +495,8 @@ function sessionWindow(){
   }
   const sheetsUi = uiBox('?sheets=1', '1');
   await sheetsUi.box.clearAssignment();
-  assert.strictEqual(JSON.stringify(sheetsUi.posts[0]), JSON.stringify({action:'clear_assigned_topic'}), 'sheets rollback clear has no topic id');
-  assert.ok(!sheetsUi.posts.some(function(p){return p.via==='sbClearAssignedTopic';}), 'sheets rollback does not delete the sb row');
+  assert.deepStrictEqual(sheetsUi.posts[0], {via:'sbClearAssignedTopic', topicId:'1'}, 'a sheets query still clears through supabase');
+  assert.ok(!sheetsUi.posts.some(function(p){return p.action==='clear_assigned_topic';}), 'a sheets query does not post the legacy clear');
   const defaultUi = uiBox('', '3');
   await defaultUi.box.clearAssignment();
   assert.deepStrictEqual(defaultUi.posts[0], {via:'sbClearAssignedTopic', topicId:'3'}, 'default clear deletes the selected topic');

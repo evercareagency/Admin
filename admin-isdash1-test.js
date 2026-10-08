@@ -86,8 +86,8 @@ assert.ok(commitDel.includes('isComplianceDeleteTopicId(row)'), 'delete uses the
 assert.ok(!commitDel.includes('assignTopicSel'), 'delete does not use SELECT TOPIC');
 assert.ok(viewCert.includes('isComplianceRows[rowIndex]') && viewCert.includes('printCert(row)'), 'View Cert uses the row');
 assert.ok(printCert.includes('isComplianceRows[rowIndex]') && printCert.includes('printCert(row)'), 'Print Cert uses the row');
-assert.ok(reminder.includes('isComplianceDeleteTopicId(row)'), 'reminder uses the row topic');
-assert.ok(!reminder.includes('sbAssignTopicQuery'), 'reminder does not use SELECT TOPIC');
+assert.ok(reminder.includes("Reminders aren't available yet."), 'reminder says it is not available yet');
+assert.ok(!reminder.includes('apiPost') && !reminder.includes('fetch('), 'reminder does not send anything');
 
 const calls = [];
 const els = {

@@ -107,11 +107,11 @@ assert.ok(completedActs.indexOf('View Results') < completedActs.indexOf('View Ce
 assert.ok(completedActs.indexOf('View Cert') < completedActs.indexOf('Print Cert'), 'View Cert before Print Cert');
 assert.ok(completedActs.indexOf('Print Cert') < completedActs.indexOf('Delete'), 'Print Cert before Delete');
 assert.ok(completedActs.includes('isOfficeCertStaff'), 'certs are office staff only');
-assert.ok(pendingActs.includes('Send Reminder'), 'not completed keeps Send Reminder');
+assert.ok(pendingActs.includes("Reminders aren\\'t available yet."), 'not completed says reminders are not available yet');
 assert.ok(pendingActs.includes('Delete'), 'not completed includes Delete');
 assert.ok(pendingActs.includes('confirmDeleteISAssignment'), 'not completed Delete confirms the assignment');
 assert.ok(!pendingActs.includes('confirmDeleteISResult'), 'not completed Delete does not archive a result');
-assert.ok(pendingActs.indexOf('Send Reminder') < pendingActs.indexOf('Delete'), 'Send Reminder before Delete');
+assert.ok(pendingActs.indexOf("Reminders aren\\'t available yet.") < pendingActs.indexOf('Delete'), 'the reminder note stays before Delete');
 assert.ok(!pendingActs.includes('View Results'), 'not completed has no View Results');
 assert.ok(!pendingActs.includes('View Cert'), 'not completed has no View Cert');
 assert.ok(!pendingActs.includes('Print Cert'), 'not completed has no Print Cert');
@@ -300,9 +300,9 @@ vm.runInContext([pendingActs, onAssign, confirmAssign, extractFn(html, 'function
 sandbox.isComplianceRows=[pending];
 sandbox.showSharedConfirm=function(title, fn, label){sandbox._confirm={title:title,label:label,fn:fn};};
 const pendingHtml=sandbox.isPendingActionsHtml(0);
-assert.ok(pendingHtml.includes('Send Reminder'), 'pending html has Send Reminder');
+assert.ok(pendingHtml.includes("Reminders aren't available yet."), 'pending html says reminders are not available yet');
 assert.ok(pendingHtml.includes('Delete'), 'pending html has Delete');
-assert.ok(pendingHtml.indexOf('Send Reminder')<pendingHtml.indexOf('Delete'), 'pending html order');
+assert.ok(pendingHtml.indexOf("Reminders aren't available yet.")<pendingHtml.indexOf('Delete'), 'pending html order');
 assert.ok(pendingHtml.includes('confirmDeleteISAssignment(0)'), 'pending Delete is wired');
 assert.ok(!pendingHtml.includes('View Results')&&!pendingHtml.includes('Print Cert'), 'pending html has no cert actions');
 sandbox.confirmDeleteISAssignment(0);

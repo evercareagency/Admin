@@ -54,8 +54,9 @@ assert.ok(!load.includes('includeArchived'), 'UI call does not pass includeArchi
 assert.ok(load.includes('paintNurseActivityEmpty(false)') && load.includes('paintNurseActivityEmpty(true)'), 'empty and failed cut results paint an empty state');
 assert.ok(load.indexOf('deriveNurseActivityFromLists()') > load.lastIndexOf('if(cut)'), 'derived fallback is only reached when the cut is off');
 
-const abortLine = (html.match(/var nurseSheetsAction=payload&&\([^;]+\)/) || [])[0] || '';
-assert.ok(abortLine.includes("action==='list_nurse_activity'"), 'rollback activity fetch still carries the nursespd2 abort signal');
+const apiPostSrc = extractFn(html, 'async function apiPost(payload)');
+assert.ok(apiPostSrc.includes('sbNurseActivityDispatch(payload, nurseActivitySignal)'), 'activity dispatch keeps the nursespd2 abort signal');
+assert.ok(apiPostSrc.includes('nurseSheetsSignal()'), 'activity still reads the shared abort signal');
 
 const urlConst = (html.match(/const SUPABASE_URL='([^']+)'/) || [])[1];
 const keyConst = (html.match(/const SUPABASE_ANON_KEY='([^']+)'/) || [])[1];
@@ -253,15 +254,11 @@ function lastBody(){
   sandbox.deriveCalls = 0;
   box.innerHTML = '';
   await sandbox.loadNurseActivityFeed();
-  assert.ok(calls.length >= 1, 'rollback still calls /exec');
-  assert.ok(calls.every(function(c){return c.url.indexOf('/rpc/list_nurse_activity') < 0;}), 'rollback does not call the activity RPC');
-  assert.ok(calls.some(function(c){return c.url.indexOf('script.google.com') >= 0;}));
-  const sheetBody = JSON.parse(calls[0].init.body);
-  assert.strictEqual(sheetBody.action, 'list_nurse_activity');
-  assert.strictEqual(sheetBody.limit, 50);
-  assert.ok(!Object.prototype.hasOwnProperty.call(sheetBody, 'includeArchived'));
-  assert.strictEqual(sandbox.deriveCalls, 1, 'sheets rollback still uses the derived fallback when /exec is empty');
-  assert.ok(box.innerHTML.indexOf('Archived Client Should Not Show') >= 0);
+  assert.ok(calls[0].url.indexOf('/rpc/list_nurse_activity') > 0, 'a sheets query still uses the activity RPC');
+  assert.deepStrictEqual(JSON.parse(calls[0].init.body), {p_limit:50});
+  assert.strictEqual(sandbox.deriveCalls, 0, 'an empty RPC does not derive');
+  assert.ok(box.innerHTML.indexOf('No recent nurse activity.') >= 0);
+  assert.ok(box.innerHTML.indexOf('Archived Client Should Not Show') < 0);
 
   console.log('admin-nurse-activity-sb1-test: ok');
 })().catch(function(err){

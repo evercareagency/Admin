@@ -71,10 +71,12 @@ assert.ok(load.includes('Could not load compliance'), 'RPC failure keeps the emp
 const hydrate = extractFn(html, 'function hydrateNurseComplianceRow(r,extra)');
 assert.ok(hydrate.includes('r.visitCount') && hydrate.includes('r.callCount') && hydrate.includes('r.daysLeftInWindow'), 'hydrate field mapping stays');
 
-const abortLine = (html.match(/var nurseSheetsAction=payload&&\([^;]+\)/) || [])[0] || '';
-assert.ok(abortLine.includes("action==='list_nurse_alerts'") && abortLine.includes("action==='mark_nurse_alerts_read'") && abortLine.includes("action==='list_nurse_activity'"),
-  'Completes Refresh still aborts list, mark, and activity');
-assert.ok(!abortLine.includes('get_supervisory_compliance'), 'compliance is not on the Completes abort list');
+const apiPostSrc = extractFn(html, 'async function apiPost(payload)');
+assert.ok(apiPostSrc.includes("sbIsNurseAlertRpcAction(payload.action)") && apiPostSrc.includes('sbNurseAlertsDispatch(payload, nurseAlertSignal)'),
+  'alert list and mark keep the nursespd2 abort signal');
+assert.ok(apiPostSrc.includes("sbIsNurseActivityAction(payload.action)") && apiPostSrc.includes('sbNurseActivityDispatch(payload, nurseActivitySignal)'),
+  'activity keeps the nursespd2 abort signal');
+assert.ok(!apiPostSrc.includes('get_supervisory_compliance') || apiPostSrc.indexOf('sbNurseComplianceDispatch') > 0, 'compliance stays on its own dispatch');
 
 const box = {
   nurseVisitPdfStash: {},

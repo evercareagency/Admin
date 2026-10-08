@@ -35,14 +35,15 @@ function between(startSig, endSig){
 }
 
 assert.ok(html.includes('GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1'), 'contract is named in the tip');
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(html.includes(anon), 'anon key stays the embedded jwt');
 assert.ok(html.includes("const EVERCARE_ORG_ID='"+ORG+"';"), 'org id');
 assert.ok(!html.includes('rpc/complete_aide_setup'), 'caregiver setup stays off this tip');
 assert.ok(!html.includes("from('aides').insert") && !html.includes("POST','aides'"), 'aides are created through the Ace RPC');
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
-assert.ok(apiPost.indexOf('sbIsAdminWriteAction') < apiPost.indexOf('fetch(SHEETS_URL'), 'admin writes branch before sheets');
+assert.ok(apiPost.includes('sbIsAdminWriteAction'), 'admin writes branch stays');
+assert.ok(!apiPost.includes('fetch('), 'apiPost does not fetch the legacy web app');
 assert.ok(apiPost.includes('sbAdminWriteDispatch(payload)'), 'admin writes delegate');
 assert.ok(apiPost.includes('typeof sbIsAdminWriteAction'), 'missing helper must not throw');
 
@@ -54,14 +55,13 @@ const commitTs = extractFn(html, 'async function commitTimesheetDelete(id)');
 const deleteClientSrc = extractFn(html, 'function deleteClient(id)');
 const commitClientSrc = extractFn(html, 'async function commitDeleteClient(id)');
 assert.ok(saveEdits.includes('sbAdminWriteDispatch'), 'flag-on save edits uses the dispatcher');
-assert.ok(saveEdits.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update',id:currentRec.id,emp_name:currentRec.empName,client_name:currentRec.clientName,total_hours:currentRec.totalHrs,notes:currentRec.notes,days:currentRec.days||{}})}).catch(()=>{});"), 'flag-off timesheet update fetch is unchanged');
-assert.ok(saveEdits.indexOf('sbAdminWriteDispatch') < saveEdits.indexOf('fetch(SHEETS_URL'), 'supabase return happens before the sheets fetch');
+assert.ok(!saveEdits.includes('fetch('), 'timesheet edit does not fetch the legacy web app');
+assert.ok(saveEdits.includes('sbAdminWriteDispatch'), 'timesheet edit uses the dispatcher');
 assert.ok(sendCorrFn.includes("action:'send_correction'"), 'correction action name stays');
-assert.ok(sendCorrFn.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_correction',id:currentRec.id,correctionDays,correctionNote:note})})"), 'flag-off send_correction fetch is unchanged');
-assert.ok(commitTs.includes("fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});"), 'flag-off timesheet delete fetch is unchanged');
-assert.ok(commitTs.includes("apiPost({action:'delete',id:id})"), 'flag-on timesheet delete posts action delete');
+assert.ok(!sendCorrFn.includes('fetch('), 'correction does not fetch the legacy web app');
+assert.ok(!commitTs.includes('fetch('), 'timesheet delete does not fetch the legacy web app');
+assert.ok(commitTs.includes("apiPost({action:'delete',id:id})"), 'timesheet delete posts action delete');
 assert.ok(commitTs.includes('data.success===true&&data.is_active===false'), 'timesheet success requires is_active false');
-assert.ok(commitTs.indexOf('evercareSbEnabled()') < commitTs.indexOf('fetch(SHEETS_URL'), 'sheets delete stays on the flag-off branch');
 assert.ok(quickDelete.includes("showSharedConfirm('Delete this timesheet?'"), 'row delete confirms Delete this timesheet?');
 assert.ok(quickDelete.includes("'Delete'"), 'row delete primary is Delete');
 assert.ok(quickDelete.includes('commitTimesheetTrash'), 'row delete uses the trash path');
@@ -279,13 +279,13 @@ const clientRow = {
     const payload = offPayloads[i];
     const off = harness({search:'?sheets=1', responses:[{status:200, raw:JSON.stringify({success:true})}]});
     const data = await off.box.apiPost(payload);
-    assert.strictEqual(data.success, true, payload.action);
-    assert.strictEqual(off.calls.length, 1, payload.action+' flag off is one sheets call');
-    assert.strictEqual(off.calls[0].url, sheetsUrl, payload.action);
-    assert.strictEqual(off.calls[0].init.method, 'POST');
-    assert.strictEqual(off.calls[0].init.headers['Content-Type'], 'text/plain;charset=utf-8');
-    assert.deepStrictEqual(bodyOf(off.calls[0]), payload, payload.action+' body unchanged');
-    assert.ok(off.calls[0].url.indexOf('/exec') > 0, payload.action);
+    assert.strictEqual(data.success, false, payload.action);
+    assert.strictEqual(off.calls.length, 0, payload.action+' makes no legacy call');
+    if(payload.action==='complete_aide_setup'||payload.action==='log_activity'){
+      assert.strictEqual(data.error, 'Not available on this desk.', payload.action);
+    }else{
+      assert.strictEqual(data.error, 'Not signed in', payload.action);
+    }
   }
 
   const storageOn = harness({
@@ -313,12 +313,12 @@ const clientRow = {
     search:'',
     role:'Nurse',
     session:session(),
-    responses:[{status:200, raw:JSON.stringify({success:true})}]
+    responses:[{status:201, raw:JSON.stringify([{id:clientId, name:'Ann', address:'1 Main', is_active:true, org_id:ORG}])}]
   });
   const nurseSaved = await nurseWrite.box.apiPost({action:'add_client', name:'Ann', address:'1 Main', lat:'', lng:'', assignedAides:[]});
   assert.strictEqual(nurseSaved.success, true);
-  assert.strictEqual(nurseWrite.calls[0].url, sheetsUrl, 'nurse client write stays on sheets');
-  assert.ok(!nurseWrite.calls.some(function(c){return c.url.indexOf('supabase.co') >= 0;}));
+  assert.ok(nurseWrite.calls[0].url.indexOf('/rest/v1/clients') > 0, nurseWrite.calls[0].url);
+  assert.strictEqual(nurseWrite.calls[0].init.method, 'POST');
 
   const noJwt = harness({search:''});
   const missing = await noJwt.box.apiPost({action:'admin_create_aide', username:'jdoe', fullName:'Jane Doe', tempPassword:'EcLocal99'});
@@ -635,10 +635,13 @@ const clientRow = {
       {status:200, raw:JSON.stringify({success:true})}
     ]
   });
-  await stillSheets.box.apiPost({action:'complete_aide_setup', username:'jdoe'});
-  await stillSheets.box.apiPost({action:'save_new_client_intake', clientName:'Ann'});
-  assert.strictEqual(stillSheets.calls.length, 2);
-  assert.ok(stillSheets.calls.every(function(c){return c.url === sheetsUrl;}));
+  const setupClosed = await stillSheets.box.apiPost({action:'complete_aide_setup', username:'jdoe'});
+  const intakeClosed = await stillSheets.box.apiPost({action:'save_new_client_intake', clientName:'Ann'});
+  assert.strictEqual(stillSheets.calls.length, 0, 'unrouted actions do not call the legacy web app');
+  assert.strictEqual(setupClosed.success, false);
+  assert.strictEqual(setupClosed.error, 'Not available on this desk.');
+  assert.strictEqual(intakeClosed.success, false);
+  assert.strictEqual(intakeClosed.error, 'Not available on this desk.');
 
   const profileOrg = harness({
     search:'?sb=1',

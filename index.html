@@ -12,6 +12,9 @@
 <!-- pay admin1 2026-10-08 v=pay-admin1 ?v=pay-admin1 admin-build 2026-10-08-pay-admin1. PAY_ADMIN1. Payroll is Admin-only. Scheduler and Nurse share this portal but must not see pay UI and must not call pay or payroll RPCs. The gate reads currentAdminRole, the signed-in session role set by applyAdminSession, the same source layoutA1ApplyRoles already uses. It does not read a control a person can toggle. #payReady is data-layout-roles Admin. payAdmin1MaybeLoad skips payReadyLoad unless that role is Admin, and payReadyFetchAce, payReadyHold, and payReadyExport return before sbRestRpc for admin_timesheet_pay_readiness, admin_set_timesheet_pay_hold, and admin_timesheet_pay_export. The rest of the Timesheets tab stays for Scheduler. The Messages Remi pay-dispute card stays Admin-only: admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply are not called for Scheduler or Nurse. remiIdeas763OfficeOk still lets Scheduler use Why open and bilingual cover. A Scheduler payroll range ask in Remi chat is answered Payroll is Admin-only and does not post admin_parse_remi_payroll_range. remiPayroll1OfficeOk is Admin-only, so payroll load, run, confirm, and export stay off that RPC for Scheduler and Nurse. Admin behavior stays. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-pay-admin1">
 <script>var PAY_ADMIN1='PAY_ADMIN1';var PAY_ADMIN1_MARKER='v=pay-admin1';var PAY_ADMIN1_BUILD='2026-10-08-pay-admin1';</script>
+<!-- exec off1 2026-10-08 v=exec-off1 ?v=exec-off1 admin-build 2026-10-08-exec-off1. EXEC_OFF1. Supabase is the only desk. The legacy web app, its URL constant, warm-up, keep-alive, ping, and rollback flag are gone. log_activity posts rpc/log_office_activity {p_activity}. get_activity_log posts rpc/list_office_activity {p_limit}. An empty Activity Log shows No activity recorded yet. Nurse get_clients and get_users use the same Supabase list path as Admin. In-service reminders are not sent; the row says reminders aren't available yet. archive_new_client_intake_pdf is dropped. A Complete intake saves without a PDF and shows PDF will be available soon. The Storage upload waits for nci-pdf-sb1. Unrouted actions return Not available on this desk and make no network call. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, sec1-ui login, forgot, and idle, pay-admin1 gates, and nurse activity and compliance stay. -->
+<meta name="admin-build" content="2026-10-08-exec-off1">
+<script>var EXEC_OFF1='EXEC_OFF1';var EXEC_OFF1_MARKER='v=exec-off1';var EXEC_OFF1_BUILD='2026-10-08-exec-off1';</script>
 <!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
 <meta name="admin-build" content="2026-10-08-sec1-ui">
 <script>var SEC1_UI='sec1-ui';var SEC1_UI_MARKER='v=sec1-ui';var SEC1_UI_BUILD='2026-10-08-sec1-ui';</script>
@@ -5278,7 +5281,6 @@ Call (216) 377-5991 with any questions.</textarea>
 </div>
 
 <script>
-const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7reMvaygQ2tDQgxfidaytVZBykIvl-yT3X0qgnpufAg6Xku4/exec';
 const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplYWxrcHR3Z2lmbmtia3VhdnZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMDExMTAsImV4cCI6MjEwNTc3NzExMH0.b-3Pdb_oVR3L6JM0yd_aQcqtQH8exGV7OPwdtx0b3Xg';
 const EVERCARE_ORG_ID='4f97f4d3-6635-4544-904c-6b06aa02d40b';
@@ -5571,75 +5573,44 @@ const _memCache={};
 const _inflight={};
 
 
-// Wake Apps Script as soon as this file runs so the first login is less cold.
-// ping is the lightweight no-op; GET matches the existing doGet warm. Both soft-fail offline.
-// Cross-origin /exec redirects never show up in Resource Timing, so also beacon same-origin ./exec.
-// Flag flips only after those fetch() calls are invoked. Sign Out keep-alive resets it each tick.
-function warmUpSheets(){
-  // v=warmoff1: data-backend cut skips Sheets /exec warmkeep so Admin/Scheduler login first paint is not blocked.
-  // Rollback (?sheets=1 / evercare_sheets=1) still pings. Nurse feature /exec is not this beacon.
-  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled())return;
-  if(window._sheetsWarmUpStarted)return;
-  var post=fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'ping'}),mode:'cors',cache:'no-store'});
-  var get=fetch(SHEETS_URL,{method:'GET',mode:'cors',cache:'no-store'});
-  var beacon=fetch(new URL('exec', location.href).href+'?t='+Date.now(),{cache:'no-store',mode:'cors'});
-  window._sheetsWarmUpStarted=true;
-  post.catch(function(){});
-  get.catch(function(){});
-  // A 200 fetch is missing from Resource Timing until the body is read. Soft-fail either way.
-  beacon.then(function(r){return r&&r.text?r.text():null;}).catch(function(){});
-}
-warmUpSheets();
-
-
 document.addEventListener('DOMContentLoaded',function(){
-  warmUpSheets();
   if(typeof syncSbRoleField==='function')syncSbRoleField();
   if(typeof nciBindDateMask==='function')nciBindDateMask();
   if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();
 });
 
 async function apiPost(payload){
-  // sbcut v=sbcut1: aides, clients, assignments, payroll timesheets, office supervisory contacts,
-  // and inservice compliance/results are Supabase by default. Admin writes too.
-  // Those returns happen before the /exec post — no Sheets dual-write on the Supabase path.
-  // Emergency rollback (?sheets=1 or evercare_sheets=1) makes evercareSbEnabled() false.
-  // v=nursenb1: intakes (every role) and Nurse supervisory list/save/archive use Ace when the cut is on.
-  // v=nurse-compliance-sb1: get_supervisory_compliance, list_nurse_alerts, and mark_nurse_alerts_read use Ace when the cut is on.
-  // v=nurse-activity-sb1b: list_nurse_activity uses Ace when the cut is on ({p_limit:50}, p_include_archived omitted). Nurse client writes stay on Sheets /exec.
-  // Rollback (?sheets=1 / evercare_sheets=1) keeps compliance, alerts, and activity on /exec.
-  // Broadcast Alert does not use apiPost.
+  // exec-off1: Supabase gates only. No legacy web-app post and no rollback branch.
+  // Lists, supervisory, inservice, and admin writes run for Admin, Scheduler, and Nurse.
+  // Nurse supervisory still uses sbNurseSupervisoryDispatch first.
   var sbOn=typeof evercareSbEnabled==='function'&&evercareSbEnabled();
   if(sbOn&&payload&&typeof sbIsNurseIntakeAction==='function'&&sbIsNurseIntakeAction(payload.action)){
     return sbNurseIntakeDispatch(payload);
   }
-  var nurseSheets=false;
-  try{nurseSheets=(typeof currentAdminRole!=='undefined'&&currentAdminRole==='Nurse');}catch(eNurse){nurseSheets=false;}
-  if(nurseSheets&&sbOn&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)&&typeof sbNurseSupervisoryDispatch==='function'){
+  var nurseRole=false;
+  try{nurseRole=(typeof currentAdminRole!=='undefined'&&currentAdminRole==='Nurse');}catch(eNurse){nurseRole=false;}
+  if(nurseRole&&sbOn&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)&&typeof sbNurseSupervisoryDispatch==='function'){
     return sbNurseSupervisoryDispatch(payload);
   }
-  if(!nurseSheets){
-  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
+  if(sbOn&&payload&&typeof sbIsListAction==='function'&&sbIsListAction(payload.action)){
     return sbApiList(payload);
   }
-  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)){
+  if(sbOn&&payload&&typeof sbIsSupervisoryAction==='function'&&sbIsSupervisoryAction(payload.action)){
     return sbApiSupervisory(payload);
   }
-  if(payload&&evercareSbEnabled()&&typeof sbInserviceAction==='function'&&sbInserviceAction(payload.action)){
+  if(payload&&sbOn&&typeof sbInserviceAction==='function'&&sbInserviceAction(payload.action)){
     return sbInserviceDispatch(payload);
   }
-  if(payload&&typeof sbIsAdminWriteAction==='function'&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()&&sbIsAdminWriteAction(payload.action)){
+  if(payload&&sbOn&&typeof sbIsAdminWriteAction==='function'&&sbIsAdminWriteAction(payload.action)){
     return sbAdminWriteDispatch(payload);
   }
-  }
-  // v=cgreset1: aide Auth passwords never fall through to Sheets reset_password/set_password on the cut, including Nurse.
+  // v=cgreset1: aide Auth passwords use the Supabase reset path, including Nurse.
   if(sbOn&&payload&&(payload.action==='reset_password'||payload.action==='set_password'||payload.action==='reset_temp_password'||payload.action==='reset_aide_temp_password'||payload.action==='admin_create_aide'||payload.action==='create_aide')){
     if(typeof sbAdminWriteDispatch==='function')return sbAdminWriteDispatch(payload);
     return {success:false,error:'Could not reset password.'};
   }
   // v=nurse-compliance-sb1: compliance list and the nurse-alert badge. Failure stays here — no Sheets fallback while the cut is on.
-  // v=nurse-activity-sb1b: activity is its own gate (not the alerts gate). This runs before the SHEETS_URL check so a bad /exec URL cannot block the RPC.
-  // Cut ON activity failure stays in sbNurseActivityDispatch — no Sheets fallback.
+  // v=nurse-activity-sb1b: activity is its own gate. Cut ON failure stays in sbNurseActivityDispatch.
   if(sbOn&&payload&&typeof sbIsNurseComplianceAction==='function'&&sbIsNurseComplianceAction(payload.action)&&typeof sbNurseComplianceDispatch==='function'){
     return sbNurseComplianceDispatch(payload);
   }
@@ -5657,35 +5628,9 @@ async function apiPost(payload){
     }
     return sbNurseActivityDispatch(payload, nurseActivitySignal);
   }
-  if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
-    throw new Error('SHEETS_URL missing or not Apps Script /exec');
-  }
-  // nursespd2: nurse-alert fetches can be aborted so Completes Refresh is not stuck behind list/mark/activity.
-  // Cut ON list/mark/activity already returned above (SB + the same abort signal). This /exec path is sheets rollback only.
-  var sheetInit={method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload),mode:'cors',cache:'no-store'};
-  var nurseSheetsAction=payload&&(payload.action==='list_nurse_alerts'||payload.action==='mark_nurse_alerts_read'||payload.action==='list_nurse_activity');
-  if(nurseSheetsAction&&typeof nurseSheetsSignal==='function'){
-    try{sheetInit.signal=nurseSheetsSignal();}catch(eSig){}
-  }
-  var res;
-  try{
-    res=await fetch(SHEETS_URL,sheetInit);
-  }catch(sheetErr){
-    if(sheetErr&&sheetErr.name==='AbortError')return {success:false,aborted:true};
-    throw sheetErr;
-  }
-  const raw=await res.text();
-  let data=null;
-  try{data=JSON.parse(raw);}catch(parseErr){
-    // GAS crashes return HTML Error pages — surface the real message (not "stub")
-    let msg='Sheets returned non-JSON (HTTP '+res.status+').';
-    const m=raw.match(/Error:\s*([^<\n]+)/i)||raw.match(/TypeError:\s*([^<\n]+)/i);
-    if(m)msg='Sheets error: '+m[1].trim();
-    else if(/<!DOCTYPE html/i.test(raw))msg='Sheets script crashed (HTML error page). Check Apps Script deploy.';
-    return {success:false,error:msg,httpStatus:res.status,_nonJson:true};
-  }
-  if(!res.ok&&data&&!data.error)data.error='HTTP '+res.status;
-  return data;
+  var execOff1Action='';
+  try{execOff1Action=payload&&payload.action?String(payload.action):'';}catch(eExecOff1){execOff1Action='';}
+  return {success:false,error:'Not available on this desk.',action:execOff1Action,execOff:true};
 }
 function _cacheKey(action){return 'ec_cache_'+action;}
 function cacheGet(action){
@@ -5832,25 +5777,7 @@ function formatDateTimeLabel(val){
 
 
 
-function stopLoginWarmKeepAlive(){
-  if(window._loginWarmTimer){clearInterval(window._loginWarmTimer);window._loginWarmTimer=null;}
-}
-function startLoginWarmKeepAlive(){
-  // v=warmoff1: login-screen keep-alive is Sheets-rollback only. Cut-on Admin/Scheduler must not beacon /exec.
-  if(typeof evercareSbEnabled==='function'&&evercareSbEnabled())return;
-  window._sheetsWarmUpStarted=false;
-  window._sheetsWarmUpAt=0;
-  warmUpSheets();
-  if(window._loginWarmTimer)return;
-  window._loginWarmTimer=setInterval(function(){
-    var el=document.getElementById('loginScreen');
-    if(!el||!el.classList.contains('active')){stopLoginWarmKeepAlive();return;}
-    window._sheetsWarmUpStarted=false;
-    window._sheetsWarmUpAt=0;
-    warmUpSheets();
-  },1100);
-}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='loginScreen')startLoginWarmKeepAlive();else stopLoginWarmKeepAlive();if(typeof loginKbClear==='function')loginKbClear();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(typeof loginKbClear==='function')loginKbClear();}
 let _modalScrollY=0;
 function lockBodyScroll(){
   if(document.body.dataset.modalLock==='1')return;
@@ -30948,7 +30875,6 @@ function enforceAdminSessionTimeout(){
 }
 function bootAdminPortal(){
   if(typeof bindAdminIdleWatch==='function')bindAdminIdleWatch();
-  warmUpSheets();
   syncSbRoleField();
   if(/[?&](?:printSample|certSample)=1(?:&|$)/.test(location.search||''))return;
   const sess=restoreAdminSession();
@@ -30961,13 +30887,7 @@ function bootAdminPortal(){
 }
 
 function evercareSbEnabled(){
-  // sbcut v=sbcut1 — migrated surfaces use Supabase unless emergency Sheets rollback.
-  // Rollback ONLY: ?sheets=1 or localStorage evercare_sheets=1. Missing ?sb=1 does not select Sheets.
-  try{
-    var search=(typeof location!=='undefined'&&location&&location.search)||'';
-    if(/(?:^|[?&])sheets=1(?:&|$)/.test(search))return false;
-    if(typeof localStorage!=='undefined'&&localStorage.getItem('evercare_sheets')==='1')return false;
-  }catch(e){}
+  // exec-off1: Supabase is the only desk. The rollback flag is gone.
   return true;
 }
 function syncSbRoleField(){
@@ -33656,11 +33576,6 @@ async function mgrLogin(){
       }
       return;
     }
-    if(errEl){
-      errEl.textContent='Sheets sign-in is no longer available. Contact the office administrator.';
-      errEl.style.display='block';
-    }
-    try{if(typeof showScreen==='function')showScreen('loginScreen');}catch(eStay){}
   }catch(e){
     if(errEl){
       errEl.textContent='Connection error. Please try again.';
@@ -33676,32 +33591,41 @@ async function mgrLogin(){
 async function logActivity(action){
   if(!currentAdminRole)return;
   try{
-    fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'log_activity',role:currentAdminRole,activity:action})}).catch(()=>{});
+    var ctl=typeof AbortController==='function'?new AbortController():null;
+    var timer=ctl?setTimeout(function(){try{ctl.abort();}catch(eAbort){}},10000):null;
+    sbRestRpc('log_office_activity',{p_activity:String(action||'')},ctl&&ctl.signal).catch(function(){}).then(function(){if(timer)clearTimeout(timer);},function(){if(timer)clearTimeout(timer);});
   }catch(e){}
 }
-
 async function renderActivityLog(){
   const tbody=document.getElementById('activityLogBody');
   const empty=document.getElementById('activityLogEmpty');
   if(!tbody)return;
   tbody.innerHTML='<tr><td colspan="3" style="text-align:center;padding:16px;color:var(--muted)">Loading...</td></tr>';
+  if(empty){
+    empty.style.display='none';
+    var note=empty.querySelector('p');
+    if(note)note.textContent='No activity recorded yet.';
+  }
+  var ctl=typeof AbortController==='function'?new AbortController():null;
+  var timer=ctl?setTimeout(function(){try{ctl.abort();}catch(eAbort){}},10000):null;
   try{
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'get_activity_log'})});
-    const data=await res.json();
-    if(data.success&&data.data&&data.data.length){
-      empty.style.display='none';
-      tbody.innerHTML=data.data.slice().reverse().map(r=>`<tr>
-        <td style="font-size:0.78rem">${formatDateTimeLabel(r.timestamp)}</td>
-        <td><span style="background:${r.role==='Admin'?'#e8f4f4':'#fff3e0'};color:${r.role==='Admin'?'var(--teal-dark)':'var(--warn)'};padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600">${r.role}</span></td>
-        <td style="font-size:0.82rem">${formatAdminDateCopy(r.activity)}</td>
-      </tr>`).join('');
-    } else {
-      empty.style.display='block';
+    const got=await sbRestRpc('list_office_activity',{p_limit:200},ctl&&ctl.signal);
+    var data=got&&got.ok?got.data:null;
+    if(typeof data==='string'){try{data=JSON.parse(data);}catch(eParse){data=null;}}
+    if(data&&data.success&&Array.isArray(data.data)&&data.data.length){
+      if(empty)empty.style.display='none';
+      tbody.innerHTML=data.data.slice().reverse().map(function(r){
+        return '<tr><td style="font-size:0.78rem">'+formatDateTimeLabel(r.timestamp)+'</td><td><span style="background:'+(r.role==='Admin'?'#e8f4f4':'#fff3e0')+';color:'+(r.role==='Admin'?'var(--teal-dark)':'var(--warn)')+';padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:600">'+r.role+'</span></td><td style="font-size:0.82rem">'+formatAdminDateCopy(r.activity)+'</td></tr>';
+      }).join('');
+    }else{
+      if(empty)empty.style.display='block';
       tbody.innerHTML='';
     }
   }catch(e){
-    empty.style.display='block';
+    if(empty)empty.style.display='block';
     tbody.innerHTML='';
+  }finally{
+    if(timer)clearTimeout(timer);
   }
 }
 
@@ -34653,23 +34577,8 @@ async function renderBackupRequests(){
         return r;
       });
     }else{
-      const data=await apiPost({action:'list_timesheet_backups'});
-      const list=(data&&data.success&&Array.isArray(data.data))?data.data:[];
-      allBackupRecords=list.map(function(r){
-        return {
-          id:r.id,
-          backedUpAt:r.backedUpAt||r.submitted||'',
-          empName:r.empName||r.emp_name||'',
-          username:r.username||'',
-          clientName:r.clientName||r.client_name||'',
-          svcType:r.svcType||r.svc_type||'',
-          weekStart:r.weekStart||r.week_start||'',
-          totalHrs:r.totalHrs||r.total_hours||r.totalHours||'0:00',
-          notes:r.notes||'',
-          days:r.days||{},
-          status:r.status||''
-        };
-      }).filter(layoutA1DraftOpen);
+      layoutA1BackupFail('Not available on this desk.');
+      return;
     }
   }catch(e){
     layoutA1BackupFail('Could not load phone-change drafts.');
@@ -37556,8 +37465,7 @@ function saveEdits(){
     }).catch(function(){showTempMsg('Could not save timesheet.','var(--danger)');});
     return;
   }
-  fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'update',id:currentRec.id,emp_name:currentRec.empName,client_name:currentRec.clientName,total_hours:currentRec.totalHrs,notes:currentRec.notes,days:currentRec.days||{}})}).catch(()=>{});
-  showTempMsg('✅ Changes saved!','var(--success)');renderTimesheets();
+  showTempMsg('Not available on this desk.','var(--danger)');
 }
 
 function showCorrectionPanel(){
@@ -37588,7 +37496,8 @@ async function sendCorrectionRequest(){
       const wrote=await sbAdminWriteDispatch({action:'send_correction',id:currentRec.id,correctionDays:correctionDays,correctionNote:note});
       if(!(wrote&&wrote.success))throw new Error((wrote&&wrote.error)||'Error sending correction.');
     }else{
-      await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_correction',id:currentRec.id,correctionDays,correctionNote:note})});
+      showTempMsg('Not available on this desk.','var(--danger)');
+      return;
     }
     const idx=allRecords.findIndex(r=>String(r.id)===String(currentRec.id));
     if(idx!==-1){allRecords[idx].status='correction_requested';store.set('admin_records',allRecords);}
@@ -37685,10 +37594,7 @@ async function commitTimesheetDelete(id){
       return;
     }
   }
-  allRecords=allRecords.filter(r=>String(r.id)!==String(id));
-  store.set('admin_records',allRecords);
-  fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})}).catch(()=>{});
-  renderTimesheets();showTempMsg('🗑️ Deleted.','var(--danger)');
+  showTempMsg('Not available on this desk.','var(--danger)');
 }
 async function commitTimesheetArchiveRestore(id){
   if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
@@ -38476,11 +38382,8 @@ async function changeRolePassword(role){
       logActivity('Changed '+role+' password');
       return;
     }
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'change_admin_password',role,password:newp})});
-    input.value='';
-    ok.textContent='✅ '+role+' password updated!';
-    ok.style.display='block';
-    logActivity('Changed '+role+' password');
+    err.textContent='Not available on this desk.';
+    err.style.display='block';
   }catch(e){
     err.textContent='Error updating password. Try again.';
     err.style.display='block';
@@ -38521,13 +38424,10 @@ async function adminResetCaregiverPwd(){
     }
     return;
   }
-  try{
-    await apiPost({action:'reset_password',username:user,password:pwd});cacheInvalidate('get_users');
-    if(userEl)userEl.value='';
-    if(pwdEl)pwdEl.value='';
-    if(ok){ok.textContent='✅ Password reset for @'+user+'!';ok.style.display='block';}
-    logActivity('Reset caregiver password for @'+user);
-  }catch(e){if(err){err.textContent='Error. Try again.';err.style.display='block';}}
+  if(err){
+    err.textContent='Not available on this desk.';
+    err.style.display='block';
+  }
 }
 
 function showTempMsg(msg,color,holdMs){
@@ -39524,7 +39424,7 @@ function isCompletedActionsHtml(i){
 }
 function isPendingActionsHtml(i){
   const row=isComplianceRows[i]||{};
-  const remind='<button type="button" class="btn btn-sm" style="background:#fff3e0;color:var(--warn)" onclick="sendISReminder('+i+')">📢 Send Reminder</button>';
+  const remind='<span style="display:inline-block;max-width:220px;color:var(--warn);font-size:0.75rem;line-height:1.35">Reminders aren\'t available yet.</span>';
   const del=row.inAssignmentScope===true
     ?'<button type="button" class="btn btn-sm" style="background:#fde8e8;color:var(--danger)" onclick="confirmDeleteISAssignment('+i+')">Delete</button>'
     :'<button type="button" class="btn btn-sm is-compliance-delete-off" disabled title="Not assigned — nothing to remove" style="background:#eef1f4;color:#8b95a1;opacity:0.45;cursor:not-allowed">Delete</button>';
@@ -40073,20 +39973,9 @@ async function loadISCompliance(force){
 }
 
 async function sendISReminder(rowIndexOrUsername,name){
-  try{
-    let username=rowIndexOrUsername,label=name,topicId='';
-    if(typeof rowIndexOrUsername==='number'){
-      const row=isComplianceRows[rowIndexOrUsername]||{};
-      username=row.username;
-      label=row.empName||row.username;
-      topicId=isComplianceDeleteTopicId(row);
-    }
-    if(!topicId){showTempMsg('No topic currently assigned.','var(--danger)');return;}
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'send_is_reminder',username,topicId:topicId})});
-    showTempMsg('📢 Reminder sent to '+(label||username)+'!','var(--success)');
-  }catch(e){
-    showTempMsg('Error sending reminder. Try again.','var(--danger)');
-  }
+  void rowIndexOrUsername;
+  void name;
+  showTempMsg("Reminders aren't available yet.",'var(--warn)');
 }
 
 function viewISCert(rowIndex){
@@ -44016,9 +43905,8 @@ async function saveNewClientIntake(status){
       }
       // pdfPending / empty pdfLink is success — never fail or roll back Complete.
       // Toast BEFORE close/reload so the generating message is not wiped.
-      if(nciPdfNeedsFollowup(meta)){
-        showTempMsg('Saved — PDF generating','var(--success)',0);
-        nciEnsureCompletePdf(nciState.intakeId,meta.pdfError);
+      if(!(nciPdfStoragePath(meta)||nciStr(meta.pdfLink))){
+        showTempMsg('PDF will be available soon','var(--teal)');
       }else if(wasCompleteEdit){
         showTempMsg('Saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       }else{
@@ -44072,13 +43960,9 @@ function nciPickPdfMeta(obj){
 }
 function nciPdfNeedsFollowup(meta){
   if(!meta)return true;
+  if(nciStr(meta.pdfStoragePath)||nciPdfStoragePath(meta))return false;
   if(nciStr(meta.pdfLink))return false;
   return true;
-}
-
-async function archiveNewClientIntakePdf(intakeId){
-  // Ace PDF archive — action locked: archive_new_client_intake_pdf { intakeId }.
-  return apiPost({action:'archive_new_client_intake_pdf',intakeId:(intakeId==null||intakeId==='')?'':String(intakeId)});
 }
 
 async function getNewClientIntake(intakeId, opts){
@@ -44099,137 +43983,6 @@ function nciApplyCompletePdf(intakeId,pdfLink,pdfFileId){
   const prev=nciLastCompletePdf&&String(nciLastCompletePdf.intakeId)===id?nciLastCompletePdf:null;
   nciLastCompletePdf={intakeId:id,pdfLink:link,pdfFileId:pdfFileId||'',pdfStoragePath:(prev&&prev.pdfStoragePath)||''};
   nciRememberCompletePdf(id,link,pdfFileId||'',nciLastCompletePdf.pdfStoragePath);
-}
-
-const NCI_PDF_POLL_MS=60000;
-const NCI_ARCHIVE_RETRY_MS=3000;
-const NCI_PDF_INTERIM_WARN_MS=8000;
-
-function nciLogArchiveShape(archived){
-  const meta=nciPickPdfMeta(archived&&typeof archived==='object'?archived:{});
-  const err=nciStr(archived&&(archived.pdfError||archived.error||archived.message));
-  console.warn('archive_new_client_intake_pdf',{
-    action:(archived&&archived.action)||'archive_new_client_intake_pdf',
-    success:archived?archived.success:undefined,
-    pdfLink:meta.pdfLink||'',
-    pdfError:meta.pdfError||err||'',
-    pdfPending:!!(archived&&nciIsPdfPending(archived))
-  });
-}
-function nciArchiveHardError(archived,err){
-  if(err)return nciStr(err.message)||'PDF archive failed';
-  const meta=nciPickPdfMeta(archived&&typeof archived==='object'?archived:{});
-  if(meta.pdfError)return meta.pdfError;
-  if(archived&&archived.success===false){
-    return nciStr(archived.error||archived.message)||'PDF archive failed';
-  }
-  return '';
-}
-async function nciCallArchivePdf(intakeId){
-  try{
-    const archived=await archiveNewClientIntakePdf(intakeId);
-    nciLogArchiveShape(archived);
-    return {archived:archived,meta:nciPickPdfMeta(archived),err:null};
-  }catch(err){
-    nciLogArchiveShape({
-      action:'archive_new_client_intake_pdf',
-      success:false,
-      pdfLink:'',
-      pdfError:nciStr(err&&err.message),
-      pdfPending:false
-    });
-    return {archived:null,meta:null,err:err};
-  }
-}
-
-async function nciPollCompletePdfLink(intakeId,budgetMs){
-  const id=String(intakeId||'');
-  const deadline=Date.now()+(budgetMs||NCI_PDF_POLL_MS);
-  while(Date.now()<deadline){
-    try{
-      const got=await getNewClientIntake(id);
-      const meta=nciPickPdfMeta(got);
-      if(meta.pdfLink){
-        nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
-        return meta;
-      }
-    }catch(e){}
-    try{
-      nciInvalidateCompleteListCache();
-      await loadCompletedNewClientIntakes();
-      const row=(nciCompletedRows||[]).find(function(r){return nciIntakeIdOf(r)===id;})||null;
-      const link=pickIntakePdfLink(row);
-      if(link){
-        nciApplyCompletePdf(id,link,row&&row.pdfFileId);
-        return {intakeId:id,pdfLink:link,pdfFileId:nciStr(row&&row.pdfFileId),pdfError:'',pdfPending:false};
-      }
-    }catch(e){}
-    const left=deadline-Date.now();
-    if(left<=0)break;
-    await nciSleep(Math.min(2000,left));
-  }
-  return null;
-}
-
-async function nciEnsureCompletePdf(intakeId,priorPdfError){
-  const id=nciStr(intakeId);
-  if(!id){
-    console.error('nciEnsureCompletePdf missing intakeId');
-    showTempMsg('Saved Complete but missing intakeId — PDF cannot start','var(--danger)');
-    return;
-  }
-  let pdfError=nciStr(priorPdfError);
-  let ready=false;
-  let warned=false;
-  const started=Date.now();
-  const markReady=function(meta){
-    if(!meta||!meta.pdfLink)return false;
-    nciApplyCompletePdf(id,meta.pdfLink,meta.pdfFileId);
-    if(!ready){
-      ready=true;
-      showTempMsg('PDF ready','var(--success)');
-      loadCompletedNewClientIntakes();
-    }
-    return true;
-  };
-  const applyArchive=function(result){
-    result=result||{};
-    const hard=nciArchiveHardError(result.archived,result.err);
-    if(hard)pdfError=hard;
-    if(result.meta)markReady(result.meta);
-    return hard;
-  };
-  const warnIfPending=function(){
-    if(ready||warned)return;
-    const wait=NCI_PDF_INTERIM_WARN_MS-(Date.now()-started);
-    if(wait>0){
-      nciSleep(wait).then(warnIfPending);
-      return;
-    }
-    warned=true;
-    showTempMsg(pdfError||'PDF not ready yet','var(--warn)');
-  };
-  try{
-    // Do not await archive — Complete hang must stay fast.
-    const archiveP=nciCallArchivePdf(id).then(applyArchive);
-    const pollP=nciPollCompletePdfLink(id,NCI_PDF_POLL_MS).then(function(meta){
-      markReady(meta);
-      return meta;
-    }).catch(function(){return null;});
-    archiveP.then(function(firstHard){
-      if(ready||firstHard)return null;
-      return nciSleep(NCI_ARCHIVE_RETRY_MS).then(function(){
-        if(ready)return null;
-        return nciCallArchivePdf(id).then(applyArchive);
-      });
-    }).catch(function(){return null;});
-    nciSleep(NCI_PDF_INTERIM_WARN_MS).then(warnIfPending);
-    await pollP;
-    if(!ready)warnIfPending();
-  }catch(e){
-    pdfError=pdfError||nciStr((e&&e.message)||'');
-    if(!ready)warnIfPending();
-  }
 }
 
 async function resumeNewClientIntake(intakeId,opts){
@@ -44420,7 +44173,7 @@ function nciCompletedTableHtml(rows){
     const done=escapeHtml(toEasternMDY(nciIntakeCompletedAt(r))||'—');
     const nurse=escapeHtml(r.nurseName||r.nurseUsername||'—');
     const pdf=!!(nciPdfStoragePath(r)||nciLegacyDriveUrl(r));
-    const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF pending</span>';
+    const pdfCell=pdf?'<span class="badge badge-ok">PDF ready</span>':'<span class="nci-pdf-pending">PDF will be available soon</span>';
     const safe=escapeAttr(id);
     return `<tr>
       <td><strong>${name}</strong></td>
@@ -44779,7 +44532,7 @@ async function viewCompletedIntakePdf(intakeId){
       return;
     }
   }catch(e){}
-  showTempMsg('PDF not ready yet','var(--warn)');
+  showTempMsg('PDF will be available soon','var(--teal)');
 }
 
 // ─── ADMIN / SCHEDULER NURSE SECTION ─────────────────────

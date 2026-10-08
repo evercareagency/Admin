@@ -44,8 +44,8 @@ assert.ok(resetFn && createFn && writeGate && dispatch && resetHelper && apiPost
 assert.ok(resetFn.includes("postAideAction('reset_temp_password','reset_aide_temp_password'"), 'Settings reuses the office reset helper');
 assert.ok(resetFn.includes('showAideTempPasswordOnce'), 'success shows the temp password');
 assert.ok(resetFn.includes('Temporary password:'), 'card repeats the temp password');
-assert.ok(/evercareSbEnabled\(\)\)\{[\s\S]*return;[\s\S]*action:'reset_password'/.test(resetFn), 'Sheets reset_password stays on the rollback branch');
-assert.ok(resetFn.indexOf("action:'reset_password'") > resetFn.indexOf('return;'), 'cut returns before Sheets');
+assert.ok(!/action:'reset_password'/.test(resetFn), 'reset no longer posts the legacy action');
+assert.ok(resetFn.includes('Not available on this desk.'), 'flag off fails closed');
 assert.ok(!resetFn.includes("'set_password'"), 'Settings does not invent a set_password client');
 
 assert.ok(createFn.includes('sbAdminAddAide') && createFn.includes('admin_add_aide'), 'Add aide form uses admin_add_aide');
@@ -56,10 +56,8 @@ assert.ok(writeGate.includes("action==='reset_password'") && writeGate.includes(
 assert.ok(dispatch.includes("action==='reset_password'") && dispatch.includes("action==='set_password'"), 'dispatch routes Sheets password names to the Ace helper');
 assert.ok(resetHelper.includes("sbRestRpc('reset_aide_temp_password'"), 'helper stays the existing RPC client');
 assert.ok(resetHelper.includes('payload.password'), 'Settings and raw reset_password passwords reach p_temp_password');
-const sheetsAt = apiPost.indexOf('fetch(SHEETS_URL');
-const gateAt = apiPost.indexOf("payload.action==='reset_password'");
-assert.ok(gateAt > 0 && gateAt < sheetsAt, 'reset_password is gated before the Sheets post');
-assert.ok(apiPost.indexOf("payload.action==='set_password'") < sheetsAt, 'set_password is gated before the Sheets post');
+assert.ok(apiPost.indexOf("payload.action==='reset_password'") > 0, 'reset_password stays on the supabase gate');
+assert.ok(!apiPost.includes('fetch('), 'apiPost does not fetch the legacy web app');
 
 function harness(opts){
   const calls = [];
@@ -117,15 +115,11 @@ function harness(opts){
 
   const sheets = harness({sbOn:false});
   await sheets.adminResetCaregiverPwd();
-  assert.strictEqual(sheets.calls.filter(function(c){return c.kind==='aide';}).length, 0, 'rollback does not call Ace');
-  assert.strictEqual(sheets.shown.length, 0, 'rollback keeps the old success line');
-  const api = sheets.calls.filter(function(c){return c.kind==='api';});
-  assert.strictEqual(api.length, 1);
-  assert.strictEqual(api[0].payload.action, 'reset_password');
-  assert.strictEqual(api[0].payload.username, 'jdoe');
-  assert.strictEqual(api[0].payload.password, 'EcTyped99');
-  assert.ok(sheets.els.cgResetOk.textContent.indexOf('@jdoe') >= 0);
-  assert.ok(sheets.els.cgResetOk.textContent.indexOf('EcTyped99') < 0);
+  assert.strictEqual(sheets.calls.filter(function(c){return c.kind==='aide';}).length, 0, 'flag off does not call Ace');
+  assert.strictEqual(sheets.calls.filter(function(c){return c.kind==='api';}).length, 0, 'flag off does not post a legacy reset');
+  assert.strictEqual(sheets.shown.length, 0);
+  assert.strictEqual(sheets.els.cgResetErr.textContent, 'Not available on this desk.');
+  assert.strictEqual(sheets.els.cgResetErr.style.display, 'block');
 
   const fail = harness({sbOn:true, aide:{data:{success:false, error:'No such aide'}, err:null, action:'reset_temp_password'}});
   await fail.adminResetCaregiverPwd();

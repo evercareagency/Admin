@@ -24,11 +24,10 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(!html.includes('resolve_username_email'), 'lists must not call the aides rpc');
 assert.ok(html.includes(anonFile), 'anon key stays the embedded jwt');
-const warm = extractFn(html, 'function warmUpSheets()');
-assert.ok(warm && !/supabase/i.test(warm), 'warm path must not touch supabase');
+assert.ok(!html.includes('function warmUpSheets('), 'warm-up is gone');
 
 const aideSelect = (html.match(/var SB_AIDE_SELECT='([^']+)'/) || [])[1];
 const clientSelect = (html.match(/var SB_CLIENT_SELECT='([^']+)'/) || [])[1];
@@ -36,10 +35,10 @@ assert.ok(aideSelect.indexOf('assignments:assignments(id,is_active,client:client
 assert.ok(clientSelect.indexOf('assignments:assignments(id,is_active,aide:aides(id,username,full_name))') > 0, clientSelect);
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
-assert.ok(apiPost.indexOf('evercareSbEnabled()') < apiPost.indexOf('SHEETS_URL'), 'flag check precedes the sheets post');
+assert.ok(apiPost.includes('evercareSbEnabled()'), 'flag check stays');
 assert.ok(apiPost.includes("action:'admin_login'") === false);
 assert.ok(apiPost.includes('sbApiList(payload)'), 'list actions delegate to supabase');
-assert.ok(apiPost.includes("fetch(SHEETS_URL"), 'flag off still posts to sheets');
+assert.ok(!apiPost.includes('fetch('), 'apiPost does not fetch the legacy web app');
 
 const fns = [
   'function evercareSbEnabled()',
@@ -255,10 +254,9 @@ Promise.all([
   const clients = results[6];
   const timesheets = results[7];
   const allClients = results[8];
-  assert.strictEqual(off.calls.length, 1, 'flag off makes one sheets call');
-  assert.strictEqual(off.calls[0].url, sheetsUrl);
-  assert.deepStrictEqual(JSON.parse(off.calls[0].init.body), {action: 'get_users'});
-  assert.strictEqual(sheetsUsers.success, true);
+  assert.strictEqual(off.calls.length, 0, 'a sheets query does not call the legacy web app');
+  assert.strictEqual(sheetsUsers.success, false);
+  assert.strictEqual(sheetsUsers.error, 'Not signed in');
 
   assert.strictEqual(aides.success, true);
   assert.strictEqual(aides.data.length, 1);
@@ -346,10 +344,12 @@ Promise.all([
         {status: 200, raw: JSON.stringify({success: true, data: [{username: 'sheet-user'}]})}
       ]});
       sheetsCached.box.cacheSet('get_users', {success: true, source: 'supabase', data: [{username: 'sb-user'}]});
-      return sheetsCached.box.apiGetCached('get_users');
+      return sheetsCached.box.apiGetCached('get_users').then(function(sheetsFresh){
+        assert.strictEqual(sheetsFresh.data[0].username, 'sb-user');
+        assert.strictEqual(sheetsCached.calls.length, 0, 'a sheets query still uses the supabase cache');
+      });
     });
-  }).then(function(sheetsFresh){
-    assert.strictEqual(sheetsFresh.data[0].username, 'sheet-user');
+  }).then(function(){
     console.log('admin-sb-lists-test: ok');
     return runBrowser();
   });

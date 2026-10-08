@@ -23,7 +23,7 @@ function extractFn(src, sig){
   return '';
 }
 
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(html.includes("var SB_PDF_BUCKET='evercare-pdfs'"), 'bucket is evercare-pdfs');
 assert.ok(html.includes('var SB_PDF_SIGN_SECONDS=120'), 'signed URL lifetime stays inside 60–300s');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
@@ -180,7 +180,11 @@ const missing = harness({
   session: session,
   responses: [{status: 200, raw: '[]'}]
 });
-const off = harness({search: '?sheets=1', session: session, responses: []});
+const off = harness({
+  search: '?sheets=1',
+  session: session,
+  responses: [{status: 200, raw: JSON.stringify({signedURL: signedPath})}]
+});
 const refreshed = harness({
   search: '?sb=1',
   session: session,
@@ -242,7 +246,16 @@ function runUpload(){
       {status: 500, raw: JSON.stringify({message: 'patch denied'})}
     ]
   });
-  const flagOff = harness({search: '?sheets=1', session: session, responses: []});
+  const flagOff = harness({
+    search: '?sheets=1',
+    session: session,
+    responses: [
+      {status: 200, raw: JSON.stringify({Key: madePath})},
+      {status: 204, raw: ''},
+      {status: 201, raw: ''},
+      {status: 200, raw: JSON.stringify({signedURL: '/object/sign/evercare-pdfs/' + madePath + '?token=flag'})}
+    ]
+  });
   const ensured = harness({
     search: '?sb=1',
     session: session,
@@ -321,8 +334,8 @@ function runUpload(){
     assert.ok(!patchFail.calls.some(function(c){return c.url.indexOf('/pdf_documents') >= 0 || c.url.indexOf('/object/sign/') >= 0;}));
     return flagOff.box.sbUploadTimesheetPdf({id: tsId, pdfLink: driveLink}, blob);
   }).then(function(offUp){
-    assert.strictEqual(offUp.skipped, true);
-    assert.strictEqual(flagOff.calls.length, 0, 'flag off must not upload');
+    assert.strictEqual(offUp.ok, true, 'a sheets query still uploads');
+    assert.ok(flagOff.calls[0].url.indexOf('/storage/v1/object/evercare-pdfs/') > 0, flagOff.calls[0].url);
     const live = {id: tsId, pdfLink: driveLink, pdfStoragePath: ''};
     ensured.box.currentRec = live;
     return ensured.box.sbEnsureTimesheetStoragePdf(live);
@@ -336,7 +349,7 @@ function runUpload(){
     assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('script.google.com') >= 0;}), 'a working overlay must not call Sheets');
     assert.ok(!ensured.calls.some(function(c){return c.url.indexOf('/functions/v1') >= 0 || c.url.indexOf('/rpc/') >= 0;}));
 
-    const sheetsUrl = 'https://script.google.com/macros/s/test/exec';
+    const sheetsUrl = 'https://example.invalid/exec';
     let sheetPdf = '%PDF-1.4\n';
     while(sheetPdf.length < 2048)sheetPdf += ' ';
     const blocked = harness({
@@ -416,9 +429,9 @@ Promise.resolve().then(function(){
 
   return off.box.sbResolveTimesheetPdf({id: 'ts-1', pdfStoragePath: storagePath, pdfLink: driveLink});
 }).then(function(offRes){
-  assert.strictEqual(offRes.mode, 'skipped');
-  assert.strictEqual(off.calls.length, 0, 'flag off must not sign or fetch storage');
-  assert.strictEqual(off.box.timesheetPdfAvailable({pdfStoragePath: storagePath, pdfLink: ''}), false);
+  assert.strictEqual(offRes.mode, 'storage');
+  assert.strictEqual(off.calls.length, 1, 'a sheets query still signs storage');
+  assert.strictEqual(off.box.timesheetPdfAvailable({pdfStoragePath: storagePath, pdfLink: ''}), true);
   assert.strictEqual(off.box.timesheetPdfAvailable({pdfLink: driveLink}), true);
 
   return refreshed.box.sbSignPdfUrl(storagePath);
@@ -438,7 +451,7 @@ Promise.resolve().then(function(){
     assert.strictEqual(rows[0].pdfStoragePath, storagePath);
     assert.ok(attached.calls[0].url.indexOf('entity_id=in.') > 0);
     assert.strictEqual(direct.box.timesheetPdfAvailable({id: tsId, pdfStoragePath: '', pdfLink: ''}), true);
-    assert.strictEqual(off.box.timesheetPdfAvailable({id: tsId, pdfStoragePath: '', pdfLink: ''}), false);
+    assert.strictEqual(off.box.timesheetPdfAvailable({id: tsId, pdfStoragePath: '', pdfLink: ''}), true);
     return runUpload();
   });
 }).catch(function(err){
