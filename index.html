@@ -18,6 +18,9 @@
 <!-- nci pdf sb1 2026-10-08 v=nci-pdf-sb1 ?v=nci-pdf-sb1 admin-build 2026-10-08-nci-pdf-sb1. NCI_PDF_SB1. After a Complete save the desk builds the intake PDF in the browser and uploads it to evercare-pdfs at {org_id}/nci/{new_client_intakes.id}.pdf, using the row uuid. Content-Type is application/pdf, x-upsert is true, and the body is the Blob. Then rpc/link_new_client_intake_pdf {p_id, p_object_path}. A 409 retries the link once. A 404 or a second failure shows PDF will be available soon and does not undo the Complete save. View signs pdfStoragePath. A Drive-only legacy row still opens its Drive link. Supervisory PDFs are not part of this tip. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. -->
 <meta name="admin-build" content="2026-10-08-nci-pdf-sb1">
 <script>var NCI_PDF_SB1='NCI_PDF_SB1';var NCI_PDF_SB1_MARKER='v=nci-pdf-sb1';var NCI_PDF_SB1_BUILD='2026-10-08-nci-pdf-sb1';</script>
+<!-- signout local1 2026-10-08 v=signout-local1 ?v=signout-local1 admin-build 2026-10-08-signout-local1. SIGNOUT_LOCAL1. Shared Admin, Scheduler, and Nurse sign-out posts /auth/v1/logout?scope=local so only this browser session ends. Tokens, storage, and the login screen still clear when that request fails or the 10s abort fires. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. -->
+<meta name="admin-build" content="2026-10-08-signout-local1">
+<script>var SIGNOUT_LOCAL1='SIGNOUT_LOCAL1';var SIGNOUT_LOCAL1_MARKER='v=signout-local1';var SIGNOUT_LOCAL1_BUILD='2026-10-08-signout-local1';</script>
 <!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
 <meta name="admin-build" content="2026-10-08-sec1-ui">
 <script>var SEC1_UI='sec1-ui';var SEC1_UI_MARKER='v=sec1-ui';var SEC1_UI_BUILD='2026-10-08-sec1-ui';</script>
@@ -31068,7 +31071,9 @@ function sbSignOut(){
   var sess=readSbSession();
   if(!sess||!sess.access_token)return;
   try{
-    fetch(SUPABASE_URL+'/auth/v1/logout',{
+    var ctl=typeof AbortController==='function'?new AbortController():null;
+    var timer=ctl?setTimeout(function(){try{ctl.abort();}catch(eAbort){}},10000):null;
+    var init={
       method:'POST',
       headers:{
         apikey:SUPABASE_ANON_KEY,
@@ -31076,7 +31081,9 @@ function sbSignOut(){
         'Content-Type':'application/json'
       },
       body:'{}'
-    }).catch(function(){});
+    };
+    if(ctl)init.signal=ctl.signal;
+    fetch(SUPABASE_URL+'/auth/v1/logout?scope=local',init).catch(function(){}).then(function(){if(timer)clearTimeout(timer);},function(){if(timer)clearTimeout(timer);});
   }catch(e){}
 }
 function sbInvalidateListCaches(){
