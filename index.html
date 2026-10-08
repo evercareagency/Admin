@@ -12,9 +12,12 @@
 <!-- pay admin1 2026-10-08 v=pay-admin1 ?v=pay-admin1 admin-build 2026-10-08-pay-admin1. PAY_ADMIN1. Payroll is Admin-only. Scheduler and Nurse share this portal but must not see pay UI and must not call pay or payroll RPCs. The gate reads currentAdminRole, the signed-in session role set by applyAdminSession, the same source layoutA1ApplyRoles already uses. It does not read a control a person can toggle. #payReady is data-layout-roles Admin. payAdmin1MaybeLoad skips payReadyLoad unless that role is Admin, and payReadyFetchAce, payReadyHold, and payReadyExport return before sbRestRpc for admin_timesheet_pay_readiness, admin_set_timesheet_pay_hold, and admin_timesheet_pay_export. The rest of the Timesheets tab stays for Scheduler. The Messages Remi pay-dispute card stays Admin-only: admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply are not called for Scheduler or Nurse. remiIdeas763OfficeOk still lets Scheduler use Why open and bilingual cover. A Scheduler payroll range ask in Remi chat is answered Payroll is Admin-only and does not post admin_parse_remi_payroll_range. remiPayroll1OfficeOk is Admin-only, so payroll load, run, confirm, and export stay off that RPC for Scheduler and Nurse. Admin behavior stays. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-pay-admin1">
 <script>var PAY_ADMIN1='PAY_ADMIN1';var PAY_ADMIN1_MARKER='v=pay-admin1';var PAY_ADMIN1_BUILD='2026-10-08-pay-admin1';</script>
-<!-- exec off1 2026-10-08 v=exec-off1 ?v=exec-off1 admin-build 2026-10-08-exec-off1. EXEC_OFF1. Supabase is the only desk. The legacy web app, its URL constant, warm-up, keep-alive, ping, and rollback flag are gone. log_activity posts rpc/log_office_activity {p_activity}. get_activity_log posts rpc/list_office_activity {p_limit}. An empty Activity Log shows No activity recorded yet. Nurse get_clients and get_users use the same Supabase list path as Admin. In-service reminders are not sent; the row says reminders aren't available yet. archive_new_client_intake_pdf is dropped. A Complete intake saves without a PDF and shows PDF will be available soon. The Storage upload waits for nci-pdf-sb1. Unrouted actions return Not available on this desk and make no network call. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, sec1-ui login, forgot, and idle, pay-admin1 gates, and nurse activity and compliance stay. -->
+<!-- exec off1 2026-10-08 v=exec-off1 ?v=exec-off1 admin-build 2026-10-08-exec-off1. EXEC_OFF1. Supabase is the only desk. The legacy web app, its URL constant, warm-up, keep-alive, ping, and rollback flag are gone. log_activity posts rpc/log_office_activity {p_activity}. get_activity_log posts rpc/list_office_activity {p_limit}. An empty Activity Log shows No activity recorded yet. Nurse get_clients and get_users use the same Supabase list path as Admin. In-service reminders are not sent; the row says reminders aren't available yet. archive_new_client_intake_pdf is dropped. A Complete intake uploads its PDF to Storage and links it with link_new_client_intake_pdf. If that link does not land, the save stays Complete and shows PDF will be available soon. Unrouted actions return Not available on this desk and make no network call. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, sec1-ui login, forgot, and idle, pay-admin1 gates, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-exec-off1">
 <script>var EXEC_OFF1='EXEC_OFF1';var EXEC_OFF1_MARKER='v=exec-off1';var EXEC_OFF1_BUILD='2026-10-08-exec-off1';</script>
+<!-- nci pdf sb1 2026-10-08 v=nci-pdf-sb1 ?v=nci-pdf-sb1 admin-build 2026-10-08-nci-pdf-sb1. NCI_PDF_SB1. After a Complete save the desk builds the intake PDF in the browser and uploads it to evercare-pdfs at {org_id}/nci/{new_client_intakes.id}.pdf, using the row uuid. Content-Type is application/pdf, x-upsert is true, and the body is the Blob. Then rpc/link_new_client_intake_pdf {p_id, p_object_path}. A 409 retries the link once. A 404 or a second failure shows PDF will be available soon and does not undo the Complete save. View signs pdfStoragePath. A Drive-only legacy row still opens its Drive link. Supervisory PDFs are not part of this tip. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. -->
+<meta name="admin-build" content="2026-10-08-nci-pdf-sb1">
+<script>var NCI_PDF_SB1='NCI_PDF_SB1';var NCI_PDF_SB1_MARKER='v=nci-pdf-sb1';var NCI_PDF_SB1_BUILD='2026-10-08-nci-pdf-sb1';</script>
 <!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
 <meta name="admin-build" content="2026-10-08-sec1-ui">
 <script>var SEC1_UI='sec1-ui';var SEC1_UI_MARKER='v=sec1-ui';var SEC1_UI_BUILD='2026-10-08-sec1-ui';</script>
@@ -31645,6 +31648,45 @@ async function sbUploadTimesheetPdf(row, pdfBytes, refreshed){
   if(!signed.ok||!signed.url)return {ok:false,soft:true,error:signed.error||'sign',path:objectPath,registry:!!registered.ok};
   return {ok:true,url:signed.url,path:objectPath,registry:!!registered.ok};
 }
+async function sbUploadNciPdf(rowId, pdfBytes, refreshed){
+  var id=String(rowId||'').trim().toLowerCase();
+  if(typeof sbUuid==='function'&&!sbUuid(id))return {ok:false,soft:true,error:'bad id'};
+  var orgId=typeof sbOrgId==='function'?sbOrgId():'';
+  if(!orgId)return {ok:false,soft:true,error:'no org'};
+  var info=await sbPdfPayloadInfo(pdfBytes);
+  if(!info.ok)return {ok:false,soft:true,error:'pdf',size:info.size||0};
+  if(info.size>10*1024*1024&&typeof showTempMsg==='function'){
+    showTempMsg('This PDF is large. It may take a moment to save.','var(--warn)');
+  }
+  var objectPath=orgId+'/nci/'+id+'.pdf';
+  var sess=readSbSession();
+  if(!sess||!sess.access_token)return {ok:false,soft:true,error:'Not signed in',status:401};
+  var encoded=objectPath.split('/').map(function(seg){return encodeURIComponent(seg);}).join('/');
+  var url=SUPABASE_URL+'/storage/v1/object/'+SB_PDF_BUCKET+'/'+encoded;
+  var res;
+  try{
+    res=await fetch(url,{
+      method:'POST',
+      headers:{
+        apikey:SUPABASE_ANON_KEY,
+        Authorization:'Bearer '+sess.access_token,
+        'Content-Type':'application/pdf',
+        'x-upsert':'true',
+        'cache-control':'max-age=60'
+      },
+      body:pdfBytes
+    });
+  }catch(err){
+    return {ok:false,soft:true,network:true,error:String(err&&err.message||err||'supabase'),path:objectPath};
+  }
+  if(res.status===401&&!refreshed){
+    var next=await sbRefreshSession(sess);
+    if(next&&next.access_token)return sbUploadNciPdf(id, pdfBytes, true);
+    if(sbRefreshSession._authFailed&&typeof loginToast1OnJwtFail==='function')loginToast1OnJwtFail();
+  }
+  if(!res.ok)return {ok:false,soft:true,error:'upload',status:res.status,path:objectPath};
+  return {ok:true,path:objectPath,size:info.size};
+}
 function sbBytesToText(bytes, cap){
   if(!bytes)return '';
   var n=bytes.length||0;
@@ -32491,6 +32533,8 @@ function sbMapIntakeRow(row){
   out.intakeId=id;
   out.IntakeId=id;
   if(id)out.id=id;
+  var rawRowId=String(src.id||src.row_id||src.rowId||'');
+  if(typeof sbUuid==='function'&&sbUuid(rawRowId))out.rowId=String(rawRowId).trim().toLowerCase();
   out.clientId=String(sbIntakePick(merged,'clientId','client_id')||'');
   out.clientName=String(sbIntakePick(merged,'clientName','client_name')||'');
   out.socDate=String(sbIntakePick(merged,'socDate','soc_date')||'');
@@ -43848,6 +43892,129 @@ function applyNewClientIntake(data){
   nciPreparePhoneInputs(nciEl('newClientIntakeModal'));
 }
 
+function nciRowUuid(obj){
+  if(!obj||typeof obj!=='object')return '';
+  const nested=obj.data&&typeof obj.data==='object'&&!Array.isArray(obj.data)?obj.data:null;
+  const cands=[obj.rowId,obj.row_id,nested&&nested.rowId,nested&&nested.row_id,obj.id,nested&&nested.id];
+  for(let i=0;i<cands.length;i++){
+    if(typeof sbUuid==='function'&&sbUuid(cands[i]))return String(cands[i]).trim().toLowerCase();
+  }
+  return '';
+}
+function nciClonePdfPage(page){
+  const clone=page.cloneNode(true);
+  const srcFields=page.querySelectorAll('input,textarea,select');
+  const dstFields=clone.querySelectorAll('input,textarea,select');
+  for(let i=0;i<srcFields.length&&i<dstFields.length;i++){
+    const src=srcFields[i];
+    const dst=dstFields[i];
+    if(src.type==='checkbox'||src.type==='radio')dst.checked=src.checked;
+    else dst.value=src.value;
+  }
+  const srcCanvas=page.querySelectorAll('canvas');
+  const dstCanvas=clone.querySelectorAll('canvas');
+  for(let c=0;c<srcCanvas.length&&c<dstCanvas.length;c++){
+    const from=srcCanvas[c];
+    const to=dstCanvas[c];
+    to.width=from.width;
+    to.height=from.height;
+    try{
+      const ctx=to.getContext('2d');
+      if(ctx)ctx.drawImage(from,0,0);
+    }catch(e){}
+  }
+  clone.style.display='block';
+  clone.style.width='816px';
+  clone.style.background='#fff';
+  clone.classList.add('on');
+  return clone;
+}
+async function nciRenderPdfBlob(){
+  const pages=document.querySelectorAll('#nciBody .nci-page');
+  if(!pages.length)return null;
+  const JsPDF=window.jspdf&&window.jspdf.jsPDF;
+  if(!JsPDF||typeof html2canvas!=='function')return null;
+  const scale=Math.min(2,(window.devicePixelRatio||1));
+  const pdf=new JsPDF('p','pt','letter',true);
+  const host=document.createElement('div');
+  host.style.cssText='position:fixed;left:-10000px;top:0;width:816px;background:#fff;z-index:-1;';
+  document.body.appendChild(host);
+  try{
+    for(let i=0;i<pages.length;i++){
+      host.innerHTML='';
+      const clone=nciClonePdfPage(pages[i]);
+      host.appendChild(clone);
+      const canvas=await html2canvas(clone,{scale:scale,backgroundColor:'#ffffff',useCORS:true});
+      const img=canvas.toDataURL('image/jpeg',0.85);
+      if(i>0)pdf.addPage();
+      pdf.addImage(img,'JPEG',0,0,612,792,undefined,'FAST');
+      canvas.width=0;
+      canvas.height=0;
+    }
+  }finally{
+    if(host.parentNode)host.parentNode.removeChild(host);
+  }
+  return pdf.output('blob');
+}
+function nciWaitVisible(){
+  return new Promise(function(resolve){
+    let settled=false;
+    const finish=function(){
+      if(settled)return;
+      settled=true;
+      try{document.removeEventListener('visibilitychange',onShow);}catch(e){}
+      resolve();
+    };
+    const onShow=function(){if(!document.hidden)finish();};
+    const timer=setTimeout(finish,8000);
+    if(typeof document==='undefined'||!document.hidden){
+      clearTimeout(timer);
+      finish();
+      return;
+    }
+    document.addEventListener('visibilitychange',onShow);
+  });
+}
+async function sbLinkNciPdf(rowId, objectPath){
+  const got=await sbRestRpc('link_new_client_intake_pdf',{p_id:rowId,p_object_path:objectPath});
+  const status=got&&got.status||0;
+  let data=got&&got.data;
+  if(typeof data==='string'){try{data=JSON.parse(data);}catch(e){data=null;}}
+  const code=data&&data.code?String(data.code):'';
+  if(got&&got.ok&&(!data||data.success!==false)){
+    return {ok:true,status:status,path:(data&&data.pdfStoragePath)||objectPath,data:data||{}};
+  }
+  if(status===404||code==='PT404')return {ok:false,status:404,code:'PT404',calm:true};
+  if(status===409||code==='PT409')return {ok:false,status:409,code:'PT409'};
+  return {ok:false,status:status,code:code,calm:true,error:(got&&got.error)||'link'};
+}
+async function nciMintCompletePdf(intakeId, rowId){
+  const id=String(rowId||'').trim().toLowerCase();
+  if(typeof sbUuid!=='function'||!sbUuid(id))return {ok:false,calm:true};
+  let blob=null;
+  try{blob=await nciRenderPdfBlob();}catch(e){blob=null;}
+  if(!blob)return {ok:false,calm:true};
+  let up=null;
+  try{up=await sbUploadNciPdf(id, blob);}catch(e){up={ok:false,network:true};}
+  if(up&&!up.ok&&up.network){
+    try{
+      if(typeof document!=='undefined'&&document.hidden)await nciWaitVisible();
+    }catch(eWait){}
+    try{up=await sbUploadNciPdf(id, blob);}catch(e2){up={ok:false};}
+  }
+  if(!up||!up.ok||!up.path)return {ok:false,calm:true};
+  let link=null;
+  try{link=await sbLinkNciPdf(id, up.path);}catch(e){link={ok:false,calm:true};}
+  if(link&&link.status===409){
+    try{link=await sbLinkNciPdf(id, up.path);}catch(e2){link={ok:false,status:409,calm:true};}
+  }
+  if(link&&link.status===404){
+    try{if(typeof loadCompletedNewClientIntakes==='function')loadCompletedNewClientIntakes();}catch(eList){}
+    return {ok:false,calm:true,missing:true};
+  }
+  if(!link||!link.ok)return {ok:false,calm:true};
+  return {ok:true,path:link.path||up.path,intakeId:String(intakeId||'')};
+}
 async function saveNewClientIntake(status){
   if(nciSaving)return;
   nciSaving=true;
@@ -43906,7 +44073,15 @@ async function saveNewClientIntake(status){
       // pdfPending / empty pdfLink is success — never fail or roll back Complete.
       // Toast BEFORE close/reload so the generating message is not wiped.
       if(!(nciPdfStoragePath(meta)||nciStr(meta.pdfLink))){
-        showTempMsg('PDF will be available soon','var(--teal)');
+        showTempMsg('Saving PDF…','var(--teal)',0);
+        let minted=null;
+        try{minted=await nciMintCompletePdf(nciState.intakeId, nciRowUuid(data));}catch(eMint){minted=null;}
+        if(minted&&minted.ok&&minted.path){
+          nciRememberCompletePdf(nciState.intakeId,'','',minted.path);
+          showTempMsg('PDF ready','var(--success)');
+        }else{
+          showTempMsg('PDF will be available soon','var(--teal)');
+        }
       }else if(wasCompleteEdit){
         showTempMsg('Saved'+(nciState.intakeId?' (#'+nciState.intakeId+')':'')+'.','var(--success)');
       }else{
@@ -44100,6 +44275,38 @@ function nciLegacyDriveUrl(obj){
   return pickIntakePdfLink(obj);
 }
 
+function nciPreparePdfTab(){
+  nciPdfTab=null;
+  try{
+    const nav=window.navigator||{};
+    let standalone=nav.standalone===true;
+    if(!standalone&&window.matchMedia){
+      try{standalone=window.matchMedia('(display-mode: standalone)').matches;}catch(eMode){}
+    }
+    if(standalone){nciPdfTab={href:true};return;}
+    if(typeof window.open==='function'){
+      const win=window.open('','_blank');
+      if(win)nciPdfTab={win:win};
+    }
+  }catch(e){nciPdfTab=null;}
+}
+function nciFinishPdfTab(url){
+  const href=String(url||'').trim();
+  const tab=nciPdfTab;
+  nciPdfTab=null;
+  if(!href){
+    if(tab&&tab.win){try{tab.win.close();}catch(e){}}
+    return false;
+  }
+  if(tab&&tab.href){
+    try{location.href=href;return true;}catch(eHref){}
+  }
+  if(tab&&tab.win){
+    try{tab.win.location=href;return true;}catch(eLoc){}
+  }
+  return nciOpenExternalPdf(href);
+}
+var nciPdfTab=null;
 function nciOpenExternalPdf(url){
   const href=String(url||'').trim();
   if(!href)return false;
@@ -44204,6 +44411,10 @@ async function archiveCompletedIntake(intakeId){
   if(!id){
     showTempMsg('No intakeId for this row.','var(--danger)');
     return false;
+  }
+  const row=(nciCompletedRows||[]).find(function(r){return nciIntakeIdOf(r)===id;})||{};
+  if(!nciPdfStoragePath(row)&&nciRowUuid(row)&&String(nciState&&nciState.intakeId||'')===id){
+    try{await nciMintCompletePdf(id, nciRowUuid(row));}catch(eCatch){}
   }
   const res=await postArchiveAction('archive_new_client_intake','delete_new_client_intake',{intakeId:id});
   if(toastArchiveResult(res,'Intake deleted.')){
@@ -44486,6 +44697,7 @@ async function nciOpenIntakeStoragePdf(row){
   // Do not mint, backfill, invent an RPC, or clear pdf_link / pdf_file_id.
   const path=typeof sbSupervisoryPdfPath==='function'?sbSupervisoryPdfPath(raw):raw;
   if(typeof sbSignPdfUrl!=='function'){
+    nciFinishPdfTab('');
     showTempMsg('Could not open PDF.','var(--danger)');
     return 'error';
   }
@@ -44493,18 +44705,21 @@ async function nciOpenIntakeStoragePdf(row){
   try{
     signed=await sbSignPdfUrl(path);
   }catch(e){
+    nciFinishPdfTab('');
     showTempMsg((e&&e.message)||'Could not open PDF.','var(--danger)');
     return 'error';
   }
   if(!signed||!signed.ok||!signed.url){
+    nciFinishPdfTab('');
     showTempMsg((signed&&signed.error)||'Could not open PDF.','var(--danger)');
     return 'error';
   }
-  nciOpenExternalPdf(signed.url);
+  nciFinishPdfTab(signed.url);
   return 'opened';
 }
 
 async function viewCompletedIntakePdf(intakeId){
+  nciPreparePdfTab();
   const id=String(intakeId||'');
   const row=nciCompletedRows.find(function(r){return nciIntakeIdOf(r)===id;})||{};
   if(nciPdfStoragePath(row)){
@@ -44513,7 +44728,7 @@ async function viewCompletedIntakePdf(intakeId){
   }
   const url=nciLegacyDriveUrl(row);
   if(url){
-    nciOpenExternalPdf(url);
+    nciFinishPdfTab(url);
     return;
   }
   // Neither Storage nor Drive on the list row. Load this intake with ink — do not invent a Drive URL.
@@ -44528,10 +44743,11 @@ async function viewCompletedIntakePdf(intakeId){
     const drive=nciLegacyDriveUrl(meta);
     if(drive){
       nciApplyCompletePdf(id,drive,meta.pdfFileId);
-      nciOpenExternalPdf(drive);
+      nciFinishPdfTab(drive);
       return;
     }
   }catch(e){}
+  nciFinishPdfTab('');
   showTempMsg('PDF will be available soon','var(--teal)');
 }
 

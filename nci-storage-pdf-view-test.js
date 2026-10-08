@@ -62,6 +62,8 @@ assert.ok(extractFn(html, 'async function nciOpenIntakeStoragePdf(row)').include
 const sigs = [
   'function pickIntakePdfLink(obj)',
   'function nciLegacyDriveUrl(obj)',
+  'function nciPreparePdfTab()',
+  'function nciFinishPdfTab(url)',
   'function nciOpenExternalPdf(url)',
   'function nciPdfStoragePath(obj)',
   'function nciPickPdfMeta(obj)',
@@ -124,7 +126,18 @@ const sandbox = {
     sandbox.nciLastCompletePdf = {intakeId:id, pdfLink:link || '', pdfFileId:fileId || ''};
   },
   showTempMsg: function(msg, color){toasts.push({msg:msg, color:color});},
-  window: {open: function(url){opens.push(url); return {closed:false};}},
+  window: {open: function(url){
+    const rec={closed:false};
+    let current='';
+    Object.defineProperty(rec,'location',{
+      configurable:true,
+      get:function(){return current;},
+      set:function(v){current=String(v||''); if(current)opens.push(current);}
+    });
+    if(url)opens.push(String(url));
+    rec.close=function(){rec.closed=true;};
+    return rec;
+  }},
   String: String,
   Promise: Promise
 };
