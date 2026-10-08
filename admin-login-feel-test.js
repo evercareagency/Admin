@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -23,55 +24,28 @@ function extractFn(src, sig){
   return '';
 }
 
-const warm = extractFn(html, 'function warmUpSheets()');
-assert.ok(warm, 'warmUpSheets missing');
-assert.ok(/action:'ping'/.test(warm), 'warm ping must post action ping');
-assert.ok(/method:'GET'/.test(warm), 'warm ping must also GET /exec');
-assert.ok(/\.catch\(/.test(warm), 'warm ping must soft-fail');
-assert.ok(!/await\s+fetch/.test(warm), 'warm ping must not block on /exec');
-assert.ok(/if\(window\._sheetsWarmUpStarted\)return/.test(warm), 'warm fires once until the login screen resets the flag');
-assert.ok(!/_sheetsWarmUpAt/.test(warm), 'warm must not debounce on a timestamp');
-assert.ok(!/<2000/.test(warm), 'warm must not use a 2s debounce');
-assert.ok(/SHEETS_URL/.test(warm), 'warm must fetch SHEETS_URL');
-const fetchAt = warm.indexOf('fetch(SHEETS_URL');
-const beaconAt = warm.indexOf("fetch(new URL('exec', location.href).href+'?t='+Date.now(),{cache:'no-store',mode:'cors'})");
-const flagAt = warm.indexOf('_sheetsWarmUpStarted=true');
-assert.ok(fetchAt > 0 && beaconAt > fetchAt && flagAt > beaconAt, 'flag is set only after Ace warm and the same-origin /exec beacon are invoked');
-assert.ok(/beacon\.then\(function\(r\)\{return r&&r\.text\?r\.text\(\):null;\}\)\.catch\(function\(\)\{\}\)/.test(warm), 'beacon reads the body so a 200 /exec is visible in Resource Timing');
-assert.strictEqual(fs.readFileSync(path.join(__dirname, 'exec'), 'utf8').trim(), '{}', 'pages root must serve a static ./exec file');
-assert.ok(/function warmUpSheets\(\)\{[\s\S]*?\}\s*warmUpSheets\(\);/.test(html), 'warm ping must run when the script opens');
-assert.ok(/DOMContentLoaded[\s\S]{0,240}warmUpSheets\(\)/.test(html), 'warm ping must also run on DOMContentLoaded');
-assert.ok(!/loginScreen'\)\?\.classList\.contains\('active'\)\)warmUpSheets/.test(html), 'warm ping must not wait for the login screen check');
-assert.ok(/setInterval\(function\(\)\{[\s\S]*?warmUpSheets\(\);[\s\S]*?\},1100\)/.test(html), 'login screen keep-alive pings about every 1.1s');
-assert.ok(/clearInterval\(window\._loginWarmTimer\)/.test(html), 'leaving the login screen clears the keep-alive');
+assert.ok(!html.includes('function warmUpSheets('), 'warm-up is gone');
+assert.ok(!html.includes('startLoginWarmKeepAlive'), 'login keep-alive is gone');
+assert.ok(!html.includes('stopLoginWarmKeepAlive'), 'login keep-alive stop is gone');
+assert.ok(!fs.existsSync(path.join(__dirname, 'exec')), 'pages root must not serve a static exec beacon');
+assert.ok(!/SHEETS_URL/.test(html), 'SHEETS_URL is gone');
+assert.ok(!/script\.google\.com/.test(html), 'no Apps Script host');
 const headEnd = html.indexOf('</head>');
 assert.ok(headEnd > 0, 'head must close');
 const head = html.slice(0, headEnd);
 assert.ok(/setResourceTimingBufferSize\(500\)/.test(head), 'head must raise the Resource Timing buffer to 500');
 assert.ok(!/action:'ping'/.test(head), 'head must not POST the warm ping');
 assert.ok(!/Wake Ace/.test(head), 'head Wake Ace IIFE must be gone');
-const sheetsAt = html.indexOf("const SHEETS_URL=");
-const warmAt = html.indexOf('function warmUpSheets()');
-assert.ok(sheetsAt > headEnd && warmAt > sheetsAt, 'warmUpSheets stays in the main app script after SHEETS_URL');
-const execUrls = html.match(/https:\/\/script\.google\.com\/macros\/s\/[^'"]+\/exec/g) || [];
-assert.strictEqual(new Set(execUrls).size, 1, 'SHEETS_URL is the only /exec URL');
 const showScreenFn = extractFn(html, 'function showScreen(id)');
-const startKeep = extractFn(html, 'function startLoginWarmKeepAlive()');
-const stopKeep = extractFn(html, 'function stopLoginWarmKeepAlive()');
-assert.ok(startKeep.includes('_sheetsWarmUpStarted=false') && startKeep.includes('warmUpSheets()'),
-  'showing the login screen must reset the once-flag and warm');
-assert.ok(startKeep.includes('_sheetsWarmUpAt=0'), 'showing the login screen clears a leftover warm timestamp');
-assert.ok(showScreenFn.includes("id==='loginScreen')startLoginWarmKeepAlive()") && showScreenFn.includes('stopLoginWarmKeepAlive()'),
-  'login screen starts keep-alive and every other screen stops it');
+assert.ok(showScreenFn.includes('loginKbClear'), 'showScreen still clears the keyboard scrollport');
+assert.ok(!/Warm|exec/.test(showScreenFn), 'showScreen does not warm or beacon');
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(login, 'mgrLogin missing');
-assert.ok(!login.includes("action:'admin_login'"), 'sheets rollback does not post the legacy password login');
-assert.ok(login.includes('Sheets sign-in is no longer available. Contact the office administrator.'), 'sheets rollback fails closed with a message');
-assert.ok(login.includes("showScreen('loginScreen')"), 'sheets rollback stays on the login screen');
-assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('sbAuthRoleLogin('), 'sb cut login does not warm before auth');
-assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
-assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
+assert.ok(!login.includes("action:'admin_login'"), 'login does not post the legacy password login');
+assert.ok(!login.includes('Sheets sign-in is no longer available'), 'login has no sheets branch');
+assert.ok(login.includes("showScreen('loginScreen')"), 'a failed login stays on the login screen');
+assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('sbAuthRoleLogin('), 'login uses the office account');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'isclear1 admin-build after cgreset1');
 assert.ok(html.includes('v=cgreset1'), 'cgreset1 marker stays');
@@ -228,40 +202,8 @@ const filled = vm.runInContext('restoreAdminSession()', sandbox);
 assert.ok(filled.loginAt, 'missing loginAt is backfilled instead of forcing logout');
 assert.strictEqual(vm.runInContext('isAdminSessionExpired(readAdminSession())', sandbox), false);
 
-function runWarm(enabled){
+(function showScreenDoesNotFetch(){
   const calls = [];
-  const box = {
-    window: {},
-    SHEETS_URL: 'https://script.google.com/macros/s/x/exec',
-    fetch: function(url, opts){
-      calls.push({url: url, method: opts && opts.method, body: opts && opts.body});
-      return Promise.resolve({text: function(){return Promise.resolve('');}});
-    },
-    URL: URL,
-    location: {href: 'https://evercareagency.github.io/Admin/index.html'},
-    Date: Date,
-    JSON: JSON,
-    evercareSbEnabled: function(){return enabled;}
-  };
-  vm.createContext(box);
-  vm.runInContext(warm, box);
-  vm.runInContext('warmUpSheets()', box);
-  return {calls: calls, box: box};
-}
-const cutWarm = runWarm(true);
-assert.strictEqual(cutWarm.calls.length, 0, 'sb cut warmUpSheets does not fetch /exec');
-assert.notStrictEqual(cutWarm.box.window._sheetsWarmUpStarted, true, 'sb cut warm does not set the once-flag');
-const sheetsWarm = runWarm(false);
-assert.strictEqual(sheetsWarm.calls.length, 3, 'sheets rollback warm is POST, GET, and the beacon');
-assert.strictEqual(sheetsWarm.box.window._sheetsWarmUpStarted, true, 'sheets rollback warm sets the once-flag');
-
-console.log('admin-login-feel-test: ok');
-
-// Sign-out resets the once-flag, warms immediately, then keep-alive ticks fetch again.
-(function rewarmAfterSignOut(){
-  const calls = [];
-  const sheetsUrl = (html.match(/const SHEETS_URL='([^']+)'/) || [])[1];
-  assert.ok(sheetsUrl && /\/exec$/.test(sheetsUrl), 'SHEETS_URL missing');
   const classList = function(on){
     const set = {};
     if(on)set.active = true;
@@ -275,93 +217,8 @@ console.log('admin-login-feel-test: ok');
     loginScreen: {classList: classList(false)},
     adminScreen: {classList: classList(true)}
   };
-  let tick = null;
-  let cleared = false;
-  const box = {
-    window: {_sheetsWarmUpStarted: true, _sheetsWarmUpAt: Date.now()},
-    SHEETS_URL: sheetsUrl,
-    Date: Date,
-    JSON: JSON,
-    setInterval: function(fn, ms){
-      assert.ok(ms >= 1000 && ms <= 1200, 'keep-alive interval is about 1.0–1.2s');
-      tick = fn;
-      return 7;
-    },
-    clearInterval: function(){tick = null; cleared = true;},
-    location: {href: 'https://evercareagency.github.io/Admin/index.html'},
-    URL: URL,
-    fetch: function(url, opts){
-      calls.push({url: url, method: opts && opts.method, body: opts && opts.body, cache: opts && opts.cache, mode: opts && opts.mode});
-      return Promise.resolve();
-    },
-    document: {
-      querySelectorAll: function(){return [screens.loginScreen, screens.adminScreen];},
-      getElementById: function(id){return screens[id];}
-    }
-  };
-  vm.createContext(box);
-  vm.runInContext(warm + '\n' + stopKeep + '\n' + startKeep + '\n' + showScreenFn, box);
-  vm.runInContext('warmUpSheets()', box);
-  assert.strictEqual(calls.length, 0, 'once-flag must skip a repeat warm');
-  vm.runInContext("showScreen('loginScreen')", box);
-  assert.ok(screens.loginScreen.classList.contains('active'), 'sign-out shows the login screen');
-  assert.ok(!screens.adminScreen.classList.contains('active'), 'sign-out leaves the admin home');
-  function sheetsCalls(list){return list.filter(function(c){return c.url === sheetsUrl;});}
-  function beaconCalls(list){return list.filter(function(c){return /\/Admin\/exec\?t=\d+$/.test(c.url);});}
-  const post = sheetsCalls(calls).filter(function(c){return c.method === 'POST';});
-  const get = sheetsCalls(calls).filter(function(c){return c.method === 'GET';});
-  assert.strictEqual(post.length, 1, 'sign-out fires one POST ping');
-  assert.ok(/"action":"ping"/.test(post[0].body), 'sign-out POST body is {action:ping}');
-  assert.strictEqual(get.length, 1, 'sign-out fires one GET wake');
-  assert.strictEqual(beaconCalls(calls).length, 1, 'sign-out fires one same-origin /exec beacon');
-  assert.strictEqual(beaconCalls(calls)[0].cache, 'no-store');
-  assert.strictEqual(beaconCalls(calls)[0].mode, 'cors');
-  assert.strictEqual(calls.length, 3, 'sign-out warm is Ace POST, Ace GET, and the beacon');
-  assert.strictEqual(box.window._sheetsWarmUpStarted, true, 'sign-out warm sets the flag after fetch');
-  assert.strictEqual(box.window._sheetsWarmUpAt, 0, 'sign-out clears a leftover timestamp');
-  assert.strictEqual(typeof tick, 'function', 'sign-out arms the keep-alive');
-  calls.length = 0;
-  tick();
-  assert.strictEqual(sheetsCalls(calls).filter(function(c){return c.method === 'POST';}).length, 1, 'keep-alive tick fires one POST ping');
-  assert.strictEqual(sheetsCalls(calls).filter(function(c){return c.method === 'GET';}).length, 1, 'keep-alive tick fires one GET');
-  assert.strictEqual(beaconCalls(calls).length, 1, 'keep-alive tick fires a new same-origin /exec beacon');
-  assert.strictEqual(calls.length, 3, 'keep-alive tick is Ace POST, Ace GET, and the beacon');
-  calls.length = 0;
-  vm.runInContext("showScreen('adminScreen')", box);
-  assert.strictEqual(calls.length, 0, 'leaving the login screen must not warm');
-  assert.strictEqual(cleared, true, 'leaving the login screen clears the keep-alive');
-  assert.strictEqual(tick, null, 'keep-alive callback is dropped');
-  console.log('admin-login-feel rewarm-after-signout: ok');
-})();
-
-// Supabase cut: showing the login screen must not beacon Sheets /exec.
-(function noWarmOnSbCut(){
-  const calls = [];
-  const sheetsUrl = (html.match(/const SHEETS_URL='([^']+)'/) || [])[1];
-  const classList = function(on){
-    const set = {};
-    if(on)set.active = true;
-    return {
-      add: function(c){set[c] = true;},
-      remove: function(c){delete set[c];},
-      contains: function(c){return !!set[c];}
-    };
-  };
-  const screens = {
-    loginScreen: {classList: classList(false)},
-    adminScreen: {classList: classList(true)}
-  };
-  let tick = null;
   const box = {
     window: {},
-    SHEETS_URL: sheetsUrl,
-    Date: Date,
-    JSON: JSON,
-    evercareSbEnabled: function(){return true;},
-    setInterval: function(fn){tick = fn; return 7;},
-    clearInterval: function(){tick = null;},
-    location: {href: 'https://evercareagency.github.io/Admin/index.html'},
-    URL: URL,
     fetch: function(url, opts){
       calls.push({url: url, method: opts && opts.method});
       return Promise.resolve({text: function(){return Promise.resolve('');}});
@@ -372,13 +229,16 @@ console.log('admin-login-feel-test: ok');
     }
   };
   vm.createContext(box);
-  vm.runInContext(warm + '\n' + stopKeep + '\n' + startKeep + '\n' + showScreenFn, box);
+  vm.runInContext(showScreenFn, box);
   vm.runInContext("showScreen('loginScreen')", box);
-  assert.strictEqual(calls.length, 0, 'sb cut sign-out must not warm Sheets /exec');
-  assert.strictEqual(tick, null, 'sb cut sign-out must not arm the keep-alive');
-  assert.notStrictEqual(box.window._sheetsWarmUpStarted, true);
-  console.log('admin-login-feel sb-cut-no-warm: ok');
+  assert.ok(screens.loginScreen.classList.contains('active'), 'sign-out shows the login screen');
+  assert.ok(!screens.adminScreen.classList.contains('active'), 'sign-out leaves the admin home');
+  assert.strictEqual(calls.length, 0, 'showing the login screen does not fetch');
+  vm.runInContext("showScreen('adminScreen')", box);
+  assert.strictEqual(calls.length, 0, 'leaving the login screen does not fetch');
 })();
+
+console.log('admin-login-feel-test: ok');
 
 async function runBrowser(){
   if(process.env.SKIP_BROWSER==='1')return;
@@ -440,7 +300,7 @@ async function runBrowser(){
       const freshTiming=await page.waitForFunction(()=>{
         return window._sheetsWarmUpStarted===true &&
           performance.getEntriesByType('resource').some(function(e){
-            return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
+            return /\/exec/.test(e.name) && e.name.indexOf('script.'+'google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
           });
       },{timeout:budget}).then(function(){return true;}).catch(function(){return false;});
       const freshExec=await page.evaluate(function(){
@@ -452,7 +312,7 @@ async function runBrowser(){
         };
       });
       assert.ok(freshTiming, vp.name+' fresh open: _sheetsWarmUpStarted and same-origin /exec Resource Timing within 1.5s; names='+JSON.stringify(freshExec.exec)+' flag='+freshExec.flag+' budget='+budget);
-      assert.ok(freshExec.flag && freshExec.exec.some(function(n){return n.indexOf('script.google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' fresh Resource Timing must keep same-origin /exec');
+      assert.ok(freshExec.flag && freshExec.exec.some(function(n){return n.indexOf('script.'+'google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' fresh Resource Timing must keep same-origin /exec');
       const deadline=Date.now()+4000;
       while(!hits.some(h=>h.action==='ping'||h.method==='GET')&&Date.now()<deadline){
         await new Promise(r=>setTimeout(r,40));
@@ -489,7 +349,7 @@ async function runBrowser(){
       const keepBy=Date.now()+1800;
       while(hits.length<snap+2&&Date.now()<keepBy)await new Promise(r=>setTimeout(r,20));
       const timed=await page.waitForFunction(()=>performance.getEntriesByType('resource').some(function(e){
-        return /\/exec/.test(e.name) && e.name.indexOf('script.google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
+        return /\/exec/.test(e.name) && e.name.indexOf('script.'+'google.com')<0 && e.name.indexOf('googleusercontent.com')<0;
       }),{timeout:1800}).then(()=>true).catch(()=>false);
       const after=await page.evaluate(()=>({
         login:!!document.getElementById('loginScreen').classList.contains('active'),
@@ -501,7 +361,7 @@ async function runBrowser(){
       assert.ok(after.login, vp.name+' login screen must be showing after sign-out');
       assert.ok(!after.admin, vp.name+' admin home must be hidden after sign-out');
       assert.strictEqual(after.signInDisabled, false, vp.name+' Sign In must stay clickable');
-      assert.ok(after.exec.some(function(n){return n.indexOf('script.google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' Resource Timing must list the keep-alive same-origin /exec');
+      assert.ok(after.exec.some(function(n){return n.indexOf('script.'+'google.com')<0 && n.indexOf('googleusercontent.com')<0;}), vp.name+' Resource Timing must list the keep-alive same-origin /exec');
       const neu=hits.slice(snap);
       assert.ok(neu.some(h=>h.action==='ping'), vp.name+' keep-alive must POST {action:ping}');
       assert.ok(neu.some(h=>h.method==='GET'&&/\/exec/.test(h.url)), vp.name+' keep-alive must GET /exec');

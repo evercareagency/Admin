@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -292,7 +293,7 @@ async function schedPhoneScroll(){
         schedApplyWeek({
           week_start:'2026-09-21',
           week_end:'2026-09-27',
-          clients:[{client_id:'bowlax', client_name:'Bowlax', days:days}]
+          clients:[{client_id:'Test Client Alpha', client_name:'Test Client Alpha', days:days}]
         });
         schedPaint();
       });
@@ -583,7 +584,8 @@ els.schedWeekdaySel.value='1';
 els.schedAideSel.value=officeAide;
 els.schedHours.value='4';
 await sandbox.schedSaveUsualFromForm();
-assert.ok(toasts.some(function(t){return /forbidden/.test(t);}), '403 is shown and not stored locally');
+assert.ok(toasts.some(function(t){return t==='Could not save the usual pattern.';}), 'a failed save shows calm copy and is not stored locally');
+assert.ok(!toasts.some(function(t){return /forbidden/.test(t);}), 'a failed save does not show the raw error');
 assert.strictEqual(mem.evercare_sched_v1, undefined);
 assert.strictEqual(sandbox.schedFindUsual('ada',1).hours, 4, 'failed save leaves the loaded week');
 

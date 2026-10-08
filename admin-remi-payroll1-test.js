@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -100,9 +101,9 @@ const REPORT = {
     interval_days:14
   },
   aides:[
-    {aide_id:'devon', aide_name:'Devon', permanent_client_name:'Helen Park', summary_line:'Devon '+DOT+' Helen Park '+DOT+' 36.15', paid_hours:40.20, regulars:[row('2026-09-14','Helen Park','8:01 AM','4:03 PM',8.03), row('2026-09-17','Helen Park','8:02 AM','12:05 PM',4.05,{same_day:true, slot_label:'scheduled 8:00 – 12:00'})], covers:[cover('2026-09-17','Bowlax','1:01 PM','5:04 PM',4.05,'Lina')], flags:[]},
+    {aide_id:'devon', aide_name:'Devon', permanent_client_name:'Helen Park', summary_line:'Devon '+DOT+' Helen Park '+DOT+' 36.15', paid_hours:40.20, regulars:[row('2026-09-14','Helen Park','8:01 AM','4:03 PM',8.03), row('2026-09-17','Helen Park','8:02 AM','12:05 PM',4.05,{same_day:true, slot_label:'scheduled 8:00 – 12:00'})], covers:[cover('2026-09-17','Test Client Alpha','1:01 PM','5:04 PM',4.05,'Lina')], flags:[]},
     {aide_id:'maria', aide_name:'Maria', permanent_client_name:'Rivera', summary_line:'Maria '+DOT+' Rivera '+DOT+' 24.00', paid_hours:28.00, regulars:[row('2026-09-15','Rivera','8:05 AM','4:05 PM',8.00)], covers:[cover('2026-09-19','Helen Park','9:00 AM','1:00 PM',4.00,'Devon')], flags:[{flag_label:'Flag '+DOT+' unsigned', missing_reason:'In/Out missing', on_date:'2026-09-22', client_name:'Rivera', is_flag:true, deep_link:{surface:'timesheets', timesheet_id:'ts-maria-unsigned', on_date:'2026-09-22'}}]},
-    {aide_id:'lina', aide_name:'Lina', permanent_client_name:'Bowlax', summary_line:'Lina '+DOT+' Bowlax '+DOT+' 12.05', paid_hours:16.05, regulars:[row('2026-09-14','Bowlax','8:00 AM','4:03 PM',8.05), row('2026-09-17','Bowlax','','',null,{is_cancel:true, cancel_note:'cancelled'})], covers:[cover('2026-09-23','Rivera','1:00 PM','5:00 PM',4.00,'Maria')], flags:[{flag_label:'Flag '+DOT+' missing', missing_reason:'timesheet missing', on_date:'2026-09-21', client_name:'Bowlax', is_flag:true, deep_link:{surface:'timesheets', timesheet_id:'ts-lina-missing', on_date:'2026-09-21'}}]},
+    {aide_id:'lina', aide_name:'Lina', permanent_client_name:'Test Client Alpha', summary_line:'Lina '+DOT+' Test Client Alpha '+DOT+' 12.05', paid_hours:16.05, regulars:[row('2026-09-14','Test Client Alpha','8:00 AM','4:03 PM',8.05), row('2026-09-17','Test Client Alpha','','',null,{is_cancel:true, cancel_note:'cancelled'})], covers:[cover('2026-09-23','Rivera','1:00 PM','5:00 PM',4.00,'Maria')], flags:[{flag_label:'Flag '+DOT+' missing', missing_reason:'timesheet missing', on_date:'2026-09-21', client_name:'Test Client Alpha', is_flag:true, deep_link:{surface:'timesheets', timesheet_id:'ts-lina-missing', on_date:'2026-09-21'}}]},
     {aide_id:'jamal', aide_name:'Jamal', permanent_client_name:'Torres', summary_line:'Jamal '+DOT+' Torres '+DOT+' 32.00', paid_hours:36.00, regulars:[row('2026-09-14','Torres','8:00 AM','4:00 PM',8.00)], covers:[cover('2026-09-24','Nguyen','9:00 AM','1:00 PM',4.00,'Keisha')], flags:[]},
     {aide_id:'keisha', aide_name:'Keisha', permanent_client_name:'Nguyen', summary_line:'Keisha '+DOT+' Nguyen '+DOT+' 28.05', paid_hours:32.05, regulars:[row('2026-09-15','Nguyen','8:00 AM','4:00 PM',8.00), row('2026-09-25','Nguyen','8:00 AM','12:00 PM',4.00)], covers:[cover('2026-09-26','Torres','10:00 AM','2:00 PM',4.00,'Jamal')], flags:[{flag_label:'Flag '+DOT+' unsigned', missing_reason:'In/Out missing', on_date:'2026-09-22', client_name:'Nguyen', is_flag:true, deep_link:{surface:'timesheets', timesheet_id:'ts-keisha-unsigned', on_date:'2026-09-22'}}]},
     {aide_id:'omar', aide_name:'Omar', permanent_client_name:'Brooks', summary_line:'Omar '+DOT+' Brooks '+DOT+' 20.00', paid_hours:20.00, regulars:[row('2026-09-14','Brooks','8:05 AM','4:05 PM',8.00)], covers:[], flags:[]},
@@ -174,7 +175,7 @@ function runSlice(){
   const collapsed = sandbox.remiPayroll1ReportHtml();
   assert.ok(collapsed.indexOf('Devon '+DOT+' Helen Park '+DOT+' 36.15') >= 0, collapsed);
   assert.ok(collapsed.indexOf('Maria '+DOT+' Rivera '+DOT+' 24.00') >= 0, 'maria summary');
-  assert.ok(collapsed.indexOf('Lina '+DOT+' Bowlax '+DOT+' 12.05') >= 0, 'lina summary');
+  assert.ok(collapsed.indexOf('Lina '+DOT+' Test Client Alpha '+DOT+' 12.05') >= 0, 'lina summary');
   assert.ok(collapsed.indexOf('Keisha '+DOT+' Nguyen '+DOT+' 28.05') >= 0, 'keisha summary');
   assert.ok(collapsed.indexOf('236.39') >= 0, 'paid hours number');
   assert.ok(collapsed.indexOf('Flag '+DOT+' missing') >= 0, 'missing flag');
@@ -447,7 +448,7 @@ async function runBrowser(){
     });
     assert.strictEqual(expanded.linaOpen, true);
     assert.strictEqual(expanded.keishaOpen, true);
-    assert.ok(expanded.lina.indexOf('Bowlax') >= 0, expanded.lina);
+    assert.ok(expanded.lina.indexOf('Test Client Alpha') >= 0, expanded.lina);
     assert.ok(expanded.lina.indexOf('8:00 AM') >= 0 && expanded.lina.indexOf('4:03 PM') >= 0, expanded.lina);
     assert.ok(expanded.lina.indexOf('Flag') >= 0, expanded.lina);
     assert.ok(expanded.lina.indexOf('covered for Maria') >= 0, expanded.lina);

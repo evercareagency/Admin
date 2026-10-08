@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -78,7 +79,7 @@ const sandbox = {
       return {ok: true, data: {success: true, week_start: '2026-09-21', week_end: '2026-09-27', ready_count: 1, held_count: 0, rows: [{timesheet_id: 'ts-1', aide_name: 'Maya Brooks', pay_status: 'ready', checklist: {submitted: true, save_day_complete: true, signature: true, office_review: 'clear'}}]}};
     }
     if(name === 'admin_get_pay_dispute_evidence'){
-      return {ok: true, data: {aide_name: 'Jamal', on_date: '2026-09-25', client_name: 'Bowlax', shift: {is_completed: true, is_missed: false, status_label: 'Completed'}}};
+      return {ok: true, data: {aide_name: 'Jamal', on_date: '2026-09-25', client_name: 'Test Client Alpha', shift: {is_completed: true, is_missed: false, status_label: 'Completed'}}};
     }
     if(name === 'admin_draft_pay_dispute_reply')return {ok: true, data: {draft_reply: 'Record shows the shift.'}};
     if(name === 'admin_parse_remi_payroll_range')return {ok: true, data: {start_date: '2026-09-14', end_date: '2026-09-27', start_date_display: '09/14/2026', end_date_display: '09/27/2026'}};

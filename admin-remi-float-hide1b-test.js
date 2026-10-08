@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -71,7 +72,7 @@ const RANK = {
   float_pool: [{rank: 9, aide_id: GHOST, name: 'ShouldNotPaint', same_day_yes_30d: 3, miles: 1, is_float: true}],
   float_count: 1,
   open_shift_id: SHIFT,
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   shift_start: '2026-09-27T13:00:00.000Z',
   shift_end: '2026-09-27T17:00:00.000Z',
   assigned_aide_id: MARIA,
@@ -86,7 +87,7 @@ const RANK = {
   ]
 };
 const ONLY_POOL = {
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   shift_start: '2026-09-27T13:00:00.000Z',
   shift_end: '2026-09-27T17:00:00.000Z',
   ranked: [],
@@ -94,7 +95,7 @@ const ONLY_POOL = {
   float_pool: [{rank: 1, aide_id: GHOST, name: 'PoolYes', same_day_yes_30d: 3, miles: 1, is_float: true}]
 };
 const REST_MIXED = {
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   shift_start: '2026-09-27T13:00:00.000Z',
   shift_end: '2026-09-27T17:00:00.000Z',
   ranked: [],
@@ -113,13 +114,13 @@ const REST_MIXED = {
   ]
 };
 const ALL_REST = {
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   ranked: [],
   rest: [{rank: 4, aide_id: JAMAL, name: 'Jamal', same_day_yes_30d: 0, miles: 5.2, is_float: false}],
   float_pool: []
 };
 const ALL_YES = {
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   ranked: [],
   rest: [{rank: 1, aide_id: DEVON, name: 'Devon', same_day_yes_30d: 8, miles: 2.1, is_float: true}],
   float_pool: []
@@ -165,7 +166,7 @@ const PROBE_SHADOW = {
 const RESCUE_CARD = {
   id: RESCUE,
   status: 'pending',
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   assigned_aide_id: MARIA,
   assigned_aide_name: 'Maria',
   shift_start: '2026-09-27T13:00:00.000Z',
@@ -385,7 +386,7 @@ function runSlice(){
   assert.ok(rescueHtml.indexOf('no Float pool UI') >= 0, 'no-show note stays');
   assert.ok(rescueHtml.indexOf('Devon') >= 0, rescueHtml);
 
-  sandbox.remiIdeas763Why = {client_name: 'Bowlax', window_label: '1:00–5:00 PM'};
+  sandbox.remiIdeas763Why = {client_name: 'Test Client Alpha', window_label: '1:00–5:00 PM'};
   sandbox.remiIdeas763Attempts = [];
   sandbox.remiIdeas763Dismissed = false;
   const why = sandbox.remiIdeas763WhyHtml();

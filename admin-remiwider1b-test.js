@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -117,7 +118,7 @@ async function runBrowser(){
     headless: 'new',
     args: ['--no-sandbox','--disable-dev-shm-usage']
   });
-  const bowlax = '18acd525-1111-4111-8111-111111111111';
+  const testClientAlpha = '18acd525-1111-4111-8111-111111111111';
   try{
     const page = await browser.newPage();
     await page.setViewport({width:390, height:844, isMobile:true, hasTouch:true, deviceScaleFactor:2});
@@ -130,13 +131,13 @@ async function runBrowser(){
       showScreen('adminScreen');
       window.__bRpc = [];
       window.__bGo = [];
-      window.__bowlax = id;
+      window.__testClientAlpha = id;
       coverGo = function(href){window.__bGo.push(String(href||''));};
       coverRpc = function(kind, body){
         window.__bRpc.push({kind:kind, body:body||{}});
         if(kind==='list'){
           return Promise.resolve({ok:true, data:{success:true, shifts:[{
-            open_shift_id:id, status:'open', source:'office', client_name:'Bowlax', regular_aide_name:'Ada Cole',
+            open_shift_id:id, status:'open', source:'office', client_name:'Test Client Alpha', regular_aide_name:'Ada Cole',
             regular_aide_id:'33333333-3333-4333-8333-333333333333', client_id:'66666666-6666-4666-8666-666666666666',
             shift_start:'2026-09-27T16:00:00Z', shift_end:'2026-09-27T20:00:00Z',
             client_phone:'', case_manager_email:'', case_manager_name:'', client_home_address:''
@@ -146,9 +147,9 @@ async function runBrowser(){
         return Promise.resolve({missing:true});
       };
       showTab('coverage');
-    }, bowlax);
-    await page.waitForSelector('[data-cover-id="'+bowlax+'"]');
-    await page.click('[data-cover-id="'+bowlax+'"]');
+    }, testClientAlpha);
+    await page.waitForSelector('[data-cover-id="'+testClientAlpha+'"]');
+    await page.click('[data-cover-id="'+testClientAlpha+'"]');
     await page.waitForSelector('#coverOutcomeView:not([hidden])');
 
     function outcomes(kind){
@@ -201,9 +202,9 @@ async function runBrowser(){
     const decided = await page.evaluate(function(id){
       var hit = window.__bRpc.filter(function(r){return r.kind==='outcome' && r.body && r.body.p_outcome==='awaiting_client';});
       return {n:hit.length, id:hit[0] && hit[0].body.p_open_shift_id};
-    }, bowlax);
+    }, testClientAlpha);
     assert.strictEqual(decided.n, 1);
-    assert.strictEqual(decided.id, bowlax);
+    assert.strictEqual(decided.id, testClientAlpha);
 
     await page.evaluate(function(id){
       var shift = coverFind(id);
@@ -215,7 +216,7 @@ async function runBrowser(){
       window.__bRpc = [];
       window.__bGo = [];
       coverOpenOutcome(id);
-    }, bowlax);
+    }, testClientAlpha);
     await page.click('#coverCallBtn');
     await page.waitForSelector('#coverOutboundConfirm:not([hidden])');
     const call = await page.evaluate(function(){
@@ -277,7 +278,7 @@ async function runBrowser(){
         window.__bRpc.push({kind:kind, body:body||{}});
         if(kind==='list'){
           return Promise.resolve({ok:true, data:{success:true, shifts:[{
-            open_shift_id:id, status:'open', source:'office', client_name:'Bowlax', regular_aide_name:'Ada Cole',
+            open_shift_id:id, status:'open', source:'office', client_name:'Test Client Alpha', regular_aide_name:'Ada Cole',
             regular_aide_id:'33333333-3333-4333-8333-333333333333', client_id:'66666666-6666-4666-8666-666666666666',
             shift_start:'2026-09-27T16:00:00Z', shift_end:'2026-09-27T20:00:00Z',
             client_phone:'2165550140', home_address:'100 Public Square',
@@ -296,12 +297,12 @@ async function runBrowser(){
       window.__bGo = [];
       await coverReload();
       coverOpenOutcome(id);
-    }, bowlax, camId);
+    }, testClientAlpha, camId);
     await page.waitForFunction(function(id){
       var shift = coverFind(id);
       var row = document.querySelector('#coverRankList .cover-rank-row');
       return shift && String(shift.phone||'')==='2165550140' && String(shift.clientHomeAddress||'')==='100 Public Square' && row && /Cam Brooks/.test(row.textContent||'');
-    }, {timeout:8000}, bowlax);
+    }, {timeout:8000}, testClientAlpha);
     await page.evaluate(function(camId){
       document.querySelector('#coverRankList [data-cover-aide="'+camId+'"]').scrollIntoView({block:'center'});
     }, camId);
@@ -424,7 +425,7 @@ async function runBrowser(){
       var draft = document.getElementById('coverCmDraft');
       var mail = document.getElementById('coverCmMail');
       var box = document.getElementById('coverRefuseMail');
-      return box && !box.hidden && draft && /Bowlax/.test(draft.value||'') && /no case manager email/.test(mail.textContent||'');
+      return box && !box.hidden && draft && /testClientAlpha/.test(draft.value||'') && /no case manager email/.test(mail.textContent||'');
     });
     const refuse = await page.evaluate(function(){
       function box(id){
@@ -506,9 +507,9 @@ async function runBrowser(){
     const refused = await page.evaluate(function(id){
       var hit = window.__bRpc.filter(function(r){return r.kind==='outcome' && r.body && r.body.p_outcome==='client_refused_resume_next_day';});
       return {n:hit.length, id:hit[0] && hit[0].body.p_open_shift_id, goes: window.__bGo.slice()};
-    }, bowlax);
+    }, testClientAlpha);
     assert.strictEqual(refused.n, 1);
-    assert.strictEqual(refused.id, bowlax);
+    assert.strictEqual(refused.id, testClientAlpha);
     assert.deepStrictEqual(refused.goes, [], 'recording the refusal does not open Mail');
     const mailReady = await page.evaluate(function(){
       var mail = document.getElementById('coverCmMail');

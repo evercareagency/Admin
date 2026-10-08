@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -120,8 +121,8 @@ const LIST = {
     {code:'ar', label:'Arabic'}
   ]
 };
-const EN = 'Hi Fatima \u2014 can you cover Bowlax Sunday 9:00 AM\u20131:00 PM? Reply Yes or No.';
-const AR = '\u0645\u0631\u062d\u0628\u0627 Fatima \u2014 \u0647\u0644 \u064a\u0645\u0643\u0646\u0643 \u062a\u063a\u0637\u064a\u0629 Bowlax \u064a\u0648\u0645 \u0627\u0644\u0623\u062d\u062f \u0645\u0646 9:00 AM\u20131:00 PM\u061f \u0623\u062c\u0628 \u0628\u0646\u0639\u0645 \u0623\u0648 \u0644\u0627. \u2014 EverCare / Remi';
+const EN = 'Hi Fatima \u2014 can you cover Test Client Alpha Sunday 9:00 AM\u20131:00 PM? Reply Yes or No.';
+const AR = '\u0645\u0631\u062d\u0628\u0627 Fatima \u2014 \u0647\u0644 \u064a\u0645\u0643\u0646\u0643 \u062a\u063a\u0637\u064a\u0629 Test Client Alpha \u064a\u0648\u0645 \u0627\u0644\u0623\u062d\u062f \u0645\u0646 9:00 AM\u20131:00 PM\u061f \u0623\u062c\u0628 \u0628\u0646\u0639\u0645 \u0623\u0648 \u0644\u0627. \u2014 EverCare / Remi';
 
 function runSlice(){
   const sandbox = {
@@ -281,9 +282,9 @@ function runSlice(){
   assert.strictEqual(rpc[0].body.p_aide_id, AIDE);
   assert.ok(!rpc.some(function(row){return /sms|quo|twilio/i.test(row.name);}));
 
-  const ES = 'Hola Langs1Fatima \u2014 \u00bfpuedes cubrir Bowlax el domingo de 9\u20131? Responde S\u00ed o No. \u2014 EverCare / Remi';
-  const EN_FATIMA = 'Hi Langs1Fatima \u2014 can you cover Bowlax Sunday 9\u20131? Reply Yes or No.';
-  sandbox.remiLangs1Aide = {id:AIDE, name:'Langs1Fatima', client_name:'Bowlax', window_label:'Sunday 9\u20131'};
+  const ES = 'Hola Langs1Fatima \u2014 \u00bfpuedes cubrir Test Client Alpha el domingo de 9\u20131? Responde S\u00ed o No. \u2014 EverCare / Remi';
+  const EN_FATIMA = 'Hi Langs1Fatima \u2014 can you cover Test Client Alpha Sunday 9\u20131? Reply Yes or No.';
+  sandbox.remiLangs1Aide = {id:AIDE, name:'Langs1Fatima', client_name:'Test Client Alpha', window_label:'Sunday 9\u20131'};
   sandbox.remiLangs1English = EN_FATIMA;
   sandbox.remiLangs1Lang = 'en';
   sandbox.remiLangs1Mode = 'draft';
@@ -411,14 +412,14 @@ function runSlice(){
       english_draft:body.p_english_body, translated_body:'Hola Maria', preview_body:'Hola Maria',
       sms_send:{implemented:true, oos:false}
     }};
-    if(name==='admin_get_open_shift_why')return {ok:true, data:{success:true, client_name:'Bowlax', window_label:'Sun 9:00 AM\u20131:00 PM', open_shift_id:body.p_open_shift_id}};
+    if(name==='admin_get_open_shift_why')return {ok:true, data:{success:true, client_name:'Test Client Alpha', window_label:'Sun 9:00 AM\u20131:00 PM', open_shift_id:body.p_open_shift_id}};
     if(name==='admin_list_cover_attempts')return {ok:true, data:{attempts:[{when_label:'Sat 4:18 PM', who_label:'Blasted by Remi', status:'no', detail:'Devon said no'}]}};
-    if(name==='admin_get_pay_dispute_evidence')return {ok:true, data:{success:true, aide_name:'Jamal', on_date:'2026-09-25', client_name:'Bowlax', shift:{scheduled_label:'8:00\u20134:00', clock_in:'07:58', clock_out:'16:03', status_label:'Completed', is_missed:false, is_completed:true}, signature:{present:true, label:'Client signature on file'}}};
-    if(name==='admin_draft_pay_dispute_reply')return {ok:true, data:{draft_reply:'Jamal \u2014 the record shows Bowlax 09/25/2026.'}};
+    if(name==='admin_get_pay_dispute_evidence')return {ok:true, data:{success:true, aide_name:'Jamal', on_date:'2026-09-25', client_name:'Test Client Alpha', shift:{scheduled_label:'8:00\u20134:00', clock_in:'07:58', clock_out:'16:03', status_label:'Completed', is_missed:false, is_completed:true}, signature:{present:true, label:'Client signature on file'}}};
+    if(name==='admin_draft_pay_dispute_reply')return {ok:true, data:{draft_reply:'Jamal \u2014 the record shows Test Client Alpha 09/25/2026.'}};
     if(name==='admin_send_aide_office_message')return {ok:true, data:{success:true}};
     return {ok:true, data:{success:true}};
   };
-  const es = await live.remiIdeas763OpenBilingual({id:AIDE, name:'Maria'}, 'Hi Maria \u2014 can you cover Bowlax Sunday 9\u20131? Reply Yes or No.');
+  const es = await live.remiIdeas763OpenBilingual({id:AIDE, name:'Maria'}, 'Hi Maria \u2014 can you cover Test Client Alpha Sunday 9\u20131? Reply Yes or No.');
   assert.strictEqual(es.ok, true);
   assert.ok(liveRpc.some(function(row){return row.name==='admin_draft_bilingual_cover_ask' && row.body.p_target_lang==='es';}));
   assert.strictEqual(live.remiLangs1Mode, 'draft');
@@ -434,7 +435,7 @@ function runSlice(){
   assert.strictEqual(why.ok, true);
   const whyCard = live.remiIdeas763WhyHtml();
   assert.ok(whyCard.indexOf('Why open') >= 0, whyCard);
-  assert.ok(whyCard.indexOf('Bowlax') >= 0, whyCard);
+  assert.ok(whyCard.indexOf('Test Client Alpha') >= 0, whyCard);
   assert.ok(whyCard.indexOf('Sat 4:18 PM') >= 0, whyCard);
   const pay = await live.remiIdeas763OpenPay({id:AIDE, name:'Jamal'}, 'Why am I not getting paid?', '2026-09-25');
   assert.strictEqual(pay.ok, true);
@@ -492,7 +493,7 @@ async function runBrowser(){
     args: ['--no-sandbox','--disable-dev-shm-usage']
   });
   const errors = [];
-  const ES_PREVIEW = 'Hola Langs1Fatima \u2014 \u00bfpuedes cubrir Bowlax el domingo de 9\u20131? Responde S\u00ed o No. \u2014 EverCare / Remi';
+  const ES_PREVIEW = 'Hola Langs1Fatima \u2014 \u00bfpuedes cubrir Test Client Alpha el domingo de 9\u20131? Responde S\u00ed o No. \u2014 EverCare / Remi';
   const pack = {aide:AIDE, list:LIST, en:EN, ar:AR, es:ES_PREVIEW};
   try{
     async function boot(page){
@@ -578,7 +579,7 @@ async function runBrowser(){
       var tab = document.getElementById('tab_aidechat');
       tab.classList.add('active');
       tab.removeAttribute('hidden');
-      await remiLangs1ShowDraft({id:pack.aide, name:'Fatima Hassan', client_name:'Bowlax', window_label:'Sunday 9:00 AM\u20131:00 PM'}, pack.en);
+      await remiLangs1ShowDraft({id:pack.aide, name:'Fatima Hassan', client_name:'Test Client Alpha', window_label:'Sunday 9:00 AM\u20131:00 PM'}, pack.en);
     }, pack);
     const phoneDraft = await page.evaluate(function(ar){
       var host = document.getElementById('remiLangsHost');
@@ -623,7 +624,7 @@ async function runBrowser(){
 
     await page.evaluate(async function(){
       remiLangs1Aide.name = 'Langs1Fatima';
-      remiLangs1English = 'Hi Langs1Fatima \u2014 can you cover Bowlax Sunday 9\u20131? Reply Yes or No.';
+      remiLangs1English = 'Hi Langs1Fatima \u2014 can you cover Test Client Alpha Sunday 9\u20131? Reply Yes or No.';
       window.__rpc = [];
       await remiLangs1Set('es');
     });
@@ -684,7 +685,7 @@ async function runBrowser(){
       var tab = document.getElementById('tab_aidechat');
       tab.classList.add('active');
       tab.removeAttribute('hidden');
-      await remiLangs1ShowDraft({id:pack.aide, name:'Fatima Hassan', client_name:'Bowlax', window_label:'Sunday 9:00 AM\u20131:00 PM'}, pack.en);
+      await remiLangs1ShowDraft({id:pack.aide, name:'Fatima Hassan', client_name:'Test Client Alpha', window_label:'Sunday 9:00 AM\u20131:00 PM'}, pack.en);
     }, pack);
     const deskDraft = await desk.evaluate(function(ar){
       var msg = document.getElementById('remiLangsMsgCard');
@@ -715,7 +716,7 @@ async function runBrowser(){
     await desk.screenshot({path:path.join(shotDir, 'remi-langs1-desktop-arabic.png')});
     await desk.evaluate(async function(){
       remiLangs1Aide.name = 'Langs1Fatima';
-      remiLangs1English = 'Hi Langs1Fatima \u2014 can you cover Bowlax Sunday 9\u20131? Reply Yes or No.';
+      remiLangs1English = 'Hi Langs1Fatima \u2014 can you cover Test Client Alpha Sunday 9\u20131? Reply Yes or No.';
       window.__rpc = [];
       await remiLangs1Set('es');
     });

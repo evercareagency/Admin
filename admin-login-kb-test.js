@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -45,7 +46,7 @@ assert.ok(mgrLogin, 'mgrLogin missing');
 assert.ok(!/loginKb|visualViewport/.test(mgrLogin), 'keyboard lift must not change mgrLogin');
 const showScreen = extractFn(html, 'function showScreen(id)');
 assert.ok(showScreen.includes('loginKbClear'), 'leaving or reopening a screen drops the keyboard scrollport');
-assert.ok(showScreen.includes("id==='loginScreen')startLoginWarmKeepAlive()"), 'login warm keep-alive still starts from showScreen');
+assert.ok(!showScreen.includes('startLoginWarmKeepAlive'), 'login screen does not start a keep-alive');
 assert.ok(!extractFn(html, 'async function doAdminReset()'), 'recovery reset is not part of the login keyboard path');
 const showForgot = extractFn(html, 'function showAdminReset()');
 assert.ok(showForgot && !/loginKb|visualViewport/.test(showForgot), 'forgot note must not change the keyboard lift');

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -84,7 +85,8 @@ assert.equal((html.match(new RegExp(legacyMgrName,'g'))||[]).length, 0);
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(!login.includes("action:'admin_login'"), 'sheets rollback does not post legacy login');
-assert.ok(login.includes('Sheets sign-in is no longer available. Contact the office administrator.'));
+assert.ok(!login.includes('Sheets sign-in is no longer available. Contact the office administrator.'));
+assert.ok(!/fetch\(/.test(login), 'login does not fetch');
 assert.ok(login.includes("showScreen('loginScreen')"));
 assert.ok(/finally\{[\s\S]*_mgrLoginInFlight=false/.test(login), 'login button lock always clears');
 
