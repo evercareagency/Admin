@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -95,7 +96,7 @@ async function runBrowser(){
     headless: 'new',
     args: ['--no-sandbox','--disable-dev-shm-usage']
   });
-  const bowlax = '18acd525-1111-4111-8111-111111111111';
+  const testClientAlpha = '18acd525-1111-4111-8111-111111111111';
   try{
     const page = await browser.newPage();
     await page.setViewport({width:390, height:844, isMobile:true, hasTouch:true, deviceScaleFactor:2});
@@ -116,7 +117,7 @@ async function runBrowser(){
         window.__bRpc.push({kind:kind, body:body||{}});
         if(kind==='list'){
           return Promise.resolve({ok:true, data:{success:true, shifts:[{
-            open_shift_id:id, status:'open', source:'office', client_name:'Bowlax', regular_aide_name:'Ada Cole',
+            open_shift_id:id, status:'open', source:'office', client_name:'Test Client Alpha', regular_aide_name:'Ada Cole',
             regular_aide_id:'33333333-3333-4333-8333-333333333333', client_id:'66666666-6666-4666-8666-666666666666',
             shift_start:'2026-09-27T16:00:00Z', shift_end:'2026-09-27T20:00:00Z',
             client_phone:'', case_manager_email:'', case_manager_name:'', client_home_address:''
@@ -127,9 +128,9 @@ async function runBrowser(){
         return Promise.resolve({missing:true});
       };
       showTab('coverage');
-    }, bowlax);
-    await page.waitForSelector('[data-cover-id="'+bowlax+'"]');
-    await page.click('[data-cover-id="'+bowlax+'"]');
+    }, testClientAlpha);
+    await page.waitForSelector('[data-cover-id="'+testClientAlpha+'"]');
+    await page.click('[data-cover-id="'+testClientAlpha+'"]');
     await page.waitForSelector('#coverOutcomeView:not([hidden])');
     await page.waitForFunction(function(){return document.querySelectorAll('[data-cover-aide]').length>=1;});
 
@@ -224,9 +225,9 @@ async function runBrowser(){
     const decided = await page.evaluate(function(id){
       var hit = window.__bRpc.filter(function(r){return r.kind==='outcome' && r.body && r.body.p_outcome==='awaiting_client';});
       return {n:hit.length, id:hit[0] && hit[0].body.p_open_shift_id};
-    }, bowlax);
+    }, testClientAlpha);
     assert.strictEqual(decided.n, 1);
-    assert.strictEqual(decided.id, bowlax);
+    assert.strictEqual(decided.id, testClientAlpha);
 
     await page.evaluate(function(id){
       var shift = coverFind(id);
@@ -235,7 +236,7 @@ async function runBrowser(){
       coverBusy = false;
       window.__bRpc = [];
       coverOpenOutcome(id);
-    }, bowlax);
+    }, testClientAlpha);
     await page.waitForSelector('#coverOutcomeView:not([hidden])');
     const asked = await page.evaluate(function(){
       var pack = remiWiderAnswer('still deciding');

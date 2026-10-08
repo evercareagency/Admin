@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -120,7 +121,7 @@ async function runBrowser(){
     headless: 'new',
     args: ['--no-sandbox','--disable-dev-shm-usage']
   });
-  const bowlax = '18acd525-1111-4111-8111-111111111111';
+  const testClientAlpha = '18acd525-1111-4111-8111-111111111111';
   const zelda = '22222222-2222-4222-8222-222222222222';
   const adaId = '33333333-3333-4333-8333-333333333333';
   const camId = '44444444-4444-4444-8444-444444444444';
@@ -155,7 +156,7 @@ async function runBrowser(){
       showTab('timesheets');
       coverShifts = [
         {
-          id: ids.bowlax, status:'open', source:'ace', clientName:'Bowlax', aideName:'Ada Cole', aideId: ids.adaId,
+          id: ids.testClientAlpha, status:'open', source:'ace', clientName:'Test Client Alpha', aideName:'Ada Cole', aideId: ids.adaId,
           clientId: ids.clientId, startsAt:'2026-09-27T16:00:00Z', endsAt:'2026-09-27T20:00:00Z',
           phone:'2165550140', caseManagerEmail:'pat@example.com', caseManagerName:'Pat Lee',
           clientHomeAddress:'100 Public Square, Cleveland OH 44129'
@@ -203,7 +204,7 @@ async function runBrowser(){
         if(kind==='outcome' || kind==='skipRecord')return Promise.resolve({ok:true, data:{success:true}});
         return Promise.resolve({missing:true});
       };
-    }, {bowlax:bowlax, zelda:zelda, adaId:adaId, camId:camId, danaId:danaId, clientId:clientId});
+    }, {testClientAlpha:testClientAlpha, zelda:zelda, adaId:adaId, camId:camId, danaId:danaId, clientId:clientId});
 
     await page.waitForSelector('#copilotFab .remi-chip-face', {visible:true});
     const closed = await page.evaluate(function(){
@@ -307,8 +308,8 @@ async function runBrowser(){
         goes: window.__widerGo.slice(),
         scrollX: window.scrollX
       };
-    }, {bowlax:bowlax});
-    assert.ok(/Bowlax/.test(talk.text), talk.text);
+    }, {testClientAlpha:testClientAlpha});
+    assert.ok(/testClientAlpha/.test(talk.text), talk.text);
     assert.ok(!/Zelda/.test(talk.text), 'one cover only');
     assert.ok(!/Ada Cole/.test(talk.text), 'regular aide is not offered as backup');
     assert.ok(/2\.4 miles away/.test(talk.text) && /Never worked this client/.test(talk.text), talk.text);
@@ -322,7 +323,7 @@ async function runBrowser(){
     assert.strictEqual(talk.outcomes, 0, 'reading ranks does not assign');
     assert.deepStrictEqual(talk.goes, [], 'reading ranks does not text or call');
     assert.ok(talk.ranks.length >= 1, 'rank RPC ran');
-    assert.strictEqual(talk.ranks[0].p_open_shift_id, bowlax);
+    assert.strictEqual(talk.ranks[0].p_open_shift_id, testClientAlpha);
     assert.strictEqual(talk.ranks[0].p_limit, 20);
     assert.strictEqual(talk.scrollX, 0);
     await page.screenshot({path: path.join(shotDir, 'remiwider1-shift-talk.png')});
@@ -432,7 +433,7 @@ async function runBrowser(){
     await page.click('#copilotChatSend');
     await page.waitForFunction(function(){
       var t = document.getElementById('copilotThread').innerText;
-      return /Services not delivered today/.test(t) && /Bowlax/.test(t) && /will not receive services/.test(t);
+      return /Services not delivered today/.test(t) && /testClientAlpha/.test(t) && /will not receive services/.test(t);
     });
     const refuse = await page.evaluate(function(){
       return {
@@ -460,9 +461,9 @@ async function runBrowser(){
     const refused = await page.evaluate(function(id){
       var hit = window.__widerRpc.filter(function(r){return r.kind==='outcome' && r.body && r.body.p_outcome==='client_refused_resume_next_day';});
       return {n: hit.length, id: hit[0] && hit[0].body.p_open_shift_id, goes: window.__widerGo.slice()};
-    }, bowlax);
+    }, testClientAlpha);
     assert.strictEqual(refused.n, 1);
-    assert.strictEqual(refused.id, bowlax);
+    assert.strictEqual(refused.id, testClientAlpha);
     assert.deepStrictEqual(refused.goes, [], 'recording the refusal does not open Mail');
 
     await page.evaluate(function(){
@@ -502,10 +503,10 @@ async function runBrowser(){
     });
     assert.strictEqual(skipped.n, 1);
     assert.strictEqual(skipped.reason, 'personal');
-    assert.strictEqual(skipped.id, bowlax);
+    assert.strictEqual(skipped.id, testClientAlpha);
 
     await page.evaluate(function(){
-      coverShifts.forEach(function(s){if(s.clientName==='Bowlax')s.status='open';});
+      coverShifts.forEach(function(s){if(s.clientName==='Test Client Alpha')s.status='open';});
       coverPostedKey='';
       coverBusy=false;
       window.__widerRpc = window.__widerRpc.filter(function(r){return r.kind!=='outcome';});
@@ -539,7 +540,7 @@ async function runBrowser(){
     });
     assert.strictEqual(assigned.n, 1);
     assert.strictEqual(assigned.aide, camId);
-    assert.strictEqual(assigned.id, bowlax);
+    assert.strictEqual(assigned.id, testClientAlpha);
 
     await page.evaluate(function(){
       copilotClose();

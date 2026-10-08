@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -123,7 +124,7 @@ vm.runInContext(schedSrc + '\n' + slotSrc, sandbox);
 assert.strictEqual(sandbox.HOLD_CLIENT1_MARKER, 'v=hold-client1');
 assert.strictEqual(sandbox.CLIENTHRS1C_MARKER, 'v=clienthrs1c');
 
-const bowlax = '11111111-1111-4111-8111-111111111111';
+const testClientAlpha = '11111111-1111-4111-8111-111111111111';
 const ada = '22222222-2222-4222-8222-222222222222';
 const holdId = '99999999-9999-4999-8999-999999999999';
 
@@ -156,7 +157,7 @@ const banner = {
     marker: 'hold-client1',
     v: 'hold-client1',
     clients: [
-      {client_id: bowlax, client_name: 'Bowlax', weekly_authorized_hours: 63, client_on_hold: false, hold_banner: null, holds: [], days: emptyDays('2026-09-28')},
+      {client_id: testClientAlpha, client_name: 'Test Client Alpha', weekly_authorized_hours: 63, client_on_hold: false, hold_banner: null, holds: [], days: emptyDays('2026-09-28')},
       {client_id: ada, client_name: 'Ada Cole', weekly_authorized_hours: 40, days: emptyDays('2026-09-28')}
     ]
   });
@@ -164,10 +165,10 @@ const banner = {
   assert.strictEqual(sandbox.schedSlotMode, true);
   sandbox.schedPaint();
   assert.strictEqual(els.schedEmpty.hidden, true, 'empty week does not demand Add shift first');
-  assert.ok(els.schedBody.innerHTML.includes('Bowlax'), 'empty week still lists the client');
+  assert.ok(els.schedBody.innerHTML.includes('Test Client Alpha'), 'empty week still lists the client');
   assert.ok(els.schedBody.innerHTML.includes('sched-dash'), 'empty days are dashes');
   assert.strictEqual(els.schedSlotDetail.hidden, true, 'cold paint does not open the client panel');
-  sandbox.schedSelectSlotDay(bowlax, '2026-09-28', 1);
+  sandbox.schedSelectSlotDay(testClientAlpha, '2026-09-28', 1);
   assert.ok(els.schedSlotCards.innerHTML.includes('Put on hold'), 'Put on hold is on the client week');
   assert.ok(els.schedSlotCards.innerHTML.includes('Save hold'), 'Start/End/Note save is on the panel');
   assert.ok(els.schedSlotCards.innerHTML.includes('No Add shift required'), 'no Add shift prerequisite');
@@ -178,10 +179,10 @@ const banner = {
   els.schedClientHoldEnd.value = '10/05/2026';
   els.schedClientHoldNote.value = 'hospital / ER';
   rpc.length = 0;
-  await sandbox.schedSaveClientHold(bowlax);
+  await sandbox.schedSaveClientHold(testClientAlpha);
   const saved = calls('upsert_schedule_client_hold');
   assert.strictEqual(saved.length, 1, 'one client hold upsert');
-  assert.strictEqual(saved[0].body.p_client_id, bowlax);
+  assert.strictEqual(saved[0].body.p_client_id, testClientAlpha);
   assert.strictEqual(saved[0].body.p_start_date, '2026-09-28');
   assert.strictEqual(saved[0].body.p_end_date, '2026-10-05');
   assert.strictEqual(saved[0].body.p_note, 'hospital / ER');
@@ -195,7 +196,7 @@ const banner = {
     marker: 'hold-client1',
     v: 'hold-client1',
     clients: [
-      {client_id: bowlax, client_name: 'Bowlax', weekly_authorized_hours: 63, client_on_hold: true, hold_banner: banner, holds: [{hold_id: holdId, start_date: '2026-09-28', end_date: '2026-10-05', note: 'hospital', open_ended: false}], days: emptyDays('2026-09-28')},
+      {client_id: testClientAlpha, client_name: 'Test Client Alpha', weekly_authorized_hours: 63, client_on_hold: true, hold_banner: banner, holds: [{hold_id: holdId, start_date: '2026-09-28', end_date: '2026-10-05', note: 'hospital', open_ended: false}], days: emptyDays('2026-09-28')},
       {
         client_id: ada,
         client_name: 'Ada Cole',
@@ -209,12 +210,12 @@ const banner = {
       }
     ]
   });
-  const painted = sandbox.schedFindSlotClient(bowlax);
+  const painted = sandbox.schedFindSlotClient(testClientAlpha);
   assert.strictEqual(painted.client_on_hold, true);
   assert.strictEqual(painted.hold_banner.label, 'hospital · 09/28 – 10/05');
   assert.strictEqual(painted.days['1'].slots.length, 0, 'hold does not invent a slot');
   sandbox.schedSetFilter('hold');
-  assert.ok(els.schedBody.innerHTML.includes('Bowlax'), 'On hold filter lists the client');
+  assert.ok(els.schedBody.innerHTML.includes('Test Client Alpha'), 'On hold filter lists the client');
   assert.ok(els.schedBody.innerHTML.includes('hospital · 09/28 – 10/05'), 'row banner uses hold_banner.label');
   assert.ok(els.schedBody.innerHTML.includes('row-hold-banner'), 'row banner class');
   assert.ok(els.schedBody.innerHTML.includes('sched-dash'), 'held empty days stay dashes');
@@ -225,7 +226,7 @@ const banner = {
 
   els.schedClientHoldEnd.value = '10/01/2026';
   rpc.length = 0;
-  await sandbox.schedEndClientHold(bowlax);
+  await sandbox.schedEndClientHold(testClientAlpha);
   const ended = calls('clear_schedule_client_hold');
   assert.strictEqual(ended.length, 1, 'end hold is one clear');
   assert.strictEqual(ended[0].body.p_hold_id, holdId);
@@ -239,8 +240,8 @@ const banner = {
     marker: 'hold-client1',
     v: 'hold-client1',
     clients: [{
-      client_id: bowlax,
-      client_name: 'Bowlax',
+      client_id: testClientAlpha,
+      client_name: 'Test Client Alpha',
       weekly_authorized_hours: 63,
       client_on_hold: true,
       hold_banner: banner,
@@ -251,7 +252,7 @@ const banner = {
   sandbox.schedFilterHold = false;
   sandbox.schedPaint();
   rpc.length = 0;
-  await sandbox.schedClearClientHold(bowlax);
+  await sandbox.schedClearClientHold(testClientAlpha);
   const cleared = calls('clear_schedule_client_hold');
   assert.strictEqual(cleared.length, 1, 'clear abandons the hold');
   assert.strictEqual(cleared[0].body.p_hold_id, holdId);
@@ -263,16 +264,16 @@ const banner = {
     marker: 'hold-client1',
     v: 'hold-client1',
     clients: [
-      {client_id: bowlax, client_name: 'Bowlax', weekly_authorized_hours: 63, client_on_hold: false, hold_banner: null, holds: [{hold_id: holdId, start_date: '2026-09-28', end_date: '2026-10-01', note: 'hospital', open_ended: false, is_active: true}], days: emptyDays('2026-10-12')},
+      {client_id: testClientAlpha, client_name: 'Test Client Alpha', weekly_authorized_hours: 63, client_on_hold: false, hold_banner: null, holds: [{hold_id: holdId, start_date: '2026-09-28', end_date: '2026-10-01', note: 'hospital', open_ended: false, is_active: true}], days: emptyDays('2026-10-12')},
       {client_id: ada, client_name: 'Ada Cole', weekly_authorized_hours: 40, client_on_hold: false, days: emptyDays('2026-10-12')}
     ]
   });
-  assert.strictEqual(sandbox.schedFindSlotClient(bowlax).client_on_hold, false);
+  assert.strictEqual(sandbox.schedFindSlotClient(testClientAlpha).client_on_hold, false);
   sandbox.schedSetFilter('hold');
-  assert.ok(!els.schedBody.innerHTML.includes('Bowlax'), 'later week filter excludes the ended hold');
+  assert.ok(!els.schedBody.innerHTML.includes('Test Client Alpha'), 'later week filter excludes the ended hold');
   assert.ok(els.schedBody.innerHTML.includes('No clients on hold this week'), 'empty On hold filter does not say to make a shift');
   sandbox.schedSetFilter('all');
-  assert.ok(els.schedBody.innerHTML.includes('Bowlax'), 'later week All still lists the client');
+  assert.ok(els.schedBody.innerHTML.includes('Test Client Alpha'), 'later week All still lists the client');
   assert.ok(els.schedBody.innerHTML.includes('sched-dash'), 'later week stays dashes until hours resume');
   assert.ok(!els.schedBody.innerHTML.includes('row-hold-banner'), 'ended hold has no row banner');
 
@@ -320,14 +321,14 @@ async function shots(){
   });
   const outDir = process.env.HOLD_SHOTS || '/opt/cursor/artifacts';
   fs.mkdirSync(outDir, {recursive: true});
-  const bowlaxId = '11111111-1111-4111-8111-111111111111';
+  const testClientAlphaId = '11111111-1111-4111-8111-111111111111';
   const adaId = '22222222-2222-4222-8222-222222222222';
   const hid = '99999999-9999-4999-8999-999999999999';
   try {
     const page = await browser.newPage();
     await page.setViewport({width: 390, height: 844, isMobile: true, hasTouch: true, deviceScaleFactor: 2});
     await page.goto('http://127.0.0.1:' + port + '/index.html?v=hold-client1', {waitUntil: 'domcontentloaded', timeout: 20000});
-    const boot = await page.evaluate(function(bowlaxId, adaId, hid){
+    const boot = await page.evaluate(function(testClientAlphaId, adaId, hid){
       document.getElementById('loginScreen').classList.remove('active');
       document.getElementById('adminScreen').classList.add('active');
       document.querySelectorAll('#adminScreen .tab-panel').forEach(function(p){ p.classList.remove('active'); });
@@ -359,18 +360,18 @@ async function shots(){
         marker: 'hold-client1',
         v: 'hold-client1',
         clients: [
-          {client_id: bowlaxId, client_name: 'Bowlax', weekly_authorized_hours: 63, client_on_hold: false, hold_banner: null, holds: [], days: days('2026-09-28')},
+          {client_id: testClientAlphaId, client_name: 'Test Client Alpha', weekly_authorized_hours: 63, client_on_hold: false, hold_banner: null, holds: [], days: days('2026-09-28')},
           {client_id: adaId, client_name: 'Ada Cole', weekly_authorized_hours: 40, client_on_hold: false, days: adaDays}
         ]
       });
-      schedSelectSlotDay(bowlaxId, '2026-09-28', 1);
+      schedSelectSlotDay(testClientAlphaId, '2026-09-28', 1);
       return {
         build: document.querySelector('meta[name="admin-build"]').content,
         marker: document.getElementById('tab_schedule').getAttribute('data-hold-client1'),
         put: document.getElementById('schedSlotCards').innerText,
         dashes: document.querySelectorAll('#schedBody .sched-dash').length
       };
-    }, bowlaxId, adaId, hid);
+    }, testClientAlphaId, adaId, hid);
     assert.strictEqual(boot.build, '2026-09-27-remi-float-hide1b');
     assert.strictEqual(boot.marker, 'v=hold-client1');
     assert.ok(boot.put.indexOf('Put on hold') >= 0, boot.put);
@@ -381,7 +382,7 @@ async function shots(){
     });
     await page.screenshot({path: path.join(outDir, 'hold-client1-01-put-phone.png')});
 
-    const saved = await page.evaluate(function(bowlaxId, hid){
+    const saved = await page.evaluate(function(testClientAlphaId, hid){
       window.__rpc = [];
       window.__nextWeek = {
         week_start: '2026-09-28',
@@ -389,8 +390,8 @@ async function shots(){
         v: 'hold-client1',
         clients: [
           {
-            client_id: bowlaxId,
-            client_name: 'Bowlax',
+            client_id: testClientAlphaId,
+            client_name: 'Test Client Alpha',
             weekly_authorized_hours: 63,
             client_on_hold: true,
             hold_banner: {
@@ -424,7 +425,7 @@ async function shots(){
           });
         }, 80);
       });
-    }, bowlaxId, hid);
+    }, testClientAlphaId, hid);
     const upsert = saved.rpc.filter(function(c){ return c.name === 'upsert_schedule_client_hold'; });
     assert.strictEqual(upsert.length, 1, 'browser save posts the client hold');
     assert.strictEqual(upsert[0].body.p_note, 'hospital / ER');
@@ -437,19 +438,19 @@ async function shots(){
       };
     });
     assert.strictEqual(filtered.pressed, 'true');
-    assert.ok(filtered.text.indexOf('Bowlax') >= 0, filtered.text);
+    assert.ok(filtered.text.indexOf('Test Client Alpha') >= 0, filtered.text);
     assert.ok(filtered.text.indexOf('hospital · 09/28 – 10/05') >= 0, filtered.text);
     await page.screenshot({path: path.join(outDir, 'hold-client1-02-filter-phone.png')});
 
-    const ended = await page.evaluate(function(bowlaxId){
+    const ended = await page.evaluate(function(testClientAlphaId){
       window.__rpc = [];
       window.__nextWeek = {
         week_start: '2026-09-28',
         marker: 'hold-client1',
         v: 'hold-client1',
         clients: [{
-          client_id: bowlaxId,
-          client_name: 'Bowlax',
+          client_id: testClientAlphaId,
+          client_name: 'Test Client Alpha',
           weekly_authorized_hours: 63,
           client_on_hold: false,
           hold_banner: null,
@@ -477,7 +478,7 @@ async function shots(){
           });
         }, 80);
       });
-    }, bowlaxId);
+    }, testClientAlphaId);
     assert.ok(ended.keys.indexOf('p_hold_id') >= 0, 'end sends hold id');
     assert.ok(ended.keys.indexOf('p_end_date') >= 0, 'end sends end date');
     assert.strictEqual(ended.end, '2026-10-01');
@@ -488,7 +489,7 @@ async function shots(){
     const desk = await browser.newPage();
     await desk.setViewport({width: 1280, height: 900, isMobile: false, hasTouch: false, deviceScaleFactor: 1});
     await desk.goto('http://127.0.0.1:' + port + '/index.html?v=hold-client1', {waitUntil: 'domcontentloaded', timeout: 20000});
-    await desk.evaluate(function(bowlaxId, hid){
+    await desk.evaluate(function(testClientAlphaId, hid){
       document.getElementById('loginScreen').classList.remove('active');
       document.getElementById('adminScreen').classList.add('active');
       document.querySelectorAll('#adminScreen .tab-panel').forEach(function(p){ p.classList.remove('active'); });
@@ -504,8 +505,8 @@ async function shots(){
         marker: 'hold-client1',
         v: 'hold-client1',
         clients: [{
-          client_id: bowlaxId,
-          client_name: 'Bowlax',
+          client_id: testClientAlphaId,
+          client_name: 'Test Client Alpha',
           weekly_authorized_hours: 63,
           client_on_hold: true,
           hold_banner: {hold_id: hid, note: 'hospital', start_date: '2026-09-28', end_date: '2026-10-05', start_label: '09/28', end_label: '10/05', open_ended: false, label: 'hospital · 09/28 – 10/05'},
@@ -514,7 +515,7 @@ async function shots(){
         }]
       });
       schedSetFilter('hold');
-    }, bowlaxId, hid);
+    }, testClientAlphaId, hid);
     await desk.screenshot({path: path.join(outDir, 'hold-client1-02-filter-desktop.png'), fullPage: true});
     console.log('hold-client1 phone and desktop screenshots ok');
   } finally {

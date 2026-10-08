@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -178,7 +179,7 @@ sandbox.paintISComplianceBoard();
 assert.ok(els.isComplianceBody.innerHTML.includes('Moe') && els.isComplianceBody.innerHTML.includes('Safety'), 'empty search shows the full roster');
 assert.ok(els.isComplianceCards.innerHTML.includes('Alex'), 'phone cards paint the same roster');
 assert.ok(els.isComplianceBody.innerHTML.includes('aria-label="Alex not deletable"'), 'non-deletable checkbox is disabled');
-assert.ok(els.isComplianceBody.innerHTML.includes('Send Reminder'), 'Send Reminder stays on the not-completed row');
+assert.ok(els.isComplianceBody.innerHTML.includes("Reminders aren't available yet."), 'not-completed row says reminders are not available yet');
 assert.strictEqual(els.isComplianceSelCount.textContent, '0 selected');
 assert.strictEqual(els.isComplianceDeleteSelected.disabled, true);
 

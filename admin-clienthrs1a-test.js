@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -51,7 +52,7 @@ assert.ok(modal.includes('id="clientWeeklyHours"'), 'hours input');
 assert.ok(/id="clientWeeklyHours"[^>]*type="number"|type="number"[^>]*id="clientWeeklyHours"/.test(modal), 'number input');
 assert.ok(modal.includes('min="0"'), 'min 0');
 assert.ok(modal.indexOf('clientWeeklyHours') < modal.indexOf('Assigned Aides'), 'hours sit above Assigned Aides');
-assert.ok(modal.indexOf('Verify Address') < modal.indexOf('clientWeeklyHours'), 'verify address stays above the hours field');
+assert.ok(modal.indexOf('Home pin') < modal.indexOf('clientWeeklyHours'), 'home pin stays above the hours field');
 assert.ok(modal.includes('Save Client'), 'Save Client stays');
 assert.ok(modal.includes('Cancel'), 'Cancel stays');
 assert.ok(modal.includes('id="assignAidesList"'), 'Assigned Aides list stays');

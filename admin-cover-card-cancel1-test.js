@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -118,7 +119,7 @@ const ctx = vm.createContext({
 const shift = {
   id: '22222222-2222-4222-8222-222222222222',
   clientId: '11111111-1111-4111-8111-111111111111',
-  clientName: 'Bowlax',
+  clientName: 'Test Client Alpha',
   startsAt: '2026-09-27T12:00:00.000Z',
   endsAt: '2026-09-27T21:00:00.000Z',
   serviceDate: '2026-09-27',
@@ -188,7 +189,7 @@ async function runBrowser(){
   const shift = {
     open_shift_id: shiftId,
     client_id: clientId,
-    client_name: 'Bowlax',
+    client_name: 'Test Client Alpha',
     service_date: '2026-09-27',
     regular_aide_id: aideId,
     regular_aide_name: 'moe',
@@ -207,7 +208,7 @@ async function runBrowser(){
       week_start: '2026-09-21',
       clients: [{
         client_id: clientId,
-        client_name: 'Bowlax',
+        client_name: 'Test Client Alpha',
         days: {
           '7': {
             on_date: '2026-09-27',
@@ -246,7 +247,7 @@ async function runBrowser(){
       if(rpc)calls.push({rpc: rpc, body: body});
       let payload = {success: true};
       if(u.indexOf('/rest/v1/clients') >= 0){
-        payload = [{id: clientId, name: 'Bowlax', is_active: true}];
+        payload = [{id: clientId, name: 'Test Client Alpha', is_active: true}];
       }else if(u.indexOf('/rest/v1/aides') >= 0){
         payload = [
           {id: aideId, username: 'moe', full_name: 'moe', is_active: true},
@@ -311,7 +312,7 @@ async function runBrowser(){
         labels: labels,
         skip: wrap ? wrap.textContent.indexOf('CLIENT-SKIP') >= 0 : false,
         office: wrap ? wrap.textContent.indexOf('Office') >= 0 : false,
-        name: wrap ? wrap.textContent.indexOf('Bowlax') >= 0 : false,
+        name: wrap ? wrap.textContent.indexOf('Test Client Alpha') >= 0 : false,
         date: wrap ? wrap.getAttribute('data-service-date') : '',
         outcomeHidden: !!(outcome && outcome.hidden),
         build: document.querySelector('meta[name="admin-build"]').content
@@ -374,7 +375,7 @@ async function runBrowser(){
     });
     assert.strictEqual(after.gone, true);
     assert.ok(/No open shifts/.test(after.empty));
-    assert.ok(/Bowlax/.test(after.empty));
+    assert.ok(/testClientAlpha/.test(after.empty));
     assert.ok(/09\/27\/2026/.test(after.banner));
     assert.strictEqual(after.outcome, true);
     assert.strictEqual(after.open, '0');

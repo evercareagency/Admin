@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -84,13 +85,12 @@ assert.equal((html.match(new RegExp(legacyMgrName,'g'))||[]).length, 0);
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(!login.includes("action:'admin_login'"), 'sheets rollback does not post legacy login');
-assert.ok(login.includes('Sheets sign-in is no longer available. Contact the office administrator.'));
+assert.ok(!login.includes('Sheets sign-in is no longer available. Contact the office administrator.'));
+assert.ok(!/fetch\(/.test(login), 'login does not fetch');
 assert.ok(login.includes("showScreen('loginScreen')"));
 assert.ok(/finally\{[\s\S]*_mgrLoginInFlight=false/.test(login), 'login button lock always clears');
 
 const cdn = [
-  ['leaflet/1.9.4/leaflet.min.css', 'sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb'],
-  ['leaflet/1.9.4/leaflet.min.js', 'sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO'],
   ['jspdf/2.5.1/jspdf.umd.min.js', 'sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk'],
   ['html2canvas/1.4.1/html2canvas.min.js', 'sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H'],
   ['jszip/3.10.1/jszip.min.js', 'sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG']
@@ -103,7 +103,7 @@ cdn.forEach(function(pair){
   assert.ok(tag.includes('crossorigin="anonymous"'), pair[0]+' crossorigin');
   assert.ok(tag.includes('referrerpolicy="no-referrer"'), pair[0]+' referrerpolicy');
 });
-assert.equal((html.match(/cdnjs\.cloudflare\.com/g)||[]).length, 5, 'only the pinned cdnjs assets');
+assert.equal((html.match(/cdnjs\.cloudflare\.com/g)||[]).length, 3, 'only the pinned cdnjs assets');
 
 assert.ok(/const ADMIN_IDLE_MS=60\*60\*1000;/.test(html), '60 minute idle');
 assert.ok(!/ADMIN_SESSION_MS/.test(html), 'absolute session clock is gone');

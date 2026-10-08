@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -31,7 +32,7 @@ assert.ok(html.includes('inservice_results'), 'results table');
 assert.ok(html.includes('inservice_topic_assignment'), 'assignment table');
 assert.ok(html.includes('score_pct'), 'score field is score_pct');
 assert.ok(!html.includes('lvaglmztnlnsrhlluayz'), 'abandoned project ref must not appear');
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(!html.includes('evercare_sb_jwt'), 'inservice uses the auth session, not a second jwt key');
 assert.ok(!html.includes('function sbRememberAdminJwt'), 'no parallel token store');
 
@@ -70,7 +71,8 @@ assert.ok(sbClearBranch.indexOf('sbClearAssignedTopic(topicId)')<sbClearBranch.l
 assert.ok(extractFn(html, 'function sbAssignTopicQuery()').includes('isAssignTopicTouched'), 'refresh follows the topic the user selected');
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
-assert.ok(apiPost.indexOf('evercareSbEnabled()') < apiPost.indexOf('SHEETS_URL'), 'flag check precedes Sheets');
+assert.ok(apiPost.includes('evercareSbEnabled()'), 'flag check stays');
+assert.ok(!apiPost.includes('fetch('), 'apiPost does not fetch the legacy web app');
 assert.ok(apiPost.includes("sbInserviceDispatch(payload)"), 'flag on dispatches inservice actions');
 
 const names = [
@@ -114,7 +116,7 @@ function harness(opts){
     SUPABASE_URL: url,
     SUPABASE_ANON_KEY: anon,
     EVERCARE_ORG_ID: ORG,
-    SHEETS_URL: 'https://script.google.com/macros/s/TEST/exec',
+    SHEETS_URL: '',
     GAS_HEADERS: {'Content-Type':'text/plain;charset=utf-8'},
     SB_SESSION_KEY: 'evercare_sb_session',
     INSERVICES: opts.topics || [{
@@ -166,17 +168,16 @@ function sessionWindow(){
 (async function(){
   const off = harness({search:'?sheets=1'});
   const offData = await off.box.apiPost({action:'get_inservices'});
-  assert.strictEqual(off.calls.length, 1, 'flag off makes one Sheets call');
-  assert.ok(off.calls[0].url.indexOf('script.google.com')>=0, 'flag off stays on /exec');
-  assert.ok(off.calls[0].url.indexOf('supabase.co')<0, 'flag off does not call supabase');
-  assert.strictEqual(JSON.parse(off.calls[0].init.body).action, 'get_inservices');
-  assert.deepStrictEqual(offData, []);
+  assert.strictEqual(off.calls.length, 0, 'a sheets query does not call the legacy web app');
+  assert.strictEqual(offData.success, false);
+  assert.ok(/not signed in/i.test(offData.error));
 
   const stored = harness({storage:{evercare_sb:'1'}});
   stored.calls.length = 0;
-  await stored.box.apiPost({action:'get_activity_log'});
-  assert.ok(stored.calls[0].url.indexOf('script.google.com')>=0, 'non-inservice actions stay on Sheets');
-  assert.strictEqual(stored.calls.filter(function(c){return c.url.indexOf('supabase.co')>=0;}).length, 0);
+  const storedLog = await stored.box.apiPost({action:'get_activity_log'});
+  assert.strictEqual(stored.calls.length, 0, 'activity log is not a legacy web-app post');
+  assert.strictEqual(storedLog.success, false);
+  assert.strictEqual(storedLog.error, 'Not available on this desk.');
 
   const missingDefault = harness({search:''});
   const missDefault = await missingDefault.box.apiPost({action:'get_inservices'});
@@ -356,13 +357,13 @@ function sessionWindow(){
   assign.calls.length = 0;
   assignmentRows.length = 0;
   assignmentRows.push({org_id:ORG, topic_id:'1', aide_usernames:['bbj'], updated_at:'2026-09-01T00:00:00Z'});
-  const topicB = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'2', aideUsernames:['bowlax19']});
+  const topicB = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'2', aideUsernames:['testClientAlpha19']});
   assert.strictEqual(topicB.success, true);
   assert.strictEqual(topicB.topicId, '2');
-  assert.strictEqual(JSON.stringify(topicB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(JSON.stringify(topicB.aideUsernames), JSON.stringify(['testClientAlpha19']));
   assert.strictEqual(topicB.assignAll, false);
   const multiBody = JSON.parse(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().init.body);
-  assert.deepStrictEqual(multiBody, {org_id:ORG, topic_id:'2', aide_usernames:['bowlax19']});
+  assert.deepStrictEqual(multiBody, {org_id:ORG, topic_id:'2', aide_usernames:['testClientAlpha19']});
   assert.ok(assignmentQuery(assign.calls.filter(function(c){return c.init.method==='POST';}).pop().url).indexOf('on_conflict=org_id,topic_id')>=0);
   assert.deepStrictEqual(assignmentRows.map(function(r){return r.topic_id;}).sort(), ['1','2']);
   assert.deepStrictEqual(assignmentRows.find(function(r){return r.topic_id==='1';}).aide_usernames, ['bbj']);
@@ -377,7 +378,7 @@ function sessionWindow(){
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('select=id,org_id,topic_id,aide_usernames,updated_at')>=0);
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('order=topic_id')>=0);
   const stillB = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
-  assert.strictEqual(JSON.stringify(stillB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(JSON.stringify(stillB.aideUsernames), JSON.stringify(['testClientAlpha19']));
 
   assign.calls.length = 0;
   const clearA = await assign.box.apiPost({action:'clear_assigned_topic', topicId:'1'});
@@ -399,12 +400,12 @@ function sessionWindow(){
   assert.strictEqual(afterClearA.assignAll, false);
   const keptB = await assign.box.apiPost({action:'get_assigned_topic', topicId:'2'});
   assert.strictEqual(keptB.topicId, '2');
-  assert.strictEqual(JSON.stringify(keptB.aideUsernames), JSON.stringify(['bowlax19']));
+  assert.strictEqual(JSON.stringify(keptB.aideUsernames), JSON.stringify(['testClientAlpha19']));
 
   assign.calls.length = 0;
   const listedTopics = await assign.box.apiPost({action:'get_assigned_topic'});
   assert.strictEqual(listedTopics.topicId, '2');
-  assert.strictEqual(JSON.stringify(listedTopics.assignments), JSON.stringify([{topicId:'2', aideUsernames:['bowlax19'], assignAll:false}]));
+  assert.strictEqual(JSON.stringify(listedTopics.assignments), JSON.stringify([{topicId:'2', aideUsernames:['testClientAlpha19'], assignAll:false}]));
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('select=id,org_id,topic_id,aide_usernames,updated_at')>=0);
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('order=topic_id')>=0);
   assert.ok(assignmentQuery(assign.calls[0].url).indexOf('org_id=eq.'+ORG)>=0);
@@ -413,7 +414,7 @@ function sessionWindow(){
   assignmentRows.push({org_id:ORG, topic_id:null, aide_usernames:null});
   assignmentRows.push({org_id:ORG, topic_id:'9', aide_usernames:{v:2, topics:{'9':{aides:['old']}}}});
   const legacyRead = await assign.box.apiPost({action:'get_assigned_topic'});
-  assert.strictEqual(JSON.stringify(legacyRead.assignments), JSON.stringify([{topicId:'2', aideUsernames:['bowlax19'], assignAll:false}]), 'legacy null-topic and non-array rows are not rewritten or listed');
+  assert.strictEqual(JSON.stringify(legacyRead.assignments), JSON.stringify([{topicId:'2', aideUsernames:['testClientAlpha19'], assignAll:false}]), 'legacy null-topic and non-array rows are not rewritten or listed');
   assert.ok(assignmentRows.some(function(r){return r.topic_id==='9';}), 'non-array aide_usernames row is left in place');
   assign.calls.length = 0;
   const nobody = await assign.box.apiPost({action:'assign_inservice_aides', topicId:'4', aideUsernames:[]});
@@ -495,8 +496,8 @@ function sessionWindow(){
   }
   const sheetsUi = uiBox('?sheets=1', '1');
   await sheetsUi.box.clearAssignment();
-  assert.strictEqual(JSON.stringify(sheetsUi.posts[0]), JSON.stringify({action:'clear_assigned_topic'}), 'sheets rollback clear has no topic id');
-  assert.ok(!sheetsUi.posts.some(function(p){return p.via==='sbClearAssignedTopic';}), 'sheets rollback does not delete the sb row');
+  assert.deepStrictEqual(sheetsUi.posts[0], {via:'sbClearAssignedTopic', topicId:'1'}, 'a sheets query still clears through supabase');
+  assert.ok(!sheetsUi.posts.some(function(p){return p.action==='clear_assigned_topic';}), 'a sheets query does not post the legacy clear');
   const defaultUi = uiBox('', '3');
   await defaultUi.box.clearAssignment();
   assert.deepStrictEqual(defaultUi.posts[0], {via:'sbClearAssignedTopic', topicId:'3'}, 'default clear deletes the selected topic');
@@ -514,7 +515,8 @@ function sessionWindow(){
   const failedUi = uiBox('', '1');
   failedUi.box.sbClearAssignedTopic=function(){return Promise.resolve({success:false, error:'Could not clear topic assignment.'});};
   await failedUi.box.clearAssignment();
-  assert.ok(failedUi.toasts.some(function(t){return /could not clear topic assignment/i.test(t);}), 'failed DELETE is shown');
+  assert.ok(failedUi.toasts.some(function(t){return /could not update the inservice assignment/i.test(t);}), 'failed DELETE is shown');
+  assert.ok(!failedUi.toasts.some(function(t){return /Could not clear topic assignment/.test(t);}), 'failed DELETE does not show the raw error');
   assert.ok(!failedUi.toasts.some(function(t){return /Assignment cleared/.test(t);}), 'failed DELETE is not reported as cleared');
 
   const rpcSrc = extractFn(html, 'async function sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult)');

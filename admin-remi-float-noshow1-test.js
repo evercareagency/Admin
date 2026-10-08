@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -98,7 +99,7 @@ const RANK = {
   ok: true,
   marker: 'remi-float-noshow1',
   open_shift_id: SHIFT,
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   shift_start: '2026-09-27T13:00:00.000Z',
   shift_end: '2026-09-27T17:00:00.000Z',
   assigned_aide_id: MARIA,
@@ -115,7 +116,7 @@ const RANK = {
 const RESCUE_CARD = {
   id: RESCUE,
   status: 'pending',
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   assigned_aide_id: MARIA,
   assigned_aide_name: 'Maria',
   shift_start: '2026-09-27T13:00:00.000Z',
@@ -159,8 +160,8 @@ function runSlice(){
   assert.strictEqual(sandbox.remiFloat1GraceFrom({value: {minutes: 25}}), 25);
   assert.strictEqual(sandbox.remiFloat1GraceFrom('{"minutes":30}'), 30);
   assert.strictEqual(sandbox.remiFloat1Date('2026-09-27T13:00:00.000Z'), '09/27/2026');
-  const intro = sandbox.remiFloat1Intro({client: 'Bowlax', start: '2026-09-27T13:00:00.000Z', end: '2026-09-27T17:00:00.000Z'});
-  assert.ok(intro.indexOf('Bowlax is open') === 0, intro);
+  const intro = sandbox.remiFloat1Intro({client: 'Test Client Alpha', start: '2026-09-27T13:00:00.000Z', end: '2026-09-27T17:00:00.000Z'});
+  assert.ok(intro.indexOf('Test Client Alpha is open') === 0, intro);
   assert.ok(intro.indexOf('9:00') >= 0, intro);
   assert.ok(!/\d{4}-\d{2}-\d{2}/.test(intro), intro);
   const rankBody = sandbox.remiFloat1RankBody(SHIFT);
@@ -193,7 +194,7 @@ function runSlice(){
 
   const rescueHtml = sandbox.remiFloat1NoshowHtml(RESCUE_CARD);
   assert.ok(rescueHtml.indexOf('Maria no reply 20 min past start') >= 0, rescueHtml);
-  assert.ok(rescueHtml.indexOf('Bowlax') >= 0, rescueHtml);
+  assert.ok(rescueHtml.indexOf('Test Client Alpha') >= 0, rescueHtml);
   assert.ok(rescueHtml.indexOf('Devon') >= 0, rescueHtml);
   assert.ok(rescueHtml.indexOf('>Float<') >= 0, rescueHtml);
   assert.ok(rescueHtml.indexOf('>Confirm<') >= 0, rescueHtml);

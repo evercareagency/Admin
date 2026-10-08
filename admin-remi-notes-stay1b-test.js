@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -215,7 +216,7 @@ function wire(sandbox){
   assert.ok(host.innerHTML.indexOf('Notes stay here')>=0, host.innerHTML);
   assert.ok(host.innerHTML.indexOf('>Edit<')>=0 && host.innerHTML.indexOf('>Delete<')>=0, host.innerHTML);
 
-  const composer = {value:'Keep Bowlax CM quiet until Maria confirms.'};
+  const composer = {value:'Keep Test Client Alpha CM quiet until Maria confirms.'};
   const sheet = {hidden:true};
   sandbox.document = {getElementById:function(id){
     if(id==='remiNotesVisInput')return composer;

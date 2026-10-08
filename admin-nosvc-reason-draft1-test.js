@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -92,8 +93,8 @@ function previewData(body){
     chips:['personal','doctor','not_feeling_well','other'].map(function(c){
       return {code:c, label:labels[c]||c, selected:c===code};
     }),
-    subject:'Services not delivered today — Bowlax (09/27/2026)',
-    body:'Good evening\n\nI wanted to inform you that our mutual member Bowlax will not receive services today, 09/27/2026, at the member\'s request due to '+label+'. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,',
+    subject:'Services not delivered today — Test Client Alpha (09/27/2026)',
+    body:'Good evening\n\nI wanted to inform you that our mutual member Test Client Alpha will not receive services today, 09/27/2026, at the member\'s request due to '+label+'. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,',
     case_manager_name:'Patricia Hayes',
     case_manager_email:'patricia.hayes@countyhealth.org',
     service_date_display:'09/27/2026',
@@ -148,7 +149,7 @@ async function runBrowser(){
       showTab('schedule');
       allClients = [{
         id:ids.clientId,
-        name:'Bowlax',
+        name:'Test Client Alpha',
         case_manager_name:'Patricia Hayes',
         case_manager_email:'patricia.hayes@countyhealth.org'
       }];
@@ -156,7 +157,7 @@ async function runBrowser(){
         id:ids.shiftId,
         status:'open',
         source:'ace',
-        clientName:'Bowlax',
+        clientName:'Test Client Alpha',
         clientId:ids.clientId,
         aideName:'Ada Cole',
         startsAt:'2026-09-27T16:00:00Z',
@@ -186,8 +187,8 @@ async function runBrowser(){
             chips:['personal','doctor','not_feeling_well','other'].map(function(c){
               return {code:c, label:labels[c]||c, selected:c===code};
             }),
-            subject:'Services not delivered today — Bowlax (09/27/2026)',
-            body:'Good evening\n\nI wanted to inform you that our mutual member Bowlax will not receive services today, 09/27/2026, at the member\'s request due to '+label+'. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,',
+            subject:'Services not delivered today — Test Client Alpha (09/27/2026)',
+            body:'Good evening\n\nI wanted to inform you that our mutual member Test Client Alpha will not receive services today, 09/27/2026, at the member\'s request due to '+label+'. Services will resume on the next scheduled date.\nPlease let me know if you need any additional information.\n\nThank you,',
             case_manager_name:'Patricia Hayes',
             case_manager_email:'patricia.hayes@countyhealth.org',
             service_date_display:'09/27/2026',

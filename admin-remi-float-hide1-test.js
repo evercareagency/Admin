@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -108,7 +109,7 @@ const RANK = {
   float_pool: [],
   float_count: 0,
   open_shift_id: SHIFT,
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   shift_start: '2026-09-27T13:00:00.000Z',
   shift_end: '2026-09-27T17:00:00.000Z',
   assigned_aide_id: MARIA,
@@ -128,7 +129,7 @@ RANK.float_pool = [{rank: 9, aide_id: GHOST, name: 'ShouldNotPaint', same_day_ye
 const RESCUE_CARD = {
   id: RESCUE,
   status: 'pending',
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   assigned_aide_id: MARIA,
   assigned_aide_name: 'Maria',
   shift_start: '2026-09-27T13:00:00.000Z',
@@ -341,10 +342,10 @@ async function runBrowser(){
   });
   const receipt = {
     id: 'a0a0e41d-6cdd-4ad0-ad11-ba44b3f31513',
-    title: 'Bowlax cover',
+    title: 'Test Client Alpha cover',
     status: 'Covered',
-    chip_summary: 'Bowlax \u00b7 Sun 9:00\u20131:00 closed with Devon. Blasted 12 \u00b7 3 yes \u00b7 covered 9:41.',
-    list_summary: 'Bowlax cover \u00b7 Devon \u00b7 Covered',
+    chip_summary: 'Test Client Alpha \u00b7 Sun 9:00\u20131:00 closed with Devon. Blasted 12 \u00b7 3 yes \u00b7 covered 9:41.',
+    list_summary: 'Test Client Alpha cover \u00b7 Devon \u00b7 Covered',
     finished_label: '09/27/2026'
   };
   function arm(page){
@@ -452,7 +453,7 @@ async function runBrowser(){
     assert.ok(receipts.text.indexOf('96.5') >= 0, receipts.text);
     assert.ok(receipts.text.indexOf('Open full report') >= 0, receipts.text);
     assert.ok(receipts.text.indexOf('10/07/2026') >= 0, receipts.text);
-    assert.ok(receipts.text.indexOf('Bowlax') >= 0, receipts.text);
+    assert.ok(receipts.text.indexOf('Test Client Alpha') >= 0, receipts.text);
     assert.ok(receipts.text.indexOf('Float pool block removed') >= 0, receipts.text);
     assert.ok(receipts.host.indexOf('Confirm blast') < 0, receipts.host);
     assert.ok(receipts.host.indexOf('Ranked') < 0, receipts.host);

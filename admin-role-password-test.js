@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -63,9 +64,8 @@ assert.ok(!/fetch\(/.test(showFn) && !/admin_set_role_password/.test(showFn), 'f
 
 assert.ok(changeFn.includes("role==='Nurse'?'adm_new_nurse'"), 'Settings maps Nurse to adm_new_nurse');
 assert.ok(changeFn.includes('sbAdminSetRolePasswordSession(role,newp)'), 'Settings Auth path uses the session helper');
-assert.ok(changeFn.includes("action:'change_admin_password'"), 'Settings keeps Sheets rollback');
-assert.ok(/evercareSbEnabled\(\)\)\{[\s\S]*return;[\s\S]*action:'change_admin_password'/.test(changeFn),
-  'Auth settings returns before Sheets');
+assert.ok(!changeFn.includes("action:'change_admin_password'"), 'settings does not post the legacy password action');
+assert.ok(changeFn.includes('Not available on this desk.'), 'flag off fails closed');
 assert.ok(!/p_recovery_code/.test(sessionFn), 'Settings RPC body omits the recovery code');
 assert.ok(sessionFn.includes("sbRestRpc('admin_set_role_password'"), 'Settings uses sbRestRpc');
 assert.ok(acceptedFn.includes('row.ok!==true||row.success!==true'), 'success requires both ok and success');
@@ -158,7 +158,8 @@ function harness(){
     box.els.adm_new_nurse.value = 'nursepass';
     await box.changeRolePassword('Nurse');
     assert.strictEqual(box.els.adminPwdOk.style.display, 'none');
-    assert.strictEqual(box.els.adminPwdErr.textContent, 'password must be at least 6 characters');
+    assert.strictEqual(box.els.adminPwdErr.textContent, 'Could not update the password. Try again.');
+    assert.ok(box.els.adminPwdErr.textContent.indexOf('password must be at least 6 characters') < 0);
     assert.strictEqual(box.activity.length, 0);
     assert.strictEqual(box.calls.length, 0);
   }
@@ -169,7 +170,8 @@ function harness(){
     box.nextRpc = {ok:true, status:200, data:{ok:false, success:false, message:'invalid role'}};
     await box.changeRolePassword('Scheduler');
     assert.strictEqual(box.els.adminPwdOk.style.display, 'none');
-    assert.strictEqual(box.els.adminPwdErr.textContent, 'invalid role');
+    assert.strictEqual(box.els.adminPwdErr.textContent, 'Could not update the password. Try again.');
+    assert.ok(box.els.adminPwdErr.textContent.indexOf('invalid role') < 0);
   }
 
   // Non-admin cannot change passwords.
@@ -182,15 +184,15 @@ function harness(){
     assert.strictEqual(box.toasts[0].msg, 'Only Admin can change passwords.');
   }
 
-  // Sheets rollback for Nurse uses change_admin_password.
   {
     const box = harness();
     box.sbOn = false;
     await box.changeRolePassword('Nurse');
     assert.strictEqual(box.rpcCalls.length, 0);
-    assert.strictEqual(box.calls.length, 1);
-    assert.deepStrictEqual(box.calls[0].body, {action:'change_admin_password', role:'Nurse', password:'nursepass'});
-    assert.strictEqual(box.els.adminPwdOk.style.display, 'block');
+    assert.strictEqual(box.calls.length, 0);
+    assert.strictEqual(box.els.adminPwdErr.textContent, 'Not available on this desk.');
+    assert.strictEqual(box.els.adminPwdErr.style.display, 'block');
+    assert.strictEqual(box.els.adminPwdOk.style.display, 'none');
   }
 
   console.log('admin-role-password-test: ok');

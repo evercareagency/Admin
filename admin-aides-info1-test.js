@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -208,7 +209,7 @@ const box = {
         initials:'JD',
         phone:'2163775991',
         preferred_language_label:'es',
-        clients:[{name:'Bowlax'},{name:'Rivera'},{name:'Bowlax'}],
+        clients:[{name:'Test Client Alpha'},{name:'Rivera'},{name:'Test Client Alpha'}],
         next_status:'next',
         next_label:'Next · 2026-09-28',
         is_active:true,
@@ -284,8 +285,8 @@ vm.runInContext(src, box);
   assert.ok(card.includes('>ES<') && card.includes('>EN<') && card.includes('>AR<'), 'one uppercased lang chip each');
   assert.ok(!/>SPANISH</.test(card) && !/>FR</.test(card), 'no chip outside the allowlist');
   assert.strictEqual((card.match(/aide-info-lang/g) || []).length, 3, 'Jane, Sam, and Maria only');
-  assert.ok(card.includes('Bowlax') && card.includes('Rivera') && card.includes('Chen') && card.includes('Patel'), 'client chips');
-  assert.strictEqual((card.match(/Bowlax/g) || []).length, 1, 'duplicate client chip collapsed');
+  assert.ok(card.includes('Test Client Alpha') && card.includes('Rivera') && card.includes('Chen') && card.includes('Patel'), 'client chips');
+  assert.strictEqual((card.match(/testClientAlpha/g) || []).length, 1, 'duplicate client chip collapsed');
   assert.ok(card.includes('is-next') && card.includes('is-open') && card.includes('is-warn'), 'next tones');
   assert.ok(card.includes('Next · 09/28/2026'), 'next date is MM/DD/YYYY');
   assert.ok(card.includes('Creds due 10/15/2026'), 'creds due');
@@ -433,7 +434,7 @@ async function runBrowser(){
             initials:'JD',
             phone:'2163775991',
             preferred_language_label:'es',
-            clients:[{name:'Bowlax'},{name:'Rivera'}],
+            clients:[{name:'Test Client Alpha'},{name:'Rivera'}],
             next_status:'next',
             next_label:'Next · 2026-09-28',
             is_active:true,
@@ -520,7 +521,7 @@ async function runBrowser(){
     assert.deepStrictEqual(paint.cards[2].langs, ['AR']);
     assert.strictEqual(paint.cards[0].initials, 'JD');
     assert.strictEqual(paint.cards[0].phone, '(216) 377-5991');
-    assert.deepStrictEqual(paint.cards[0].clients, ['Bowlax','Rivera']);
+    assert.deepStrictEqual(paint.cards[0].clients, ['Test Client Alpha','Rivera']);
     assert.ok(paint.cards[0].next.indexOf('is-next') >= 0);
     assert.ok(paint.cards[1].next.indexOf('is-open') >= 0);
     assert.ok(paint.cards[2].next.indexOf('is-warn') >= 0);

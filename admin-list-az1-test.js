@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -146,7 +147,7 @@ assert.deepStrictEqual(Array.from(sandbox.listAz1TimesheetRows(sheets), function
 
 const shifts = [
   { clientName: 'Client', aideName: 'Zoe', id: 's2' },
-  { clientName: 'Bowlax Abib', aideName: 'Moe', id: 's1' },
+  { clientName: 'Test Client Alpha', aideName: 'Moe', id: 's1' },
   { clientName: '', aideName: 'Ada', id: 's3' }
 ];
 const shiftOrder = Array.from(sandbox.listAz1Apply(shifts, [
@@ -188,16 +189,16 @@ const probeClients = [
   { id: 'q', name: 'QaHold Clientgc3oi' },
   { id: 'p', name: 'ProbeHold HC1kgaxcu' },
   { id: 'c', name: 'CoverCard mukk61tk' },
-  { id: 'b', name: 'Bowlax Abib' }
+  { id: 'b', name: 'Test Client Alpha' }
 ];
 sandbox.listAz1Write('usual');
 assert.strictEqual(sandbox.listAz1SchedRows(probeClients), probeClients, 'usual schedule rows stay the server array');
 sandbox.listAz1Write('az');
 assert.deepStrictEqual(Array.from(sandbox.listAz1SchedRows(probeClients), function(c){ return c.name; }), [
-  'Bowlax Abib',
   'CoverCard mukk61tk',
   'ProbeHold HC1kgaxcu',
-  'QaHold Clientgc3oi'
+  'QaHold Clientgc3oi',
+  'Test Client Alpha'
 ], 'A–Z reorders schedule client rows');
 assert.deepStrictEqual(probeClients.map(function(c){ return c.id; }), ['q', 'p', 'c', 'b'], 'usual source order is untouched');
 
@@ -213,7 +214,7 @@ const schedBody = {
     fakeSchedRow('q', 'QaHold Clientgc3oi', 0),
     fakeSchedRow('p', 'ProbeHold HC1kgaxcu', 1),
     fakeSchedRow('c', 'CoverCard mukk61tk', 2),
-    fakeSchedRow('b', 'Bowlax Abib', 3)
+    fakeSchedRow('b', 'Test Client Alpha', 3)
   ],
   querySelectorAll: function(){
     return this.children.filter(function(node){ return String(node.attrs.id || '').indexOf('sched-row-') === 0; });
@@ -228,10 +229,10 @@ sandbox.document.getElementById = function(id){ return id === 'schedBody' ? sche
 sandbox.listAz1Write('az');
 sandbox.listAz1ReorderSchedDom();
 assert.deepStrictEqual(schedBody.children.map(function(node){ return node.attrs['data-sched-name']; }), [
-  'Bowlax Abib',
   'CoverCard mukk61tk',
   'ProbeHold HC1kgaxcu',
-  'QaHold Clientgc3oi'
+  'QaHold Clientgc3oi',
+  'Test Client Alpha'
 ], 'schedule DOM rows move A–Z');
 sandbox.listAz1Write('usual');
 sandbox.listAz1ReorderSchedDom();
@@ -276,11 +277,11 @@ assert.deepStrictEqual(Array.from(sandbox.wrappedSort(), function(t){ return t.n
 ], 'usual messages stay unread then urgent then recency');
 
 // Live card: .ts-card-top strong = aide (Andre). .ts-card-sub = client · week (Whitfield · Week of …).
-// Probe must read the strong title, not the subtitle. Usual order below is subtitle order Whitfield, Whitfield, Bowlax, Helen Park with aides that are not A–Z.
+// Probe must read the strong title, not the subtitle. Usual order below is subtitle order Whitfield, Whitfield, Test Client Alpha, Helen Park with aides that are not A–Z.
 const tsScramble = [
   { id: 'z', empName: 'Zoe', clientName: 'Whitfield', weekStart: '2026-09-13' },
   { id: 'a2', empName: 'Andre', clientName: 'Whitfield', weekStart: '2026-09-20' },
-  { id: 'm', empName: 'Mia', clientName: 'Bowlax', weekStart: '2026-09-07' },
+  { id: 'm', empName: 'Mia', clientName: 'Test Client Alpha', weekStart: '2026-09-07' },
   { id: 'b', empName: 'Ben', clientName: 'Helen Park', weekStart: '2026-09-28' },
   { id: 'a1', empName: 'Andre', clientName: 'Whitfield', weekStart: '2026-09-13' }
 ];
@@ -292,7 +293,7 @@ assert.deepStrictEqual(Array.from(tsAz, function(r){ return sandbox.listAz1Times
   'Andre', 'Andre', 'Ben', 'Mia', 'Zoe'
 ], 'strong titles A–Z by aide, not Whitfield-first subtitles');
 assert.deepStrictEqual(Array.from(tsAz, function(r){ return r.clientName; }), [
-  'Whitfield', 'Whitfield', 'Helen Park', 'Bowlax', 'Whitfield'
+  'Whitfield', 'Whitfield', 'Helen Park', 'Test Client Alpha', 'Whitfield'
 ], 'client subtitles are not the A–Z key');
 assert.deepStrictEqual(Array.from(tsAz, function(r){ return r.id; }), [
   'a1', 'a2', 'b', 'm', 'z'
@@ -319,7 +320,7 @@ const tsCards = {
   children: [
     fakeTsCard('z', 'Zoe', 'Whitfield', '2026-09-13', 0),
     fakeTsCard('a2', 'Andre', 'Whitfield', '2026-09-20', 1),
-    fakeTsCard('m', 'Mia', 'Bowlax', '2026-09-07', 2),
+    fakeTsCard('m', 'Mia', 'Test Client Alpha', '2026-09-07', 2),
     fakeTsCard('b', 'Ben', 'Helen Park', '2026-09-28', 3),
     fakeTsCard('a1', 'Andre', 'Whitfield', '2026-09-13', 4)
   ],

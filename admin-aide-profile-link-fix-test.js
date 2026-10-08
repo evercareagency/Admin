@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -112,7 +113,7 @@ const box = {
       initials: 'JD',
       phone: '(216) 377-5991',
       preferred_language_label: 'ES',
-      assignedClients: [{name:'Bowlax'}],
+      assignedClients: [{name:'Test Client Alpha'}],
       _raw: {next_status:'next', next_label:'Next · 09/28/2026', creds_due:'2026-10-15'}
     }
   },
@@ -198,7 +199,7 @@ assert.strictEqual(els.aideProfilePage.hidden, false);
 assert.strictEqual(els.aideProfileName.textContent, 'Jane Doe');
 assert.ok(els.aideProfileContact.innerHTML.includes('(216) 377-5991'));
 assert.ok(els.aideProfileContact.innerHTML.includes('ES'));
-assert.ok(els.aideProfileClients.innerHTML.includes('Bowlax'));
+assert.ok(els.aideProfileClients.innerHTML.includes('Test Client Alpha'));
 assert.ok(els.aideProfileCreds.innerHTML.includes('Credentials'));
 assert.ok(!els.nav_more.classList.contains('active'), 'More is not left half-active');
 assert.ok(els.nav_aides.classList.contains('active'));
@@ -312,7 +313,7 @@ async function runBrowser(){
           initials:'JD',
           phone:'2163775991',
           preferred_language_label:'es',
-          clients:[{name:'Bowlax'},{name:'Rivera'}],
+          clients:[{name:'Test Client Alpha'},{name:'Rivera'}],
           next_status:'next',
           next_label:'Next · 2026-09-28',
           creds_due:'2026-10-15',

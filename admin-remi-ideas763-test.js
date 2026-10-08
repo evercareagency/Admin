@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -92,7 +93,7 @@ const WHY = {
   marker: 'remi-ideas763',
   v: 'remi-ideas763',
   open_shift_id: SHIFT,
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   window_label: 'Sun 9:00 AM\u20131:00 PM',
   attempts: []
 };
@@ -121,9 +122,9 @@ const DRAFT = {
   admin_language: 'en',
   target_language: 'es',
   language_label: 'Espa\u00f1ol',
-  english_draft: 'Hi Maria \u2014 can you cover Bowlax Sunday 9\u20131? Reply Yes or No.',
-  translated_body: 'Hola Maria \u2014 \u00bfpuedes cubrir Bowlax el domingo de 9:00 a 1:00? Responde S\u00ed o No. \u2014 EverCare / Remi',
-  preview_body: 'Hola Maria \u2014 \u00bfpuedes cubrir Bowlax el domingo de 9:00 a 1:00? Responde S\u00ed o No. \u2014 EverCare / Remi',
+  english_draft: 'Hi Maria \u2014 can you cover Test Client Alpha Sunday 9\u20131? Reply Yes or No.',
+  translated_body: 'Hola Maria \u2014 \u00bfpuedes cubrir Test Client Alpha el domingo de 9:00 a 1:00? Responde S\u00ed o No. \u2014 EverCare / Remi',
+  preview_body: 'Hola Maria \u2014 \u00bfpuedes cubrir Test Client Alpha el domingo de 9:00 a 1:00? Responde S\u00ed o No. \u2014 EverCare / Remi',
   sms_send: {implemented: true, oos: false}
 };
 const PAY = {
@@ -131,7 +132,7 @@ const PAY = {
   marker: 'remi-ideas763',
   aide_name: 'Jamal',
   on_date: '2026-09-25',
-  client_name: 'Bowlax',
+  client_name: 'Test Client Alpha',
   shift: {
     scheduled_label: '8:00\u20134:00',
     clock_in: '07:58',
@@ -172,9 +173,9 @@ function runSlice(){
   assert.strictEqual(sandbox.remiIdeas763Mdy('2026-09-25'), '09/25/2026');
   assert.ok(sandbox.remiIdeas763DateLine('2026-09-25').indexOf('09/25/2026') >= 0);
   assert.strictEqual(sandbox.remiIdeas763PayDate('I worked Thursday. Why am I not getting paid?', new Date('2026-09-27T16:00:00Z')), '2026-09-24');
-  assert.strictEqual(sandbox.remiIdeas763PayDate('Thu Sep 25 Bowlax', new Date('2026-09-27T16:00:00Z')), '2026-09-25');
+  assert.strictEqual(sandbox.remiIdeas763PayDate('Thu Sep 25 Test Client Alpha', new Date('2026-09-27T16:00:00Z')), '2026-09-25');
   assert.ok(sandbox.remiIdeas763LooksLikePay('Why am I not getting paid?'));
-  assert.ok(!sandbox.remiIdeas763LooksLikePay('Can you cover Bowlax Sunday?'));
+  assert.ok(!sandbox.remiIdeas763LooksLikePay('Can you cover Test Client Alpha Sunday?'));
   assert.strictEqual(sandbox.remiIdeas763NormLang('Espa\u00f1ol'), 'es');
   assert.strictEqual(sandbox.remiIdeas763LangLabel('es'), 'Espa\u00f1ol');
   const whyBody = sandbox.remiIdeas763WhyBody(SHIFT, 3);
@@ -204,7 +205,7 @@ function runSlice(){
     if(name === 'admin_draft_bilingual_cover_ask')return {ok: true, data: Object.assign({}, DRAFT, {sms_send: {implemented: true, oos: false}})};
     if(name === 'admin_send_bilingual_cover_in_messages')return {ok: true, data: {success: true, sms_sent: false}};
     if(name === 'admin_get_pay_dispute_evidence')return {ok: true, data: PAY};
-    if(name === 'admin_draft_pay_dispute_reply')return {ok: true, data: {draft_reply: 'Jamal \u2014 you are right. Record shows Bowlax 09/25/2026. No Missed flag.'}};
+    if(name === 'admin_draft_pay_dispute_reply')return {ok: true, data: {draft_reply: 'Jamal \u2014 you are right. Record shows Test Client Alpha 09/25/2026. No Missed flag.'}};
     if(name === 'admin_send_aide_office_message')return {ok: true, data: {success: true}};
     return {ok: false, error: 'unexpected ' + name};
   };
@@ -217,7 +218,7 @@ function runSlice(){
   assert.strictEqual(rpc[1].body.p_limit, 3);
   const card = sandbox.remiIdeas763WhyHtml();
   assert.ok(card.indexOf('Why open') >= 0, card);
-  assert.ok(card.indexOf('Bowlax') >= 0, card);
+  assert.ok(card.indexOf('Test Client Alpha') >= 0, card);
   assert.ok(card.indexOf('Sat 4:18 PM') >= 0, card);
   assert.ok(card.indexOf('Blasted by Remi') >= 0, card);
   assert.ok(card.indexOf('>No<') >= 0, card);
@@ -252,7 +253,7 @@ function runSlice(){
   assert.ok(after.indexOf('Blast float pool') < 0, 'dismissed card drops the blast button');
 
   rpc.length = 0;
-  const bilingual = await sandbox.remiIdeas763OpenBilingual({id: AIDE, name: 'Maria'}, 'Hi Maria \u2014 can you cover Bowlax Sunday 9\u20131? Reply Yes or No.');
+  const bilingual = await sandbox.remiIdeas763OpenBilingual({id: AIDE, name: 'Maria'}, 'Hi Maria \u2014 can you cover Test Client Alpha Sunday 9\u20131? Reply Yes or No.');
   assert.strictEqual(bilingual.ok, true);
   assert.ok(rpc.some(function(row){return row.name === 'admin_get_aide_preferred_language';}));
   assert.ok(rpc.some(function(row){return row.name === 'admin_draft_bilingual_cover_ask';}));
@@ -296,7 +297,7 @@ function runSlice(){
   assert.strictEqual(rpc[1].name, 'admin_draft_pay_dispute_reply');
   const evidence = sandbox.remiIdeas763PayHtml();
   assert.ok(evidence.indexOf('09/25/2026') >= 0, evidence);
-  assert.ok(evidence.indexOf('Bowlax') >= 0, evidence);
+  assert.ok(evidence.indexOf('Test Client Alpha') >= 0, evidence);
   assert.ok(evidence.indexOf('8:00') >= 0, evidence);
   assert.ok(evidence.indexOf('7:58 AM') >= 0, evidence);
   assert.ok(evidence.indexOf('4:03 PM') >= 0, evidence);

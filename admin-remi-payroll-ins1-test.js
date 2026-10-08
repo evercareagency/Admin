@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -100,7 +101,7 @@ const REPORT = {
   aides:[
     {aide_id:'devon', aide_name:'Devon', permanent_client_name:'Helen Park', summary_line:'Devon '+DOT+' Helen Park '+DOT+' 36.20', paid_hours:36.20, insurance_plan:'caresource', insurance_label:'CareSource', insurance_color:'#6B2D8B', insurance_bucket:'caresource', regulars:[], covers:[], flags:[]},
     {aide_id:'maria', aide_name:'Maria', permanent_client_name:'Rivera', summary_line:'Maria '+DOT+' Rivera '+DOT+' 24.00', paid_hours:24.00, insurance_plan:'passport', insurance_label:'Passport', insurance_color:'#E6B800', insurance_bucket:'passport', regulars:[], covers:[], flags:[]},
-    {aide_id:'lina', aide_name:'Lina', permanent_client_name:'Bowlax', summary_line:'Lina '+DOT+' Bowlax '+DOT+' 12.10', paid_hours:12.10, insurance_plan:null, insurance_label:'Other', insurance_color:'#6b7a90', insurance_bucket:'other', regulars:[], covers:[], flags:[]}
+    {aide_id:'lina', aide_name:'Lina', permanent_client_name:'Test Client Alpha', summary_line:'Lina '+DOT+' Test Client Alpha '+DOT+' 12.10', paid_hours:12.10, insurance_plan:null, insurance_label:'Other', insurance_color:'#6b7a90', insurance_bucket:'other', regulars:[], covers:[], flags:[]}
   ]
 };
 const CARE = {

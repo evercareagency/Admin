@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -62,6 +63,8 @@ assert.ok(extractFn(html, 'async function nciOpenIntakeStoragePdf(row)').include
 const sigs = [
   'function pickIntakePdfLink(obj)',
   'function nciLegacyDriveUrl(obj)',
+  'function nciPreparePdfTab()',
+  'function nciFinishPdfTab(url)',
   'function nciOpenExternalPdf(url)',
   'function nciPdfStoragePath(obj)',
   'function nciPickPdfMeta(obj)',
@@ -79,7 +82,7 @@ const src = sigs.map(function(sig){
 const viewSrc = extractFn(html, 'async function viewCompletedIntakePdf(intakeId)');
 assert.ok(viewSrc.includes('includeSignatures:true,includeSigs:true'), 'empty View still loads ink');
 assert.ok(viewSrc.indexOf('nciPdfStoragePath(row)') < viewSrc.indexOf('nciLegacyDriveUrl(row)'), 'storage path is checked before Drive');
-assert.ok(viewSrc.includes("showTempMsg('PDF not ready yet','var(--warn)')"), 'both empty stays the pending message');
+assert.ok(viewSrc.includes("showTempMsg('PDF will be available soon','var(--teal)')"), 'both empty stays the calm soon message');
 
 const opens = [];
 const toasts = [];
@@ -124,7 +127,18 @@ const sandbox = {
     sandbox.nciLastCompletePdf = {intakeId:id, pdfLink:link || '', pdfFileId:fileId || ''};
   },
   showTempMsg: function(msg, color){toasts.push({msg:msg, color:color});},
-  window: {open: function(url){opens.push(url); return {closed:false};}},
+  window: {open: function(url){
+    const rec={closed:false};
+    let current='';
+    Object.defineProperty(rec,'location',{
+      configurable:true,
+      get:function(){return current;},
+      set:function(v){current=String(v||''); if(current)opens.push(current);}
+    });
+    if(url)opens.push(String(url));
+    rec.close=function(){rec.closed=true;};
+    return rec;
+  }},
   String: String,
   Promise: Promise
 };
@@ -159,7 +173,7 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   const table = sandbox.nciCompletedTableHtml(mapped);
   assert.ok(table.includes('New Storage') && table.includes('Legacy') && table.includes('Pending') && table.includes('Snake'));
   assert.strictEqual((table.match(/badge badge-ok">PDF ready/g) || []).length, 3, 'storage, drive, and snake rows are PDF ready');
-  assert.strictEqual((table.match(/nci-pdf-pending">PDF pending/g) || []).length, 1, 'empty row stays pending');
+  assert.strictEqual((table.match(/nci-pdf-pending">PDF will be available soon/g) || []).length, 1, 'empty row stays pending');
   assert.ok(table.includes("viewCompletedIntakePdf('new-1')"));
   assert.ok(table.includes("viewCompletedIntakePdf('old-1')"));
   assert.ok(table.includes("viewCompletedIntakePdf('empty-1')"));
@@ -183,7 +197,8 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   await sandbox.viewCompletedIntakePdf('new-1');
   assert.deepStrictEqual(signs, [storagePath], 'bucket prefix is stripped before sign');
   assert.deepStrictEqual(opens, [], 'sign failure does not open a URL');
-  assert.strictEqual(toasts[0].msg, 'sign denied');
+  assert.strictEqual(toasts[0].msg, 'Could not open PDF.');
+  assert.ok(toasts[0].msg.indexOf('sign denied') < 0);
   assert.strictEqual(toasts[0].color, 'var(--danger)');
   sandbox._signError = '';
 
@@ -210,7 +225,7 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   await sandbox.viewCompletedIntakePdf('httpf');
   assert.deepStrictEqual(opens, [], 'pdf_file_id is not a Drive fallback');
   assert.deepStrictEqual(signs, [], 'pdf_file_id does not sign');
-  assert.strictEqual(toasts[0].msg, 'PDF not ready yet');
+  assert.strictEqual(toasts[0].msg, 'PDF will be available soon');
   assert.strictEqual(sandbox.nciCompletedRows[0].pdfFileId, httpFile, 'View leaves pdf_file_id on the row');
 
   opens.length = 0;
@@ -221,7 +236,7 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   await sandbox.viewCompletedIntakePdf('bare');
   assert.deepStrictEqual(opens, [], 'bare pdf_file_id does not invent a Drive URL');
   assert.strictEqual(gets.length, 1, 'bare file id still loads the intake');
-  assert.strictEqual(toasts[0].msg, 'PDF not ready yet');
+  assert.strictEqual(toasts[0].msg, 'PDF will be available soon');
 
   opens.length = 0;
   gets.length = 0;
@@ -233,8 +248,8 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   assert.strictEqual(gets[0].opts.includeSignatures, true);
   assert.strictEqual(gets[0].opts.includeSigs, true);
   assert.deepStrictEqual(opens, [], 'empty row does not open Drive');
-  assert.strictEqual(toasts[0].msg, 'PDF not ready yet');
-  assert.strictEqual(toasts[0].color, 'var(--warn)');
+  assert.strictEqual(toasts[0].msg, 'PDF will be available soon');
+  assert.strictEqual(toasts[0].color, 'var(--teal)');
 
   opens.length = 0;
   signs.length = 0;

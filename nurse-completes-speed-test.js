@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -28,7 +29,7 @@ assert.ok(html.includes('v=nursespd2'), 'nursespd2 marker');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
 assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
-assert.ok(html.includes('v=warmkeep'), 'warmkeep marker stays');
+assert.ok(!html.includes('warmkeep'), 'warm-idle comment no longer names the old keep-alive');
 assert.ok(html.includes('Still loading from Sheets…'), 'slow copy');
 assert.ok(html.includes('onclick="retryCompletedNewClientIntakes()"'), 'Retry button');
 assert.ok(html.includes('ec_nci_completes_nursespd1'), 'sessionStorage key');
@@ -41,13 +42,13 @@ assert.ok(html.includes('includeSignatures:true') && html.includes('includeSigs:
 const getInk = extractFn(html, 'async function getNewClientIntake(intakeId, opts)');
 const resumeInk = extractFn(html, 'async function resumeNewClientIntake(intakeId,opts)');
 const pollInk = extractFn(html, 'async function nciPollCompletePdfLink(intakeId,budgetMs)');
+assert.strictEqual(pollInk, '', 'PDF link poll is gone');
 const recheckInk = extractFn(html, 'async function nciRecheckPendingCompletePdfs()');
 const listInk = extractFn(html, 'function nciFetchCompleteList()');
 assert.ok(getInk.includes('payload.includeSignatures=true') && getInk.includes('payload.includeSigs=true'), 'get sends both aliases together');
 assert.ok(resumeInk.includes('includeSignatures:true,includeSigs:true'), 'edit and resume ask for ink');
 const viewInk = extractFn(html, 'async function viewCompletedIntakePdf(intakeId)');
 assert.ok(viewInk.includes('includeSignatures:true,includeSigs:true'), 'View/PDF asks for ink when it loads the intake');
-assert.ok(pollInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(pollInk), 'PDF link poll stays trimmed');
 assert.ok(recheckInk.includes('getNewClientIntake(id)') && !/includeSignatures|includeSigs/.test(recheckInk), 'pending PDF recheck stays trimmed');
 assert.ok(!/includeSignatures|includeSigs/.test(listInk), 'Completes list does not ask for signatures');
 assert.ok(html.includes('if(nciCompleteListInflight&&nciCompleteListInflight.epoch===nciCompleteListEpoch)return nciCompleteListInflight;'), 'single-flight guard');
@@ -84,10 +85,10 @@ assert.ok(refresh.indexOf('loadCompletedNewClientIntakes()') < refresh.indexOf('
 const deferred = extractFn(html, 'function scheduleDeferredNurseSheets()');
 assert.ok(deferred.includes('loadAdminNurseAlertsAfterCompletes()'), 'badges and activity still load after Completes paints');
 assert.ok(!deferred.includes('loadNurseCompliance'), 'Completes deferral does not reload compliance');
-const abortLine = (html.match(/var nurseSheetsAction=payload&&\([^;]+\)/) || [])[0] || '';
-assert.ok(abortLine.includes("action==='list_nurse_alerts'") && abortLine.includes("action==='mark_nurse_alerts_read'") && abortLine.includes("action==='list_nurse_activity'"),
+const apiPostSrc = extractFn(html, 'async function apiPost(payload)');
+assert.ok(apiPostSrc.includes('sbNurseAlertsDispatch(payload, nurseAlertSignal)') && apiPostSrc.includes('sbNurseActivityDispatch(payload, nurseActivitySignal)'),
   'Refresh can abort list, mark, and activity');
-assert.ok(!abortLine.includes('get_supervisory_compliance'), 'compliance /exec is not on the Completes abort list');
+assert.ok(apiPostSrc.includes('sbNurseComplianceDispatch(payload)'), 'compliance stays on its own dispatch');
 
 const sigs = [
   'function nciCompleteListCacheGet()',

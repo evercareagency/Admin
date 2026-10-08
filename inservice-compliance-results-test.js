@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -107,11 +108,11 @@ assert.ok(completedActs.indexOf('View Results') < completedActs.indexOf('View Ce
 assert.ok(completedActs.indexOf('View Cert') < completedActs.indexOf('Print Cert'), 'View Cert before Print Cert');
 assert.ok(completedActs.indexOf('Print Cert') < completedActs.indexOf('Delete'), 'Print Cert before Delete');
 assert.ok(completedActs.includes('isOfficeCertStaff'), 'certs are office staff only');
-assert.ok(pendingActs.includes('Send Reminder'), 'not completed keeps Send Reminder');
+assert.ok(pendingActs.includes("Reminders aren\\'t available yet."), 'not completed says reminders are not available yet');
 assert.ok(pendingActs.includes('Delete'), 'not completed includes Delete');
 assert.ok(pendingActs.includes('confirmDeleteISAssignment'), 'not completed Delete confirms the assignment');
 assert.ok(!pendingActs.includes('confirmDeleteISResult'), 'not completed Delete does not archive a result');
-assert.ok(pendingActs.indexOf('Send Reminder') < pendingActs.indexOf('Delete'), 'Send Reminder before Delete');
+assert.ok(pendingActs.indexOf("Reminders aren\\'t available yet.") < pendingActs.indexOf('Delete'), 'the reminder note stays before Delete');
 assert.ok(!pendingActs.includes('View Results'), 'not completed has no View Results');
 assert.ok(!pendingActs.includes('View Cert'), 'not completed has no View Cert');
 assert.ok(!pendingActs.includes('Print Cert'), 'not completed has no Print Cert');
@@ -300,9 +301,9 @@ vm.runInContext([pendingActs, onAssign, confirmAssign, extractFn(html, 'function
 sandbox.isComplianceRows=[pending];
 sandbox.showSharedConfirm=function(title, fn, label){sandbox._confirm={title:title,label:label,fn:fn};};
 const pendingHtml=sandbox.isPendingActionsHtml(0);
-assert.ok(pendingHtml.includes('Send Reminder'), 'pending html has Send Reminder');
+assert.ok(pendingHtml.includes("Reminders aren't available yet."), 'pending html says reminders are not available yet');
 assert.ok(pendingHtml.includes('Delete'), 'pending html has Delete');
-assert.ok(pendingHtml.indexOf('Send Reminder')<pendingHtml.indexOf('Delete'), 'pending html order');
+assert.ok(pendingHtml.indexOf("Reminders aren't available yet.")<pendingHtml.indexOf('Delete'), 'pending html order');
 assert.ok(pendingHtml.includes('confirmDeleteISAssignment(0)'), 'pending Delete is wired');
 assert.ok(!pendingHtml.includes('View Results')&&!pendingHtml.includes('Print Cert'), 'pending html has no cert actions');
 sandbox.confirmDeleteISAssignment(0);
@@ -325,7 +326,7 @@ vm.runInContext([
 
 assert.strictEqual(
   sandbox.formatISAceActionError({success:false,error:'Unknown action'},'get_inservice_result','Could not load results.'),
-  'Ace get_inservice_result failed: Unknown action'
+  'That action is not available on this desk.'
 );
 assert.ok(sandbox.isISGetShape({success:true,items:[{q:'Q1'}],scorePct:90}), 'items+score is get shape');
 assert.ok(sandbox.isISGetShape({success:true,scoreCorrect:9,scoreTotal:10,scorePct:90}), 'score fields are get shape');
@@ -357,9 +358,8 @@ assert.ok(!sandbox.isISGetShape({success:true}), 'bare success is not get shape'
   posts.length=0;
   await sandbox.viewISResults(0);
   assert.ok(posts.some(function(p){return p.action==='get_inservice_result'&&p.id==='is-asha-1';}), 'open calls LOCK get_inservice_result { id }');
-  assert.ok(els.isResultsNote.textContent.indexOf('get_inservice_result')>=0, 'note names the Ace action');
-  assert.ok(els.isResultsNote.textContent.indexOf('Unknown action')>=0, 'note keeps Ace error string');
-  assert.ok(els.isResultsNote.textContent.trim()!=='Unknown action', 'must not show bare Unknown action');
+  assert.strictEqual(els.isResultsNote.textContent, 'That action is not available on this desk.', 'note stays calm when the action is missing');
+  assert.ok(els.isResultsNote.textContent.indexOf('Unknown action')<0, 'note does not keep the raw error');
   assert.ok(els.isResultsBody.innerHTML.indexOf('is-result-qa')>=0, 'list-row answers paint Q&A when get fails');
   assert.ok(/class="mark"/.test(els.isResultsBody.innerHTML), 'Q&A includes correct/wrong marks');
   assert.ok(els.isResultsBody.innerHTML.indexOf('Aide answer:')>=0, 'review names the aide answer');

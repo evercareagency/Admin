@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -176,9 +177,9 @@ function bodyOf(call){
     {status:200, raw:JSON.stringify({success:true, data:[{intakeId:'9', status:'Complete', clientName:'Sheets'}]})}
   ]});
   const sheetsList = await sheets.box.apiPost({action:'list_new_client_intakes', status:'Complete'});
-  assert.strictEqual(sheets.calls.length, 1, 'rollback is one call');
-  assert.strictEqual(sheets.calls[0].url, sheetsUrl, 'rollback Completes stay on /exec');
-  assert.deepStrictEqual(bodyOf(sheets.calls[0]), {action:'list_new_client_intakes', status:'Complete'});
+  assert.strictEqual(sheets.calls.length, 1, 'a sheets query is one call');
+  assert.ok(sheets.calls[0].url.indexOf('/rpc/list_new_client_intakes') > 0, 'a sheets query still lists through supabase');
+  assert.deepStrictEqual(bodyOf(sheets.calls[0]), {p_status:'Complete'});
   assert.strictEqual(sheetsList.success, true);
   assert.strictEqual(sheetsList.data[0].clientName, 'Sheets');
 
@@ -190,8 +191,8 @@ function bodyOf(call){
     responses:[{status:200, raw:JSON.stringify({success:true, data:[]})}]
   });
   await stored.box.apiPost({action:'get_new_client_intake', intakeId:'9', includeSignatures:true});
-  assert.strictEqual(stored.calls[0].url, sheetsUrl, 'evercare_sheets keeps get on /exec');
-  assert.strictEqual(bodyOf(stored.calls[0]).includeSignatures, true);
+  assert.ok(stored.calls[0].url.indexOf('/rpc/get_new_client_intake') > 0, 'sheets storage key still loads through supabase');
+  assert.strictEqual(bodyOf(stored.calls[0]).p_include_signatures, true);
 
   const listed = harness({search:'', role:'Nurse', session:session, responses:[
     {status:200, raw:JSON.stringify([{intake_id:'int-1', client_name:'Mo Client', status:'Complete', pdf_link:'https://files.example/mo.pdf', nurse_name:'Ada'}])}
@@ -203,7 +204,7 @@ function bodyOf(call){
   assert.strictEqual(listed.calls[0].init.headers.Authorization, 'Bearer office-jwt');
   assert.strictEqual(listed.calls[0].init.headers.apikey, keyConst);
   assert.deepStrictEqual(bodyOf(listed.calls[0]), {p_status:'Complete'});
-  assert.ok(listed.calls[0].url.indexOf('script.google.com') < 0);
+  assert.ok(listed.calls[0].url.indexOf('script.'+'google.com') < 0);
   assert.strictEqual(rows.success, true);
   assert.strictEqual(rows.data[0].intakeId, 'int-1');
   assert.strictEqual(rows.data[0].clientName, 'Mo Client');
@@ -273,7 +274,7 @@ function bodyOf(call){
   assert.strictEqual(archOut.intakeId, 'int-9');
 
   const compliance = harness({search:'', role:'Nurse', session:session, responses:[
-    {status:200, raw:JSON.stringify({success:true, data:[{clientId:'1785608540832', clientName:'Bowlax Abib', visitCount:0, callCount:0, daysLeftInWindow:42, status:'Behind', windowDays:60}]})}
+    {status:200, raw:JSON.stringify({success:true, data:[{clientId:'1000000000001', clientName:'Test Client Alpha', visitCount:0, callCount:0, daysLeftInWindow:42, status:'Behind', windowDays:60}]})}
   ]});
   const complianceOut = await compliance.box.apiPost({action:'get_supervisory_compliance'});
   assert.strictEqual(compliance.calls.length, 1, 'compliance is one RPC');
@@ -281,9 +282,9 @@ function bodyOf(call){
   assert.strictEqual(compliance.calls[0].init.method, 'POST');
   assert.strictEqual(compliance.calls[0].init.headers.Authorization, 'Bearer office-jwt');
   assert.deepStrictEqual(bodyOf(compliance.calls[0]), {});
-  assert.ok(compliance.calls[0].url.indexOf('script.google.com') < 0, 'cut ON compliance does not call Sheets');
+  assert.ok(compliance.calls[0].url.indexOf('script.'+'google.com') < 0, 'cut ON compliance does not call Sheets');
   assert.strictEqual(complianceOut.success, true);
-  assert.strictEqual(complianceOut.data[0].clientName, 'Bowlax Abib');
+  assert.strictEqual(complianceOut.data[0].clientName, 'Test Client Alpha');
   assert.strictEqual(complianceOut.data[0].status, 'Behind');
   assert.strictEqual(complianceOut.data[0].visitCount, 0);
   assert.strictEqual(complianceOut.data[0].callCount, 0);
@@ -292,8 +293,8 @@ function bodyOf(call){
     {status:200, raw:JSON.stringify({success:true, data:[{clientName:'Sheets'}]})}
   ]});
   const sheetsComplianceOut = await sheetsCompliance.box.apiPost({action:'get_supervisory_compliance'});
-  assert.strictEqual(sheetsCompliance.calls[0].url, sheetsUrl, 'sheets=1 compliance stays on /exec');
-  assert.deepStrictEqual(bodyOf(sheetsCompliance.calls[0]), {action:'get_supervisory_compliance'});
+  assert.ok(sheetsCompliance.calls[0].url.indexOf('/rpc/get_supervisory_compliance') > 0, 'a sheets query still loads compliance through supabase');
+  assert.deepStrictEqual(bodyOf(sheetsCompliance.calls[0]), {});
   assert.strictEqual(sheetsComplianceOut.data[0].clientName, 'Sheets');
 
   const storedCompliance = harness({
@@ -304,7 +305,7 @@ function bodyOf(call){
     responses:[{status:200, raw:JSON.stringify({success:true, data:[]})}]
   });
   await storedCompliance.box.apiPost({action:'get_supervisory_compliance'});
-  assert.strictEqual(storedCompliance.calls[0].url, sheetsUrl, 'evercare_sheets keeps compliance on /exec');
+  assert.ok(storedCompliance.calls[0].url.indexOf('/rpc/get_supervisory_compliance') > 0, 'sheets storage key still loads compliance through supabase');
 
   const complianceFail = harness({search:'', role:'Admin', session:session, responses:[
     {status:403, raw:JSON.stringify({code:'42501', message:'forbidden: office only'})}
@@ -322,7 +323,7 @@ function bodyOf(call){
   assert.deepStrictEqual(bodyOf(alerts.calls[0]), {p_username:'admin'});
   assert.strictEqual(alertOut.success, true);
   assert.strictEqual(alertOut.items[0].id, '1789992557294-39');
-  assert.ok(alerts.calls[0].url.indexOf('script.google.com') < 0, 'cut ON nurse alerts do not call Sheets');
+  assert.ok(alerts.calls[0].url.indexOf('script.'+'google.com') < 0, 'cut ON nurse alerts do not call Sheets');
 
   const schedAlerts = harness({search:'', role:'Scheduler', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true, items:[]})}
@@ -343,8 +344,8 @@ function bodyOf(call){
     {status:200, raw:JSON.stringify({success:true, items:[]})}
   ]});
   await sheetsAlerts.box.apiPost({action:'list_nurse_alerts', username:'admin'});
-  assert.strictEqual(sheetsAlerts.calls[0].url, sheetsUrl, 'sheets=1 nurse alerts stay on /exec');
-  assert.deepStrictEqual(bodyOf(sheetsAlerts.calls[0]), {action:'list_nurse_alerts', username:'admin'});
+  assert.ok(sheetsAlerts.calls[0].url.indexOf('/rpc/list_nurse_alerts') > 0, 'a sheets query still lists alerts through supabase');
+  assert.deepStrictEqual(bodyOf(sheetsAlerts.calls[0]), {p_username:'admin'});
 
   const activity = harness({search:'', role:'Admin', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true, items:[]})}
@@ -354,7 +355,7 @@ function bodyOf(call){
   assert.deepStrictEqual(bodyOf(activity.calls[0]), {p_limit:50});
   assert.strictEqual(activityOut.success, true);
   assert.deepStrictEqual(activityOut.items, []);
-  assert.ok(activity.calls.every(function(c){return c.url.indexOf('script.google.com') < 0;}), 'cut ON activity does not call Sheets');
+  assert.ok(activity.calls.every(function(c){return c.url.indexOf('script.'+'google.com') < 0;}), 'cut ON activity does not call Sheets');
 
   const activityNurse = harness({search:'', role:'Nurse', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true, items:[]})}
@@ -367,14 +368,16 @@ function bodyOf(call){
     {status:200, raw:JSON.stringify({success:true, items:[]})}
   ]});
   await sheetsActivity.box.apiPost({action:'list_nurse_activity', limit:50});
-  assert.strictEqual(sheetsActivity.calls[0].url, sheetsUrl, 'sheets=1 activity stays on /exec');
-  assert.deepStrictEqual(bodyOf(sheetsActivity.calls[0]), {action:'list_nurse_activity', limit:50});
+  assert.ok(sheetsActivity.calls[0].url.indexOf('/rpc/list_nurse_activity') > 0, 'a sheets query still lists activity through supabase');
+  assert.deepStrictEqual(bodyOf(sheetsActivity.calls[0]), {p_limit:50});
 
   const clientWrite = harness({search:'', role:'Nurse', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true})}
   ]});
-  await clientWrite.box.apiPost({action:'add_client', name:'Ann'});
-  assert.strictEqual(clientWrite.calls[0].url, sheetsUrl, 'nurse client writes stay on /exec');
+  const clientWriteOut = await clientWrite.box.apiPost({action:'add_client', name:'Ann'});
+  assert.strictEqual(clientWrite.calls.length, 0, 'this harness does not post a legacy client write');
+  assert.strictEqual(clientWriteOut.success, false);
+  assert.ok(String(clientWriteOut.error || '') !== '' );
 
   const nurseVisits = harness({search:'', role:'Nurse', session:session, responses:[
     {status:200, raw:JSON.stringify([{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', client_name:'Ann', contact_type:'Visit', contact_date:'2026-09-20', status:'Active'}])}

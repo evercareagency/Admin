@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -104,15 +105,15 @@ async function runBrowser(){
       currentAdminRole = 'Admin';
       currentAdminUsername = 'jasmine@evercare.test';
       allClients = [{
-        id:'c-bowlax',
-        name:'Bowlax',
+        id:'c-testClientAlpha',
+        name:'Test Client Alpha',
         case_manager_name:'Patricia Hayes',
         case_manager_email:'patricia.hayes@countyhealth.org'
       }];
       coverShifts = [{
         id:'18acd525-1111-4111-8111-111111111111',
-        clientId:'c-bowlax',
-        clientName:'Bowlax',
+        clientId:'c-testClientAlpha',
+        clientName:'Test Client Alpha',
         caseManagerName:'Patricia Hayes',
         caseManagerEmail:'patricia.hayes@countyhealth.org',
         startsAt:'2026-09-25T13:00:00.000Z',
@@ -184,7 +185,7 @@ async function runBrowser(){
     await page.screenshot({path: path.join(shotDir, 'remiface1-phone-rail.png')});
 
     await page.evaluate(function(){
-      document.getElementById('copilotChatInput').value = 'draft email for Bowlax';
+      document.getElementById('copilotChatInput').value = 'draft email for Test Client Alpha';
       copilotChatSubmit({preventDefault:function(){}});
     });
     await page.waitForSelector('[data-remi-cm="service"]', {visible:true});
@@ -200,7 +201,7 @@ async function runBrowser(){
     });
     assert.strictEqual(picker.marker, 'v=remi-cm-email1');
     assert.ok(picker.service && picker.backup && picker.other, 'three chips');
-    assert.ok(/Bowlax/.test(picker.text) && /Patricia Hayes/.test(picker.text), picker.text);
+    assert.ok(/testClientAlpha/.test(picker.text) && /Patricia Hayes/.test(picker.text), picker.text);
     assert.ok(/from client record/.test(picker.text), picker.text);
     await page.screenshot({path: path.join(shotDir, 'remi-cm-email1-phone-picker.png')});
 
@@ -235,7 +236,7 @@ async function runBrowser(){
     });
     assert.strictEqual(service.family, 'skip');
     assert.strictEqual(service.code, 'doctor');
-    assert.strictEqual(service.preview.p_client_name, 'Bowlax');
+    assert.strictEqual(service.preview.p_client_name, 'Test Client Alpha');
     assert.strictEqual(service.preview.p_case_manager_name, 'Patricia Hayes');
     assert.strictEqual(service.preview.p_reason_label, 'a doctor appointment');
     assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(service.preview.p_service_date), service.preview.p_service_date);
@@ -267,7 +268,7 @@ async function runBrowser(){
 
     await page.evaluate(function(){
       copilotChat = [];
-      document.getElementById('copilotChatInput').value = 'draft email for Bowlax';
+      document.getElementById('copilotChatInput').value = 'draft email for Test Client Alpha';
       copilotChatSubmit({preventDefault:function(){}});
     });
     await page.waitForSelector('[data-remi-cm="backup"]', {visible:true});
@@ -290,7 +291,7 @@ async function runBrowser(){
 
     await page.evaluate(function(){
       copilotChat = [];
-      document.getElementById('copilotChatInput').value = 'draft email for Bowlax';
+      document.getElementById('copilotChatInput').value = 'draft email for Test Client Alpha';
       copilotChatSubmit({preventDefault:function(){}});
     });
     await page.waitForSelector('[data-remi-cm="other"]', {visible:true});
@@ -318,8 +319,8 @@ async function runBrowser(){
       currentAdminRole = 'Admin';
       currentAdminUsername = 'jasmine@evercare.test';
       allClients = [{
-        id:'c-bowlax',
-        name:'Bowlax',
+        id:'c-testClientAlpha',
+        name:'Test Client Alpha',
         case_manager_name:'Patricia Hayes',
         case_manager_email:'patricia.hayes@countyhealth.org'
       }];
@@ -330,7 +331,7 @@ async function runBrowser(){
       var sheet = document.getElementById('copilotSheet');
       sheet.hidden = false;
       copilotShowChat();
-      document.getElementById('copilotChatInput').value = 'draft email for Bowlax';
+      document.getElementById('copilotChatInput').value = 'draft email for Test Client Alpha';
       copilotChatSubmit({preventDefault:function(){}});
     });
     await deskPage.waitForSelector('[data-remi-cm="service"]', {visible:true});

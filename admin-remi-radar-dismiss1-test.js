@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -248,7 +249,7 @@ async function runBrowser(){
           return {ok:true, data:{signals:[
             {id:'sig-fri', kind:'schedule_gap', title:'Fri mark still open', summary:'Ada Cole · 2026-09-26 still open.', status:'open', severity:'warn'},
             {id:'sig-wed', kind:'aide_issue', title:'Wed AM shortfall', summary:'Sara no-show on Ada.', status:'open'},
-            {id:'sig-bowl', kind:'broadcast_needed', title:'Coverage gap · Bowlax', summary:'Thu 8a–5p still open.', status:'open'},
+            {id:'sig-bowl', kind:'broadcast_needed', title:'Coverage gap · Test Client Alpha', summary:'Thu 8a–5p still open.', status:'open'},
             {id:'sig-ben', kind:'timesheet_late', title:'Ben Ortiz week', summary:'All five days marked.', status:'open'}
           ]}};
         }

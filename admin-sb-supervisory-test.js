@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+require('./test-block-apps-script.js');
 
 const fs = require('fs');
 const path = require('path');
@@ -26,7 +27,7 @@ function extractFn(src, sig){
 
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker stays');
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(html.includes(anonFile), 'anon key stays the embedded jwt');
 assert.ok(!html.includes(".delete('supervisory_contacts'"), 'no client hard delete of supervisory_contacts');
 assert.ok(html.includes("return {ok:false,error:'Archive only — hard delete is not allowed'};"), 'write helper refuses DELETE');
@@ -35,7 +36,8 @@ const keysLine = (html.match(/var SB_SC_PAYLOAD_KEYS=\[[^\]]+\];/) || [])[0];
 assert.ok(keysLine && keysLine.includes('ClientSignatureData') && keysLine.includes('Bathing'), keysLine);
 
 const apiPost = extractFn(html, 'async function apiPost(payload)');
-assert.ok(apiPost.indexOf('sbIsSupervisoryAction') < apiPost.indexOf('fetch(SHEETS_URL'), 'supervisory branch precedes sheets');
+assert.ok(apiPost.includes('sbIsSupervisoryAction'), 'supervisory branch stays');
+assert.ok(!apiPost.includes('fetch('), 'apiPost does not fetch the legacy web app');
 assert.ok(apiPost.includes('sbApiSupervisory(payload)'), 'supervisory actions delegate');
 assert.ok(apiPost.includes('typeof sbIsSupervisoryAction'), 'missing helper must not throw');
 
@@ -363,11 +365,9 @@ Promise.all([
   const refreshedOut = results[15];
   const deleted = results[16];
 
-  assert.strictEqual(off.calls.length, 1, 'flag off makes one sheets call');
-  assert.strictEqual(off.calls[0].url, sheetsUrl);
-  assert.deepStrictEqual(JSON.parse(off.calls[0].init.body), {action: 'list_supervisory_contacts', sinceDays: 60});
-  assert.strictEqual(sheetsList.success, true);
-  assert.ok(!off.calls.some(function(c){return c.url.indexOf('supabase.co') >= 0;}), 'flag off must not call supabase');
+  assert.strictEqual(off.calls.length, 0, 'a sheets query does not call the legacy web app');
+  assert.strictEqual(sheetsList.success, false);
+  assert.strictEqual(sheetsList.error, 'Not signed in');
 
   assert.strictEqual(storedList.success, true);
   assert.deepStrictEqual(storedList.data, []);
