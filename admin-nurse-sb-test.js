@@ -88,6 +88,8 @@ const sigs = [
   'function sbNurseAlertItems(node)',
   'async function sbNurseComplianceDispatch(payload)',
   'async function sbNurseAlertsDispatch(payload, signal)',
+  'function sbIsNurseActivityAction(action)',
+  'async function sbNurseActivityDispatch(payload, signal)',
   'function sbSupervisoryRpcRows(node)',
   'async function sbListSupervisoryContactsRpc(payload)',
   'async function sbArchiveSupervisoryContactRpc(payload)',
@@ -345,11 +347,28 @@ function bodyOf(call){
   assert.deepStrictEqual(bodyOf(sheetsAlerts.calls[0]), {action:'list_nurse_alerts', username:'admin'});
 
   const activity = harness({search:'', role:'Admin', session:session, responses:[
-    {status:200, raw:JSON.stringify({success:true, activity:[]})}
+    {status:200, raw:JSON.stringify({success:true, items:[]})}
   ]});
-  await activity.box.apiPost({action:'list_nurse_activity', limit:50});
-  assert.strictEqual(activity.calls[0].url, sheetsUrl, 'list_nurse_activity stays on /exec');
-  assert.deepStrictEqual(bodyOf(activity.calls[0]), {action:'list_nurse_activity', limit:50});
+  const activityOut = await activity.box.apiPost({action:'list_nurse_activity', limit:50});
+  assert.ok(activity.calls[0].url.indexOf('/rpc/list_nurse_activity') > 0, activity.calls[0].url);
+  assert.deepStrictEqual(bodyOf(activity.calls[0]), {p_limit:50});
+  assert.strictEqual(activityOut.success, true);
+  assert.deepStrictEqual(activityOut.items, []);
+  assert.ok(activity.calls.every(function(c){return c.url.indexOf('script.google.com') < 0;}), 'cut ON activity does not call Sheets');
+
+  const activityNurse = harness({search:'', role:'Nurse', session:session, responses:[
+    {status:200, raw:JSON.stringify({success:true, items:[]})}
+  ]});
+  await activityNurse.box.apiPost({action:'list_nurse_activity', limit:50});
+  assert.ok(activityNurse.calls[0].url.indexOf('/rpc/list_nurse_activity') > 0, activityNurse.calls[0].url);
+  assert.deepStrictEqual(bodyOf(activityNurse.calls[0]), {p_limit:50});
+
+  const sheetsActivity = harness({search:'?sheets=1', role:'Scheduler', session:session, responses:[
+    {status:200, raw:JSON.stringify({success:true, items:[]})}
+  ]});
+  await sheetsActivity.box.apiPost({action:'list_nurse_activity', limit:50});
+  assert.strictEqual(sheetsActivity.calls[0].url, sheetsUrl, 'sheets=1 activity stays on /exec');
+  assert.deepStrictEqual(bodyOf(sheetsActivity.calls[0]), {action:'list_nurse_activity', limit:50});
 
   const clientWrite = harness({search:'', role:'Nurse', session:session, responses:[
     {status:200, raw:JSON.stringify({success:true})}
