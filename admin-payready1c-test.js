@@ -98,6 +98,7 @@ const box = {
     if(name==='admin_timesheet_pay_export')return {ok:true, data:box.exportData};
     return {ok:false, status:404, error:'Could not find the function'};
   },
+  currentAdminRole:'Admin',
   exportData:null,
   downloaded:'',
   URL:URL,

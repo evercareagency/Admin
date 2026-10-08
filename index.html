@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- pay admin1 2026-10-08 v=pay-admin1 ?v=pay-admin1 admin-build 2026-10-08-pay-admin1. PAY_ADMIN1. Payroll is Admin-only. Scheduler and Nurse share this portal but must not see pay UI and must not call pay or payroll RPCs. The gate reads currentAdminRole, the signed-in session role set by applyAdminSession, the same source layoutA1ApplyRoles already uses. It does not read a control a person can toggle. #payReady is data-layout-roles Admin. payAdmin1MaybeLoad skips payReadyLoad unless that role is Admin, and payReadyFetchAce, payReadyHold, and payReadyExport return before sbRestRpc for admin_timesheet_pay_readiness, admin_set_timesheet_pay_hold, and admin_timesheet_pay_export. The rest of the Timesheets tab stays for Scheduler. The Messages Remi pay-dispute card stays Admin-only: admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply are not called for Scheduler or Nurse. remiIdeas763OfficeOk still lets Scheduler use Why open and bilingual cover. A Scheduler payroll range ask in Remi chat is answered Payroll is Admin-only and does not post admin_parse_remi_payroll_range. remiPayroll1OfficeOk is Admin-only, so payroll load, run, confirm, and export stay off that RPC for Scheduler and Nurse. Admin behavior stays. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
+<meta name="admin-build" content="2026-10-08-pay-admin1">
+<script>var PAY_ADMIN1='PAY_ADMIN1';var PAY_ADMIN1_MARKER='v=pay-admin1';var PAY_ADMIN1_BUILD='2026-10-08-pay-admin1';</script>
 <!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
 <meta name="admin-build" content="2026-10-08-sec1-ui">
 <script>var SEC1_UI='sec1-ui';var SEC1_UI_MARKER='v=sec1-ui';var SEC1_UI_BUILD='2026-10-08-sec1-ui';</script>
@@ -3218,7 +3221,7 @@ bindLoginKeyboard();
       <!-- TIMESHEETS TAB -->
       <div class="tab-panel" id="tab_timesheets" data-aide-manage-delete1="v=aide-manage-delete1">
         <p id="tsManageSure" class="aide-manage-sure" data-aide-manage-delete1="v=aide-manage-delete1" hidden>Are you sure?</p>
-        <section id="payReady" data-payready="v=payready1" data-payready1b="v=payready1b" data-payready1c="v=payready1c" data-payready1d="v=payready1d" aria-label="Pay readiness">
+        <section id="payReady" data-layout-roles="Admin" data-pay-admin1="v=pay-admin1" data-payready="v=payready1" data-payready1b="v=payready1b" data-payready1c="v=payready1c" data-payready1d="v=payready1d" aria-label="Pay readiness">
           <div id="payReadyListView">
             <p class="pay-week" id="payReadyWeek">Week of</p>
             <h2 class="pay-screen-title" id="payReadyTitle" hidden>Pay ready</h2>
@@ -6039,6 +6042,7 @@ function layoutA1ApplyRoles(){
     if(typeof copilotSyncRole==='function')copilotSyncRole();
     if(typeof remiPayrollIns1ApplyRoleGate==='function')remiPayrollIns1ApplyRoleGate();
     if(typeof schedPayrollHide1Apply==='function')schedPayrollHide1Apply();
+    if(typeof payAdmin1Apply==='function')payAdmin1Apply();
   }finally{
     layoutA1ApplyRoles._busy=0;
   }
@@ -7107,7 +7111,8 @@ function showTab(tab){
   }
   if(tab==='timesheets'){
     try{if(typeof paintTimesheets==='function'&&typeof allRecords!=='undefined'&&allRecords&&allRecords.length)paintTimesheets();}catch(eTs){}
-    if(typeof payReadyLoad==='function')payReadyLoad();
+    if(typeof payAdmin1MaybeLoad==='function')payAdmin1MaybeLoad();
+    else if(typeof payReadyLoad==='function')payReadyLoad();
   }
   if(tab==='payroll'&&typeof remiPayrollIns1OnShow==='function'){
     try{remiPayrollIns1Shown=remiPayrollIns1OnShow();}catch(ePayIns){}
@@ -26452,9 +26457,7 @@ function remiPayroll1Role(){
 }
 function remiPayroll1OfficeOk(){
   var role=remiPayroll1Role();
-  if(role==='Nurse')return false;
-  if(!role)return true;
-  return role==='Admin'||role==='Scheduler';
+  return String(role||'').toLowerCase()==='admin';
 }
 function remiPayroll1El(id){
   try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
@@ -26527,7 +26530,10 @@ function remiPayroll1IsPayrollJob(job){
   return /\bpayroll\b/i.test(String(job.title||''));
 }
 async function remiPayroll1Rpc(name, body){
-  if(!remiPayroll1OfficeOk())return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.'};
+  if(!remiPayroll1OfficeOk()){
+    var denied=remiPayroll1Role().toLowerCase()==='nurse'?'Nurse cannot use Remi payroll.':'Payroll is Admin-only.';
+    return {ok:false, forbidden:true, adminOnly:true, error:denied};
+  }
   if(typeof sbRestRpc!=='function')return {ok:false, error:'Payroll is not callable yet.'};
   var got=null;
   try{got=await sbRestRpc(name, body||{});}
@@ -26612,7 +26618,12 @@ function remiPayroll1IsRangeAsk(q){
 function remiPayroll1FromAsk(q){
   var hideRole='';
   try{hideRole=currentAdminRole==null?'':String(currentAdminRole);}catch(eHideAsk){hideRole='';}
-  if(hideRole&&hideRole.toLowerCase()!=='admin')return null;
+  if(hideRole&&hideRole.toLowerCase()!=='admin'){
+    if(hideRole.toLowerCase()==='scheduler'&&remiPayroll1IsRangeAsk(q)){
+      return {sec:true, kind:'', text:'Payroll is Admin-only.', actions:[]};
+    }
+    return null;
+  }
   if(!remiPayroll1OfficeOk())return null;
   if(typeof remiPayrollIns1FromAsk==='function'){
     var insAsk=null;
@@ -26627,6 +26638,15 @@ async function remiPayroll1Lookup(idx){
   var msg=copilotChat[idx];
   var q=String(msg.payrollQuery||'').trim();
   if(!q)return {ok:false};
+  if(!remiPayroll1OfficeOk()){
+    if(!msg.payroll)msg.payroll={chip:'Payroll range', sent:false, draft:null, error:''};
+    msg.payroll.error='';
+    msg.payroll.draft=null;
+    msg.payrollQuery='';
+    msg.text='Payroll is Admin-only.';
+    try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePayAdmin){}
+    return {ok:false, forbidden:true, adminOnly:true};
+  }
   var got=await remiPayroll1Rpc('admin_parse_remi_payroll_range', {p_text:q});
   if(!msg.payroll)msg.payroll={chip:'Payroll range', sent:false, draft:null, error:''};
   if(!got||!got.ok){
@@ -28867,6 +28887,9 @@ function remiIdeas763OfficeOk(){
   if(!role)return true;
   return role==='Admin'||role==='Scheduler';
 }
+function remiIdeas763PayAdminOk(){
+  return remiIdeas763Role().toLowerCase()==='admin';
+}
 function remiIdeas763El(id){
   try{if(typeof document!=='undefined'&&document&&document.getElementById)return document.getElementById(id);}catch(e){}
   return null;
@@ -29138,6 +29161,9 @@ function remiIdeas763DefaultEnglish(){
   return 'Hi '+who+' \u2014 can you cover '+tail+'? Reply Yes or No.';
 }
 async function remiIdeas763Rpc(name, body){
+  if((name==='admin_get_pay_dispute_evidence'||name==='admin_draft_pay_dispute_reply')&&!remiIdeas763PayAdminOk()){
+    return {ok:false, forbidden:true, status:42501, adminOnly:true, error:'Payroll is Admin-only.'};
+  }
   if(!remiIdeas763OfficeOk())return {ok:false, forbidden:true, status:42501, error:'Nurse cannot use Remi ideas.'};
   if(typeof sbRestRpc!=='function')return {ok:false, error:'Not callable yet.'};
   var got=null;
@@ -29291,7 +29317,7 @@ function remiIdeas763Paint(){
   if(remiIdeas763OfficeOk()){
     if(remiIdeas763Mode==='why'&&remiIdeas763Why)html=remiIdeas763WhyHtml();
     else if(remiIdeas763Mode==='bilingual')html=remiIdeas763BilingualHtml();
-    else if(remiIdeas763Mode==='pay'&&remiIdeas763Pay)html=remiIdeas763PayHtml();
+    else if(remiIdeas763Mode==='pay'&&remiIdeas763Pay&&remiIdeas763PayAdminOk())html=remiIdeas763PayHtml();
   }
   if(!host)return html;
   host.innerHTML=html?'<div class="remi-i763">'+html+'</div>':'';
@@ -29546,6 +29572,14 @@ async function remiIdeas763SendInMessages(){
   return {ok:true, sms_sent:false, data:got.data};
 }
 async function remiIdeas763OpenPay(aide, text, onDate, clientId){
+  if(!remiIdeas763PayAdminOk()){
+    if(remiIdeas763Mode==='pay'){
+      remiIdeas763Mode='';
+      remiIdeas763Pay=null;
+      remiIdeas763Paint();
+    }
+    return {ok:false, forbidden:true, status:42501, adminOnly:true};
+  }
   if(!remiIdeas763OfficeOk())return {ok:false, forbidden:true, status:42501};
   aide=aide||{};
   remiIdeas763Aide={
@@ -29592,6 +29626,7 @@ function remiIdeas763PayEdit(){
   remiIdeas763Paint();
 }
 async function remiIdeas763PaySend(){
+  if(!remiIdeas763PayAdminOk())return {ok:false, forbidden:true, status:42501, adminOnly:true};
   if(!remiIdeas763OfficeOk())return {ok:false, forbidden:true, status:42501};
   var aide=remiIdeas763Aide||{};
   var text=remiIdeas763PayText();
@@ -29623,7 +29658,7 @@ function remiIdeas763AfterThread(){
   if(remiIdeas763AfterThread.key===key)return;
   remiIdeas763AfterThread.key=key;
   if(remiIdeas763LooksLikePay(last)){
-    remiIdeas763OpenPay(aide, last);
+    if(remiIdeas763PayAdminOk())remiIdeas763OpenPay(aide, last);
     return;
   }
   remiIdeas763ConsiderBilingual(aide, last);
@@ -33741,6 +33776,37 @@ var PAYREADY_MARKER='v=payready1';
 var PAYREADY_READINESS_RPC='admin_timesheet_pay_readiness';
 var PAYREADY_HOLD_RPC='admin_set_timesheet_pay_hold';
 var PAYREADY_EXPORT_RPC='admin_timesheet_pay_export';
+function payAdmin1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function payAdmin1IsAdmin(){
+  return payAdmin1Role().toLowerCase()==='admin';
+}
+function payAdmin1Apply(){
+  var root=null;
+  try{root=document.getElementById('payReady');}catch(e){root=null;}
+  var admin=payAdmin1IsAdmin();
+  if(!root)return admin;
+  if(admin){
+    root.hidden=false;
+    if(root.removeAttribute)root.removeAttribute('hidden');
+    return true;
+  }
+  root.hidden=true;
+  if(root.setAttribute)root.setAttribute('hidden','');
+  var rows=null;
+  try{rows=document.getElementById('payReadyRows');}catch(eRows){rows=null;}
+  if(rows)rows.innerHTML='';
+  return false;
+}
+function payAdmin1MaybeLoad(){
+  if(!payAdmin1IsAdmin()){
+    payAdmin1Apply();
+    return null;
+  }
+  if(typeof payReadyLoad==='function')return payReadyLoad();
+  return null;
+}
 var PAYREADY_MONEY_KEY=/(^|_)(amount|gross|net|wage|rate|dollars?|stipend|salary)($|_)|^pay_amount$|^pay_total$|^hourly_rate$|^ot_pay$/i;
 var PAYREADY_AVATAR={JS:'#3b82f6',CW:'#e07a4c',TR:'#7c6bb5',MD:'#6d4ea3',MB:'#1d8a86',AN:'#1e9a62'};
 var payReadyState=null;
@@ -34141,6 +34207,7 @@ function payReadyBlank(week, error){
   return {source:'ace',error:error||'Could not load pay readiness.',rows:[],ready_count:0,held_count:0,week_start:week.week_start,week_end:week.week_end,label:week.label};
 }
 async function payReadyFetchAce(weekStart){
+  if(!payAdmin1IsAdmin())return {error:'Payroll is Admin-only.', skipped:true, adminOnly:true};
   if(typeof sbRestRpc!=='function')return {error:'Not signed in.'};
   var body={};
   if(weekStart)body.p_week_start=weekStart;
@@ -34155,6 +34222,11 @@ async function payReadyFetchAce(weekStart){
   return mapped;
 }
 async function payReadyLoad(){
+  if(!payAdmin1IsAdmin()){
+    payAdmin1Apply();
+    return null;
+  }
+  payAdmin1Apply();
   var gen=++payReadyGen;
   var week=payReadyWeekRange(new Date());
   var ace;
@@ -34292,6 +34364,7 @@ function payReadyOpenTimesheet(){
   if(typeof showTempMsg==='function')showTempMsg('Readiness only. The timesheet is on the desk below.','var(--navy)');
 }
 async function payReadyHold(){
+  if(!payAdmin1IsAdmin())return;
   var row=(payReadyState&&payReadyState.rows||[]).filter(function(r){return String(r.id)===String(payReadySelected);})[0];
   if(!row)return;
   var id=String(row.timesheet_id||'').trim();
@@ -34323,6 +34396,7 @@ function payReadyDownloadCsv(csv, week){
   return csv;
 }
 async function payReadyExport(){
+  if(!payAdmin1IsAdmin())return '';
   if(typeof sbRestRpc!=='function'){
     if(typeof showTempMsg==='function')showTempMsg('Not signed in.','var(--navy)');
     return '';
@@ -34370,7 +34444,8 @@ async function renderTimesheets(){
     }
   }catch(e){if(tsDesk==='active')allRecords=store.get('admin_records')||[];}
   paintTimesheets();
-  if(typeof payReadyLoad==='function')payReadyLoad();
+  if(typeof payAdmin1MaybeLoad==='function')payAdmin1MaybeLoad();
+  else if(typeof payReadyLoad==='function')payReadyLoad();
 }
 
 
