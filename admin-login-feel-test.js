@@ -66,9 +66,10 @@ assert.ok(showScreenFn.includes("id==='loginScreen')startLoginWarmKeepAlive()") 
 
 const login = extractFn(html, 'async function mgrLogin()');
 assert.ok(login, 'mgrLogin missing');
-assert.ok(login.indexOf('warmUpSheets()') >= 0 && login.indexOf('warmUpSheets()') < login.indexOf("action:'admin_login'"),
-  'sheets rollback warm ping must start before the login POST');
-assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()'), 'sb cut login does not warm before auth');
+assert.ok(!login.includes("action:'admin_login'"), 'sheets rollback does not post the legacy password login');
+assert.ok(login.includes('Sheets sign-in is no longer available. Contact the office administrator.'), 'sheets rollback fails closed with a message');
+assert.ok(login.includes("showScreen('loginScreen')"), 'sheets rollback stays on the login screen');
+assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('sbAuthRoleLogin('), 'sb cut login does not warm before auth');
 assert.ok(warm.indexOf('evercareSbEnabled()') < warm.indexOf('fetch(SHEETS_URL'), 'cut check precedes the sheets warm fetch');
 assert.ok(startKeep.indexOf('evercareSbEnabled()') < startKeep.indexOf('warmUpSheets()'), 'sb cut does not arm login warmkeep');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
@@ -97,7 +98,9 @@ assert.ok(/showScreen\('adminScreen'\)/.test(home), 'Admin and Scheduler use adm
 const start = extractFn(html, 'function startAdminSession(data)');
 assert.ok(start, 'startAdminSession missing');
 assert.ok(!/password/.test(start), 'session must not store the password');
-assert.ok(/ADMIN_SESSION_MS=8\*60\*60\*1000/.test(html), 'session must last 8 hours');
+assert.ok(/const ADMIN_IDLE_MS=60\*60\*1000;/.test(html), 'office idle timeout is 60 minutes');
+assert.ok(!/ADMIN_SESSION_MS/.test(html), 'absolute 8 hour session clock is gone');
+assert.ok(html.includes('function touchAdminSessionActivity()'), 'activity resets the idle clock');
 assert.ok(extractFn(html, 'function adminLogout()').includes('clearAdminSession()'), 'logout must clear the session');
 assert.ok(html.includes('bootAdminPortal();'), 'session must restore when the app opens');
 assert.ok(html.includes('enforceAdminSessionTimeout();'), 'session must expire on return');
@@ -142,9 +145,11 @@ const sandbox = {
 vm.createContext(sandbox);
 const prelude = [
   'const ADMIN_SESSION_KEY=\'admin_session\';',
-  'const ADMIN_SESSION_MS=8*60*60*1000;',
+  'const ADMIN_IDLE_MS=60*60*1000;',
+  'var adminIdleMemAt=0;',
   extractFn(html, 'function isPortalRole(role)'),
   extractFn(html, 'function parseAdminLoginAt(sess)'),
+  extractFn(html, 'function adminSessionActivityAt(sess)'),
   extractFn(html, 'function isAdminSessionExpired(sess)'),
   extractFn(html, 'function clearAdminSession()'),
   extractFn(html, 'function readAdminSession()'),
@@ -157,8 +162,8 @@ const prelude = [
 ].join('\n');
 vm.runInContext(prelude, sandbox);
 
-const eightH = 8 * 60 * 60 * 1000;
-assert.strictEqual(vm.runInContext('ADMIN_SESSION_MS', sandbox), eightH);
+const idleMs = 60 * 60 * 1000;
+assert.strictEqual(vm.runInContext('ADMIN_IDLE_MS', sandbox), idleMs);
 
 const adminSess = vm.runInContext('startAdminSession({success:true,role:"Admin",username:"mo"})', sandbox);
 assert.strictEqual(adminSess.role, 'Admin');
@@ -190,16 +195,24 @@ assert.ok(screens.includes('nurseScreen'), 'Nurse home paints');
 assert.ok(!screens.includes('adminScreen'), 'Nurse must not open admin tools');
 assert.ok(screens.indexOf('nurseScreen') < screens.indexOf('load-compliance'));
 
-const kept = JSON.parse(localStorage.getItem('admin_session'));
-kept.loginAt = Date.now() - eightH + 5000;
-localStorage.setItem('admin_session', JSON.stringify(kept));
+function parkIdle(loginAt, activityAt){
+  const row = JSON.parse(localStorage.getItem('admin_session'));
+  row.loginAt = loginAt;
+  row.lastActivityAt = activityAt;
+  localStorage.setItem('admin_session', JSON.stringify(row));
+  vm.runInContext('adminIdleMemAt=0', sandbox);
+}
+parkIdle(Date.now() - idleMs + 5000, Date.now() - idleMs + 5000);
 const still = vm.runInContext('restoreAdminSession()', sandbox);
-assert.ok(still && still.role === 'Nurse', 'session inside 8h must restore');
+assert.ok(still && still.role === 'Nurse', 'session inside 60 idle minutes must restore');
 
-kept.loginAt = Date.now() - eightH - 1000;
-localStorage.setItem('admin_session', JSON.stringify(kept));
+parkIdle(Date.now() - idleMs * 8, Date.now());
+const active = vm.runInContext('restoreAdminSession()', sandbox);
+assert.ok(active && active.role === 'Nurse', 'recent activity keeps a long login alive');
+
+parkIdle(Date.now() - idleMs - 1000, Date.now() - idleMs - 1000);
 const gone = vm.runInContext('restoreAdminSession()', sandbox);
-assert.strictEqual(gone, null, 'session past 8h must require login');
+assert.strictEqual(gone, null, 'idle session past 60 minutes must require login');
 assert.strictEqual(localStorage.getItem('admin_session'), null);
 assert.strictEqual(sandbox.currentAdminRole, null);
 

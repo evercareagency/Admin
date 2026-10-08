@@ -131,7 +131,7 @@ const sandbox = {
   loadedAidesList: [],
   allAidesForAssign: [],
   currentAdminRole: 'Scheduler',
-  currentAdminUsername: 'Jaz2029',
+  currentAdminUsername: 'scheduler',
   location: {search: '', hash: ''},
   document: {getElementById: function(id){ return els[id] || null; }},
   showTempMsg: function(msg){ toasts.push(String(msg)); },
@@ -139,7 +139,7 @@ const sandbox = {
   showTab: function(){},
   sbUuid: function(v){ return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v || '')); },
   evercareSbEnabled: function(){ return true; },
-  readSbSession: function(){ return {access_token: 'office', username: 'Jaz2029', role: 'Scheduler'}; },
+  readSbSession: function(){ return {access_token: 'office', username: 'scheduler', role: 'Scheduler'}; },
   sbRestRpc: function(name, body){
     rpc.push({name: name, body: body});
     if(name === 'list_schedule_week_slots' || name === 'list_schedule_week'){
@@ -684,8 +684,8 @@ async function shots(){
       window.__calls = [];
       window.__phase = 'empty';
       currentAdminRole = 'Scheduler';
-      currentAdminUsername = 'Jaz2029';
-      readSbSession = function(){ return {access_token: 'office', username: 'Jaz2029', role: 'Scheduler'}; };
+      currentAdminUsername = 'scheduler';
+      readSbSession = function(){ return {access_token: 'office', username: 'scheduler', role: 'Scheduler'}; };
       loadedAidesList = [{id: moeId, username: 'moe', name: 'moe', is_active: true}];
       function days(start, fill){
         var out = {};

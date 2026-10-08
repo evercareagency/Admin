@@ -46,8 +46,10 @@ assert.ok(!/loginKb|visualViewport/.test(mgrLogin), 'keyboard lift must not chan
 const showScreen = extractFn(html, 'function showScreen(id)');
 assert.ok(showScreen.includes('loginKbClear'), 'leaving or reopening a screen drops the keyboard scrollport');
 assert.ok(showScreen.includes("id==='loginScreen')startLoginWarmKeepAlive()"), 'login warm keep-alive still starts from showScreen');
-const doReset = extractFn(html, 'async function doAdminReset()');
-assert.ok(doReset && !/loginKb|visualViewport/.test(doReset), 'keyboard lift must not change doAdminReset');
+assert.ok(!extractFn(html, 'async function doAdminReset()'), 'recovery reset is not part of the login keyboard path');
+const showForgot = extractFn(html, 'function showAdminReset()');
+assert.ok(showForgot && !/loginKb|visualViewport/.test(showForgot), 'forgot note must not change the keyboard lift');
+assert.ok(showForgot.includes('Contact the office administrator'), 'forgot password shows the office message');
 
 const insetFrom = extractFn(html, 'function loginKbInsetFrom(baseHeight, viewHeight, innerHeight)');
 const shouldLift = extractFn(html, 'function loginKbShouldLift(isPhone, fieldFocused, inset)');
