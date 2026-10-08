@@ -49,11 +49,11 @@ assert.ok(modal.includes('id="clientCmName"') && modal.includes('id="clientCmEma
 assert.ok(modal.includes('id="clientInsChips"'), 'insurance chips stay');
 assert.ok(modal.includes('Weekly authorized hours (hrs/week)'), 'weekly hours stay');
 assert.ok(modal.includes('id="clientCoverPrefs"'), 'cover prefs stay');
-assert.ok(modal.includes('Verify Address & Get GPS Coordinates'), 'verify address stays');
+assert.ok(modal.includes('Set pin from a visit'), 'home pin stays');
 assert.ok(modal.includes('Assigned Aides'), 'assigned aides stay');
 assert.ok(modal.includes('Cancel') && modal.includes('Save Client'), 'cancel and save stay');
 
-const order = ['clientFirstName','clientLastName','clientAddress','clientPhone','clientCmName','clientCmEmail','clientInsChips','Verify Address','clientWeeklyHours','clientCoverPrefs','assignAidesList','Cancel','Save Client'];
+const order = ['clientFirstName','clientLastName','clientAddress','clientPhone','clientCmName','clientCmEmail','clientInsChips','Home pin','clientWeeklyHours','clientCoverPrefs','assignAidesList','Cancel','Save Client'];
 let at = -1;
 order.forEach(function(token){
   const next = modal.indexOf(token);

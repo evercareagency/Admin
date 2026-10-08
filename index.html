@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- geo1 2026-10-08 v=geo1 ?v=geo1 admin-build 2026-10-08-geo1. GEO1. No client or aide address and no visit location is sent to an outside map service. Verify Address is gone. Admin and Scheduler set a home pin from a verified visit with admin_list_client_visit_gps and admin_set_client_pin_from_visit. Nurse does not see pin controls and can read distance text from admin_timesheet_gps_distances, which returns no coordinates. Client saves do not send lat or lng. The database clears a pin when the address changes. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes, the knowledge base, compose, and Messages Aides stay. Payroll stays Admin-only. -->
+<meta name="admin-build" content="2026-10-08-geo1">
+<script>var GEO1='GEO1';var GEO1_MARKER='v=geo1';var GEO1_BUILD='2026-10-08-geo1';</script>
 <!-- pay admin1 2026-10-08 v=pay-admin1 ?v=pay-admin1 admin-build 2026-10-08-pay-admin1. PAY_ADMIN1. Payroll is Admin-only. Scheduler and Nurse share this portal but must not see pay UI and must not call pay or payroll RPCs. The gate reads currentAdminRole, the signed-in session role set by applyAdminSession, the same source layoutA1ApplyRoles already uses. It does not read a control a person can toggle. #payReady is data-layout-roles Admin. payAdmin1MaybeLoad skips payReadyLoad unless that role is Admin, and payReadyFetchAce, payReadyHold, and payReadyExport return before sbRestRpc for admin_timesheet_pay_readiness, admin_set_timesheet_pay_hold, and admin_timesheet_pay_export. The rest of the Timesheets tab stays for Scheduler. The Messages Remi pay-dispute card stays Admin-only: admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply are not called for Scheduler or Nurse. remiIdeas763OfficeOk still lets Scheduler use Why open and bilingual cover. A Scheduler payroll range ask in Remi chat is answered Payroll is Admin-only and does not post admin_parse_remi_payroll_range. remiPayroll1OfficeOk is Admin-only, so payroll load, run, confirm, and export stay off that RPC for Scheduler and Nurse. Admin behavior stays. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-pay-admin1">
 <script>var PAY_ADMIN1='PAY_ADMIN1';var PAY_ADMIN1_MARKER='v=pay-admin1';var PAY_ADMIN1_BUILD='2026-10-08-pay-admin1';</script>
@@ -21,7 +24,7 @@
 <!-- signout local1 2026-10-08 v=signout-local1 ?v=signout-local1 admin-build 2026-10-08-signout-local1. SIGNOUT_LOCAL1. Shared Admin, Scheduler, and Nurse sign-out posts /auth/v1/logout?scope=local so only this browser session ends. Tokens, storage, and the login screen still clear when that request fails or the 10s abort fires. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. -->
 <meta name="admin-build" content="2026-10-08-signout-local1">
 <script>var SIGNOUT_LOCAL1='SIGNOUT_LOCAL1';var SIGNOUT_LOCAL1_MARKER='v=signout-local1';var SIGNOUT_LOCAL1_BUILD='2026-10-08-signout-local1';</script>
-<!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
+<!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
 <meta name="admin-build" content="2026-10-08-sec1-ui">
 <script>var SEC1_UI='sec1-ui';var SEC1_UI_MARKER='v=sec1-ui';var SEC1_UI_BUILD='2026-10-08-sec1-ui';</script>
 <!-- nurse compliance supabase 2026-10-05 v=nurse-compliance-sb1 ?v=nurse-compliance-sb1 admin-build 2026-10-05-nurse-compliance-sb1. GHOST-NURSE-COMPLIANCE-SB-CONTRACT-v1. Ace backend CALLABLE LIVE. UI MERGE HOLD until Probe soft PASS and Friday MERGE GO. Do not claim Portal merge. Do not squash-merge. Performance/data swap only. Cut ON (evercareSbEnabled): Nurse Compliance loadNurseCompliance posts rpc/get_supervisory_compliance {} via sbRestRpc (office JWT, same as Completes). hydrateNurseComplianceRow still maps visitCount to visits, callCount to countingCalls, and daysLeftInWindow to daysInWindow. The list does not wait on get_users or get_clients. Nurse alerts badge posts rpc/list_nurse_alerts {p_username} and rpc/mark_nurse_alerts_read {p_username, p_ids}. p_username is the stable office role lowercased (admin, scheduler, nurse). Admin and Scheduler share the badge. Nurse sees the Compliance list. list_nurse_activity is Supabase as of v=nurse-activity-sb1b (rpc/list_nurse_activity {p_limit:50}; p_include_archived omitted; legacy desk only on sheets rollback). Nurse client writes stay legacy desk. nursespd2 abort/re-fetch stays: Completes Refresh aborts in-flight list and mark (the Supabase fetch) and list_nurse_activity (the Supabase fetch when the cut is on), then loads them again after the Ace Completes list paints. Rollback retired-query or localStorage evercare-retired keeps compliance and alerts on legacy desk. Cut ON RPC failure paints the empty state and Refresh and does not fall back to Sheets. cacheInvalidate('get_supervisory_compliance') stays after visit/call save. Supabase is the source of truth (do not match old Sheets archived visits). Phone and desktop. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #nurseComplianceTable carries data-nurse-compliance-sb1. #nav_nurse_badge carries data-nurse-alerts-sb1. Prior markers stay, including v=nursespd2, v=nursenb1, and v=nursecomp57. -->
@@ -1133,6 +1136,21 @@ html.nav-edit-on,html.nav-edit-on body{overflow:hidden;}
 #clientModal .client-hrs label{color:var(--teal-dark);text-transform:none;letter-spacing:0;font-size:0.95rem;font-weight:700;line-height:1.35;}
 #clientModal .client-hrs input[type="number"]{width:100%;max-width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text);background:#fff;min-height:48px;}
 #clientModal .client-hrs-hint{font-size:0.82rem;color:var(--muted);margin-top:6px;line-height:1.4;font-weight:500;}
+/* v=geo1 — home pin and visit distance. No outside map. Phone tap targets. */
+#clientPinRow{margin:0 0 14px;min-width:0;max-width:100%;}
+#clientPinRow .geo1-pin-label{font-size:0.95rem;font-weight:800;color:var(--navy);margin:0 0 6px;}
+#clientPinStatus,#clientPinNote,#visitDistanceDay,#visitDistanceExtra,#mapStatusBanner{overflow-wrap:anywhere;}
+#clientPinStatus{font-size:0.95rem;line-height:1.45;margin:0 0 8px;}
+#clientPinNote{font-size:0.95rem;line-height:1.45;margin:8px 0 0;color:var(--navy);}
+#clientPinBtn{width:100%;min-height:48px;font-size:1rem;}
+#clientPinActions[hidden],#clientPinVisits[hidden],#clientPinBtn[hidden]{display:none !important;}
+#clientPinVisits{display:flex;flex-direction:column;gap:8px;margin-top:8px;max-height:50vh;overflow:auto;-webkit-overflow-scrolling:touch;}
+#clientPinVisits .geo1-empty{margin:0;font-size:0.95rem;line-height:1.45;color:var(--muted);}
+.geo1-visit{display:flex;flex-direction:column;justify-content:center;width:100%;min-height:48px;box-sizing:border-box;text-align:left;font-family:inherit;font-size:1rem;font-weight:700;line-height:1.35;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--navy);cursor:pointer;}
+.geo1-visit.is-off{background:var(--off);color:var(--muted);cursor:default;}
+.geo1-visit .sub{display:block;font-size:0.85rem;font-weight:600;margin-top:2px;}
+#locationMapModal .mbtn{min-height:48px;}
+#locationMapModal .modal{max-width:min(600px,100%);}
 #clientModal .client-cover-prefs{background:#f6eef9;border:1px solid #d4b8e4;border-radius:10px;padding:14px 16px;margin:0 0 16px;max-width:100%;min-width:0;box-sizing:border-box;}
 #clientModal .client-cover-prefs .field>label:first-child{color:#5a1f68;font-weight:800;}
 #clientModal .client-cover-prefs label.chk{display:flex;align-items:center;gap:10px;min-height:44px;font-weight:700;color:var(--navy);margin-top:6px;}
@@ -2975,8 +2993,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 else setupEverCarePWA();
 </script>
 </head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb" crossorigin="anonymous" referrerpolicy="no-referrer">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -5139,9 +5155,14 @@ Call (216) 377-5991 with any questions.</textarea>
         <div class="ins-selected" id="clientInsSelected">Optional. Blank is fine for an older client.</div>
       </div>
     </div>
-    <div class="field" style="margin-bottom:14px">
-      <button class="btn btn-ghost" onclick="geocodeClientAddress()">&#128205; Verify Address & Get GPS Coordinates</button>
-      <p id="geocodeResult" style="font-size:0.76rem;color:var(--muted);margin-top:6px"></p>
+    <div class="geo1-pin" id="clientPinRow" data-geo1="v=geo1">
+      <div class="geo1-pin-label">Home pin</div>
+      <p id="clientPinStatus" class="geo1-pin-status">No pin yet. Set one from a verified visit.</p>
+      <div id="clientPinActions">
+        <button type="button" class="btn btn-ghost" id="clientPinBtn" onclick="geo1ListVisitPins()">Set pin from a visit</button>
+        <div id="clientPinVisits" class="geo1-visits" hidden></div>
+        <p id="clientPinNote" class="geo1-pin-note" role="status"></p>
+      </div>
     </div>
     <div class="client-hrs" data-clienthrs1a="v=clienthrs1a">
       <div class="field">
@@ -5171,19 +5192,16 @@ Call (216) 377-5991 with any questions.</textarea>
 </div>
 
 <!-- VIEW/EDIT MODAL -->
-<!-- LOCATION MAP MODAL -->
-<div class="modal-bg" id="locationMapModal">
+<!-- VISIT DISTANCE -->
+<div class="modal-bg" id="locationMapModal" data-geo1="v=geo1">
   <div class="modal" style="max-width:600px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <h3 style="margin-bottom:0" id="mapModalTitle">Location Verification</h3>
-      <button class="mbtn mbtn-cancel" onclick="closeModal('locationMapModal')">✕ Close</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap">
+      <h3 style="margin-bottom:0" id="mapModalTitle">Visit location</h3>
+      <button type="button" class="mbtn mbtn-cancel" onclick="closeModal('locationMapModal')">✕ Close</button>
     </div>
-    <div id="mapStatusBanner" style="padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:0.85rem;font-weight:600"></div>
-    <div id="mapContainer" style="width:100%;height:340px;border-radius:10px;overflow:hidden;border:1px solid var(--border)"></div>
-    <div style="display:flex;gap:16px;margin-top:12px;font-size:0.78rem">
-      <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#2a7f7f;border-radius:50%;display:inline-block"></span> Client's Home Address</div>
-      <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#c0392b;border-radius:50%;display:inline-block"></span> Aide's Saved Location</div>
-    </div>
+    <p id="visitDistanceDay" style="margin:0 0 8px;font-size:0.95rem;line-height:1.4;color:var(--muted)"></p>
+    <div id="mapStatusBanner" style="padding:12px 14px;border-radius:8px;margin-bottom:12px;font-size:1rem;font-weight:600;line-height:1.45"></div>
+    <p id="visitDistanceExtra" style="margin:0;font-size:1rem;line-height:1.45"></p>
   </div>
 </div>
 
@@ -5479,7 +5497,7 @@ function gpsStatusLabel(d){
   const mi=dayHasDistance(d)?formatDistanceMiles(d)+' from client':'';
   if(d&&d.verified===true)return mi?'✓ Verified — '+mi:'✓ Verified';
   if(d&&d.verified===false)return mi?'✗ Off Location — '+mi:'✗ Off Location';
-  return mi?'View Map — '+mi:'View Map';
+  return mi?'View — '+mi:'View';
 }
 function serviceCodeFor(rec,day){
   const t=String((rec&&rec.svcType)||'').toLowerCase();
@@ -11857,8 +11875,6 @@ function remiSecClientPayload(client, address){
     id:String(client.id||client.clientId||''),
     name:name,
     address:address,
-    lat:client.lat||'',
-    lng:client.lng||'',
     firstName:first,
     lastName:last,
     caseManagerName:client.caseManagerName||client.case_manager_name||'',
@@ -17851,8 +17867,6 @@ async function remiSecCommit(action){
         id:payload.id,
         name:payload.name,
         address:payload.address,
-        lat:payload.lat||'',
-        lng:payload.lng||'',
         firstName:payload.firstName||'',
         lastName:payload.lastName||'',
         caseManagerName:payload.caseManagerName||'',
@@ -17863,15 +17877,21 @@ async function remiSecCommit(action){
       saved={success:false, error:String(err&&err.message||err||'Could not update the address.')};
     }
     if(saved&&saved.success){
-      try{
-        var list=(typeof allClients!=='undefined'&&allClients)?allClients:[];
-        for(var i=0;i<list.length;i++){
-          if(String(list[i]&&(list[i].id||list[i].clientId))===String(payload.id))list[i].address=payload.address;
-        }
-        if(typeof paintClients==='function')paintClients();
-      }catch(eMem){}
-      if(typeof showTempMsg==='function')showTempMsg('Address updated.','var(--success)');
-      remiSecSay('Address updated for '+payload.name+'.');
+      var prior=typeof geo1FindClient==='function'?geo1FindClient(payload.id):null;
+      var changed=!!(prior&&typeof geo1AddressChanged==='function'&&geo1AddressChanged(prior.address, payload.address));
+      var hadPin=!!(prior&&typeof geo1HasCoords==='function'&&geo1HasCoords(prior));
+      if(prior)prior.address=payload.address;
+      if(changed&&hadPin&&typeof geo1ClearLocalPin==='function')geo1ClearLocalPin(prior);
+      if(typeof cacheInvalidate==='function')cacheInvalidate('get_clients');
+      if(changed&&hadPin){
+        if(typeof showTempMsg==='function')showTempMsg(GEO1_PIN_CLEARED,'var(--warn)');
+        remiSecSay('Address updated for '+payload.name+'. '+GEO1_PIN_CLEARED);
+      }else{
+        if(typeof showTempMsg==='function')showTempMsg('Address updated.','var(--success)');
+        remiSecSay('Address updated for '+payload.name+'.');
+      }
+      if(typeof renderClients==='function'){try{renderClients(true);}catch(eRen){}}
+      else if(typeof paintClients==='function'){try{paintClients();}catch(ePaint){}}
       return;
     }
     remiSecSay((typeof deskFaceError==='function'?deskFaceError('Address was not written. The desk did not accept it.', saved&&(saved.error||saved.message)):'Address was not written. The desk did not accept it.'));
@@ -31182,6 +31202,14 @@ function sbMapClient(row){
     is_active:row.is_active!==false,
     assignedAides:aides
   };
+  if(row&&(Object.prototype.hasOwnProperty.call(row,'pin_source')||Object.prototype.hasOwnProperty.call(row,'pinSource')||Object.prototype.hasOwnProperty.call(row,'pin_set_at')||Object.prototype.hasOwnProperty.call(row,'pinSetAt')||Object.prototype.hasOwnProperty.call(row,'pin_set_by')||Object.prototype.hasOwnProperty.call(row,'pinSetBy')||Object.prototype.hasOwnProperty.call(row,'pin_timesheet_id')||Object.prototype.hasOwnProperty.call(row,'pinTimesheetId')||Object.prototype.hasOwnProperty.call(row,'pin_day')||Object.prototype.hasOwnProperty.call(row,'pinDay')||Object.prototype.hasOwnProperty.call(row,'pin_accuracy_m')||Object.prototype.hasOwnProperty.call(row,'pinAccuracyM'))){
+    mapped.pin_source=row.pin_source!=null?row.pin_source:(row.pinSource!=null?row.pinSource:null);
+    mapped.pin_set_at=row.pin_set_at!=null?row.pin_set_at:(row.pinSetAt!=null?row.pinSetAt:null);
+    mapped.pin_set_by=row.pin_set_by!=null?row.pin_set_by:(row.pinSetBy!=null?row.pinSetBy:null);
+    mapped.pin_timesheet_id=row.pin_timesheet_id!=null?row.pin_timesheet_id:(row.pinTimesheetId!=null?row.pinTimesheetId:null);
+    mapped.pin_day=row.pin_day!=null?String(row.pin_day):(row.pinDay!=null?String(row.pinDay):null);
+    mapped.pin_accuracy_m=row.pin_accuracy_m!=null?row.pin_accuracy_m:(row.pinAccuracyM!=null?row.pinAccuracyM:null);
+  }
   if(row&&(row.deactivated_at!=null||row.deactivatedAt!=null)){
     mapped.deactivated_at=row.deactivated_at||row.deactivatedAt||null;
     mapped.deactivatedAt=mapped.deactivated_at||'';
@@ -31335,7 +31363,7 @@ async function sbRestGet(table, pairs, refreshed){
   return {ok:true,data:data,status:res.status};
 }
 var SB_AIDE_SELECT='id,username,full_name,email,joined_at,location_status,last_seen_at,must_change_password,is_active,profile_id,legacy_sheet_row,assignments:assignments(id,is_active,client:clients(id,name,legacy_id,is_active))';
-var SB_CLIENT_SELECT='id,legacy_id,name,address,phone,lat,lng,is_active,weekly_authorized_hours,insurance_plan,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
+var SB_CLIENT_SELECT='id,legacy_id,name,address,phone,lat,lng,pin_source,pin_set_at,pin_set_by,pin_timesheet_id,pin_day,pin_accuracy_m,is_active,weekly_authorized_hours,insurance_plan,assignments:assignments(id,is_active,aide:aides(id,username,full_name))';
 async function sbApiList(payload){
   if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
   var action=payload&&payload.action;
@@ -33241,9 +33269,7 @@ async function sbUpdateClientInsurance(id, plan){
 function sbClientWriteBody(payload, isCreate){
   var body={
     name:String((payload&&payload.name)||'').trim(),
-    address:String((payload&&payload.address)||'').trim(),
-    lat:sbCoord(payload&&payload.lat),
-    lng:sbCoord(payload&&payload.lng)
+    address:String((payload&&payload.address)||'').trim()
   };
   if(isCreate){
     body.org_id=sbOrgId();
@@ -34544,7 +34570,7 @@ function paintTimesheets(){
   const built=recs.map(r=>{
     const days=r.days||{};
     const locs=[...new Set(Object.values(days).filter(d=>d&&d.location&&!d.location.includes('not')).map(d=>d.location))];
-    const locSum=locs.length?`📍 ${locs[0].split(',')[0]}`:'—';
+    const locSum=locs.length?`📍 ${locs[0].split(',')[0]}`:(Object.values(days).some(function(d){return typeof geo1LocLabel==='function'&&geo1LocLabel(d);})?'📍 GPS saved':'—');
     // list-az1: .ts-card-top strong is the aide display name (sort key). .ts-card-sub is client · week, not the A–Z key.
     const aideShown=(typeof listAz1TimesheetName==='function'?listAz1TimesheetName(r):String(r.empName||''))||'—';
     const clientShown=String(r.clientName||r.client_name||'');
@@ -34719,7 +34745,7 @@ function viewBackup(id){
       <td>${tin}</td>
       <td>${tout}</td>
       <td><strong>${d.hrs||'—'}</strong></td>
-      <td style="font-size:0.68rem;color:var(--teal)">${(d.location||dayHasDistance(d))?`${d.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}`:'—'}</td>
+      <td style="font-size:0.68rem;color:var(--teal)">${geo1LocCell(d,i,false)}</td>
       <td>${aideSigHTML}</td>
       <td>${clientSigHTML}</td>
       <td style="font-size:0.7rem;max-width:160px">${(d.svcs||[]).join(', ')||'—'}</td>
@@ -37341,7 +37367,7 @@ function buildDetailBody(){
     if(!d&&!Object.keys(days).length)return;
     const aideSigHTML=hasSigInk(d?.aideSig)?`<img src="${d.aideSig}" class="sig-mini"><br>`:''
     const clientSigHTML=hasSigInk(d?.clientSig)?`<img src="${d.clientSig}" class="sig-mini"><br>`:''
-    const locCell=(d&&(d.location||dayHasDistance(d)||(d.lat&&d.lng)))?`${d.location?`📍 ${d.location}`:''}${gpsDistanceUi(d)}${d.lat&&d.lng?`<br><button onclick="showLocationMap(${i})" style="margin-top:4px;padding:3px 8px;font-size:0.65rem;background:${d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--muted)'};color:white;border:none;border-radius:5px;cursor:pointer">🗺️ ${gpsStatusLabel(d)}</button>`:''}`:'—';
+    const locCell=geo1LocCell(d,i,true);
     dayRows+=`<tr>
       <td><strong>${day}</strong></td>
       <td>${formatTimesheetDayLabel(d?.date)||'—'}</td>
@@ -37417,73 +37443,449 @@ function initAdminSig(id){
 
 function clearAdminSig(id){const c=document.getElementById(id);if(!c)return;c.getContext('2d').clearRect(0,0,c.width,c.height);c.classList.remove('signed');if(adminSigPads[id])adminSigPads[id].hasData=false;}
 
-let currentMapInstance=null;
-
-async function showLocationMap(dayIndex){
-  if(!currentRec)return;
-  const d=(currentRec.days||{})[dayIndex];
-  if(!d||!d.lat||!d.lng){showTempMsg('No GPS data saved for this day.','var(--warn)');return;}
-
-  document.getElementById('mapModalTitle').textContent=DAYS[dayIndex]+' — '+(formatTimesheetDayLabel(d.date)||'');
-  openModal('locationMapModal');
-
-  // Look up the client's registered home coordinates
-  let clientLat=null, clientLng=null;
-  try{
-    const data=await apiGetCached('get_clients');
-    if(data.success&&data.data){
-      const match=data.data.find(c=>c.name===currentRec.clientName);
-      if(match&&match.lat&&match.lng){clientLat=parseFloat(match.lat);clientLng=parseFloat(match.lng);}
-    }
-  }catch(e){}
-
-  const aideLat=parseFloat(d.lat), aideLng=parseFloat(d.lng);
-
-  // Status banner — miles primary (distanceMi, else distanceFt/5280)
-  const banner=document.getElementById('mapStatusBanner');
-  const hasDist=dayHasDistance(d);
-  const distLabel=hasDist?formatDistanceMiles(d):'';
-  if(d.verified===true){
-    banner.style.background='#e8f8f0';banner.style.color='var(--success)';
-    const vMi=hasDist?' ('+distLabel+')':'';
-    banner.textContent='✅ Verified — Aide was at the client\'s home when this day was saved.'+vMi;
-  }else if(d.verified===false){
-    banner.style.background='#fde8e8';banner.style.color='var(--danger)';
-    banner.textContent='❌ Not Verified — Aide was approximately '+distLabel+' from the client\'s registered address.';
-  }else{
-    banner.style.background='#f5f8fc';banner.style.color='var(--muted)';
-    banner.textContent='⚠️ No client address on file to compare against — showing aide\'s location only.';
+var GEO1_PIN_CLEARED='Address changed. The old pin was cleared. Set a new pin from the next verified visit.';
+var geo1VisitPoints=[];
+var geo1PinBusy=false;
+var geo1ListClientId='';
+function geo1OfficeCanPin(){
+  var role='';
+  try{role=typeof currentAdminRole==='undefined'||currentAdminRole==null?'':String(currentAdminRole);}catch(e){role='';}
+  return role==='Admin'||role==='Scheduler';
+}
+function geo1HasCoords(c){
+  if(!c)return false;
+  var lat=c.lat, lng=c.lng;
+  if(lat==null||lat===''||lng==null||lng==='')return false;
+  var la=Number(lat), ln=Number(lng);
+  if(!isFinite(la)||!isFinite(ln))return false;
+  if(la===0&&ln===0)return false;
+  return true;
+}
+function geo1AddressKey(s){
+  return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+function geo1AddressChanged(before, after){
+  return geo1AddressKey(before)!==geo1AddressKey(after);
+}
+function geo1ClearLocalPin(c){
+  if(!c)return;
+  c.lat='';
+  c.lng='';
+  c.pin_source=null;
+  c.pin_set_at=null;
+  c.pin_set_by=null;
+  c.pin_timesheet_id=null;
+  c.pin_day=null;
+  c.pin_accuracy_m=null;
+}
+function geo1FormatWhen(raw){
+  if(typeof formatAdminDate==='function'){
+    var shown=formatAdminDate(raw);
+    if(shown)return shown;
   }
-
-  // Build the map
-  setTimeout(()=>{
-    if(currentMapInstance){currentMapInstance.remove();currentMapInstance=null;}
-    const mapEl=document.getElementById('mapContainer');
-    mapEl.innerHTML='';
-
-    const centerLat=clientLat||aideLat, centerLng=clientLng||aideLng;
-    const map=L.map('mapContainer').setView([centerLat,centerLng],15);
-    currentMapInstance=map;
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'&copy; OpenStreetMap contributors',maxZoom:19
-    }).addTo(map);
-
-    const teal=L.divIcon({className:'',html:'<div style="background:#2a7f7f;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>',iconSize:[24,24],iconAnchor:[12,24]});
-    const red=L.divIcon({className:'',html:'<div style="background:#c0392b;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>',iconSize:[24,24],iconAnchor:[12,24]});
-
-    const bounds=[];
-    if(clientLat&&clientLng){
-      L.marker([clientLat,clientLng],{icon:teal}).addTo(map).bindPopup('🏠 '+(currentRec.clientName||'Client')+"'s Home");
-      bounds.push([clientLat,clientLng]);
+  var s=String(raw==null?'':raw);
+  var m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m)return m[2]+'/'+m[3]+'/'+m[1];
+  return '';
+}
+function geo1PinStatusText(c){
+  if(!c)return 'No pin yet. Set one from a verified visit.';
+  var src=c.pin_source!=null?c.pin_source:(c.pinSource!=null?c.pinSource:'');
+  src=src==null?'':String(src);
+  if(src==='visit_gps'){
+    var when=geo1FormatWhen(c.pin_visit_date||c.visit_date||c.pin_set_at||c.pinSetAt);
+    return when?('📍 Pin set from visit on '+when):'📍 Pin set from visit';
+  }
+  if(src==='manual')return '📍 Pin set manually';
+  if(geo1HasCoords(c))return '📍 Pin on file';
+  return 'No pin yet. Set one from a verified visit.';
+}
+function geo1PhoneGpsMessage(kind){
+  var k=String(kind==null?'':kind);
+  if(k==='1'||k==='denied')return 'Location is off for this site. Turn on Location in Settings, then come back home and tap Continue.';
+  if(k==='rough'||k==='accuracy')return 'Location is rough. Step near a window and tap Continue again.';
+  return "Couldn't get your location. Check that Location is on and tap Continue again.";
+}
+function geo1PinErrorCopy(code, message){
+  var c=String(code==null?'':code).trim();
+  var m=String(message==null?'':message).replace(/^\s+/,'').toLowerCase();
+  if(c==='42501'||m.indexOf('forbidden: admin/scheduler only')===0||m.indexOf('forbidden: office only')===0||m.indexOf('permission denied')===0){
+    return {text:'Only Admin or Scheduler can set a pin.'};
+  }
+  if(c==='P0002'||c==='p0002'||m.indexOf('client not found')===0||m.indexOf('timesheet not found')===0){
+    return {text:'Not found. Refresh and try again.'};
+  }
+  if(m.indexOf('no phone gps for that day')===0)return {text:'That visit has no phone location.'};
+  if(m.indexOf('phone gps too inaccurate')===0)return {text:"That visit's location was too rough (over 100 m). Pick another visit."};
+  if(m.indexOf('visit failed the location check')===0)return {text:"That visit was saved away from the client's pin."};
+  if(m.indexOf('visit not verified')===0)return {text:'Pick a visit with both signatures.'};
+  if(m.indexOf('client already has a pin')===0)return {replace:true, text:'Replace the current pin?'};
+  if(m.indexOf('timesheet is not for this client')===0||m.indexOf('no visit saved for that day')===0||m.indexOf('p_day must be a day key')===0||m.indexOf('phone gps out of range')===0||m.indexOf('org required')===0||/\brequired\b/.test(m)||c==='22023'){
+    return {text:"Couldn't use that visit."};
+  }
+  return {text:"Couldn't use that visit."};
+}
+function geo1VisitReasonCopy(reason){
+  var r=reason==null?'':String(reason);
+  if(!r||r==='null')return '';
+  if(r==='no_gps')return 'That visit has no phone location.';
+  if(r==='gps_out_of_range')return "Couldn't use that visit.";
+  if(r==='failed_location_check')return "That visit was saved away from the client's pin.";
+  if(r==='missing_signatures')return 'Pick a visit with both signatures.';
+  if(r==='gps_too_inaccurate')return "That visit's location was too rough (over 100 m). Pick another visit.";
+  return "Couldn't use that visit.";
+}
+function geo1FeetWords(ft){
+  var n=Number(ft);
+  if(!isFinite(n))return '';
+  if(Math.abs(n)<5280)return Math.round(n)+' ft';
+  return (n/5280).toFixed(2)+' mi';
+}
+function geo1Esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function geo1WithTimeout(){
+  var ctl=typeof AbortController==='function'?new AbortController():null;
+  var timer=ctl?setTimeout(function(){try{ctl.abort();}catch(e){}},10000):null;
+  return {signal:ctl?ctl.signal:undefined, clear:function(){if(timer)clearTimeout(timer);}};
+}
+function geo1Node(got){
+  if(!got)return null;
+  var node=got.data;
+  if(typeof sbRpcNode==='function'){
+    try{node=sbRpcNode(got.data);}catch(e){node=got.data;}
+  }
+  if(Array.isArray(node))node=node[0]||null;
+  if(node&&typeof node==='object')return node;
+  return null;
+}
+function geo1ReadRpc(got){
+  if(!got)return {ok:false, copy:{text:"Couldn't reach the desk. Try again."}};
+  if(got.aborted)return {ok:false, copy:{text:'That took too long. Try again.'}};
+  if(got.network)return {ok:false, copy:{text:"Couldn't reach the desk. Try again."}};
+  if(got.ok!==true){
+    var data=got.data;
+    var code=data&&typeof data==='object'?data.code:'';
+    var message=data&&typeof data==='object'?(data.message||data.error||''):'';
+    if(message&&typeof message==='object')message=message.message||'';
+    if(!message)message=got.error||'';
+    return {ok:false, copy:geo1PinErrorCopy(code, message)};
+  }
+  var node=geo1Node(got);
+  if(!node)return {ok:false, copy:{text:"Couldn't use that visit."}};
+  if(node.ok===false||node.success===false){
+    return {ok:false, copy:geo1PinErrorCopy(node.code, node.message||node.error||'')};
+  }
+  return {ok:true, node:node};
+}
+function geo1PinSay(text){
+  var note=typeof document!=='undefined'&&document.getElementById?document.getElementById('clientPinNote'):null;
+  var face=String(text||'');
+  if(note)note.textContent=face;
+  if(face&&typeof showTempMsg==='function')showTempMsg(face,'var(--teal)');
+}
+function geo1PaintPin(c){
+  if(typeof document==='undefined'||!document.getElementById)return;
+  var status=document.getElementById('clientPinStatus');
+  var actions=document.getElementById('clientPinActions');
+  var visits=document.getElementById('clientPinVisits');
+  var note=document.getElementById('clientPinNote');
+  var btn=document.getElementById('clientPinBtn');
+  if(status)status.textContent=geo1PinStatusText(c||null);
+  if(visits){visits.hidden=true;visits.innerHTML='';}
+  if(note)note.textContent='';
+  var office=geo1OfficeCanPin();
+  var id=c&&(c.id||c.clientId);
+  if(!id){
+    var idEl=document.getElementById('editClientId');
+    id=idEl&&idEl.value?idEl.value:'';
+  }
+  if(actions)actions.hidden=!office;
+  if(btn){
+    btn.hidden=!(office&&id);
+    btn.disabled=!!geo1PinBusy;
+    btn.textContent='Set pin from a visit';
+  }
+  if(note&&office&&!id)note.textContent='Save the client, then set a pin from a verified visit.';
+}
+function geo1LocLabel(d){
+  if(!d)return '';
+  if(d.location)return '📍 '+d.location;
+  if((d.lat!=null&&d.lat!==''&&d.lng!=null&&d.lng!=='')||d.accuracyM!=null||d.gpsAt||(typeof dayHasDistance==='function'&&dayHasDistance(d)))return '📍 GPS saved';
+  return '';
+}
+function geo1LocCell(d, dayIndex, withButton){
+  var label=geo1LocLabel(d);
+  if(!label)return '—';
+  if(d&&d.location)label='📍 '+geo1Esc(d.location);
+  var extra=typeof gpsDistanceUi==='function'?gpsDistanceUi(d):'';
+  var btn='';
+  if(withButton){
+    var bg=d.verified===true?'var(--success)':d.verified===false?'var(--danger)':'var(--teal)';
+    var idx=Number(dayIndex);
+    if(!isFinite(idx))idx=0;
+    btn='<br><button type="button" class="geo1-view" onclick="showLocationDistance('+idx+')" style="margin-top:6px;min-height:48px;padding:10px 14px;font-size:0.95rem;background:'+bg+';color:#fff;border:none;border-radius:8px;cursor:pointer">📍 View</button>';
+  }
+  return label+extra+btn;
+}
+function geo1DistanceCopy(pack, dayKey){
+  var out={banner:'No phone location saved for this day.', extra:''};
+  var days=pack&&Array.isArray(pack.days)?pack.days:[];
+  var row=null;
+  var i;
+  for(i=0;i<days.length;i++){
+    if(String(days[i]&&days[i].day)===String(dayKey)){row=days[i];break;}
+  }
+  if(pack&&pack.aide_home_distance_ft!=null&&pack.aide_home_distance_ft!==''&&isFinite(Number(pack.aide_home_distance_ft))){
+    out.extra="Aide's home is "+(Number(pack.aide_home_distance_ft)/5280).toFixed(2)+' mi from this client.';
+  }
+  if(!row||row.has_gps===false){
+    out.banner='No phone location saved for this day.';
+    return out;
+  }
+  if(!pack||pack.client_has_pin===false){
+    out.banner='No client pin yet. Set one from a verified visit (Client > Home pin).';
+    return out;
+  }
+  if(row.within_500ft===true){
+    var ft=isFinite(Number(row.distance_ft))?Math.round(Number(row.distance_ft))+' ft':'';
+    var acc=(row.accuracy_m==null||row.accuracy_m==='')?'':' (±'+row.accuracy_m+' m)';
+    out.banner='✅ At the client\'s home'+(ft?': '+ft:'')+acc;
+    return out;
+  }
+  if(row.within_500ft===false){
+    var mi=isFinite(Number(row.distance_ft))?(Number(row.distance_ft)/5280).toFixed(2):'';
+    out.banner='❌ '+(mi?mi+' mi':'')+' from the client\'s pin';
+    return out;
+  }
+  out.banner='No phone location saved for this day.';
+  return out;
+}
+function geo1StoredDistanceCopy(d){
+  if(!d)return 'No phone location saved for this day.';
+  var dist=(typeof dayHasDistance==='function'&&dayHasDistance(d)&&typeof formatDistanceMiles==='function')?formatDistanceMiles(d):'';
+  if(d.verified===true)return dist?('✅ At the client\'s home: '+dist):'✅ At the client\'s home';
+  if(d.verified===false)return dist?('❌ '+dist+' from the client\'s pin'):"❌ Away from the client's pin";
+  if(dist)return dist+' from client';
+  if(geo1LocLabel(d))return '📍 GPS saved';
+  return 'No phone location saved for this day.';
+}
+function geo1PaintDistance(copy){
+  if(typeof document==='undefined'||!document.getElementById)return;
+  var banner=document.getElementById('mapStatusBanner');
+  var extra=document.getElementById('visitDistanceExtra');
+  var text=copy&&copy.banner?copy.banner:'No phone location saved for this day.';
+  var good=text.indexOf('✅')===0;
+  var bad=text.indexOf('❌')===0;
+  if(banner){
+    banner.textContent=text;
+    banner.style.background=good?'#e8f8f0':bad?'#fde8e8':'#f5f8fc';
+    banner.style.color=good?'var(--success)':bad?'var(--danger)':'var(--navy)';
+  }
+  if(extra)extra.textContent=copy&&copy.extra?copy.extra:'';
+}
+function geo1FindClient(id){
+  var list=typeof allClients!=='undefined'&&allClients?allClients:[];
+  var i;
+  for(i=0;i<list.length;i++){
+    if(String(list[i]&&(list[i].id||list[i].clientId))===String(id))return list[i];
+  }
+  return null;
+}
+function geo1ApplyPin(clientId, node, visitDate){
+  var row=geo1FindClient(clientId);
+  if(!row)return;
+  row.pin_source=(node&&node.pin_source)||'visit_gps';
+  row.pin_set_at=node&&node.pin_set_at||null;
+  row.pin_timesheet_id=node&&node.pin_timesheet_id||null;
+  row.pin_day=node&&node.pin_day!=null?String(node.pin_day):null;
+  if(node&&node.pin_accuracy_m!=null)row.pin_accuracy_m=node.pin_accuracy_m;
+  if(visitDate)row.pin_visit_date=visitDate;
+  if(node&&node.lat!=null&&node.lng!=null){
+    row.lat=node.lat;
+    row.lng=node.lng;
+  }
+  geo1PaintPin(row);
+}
+function geo1PaintVisits(points, hasPin){
+  var box=typeof document!=='undefined'&&document.getElementById?document.getElementById('clientPinVisits'):null;
+  geo1VisitPoints=(points||[]).map(function(p){
+    return {
+      timesheet_id:p&&p.timesheet_id,
+      day:p&&p.day!=null?String(p.day):'',
+      date:p&&p.date,
+      gps_at:p&&p.gps_at,
+      accuracy_m:p&&p.accuracy_m,
+      distance_ft_to_pin:p?p.distance_ft_to_pin:null,
+      eligible:!!(p&&p.eligible),
+      reason:p?p.reason:null
+    };
+  }).filter(function(p){return String(p.reason||'')!=='no_gps';});
+  if(!box)return;
+  if(!geo1VisitPoints.length){
+    box.hidden=false;
+    box.innerHTML='<p class="geo1-empty">No verified visit yet. A pin can be set after a visit with both signatures and a phone location.</p>';
+    return;
+  }
+  box.hidden=false;
+  box.innerHTML=geo1VisitPoints.map(function(p, i){
+    var when=geo1FormatWhen(p.date)||geo1FormatWhen(p.gps_at)||'Visit';
+    var bits=[];
+    if(p.accuracy_m!=null&&p.accuracy_m!=='')bits.push('±'+p.accuracy_m+' m');
+    if(hasPin&&p.distance_ft_to_pin!=null&&p.distance_ft_to_pin!==''){
+      var words=geo1FeetWords(p.distance_ft_to_pin);
+      if(words)bits.push(words+' from the current pin');
     }
-    L.marker([aideLat,aideLng],{icon:red}).addTo(map).bindPopup('📍 '+(currentRec.empName||'Aide')+"'s Saved Location<br>"+(d.location||''));
-    bounds.push([aideLat,aideLng]);
-
-    if(bounds.length===2){
-      map.fitBounds(bounds,{padding:[40,40]});
+    var sub=bits.join(' · ');
+    if(p.eligible){
+      return '<button type="button" class="geo1-visit" onclick="geo1ChooseVisit('+i+')"><span>'+geo1Esc(when)+'</span>'+(sub?'<span class="sub">'+geo1Esc(sub)+'</span>':'')+'<span class="sub">Use this visit</span></button>';
     }
-  },150);
+    var why=geo1VisitReasonCopy(p.reason);
+    return '<div class="geo1-visit is-off" aria-disabled="true"><span>'+geo1Esc(when)+'</span>'+(sub?'<span class="sub">'+geo1Esc(sub)+'</span>':'')+(why?'<span class="sub">'+geo1Esc(why)+'</span>':'')+'</div>';
+  }).join('');
+}
+async function geo1ListVisitPins(){
+  if(!geo1OfficeCanPin()){
+    geo1PinSay('Only Admin or Scheduler can set a pin.');
+    return;
+  }
+  var idEl=typeof document!=='undefined'&&document.getElementById?document.getElementById('editClientId'):null;
+  var id=idEl&&idEl.value?String(idEl.value):'';
+  if(!id){
+    geo1PinSay('Save the client, then set a pin from a verified visit.');
+    return;
+  }
+  if(typeof sbRestRpc!=='function'){
+    geo1PinSay("Couldn't reach the desk. Try again.");
+    return;
+  }
+  var box=document.getElementById('clientPinVisits');
+  var btn=document.getElementById('clientPinBtn');
+  geo1PinBusy=true;
+  if(btn){btn.disabled=true;btn.textContent='Loading visits…';}
+  if(box){box.hidden=false;box.textContent='Loading visits…';}
+  var timer=geo1WithTimeout();
+  try{
+    var got=await sbRestRpc('admin_list_client_visit_gps', {p_client_id:id}, timer.signal);
+    timer.clear();
+    var read=geo1ReadRpc(got);
+    if(!read.ok){
+      if(box){box.hidden=true;box.textContent='';}
+      geo1PinSay(read.copy&&read.copy.text?read.copy.text:"Couldn't use that visit.");
+      return;
+    }
+    var node=read.node||{};
+    geo1ListClientId=id;
+    geo1PaintVisits(node.points||[], !!node.client_has_pin);
+    var note=document.getElementById('clientPinNote');
+    if(note)note.textContent='';
+  }catch(err){
+    timer.clear();
+    if(box){box.hidden=true;box.textContent='';}
+    var aborted=err&&(err.name==='AbortError'||err.aborted);
+    geo1PinSay(aborted?'That took too long. Try again.':"Couldn't reach the desk. Try again.");
+  }finally{
+    timer.clear();
+    geo1PinBusy=false;
+    if(btn){btn.disabled=false;btn.hidden=false;btn.textContent='Set pin from a visit';}
+  }
+}
+async function geo1ChooseVisit(index, replace){
+  if(!geo1OfficeCanPin()){
+    geo1PinSay('Only Admin or Scheduler can set a pin.');
+    return;
+  }
+  var point=geo1VisitPoints[index];
+  if(!point||!point.eligible)return;
+  var idEl=typeof document!=='undefined'&&document.getElementById?document.getElementById('editClientId'):null;
+  var id=idEl&&idEl.value?String(idEl.value):geo1ListClientId;
+  var day=String(point.day==null?'':point.day);
+  if(!id||!point.timesheet_id||!/^[0-6]$/.test(day)){
+    geo1PinSay("Couldn't use that visit.");
+    return;
+  }
+  if(typeof sbRestRpc!=='function'){
+    geo1PinSay("Couldn't reach the desk. Try again.");
+    return;
+  }
+  var btn=document.getElementById('clientPinBtn');
+  geo1PinBusy=true;
+  if(btn)btn.disabled=true;
+  var timer=geo1WithTimeout();
+  try{
+    var body={p_client_id:id, p_timesheet_id:String(point.timesheet_id), p_day:day, p_replace:replace===true};
+    var got=await sbRestRpc('admin_set_client_pin_from_visit', body, timer.signal);
+    timer.clear();
+    var read=geo1ReadRpc(got);
+    if(!read.ok&&read.copy&&read.copy.replace&&replace!==true){
+      geo1PinBusy=false;
+      if(btn)btn.disabled=false;
+      if(typeof showSharedConfirm==='function'){
+        showSharedConfirm('Replace the current pin?', function(){geo1ChooseVisit(index, true);}, 'Replace');
+      }else{
+        geo1PinSay('Replace the current pin?');
+      }
+      return;
+    }
+    if(!read.ok){
+      geo1PinSay(read.copy&&read.copy.text?read.copy.text:"Couldn't use that visit.");
+      return;
+    }
+    geo1ApplyPin(id, read.node, point.date||point.gps_at);
+    if(typeof cacheInvalidate==='function')cacheInvalidate('get_clients');
+    var visits=document.getElementById('clientPinVisits');
+    if(visits){visits.hidden=true;visits.innerHTML='';}
+    geo1PinSay('Pin set from that visit.');
+    if(typeof renderClients==='function'){
+      try{renderClients(true);}catch(e){}
+    }
+  }catch(err2){
+    timer.clear();
+    var aborted2=err2&&(err2.name==='AbortError'||err2.aborted);
+    geo1PinSay(aborted2?'That took too long. Try again.':"Couldn't reach the desk. Try again.");
+  }finally{
+    timer.clear();
+    geo1PinBusy=false;
+    if(btn){btn.disabled=false;btn.textContent='Set pin from a visit';}
+  }
+}
+async function showLocationDistance(dayIndex){
+  if(typeof currentRec==='undefined'||!currentRec)return;
+  var days=currentRec.days||{};
+  var d=days[dayIndex]!=null?days[dayIndex]:days[String(dayIndex)];
+  var title=typeof document!=='undefined'&&document.getElementById?document.getElementById('mapModalTitle'):null;
+  if(title)title.textContent='Visit location';
+  var dayName=(typeof DAYS!=='undefined'&&DAYS&&DAYS[dayIndex])?DAYS[dayIndex]:'';
+  var when=d&&typeof formatTimesheetDayLabel==='function'?formatTimesheetDayLabel(d.date):'';
+  var sub=document.getElementById('visitDistanceDay');
+  if(sub)sub.textContent=[dayName, when].filter(Boolean).join(' · ');
+  if(typeof openModal==='function')openModal('locationMapModal');
+  geo1PaintDistance({banner:'Checking this visit…', extra:''});
+  var id=currentRec.id;
+  var uuidOk=typeof sbUuid==='function'&&sbUuid(id);
+  if(!uuidOk||typeof sbRestRpc!=='function'){
+    geo1PaintDistance({banner:geo1StoredDistanceCopy(d), extra:''});
+    return;
+  }
+  var timer=geo1WithTimeout();
+  try{
+    var got=await sbRestRpc('admin_timesheet_gps_distances', {p_timesheet_id:String(id)}, timer.signal);
+    timer.clear();
+    var read=geo1ReadRpc(got);
+    if(!read.ok){
+      var msg=(got&&(got.aborted||got.network)&&read.copy&&read.copy.text)?read.copy.text:geo1StoredDistanceCopy(d);
+      if(!(got&&(got.aborted||got.network))&&read.copy&&read.copy.text)msg=read.copy.text;
+      geo1PaintDistance({banner:msg, extra:''});
+      return;
+    }
+    geo1PaintDistance(geo1DistanceCopy(read.node, dayIndex));
+  }catch(err){
+    timer.clear();
+    var aborted=err&&(err.name==='AbortError'||err.aborted);
+    geo1PaintDistance({banner:aborted?'That took too long. Try again.':geo1StoredDistanceCopy(d), extra:''});
+  }finally{
+    timer.clear();
+  }
 }
 
 function saveEdits(){
@@ -40848,7 +41250,7 @@ function paintClients(){
     return open+manageCheck+`
       <div>
         ${head}
-        <p>&#128205; ${c.address||'No address set'} ${hasGPS?'<span style="color:var(--success)">&#10003; GPS Verified</span>':'<span style="color:var(--warn)">&#9888; GPS Not Set</span>'}</p>
+        <p>&#128205; ${c.address||'No address set'} ${hasGPS?'<span style="color:var(--success)">&#128205; Pin on file</span>':'<span style="color:var(--warn)">No pin yet</span>'}</p>
         <p style="margin-top:3px">${aideCount} aide${aideCount!==1?'s':''} assigned</p>
       </div>
       <div style="display:flex;gap:6px">
@@ -41048,9 +41450,7 @@ function showAddClientModal(){
   if(cmEmail)cmEmail.value='';
   const phoneEl=document.getElementById('clientPhone');
   if(phoneEl)phoneEl.value='';
-  document.getElementById('geocodeResult').textContent='';
-  document.getElementById('geocodeResult').dataset.lat='';
-  document.getElementById('geocodeResult').dataset.lng='';
+  if(typeof geo1PaintPin==='function')geo1PaintPin(null);
   clientHoursFill(null);
   clientInsOpen('add','');
   if(typeof coverDesk1ResetClientPrefs==='function')coverDesk1ResetClientPrefs();
@@ -41074,42 +41474,9 @@ function editClient(id){
   clientHoursFill(c);
   clientInsOpen('edit', c.insurance_plan||c.insurancePlan||'');
   if(typeof coverDesk1LoadClientPrefs==='function')coverDesk1LoadClientPrefs(c.id);
-  const geo=document.getElementById('geocodeResult');
-  if(c.lat&&c.lng){
-    geo.textContent='&#10003; GPS: '+c.lat+', '+c.lng;
-    geo.dataset.lat=c.lat;
-    geo.dataset.lng=c.lng;
-  }else{
-    geo.textContent='';
-    geo.dataset.lat='';
-    geo.dataset.lng='';
-  }
+  if(typeof geo1PaintPin==='function')geo1PaintPin(c);
   loadAidesForAssignment(c.assignedAides||[]);
   openModal('clientModal');
-}
-
-async function geocodeClientAddress(){
-  const addr=document.getElementById('clientAddress').value.trim();
-  if(!addr){showTempMsg('Please enter an address first.','var(--danger)');return;}
-  const resultEl=document.getElementById('geocodeResult');
-  resultEl.textContent='Looking up address...';
-  try{
-    const res=await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(addr));
-    const data=await res.json();
-    if(data&&data.length>0){
-      const lat=data[0].lat, lng=data[0].lon;
-      resultEl.textContent='&#10003; Found: '+data[0].display_name.split(',').slice(0,3).join(',');
-      resultEl.dataset.lat=lat;
-      resultEl.dataset.lng=lng;
-      resultEl.style.color='var(--success)';
-    }else{
-      resultEl.textContent='&#10007; Address not found. Please check and try again.';
-      resultEl.style.color='var(--danger)';
-    }
-  }catch(e){
-    resultEl.textContent='Error looking up address.';
-    resultEl.style.color='var(--danger)';
-  }
 }
 
 async function saveClient(){
@@ -41123,18 +41490,18 @@ async function saveClient(){
   const caseManagerName=(document.getElementById('clientCmName')&&document.getElementById('clientCmName').value||'').trim();
   const caseManagerEmail=(document.getElementById('clientCmEmail')&&document.getElementById('clientCmEmail').value||'').trim();
   const phone=(document.getElementById('clientPhone')&&document.getElementById('clientPhone').value||'').trim();
-  const geo=document.getElementById('geocodeResult');
-  const lat=geo.dataset.lat||'';
-  const lng=geo.dataset.lng||'';
   const assignedAides=Array.from(document.querySelectorAll('.assign-aide-cb:checked')).map(cb=>cb.value);
   const hours=clientHoursRead();
   const ins=clientInsRead();
+  const prev=id&&typeof geo1FindClient==='function'?geo1FindClient(id):null;
+  const addrChanged=!!(prev&&typeof geo1AddressChanged==='function'&&geo1AddressChanged(prev.address, address));
+  const hadPin=!!(prev&&typeof geo1HasCoords==='function'&&geo1HasCoords(prev));
 
   if(!firstName||!lastName||!address){showTempMsg('Please fill in first name, last name, and home address.','var(--danger)');return;}
   if(hours.invalid){showTempMsg('Weekly authorized hours must be 0 or more.','var(--danger)');return;}
 
   const action=id?'update_client':'add_client';
-  const payload={action,name,address,lat,lng,assignedAides,firstName,lastName,caseManagerName,caseManagerEmail,phone};
+  const payload={action,name,address,assignedAides,firstName,lastName,caseManagerName,caseManagerEmail,phone};
   if(typeof hours.value==='number')payload.weekly_authorized_hours=hours.value;
   else if(id&&hours.known)payload.weekly_authorized_hours=null;
   if(!ins.omit)payload.insurance_plan=ins.value;
@@ -41151,7 +41518,10 @@ async function saveClient(){
       var prefGot=null;
       try{prefGot=await coverDesk1SaveClientPrefs(prefId);}catch(prefErr){prefGot={ok:false};}
       if(prefGot&&prefGot.ok===false){
-        showTempMsg((typeof deskFaceError==='function'?deskFaceError('Client saved. Cover preference was not saved.', (prefGot.error)):'Client saved. Cover preference was not saved.'),'var(--warn)');
+        var pinClearedEarly=!!(addrChanged&&hadPin);
+        if(pinClearedEarly&&typeof geo1ClearLocalPin==='function')geo1ClearLocalPin(prev);
+        var prefFace=pinClearedEarly?GEO1_PIN_CLEARED:'Client saved. Cover preference was not saved.';
+        showTempMsg((typeof deskFaceError==='function'&&!pinClearedEarly?deskFaceError(prefFace, (prefGot.error)):prefFace),'var(--warn)');
         cacheInvalidate('get_clients');
         closeModal('clientModal');
         renderClients(true);
@@ -41161,8 +41531,14 @@ async function saveClient(){
     cacheInvalidate('get_clients');
     closeModal('clientModal');
     var savedMsg='Client saved.';
-    if(saved&&saved.deskPending)savedMsg='Client saved. Case manager fields are waiting on admin_add_client.';
-    showTempMsg(savedMsg,'var(--success)');
+    var pinCleared=!!(addrChanged&&hadPin);
+    if(pinCleared){
+      if(typeof geo1ClearLocalPin==='function')geo1ClearLocalPin(prev);
+      savedMsg=GEO1_PIN_CLEARED;
+    }else if(saved&&saved.deskPending){
+      savedMsg='Client saved. Case manager fields are waiting on admin_add_client.';
+    }
+    showTempMsg(savedMsg, pinCleared?'var(--warn)':'var(--success)');
     logActivity((id?'Updated':'Added')+' client: '+name);
     renderClients(true);
   }catch(e){

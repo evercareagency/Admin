@@ -73,7 +73,7 @@ assert.ok(select.includes('weekly_authorized_hours'), 'hours column stays on the
 const modal = html.slice(html.indexOf('id="clientModal"'), html.indexOf('id="locationMapModal"'));
 assert.ok(modal.includes('id="clientInsurancePlan"'), 'hidden plan value');
 assert.ok(modal.indexOf('clientWeeklyHours') < modal.indexOf('Assigned Aides'), 'hours stay above Assigned Aides');
-assert.ok(modal.indexOf('Verify Address') < modal.indexOf('clientWeeklyHours'), 'verify address stays above hours');
+assert.ok(modal.indexOf('Home pin') < modal.indexOf('clientWeeklyHours'), 'home pin stays above hours');
 assert.ok(modal.includes('Optional. Blank is fine for an older client.'), 'null plan is allowed');
 assert.ok(!modal.includes('Member ID'), 'member id is not on this tip');
 

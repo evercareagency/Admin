@@ -486,8 +486,8 @@ const clientRow = {
   assert.strictEqual(addBody.org_id, OTHER_ORG, 'org comes from the office profile');
   assert.strictEqual(addBody.name, 'Ann Client');
   assert.strictEqual(addBody.address, '123 Main');
-  assert.strictEqual(addBody.lat, 41.5);
-  assert.strictEqual(addBody.lng, -81.6);
+  assert.ok(!Object.prototype.hasOwnProperty.call(addBody, 'lat'), 'client insert does not send lat');
+  assert.ok(!Object.prototype.hasOwnProperty.call(addBody, 'lng'), 'client insert does not send lng');
   assert.strictEqual(addBody.is_active, true);
   assert.ok(/^\d+$/.test(addBody.legacy_id), addBody.legacy_id);
   assert.ok(!Object.prototype.hasOwnProperty.call(addBody, 'assignedAides'));
@@ -510,7 +510,7 @@ const clientRow = {
   assert.strictEqual(updated.success, true);
   assert.strictEqual(on.calls[0].init.method, 'PATCH');
   assert.strictEqual(params(on.calls[0].url).get('id'), 'eq.'+clientId);
-  assert.deepStrictEqual(bodyOf(on.calls[0]), {name:'Ann Client', address:'9 Oak', lat:null, lng:null});
+  assert.deepStrictEqual(bodyOf(on.calls[0]), {name:'Ann Client', address:'9 Oak'});
   assert.ok(decoded(on.calls[1].url).indexOf('/rest/v1/assignments?') === decoded(on.calls[1].url).indexOf('/rest/v1/assignments'));
   assert.strictEqual(params(on.calls[1].url).get('client_id'), 'eq.'+clientId);
   assert.strictEqual(params(on.calls[1].url).get('is_active'), 'eq.true');
