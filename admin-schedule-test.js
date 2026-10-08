@@ -584,7 +584,8 @@ els.schedWeekdaySel.value='1';
 els.schedAideSel.value=officeAide;
 els.schedHours.value='4';
 await sandbox.schedSaveUsualFromForm();
-assert.ok(toasts.some(function(t){return /forbidden/.test(t);}), '403 is shown and not stored locally');
+assert.ok(toasts.some(function(t){return t==='Could not save the usual pattern.';}), 'a failed save shows calm copy and is not stored locally');
+assert.ok(!toasts.some(function(t){return /forbidden/.test(t);}), 'a failed save does not show the raw error');
 assert.strictEqual(mem.evercare_sched_v1, undefined);
 assert.strictEqual(sandbox.schedFindUsual('ada',1).hours, 4, 'failed save leaves the loaded week');
 

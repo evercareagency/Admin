@@ -158,7 +158,8 @@ function harness(){
     box.els.adm_new_nurse.value = 'nursepass';
     await box.changeRolePassword('Nurse');
     assert.strictEqual(box.els.adminPwdOk.style.display, 'none');
-    assert.strictEqual(box.els.adminPwdErr.textContent, 'password must be at least 6 characters');
+    assert.strictEqual(box.els.adminPwdErr.textContent, 'Could not update the password. Try again.');
+    assert.ok(box.els.adminPwdErr.textContent.indexOf('password must be at least 6 characters') < 0);
     assert.strictEqual(box.activity.length, 0);
     assert.strictEqual(box.calls.length, 0);
   }
@@ -169,7 +170,8 @@ function harness(){
     box.nextRpc = {ok:true, status:200, data:{ok:false, success:false, message:'invalid role'}};
     await box.changeRolePassword('Scheduler');
     assert.strictEqual(box.els.adminPwdOk.style.display, 'none');
-    assert.strictEqual(box.els.adminPwdErr.textContent, 'invalid role');
+    assert.strictEqual(box.els.adminPwdErr.textContent, 'Could not update the password. Try again.');
+    assert.ok(box.els.adminPwdErr.textContent.indexOf('invalid role') < 0);
   }
 
   // Non-admin cannot change passwords.

@@ -515,7 +515,8 @@ function sessionWindow(){
   const failedUi = uiBox('', '1');
   failedUi.box.sbClearAssignedTopic=function(){return Promise.resolve({success:false, error:'Could not clear topic assignment.'});};
   await failedUi.box.clearAssignment();
-  assert.ok(failedUi.toasts.some(function(t){return /could not clear topic assignment/i.test(t);}), 'failed DELETE is shown');
+  assert.ok(failedUi.toasts.some(function(t){return /could not update the inservice assignment/i.test(t);}), 'failed DELETE is shown');
+  assert.ok(!failedUi.toasts.some(function(t){return /Could not clear topic assignment/.test(t);}), 'failed DELETE does not show the raw error');
   assert.ok(!failedUi.toasts.some(function(t){return /Assignment cleared/.test(t);}), 'failed DELETE is not reported as cleared');
 
   const rpcSrc = extractFn(html, 'async function sbAdminUnassignInserviceAide(topicId, username, archiveActiveResult)');

@@ -28,8 +28,8 @@ function extractFn(src, sig){
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
 assert.ok(html.includes('v=warmoff1'), 'warmoff1 marker');
 assert.ok(html.includes('v=sbcut1b'), 'sbcut hotfix marker');
-assert.ok(html.includes('sheets=1'), 'sheets rollback query');
-assert.ok(html.includes('evercare_sheets'), 'sheets rollback storage key');
+assert.ok(!html.includes('sheets=1'), 'retired query is gone from the page');
+assert.ok(!html.includes('evercare_sheets'), 'retired storage key is gone from the page');
 assert.ok(html.includes("currentAdminRole==='Nurse'"), 'nurse client writes still detect the Nurse role');
 assert.ok(html.includes('v=nursenb1'), 'nursenb1 marker');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker');

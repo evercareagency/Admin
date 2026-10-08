@@ -20,6 +20,12 @@ assert.ok(html.includes("sbRestRpc('list_office_activity'"), 'activity read uses
 assert.ok(!html.includes('if(!nurseSheets){'), 'nurse sheets bypass is gone');
 assert.ok(!/function archiveNewClientIntakePdf|apiPost\(\{action:'archive_new_client_intake_pdf'/.test(html), 'drive archive is gone');
 assert.ok(!/body:JSON\.stringify\(\{action:'(log_activity|get_activity_log|send_is_reminder)'/.test(html), 'those actions are not posted to a web app');
+assert.ok(!html.includes('/exec'), 'legacy path is gone, including old build comments');
+assert.ok(!html.includes('sheets=1'), 'retired query is gone, including old build comments');
+assert.ok(!html.toLowerCase().includes('warmkeep'), 'old keep-alive name is gone, including comments');
+assert.ok(!/Apps Script/i.test(html), 'old web app name is gone, including comments');
+assert.strictEqual(html.indexOf('<meta name="admin-build" content="2026-09-27-remi-float-hide1b">'), html.indexOf('<meta name="admin-build"'), 'first admin-build meta stays');
+assert.strictEqual(fs.readFileSync(path.join(__dirname, 'admin-build.txt'), 'utf8').trim(), '2026-09-29-pages-cache-fresh1', 'admin-build.txt stays');
 
 function extractFn(src, sig){
   const start = src.indexOf(sig);

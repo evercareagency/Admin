@@ -29,7 +29,7 @@ assert.ok(html.includes('v=nursespd2'), 'nursespd2 marker');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-isclear1">'), 'admin-build meta');
 assert.ok(html.includes('v=adminpw1'), 'adminpw1 marker stays');
-assert.ok(html.includes('v=warmkeep'), 'warmkeep marker stays');
+assert.ok(!html.includes('warmkeep'), 'warm-idle comment no longer names the old keep-alive');
 assert.ok(html.includes('Still loading from Sheets…'), 'slow copy');
 assert.ok(html.includes('onclick="retryCompletedNewClientIntakes()"'), 'Retry button');
 assert.ok(html.includes('ec_nci_completes_nursespd1'), 'sessionStorage key');

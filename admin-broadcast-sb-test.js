@@ -215,7 +215,8 @@ function harness(opts){
     box.nextRpc = {ok:false, error:'office only'};
     await box.sendBroadcast();
     assert.strictEqual(box.toasts.length, 1);
-    assert.ok(box.toasts[0].msg.indexOf('office only') >= 0);
+    assert.strictEqual(box.toasts[0].msg, 'Could not send alert.');
+    assert.ok(box.toasts[0].msg.indexOf('office only') < 0);
     assert.ok(box.toasts[0].color.indexOf('danger') >= 0 || box.toasts[0].color === 'var(--danger)');
   }
 

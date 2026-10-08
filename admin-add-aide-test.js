@@ -151,12 +151,14 @@ assert.deepStrictEqual(helpers.aideAssignedClientValues({clients: 'c1,c2'}), ['c
 assert.deepStrictEqual(helpers.aideAssignedClientValues({clientIds: ['c9']}), ['c9']);
 assert.strictEqual(helpers.formatAideAssignedClients({assignedClients: ['c1']}), 'Rivera, Ana');
 
-assert.ok(/Unknown action: admin_create_aide/.test(helpers.aceActionError({error: 'Unknown action'}, null, 'admin_create_aide')),
+assert.strictEqual(helpers.aceActionError({error: 'Unknown action'}, null, 'admin_create_aide'),
+  'That action is not available on this desk.',
   'Unknown action must surface as a clear toast string');
-assert.ok(helpers.aceActionError({error: 'Username taken'}, null, 'admin_create_aide') === 'Username taken',
-  'Ace collision error is shown as-is');
+assert.strictEqual(helpers.aceActionError({error: 'Username taken'}, null, 'admin_create_aide'),
+  'That username is already taken.',
+  'A taken username stays a calm desk sentence');
 assert.strictEqual(helpers.aceActionError({success:false,error:'Username already taken'}, null, 'admin_create_aide'),
-  'Username already taken', 'Ace v46 collision error is shown as-is');
+  'That username is already taken.', 'A taken username stays a calm desk sentence');
 assert.ok(!helpers.nciLooksLikeUnknownAction('Username already taken'),
   'taken username is not Unknown action');
 assert.ok(helpers.looksLikeUsernameTaken('Username already taken'),

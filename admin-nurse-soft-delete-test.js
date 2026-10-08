@@ -110,10 +110,12 @@ assert.ok(archiveDraft.includes('loadNewClientIntakeDrafts()'),
   'draft archive success refreshes drafts list');
 assert.ok(!/hard.?delete|delete_client',id/.test(archiveClient+archiveIntake+archiveDraft+postArchive),
   'must not invent hard-delete or old delete_client {id} payload');
-assert.ok(toastRes.includes('data.error'),
-  'fail toast uses data.error');
-assert.ok(toastRes.includes("'Unknown action: '"),
+assert.ok(toastRes.includes('console.warn'),
+  'fail toast logs the raw error');
+assert.ok(toastRes.includes('That action is not available on this desk.'),
   'Unknown action must toast clearly');
+assert.ok(toastRes.includes('Could not delete that.'),
+  'other delete failures stay a calm sentence');
 
 assert.ok(hydrate.includes("scField(r,'ClientId','clientId')"),
   'hydrate must keep ClientId/clientId');
@@ -230,7 +232,7 @@ eval('globalThis.toastArchiveResult = '+toastRes);
   assert.strictEqual(posts[1].action, 'delete_new_client_intake');
   assert.strictEqual(posts[0].intakeId, 'I9');
   assert.strictEqual(toastArchiveResult(res,'Intake deleted.'), false);
-  assert.strictEqual(toasts[0].msg, 'Unknown action');
+  assert.strictEqual(toasts[0].msg, 'That action is not available on this desk.');
   assert.strictEqual(toasts[0].color, 'var(--danger)');
 
   posts.length = 0;
@@ -242,7 +244,8 @@ eval('globalThis.toastArchiveResult = '+toastRes);
   res = await postArchiveAction('archive_client','delete_client',{clientId:'C3'});
   assert.strictEqual(posts.length, 1, 'do not fall back unless Unknown action');
   assert.strictEqual(toastArchiveResult(res,'Client deleted.'), false);
-  assert.strictEqual(toasts[0].msg, 'Client already archived');
+  assert.strictEqual(toasts[0].msg, 'Could not delete that.');
+  assert.ok(toasts[0].msg.indexOf('Client already archived') < 0);
 
   function clientIdOfComplianceRow(r){
     if(!r)return '';
@@ -289,7 +292,8 @@ eval('globalThis.toastArchiveResult = '+toastRes);
   assert.strictEqual(draftOk, false);
   assert.strictEqual(posts.length, 1, 'draft fail does not invent extra fields or alias unless Unknown action');
   assert.strictEqual(draftsRefresh, 0, 'failed archive leaves the draft');
-  assert.strictEqual(toasts[0].msg, 'Client already archived');
+  assert.strictEqual(toasts[0].msg, 'Could not delete that.');
+  assert.ok(toasts[0].msg.indexOf('Client already archived') < 0);
 
   confirmDeleteDraftIntake('D3');
   assert.strictEqual(els.nciDiscardConfirm.hidden, false, 'draft Delete shows Are you sure?');

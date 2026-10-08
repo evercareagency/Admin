@@ -197,7 +197,8 @@ const storagePath = '4f97f4d3-6635-4544-904c-6b06aa02d40b/nci/221cb451-5b17-44c8
   await sandbox.viewCompletedIntakePdf('new-1');
   assert.deepStrictEqual(signs, [storagePath], 'bucket prefix is stripped before sign');
   assert.deepStrictEqual(opens, [], 'sign failure does not open a URL');
-  assert.strictEqual(toasts[0].msg, 'sign denied');
+  assert.strictEqual(toasts[0].msg, 'Could not open PDF.');
+  assert.ok(toasts[0].msg.indexOf('sign denied') < 0);
   assert.strictEqual(toasts[0].color, 'var(--danger)');
   sandbox._signError = '';
 

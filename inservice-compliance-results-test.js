@@ -326,7 +326,7 @@ vm.runInContext([
 
 assert.strictEqual(
   sandbox.formatISAceActionError({success:false,error:'Unknown action'},'get_inservice_result','Could not load results.'),
-  'Ace get_inservice_result failed: Unknown action'
+  'That action is not available on this desk.'
 );
 assert.ok(sandbox.isISGetShape({success:true,items:[{q:'Q1'}],scorePct:90}), 'items+score is get shape');
 assert.ok(sandbox.isISGetShape({success:true,scoreCorrect:9,scoreTotal:10,scorePct:90}), 'score fields are get shape');
@@ -358,9 +358,8 @@ assert.ok(!sandbox.isISGetShape({success:true}), 'bare success is not get shape'
   posts.length=0;
   await sandbox.viewISResults(0);
   assert.ok(posts.some(function(p){return p.action==='get_inservice_result'&&p.id==='is-asha-1';}), 'open calls LOCK get_inservice_result { id }');
-  assert.ok(els.isResultsNote.textContent.indexOf('get_inservice_result')>=0, 'note names the Ace action');
-  assert.ok(els.isResultsNote.textContent.indexOf('Unknown action')>=0, 'note keeps Ace error string');
-  assert.ok(els.isResultsNote.textContent.trim()!=='Unknown action', 'must not show bare Unknown action');
+  assert.strictEqual(els.isResultsNote.textContent, 'That action is not available on this desk.', 'note stays calm when the action is missing');
+  assert.ok(els.isResultsNote.textContent.indexOf('Unknown action')<0, 'note does not keep the raw error');
   assert.ok(els.isResultsBody.innerHTML.indexOf('is-result-qa')>=0, 'list-row answers paint Q&A when get fails');
   assert.ok(/class="mark"/.test(els.isResultsBody.innerHTML), 'Q&A includes correct/wrong marks');
   assert.ok(els.isResultsBody.innerHTML.indexOf('Aide answer:')>=0, 'review names the aide answer');
