@@ -12,7 +12,7 @@
 <!-- pay admin1 2026-10-08 v=pay-admin1 ?v=pay-admin1 admin-build 2026-10-08-pay-admin1. PAY_ADMIN1. Payroll is Admin-only. Scheduler and Nurse share this portal but must not see pay UI and must not call pay or payroll RPCs. The gate reads currentAdminRole, the signed-in session role set by applyAdminSession, the same source layoutA1ApplyRoles already uses. It does not read a control a person can toggle. #payReady is data-layout-roles Admin. payAdmin1MaybeLoad skips payReadyLoad unless that role is Admin, and payReadyFetchAce, payReadyHold, and payReadyExport return before sbRestRpc for admin_timesheet_pay_readiness, admin_set_timesheet_pay_hold, and admin_timesheet_pay_export. The rest of the Timesheets tab stays for Scheduler. The Messages Remi pay-dispute card stays Admin-only: admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply are not called for Scheduler or Nurse. remiIdeas763OfficeOk still lets Scheduler use Why open and bilingual cover. A Scheduler payroll range ask in Remi chat is answered Payroll is Admin-only and does not post admin_parse_remi_payroll_range. remiPayroll1OfficeOk is Admin-only, so payroll load, run, confirm, and export stay off that RPC for Scheduler and Nurse. Admin behavior stays. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-pay-admin1">
 <script>var PAY_ADMIN1='PAY_ADMIN1';var PAY_ADMIN1_MARKER='v=pay-admin1';var PAY_ADMIN1_BUILD='2026-10-08-pay-admin1';</script>
-<!-- schedule overlap 2026-10-08 v=sched-overlap1 ?v=sched-overlap1 admin-build 2026-10-08-sched-overlap1. SCHED_OVERLAP1. Aide double-book is a warning, never a blocked save. After upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, or upsert_schedule_slot_day_mark succeeds, read resp.conflicts and resp.warnings as optional. code aide_double_booked paints a non-blocking amber notice: Saved. Heads-up, the aide, the other client, the weekday, 12-hour times, and the first date as MM/DD/YYYY. The save stays successful. Save week still returns marker, v, and holds_written so schedHoldAutosave1Violation keeps working. overlap_unchecked_no_times is muted text. Week load calls list_schedule_aide_overlaps {p_week_start}. Each pair paints a small amber Double-booked badge on both shifts; a tap shows the other shift. Admin, Scheduler, and Nurse may call it. A failed call paints nothing and does not toast. History on the week view calls list_schedule_change_history {p_week_start, p_client_id when a client is focused, p_limit}. Rows show changed_at_et, actor_name, and summary, newest first. has_more shows Load more and raises p_limit up to 500. Empty state is No changes this week. A failed call is a quiet line in the drawer. The button is Admin and Scheduler only; Nurse is hidden and the RPC is not called. Phone: Completed new client intakes and Supervisory visits and calls headers stay on one line and scroll sideways. Nurse landing Log Visit, Log Phone Call, View PDF, and Archive Client are at least 40px tall. Remi payroll for last week still posts the phrase to admin_parse_remi_payroll_range and paints the server range. This desk does not compute last week. Names are not written to the console. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Payroll stays Admin-only. Remi notes keyboard and compose, Messages Aides, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
+<!-- schedule overlap 2026-10-08 v=sched-overlap1 ?v=sched-overlap1 admin-build 2026-10-08-sched-overlap1. SCHED_OVERLAP1. Aide double-book is a warning, never a blocked save. After upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, or upsert_schedule_slot_day_mark succeeds, read resp.conflicts and resp.warnings as optional. code aide_double_booked paints a non-blocking amber notice: Saved. Heads-up, the aide, the other client, the weekday, 12-hour times, and the first date as MM/DD/YYYY. The save stays successful. Save week still returns marker, v, and holds_written so schedHoldAutosave1Violation keeps working. overlap_unchecked_no_times is muted text. Week load calls list_schedule_aide_overlaps {p_week_start}. Each pair paints a small amber Double-booked badge on both shifts; a tap shows the other shift. Admin, Scheduler, and Nurse may call it. A failed call paints nothing and does not toast. History on the week view calls list_schedule_change_history {p_week_start, p_client_id when a client is focused, p_limit}. Rows show changed_at_et, actor_name, and summary, newest first. has_more shows Load more and raises p_limit up to 500. Empty state is No changes this week. A failed call is a quiet line in the drawer. The button is Admin and Scheduler only; Nurse is hidden and the RPC is not called. Phone: Completed new client intakes and Supervisory visits and calls headers stay on one line and scroll sideways. Nurse landing Log Visit, Log Phone Call, View PDF, and Archive Client are at least 40px tall. Remi payroll posts the user's phrase or typed range as p_text to admin_parse_remi_payroll_range and paints the start and end the server returns. This desk does not compute last week, a Monday-Sunday week, or a rolling 7 days. Ace remi-pay-range1 owns that range. Error 22023 paints try a shorter range and does not throw. A Scheduler still hears Payroll is Admin-only and does not call the parse. MERGE HOLD behind exec-off1. Do not claim LIVE. Names are not written to the console. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Payroll stays Admin-only. Remi notes keyboard and compose, Messages Aides, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-sched-overlap1">
 <script>var SCHED_OVERLAP1='SCHED_OVERLAP1';var SCHED_OVERLAP1_MARKER='v=sched-overlap1';var SCHED_OVERLAP1_BUILD='2026-10-08-sched-overlap1';</script>
 <!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-activity-sb1b, v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
@@ -26873,6 +26873,21 @@ function remiPayroll1IsPayrollJob(job){
   if(kind==='payroll_report')return true;
   return /\bpayroll\b/i.test(String(job.title||''));
 }
+function remiPayroll1ShorterRange(){
+  return {ok:false, status:22023, error:'That range is too long. Please try a shorter range.'};
+}
+function remiPayroll1Is22023(got, errText){
+  var blob=String(errText||'');
+  if(/22023/.test(blob))return true;
+  if(!got||typeof got!=='object')return false;
+  if(got.status===22023||got.code==='22023'||got.code===22023)return true;
+  var data=got.data;
+  if(data&&typeof data==='object'&&!Array.isArray(data)){
+    if(data.code==='22023'||data.code===22023||data.sqlstate==='22023')return true;
+    if(/22023/.test(String(data.message||data.error||data.hint||data.details||'')))return true;
+  }
+  return false;
+}
 async function remiPayroll1Rpc(name, body){
   if(!remiPayroll1OfficeOk()){
     var denied=remiPayroll1Role().toLowerCase()==='nurse'?'Nurse cannot use Remi payroll.':'Payroll is Admin-only.';
@@ -26881,9 +26896,14 @@ async function remiPayroll1Rpc(name, body){
   if(typeof sbRestRpc!=='function')return {ok:false, error:'Payroll is not callable yet.'};
   var got=null;
   try{got=await sbRestRpc(name, body||{});}
-  catch(err){return {ok:false, error:String(err&&err.message||err||'Request failed.')};}
+  catch(err){
+    var thrown=String(err&&err.message||err||'Request failed.');
+    if(remiPayroll1Is22023(null, thrown))return remiPayroll1ShorterRange();
+    return {ok:false, error:thrown};
+  }
   var errText=String((got&&got.error)||'');
   if(!got||got.ok!==true){
+    if(remiPayroll1Is22023(got, errText))return remiPayroll1ShorterRange();
     if((got&&(got.status===42501||got.status===403))||/42501|is_scheduler_office/.test(errText)){
       return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.', status:got&&got.status};
     }
@@ -26897,6 +26917,7 @@ async function remiPayroll1Rpc(name, body){
   if(Array.isArray(node)&&node.length===1&&node[0]&&typeof node[0]==='object')node=node[0];
   if(node&&typeof node==='object'&&(node.success===false||node.ok===false)){
     var why=String(node.error||node.message||'Request failed.');
+    if(remiPayroll1Is22023(node, why))return remiPayroll1ShorterRange();
     if(/42501|is_scheduler_office/.test(why))return {ok:false, forbidden:true, error:'Nurse cannot use Remi payroll.', data:node};
     return {ok:false, error:why, data:node};
   }
@@ -26991,7 +27012,12 @@ async function remiPayroll1Lookup(idx){
     try{if(typeof copilotPaintChat==='function'&&copilotView==='chat')copilotPaintChat();}catch(ePayAdmin){}
     return {ok:false, forbidden:true, adminOnly:true};
   }
-  var got=await remiPayroll1Rpc('admin_parse_remi_payroll_range', {p_text:q});
+  var got=null;
+  try{got=await remiPayroll1Rpc('admin_parse_remi_payroll_range', {p_text:q});}
+  catch(errLook){
+    var thrownLook=String(errLook&&errLook.message||errLook||'');
+    got=remiPayroll1Is22023(null, thrownLook)?remiPayroll1ShorterRange():{ok:false, error:thrownLook||'Could not read that range.'};
+  }
   if(!msg.payroll)msg.payroll={chip:'Payroll range', sent:false, draft:null, error:''};
   if(!got||!got.ok){
     msg.payroll.error=(got&&got.error)||'Could not read that range.';

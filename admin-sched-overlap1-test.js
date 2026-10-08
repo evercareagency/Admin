@@ -371,6 +371,79 @@ function slot(on, key){
   assert.ok(els.schedHistBody.innerHTML.includes('Could not load history.'), 'quiet error copy');
   assert.strictEqual(toasts.length, 0, 'history failure does not toast');
 
+  const payStart = html.indexOf('// remi payroll1 v=remi-payroll1');
+  const payEnd = html.indexOf('// end remi payroll1 v=remi-payroll1');
+  const paySrc = html.slice(payStart, payEnd);
+  const lookSrc = paySrc.slice(paySrc.indexOf('async function remiPayroll1Lookup'), paySrc.indexOf('function remiPayroll1BubbleHtml'));
+  assert.ok(lookSrc.includes('{p_text:q}'), 'last week is sent as the phrase');
+  assert.ok(!lookSrc.includes('p_as_of') && !lookSrc.includes('setDate') && !lookSrc.includes('getDate'), 'lookup does not compute a week');
+  assert.ok(paySrc.includes('try a shorter range'), '22023 friendly copy');
+
+  const payCalls = [];
+  const paySandbox = {
+    currentAdminRole: 'Admin',
+    console: console,
+    Intl: Intl,
+    Date: Date,
+    copilotChat: [],
+    copilotView: 'chat',
+    copilotPaintChat: function(){},
+    sbRestRpc: async function(name, body){
+      payCalls.push({name: name, body: body});
+      return {ok: true, data: {success: true, start_date: '2026-09-28', end_date: '2026-10-04'}};
+    }
+  };
+  vm.createContext(paySandbox);
+  vm.runInContext(paySrc, paySandbox);
+
+  const weekAsk = paySandbox.remiPayroll1FromAsk('last week');
+  assert.strictEqual(weekAsk.payrollQuery, 'last week');
+  paySandbox.copilotChat = [{role: 'remi', text: weekAsk.text, payroll: weekAsk.payroll, payrollQuery: 'last week'}];
+  const weekLook = await paySandbox.remiPayroll1Lookup(0);
+  assert.strictEqual(weekLook.ok, true);
+  assert.strictEqual(payCalls.length, 1);
+  assert.strictEqual(payCalls[0].name, 'admin_parse_remi_payroll_range');
+  assert.strictEqual(JSON.stringify(payCalls[0].body), JSON.stringify({p_text: 'last week'}));
+  assert.strictEqual(paySandbox.copilotChat[0].payroll.draft.start_date, '2026-09-28');
+  assert.strictEqual(paySandbox.copilotChat[0].payroll.draft.end_date, '2026-10-04');
+  const weekShown = paySandbox.copilotChat[0].text + paySandbox.remiPayroll1BubbleHtml(paySandbox.copilotChat[0], 0);
+  assert.ok(weekShown.includes('09/28/2026') && weekShown.includes('10/04/2026'), weekShown);
+  assert.ok(!weekShown.includes('10/01/2026') && !weekShown.includes('2026-10-01'), 'not a rolling 7 days ending Wed 2026-10-07');
+  assert.ok(!weekShown.includes('10/02/2026') && !weekShown.includes('10/08/2026'), 'not a rolling 7 days ending today');
+
+  payCalls.length = 0;
+  paySandbox.sbRestRpc = async function(name, body){
+    payCalls.push({name: name, body: body});
+    return {ok: false, status: 22023, error: '22023 invalid_parameter_value'};
+  };
+  paySandbox.copilotChat = [{role: 'remi', text: 'Checking that payroll range.', payroll: {chip: 'Payroll range', sent: false, draft: null, error: ''}, payrollQuery: '1/1/2020\u201310/7/2026'}];
+  let threw = false;
+  let rangeErr = null;
+  try{
+    rangeErr = await paySandbox.remiPayroll1Lookup(0);
+  }catch(errRange){
+    threw = true;
+    rangeErr = errRange;
+  }
+  assert.strictEqual(threw, false, '22023 does not throw');
+  assert.strictEqual(rangeErr.ok, false);
+  assert.strictEqual(rangeErr.status, 22023);
+  assert.ok(/try a shorter range/.test(paySandbox.copilotChat[0].text), paySandbox.copilotChat[0].text);
+  const rangeHtml = paySandbox.remiPayroll1BubbleHtml(paySandbox.copilotChat[0], 0);
+  assert.ok(/try a shorter range/.test(rangeHtml), rangeHtml);
+  assert.ok(!paySandbox.copilotChat[0].payroll.draft, 'a 22023 response does not invent dates');
+
+  paySandbox.currentAdminRole = 'Scheduler';
+  payCalls.length = 0;
+  const schedAsk = paySandbox.remiPayroll1FromAsk('payroll for last week');
+  assert.strictEqual(schedAsk.text, 'Payroll is Admin-only.');
+  assert.ok(!schedAsk.payrollQuery, 'Scheduler reply does not queue a parse');
+  paySandbox.copilotChat = [{payrollQuery: 'last week', text: 'Checking that payroll range.', payroll: {chip: 'Payroll range', sent: false, draft: null, error: ''}}];
+  const schedLook = await paySandbox.remiPayroll1Lookup(0);
+  assert.strictEqual(schedLook.adminOnly, true);
+  assert.strictEqual(paySandbox.copilotChat[0].text, 'Payroll is Admin-only.');
+  assert.strictEqual(payCalls.length, 0, 'Scheduler never reaches the payroll parse');
+
   console.log('admin-sched-overlap1-test ok');
 })().catch(function(err){
   console.error(err);
