@@ -40,7 +40,7 @@ assert.ok(sendBroadcast.includes("localStorage.setItem('broadcast_msg'"), 'broad
 assert.ok(!/SHEETS_URL/.test(sendBroadcast), 'broadcast has no Sheets /exec');
 assert.ok(html.includes("const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';"), 'supabase url');
 assert.ok(!html.includes('lvaglmztnlnsrhlluayz'), 'abandoned project ref must not appear');
-assert.ok(!/service_role/i.test(html), 'service_role must not be embedded');
+assert.ok(!/service_role/i.test(html.replace(/no service_role/ig, '')), 'service_role must not be embedded');
 assert.ok(!html.includes('resolve_username_email'), 'admin must not call the aides-only rpc');
 assert.ok(html.includes(anonFile), 'anon key must be the attached legacy jwt');
 assert.strictEqual(anonFile.length, 208);
@@ -81,12 +81,12 @@ const authFns = [
 }).join('\n');
 
 const login = extractFn(html, 'async function mgrLogin()');
-assert.ok(login.includes("action:'admin_login'"), 'sheets login stays for flag off');
+assert.ok(!login.includes("action:'admin_login'"), 'sheets rollback does not post the legacy password login');
+assert.ok(login.includes('Sheets sign-in is no longer available. Contact the office administrator.'), 'sheets rollback fails closed');
+assert.ok(login.includes("showScreen('loginScreen')"), 'sheets rollback stays on the login screen');
 assert.ok(!login.includes('softSbDualVerify'), 'soft probe must not run after sheets success');
-assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('warmUpSheets()'), 'sb cut login does not warm before the flag branch');
-assert.ok(login.indexOf('sbAuthRoleLogin(') < login.indexOf('warmUpSheets()'), 'sb auth is not preceded by sheets warmkeep');
-assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf("action:'admin_login'"), 'flag check precedes sheets admin_login');
-assert.ok(login.indexOf('sbAuthRoleLogin(') > 0 && login.indexOf('sbAuthRoleLogin(') < login.indexOf("action:'admin_login'"), 'auth login is the flag-on branch');
+assert.ok(login.indexOf('evercareSbEnabled()') < login.indexOf('sbAuthRoleLogin('), 'sb cut login does not warm before the flag branch');
+assert.ok(login.indexOf('sbAuthRoleLogin(') > 0, 'auth login is the flag-on branch');
 assert.ok(!/await\s+softSbDualVerify/.test(login), 'soft verify must not be awaited');
 assert.strictEqual((html.match(/\/auth\/v1\/token\?grant_type=password/g) || []).length, 1, 'only one password grant');
 assert.ok(html.includes("'/rest/v1/profiles?id=eq.'"), 'profile load uses the user jwt');
@@ -364,13 +364,15 @@ Promise.all([
   assert.strictEqual(inactive.out.error, 'profile inactive');
 
   const sheetsOff = results[11];
-  assert.strictEqual(sheetsOff.warmed.length, 1);
+  assert.strictEqual(sheetsOff.warmed.length, 0, 'flag off does not warm before a retired login');
   assert.strictEqual(sheetsOff.box.auth, undefined, 'flag off does not call auth');
-  assert.strictEqual(sheetsOff.sheets.length, 1);
-  assert.deepStrictEqual(JSON.parse(sheetsOff.sheets[0].init.body), {action:'admin_login', password:'sheets-secret'});
-  assert.strictEqual(sheetsOff.box.home.sess.role, 'Scheduler');
-  assert.strictEqual(sheetsOff.box.started.username, 'sheets-sched');
-  assert.strictEqual(sheetsOff.els.mgr_pass.value, '');
+  assert.strictEqual(sheetsOff.sheets.length, 0, 'flag off does not post the legacy password login');
+  assert.strictEqual(sheetsOff.box.home, undefined, 'flag off does not open the portal');
+  assert.strictEqual(sheetsOff.els.mgrErr.style.display, 'block');
+  assert.strictEqual(sheetsOff.els.mgrErr.textContent, 'Sheets sign-in is no longer available. Contact the office administrator.');
+  assert.strictEqual(sheetsOff.els.mgrLoginBtn.disabled, false);
+  assert.strictEqual(sheetsOff.els.mgrLoginBtn.textContent, 'Sign In →');
+  assert.strictEqual(sheetsOff.box.window._mgrLoginInFlight, false);
 
   const sheetsOn = results[12];
   assert.strictEqual(sheetsOn.sheets.length, 0, 'flag on does not post admin_login');
@@ -549,24 +551,31 @@ async function runBrowser(){
     await off.page.type('#mgr_pass','sheets-secret');
     await off.page.click('#mgrLoginBtn');
     await off.page.waitForFunction(function(){
-      return document.getElementById('adminScreen').classList.contains('active');
+      var err=document.getElementById('mgrErr');
+      var login=document.getElementById('loginScreen');
+      return err&&err.style.display==='block'&&login&&login.classList.contains('active');
     },{timeout:8000});
     const offState=await off.page.evaluate(function(){
+      var err=document.getElementById('mgrErr');
+      var btn=document.getElementById('mgrLoginBtn');
       return {
+        login:document.getElementById('loginScreen').classList.contains('active'),
         admin:document.getElementById('adminScreen').classList.contains('active'),
         nurse:document.getElementById('nurseScreen').classList.contains('active'),
         pass:document.getElementById('mgr_pass').value,
-        sb:localStorage.getItem('evercare_sb_session'),
-        role:document.getElementById('sidebarRoleName').textContent
+        msg:err?err.textContent:'',
+        btn:btn?btn.disabled:true,
+        label:btn?btn.textContent:''
       };
     });
-    assert.strictEqual(offState.admin,true);
+    assert.strictEqual(offState.login,true,'sheets rollback stays on the login card');
+    assert.strictEqual(offState.admin,false);
     assert.strictEqual(offState.nurse,false);
-    assert.strictEqual(offState.pass,'');
-    assert.strictEqual(offState.sb,null);
-    assert.ok(off.hits.some(function(h){return h.action==='admin_login'&&h.post.indexOf('sheets-secret')>0;}));
+    assert.strictEqual(offState.msg,'Sheets sign-in is no longer available. Contact the office administrator.');
+    assert.strictEqual(offState.btn,false);
+    assert.strictEqual(offState.label,'Sign In →');
+    assert.ok(!off.hits.some(function(h){return h.action==='admin_login';}),'sheets rollback does not post the legacy password login');
     assert.ok(!off.hits.some(function(h){return /supabase\.co/.test(h.url);}),'flag off must not call supabase');
-    assert.strictEqual(offState.role,'Admin');
     await off.context.close();
 
     for(const vp of [{name:'desktop',size:desktop,role:'Scheduler',home:'admin',search:'?v=sbcut1'},{name:'phone',size:phone,role:'Nurse',home:'nurse',search:'?sb=1&v=phone'}]){

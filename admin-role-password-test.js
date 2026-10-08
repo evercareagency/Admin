@@ -34,33 +34,32 @@ assert.ok(html.includes('v=sched1m'), 'sched1m marker stays');
 assert.ok(html.includes('v=cgreset1'), 'cgreset1 marker stays');
 assert.ok(html.includes('v=bcast1'), 'bcast1 marker stays');
 assert.ok(!/resetPasswordForEmail/.test(html), 'role passwords must not use recovery email');
-
-const resetSelect = html.slice(html.indexOf('id="adminResetRole"'), html.indexOf('id="adminRecoveryCode"'));
-assert.ok(resetSelect.includes('value="Admin"') && resetSelect.includes('value="Scheduler"') && resetSelect.includes('value="Nurse"'),
-  'Forgot account picker must offer Admin, Scheduler, and Nurse');
+assert.ok(!html.includes('id="adminRecoveryCode"'), 'recovery code field is gone');
+assert.ok(!html.includes('id="adminResetModal"'), 'reset modal is gone');
+assert.ok(!html.includes('id="adminResetRole"'), 'forgot account picker is gone');
+assert.ok(!extractFn(html, 'async function doAdminReset()'), 'office reset function is gone');
+assert.ok(!extractFn(html, 'async function sbAdminSetRolePasswordAnon(role, newPassword, recoveryCode)'), 'anon setter is gone');
+assert.ok(!html.includes('p_recovery_code'), 'role password calls do not send a recovery code');
+assert.ok(!html.includes('admin_forgot_password'), 'forgot sheets action is gone');
+assert.ok(html.includes('id="mgrForgotBtn"') && html.includes('showAdminReset()'), 'forgot control stays');
+assert.ok(html.includes('Contact the office administrator'), 'forgot copy');
 
 const settings = html.slice(html.indexOf('id="adminOnlyPwdCard"'), html.indexOf('id="schedulerNoAccessCard"'));
 assert.ok(settings.includes('id="adm_new_admin"') && settings.includes("changeRolePassword('Admin')"), 'Admin settings row stays');
 assert.ok(settings.includes('id="adm_new_scheduler"') && settings.includes("changeRolePassword('Scheduler')"), 'Scheduler settings row stays');
 assert.ok(settings.includes('id="adm_new_nurse"') && settings.includes('Update Nurse Password') && settings.includes("changeRolePassword('Nurse')"),
   'Nurse settings row must call changeRolePassword(Nurse)');
+assert.ok(!/recovery code/i.test(settings), 'settings copy does not mention a recovery code');
 
-const resetFn = extractFn(html, 'async function doAdminReset()');
+const showFn = extractFn(html, 'function showAdminReset()');
 const changeFn = extractFn(html, 'async function changeRolePassword(role)');
-const anonFn = extractFn(html, 'async function sbAdminSetRolePasswordAnon(role, newPassword, recoveryCode)');
 const sessionFn = extractFn(html, 'async function sbAdminSetRolePasswordSession(role, newPassword)');
 const acceptedFn = extractFn(html, 'function sbRolePasswordAccepted(data)');
 const payloadFn = extractFn(html, 'function sbRolePasswordPayload(data)');
 const errFn = extractFn(html, 'function sbAuthErrorMessage(data,status)');
-assert.ok(resetFn && changeFn && anonFn && sessionFn && acceptedFn && payloadFn && errFn, 'password helpers missing');
-
-assert.ok(resetFn.includes("code!=='ECA2026'"), 'Forgot keeps the ECA2026 client check');
-assert.ok(resetFn.includes("sbAdminSetRolePasswordAnon(role,newpwd,'ECA2026')"), 'Forgot Auth path sends ECA2026');
-assert.ok(resetFn.includes("action:'admin_forgot_password'"), 'Forgot keeps Sheets rollback');
-assert.ok(resetFn.indexOf('sbAdminSetRolePasswordAnon') < resetFn.indexOf("action:'admin_forgot_password'"),
-  'Sheets forgot action stays on the rollback branch');
-assert.ok(/evercareSbEnabled\(\)\)\{[\s\S]*return;[\s\S]*action:'admin_forgot_password'/.test(resetFn),
-  'Auth forgot returns before Sheets');
+assert.ok(showFn && changeFn && sessionFn && acceptedFn && payloadFn && errFn, 'password helpers missing');
+assert.ok(showFn.includes('Contact the office administrator'), 'forgot shows the office message');
+assert.ok(!/fetch\(/.test(showFn) && !/admin_set_role_password/.test(showFn), 'forgot does not call the password RPC');
 
 assert.ok(changeFn.includes("role==='Nurse'?'adm_new_nurse'"), 'Settings maps Nurse to adm_new_nurse');
 assert.ok(changeFn.includes('sbAdminSetRolePasswordSession(role,newp)'), 'Settings Auth path uses the session helper');
@@ -69,11 +68,6 @@ assert.ok(/evercareSbEnabled\(\)\)\{[\s\S]*return;[\s\S]*action:'change_admin_pa
   'Auth settings returns before Sheets');
 assert.ok(!/p_recovery_code/.test(sessionFn), 'Settings RPC body omits the recovery code');
 assert.ok(sessionFn.includes("sbRestRpc('admin_set_role_password'"), 'Settings uses sbRestRpc');
-assert.ok(anonFn.includes("SUPABASE_URL+'/rest/v1/rpc/admin_set_role_password'"), 'Forgot posts the named RPC');
-assert.ok(anonFn.includes('apikey:SUPABASE_ANON_KEY') && anonFn.includes("Authorization:'Bearer '+SUPABASE_ANON_KEY"),
-  'Forgot reuses the anon key bearer pattern');
-assert.ok(anonFn.includes('p_role:role') && anonFn.includes('p_new_password:newPassword') && anonFn.includes('p_recovery_code:recoveryCode'),
-  'Forgot body uses the contract arg names');
 assert.ok(acceptedFn.includes('row.ok!==true||row.success!==true'), 'success requires both ok and success');
 
 const mutate = extractFn(html, 'async function sbRestMutate(method, table, pairs, body, prefer, refreshed, signal)');
@@ -85,11 +79,7 @@ function harness(){
   const toasts = [];
   const activity = [];
   const els = {
-    adminResetRole:{value:'Admin'},
-    adminRecoveryCode:{value:'ECA2026'},
-    adminNewPwdReset:{value:'newpass1'},
-    adminResetModalErr:{textContent:'',style:{display:'none'}},
-    adminResetModal:{style:{display:'flex'}},
+    mgrForgotNote:{textContent:'', classList:{add:function(name){this.on=name;}}},
     adm_new_admin:{value:'adminpass'},
     adm_new_scheduler:{value:'schedpass'},
     adm_new_nurse:{value:'nursepass'},
@@ -131,80 +121,18 @@ function harness(){
     nextRpc:null
   };
   vm.createContext(sandbox);
-  vm.runInContext([errFn, payloadFn, acceptedFn, anonFn, sessionFn, resetFn, changeFn].join('\n'), sandbox);
+  vm.runInContext([errFn, payloadFn, acceptedFn, sessionFn, showFn, changeFn].join('\n'), sandbox);
   return sandbox;
 }
 
 (async function(){
-  // Forgot Auth success: anon RPC, no Sheets, green toast only after ok+success.
   {
     const box = harness();
-    box.els.adminResetRole.value = 'Nurse';
-    await box.doAdminReset();
-    assert.strictEqual(box.calls.length, 1);
-    assert.ok(box.calls[0].url.endsWith('/rest/v1/rpc/admin_set_role_password'));
-    assert.strictEqual(box.calls[0].opts.headers.apikey, 'anon-test-key');
-    assert.strictEqual(box.calls[0].opts.headers.Authorization, 'Bearer anon-test-key');
-    assert.deepStrictEqual(box.calls[0].body, {p_role:'Nurse', p_new_password:'newpass1', p_recovery_code:'ECA2026'});
-    assert.strictEqual(box.els.adminResetModal.style.display, 'none');
-    assert.strictEqual(box.toasts.length, 1);
-    assert.ok(box.toasts[0].msg.indexOf('Nurse') >= 0);
-    assert.strictEqual(box.toasts[0].color, '#27ae60');
-  }
-
-  // Wrong recovery code never leaves the browser.
-  {
-    const box = harness();
-    box.els.adminRecoveryCode.value = 'nope';
-    await box.doAdminReset();
+    box.showAdminReset();
+    assert.strictEqual(box.els.mgrForgotNote.textContent, 'Contact the office administrator');
     assert.strictEqual(box.calls.length, 0);
+    assert.strictEqual(box.rpcCalls.length, 0);
     assert.strictEqual(box.toasts.length, 0);
-    assert.strictEqual(box.els.adminResetModalErr.textContent, 'Invalid recovery code.');
-    assert.strictEqual(box.els.adminResetModal.style.display, 'flex');
-  }
-
-  // Short password on the Auth cut does not toast and does not call Sheets.
-  {
-    const box = harness();
-    box.els.adminNewPwdReset.value = 'short';
-    await box.doAdminReset();
-    assert.strictEqual(box.calls.length, 0);
-    assert.strictEqual(box.toasts.length, 0);
-    assert.ok(/at least 6/.test(box.els.adminResetModalErr.textContent));
-  }
-
-  // PostgREST 400: show the error, no success toast, no Sheets.
-  {
-    const box = harness();
-    box.nextFetch = {ok:false, status:400, text:async function(){return JSON.stringify({code:'P0001', message:'invalid recovery code'});}};
-    await box.doAdminReset();
-    assert.strictEqual(box.calls.length, 1);
-    assert.ok(!/exec/.test(box.calls[0].url));
-    assert.strictEqual(box.toasts.length, 0);
-    assert.strictEqual(box.els.adminResetModalErr.textContent, 'invalid recovery code');
-    assert.strictEqual(box.els.adminResetModal.style.display, 'flex');
-  }
-
-  // HTTP 200 without ok+success is not a green toast.
-  {
-    const box = harness();
-    box.nextFetch = {ok:true, status:200, text:async function(){return JSON.stringify({ok:true, success:false});}};
-    await box.doAdminReset();
-    assert.strictEqual(box.toasts.length, 0);
-    assert.strictEqual(box.els.adminResetModal.style.display, 'flex');
-    assert.ok(box.els.adminResetModalErr.textContent);
-  }
-
-  // Sheets rollback still posts admin_forgot_password and does not call the RPC.
-  {
-    const box = harness();
-    box.sbOn = false;
-    box.els.adminResetRole.value = 'Scheduler';
-    await box.doAdminReset();
-    assert.strictEqual(box.calls.length, 1);
-    assert.strictEqual(box.calls[0].url, 'https://example.invalid/exec');
-    assert.deepStrictEqual(box.calls[0].body, {action:'admin_forgot_password', role:'Scheduler', newPassword:'newpass1'});
-    assert.strictEqual(box.toasts.length, 1);
   }
 
   // Settings Admin / Scheduler / Nurse use the session RPC and omit the recovery code.

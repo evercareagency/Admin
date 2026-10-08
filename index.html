@@ -9,6 +9,9 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- sec1 ui 2026-10-08 v=sec1-ui ?v=sec1-ui admin-build 2026-10-08-sec1-ui. SEC1_UI. Security cleanup for the public Admin page. The shared Scheduler role password is not published in comments or tests. Office forgot password does not collect a recovery code, does not post a new password, and does not call admin_set_role_password; Forgot password? shows Contact the office administrator. A signed-in Admin may still change an Admin, Scheduler, or Nurse role password through changeRolePassword, which posts admin_set_role_password with the Admin session and does not send a recovery code. The legacy hard-coded manager password constant is gone, and no login path compares against it. Sheets rollback sign-in stays on the login card and says Sheets sign-in is no longer available. cdnjs leaflet, jspdf, html2canvas, and jszip script and link tags carry a sha384 integrity hash computed from the pinned file, plus crossorigin anonymous and referrerpolicy no-referrer. Office sessions for Admin, Scheduler, and Nurse end after 60 minutes of idle. Pointer, key, touch, click, input, and scroll reset that clock. On timeout the desk signs out to the login screen, closes open modals, and unlocks the page so the login card is visible. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, Messages Aides, payroll, and nurse compliance stay as they are. Prior markers stay, including v=nurse-compliance-sb1b, v=pages-cache-fresh1, v=login-toast1, and v=adminpw1. -->
+<meta name="admin-build" content="2026-10-08-sec1-ui">
+<script>var SEC1_UI='sec1-ui';var SEC1_UI_MARKER='v=sec1-ui';var SEC1_UI_BUILD='2026-10-08-sec1-ui';</script>
 <!-- nurse compliance supabase 2026-10-05 v=nurse-compliance-sb1 ?v=nurse-compliance-sb1 admin-build 2026-10-05-nurse-compliance-sb1. GHOST-NURSE-COMPLIANCE-SB-CONTRACT-v1. Ace backend CALLABLE LIVE. UI MERGE HOLD until Probe soft PASS and Friday MERGE GO. Do not claim Portal merge. Do not squash-merge. Performance/data swap only. Cut ON (evercareSbEnabled): Nurse Compliance loadNurseCompliance posts rpc/get_supervisory_compliance {} via sbRestRpc (office JWT, same as Completes). hydrateNurseComplianceRow still maps visitCount to visits, callCount to countingCalls, and daysLeftInWindow to daysInWindow. The list does not wait on get_users or get_clients. Nurse alerts badge posts rpc/list_nurse_alerts {p_username} and rpc/mark_nurse_alerts_read {p_username, p_ids}. p_username is the stable office role lowercased (admin, scheduler, nurse). Admin and Scheduler share the badge. Nurse sees the Compliance list. list_nurse_activity stays Sheets /exec. Nurse client writes stay /exec. nursespd2 abort/re-fetch stays: Completes Refresh aborts in-flight list and mark (the Supabase fetch) and list_nurse_activity (Sheets), then loads them again after the Ace Completes list paints. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps compliance and alerts on /exec. Cut ON RPC failure paints the empty state and Refresh and does not fall back to Sheets. cacheInvalidate('get_supervisory_compliance') stays after visit/call save. Supabase is the source of truth (do not match old Sheets archived visits). Phone and desktop. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #nurseComplianceTable carries data-nurse-compliance-sb1. #nav_nurse_badge carries data-nurse-alerts-sb1. Prior markers stay, including v=nursespd2, v=nursenb1, and v=nursecomp57. -->
 <meta name="admin-build" content="2026-10-05-nurse-compliance-sb1">
 <script>var NURSE_COMPLIANCE_SB1_MARKER='v=nurse-compliance-sb1';var NURSE_COMPLIANCE_SB1_BUILD='2026-10-05-nurse-compliance-sb1';</script>
@@ -224,7 +227,7 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <meta name="admin-build" content="2026-09-27-remi-phone-rail1">
 <!-- compliance bulk 2026-09-27 v=compliance-bulk1 admin-build 2026-09-27-compliance-bulk1. GHOST-COMPLIANCE-BULK1-CONTRACT-v1. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. Remi N/A. Compliance Dashboard search filters by aide name, case-insensitive. An empty search shows the full roster (every active aide × every catalog topic). Select all and Unselect all ship as a pair and both stay visible when the selection is empty or full. Select all checks every visible deletable row. Unselect all clears the selection and leaves search and Select Topic alone. Delete selected confirms once, then calls the same admin_unassign_inservice_aide path as the row Delete (isdel1) with p_archive_active_result true for Completed and false for assigned Not Completed, then refreshes once. Rows that only have Send Reminder are not deletable: the checkbox is disabled and the count can say N selected · M skipped (not deletable). Send Reminder stays per row. Select Topic, Assign, and Clear Assignment stay as they are. Phone cards first; the desk table keeps the same toolbar. Dates people read are MM/DD/YYYY. Prior markers stay, including v=hold-autosave1, v=msg-dense1, v=aide-notif-search1, v=isdel1, v=isclear1, v=isdash1, and v=isdash1b. -->
 <meta name="admin-build" content="2026-09-27-compliance-bulk1">
-<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. A leftover On hold from another client, another day, or a cold open with no On hold pick is unselected when the opened day has no active client_on_hold, no hold_banner, and no active hold. That open clears Start, End, and Note hold drafts so Save cannot co-fire them. Save week still does not post upsert_schedule_client_hold or a day mark p_mark on_hold unless the user explicitly selected On hold and then used Save hold. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. Ace assert3 is LIVE. When the user confirms End hold…, the desk posts clear_schedule_client_hold with p_client_id and p_end_date and omits p_hold_id, so Ace ends every active hold for that client, including a 10/03 open leftover. Clear posts clear_schedule_client_hold with p_client_id only and omits p_hold_id and p_end_date, so Ace soft-clears every active hold for that client. The On hold End and Clear buttons do not send hold_banner.hold_id. Save hold may still pass p_hold_id. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler is Jaz2029. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
+<!-- schedule hold autosave 2026-09-27 v=hold-autosave1 admin-build 2026-09-27-hold-autosave1. GHOST-HOLD-AUTOSAVE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Patch patches/hold-autosave1-v1.sql is already applied. Mo LIVE bug: Schedule, Bowlax Abib, new week Save (not intending hold) landed every day On hold, paused, 0 hrs, with Hospital/ER chrome. Root cause: Save week co-fired upsert_schedule_client_hold about 6 seconds after upsert_schedule_slot_pattern_weekdays while sticky On hold Start/End stayed at the week bounds. Backend pattern RPCs do not invent holds. Save week, Add shift, and Edit pattern call only upsert_schedule_slot_pattern, upsert_schedule_slot_pattern_weekdays, and delete_schedule_slot_pattern. They do not call upsert_schedule_client_hold and they do not post a day mark p_mark on_hold, even when Start, End, and Note draft fields are filled. A leftover On hold from another client, another day, or a cold open with no On hold pick is unselected when the opened day has no active client_on_hold, no hold_banner, and no active hold. That open clears Start, End, and Note hold drafts so Save cannot co-fire them. Save week still does not post upsert_schedule_client_hold or a day mark p_mark on_hold unless the user explicitly selected On hold and then used Save hold. Explicit On hold and Save hold still post upsert_schedule_client_hold (hold-client1). After a multi-day Save, the weekdays response may include marker and v hold-autosave1 plus holds_written false. This desk asserts no hold RPC fired on the client. Clear is not End hold (hold-clear1). Clear unselects On hold and empties Start, End, and Note so the next Save cannot co-fire a hold. A failed Clear still leaves On hold selected. An active client hold still paints overlapping days On hold and 0 hrs. Save week does not auto-clear Bowlax's open hold from 10/03/2026. When several active holds are open, the banner names the target hold id and lists the others. Ace assert3 is LIVE. When the user confirms End hold…, the desk posts clear_schedule_client_hold with p_client_id and p_end_date and omits p_hold_id, so Ace ends every active hold for that client, including a 10/03 open leftover. Clear posts clear_schedule_client_hold with p_client_id only and omits p_hold_id and p_end_date, so Ace soft-clears every active hold for that client. The On hold End and Clear buttons do not send hold_banner.hold_id. Save hold may still pass p_hold_id. Week and day paint refresh. The On hold filter does not list that client on a later week unless a new hold is saved. This tip does not invent holds. Remi is N/A. No Auth reseal. No Quo/SMS. Do not break clienthrs1c, hold-clear1, hold-client1, schedule, or client-ins1. Admin dates are MM/DD/YYYY. Scheduler uses the shared Scheduler role account. Prior markers stay, including v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=clienthrs1c, v=shift-slim1, and v=client-ins1. -->
 <meta name="admin-build" content="2026-09-27-hold-autosave1">
 <!-- messages dense 2026-09-27 v=msg-dense1 admin-build 2026-09-27-msg-dense1. GHOST-MSG-DENSE1-CONTRACT-v1. Pure Admin client UI. MERGE HOLD. Do not claim LIVE. Do not squash-merge. No SQL. No Auth reseal. No mossier. No Quo/SMS. Admin Messages / Aide chat (#tab_aidechat, aidechat1) is option 2 one-box scroll. Not option 1 phone-width column. The thread panel is a fixed-height flex column. The message list scrolls inside (overflow-y: auto). Bubble padding is tighter and still reads as chat. The page and the tab do not grow with each bubble. v=msg-dense1b / aide-list-scroll1b: the left Aide Office name list is a fixed-height column with its own scrollbar (overflow-y: auto). A long roster does not stretch the Messages page. The thread panel and Schedule a Remi message stay fixed in view and do not scroll away with the roster. Option 2 one-box scroll stays: the message box scrolls and Schedule a Remi stays pinned in the thread panel. v=more-hide1: leaving Messages for any tab drops .active, sets hidden, and keeps the inactive panel display:none so the thread cannot paint over Nurse, Inservices, More, or any other desk. Aide-office peeks tied to Messages close. The aide avatar stays in the thread header and in the aide list. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Phone-first. Dates people read are MM/DD/YYYY. Do not touch the payroll desk. Prior markers stay, including v=aide-notif-search1, v=remi-chat1, v=hold-client1, v=aides-info1, v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-msg-dense1">
@@ -271,7 +274,7 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <!-- layout A phone shell 2026-09-25 v=layoutA1 admin-build 2026-09-25-layoutA1. Phone-first Admin shell. Fixed bottom nav v1: Timesheets, Schedule, Aides, Backup, More. Same five tabs on desktop. Sign Out is a red row under the avatar menu and under More → Account, not a full-width top button. Timesheets home is a slim stats row plus a card list (the wide spreadsheet stays in the DOM for list tests and is not the phone view). Backup is phone-change draft timesheets only: Open drafts and Mark saved on file. Not Approve-help. Not call-off Coverage. Coverage desk is a later tip under More and is not on Backup. Admin and Scheduler still see the tabs and More rows they had; Nurse stays on the nurse home. data-layout-roles hides an item when the signed-in role is not listed. Teal/navy tokens from v=admintheme1 stay. No auth changes. Top-pill reorder is not part of this shell. -->
 <!-- remi ask 2026-09-25 v=remichat1 admin-build 2026-09-25-remichat1. Admin and Scheduler get an Ask thread inside the Remi sheet. Radar stays. Ask answers Timesheets, Inservices, Coverage, Schedule, Aides, Backup, Completes, Compliance, Broadcast, and login issues from lists already on this desk and from radar rows already loaded. No external model and no new Ace read. Drafts only: Copy, Open Messages, Open Mail, then Confirm. Quiet hours still apply. Save as my template still posts admin_log_copilot_choice. Sheet stays closed until it is opened. Login landing stays the desk with the neon Remi chip. Nurse does not get Remi. The sheet scrolls up and down only. The phone scroll lock stays. No Auth reseal. Prior markers stay, including v=remiscroll1, v=remi1, v=phonezoom1, and v=eca-copilot1. -->
 <!-- nurse completes storage pdf 2026-09-25 v=ncipdf1 admin-build 2026-09-25-ncipdf1. GHOST-NCI-PDF-STORAGE-CONTRACT-v1. Completes View only (Ace mints on Complete). Bucket evercare-pdfs. Object path {org_id}/nci/{new_client_intakes.id}.pdf — the intake row uuid, not legacy intakeId. Field pdf_storage_path maps to list/get pdfStoragePath. Registry pdf_documents doc_kind=nci is Ace-side; View reads the path only and does not write Drive. Never clears pdf_link or pdf_file_id. Phone and desktop View: list_new_client_intakes / get_new_client_intake pdfStoragePath signs via sbSignPdfUrl, the office-JWT createSignedUrl for bucket evercare-pdfs (POST /storage/v1/object/sign/evercare-pdfs/{pdfStoragePath} with expiresIn 120, inside 60–300, no service_role). Else pdfLink / pdf_link opens Drive for old rows only. Else the in-app pending message. pdf_file_id stays on the row and is not opened. Sign failure shows the error and does not open Drive. Opens in a new tab and does not replace the Completes page. No Auth changes. Prior markers stay, including v=remichat1. -->
-<!-- login toast 2026-09-27 v=login-toast1 admin-build 2026-09-27-login-toast1. GHOST-LOGIN-TOAST1-CONTRACT-v1. Ace CALLABLE patch none. MERGE HOLD. Do not claim LIVE. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. Cold Sign In and intentional logout hide the red Not signed in toast. A mid-app session drop or auth fail that redirects to Sign In shows one toast: Session expired — sign in again. The gate is ?reason=session or sessionStorage evercare_login_toast_reason. Mere !session on the login page does not toast. Do not toast on every null auth event while already on Sign In. Wrong-password errors stay on the form. No Auth reseal. No Quo/SMS. Remi N/A. Scheduler login remains Jaz2029. Admin dates stay MM/DD/YYYY. Prior markers stay, including v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, and v=cover-card-cancel1. -->
+<!-- login toast 2026-09-27 v=login-toast1 admin-build 2026-09-27-login-toast1. GHOST-LOGIN-TOAST1-CONTRACT-v1. Ace CALLABLE patch none. MERGE HOLD. Do not claim LIVE. Do not merge until Probe PASS and Friday MERGE GO. Pure Admin UI. No SQL. Cold Sign In and intentional logout hide the red Not signed in toast. A mid-app session drop or auth fail that redirects to Sign In shows one toast: Session expired — sign in again. The gate is ?reason=session or sessionStorage evercare_login_toast_reason. Mere !session on the login page does not toast. Do not toast on every null auth event while already on Sign In. Wrong-password errors stay on the form. No Auth reseal. No Quo/SMS. Remi N/A. Scheduler login remains the shared Scheduler role account. Admin dates stay MM/DD/YYYY. Prior markers stay, including v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, and v=cover-card-cancel1. -->
 <meta name="admin-build" content="2026-09-27-login-toast1">
 <!-- aide office visible 2026-09-27 v=aide-office-vis1 admin-build 2026-09-27-aide-office-vis1. GHOST-AIDE-OFFICE-VIS1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not merge until Probe and Friday MERGE GO. Aide Office messages show for Admin and Scheduler with a Messages unread badge and Remi notify. Not silent. Same aidechat1 thread. Poll admin_get_aide_office_unread_badge for the Messages tab badge and the Remi corner chip (unread_threads / unread_messages). deep_link_base is admin/messages. Poll admin_list_due_aide_office_alerts for Remi right-rail cards, kind aide_office_unread. Open thread uses deep_link admin/messages?aide_id=. Preview is the latest aide body, not a Remi auto-reply. admin_list_aide_office_threads paints has_unread, unread, and preview_from_aide, unread first. After a caregiver send, the toast follows notify.channels remi_rail and messages_badge. notify.push is false. No staff push table. Ack is admin_mark_aide_office_messages_read(p_thread_id) and the badge and alerts drop. Admin and Scheduler both see the org-wide list. Nurse is denied (42501). Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. Remi Notes is a different surface. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, cancel-shift1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=remi-float-noshow1, v=remi-proof1, v=remi-sched1, v=remi-rules1, v=remi-notes-vis1, v=coverage-simple1, v=aidechat1, and v=remiface1. -->
 <meta name="admin-build" content="2026-09-27-aide-office-vis1">
@@ -428,6 +431,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);wi
 #loginScreen input[type="password"],#loginScreen select{border-radius:12px;}
 #mgrLoginBtn{border-radius:12px;font-size:1rem;font-weight:700;}
 .login-forgot-row{text-align:center;margin-top:2px;}
+.login-forgot-note{display:none;margin:6px 0 2px;padding:12px 12px;border-radius:10px;background:var(--teal-light);color:var(--navy);font-size:0.95rem;line-height:1.4;font-weight:600;text-align:center;overflow-wrap:anywhere;}
+.login-forgot-note.is-on{display:block;}
 #mgrForgotBtn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 12px;background:none;border:none;color:var(--teal-dark);font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 @media(min-width:769px){.login-box{padding:26px 24px 16px;}.login-logo{width:84px;height:84px;}}
 /* v=loginkb1 — phone keyboard. Resting layout stays the centered rule above. */
@@ -2861,36 +2866,6 @@ body.ts-print-open{overflow:hidden;}
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EverCare">
 <meta name="theme-color" content="#2a7f7f">
-<!-- ADMIN FORGOT PASSWORD MODAL -->
-<div id="adminResetModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999;align-items:center;justify-content:center;padding:20px">
-  <div style="background:white;border-radius:14px;padding:32px 26px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-    <div style="font-size:40px;margin-bottom:12px">🔑</div>
-    <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:#1a2744;margin-bottom:8px">Reset Admin Password</h3>
-    <p style="font-size:0.78rem;color:#6b7a90;margin-bottom:20px">Select your account, enter the recovery code, then set a new password.</p>
-    <div style="text-align:left;margin-bottom:10px">
-      <label style="font-size:0.7rem;font-weight:600;color:#6b7a90;text-transform:uppercase;letter-spacing:0.5px">Account</label>
-      <select id="adminResetRole" style="width:100%;padding:9px 11px;border:1.5px solid #dce4ef;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.86rem;margin-top:4px">
-        <option value="Admin">Admin</option>
-        <option value="Scheduler">Scheduler</option>
-        <option value="Nurse">Nurse</option>
-      </select>
-    </div>
-    <div style="text-align:left;margin-bottom:10px">
-      <label style="font-size:0.7rem;font-weight:600;color:#6b7a90;text-transform:uppercase;letter-spacing:0.5px">Recovery Code</label>
-      <input type="password" id="adminRecoveryCode" placeholder="Enter recovery code" style="width:100%;padding:9px 11px;border:1.5px solid #dce4ef;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.86rem;margin-top:4px">
-    </div>
-    <div style="text-align:left;margin-bottom:16px">
-      <label style="font-size:0.7rem;font-weight:600;color:#6b7a90;text-transform:uppercase;letter-spacing:0.5px">New Password</label>
-      <input type="password" id="adminNewPwdReset" placeholder="Enter new password" style="width:100%;padding:9px 11px;border:1.5px solid #dce4ef;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.86rem;margin-top:4px">
-    </div>
-    <div style="color:#c0392b;font-size:0.75rem;margin-bottom:10px;display:none" id="adminResetModalErr"></div>
-    <div style="display:flex;gap:10px;justify-content:center">
-      <button onclick="document.getElementById('adminResetModal').style.display='none'" style="padding:9px 18px;border-radius:7px;background:#f5f8fc;color:#1a2744;border:1.5px solid #dce4ef;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer">Cancel</button>
-      <button onclick="doAdminReset()" style="padding:9px 18px;border-radius:7px;background:#2a7f7f;color:white;border:none;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer">Reset Password</button>
-    </div>
-  </div>
-</div>
-
 <script>
 let deferredPrompt=null;
 function isEverCareStandalone(){
@@ -2975,11 +2950,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 else setupEverCarePWA();
 </script>
 </head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha384-c6Rcwz4e4CITMbu/NBmnNS8yN2sC3cUElMEMfP3vqqKFp7GOYaaBBCqmaWBjmkjb" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha384-NElt3Op+9NBMCYaef5HxeJmU4Xeard/Lku8ek6hoPTvYkQPh3zLIrJP7KiRocsxO" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <body><div id="pwaBanner" style="display:none;background:var(--teal);color:white;padding:12px 14px;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:200">
   <p style="font-size:0.82rem;line-height:1.35;flex:1">📱 Add EverCare to your <strong>Home Screen</strong> for one-tap login.</p>
   <button id="pwaBannerInstallBtn" onclick="installPWA()" style="background:var(--teal);border:none;color:white;padding:8px 14px;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Install</button>
@@ -2988,7 +2963,7 @@ else setupEverCarePWA();
 
 
 <!-- LOGIN -->
-<div class="screen active" id="loginScreen" data-login-toast1="v=login-toast1">
+<div class="screen active" id="loginScreen" data-login-toast1="v=login-toast1" data-sec1-ui="v=sec1-ui">
   <div class="login-wrap">
     <div class="login-brand">
     <img class="login-logo" src="data:image/jpeg;base64,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" alt="EverCare Home Agency">
@@ -3014,6 +2989,7 @@ else setupEverCarePWA();
     <div class="auth-err" id="mgrErr">Incorrect password.</div>
     <div class="login-forgot-row">
       <button type="button" id="mgrForgotBtn" onclick="showAdminReset()">Forgot password?</button>
+      <p id="mgrForgotNote" class="login-forgot-note" role="status" aria-live="polite"></p>
     </div>
     </div>
   </div>
@@ -4129,7 +4105,6 @@ bindLoginKeyboard();
 
 Sign up here to submit your timesheets: https://evercareagency.github.io/caregiver/
 
-Office code: ECA2026
 
 Call (216) 377-5991 with any questions.</textarea>
           <button class="btn btn-ghost" onclick="copyLink('textTemplate')" style="margin-top:10px">📋 Copy Message</button>
@@ -4220,7 +4195,7 @@ Call (216) 377-5991 with any questions.</textarea>
 
         <div class="card" id="adminOnlyPwdCard">
           <div class="card-title"><span class="ico">🔐</span> Change Admin Password</div>
-          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px">Only the Admin role can change passwords. Use the "Forgot password?" link on the login screen with recovery code <strong>ECA2026</strong> if needed.</p>
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px">Only the Admin role can change passwords.</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
             <div class="field"><label>New Admin Password</label><input type="password" id="adm_new_admin" placeholder="New Admin password"></div>
             <button class="btn btn-teal" style="align-self:end" onclick="changeRolePassword('Admin')">🔐 Update Admin Password</button>
@@ -4239,7 +4214,7 @@ Call (216) 377-5991 with any questions.</textarea>
 
         <div class="card" id="schedulerNoAccessCard" style="display:none;background:var(--off)">
           <div class="card-title"><span class="ico">🔒</span> Password Management</div>
-          <p style="font-size:0.8rem;color:var(--muted)">Only the Admin role can change passwords. If you need your password reset, please contact your Admin, or use "Forgot password?" on the login screen.</p>
+          <p style="font-size:0.8rem;color:var(--muted)">Only the Admin role can change passwords. Contact the office administrator if you need a reset.</p>
         </div>
 
         <div class="card">
@@ -5291,7 +5266,6 @@ const SHEETS_URL='https://script.google.com/macros/s/AKfycbwSZbOtThwwwiu5pojn7re
 const SUPABASE_URL='https://zealkptwgifnkbkuavvp.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplYWxrcHR3Z2lmbmtia3VhdnZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMDExMTAsImV4cCI6MjEwNTc3NzExMH0.b-3Pdb_oVR3L6JM0yd_aQcqtQH8exGV7OPwdtx0b3Xg';
 const EVERCARE_ORG_ID='4f97f4d3-6635-4544-904c-6b06aa02d40b';
-const MGR_PASSWORD='evercare2024';
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const PRINT_DAYS=[0,1,2,3,4,5,6]; // Sun–Sat Caregiver Timesheet paper
 const AGENCY={
@@ -30413,40 +30387,13 @@ function showCopyMsg(inputId){
 }
 
 function showAdminReset(){
-  document.getElementById('adminRecoveryCode').value='';
-  document.getElementById('adminNewPwdReset').value='';
-  document.getElementById('adminResetModalErr').style.display='none';
-  document.getElementById('adminResetModal').style.display='flex';
+  var note=document.getElementById('mgrForgotNote');
+  if(!note)return;
+  note.textContent='Contact the office administrator';
+  note.classList.add('is-on');
 }
 
-async function doAdminReset(){
-  const role=document.getElementById('adminResetRole').value;
-  const code=document.getElementById('adminRecoveryCode').value;
-  const newpwd=document.getElementById('adminNewPwdReset').value;
-  const err=document.getElementById('adminResetModalErr');
-  // Recovery code is ECA2026 (office code)
-  if(code!=='ECA2026'){err.textContent='Invalid recovery code.';err.style.display='block';return;}
-  if(!newpwd){err.textContent='Please enter a new password.';err.style.display='block';return;}
-  try{
-    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
-      if(String(newpwd).length<6){err.textContent='Password must be at least 6 characters.';err.style.display='block';return;}
-      const set=await sbAdminSetRolePasswordAnon(role,newpwd,'ECA2026');
-      if(!set||set.ok!==true){
-        err.textContent=(set&&set.error)||'Error resetting password. Try again.';
-        err.style.display='block';
-        return;
-      }
-      document.getElementById('adminResetModal').style.display='none';
-      showTempMsg('Password reset successfully for '+role+'! Please log in.','#27ae60');
-      return;
-    }
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_forgot_password',role,newPassword:newpwd})});
-    document.getElementById('adminResetModal').style.display='none';
-    showTempMsg('Password reset successfully for '+role+'! Please log in.','#27ae60');
-  }catch(e){
-    err.textContent='Error resetting password. Try again.';err.style.display='block';
-  }
-}
+
 
 let currentAdminRole=null;
 let currentAdminUsername=null;
@@ -30465,10 +30412,11 @@ function togglePasswordVisibility(id,btn){
   if(btn)btn.textContent=show?'Hide':'Show';
 }
 
-// Stay signed in across opens. Clock starts at loginAt only (no idle timer).
-// 8h matches Caregiver CG_SESSION_MS. Password is never stored.
+// Office idle timeout (v=sec1-ui). Admin, Scheduler, and Nurse sign out after 60 minutes
+// without activity. Activity resets the clock. Password is never stored.
 const ADMIN_SESSION_KEY='admin_session';
-const ADMIN_SESSION_MS=8*60*60*1000;
+const ADMIN_IDLE_MS=60*60*1000;
+var adminIdleMemAt=0;
 function isPortalRole(role){
   return role==='Admin'||role==='Scheduler'||role==='Nurse';
 }
@@ -30477,10 +30425,19 @@ function parseAdminLoginAt(sess){
   const n=typeof sess.loginAt==='number'?sess.loginAt:Date.parse(sess.loginAt);
   return Number.isFinite(n)?n:null;
 }
+function adminSessionActivityAt(sess){
+  if(!sess)return null;
+  var raw=(sess.lastActivityAt!=null&&sess.lastActivityAt!=='')?sess.lastActivityAt:sess.loginAt;
+  if(raw==null||raw==='')return null;
+  var n=typeof raw==='number'?raw:Date.parse(raw);
+  return Number.isFinite(n)?n:null;
+}
 function isAdminSessionExpired(sess){
-  const at=parseAdminLoginAt(sess);
+  var at=adminSessionActivityAt(sess);
+  var mem=(typeof adminIdleMemAt==='number'&&adminIdleMemAt>0)?adminIdleMemAt:0;
+  if(mem&&(!at||mem>at))at=mem;
   if(at==null)return false;
-  return (Date.now()-at)>ADMIN_SESSION_MS;
+  return (Date.now()-at)>ADMIN_IDLE_MS;
 }
 function clearAdminSession(){
   try{localStorage.removeItem(ADMIN_SESSION_KEY);}catch(e){}
@@ -30497,8 +30454,15 @@ function writeAdminSession(sess){
 }
 function backfillAdminSessionLoginAt(sess){
   if(!sess||!isPortalRole(sess.role))return sess;
-  if(parseAdminLoginAt(sess)!=null)return sess;
+  if(parseAdminLoginAt(sess)!=null){
+    if(sess.lastActivityAt==null||sess.lastActivityAt===''){
+      sess.lastActivityAt=parseAdminLoginAt(sess);
+      writeAdminSession(sess);
+    }
+    return sess;
+  }
   sess.loginAt=Date.now();
+  sess.lastActivityAt=sess.loginAt;
   writeAdminSession(sess);
   return sess;
 }
@@ -30511,12 +30475,15 @@ function applyAdminSession(sess){
 function startAdminSession(data){
   if(!data||!isPortalRole(data.role))return null;
   const role=data.role;
+  const now=Date.now();
   const sess={
     role:role,
     username:String(data.username||data.nurseUsername||data.name||data.displayName||role),
     name:String(data.name||data.supervisorName||data.displayName||(role==='Nurse'?'Nurse':'')),
-    loginAt:Date.now()
+    loginAt:now,
+    lastActivityAt:now
   };
+  adminIdleMemAt=now;
   writeAdminSession(sess);
   return applyAdminSession(sess);
 }
@@ -30532,11 +30499,52 @@ function restoreAdminSession(){
     currentAdminRole=null;
     currentAdminUsername=null;
     currentNurseName=null;
+    adminIdleMemAt=0;
+    try{if(typeof loginToast1Arm==='function')loginToast1Arm('session');}catch(eArm){}
     return null;
   }
+  var at=adminSessionActivityAt(sess);
+  if(at)adminIdleMemAt=at;
   writeAdminSession(sess);
   return applyAdminSession(sess);
 }
+function touchAdminSessionActivity(){
+  if(!currentAdminRole)return;
+  var now=Date.now();
+  adminIdleMemAt=now;
+  if(touchAdminSessionActivity._wrote&&(now-touchAdminSessionActivity._wrote)<15000)return;
+  var sess=readAdminSession();
+  if(!sess||!isPortalRole(sess.role))return;
+  sess.lastActivityAt=now;
+  writeAdminSession(sess);
+  touchAdminSessionActivity._wrote=now;
+}
+function flushAdminSessionActivity(){
+  if(!currentAdminRole||!(adminIdleMemAt>0))return;
+  var sess=readAdminSession();
+  if(!sess||!isPortalRole(sess.role))return;
+  if(sess.lastActivityAt===adminIdleMemAt)return;
+  sess.lastActivityAt=adminIdleMemAt;
+  writeAdminSession(sess);
+  touchAdminSessionActivity._wrote=adminIdleMemAt;
+}
+function bindAdminIdleWatch(){
+  if(bindAdminIdleWatch.done)return;
+  bindAdminIdleWatch.done=true;
+  if(typeof document==='undefined'||!document.addEventListener)return;
+  ['pointerdown','keydown','touchstart','click','input'].forEach(function(name){
+    document.addEventListener(name, function(){touchAdminSessionActivity();}, true);
+  });
+  if(typeof window!=='undefined'&&window.addEventListener){
+    window.addEventListener('scroll', function(){touchAdminSessionActivity();}, true);
+  }
+  if(typeof setInterval==='function'){
+    setInterval(function(){
+      try{enforceAdminSessionTimeout();}catch(eIdle){}
+    }, 15000);
+  }
+}
+
 var LOGIN_TOAST1_MARKER='v=login-toast1';
 var LOGIN_TOAST1_KEY='evercare_login_toast_reason';
 var LOGIN_TOAST1_COPY='Session expired \u2014 sign in again';
@@ -30873,11 +30881,16 @@ function openPortalHome(sess, opts){
   else setTimeout(run,0);
 }
 function enforceAdminSessionTimeout(){
+  if(enforceAdminSessionTimeout._busy)return;
   const sess=readAdminSession();
   if(!sess||!sess.role)return;
-  if(isAdminSessionExpired(sess))adminLogout('session');
+  if(!isAdminSessionExpired(sess))return;
+  enforceAdminSessionTimeout._busy=true;
+  try{adminLogout('session');}
+  finally{enforceAdminSessionTimeout._busy=false;}
 }
 function bootAdminPortal(){
+  if(typeof bindAdminIdleWatch==='function')bindAdminIdleWatch();
   warmUpSheets();
   syncSbRoleField();
   if(/[?&](?:printSample|certSample)=1(?:&|$)/.test(location.search||''))return;
@@ -32765,7 +32778,7 @@ async function sbNurseSupervisoryDispatch(payload){
     return {success:false,error:String(err&&err.message||err||'supabase')};
   }
 }
-// admin-role-password v=adminpw1 — Forgot uses anon + ECA2026. Settings uses the Admin access_token and omits the recovery code.
+// admin-role-password v=adminpw1 — Signed-in Admin sets a role password with the Admin session. No recovery code is sent.
 function sbRolePasswordPayload(data){
   var row=data;
   if(Array.isArray(row))row=row[0]||null;
@@ -32781,38 +32794,7 @@ function sbRolePasswordAccepted(data){
   }
   return {ok:true,role:row.role||'',email:row.email||''};
 }
-async function sbAdminSetRolePasswordAnon(role, newPassword, recoveryCode){
-  var res;
-  try{
-    res=await fetch(SUPABASE_URL+'/rest/v1/rpc/admin_set_role_password',{
-      method:'POST',
-      headers:{
-        apikey:SUPABASE_ANON_KEY,
-        Authorization:'Bearer '+SUPABASE_ANON_KEY,
-        'Content-Type':'application/json',
-        Accept:'application/json',
-        Prefer:'return=representation'
-      },
-      body:JSON.stringify({
-        p_role:role,
-        p_new_password:newPassword,
-        p_recovery_code:recoveryCode
-      })
-    });
-  }catch(err){
-    return {ok:false,network:true,error:String(err&&err.message||err||'supabase')};
-  }
-  var raw='';
-  try{raw=await res.text();}catch(err2){
-    return {ok:false,network:true,error:String(err2&&err2.message||err2||'supabase')};
-  }
-  var data=null;
-  try{data=raw?JSON.parse(raw):null;}catch(e){}
-  if(!res.ok)return {ok:false,error:sbAuthErrorMessage(data,res.status),status:res.status};
-  var accepted=sbRolePasswordAccepted(data);
-  if(!accepted.ok)return {ok:false,error:accepted.error||'Password was not updated.',status:res.status};
-  return accepted;
-}
+
 async function sbAdminSetRolePasswordSession(role, newPassword){
   var got=await sbRestRpc('admin_set_role_password',{
     p_role:role,
@@ -33563,19 +33545,20 @@ async function sbAdminWriteDispatch(payload){
 async function mgrLogin(){
   if(window._mgrLoginInFlight)return;
   window._mgrLoginInFlight=true;
-  const pwd=document.getElementById('mgr_pass').value;
-  const btn=document.getElementById('mgrLoginBtn')||document.querySelector('#loginScreen .login-box button.btn-navy');
-  const errEl=document.getElementById('mgrErr');
-  errEl.style.display='none';
-  if(btn){btn.disabled=true;btn.textContent='Signing in…';}
+  var passEl=null,btn=null,errEl=null;
   try{
-    // Flag on skips Sheets admin_login. Auth with the account email is the login.
-    if(evercareSbEnabled()){
+    passEl=document.getElementById('mgr_pass');
+    btn=document.getElementById('mgrLoginBtn')||document.querySelector('#loginScreen .login-box button.btn-navy');
+    errEl=document.getElementById('mgrErr');
+    var pwd=passEl?passEl.value:'';
+    if(errEl)errEl.style.display='none';
+    if(btn){btn.disabled=true;btn.textContent='Signing in…';}
+    // Office sign-in is the account email. Sheets password-only login is retired.
+    if(typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
       const roleEl=document.getElementById('mgr_role');
       const picked=roleEl&&roleEl.value?roleEl.value:'';
       const sb=await sbAuthRoleLogin(picked,pwd);
       if(sb&&sb.ok&&isPortalRole(sb.role)){
-        const passEl=document.getElementById('mgr_pass');
         if(passEl)passEl.value='';
         const display=(sb.profile&&(sb.profile.display_name||sb.profile.email))||sb.role;
         const sess=startAdminSession({
@@ -33586,25 +33569,23 @@ async function mgrLogin(){
         openPortalHome(sess,{freshLogin:true});
         return;
       }
-      errEl.textContent=sb&&sb.network?'Connection error. Please try again.':'Incorrect password.';
+      if(errEl){
+        errEl.textContent=sb&&sb.network?'Connection error. Please try again.':'Incorrect password.';
+        errEl.style.display='block';
+      }
+      return;
+    }
+    if(errEl){
+      errEl.textContent='Sheets sign-in is no longer available. Contact the office administrator.';
       errEl.style.display='block';
-      return;
     }
-    warmUpSheets();
-    const res=await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'admin_login',password:pwd})});
-    const data=await res.json();
-    if(data.success&&isPortalRole(data.role)){
-      const passEl=document.getElementById('mgr_pass');
-      if(passEl)passEl.value='';
-      const sess=startAdminSession(data);
-      openPortalHome(sess,{freshLogin:true});
-      return;
-    }
-    errEl.textContent='Incorrect password.';
-    errEl.style.display='block';
+    try{if(typeof showScreen==='function')showScreen('loginScreen');}catch(eStay){}
   }catch(e){
-    errEl.textContent='Connection error. Please try again.';
-    errEl.style.display='block';
+    if(errEl){
+      errEl.textContent='Connection error. Please try again.';
+      errEl.style.display='block';
+    }
+    try{if(typeof showScreen==='function')showScreen('loginScreen');}catch(eStay2){}
   }finally{
     window._mgrLoginInFlight=false;
     if(btn){btn.disabled=false;btn.textContent='Sign In →';}
@@ -33647,19 +33628,35 @@ function adminLogout(){
   var drop=arguments[0]==='session';
   if(!drop&&typeof loginToast1Quiet==='function')loginToast1Quiet();
   if(drop&&typeof loginToast1Arm==='function')loginToast1Arm('session');
-  logActivity('Logged out');
+  try{logActivity('Logged out');}catch(eLog){}
   try{sbSignOut();}catch(e){}
   try{sbInvalidateListCaches();}catch(e2){}
-  clearSbSession();
-  clearAdminSession();
+  try{clearSbSession();}catch(e3){}
+  try{clearAdminSession();}catch(e4){}
   currentAdminRole=null;
   currentAdminUsername=null;
   currentNurseName=null;
+  adminIdleMemAt=0;
   nurseSigPads={};
-  if(typeof resetNewClientIntake==='function')resetNewClientIntake();
-  setNurseAlertBadge(0);
-  showScreen('loginScreen');
-  if(drop&&typeof loginToast1MaybeShow==='function')loginToast1MaybeShow();
+  try{if(typeof resetNewClientIntake==='function')resetNewClientIntake();}catch(eNci){}
+  try{if(typeof setNurseAlertBadge==='function')setNurseAlertBadge(0);}catch(eBadge){}
+  try{
+    document.querySelectorAll('.modal-bg.show').forEach(function(el){el.classList.remove('show');});
+    var discard=document.getElementById('nciDiscardConfirm');
+    if(discard){discard.hidden=true;discard.classList.remove('show');}
+    if(typeof unlockBodyScroll==='function')unlockBodyScroll();
+  }catch(eModal){}
+  try{showScreen('loginScreen');}
+  catch(eShow){
+    try{
+      document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+      var login=document.getElementById('loginScreen');
+      if(login)login.classList.add('active');
+    }catch(eShow2){}
+  }
+  if(drop&&typeof loginToast1MaybeShow==='function'){
+    try{loginToast1MaybeShow();}catch(eToast){}
+  }
 }
 
 let tsDesk='active';
@@ -45919,6 +45916,10 @@ if(typeof adminSchedChatPush1ConsumeLocation==='function'){
 }
 window.addEventListener('pageshow',function(){enforceAdminSessionTimeout();});
 document.addEventListener('visibilitychange',function(){
+  if(document.visibilityState==='hidden'){
+    try{if(typeof flushAdminSessionActivity==='function')flushAdminSessionActivity();}catch(eHide){}
+    return;
+  }
   if(document.visibilityState==='visible')enforceAdminSessionTimeout();
 });
 window.addEventListener('load',()=>{renderBroadcastPreview();if(typeof nciBindDateMask==='function')nciBindDateMask();if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();});
