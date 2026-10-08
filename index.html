@@ -9,12 +9,18 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
-<!-- nurse compliance supabase 2026-10-05 v=nurse-compliance-sb1 ?v=nurse-compliance-sb1 admin-build 2026-10-05-nurse-compliance-sb1. GHOST-NURSE-COMPLIANCE-SB-CONTRACT-v1. Ace backend CALLABLE LIVE. UI MERGE HOLD until Probe soft PASS and Friday MERGE GO. Do not claim Portal merge. Do not squash-merge. Performance/data swap only. Cut ON (evercareSbEnabled): Nurse Compliance loadNurseCompliance posts rpc/get_supervisory_compliance {} via sbRestRpc (office JWT, same as Completes). hydrateNurseComplianceRow still maps visitCount to visits, callCount to countingCalls, and daysLeftInWindow to daysInWindow. The list does not wait on get_users or get_clients. Nurse alerts badge posts rpc/list_nurse_alerts {p_username} and rpc/mark_nurse_alerts_read {p_username, p_ids}. p_username is the stable office role lowercased (admin, scheduler, nurse). Admin and Scheduler share the badge. Nurse sees the Compliance list. list_nurse_activity stays Sheets /exec. Nurse client writes stay /exec. nursespd2 abort/re-fetch stays: Completes Refresh aborts in-flight list and mark (the Supabase fetch) and list_nurse_activity (Sheets), then loads them again after the Ace Completes list paints. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps compliance and alerts on /exec. Cut ON RPC failure paints the empty state and Refresh and does not fall back to Sheets. cacheInvalidate('get_supervisory_compliance') stays after visit/call save. Supabase is the source of truth (do not match old Sheets archived visits). Phone and desktop. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #nurseComplianceTable carries data-nurse-compliance-sb1. #nav_nurse_badge carries data-nurse-alerts-sb1. Prior markers stay, including v=nursespd2, v=nursenb1, and v=nursecomp57. -->
+<!-- nurse compliance supabase 2026-10-05 v=nurse-compliance-sb1 ?v=nurse-compliance-sb1 admin-build 2026-10-05-nurse-compliance-sb1. GHOST-NURSE-COMPLIANCE-SB-CONTRACT-v1. Ace backend CALLABLE LIVE. UI MERGE HOLD until Probe soft PASS and Friday MERGE GO. Do not claim Portal merge. Do not squash-merge. Performance/data swap only. Cut ON (evercareSbEnabled): Nurse Compliance loadNurseCompliance posts rpc/get_supervisory_compliance {} via sbRestRpc (office JWT, same as Completes). hydrateNurseComplianceRow still maps visitCount to visits, callCount to countingCalls, and daysLeftInWindow to daysInWindow. The list does not wait on get_users or get_clients. Nurse alerts badge posts rpc/list_nurse_alerts {p_username} and rpc/mark_nurse_alerts_read {p_username, p_ids}. p_username is the stable office role lowercased (admin, scheduler, nurse). Admin and Scheduler share the badge. Nurse sees the Compliance list. list_nurse_activity is Supabase as of v=nurse-activity-sb1b (rpc/list_nurse_activity {p_limit:50}; p_include_archived omitted; /exec only on sheets rollback). Nurse client writes stay /exec. nursespd2 abort/re-fetch stays: Completes Refresh aborts in-flight list and mark (the Supabase fetch) and list_nurse_activity (the Supabase fetch when the cut is on), then loads them again after the Ace Completes list paints. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps compliance and alerts on /exec. Cut ON RPC failure paints the empty state and Refresh and does not fall back to Sheets. cacheInvalidate('get_supervisory_compliance') stays after visit/call save. Supabase is the source of truth (do not match old Sheets archived visits). Phone and desktop. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #nurseComplianceTable carries data-nurse-compliance-sb1. #nav_nurse_badge carries data-nurse-alerts-sb1. Prior markers stay, including v=nursespd2, v=nursenb1, and v=nursecomp57. -->
 <meta name="admin-build" content="2026-10-05-nurse-compliance-sb1">
 <script>var NURSE_COMPLIANCE_SB1_MARKER='v=nurse-compliance-sb1';var NURSE_COMPLIANCE_SB1_BUILD='2026-10-05-nurse-compliance-sb1';</script>
 <!-- nurse compliance phone scroll 2026-10-05 v=nurse-compliance-sb1b ?v=nurse-compliance-sb1b admin-build 2026-10-05-nurse-compliance-sb1b. Follow-up to v=nurse-compliance-sb1. Probe phone soft FAIL at ~375px: #nurseComplianceTable letter-wrapped names and status and did not scroll sideways. This tip only fixes that grid. #nurseComplianceScroll is overflow-x auto with pan-x pan-y. #nurseComplianceTable cells and headers are white-space nowrap so Client, Status, and the other columns stay intact and the wrapper scrolls when the row is wider than the phone. Desktop uses the same table and scrolls only when the row is wider than the card. Supabase cut is unchanged. Admin and Scheduler Sign in as Nurse copy and that path stay. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b. MERGE HOLD until Probe soft PASS and Friday MERGE GO. Prior markers stay, including v=nurse-compliance-sb1. -->
 <meta name="admin-build" content="2026-10-05-nurse-compliance-sb1b">
 <script>var NURSE_COMPLIANCE_SB1B_MARKER='v=nurse-compliance-sb1b';var NURSE_COMPLIANCE_SB1B_BUILD='2026-10-05-nurse-compliance-sb1b';</script>
+<!-- nurse activity supabase 2026-10-08 v=nurse-activity-sb1 ?v=nurse-activity-sb1 admin-build 2026-10-08-nurse-activity-sb1. GHOST-NURSE-ACTIVITY-SB-CONTRACT-v1. Ace backend CALLABLE LIVE. UI MERGE HOLD until Probe soft PASS and Friday MERGE GO. Do not claim Portal merge. Do not squash-merge. Performance/data swap only. Cut ON (evercareSbEnabled): loadNurseActivityFeed posts rpc/list_nurse_activity {p_limit:50} via sbRestRpc (office JWT). p_include_archived is omitted so Archived source rows stay hidden. Admin and Scheduler share the Recent nurse activity card. A Nurse office JWT can call the same RPC. Caregiver never calls it. Empty pdfLink (Storage-only PDF) does not open a link; tap still focusNurseAlertItem. Rollback ?sheets=1 or localStorage evercare_sheets=1 keeps /exec. Nurse client writes stay /exec. -->
+<meta name="admin-build" content="2026-10-08-nurse-activity-sb1">
+<script>var NURSE_ACTIVITY_SB1='v=nurse-activity-sb1';var NURSE_ACTIVITY_SB1_MARKER='v=nurse-activity-sb1';var NURSE_ACTIVITY_SB1_BUILD='2026-10-08-nurse-activity-sb1';</script>
+<!-- nurse activity archive wins 2026-10-08 v=nurse-activity-sb1b ?v=nurse-activity-sb1b admin-build 2026-10-08-nurse-activity-sb1b. Follow-up to v=nurse-activity-sb1. Backend nurse-activity-sb1b: the default call omits p_include_archived, and with today's data rpc/list_nurse_activity {p_limit:50} returns {success:true, items:[]}. A successful empty list paints No recent nurse activity and does not call deriveNurseActivityFromLists (that would resurface archived source rows). A failed cut call, including HTTP 401/403, paints the same empty state plus Refresh and does not call Sheets /exec. Aborts still return {success:false, aborted:true} and do not paint over a newer fetch. {p_limit:500, p_include_archived:true} is not the UI call. #adminNurseAlertsList carries data-nurse-activity-sb1 and data-nurse-activity-sb1b. Phone rows stay tappable at about 390px. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. MERGE HOLD until Probe soft PASS and Friday MERGE GO. Prior markers stay, including v=nurse-activity-sb1 and v=nurse-compliance-sb1b. -->
+<meta name="admin-build" content="2026-10-08-nurse-activity-sb1b">
+<script>var NURSE_ACTIVITY_SB1B_MARKER='v=nurse-activity-sb1b';var NURSE_ACTIVITY_SB1B_BUILD='2026-10-08-nurse-activity-sb1b';</script>
 <!-- compliance bulk 2026-09-30 v=compliance-bulk1b ?v=compliance-bulk1b admin-build 2026-09-30-compliance-bulk1b. GHOST-COMPLIANCE-BULK1B-CONTRACT-v1. Follow-up to compliance-bulk1 squash 966f1487 (#196 tip 4c8c9bb8). Mo morning smoke 2026-09-30 FAIL: Compliance Select all / Unselect left 0 selected while the banner said Currently assigned … — 3 aides. Ace no new CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe PASS and Friday MERGE GO. Quiet Mo. Pure Admin UI. No SQL. No new RPC. No Auth reseal. No Quo/SMS. No Caregiver. Two causes. The *Btn ids from bulk1 stay, and Select all, Unselect all, Delete selected, and row checkboxes bind with addEventListener so a click never resolves to an HTMLElement. No element id or name equals isComplianceSelectAll, isComplianceUnselectAll, onISComplianceToggle, confirmDeleteISSelected, or isComplianceSelected. Banner paint and row inAssignmentScope share one topic key and one aide list: 1, "1", "01", "1.0", and "1 " are the same topic; username objects, JSON strings, and postgres arrays unwrap to the same names; null aide_usernames means all aides; an empty array means nobody and the banner says 0 aides, not all aides. If the banner says N aides for topic T, those N aide×topic-T rows are selectable and Select all yields N selected · M skipped. Non-assigned Not Completed rows stay non-deletable. Delete still uses admin_unassign_inservice_aide. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. #isComplianceCard keeps data-compliance-bulk1 and adds data-compliance-bulk1b. Prior markers stay, including v=compliance-bulk1, v=isdash1b, v=isdel1, and v=isclear1. -->
 <meta name="admin-build" content="2026-09-30-compliance-bulk1b">
 <script>var COMPLIANCE_BULK1B_MARKER='v=compliance-bulk1b';var COMPLIANCE_BULK1B_BUILD='2026-09-30-compliance-bulk1b';</script>
@@ -236,7 +242,7 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <meta name="admin-build" content="2026-09-27-hold-client1">
 <!-- aides info cards 2026-09-27 v=aides-info1 admin-build 2026-09-27-aides-info1. GHOST-AIDES-INFO1-CONTRACT-v1. Ace CALLABLE. Mo LOOK LOCKED option 1 info cards. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Contract bullets: • Replace bare Aides cards with info cards matching mock 01-info-cards (name plus initials, phone plus ONE lang chip preferred_language_label uppercased en|es|ar|sw|zh|ru|uk, client chips, next status). • Call admin_list_aides_info() NOT admin_list_aides for card paint. • Paint next green, open blue, warn amber. When creds_due is set show Creds due MM/DD/YYYY. • The ⋯ sheet is View profile to deep_link, Reset through the existing reset_aide_temp_password and never vs mossier, Delete through admin_deactivate_aide. • Recently deleted tab sends p_include_deleted true. • Admin, Scheduler, and Nurse read (is_org_admin). Nurse write is N/A. Remi is N/A for this marker. • Do not break aide-soft-delete, remi-langs1, aidecreds1, schedule, clienthrs, cover-card-cancel1, or nosvc. • No Auth, no mossier, no Quo, no SMS. Additive only. Mobile-first. Dates people read are MM/DD/YYYY. Remi stays the side rail only where it is already present. Prior markers stay, including v=login-toast1, v=aide-office-vis1, v=remi-langs1, v=hold-clear1, v=sched-time-tap1, v=aide-text-chat1, v=remi-float-hide1, v=tabbar-8, v=cover-card-cancel1, v=nosvc-reason-draft1, v=cover-unselect1, v=remi-payroll1, v=client-ins1, v=remi-ideas763, v=aidadel1, v=aidecreds1, v=aidecreds1b, and v=aidecreds1c. -->
 <meta name="admin-build" content="2026-09-27-aides-info1">
-<!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, list_nurse_alerts, and mark_nurse_alerts_read are Supabase as of v=nurse-compliance-sb1 (office JWT via sbRestRpc; /exec only on sheets rollback). list_nurse_activity and nurse client writes stay /exec. Broadcast Alert is Ace RPCs as of v=bcast1 (get_active_broadcast / send_broadcast / clear_broadcast); rollback keeps local broadcast_msg — no Sheets /exec for Broadcast. Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
+<!-- sheets-cut-v1 2026-09-24 v=sbcut1b portal_data_backend=supabase sheets_cut_at set. Default Supabase: no /exec for auth, aides, clients, timesheets, PDFs, supervisory, inservices. Rollback ONLY ?sheets=1 or localStorage evercare_sheets=1. Nurse intakes and nurse supervisory list/save/archive are Supabase as of v=nursenb1. get_supervisory_compliance, list_nurse_alerts, and mark_nurse_alerts_read are Supabase as of v=nurse-compliance-sb1 (office JWT via sbRestRpc; /exec only on sheets rollback). list_nurse_activity is Supabase as of v=nurse-activity-sb1b (office JWT via sbRestRpc {p_limit:50}; /exec only on sheets rollback). Nurse client writes stay /exec. Broadcast Alert is Ace RPCs as of v=bcast1 (get_active_broadcast / send_broadcast / clear_broadcast); rollback keeps local broadcast_msg — no Sheets /exec for Broadcast. Sunday Drive TimesheetArchive stays ON; Admin does not clear pdf_link and does not disable that Drive dual. -->
 <!-- admin write duals 2026-09-24 v=sbadminwrite GHOST-ADMIN-WRITE-DUALS-CONTRACT-v1 superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
 <!-- sb archive §3.3/§4.3 2026-09-24 v=sbcut1b PATCH is_active=false select id,is_active single() default trash is Archive, not hard DELETE -->
 <!-- sb supervisory+pdf 2026-09-24 v=sbsupervisory superseded by v=sbcut1b (rollback ?sheets=1 / evercare_sheets=1) -->
@@ -259,9 +265,9 @@ try{pagesCacheFresh1Start();}catch(ePagesCache){}
 <!-- admin-role-password 2026-09-24 v=adminpw1 Ace admin_set_role_password -->
 <!-- nurse completes speed 2026-09-24 v=nursespd1 admin-build 2026-09-24-nursespd1. One list_new_client_intakes Complete, sessionStorage ~5min, prefetch beside Nurse home, 2s Still loading from Sheets + Retry. Nurse feature data stays on Sheets. Open View/PDF/edit that needs ink: get_new_client_intake includeSignatures:true (alias includeSigs:true). List, Completes prefetch, and home loads do not send that flag. -->
 <!-- admin schedule 2026-09-24 v=sched1 week grid clients × Mon–Sun. Usual pattern once; cell edits are exceptions for that date. Live Ace: list_schedule_week(p_week_start), upsert_schedule_pattern, upsert_schedule_exception (call_off|cover|hours_override|aide_override|clear), delete_schedule_pattern. Office access_token via sbRestRpc. No localStorage stub. No Sheets /exec. No Sandata/EVV chips. -->
-<!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Nurse client writes stay /exec. Compliance and nurse alerts (list/mark) are Supabase as of v=nurse-compliance-sb1. list_nurse_activity stays /exec. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
+<!-- nurse supabase 2026-09-24 v=nursenb1 admin-build 2026-09-24-nursenb1. Cut ON: Completes/Refresh/Drafts POST rpc/list_new_client_intakes {p_status}; get_new_client_intake {p_intake_id,p_include_signatures}; save_new_client_intake {p_packet}; archive_new_client_intake {p_intake_id}. Nurse supervisory list POST rpc/list_supervisory_contacts_rpc; archive POST rpc/archive_supervisory_contact_rpc; save/get/pdf REST supervisory_contacts. Office JWT via sbRestRpc. Rollback ?sheets=1 or evercare_sheets=1 keeps Nurse /exec. Nurse client writes stay /exec. Compliance and nurse alerts (list/mark) are Supabase as of v=nurse-compliance-sb1. list_nurse_activity is Supabase as of v=nurse-activity-sb1b. Schedule RPCs unchanged. nursespd1 single-flight, session cache, Still loading + Retry stay. -->
 <!-- admin broadcast 2026-09-24 v=bcast1 admin-build 2026-09-24-bcast1. Cut ON: tab open/load POST rpc/get_active_broadcast {}; Send POST rpc/send_broadcast {p_message}; Clear POST rpc/clear_broadcast {}. Office JWT via sbRestRpc. Preview from data.message (empty if data null). No localStorage broadcast_msg on cut-ON. Rollback ?sheets=1 or evercare_sheets=1 keeps local broadcast_msg exactly. No Sheets /exec for Broadcast. Write roles Ace-enforced admin+scheduler. -->
-<!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert fetches. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. Ace list_new_client_intakes unchanged. As of v=nurse-compliance-sb1, list and mark abort the Supabase fetch when the cut is on, and list_nurse_activity stays Sheets /exec. Compliance is its own Supabase path and is not on this abort list. Broadcast and Schedule untouched. -->
+<!-- nurse completes refresh 2026-09-24 v=nursespd2 admin-build 2026-09-24-nursespd2. Completes Refresh no longer waits on nurse-alert fetches. In-flight list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity are aborted when Refresh starts, then loaded again after the Ace Completes list has painted. Badges and the activity feed still update after that paint; the admin home badge waits for the same prefetch. Ace list_new_client_intakes unchanged. As of v=nurse-compliance-sb1, list and mark abort the Supabase fetch when the cut is on, and list_nurse_activity aborts the Supabase fetch when the cut is on (Sheets /exec only on rollback). Compliance is its own Supabase path and is not on this abort list. Broadcast and Schedule untouched. -->
 <!-- admin schedule mobile scroll 2026-09-24 v=sched1m admin-build 2026-09-24-sched1m. Week grid horizontal scroll on touch: the day columns keep a min width so Mon–Sun are wider than a phone, and .sched-scroll is the only scroller (overflow-x auto, touch-action pan-x pan-y, -webkit-overflow-scrolling touch). Toolbar (Edit usual pattern, week, search, All|Open|Call-offs) wraps in the viewport and does not share that scroller. The “No patterns yet” notice wraps above the grid and does not cover or widen it. Desktop week layout unchanged. -->
 <!-- STANDING Mo rule v=sched1m (enforce before Ready/LIVE on this tip and future tips): EVERYTHING we create must be mobile-friendly, not only wide grids. Phone is first-class before Ready — readable, tappable, and scroll or swipe as needed. Desktop-only PASS is not done. Probe FAILS Ready if the phone cannot reach or use the UI. Wide grids and tables still must horizontal-scroll or swipe so the full content is reachable. This tip’s Schedule bar: week grid swipes Mon–Sun on a phone (~390px or a real iPhone) and desktop Schedule stays usable. -->
 <!-- caregiver password reset 2026-09-24 v=cgreset1 admin-build 2026-09-24-cgreset1. Cut ON: Settings Reset Caregiver Password uses the same office path as reset_temp_password — POST rpc/reset_aide_temp_password {p_username,p_temp_password} via sbAdminResetTempPassword (Auth + aides.must_change_password). Success shows the temp password. apiPost reset_password and set_password on cut route to that RPC and do not hit Sheets /exec. Add aide stays admin_create_aide. Rollback ?sheets=1 or evercare_sheets=1 keeps Sheets reset_password. -->
@@ -477,6 +483,13 @@ textarea{resize:vertical;min-height:80px;}
 .nurse-alert-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer;}
 .nurse-alert-row:last-child{border-bottom:none;}
 .nurse-alert-row:hover{background:var(--off);}
+/* v=nurse-activity-sb1b — Recent nurse activity stays readable and tappable near 390px. Empty pdfLink is not a link. */
+#adminNurseAlertsCard{min-width:0;max-width:100%;}
+#adminNurseAlertsList{min-width:0;overflow-wrap:anywhere;}
+#adminNurseAlertsList .nurse-alert-row{min-height:44px;}
+#adminNurseAlertsList .nurse-alert-row > div{min-width:0;flex:1 1 auto;}
+#adminNurseAlertsList .nurse-activity-empty{margin:0;line-height:1.45;}
+#adminNurseAlertsList .nurse-activity-refresh{display:inline-flex;align-items:center;justify-content:center;margin-top:10px;min-height:44px;min-width:44px;padding:10px 16px;}
 .nurse-type-visit{background:#e8f4f4;color:var(--teal-dark);}
 .nurse-type-phone{background:#e3f2fd;color:#1565c0;}
 .sidebar-bottom{margin-top:auto;padding:12px 14px 14px;border-top:1px solid var(--border);background:#fff;}
@@ -3801,7 +3814,7 @@ bindLoginKeyboard();
         <div class="card" id="adminNurseAlertsCard">
           <div class="card-title"><span class="ico">🔔</span> Recent nurse activity</div>
           <p class="nci-hint" style="margin-bottom:10px">Unread alerts from Ace. Opening this tab marks them read. If the alerts Version is not live yet, this stays empty.</p>
-          <div id="adminNurseAlertsList">
+          <div id="adminNurseAlertsList" data-nurse-activity-sb1="v=nurse-activity-sb1" data-nurse-activity-sb1b="v=nurse-activity-sb1b">
             <p class="nci-hint" style="margin:0">No unread nurse alerts.</p>
           </div>
         </div>
@@ -5616,7 +5629,8 @@ async function apiPost(payload){
   // Emergency rollback (?sheets=1 or evercare_sheets=1) makes evercareSbEnabled() false.
   // v=nursenb1: intakes (every role) and Nurse supervisory list/save/archive use Ace when the cut is on.
   // v=nurse-compliance-sb1: get_supervisory_compliance, list_nurse_alerts, and mark_nurse_alerts_read use Ace when the cut is on.
-  // Nurse client writes and list_nurse_activity stay on Sheets /exec. Rollback (?sheets=1 / evercare_sheets=1) keeps compliance and alerts on /exec.
+  // v=nurse-activity-sb1b: list_nurse_activity uses Ace when the cut is on ({p_limit:50}, p_include_archived omitted). Nurse client writes stay on Sheets /exec.
+  // Rollback (?sheets=1 / evercare_sheets=1) keeps compliance, alerts, and activity on /exec.
   // Broadcast Alert does not use apiPost.
   var sbOn=typeof evercareSbEnabled==='function'&&evercareSbEnabled();
   if(sbOn&&payload&&typeof sbIsNurseIntakeAction==='function'&&sbIsNurseIntakeAction(payload.action)){
@@ -5647,7 +5661,8 @@ async function apiPost(payload){
     return {success:false,error:'Could not reset password.'};
   }
   // v=nurse-compliance-sb1: compliance list and the nurse-alert badge. Failure stays here — no Sheets fallback while the cut is on.
-  // list_nurse_activity is not in this gate. This runs before the SHEETS_URL check so a bad /exec URL cannot block the RPC.
+  // v=nurse-activity-sb1b: activity is its own gate (not the alerts gate). This runs before the SHEETS_URL check so a bad /exec URL cannot block the RPC.
+  // Cut ON activity failure stays in sbNurseActivityDispatch — no Sheets fallback.
   if(sbOn&&payload&&typeof sbIsNurseComplianceAction==='function'&&sbIsNurseComplianceAction(payload.action)&&typeof sbNurseComplianceDispatch==='function'){
     return sbNurseComplianceDispatch(payload);
   }
@@ -5658,11 +5673,18 @@ async function apiPost(payload){
     }
     return sbNurseAlertsDispatch(payload, nurseAlertSignal);
   }
+  if(sbOn&&payload&&typeof sbIsNurseActivityAction==='function'&&sbIsNurseActivityAction(payload.action)&&typeof sbNurseActivityDispatch==='function'){
+    var nurseActivitySignal;
+    if(typeof nurseSheetsSignal==='function'){
+      try{nurseActivitySignal=nurseSheetsSignal();}catch(eNurseActSig){}
+    }
+    return sbNurseActivityDispatch(payload, nurseActivitySignal);
+  }
   if(!SHEETS_URL||SHEETS_URL.indexOf('script.google.com')<0){
     throw new Error('SHEETS_URL missing or not Apps Script /exec');
   }
   // nursespd2: nurse-alert fetches can be aborted so Completes Refresh is not stuck behind list/mark/activity.
-  // Cut ON list/mark already returned above (SB + the same abort signal). This /exec path is sheets rollback, plus list_nurse_activity.
+  // Cut ON list/mark/activity already returned above (SB + the same abort signal). This /exec path is sheets rollback only.
   var sheetInit={method:'POST',headers:GAS_HEADERS,body:JSON.stringify(payload),mode:'cors',cache:'no-store'};
   var nurseSheetsAction=payload&&(payload.action==='list_nurse_alerts'||payload.action==='mark_nurse_alerts_read'||payload.action==='list_nurse_activity');
   if(nurseSheetsAction&&typeof nurseSheetsSignal==='function'){
@@ -32692,6 +32714,30 @@ async function sbNurseAlertsDispatch(payload, signal){
     return {success:false,error:String(err2&&err2.message||err2||'supabase')};
   }
 }
+// v=nurse-activity-sb1b — office JWT via sbRestRpc. Rollback never enters here.
+// Default feed body is exactly {p_limit:50}. p_include_archived stays omitted so Archived source rows stay hidden.
+// Admin, Scheduler, and Nurse office sessions share this RPC. Caregiver never calls list_nurse_activity.
+function sbIsNurseActivityAction(action){
+  return action==='list_nurse_activity';
+}
+async function sbNurseActivityDispatch(payload, signal){
+  if(typeof evercareSbEnabled==='function'&&!evercareSbEnabled())return {success:false,skipped:true};
+  void payload;
+  var sess=typeof readSbSession==='function'?readSbSession():null;
+  if(!sess||!sess.access_token)return {success:false,error:'Not signed in',httpStatus:401};
+  try{
+    var listed=await sbRestRpc('list_nurse_activity', {p_limit:50}, signal);
+    if(listed&&listed.aborted)return {success:false,aborted:true};
+    if(!listed||listed.ok!==true)return {success:false,error:(listed&&listed.error)||'Could not list nurse activity.',httpStatus:listed&&listed.status||0};
+    var node=typeof sbRpcNode==='function'?sbRpcNode(listed.data):listed.data;
+    var err=typeof sbRpcError==='function'?sbRpcError(node):'';
+    if(err)return {success:false,error:err,httpStatus:listed.status||0};
+    return {success:true,items:sbNurseAlertItems(node)};
+  }catch(actErr){
+    if(actErr&&actErr.name==='AbortError')return {success:false,aborted:true};
+    return {success:false,error:String(actErr&&actErr.message||actErr||'supabase')};
+  }
+}
 function sbSupervisoryRpcRows(node){
   var rows=[];
   if(Array.isArray(node))rows=node;
@@ -41671,7 +41717,8 @@ function escapeAttr(str){
 
 // nursespd2 — abort in-flight nurse-alert fetches so Completes Refresh is not stuck.
 // v=nurse-compliance-sb1: list_nurse_alerts and mark_nurse_alerts_read use this signal on the Supabase fetch.
-// list_nurse_activity still uses it on Sheets /exec. Completes Refresh loads badges/activity again after the Ace list paints.
+// v=nurse-activity-sb1b: list_nurse_activity uses this signal on the Supabase fetch when the cut is on, and on Sheets /exec only on rollback.
+// Completes Refresh loads badges/activity again after the Ace list paints.
 var nurseSheetsGen=0;
 var nurseSheetsAbort=null;
 function cancelNurseSheetsFetches(){
@@ -44398,7 +44445,7 @@ async function nciRecheckPendingCompletePdfs(){
 }
 
 async function refreshCompletedNewClientIntakes(){
-  // nursespd2: drop in-flight nurse-alert fetches (SB list/mark when the cut is on, Sheets activity, or /exec on rollback) before the Ace list fetch.
+  // nursespd2: drop in-flight nurse-alert fetches (SB list/mark/activity when the cut is on, or /exec on rollback) before the Ace list fetch.
   cancelNurseSheetsFetches();
   nciInvalidateCompleteListCache();
   var epoch=nciCompleteListEpoch;
@@ -44674,7 +44721,8 @@ async function viewCompletedIntakePdf(intakeId){
 //      — NEVER archive_client for visit Delete.
 //    Admin and Scheduler have the same actions — no Admin-only gate.
 // C) list_nurse_alerts { username } unread only; mark_nurse_alerts_read { username, ids }
-// Optional: list_nurse_activity { limit?:50 } for the Recent nurse activity feed.
+// Optional: list_nurse_activity { limit:50 } for the Recent nurse activity feed.
+// v=nurse-activity-sb1b: cut ON posts rpc/list_nurse_activity {p_limit:50} and omits p_include_archived.
 // FORBIDDEN: list_admin_alerts, get_nurse_activity_unread, visitId, nurseName (visits),
 //   inHome|phone, save_supervisory_visit. contactType is Visit|PhoneCall.
 // Graceful empty if list_nurse_alerts Version is not live yet.
@@ -44763,6 +44811,7 @@ function paintAdminNurseAlerts(alerts){
 }
 
 function focusNurseAlertItem(type,refId){
+  // v=nurse-activity-sb1b: tap scrolls to the intake or supervisory card. Empty pdfLink is not opened.
   const t=String(type||'');
   const el=t==='intake'?document.getElementById('nciCompletedAdminCard'):document.getElementById('adminSupervisoryCard');
   if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
@@ -44946,6 +44995,7 @@ function appendNurseActivityFeed(items){
     const nurse=escapeHtml(it.nurseUsername||'—');
     const when=escapeHtml(formatDateTimeLabel(it.createdAt||it.visitDate||it.socDate)||'—');
     const jump=it.type==='intake'?'intake':'visit';
+    // pdfLink may be '' for Storage-only rows. The row does not turn that into a link.
     return `<div class="nurse-alert-row" onclick="focusNurseAlertItem('${jump}','${escapeAttr(it.refId||'')}')">
       <div>
         <strong>${escapeHtml(type)}</strong>
@@ -44958,9 +45008,25 @@ function appendNurseActivityFeed(items){
   box.innerHTML=(hasUnread?unreadHtml+'<div class="nci-hint" style="margin:12px 0 6px;font-weight:600">Latest from lists</div>':'')+recent;
 }
 
+function paintNurseActivityEmpty(failed){
+  const box=document.getElementById('adminNurseAlertsList');
+  if(!box)return;
+  const note=failed?'Could not load nurse activity.':'No recent nurse activity.';
+  const empty='<p class="nci-hint nurse-activity-empty" style="margin:0">'+escapeHtml(note)+'</p>'
+    +'<button type="button" class="btn btn-sm btn-teal nurse-activity-refresh" onclick="loadAdminNurseSection()">Refresh</button>';
+  const hasUnread=adminNurseAlerts&&adminNurseAlerts.length;
+  if(hasUnread){
+    box.innerHTML=box.innerHTML+'<div class="nci-hint" style="margin:12px 0 6px;font-weight:600">Recent activity</div>'+empty;
+    return;
+  }
+  box.innerHTML=empty;
+}
+
 async function loadNurseActivityFeed(){
   var gen=nurseSheetsGen;
+  var cut=typeof evercareSbEnabled==='function'&&evercareSbEnabled();
   try{
+    // Default call is limit 50. The Supabase body is {p_limit:50} with p_include_archived omitted.
     const data=await apiPost({action:'list_nurse_activity',limit:50});
     if(gen!==nurseSheetsGen||(data&&data.aborted))return;
     if(data&&data.success){
@@ -44969,16 +45035,33 @@ async function loadNurseActivityFeed(){
         appendNurseActivityFeed(rows);
         return;
       }
+      // Successful empty (archive-wins) stays empty. Do not derive archived source rows back onto the feed.
+      if(cut){
+        paintNurseActivityEmpty(false);
+        return;
+      }
+    }else if(cut){
+      // 401/403, success:false, and network errors stay on the empty state. No Sheets /exec.
+      paintNurseActivityEmpty(true);
+      return;
     }
   }catch(e){
     if(gen!==nurseSheetsGen||(e&&e.name==='AbortError'))return;
+    if(cut){
+      paintNurseActivityEmpty(true);
+      return;
+    }
   }
   if(gen!==nurseSheetsGen)return;
+  if(cut){
+    paintNurseActivityEmpty(true);
+    return;
+  }
   appendNurseActivityFeed(deriveNurseActivityFromLists());
 }
 
 function scheduleDeferredNurseSheets(){
-  // Completes rows are already painted. list_nurse_alerts and mark_nurse_alerts_read run after that (Supabase when the cut is on). list_nurse_activity stays on Sheets.
+  // Completes rows are already painted. list_nurse_alerts, mark_nurse_alerts_read, and list_nurse_activity run after that (Supabase when the cut is on; /exec only on sheets rollback).
   if(currentAdminRole==='Admin'||currentAdminRole==='Scheduler'){
     void loadAdminNurseAlertsAfterCompletes();
   }
