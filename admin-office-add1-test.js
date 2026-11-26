@@ -27,6 +27,9 @@ assert.ok(sql.includes('admin_set_shift_repeat'), 'repeat RPC is listed');
 assert.ok(sql.includes('admin_mark_visit_checked'), 'mark-checked RPC is listed');
 assert.ok(sql.includes('admin_list_aide_pay_rates'), 'pay rate RPC is listed');
 assert.ok(sql.includes("not in ('admin', 'Admin')"), 'pay rates refuse a non-admin role');
+assert.ok(sql.includes('time_entry_mode'), 'preview SQL lists time_entry_mode');
+assert.ok(sql.includes('exemption_reason'), 'preview SQL lists exemption_reason');
+assert.ok(sql.includes('exempt_effective_from'), 'preview SQL lists exempt_effective_from');
 
 function grab(src, sig){
   const start = src.indexOf(sig);
@@ -57,6 +60,10 @@ assert.ok(start > 0 && end > start, 'office module markers');
 const src = html.slice(start, end);
 assert.ok(src.includes('↻ weekly'), 'weekly mark copy');
 assert.ok(!/holiday pay/i.test(src), 'no holiday pay copy in the office module');
+assert.ok(src.includes('Exempt, manual entry'), 'exempt chip copy');
+assert.ok(src.includes('Clock in at each visit (Sandata EVV)'), 'clock-in card copy');
+assert.ok(src.includes('see Clock In'), 'calm confirm copy');
+assert.ok(src.includes("officeScreen") || src.includes("aideedit"), 'aide preview screens');
 assert.ok(src.includes('admin_list_aide_pay_rates'), 'pay rate RPC name');
 assert.ok(!src.includes('gpsDistanceUi') && !src.includes('buildPrintHtml') && !src.includes('printTimesheetSheet'), 'module does not call timesheet printers');
 
@@ -105,6 +112,11 @@ const sandbox = {
 vm.createContext(sandbox);
 vm.runInContext(src, sandbox);
 
+const exemptCounts = sandbox.officeExemptCounts();
+assert.strictEqual(exemptCounts.all, 8);
+assert.strictEqual(exemptCounts.clock, 5);
+assert.strictEqual(exemptCounts.exempt, 3);
+assert.strictEqual(sandbox.officeExemptFind('test').evv, 'exempt');
 assert.strictEqual(sandbox.officeAdd1Holiday('2026-11-26'), 'Thanksgiving');
 assert.strictEqual(sandbox.officeAdd1Holiday('2026-11-25'), '');
 assert.strictEqual(sandbox.officeAdd1HolidayPayLine('2026-11-26', 'Admin'), '');

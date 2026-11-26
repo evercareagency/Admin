@@ -2884,6 +2884,96 @@ body.ts-print-open{overflow:hidden;}
 .is-results-foot{justify-content:space-between;flex-shrink:0;margin-top:10px;padding-top:12px;border-top:1px solid var(--border);}
 
 /* v=office-add1 — office additions. Timesheet print CSS is unchanged. */
+.office-exempt-banner{position:fixed;top:0;left:0;right:0;height:34px;z-index:400;background:#c0392b;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 10px;font-size:0.74rem;font-weight:800;letter-spacing:.02em;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.office-exempt-banner[hidden]{display:none !important;}
+body.office-exempt-preview{padding-top:34px;}
+body.office-exempt-preview #adminScreen .shell-top{top:34px;}
+body.office-exempt-preview #adminScreen .main-content{padding:0 0 calc(78px + env(safe-area-inset-bottom,0px));max-width:none;}
+#tab_aides.office-exempt-host > :not(#officeExemptRoot){display:none !important;}
+#officeExemptRoot[hidden]{display:none !important;}
+#officeExemptRoot{color:var(--text);}
+#officeExemptRoot .ox-wrap{max-width:1100px;margin:0 auto;padding:10px 14px 16px;width:100%;}
+#officeExemptRoot .ox-page{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
+#officeExemptRoot h1{font-family:'DM Sans',system-ui,sans-serif;font-weight:700;font-size:1.45rem;color:var(--navy);letter-spacing:-0.02em;line-height:1.15;margin:0;}
+#officeExemptRoot .ox-sub{font-size:0.8rem;color:var(--muted);font-weight:600;margin-top:3px;}
+#officeExemptRoot .ox-back{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:var(--teal-dark);font-weight:800;font-size:0.9rem;cursor:pointer;padding:0 0 8px;min-height:32px;}
+#officeExemptRoot .ox-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;border:none;min-height:44px;white-space:nowrap;}
+#officeExemptRoot .ox-btn-teal,#officeExemptModal .ox-btn-teal{background:var(--teal);color:#fff;}
+#officeExemptRoot .ox-btn-full{width:100%;}
+#officeExemptRoot .ox-search{display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#f4f7fb;margin:0 0 8px;}
+#officeExemptRoot .ox-search input{border:none;background:transparent;flex:1;min-width:0;font-size:0.95rem;color:var(--text);outline:none;min-height:40px;font-family:inherit;}
+#officeExemptRoot .ox-search .ox-ico{color:var(--muted);flex-shrink:0;}
+#officeExemptRoot .ox-filters{display:flex;gap:8px;margin:0 0 8px;overflow-x:auto;}
+#officeExemptRoot .ox-filters button{flex:1;min-width:0;min-height:40px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-weight:800;font-size:0.8rem;cursor:pointer;padding:6px 8px;white-space:nowrap;font-family:inherit;}
+#officeExemptRoot .ox-filters button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+#officeExemptRoot .ox-filters button .n{font-weight:700;opacity:.75;margin-left:2px;}
+#officeExemptRoot .ox-filters button.on .n{opacity:.9;}
+#officeExemptRoot .ox-note{font-size:0.74rem;color:var(--muted);line-height:1.4;font-weight:600;margin:0 2px 6px;}
+#officeExemptRoot .ox-note.center{text-align:center;margin-top:8px;}
+#officeExemptRoot .ox-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px 3px 6px;font-size:0.68rem;font-weight:800;letter-spacing:.01em;line-height:1.2;white-space:nowrap;}
+#officeExemptRoot .ox-chip svg{width:14px;height:14px;flex-shrink:0;display:block;}
+#officeExemptRoot .ox-chip.clock{background:var(--teal-light);color:var(--teal-dark);border:1px solid #c5dddd;}
+#officeExemptRoot .ox-chip.exempt{background:#f3efe6;color:#3f3d6b;border:1px solid #e4d9c8;}
+#officeExemptRoot .ox-list{display:flex;flex-direction:column;gap:6px;}
+#officeExemptRoot .ox-row{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:14px;padding:8px 8px 8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.04);min-height:58px;font-family:inherit;}
+#officeExemptRoot .ox-av{width:40px;height:40px;border-radius:50%;background:var(--teal-light);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0;}
+#officeExemptRoot .ox-main{flex:1;min-width:0;}
+#officeExemptRoot .ox-main b{display:block;color:var(--navy);font-size:0.95rem;line-height:1.2;}
+#officeExemptRoot .ox-main span{display:block;font-size:0.75rem;color:var(--muted);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#officeExemptRoot .ox-chev{color:var(--muted);font-size:1.15rem;flex-shrink:0;}
+#officeExemptRoot .ox-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+#officeExemptRoot .ox-field label,#officeExemptRoot .ox-choice-lbl{font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+#officeExemptRoot .ox-choice-lbl{font-size:0.72rem;font-weight:800;color:var(--navy);margin:4px 0 8px;}
+#officeExemptRoot input[type=text],#officeExemptRoot input[type=tel],#officeExemptRoot input[type=date]{padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;color:var(--text);background:#fff;width:100%;min-height:46px;font-family:inherit;}
+#officeExemptRoot input:focus{outline:none;border-color:var(--teal);}
+#officeExemptRoot .ox-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+#officeExemptRoot .ox-choices{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+#officeExemptRoot .ox-choice{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 14px 12px;cursor:pointer;color:var(--text);font-family:inherit;}
+#officeExemptRoot .ox-ct{display:flex;align-items:flex-start;gap:10px;}
+#officeExemptRoot .ox-cico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#officeExemptRoot .ox-cico svg{width:22px;height:22px;}
+#officeExemptRoot .ox-choice.clock .ox-cico{background:var(--teal-light);color:var(--teal-dark);}
+#officeExemptRoot .ox-choice.exempt .ox-cico{background:#f3efe6;color:#3f3d6b;}
+#officeExemptRoot .ox-choice b{display:block;color:var(--navy);font-size:0.98rem;line-height:1.25;}
+#officeExemptRoot .ox-choice small{display:block;font-size:0.8rem;color:var(--muted);font-weight:600;line-height:1.35;margin-top:4px;}
+#officeExemptRoot .ox-choice.on.clock{border-color:var(--teal);background:#f4fbfb;box-shadow:0 0 0 3px rgba(42,127,127,.15);}
+#officeExemptRoot .ox-choice.on.exempt{border-color:#3f3d6b;background:#fbf9f4;box-shadow:0 0 0 3px rgba(63,61,107,.12);}
+#officeExemptRoot .ox-extra{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin:-2px 0 12px;}
+#officeExemptRoot .ox-hero{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px 10px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);text-align:center;}
+#officeExemptRoot .ox-hero .ox-av{width:56px;height:56px;font-size:1.05rem;margin:0 auto 6px;}
+#officeExemptRoot .ox-hero h2{font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;color:var(--navy);font-weight:700;margin:0 0 6px;}
+#officeExemptRoot .ox-hero .ox-chip{font-size:0.78rem;padding:5px 10px 5px 8px;}
+#officeExemptRoot .ox-hero .ox-chip svg{width:16px;height:16px;}
+#officeExemptRoot .ox-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+#officeExemptRoot .ox-card h3{font-family:'Playfair Display',Georgia,serif;font-size:1.02rem;color:var(--navy);margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--border);font-weight:700;}
+#officeExemptRoot .ox-line{display:flex;justify-content:space-between;gap:10px;font-size:0.9rem;padding:6px 0;border-bottom:1px solid var(--border);}
+#officeExemptRoot .ox-line:last-of-type{border-bottom:none;}
+#officeExemptRoot .ox-line span{color:var(--muted);}
+#officeExemptRoot .ox-line b{color:var(--navy);text-align:right;font-weight:700;}
+#officeExemptRoot .ox-desk{display:none;}
+#officeExemptRoot table.ox-grid{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+#officeExemptRoot .ox-grid th,#officeExemptRoot .ox-grid td{padding:7px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:0.92rem;vertical-align:middle;}
+#officeExemptRoot .ox-grid th{background:#eef3f7;font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:800;}
+#officeExemptRoot .ox-grid tr:last-child td{border-bottom:none;}
+#officeExemptRoot .ox-grid .ox-who{background:none;border:none;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;padding:0;color:var(--navy);font:inherit;font-weight:700;}
+#officeExemptRoot .ox-grid .muted{color:var(--muted);font-weight:600;font-size:0.85rem;}
+#officeExemptModal[hidden]{display:none !important;}
+#officeExemptModal.ox-modal-bg{position:fixed;inset:0;background:rgba(26,39,68,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+#officeExemptModal .ox-modal{background:#fff;border-radius:14px;padding:22px 20px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;}
+#officeExemptModal .ox-mi{width:48px;height:48px;border-radius:50%;background:#f3efe6;color:#3f3d6b;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+#officeExemptModal .ox-mi svg{width:24px;height:24px;}
+#officeExemptModal h3{font-family:'Playfair Display',Georgia,serif;font-size:1.3rem;color:var(--navy);margin:0 0 8px;}
+#officeExemptModal p{font-size:0.95rem;color:var(--muted);line-height:1.5;margin:0;}
+#officeExemptModal .ox-mrow{display:flex;gap:10px;margin-top:16px;}
+#officeExemptModal .ox-mrow .ox-btn{flex:1;min-height:44px;border-radius:10px;font-weight:700;font-size:0.92rem;cursor:pointer;font-family:inherit;}
+#officeExemptModal .ox-btn-ghost{background:#fff;color:var(--navy);border:1.5px solid var(--border);}
+@media(min-width:800px){
+  #officeExemptRoot .ox-wrap{padding-top:18px;}
+  #officeExemptRoot .ox-phone{display:none;}
+  #officeExemptRoot .ox-desk{display:block;}
+  #officeExemptRoot .ox-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  #officeExemptRoot .ox-filters button{flex:0 0 auto;padding:6px 16px;}
+}
 .office-banner{margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#fff6e8;color:#8a4b08;font-size:0.84rem;font-weight:700;line-height:1.4;}
 .office-banner[hidden]{display:none !important;}
 .office-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
@@ -3344,6 +3434,8 @@ bindLoginKeyboard();
 </div>
 
 <!-- ADMIN -->
+<div id="officeExemptBanner" class="office-exempt-banner" data-office-add1="v=office-add1" hidden>PREVIEW, FAKE TEST DATA, nothing is sent</div>
+<div id="officeExemptModal" data-office-add1="v=office-add1" hidden></div>
 <div class="screen" id="adminScreen">
   <div class="admin-layout layout-a1">
     <header class="shell-top" data-punch-leftovers1="v=punch-leftovers1" data-phone-safe-header1="v=phone-safe-header1">
@@ -3865,6 +3957,7 @@ bindLoginKeyboard();
       </div>
 
       <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" data-manage-dots-creds1="v=manage-dots-creds1" data-aide-profile-link-fix="v=aide-profile-link-fix" data-sched-creds1="v=sched-creds1">
+        <div id="officeExemptRoot" data-office-add1="v=office-add1" hidden></div>
         <div id="aideProfilePage" data-aide-profile-link-fix="v=aide-profile-link-fix" hidden>
           <button type="button" class="aide-profile-back" id="aideProfileBack" onclick="aideProfileLinkFixBack()">← Back</button>
           <div class="aide-profile-head">
@@ -47709,12 +47802,356 @@ async function officeAdd1LoadToday(){
   officeAdd1PaintToday(model);
   return {ok:!err, error:err};
 }
+var officeExemptActive=false;
+var officeExemptSkipReset=false;
+var officeExemptView='list';
+var officeExemptAideId='test';
+var officeExemptFilter='all';
+var officeExemptQ='';
+var officeExemptConfirm=false;
+var officeExemptAdd={first:'',last:'',phone:'(614) 555-0100',evv:'clock',reason:'',effective:'2026-11-30'};
+var officeExemptEdit=null;
+var officeExemptIcoCal='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.5v4M16 3.5v4M3.5 10h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="8" y="13" width="3" height="3" rx=".5" fill="currentColor"/></svg>';
+var officeExemptIcoClk='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v5l3.2 1.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function officeExemptAides(){
+  return [
+    {id:'test', name:'Test Aide', initials:'TA', role:'Home Health Aide', clients:'Sample Client', evv:'exempt', reason:'Family caregiver', effective:'2026-11-30', phone:'(614) 555-0101'},
+    {id:'one', name:'Aide One', initials:'A1', role:'Home Health Aide', clients:'Sample Client A', evv:'clock', reason:'', effective:'', phone:'(614) 555-0102'},
+    {id:'two', name:'Aide Two', initials:'A2', role:'Home Health Aide', clients:'East Sample', evv:'clock', reason:'', effective:'', phone:'(614) 555-0103'},
+    {id:'three', name:'Aide Three', initials:'A3', role:'Home Health Aide', clients:'Sample Client B', evv:'exempt', reason:'Live-in family', effective:'2026-11-02', phone:'(614) 555-0104'},
+    {id:'four', name:'Aide Four', initials:'A4', role:'Home Health Aide', clients:'Sample Client C', evv:'clock', reason:'', effective:'', phone:'(614) 555-0105'},
+    {id:'five', name:'Aide Five', initials:'A5', role:'Home Health Aide', clients:'Sample Client D', evv:'exempt', reason:'Family caregiver', effective:'2026-10-12', phone:'(614) 555-0106'},
+    {id:'sample', name:'Sample Aide', initials:'SA', role:'Home Health Aide', clients:'Sample Client E', evv:'clock', reason:'', effective:'', phone:'(614) 555-0107'},
+    {id:'six', name:'Aide Six', initials:'A6', role:'Home Health Aide', clients:'Sample Client F', evv:'clock', reason:'', effective:'', phone:'(614) 555-0108'}
+  ];
+}
+function officeExemptCounts(rows){
+  rows=rows||officeExemptAides();
+  var clock=0, exempt=0;
+  rows.forEach(function(a){if(a&&a.evv==='exempt')exempt++;else clock++;});
+  return {all:rows.length, clock:clock, exempt:exempt};
+}
+function officeExemptFind(id){
+  var rows=officeExemptAides();
+  for(var i=0;i<rows.length;i++){if(rows[i].id===id)return rows[i];}
+  return rows[0];
+}
+function officeExemptClone(a){
+  a=a||officeExemptFind('test');
+  return {id:a.id,name:a.name,initials:a.initials,role:a.role,clients:a.clients,evv:a.evv,reason:a.reason,effective:a.effective||'2026-11-30',phone:a.phone,orig:a.evv};
+}
+function officeExemptPretty(iso){
+  if(!iso)return '\u2014';
+  var p=String(iso).split('-');
+  var mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var m=mon[Number(p[1])-1];
+  if(!m||p.length<3)return String(iso);
+  return m+' '+Number(p[2])+', '+p[0];
+}
+function officeExemptChip(kind, long){
+  if(kind==='exempt')return '<span class="ox-chip exempt">'+officeExemptIcoCal+'Exempt, manual entry</span>';
+  return '<span class="ox-chip clock">'+officeExemptIcoClk+(long?'Clock in at each visit':'Clock in')+'</span>';
+}
+function officeExemptChoices(sel, act){
+  return '<div class="ox-choice-lbl">How this aide enters time</div>'+
+    '<div class="ox-choices">'+
+      '<button type="button" class="ox-choice clock'+(sel==='clock'?' on':'')+'" data-ox="'+act+'" data-v="clock">'+
+        '<div class="ox-ct"><span class="ox-cico">'+officeExemptIcoClk+'</span><div>'+
+          '<b>Clock in at each visit (Sandata EVV)</b>'+
+          '<small>This aide will see Clock In on their phone and must clock in at the member\u2019s home.</small>'+
+        '</div></div></button>'+
+      '<button type="button" class="ox-choice exempt'+(sel==='exempt'?' on':'')+'" data-ox="'+act+'" data-v="exempt">'+
+        '<div class="ox-ct"><span class="ox-cico">'+officeExemptIcoCal+'</span><div>'+
+          '<b>Exempt, manual weekly entry</b>'+
+          '<small>This aide will not see Clock In. They enter hours on a Monday\u2013Sunday timesheet at the end of the week.</small>'+
+        '</div></div></button>'+
+    '</div>';
+}
+function officeExemptFields(obj){
+  if(!obj||obj.evv!=='exempt')return '';
+  return '<div class="ox-extra">'+
+    '<div class="ox-field"><label for="oxReason">Reason for exemption (optional)</label>'+
+    '<input id="oxReason" type="text" placeholder="e.g. Family caregiver" value="'+officeAdd1Esc(obj.reason||'')+'"></div>'+
+    '<div class="ox-field" style="margin-bottom:0"><label for="oxEff">Effective from</label>'+
+    '<input id="oxEff" type="date" value="'+officeAdd1Esc(obj.effective||'2026-11-30')+'"></div>'+
+    '</div>';
+}
+function officeExemptRead(){
+  function val(id){var el=document.getElementById(id);return el?String(el.value||''):null;}
+  if(officeExemptView==='add'){
+    var first=val('oxFirst'); if(first!=null)officeExemptAdd.first=first;
+    var last=val('oxLast'); if(last!=null)officeExemptAdd.last=last;
+    var phone=val('oxPhone'); if(phone!=null)officeExemptAdd.phone=phone;
+    var reason=val('oxReason'); if(reason!=null)officeExemptAdd.reason=reason;
+    var eff=val('oxEff'); if(eff!=null&&eff)officeExemptAdd.effective=eff;
+  }else if(officeExemptView==='edit'&&officeExemptEdit){
+    var name=val('oxName'); if(name!=null)officeExemptEdit.name=name;
+    var ephone=val('oxPhone'); if(ephone!=null)officeExemptEdit.phone=ephone;
+    var ereason=val('oxReason'); if(ereason!=null)officeExemptEdit.reason=ereason;
+    var eeff=val('oxEff'); if(eeff!=null&&eeff)officeExemptEdit.effective=eeff;
+  }
+  var q=val('oxQ'); if(q!=null)officeExemptQ=q;
+}
+function officeExemptChrome(on){
+  var banner=document.getElementById('officeExemptBanner');
+  if(banner)banner.hidden=!on;
+  if(document.body&&document.body.classList)document.body.classList.toggle('office-exempt-preview', !!on);
+  var av=document.getElementById('avatarMenuBtn');
+  if(!av)return;
+  if(on){
+    if(!av.getAttribute('data-ox-letter'))av.setAttribute('data-ox-letter', av.textContent||'A');
+    av.textContent=officeAdd1IsAdmin()?'A':'S';
+  }else if(av.hasAttribute('data-ox-letter')){
+    av.textContent=av.getAttribute('data-ox-letter');
+    av.removeAttribute('data-ox-letter');
+  }
+}
+function officeExemptSetHost(on){
+  var tab=document.getElementById('tab_aides');
+  var root=document.getElementById('officeExemptRoot');
+  if(tab&&tab.classList)tab.classList.toggle('office-exempt-host', !!on);
+  if(root)root.hidden=!on;
+}
+function officeExemptPaintList(){
+  var rows=officeExemptAides().filter(function(a){
+    if(officeExemptFilter==='clock'&&a.evv!=='clock')return false;
+    if(officeExemptFilter==='exempt'&&a.evv!=='exempt')return false;
+    if(officeExemptQ){
+      var hay=(a.name+' '+a.clients+' '+a.evv).toLowerCase();
+      if(hay.indexOf(officeExemptQ.toLowerCase())<0)return false;
+    }
+    return true;
+  });
+  var c=officeExemptCounts();
+  var f=officeExemptFilter||'all';
+  var list=rows.map(function(a){
+    return '<button type="button" class="ox-row" data-ox="detail" data-id="'+officeAdd1Esc(a.id)+'">'+
+      '<span class="ox-av">'+officeAdd1Esc(a.initials)+'</span>'+
+      '<span class="ox-main"><b>'+officeAdd1Esc(a.name)+'</b><span>'+officeAdd1Esc(a.role)+' \u00b7 '+officeAdd1Esc(a.clients)+'</span></span>'+
+      officeExemptChip(a.evv,false)+
+      '<span class="ox-chev">\u203a</span></button>';
+  }).join('');
+  var table='<table class="ox-grid"><thead><tr><th>Aide</th><th>Status</th><th>Reason</th><th>Clients</th></tr></thead><tbody>'+
+    rows.map(function(a){
+      return '<tr><td><button type="button" class="ox-who" data-ox="detail" data-id="'+officeAdd1Esc(a.id)+'"><span class="ox-av">'+officeAdd1Esc(a.initials)+'</span>'+officeAdd1Esc(a.name)+'</button></td>'+
+        '<td>'+officeExemptChip(a.evv,false)+'</td>'+
+        '<td class="muted">'+(a.evv==='exempt'?officeAdd1Esc(a.reason||'\u2014'):'\u2014')+'</td>'+
+        '<td class="muted">'+officeAdd1Esc(a.clients)+'</td></tr>';
+    }).join('')+'</tbody></table>';
+  return '<div class="ox-wrap">'+
+    '<div class="ox-page"><div><h1>Aides</h1><div class="ox-sub">'+officeAdd1Esc(c.all+' aides \u00b7 '+c.clock+' Clock in \u00b7 '+c.exempt+' Exempt')+'</div></div>'+
+    '<button class="ox-btn ox-btn-teal" type="button" data-ox="add">+ Add aide</button></div>'+
+    '<div class="ox-search"><span class="ox-ico">\u2315</span><input id="oxQ" type="text" placeholder="Find an aide\u2026" value="'+officeAdd1Esc(officeExemptQ)+'"></div>'+
+    '<div class="ox-filters">'+
+      '<button type="button" class="'+(f==='all'?'on':'')+'" data-ox="filter" data-v="all">All <span class="n">'+c.all+'</span></button>'+
+      '<button type="button" class="'+(f==='clock'?'on':'')+'" data-ox="filter" data-v="clock">Clock in <span class="n">'+c.clock+'</span></button>'+
+      '<button type="button" class="'+(f==='exempt'?'on':'')+'" data-ox="filter" data-v="exempt">Exempt <span class="n">'+c.exempt+'</span></button>'+
+    '</div>'+
+    '<p class="ox-note">Admin and Scheduler can both set this.</p>'+
+    '<div class="ox-phone"><div class="ox-list">'+list+'</div></div>'+
+    '<div class="ox-desk">'+table+'</div>'+
+    '</div>';
+}
+function officeExemptPaintAdd(){
+  var a=officeExemptAdd;
+  return '<div class="ox-wrap">'+
+    '<button class="ox-back" type="button" data-ox="list">\u2039 Aides</button>'+
+    '<div class="ox-page"><div><h1>Add aide</h1><div class="ox-sub">Set how they will enter time.</div></div></div>'+
+    '<div class="ox-row2">'+
+      '<div class="ox-field"><label for="oxFirst">First name</label><input id="oxFirst" type="text" value="'+officeAdd1Esc(a.first)+'" placeholder="First"></div>'+
+      '<div class="ox-field"><label for="oxLast">Last name</label><input id="oxLast" type="text" value="'+officeAdd1Esc(a.last)+'" placeholder="Last"></div>'+
+    '</div>'+
+    '<div class="ox-field"><label for="oxPhone">Phone</label><input id="oxPhone" type="tel" value="'+officeAdd1Esc(a.phone)+'" placeholder="(614) 555-0100"></div>'+
+    officeExemptChoices(a.evv,'addevv')+
+    officeExemptFields(a)+
+    '<p class="ox-note" style="margin-bottom:12px">Admin and Scheduler can set this, same as other aide fields.</p>'+
+    '<button class="ox-btn ox-btn-teal ox-btn-full" type="button" data-ox="saveadd">Save aide</button>'+
+    '<p class="ox-note center">Mock only. Nothing is saved.</p>'+
+    '</div>';
+}
+function officeExemptPaintEdit(){
+  if(!officeExemptEdit)officeExemptEdit=officeExemptClone(officeExemptFind(officeExemptAideId));
+  var a=officeExemptEdit;
+  return '<div class="ox-wrap">'+
+    '<button class="ox-back" type="button" data-ox="detail" data-id="'+officeAdd1Esc(a.id)+'">\u2039 '+officeAdd1Esc(a.name)+'</button>'+
+    '<div class="ox-page"><div><h1>Edit aide</h1><div class="ox-sub">'+officeAdd1Esc(a.name)+'</div></div></div>'+
+    '<div class="ox-row2">'+
+      '<div class="ox-field"><label for="oxName">Name</label><input id="oxName" type="text" value="'+officeAdd1Esc(a.name)+'"></div>'+
+      '<div class="ox-field"><label for="oxPhone">Phone</label><input id="oxPhone" type="tel" value="'+officeAdd1Esc(a.phone)+'"></div>'+
+    '</div>'+
+    officeExemptChoices(a.evv,'editevv')+
+    officeExemptFields(a)+
+    '<p class="ox-note" style="margin-bottom:12px">Admin and Scheduler can set this, same as other aide fields.</p>'+
+    '<button class="ox-btn ox-btn-teal ox-btn-full" type="button" data-ox="saveedit">Save changes</button>'+
+    '<p class="ox-note center">Mock only. Nothing is saved.</p>'+
+    '</div>';
+}
+function officeExemptPaintDetail(){
+  var a=officeExemptFind(officeExemptAideId);
+  var status=a.evv==='exempt'?'Exempt, manual entry':'Clock in at each visit';
+  var see=a.evv==='exempt'?'Weekly hours grid, no Clock In':'Clock In at each visit';
+  var extra=a.evv==='exempt'?'<div class="ox-line"><span>Reason</span><b>'+officeAdd1Esc(a.reason||'\u2014')+'</b></div>'+
+    '<div class="ox-line"><span>Effective from</span><b>'+officeAdd1Esc(officeExemptPretty(a.effective))+'</b></div>':'';
+  return '<div class="ox-wrap">'+
+    '<button class="ox-back" type="button" data-ox="list">\u2039 Aides</button>'+
+    '<div class="ox-hero"><div class="ox-av">'+officeAdd1Esc(a.initials)+'</div><h2>'+officeAdd1Esc(a.name)+'</h2>'+officeExemptChip(a.evv,true)+'</div>'+
+    '<div class="ox-card"><h3>Time entry</h3>'+
+      '<div class="ox-line"><span>Status</span><b>'+officeAdd1Esc(status)+'</b></div>'+extra+
+      '<div class="ox-line"><span>What they see</span><b>'+officeAdd1Esc(see)+'</b></div>'+
+      '<p class="ox-note" style="margin-top:8px">Admin and Scheduler can change this, same as other aide fields.</p>'+
+    '</div>'+
+    '<div class="ox-card"><h3>Aide</h3>'+
+      '<div class="ox-line"><span>Role</span><b>'+officeAdd1Esc(a.role)+'</b></div>'+
+      '<div class="ox-line"><span>Phone</span><b>'+officeAdd1Esc(a.phone)+'</b></div>'+
+      '<div class="ox-line"><span>Clients</span><b>'+officeAdd1Esc(a.clients)+'</b></div>'+
+    '</div>'+
+    '<button class="ox-btn ox-btn-teal ox-btn-full" type="button" data-ox="edit" data-id="'+officeAdd1Esc(a.id)+'">Edit aide</button>'+
+    '</div>';
+}
+function officeExemptPaintConfirm(a){
+  var modal=document.getElementById('officeExemptModal');
+  if(!modal)return;
+  if(!officeExemptConfirm||!a){modal.hidden=true;modal.innerHTML='';modal.className='';return;}
+  modal.hidden=false;
+  modal.className='ox-modal-bg';
+  modal.innerHTML='<div class="ox-modal" role="dialog" aria-modal="true" aria-label="Confirm change">'+
+    '<div class="ox-mi">'+officeExemptIcoCal+'</div>'+
+    '<h3>Switch to weekly hours?</h3>'+
+    '<p>From next week, '+officeAdd1Esc(a.name)+' enters hours weekly and won\'t see Clock In.</p>'+
+    '<div class="ox-mrow">'+
+      '<button class="ox-btn ox-btn-ghost" type="button" data-ox="closeconfirm">Not now</button>'+
+      '<button class="ox-btn ox-btn-teal" type="button" data-ox="okconfirm">Switch</button>'+
+    '</div></div>';
+}
+function officeExemptPaint(){
+  if(!officeAdd1Preview)return;
+  var root=document.getElementById('officeExemptRoot');
+  if(!root)return;
+  officeExemptActive=true;
+  officeExemptSetHost(true);
+  officeExemptChrome(true);
+  var focusQ=document.activeElement&&document.activeElement.id==='oxQ';
+  var html='';
+  if(officeExemptView==='add')html=officeExemptPaintAdd();
+  else if(officeExemptView==='edit')html=officeExemptPaintEdit();
+  else if(officeExemptView==='detail')html=officeExemptPaintDetail();
+  else html=officeExemptPaintList();
+  root.innerHTML=html;
+  if(officeExemptView==='edit'&&officeExemptConfirm)officeExemptPaintConfirm(officeExemptEdit);
+  else officeExemptPaintConfirm(null);
+  if(focusQ){
+    var el=document.getElementById('oxQ');
+    if(el){el.focus();try{el.setSelectionRange(el.value.length, el.value.length);}catch(e){}}
+  }
+}
+function officeExemptEnter(screen){
+  var id=officeAdd1Query('officeAide')||'test';
+  officeExemptAideId=id;
+  officeExemptConfirm=officeAdd1Query('officeExemptConfirm')==='1';
+  if(screen==='aideadd'){
+    officeExemptView='add';
+    officeExemptAdd={first:'',last:'',phone:'(614) 555-0100',evv:officeAdd1Query('evv')==='exempt'?'exempt':'clock',reason:'',effective:'2026-11-30'};
+    officeExemptConfirm=false;
+  }else if(screen==='aideedit'){
+    officeExemptView='edit';
+    officeExemptEdit=officeExemptClone(officeExemptFind(id));
+    if(officeExemptConfirm)officeExemptEdit.evv='exempt';
+  }else if(screen==='aidedetail'){
+    officeExemptView='detail';
+    officeExemptConfirm=false;
+  }else{
+    officeExemptView='list';
+    officeExemptConfirm=false;
+  }
+  officeExemptSkipReset=true;
+  officeExemptActive=true;
+  if(typeof showTab==='function')showTab('aides');
+  officeExemptSkipReset=false;
+}
+function officeExemptClick(e){
+  if(!officeAdd1Preview)return;
+  var node=e.target;
+  if(node&&node.classList&&node.classList.contains('ox-modal-bg')){
+    officeExemptConfirm=false;
+    officeExemptPaint();
+    return;
+  }
+  var t=node&&node.closest?node.closest('[data-ox]'):null;
+  if(!t)return;
+  var act=t.getAttribute('data-ox');
+  officeExemptRead();
+  if(act==='list'){officeExemptView='list';officeExemptConfirm=false;officeExemptPaint();return;}
+  if(act==='add'){officeExemptView='add';officeExemptConfirm=false;officeExemptPaint();return;}
+  if(act==='detail'){officeExemptAideId=t.getAttribute('data-id')||'test';officeExemptView='detail';officeExemptConfirm=false;officeExemptPaint();return;}
+  if(act==='edit'){
+    officeExemptAideId=t.getAttribute('data-id')||officeExemptAideId;
+    officeExemptEdit=officeExemptClone(officeExemptFind(officeExemptAideId));
+    officeExemptView='edit';
+    officeExemptConfirm=false;
+    officeExemptPaint();
+    return;
+  }
+  if(act==='filter'){officeExemptFilter=t.getAttribute('data-v')||'all';officeExemptPaint();return;}
+  if(act==='addevv'){officeExemptAdd.evv=t.getAttribute('data-v')==='exempt'?'exempt':'clock';officeExemptPaint();return;}
+  if(act==='editevv'){
+    var v=t.getAttribute('data-v')==='exempt'?'exempt':'clock';
+    var prev=officeExemptEdit?officeExemptEdit.evv:'clock';
+    if(prev==='clock'&&v==='exempt'){
+      officeExemptEdit.evv='exempt';
+      officeExemptConfirm=true;
+      officeExemptPaint();
+      return;
+    }
+    if(officeExemptEdit)officeExemptEdit.evv=v;
+    officeExemptConfirm=false;
+    officeExemptPaint();
+    return;
+  }
+  if(act==='closeconfirm'){
+    officeExemptConfirm=false;
+    if(officeExemptEdit)officeExemptEdit.evv='clock';
+    officeExemptPaint();
+    return;
+  }
+  if(act==='okconfirm'){
+    officeExemptConfirm=false;
+    if(officeExemptEdit){
+      officeExemptEdit.evv='exempt';
+      if(!officeExemptEdit.reason)officeExemptEdit.reason='Family caregiver';
+      if(!officeExemptEdit.effective)officeExemptEdit.effective='2026-11-30';
+    }
+    officeExemptPaint();
+    return;
+  }
+  if(act==='saveadd'||act==='saveedit'){
+    officeExemptView='list';
+    officeExemptConfirm=false;
+    officeExemptPaint();
+  }
+}
+function officeExemptInput(e){
+  if(!officeAdd1Preview)return;
+  var t=e.target;
+  if(!t||!t.id)return;
+  if(t.id==='oxQ'){officeExemptQ=t.value;officeExemptPaint();return;}
+  officeExemptRead();
+}
+
 function officeAdd1AfterTab(tab){
   if(tab==='today')officeAdd1LoadToday();
   else if(tab==='visits')officeAdd1LoadVisits();
   else if(tab==='supervision')officeAdd1LoadSupervision();
   else if(tab==='missed')officeAdd1LoadMissed();
   else if(tab==='payroll')officeAdd1LoadPay();
+  else if(tab==='aides'&&officeAdd1Preview){
+    if(!officeExemptSkipReset)officeExemptView='list';
+    officeExemptPaint();
+  }else if(officeExemptActive){
+    officeExemptActive=false;
+    officeExemptChrome(false);
+    officeExemptSetHost(false);
+    officeExemptPaintConfirm(null);
+  }
 }
 function officeAdd1BindRepeat(){
   var on=officeAdd1El('officeRepeatOn');
@@ -47832,6 +48269,7 @@ function officeAdd1Install(){
     var tabBase=showTab;
     var tabWrap=function(tab){
       var requested=tab;
+      if(officeAdd1Preview&&tab==='aides')officeExemptActive=true;
       var out=tabBase.apply(this, arguments);
       try{officeAdd1AfterTab(requested);}catch(e){}
       return out;
@@ -47861,6 +48299,20 @@ function officeAdd1Install(){
     navEditApply=navApplyWrap;
   }
   try{officeAdd1PinDashboard();}catch(ePin0){}
+  if(typeof renderAides==='function'&&!renderAides.__officeExempt){
+    var aidesBase=renderAides;
+    var aidesWrap=async function(){
+      if(officeExemptActive)return;
+      return aidesBase.apply(this, arguments);
+    };
+    aidesWrap.__officeExempt=1;
+    renderAides=aidesWrap;
+  }
+  if(!officeAdd1Install.exemptBound&&document.addEventListener){
+    officeAdd1Install.exemptBound=true;
+    document.addEventListener('click', officeExemptClick);
+    document.addEventListener('input', officeExemptInput);
+  }
   if(typeof enforceAdminSessionTimeout==='function'&&!enforceAdminSessionTimeout.__officeAdd1){
     var timeoutBase=enforceAdminSessionTimeout;
     var timeoutWrap=function(){
@@ -47997,6 +48449,10 @@ function officeAdd1EnterPreview(){
   officeAdd1InstallSampleSchedule();
   var screen=officeAdd1Query('officeScreen')||'today';
   if(screen==='visit')screen='visits';
+  if(screen==='aides'||screen==='aideadd'||screen==='aideedit'||screen==='aidedetail'){
+    officeExemptEnter(screen);
+    return;
+  }
   if(screen==='payroll'&&role!=='Admin'){
     officeAdd1ShowLockedPayroll();
     return;

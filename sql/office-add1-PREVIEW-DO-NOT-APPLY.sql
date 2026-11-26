@@ -289,6 +289,21 @@ revoke all on function public.admin_list_missed_visits(date, date) from public;
 revoke all on function public.admin_list_missed_visits(date, date) from anon;
 grant execute on function public.admin_list_missed_visits(date, date) to authenticated;
 
+-- ---------------------------------------------------------------------------
+-- 7. Clock in vs exempt. PREVIEW ONLY. Do not apply.
+--    Admin and Scheduler can both set this, the same as other aide fields.
+--    This is not a pay rate and it does not change the timesheet PDF.
+-- ---------------------------------------------------------------------------
+do $$
+begin
+  if to_regclass('public.aides') is not null then
+    alter table public.aides
+      add column if not exists time_entry_mode text not null default 'clock',
+      add column if not exists exemption_reason text,
+      add column if not exists exempt_effective_from date;
+  end if;
+end $$;
+
 -- Holiday names are computed in the portal so the schedule can mark bank closures. No holiday table.
 -- list_schedule_week should pass through repeat_weekly, repeat_until, clock_in,
 -- and open_shift_id on each slot when those columns exist. No change to the
