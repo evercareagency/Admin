@@ -229,7 +229,6 @@ create table if not exists public.aide_pay_rates (
   org_id uuid,
   aide_id uuid not null,
   hourly_rate numeric(10,2) not null check (hourly_rate >= 0),
-  holiday_multiplier numeric(4,2) not null default 1.50,
   effective_on date not null default current_date,
   created_at timestamptz not null default now()
 );
@@ -255,7 +254,6 @@ begin
       select jsonb_agg(jsonb_build_object(
         'aide_id', r.aide_id,
         'hourly_rate', r.hourly_rate,
-        'holiday_multiplier', r.holiday_multiplier,
         'effective_on', r.effective_on
       ))
       from public.aide_pay_rates r
@@ -291,7 +289,7 @@ revoke all on function public.admin_list_missed_visits(date, date) from public;
 revoke all on function public.admin_list_missed_visits(date, date) from anon;
 grant execute on function public.admin_list_missed_visits(date, date) to authenticated;
 
--- Holiday names and the 1.5x label are computed in the portal. No holiday table.
+-- Holiday names are computed in the portal so the schedule can mark bank closures. No holiday table.
 -- list_schedule_week should pass through repeat_weekly, repeat_until, clock_in,
 -- and open_shift_id on each slot when those columns exist. No change to the
 -- caregiver timesheet or the timesheet PDF.

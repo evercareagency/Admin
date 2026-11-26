@@ -9,7 +9,7 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
-<!-- office add 2026-11-26 v=office-add1 ?v=office-add1 admin-build 2026-11-26-office-add1. OFFICE_ADD1. PREVIEW DRAFT. Do not claim LIVE. Do not merge. Do not apply SQL. Admin and Scheduler share Today, Schedule find-cover, Repeat weekly, Visits, the 60-day supervision tracker, and the missed-visit report. Payroll, pay rates, and the Holiday pay 1.5x label are Admin only. Scheduler does not see them and does not call pay RPCs. Caregiver timesheet layout and the timesheet PDF are unchanged. Wide grids scroll sideways. Dates people read are MM/DD/YYYY. Existing reads: list_schedule_week, admin_list_open_shifts, admin_rank_backup_aides, get_supervisory_compliance, and timesheet day distance when a visit RPC is missing. Anything not on file stays an empty state. The unapplied change list is sql/office-add1-PREVIEW-DO-NOT-APPLY.sql. The first admin-build meta stays 2026-09-27-remi-float-hide1b. admin-build.txt stays 2026-09-29-pages-cache-fresh1. -->
+<!-- office add 2026-11-26 v=office-add1 ?v=office-add1 admin-build 2026-11-26-office-add1. OFFICE_ADD1. PREVIEW DRAFT. Do not claim LIVE. Do not merge. Do not apply SQL. Admin and Scheduler share Today, Schedule find-cover, Repeat weekly, Visits, the 60-day supervision tracker, and the missed-visit report. Payroll and pay rates are Admin only. Scheduler does not see them and does not call pay RPCs. Schedule columns still name holidays, such as Thanksgiving, so the office can plan around bank closures. Caregiver timesheet layout and the timesheet PDF are unchanged. Wide grids scroll sideways. Dates people read are MM/DD/YYYY. Existing reads: list_schedule_week, admin_list_open_shifts, admin_rank_backup_aides, get_supervisory_compliance, and timesheet day distance when a visit RPC is missing. Anything not on file stays an empty state. The unapplied change list is sql/office-add1-PREVIEW-DO-NOT-APPLY.sql. The first admin-build meta stays 2026-09-27-remi-float-hide1b. admin-build.txt stays 2026-09-29-pages-cache-fresh1. -->
 <meta name="admin-build" content="2026-11-26-office-add1">
 <script>var OFFICE_ADD1_MARKER='v=office-add1';var OFFICE_ADD1_BUILD='2026-11-26-office-add1';</script>
 
@@ -2900,7 +2900,6 @@ body.ts-print-open{overflow:hidden;}
 .office-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;}
 .office-filters button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy);}
 .office-hol{display:block;margin-top:4px;color:#f6c56b;font-size:0.68rem;font-weight:800;line-height:1.2;}
-.office-hol-pay{display:block;color:#fff;font-size:0.66rem;font-weight:800;line-height:1.2;}
 #tab_today .cover-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px;}
 #tab_today .cover-stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 8px;min-width:0;}
 #tab_today .cover-stat .lbl{font-size:0.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
@@ -3011,7 +3010,7 @@ body.ts-print-open{overflow:hidden;}
 .eca-admin-only{border-style:dashed;}
 .eca-hol{background:#fff1db;border:1px solid #f6d29c;color:#6b3a04;border-radius:12px;padding:10px 12px;font-size:.85rem;margin:0 0 10px;}
 #schedHead th.holiday{background:#fff1db !important;color:#8a4b06 !important;}
-#schedHead th.holiday .office-hol,#schedHead th.holiday .office-hol-pay{display:inline-block;margin:3px 3px 0 0;background:#ffe2b8;color:#8a4b06;border-radius:6px;padding:1px 6px;font-size:.66rem;font-weight:800;}
+#schedHead th.holiday .office-hol{display:inline-block;margin:3px 3px 0 0;background:#ffe2b8;color:#8a4b06;border-radius:6px;padding:1px 6px;font-size:.66rem;font-weight:800;}
 #schedBody td.office-holiday-cell{background:#fffaf0;}
 #schedSlotDays .day-chip{flex-direction:row;border-radius:999px;min-width:48px;min-height:42px;padding:6px 12px;}
 #schedSlotDays .day-chip .circle{display:none;}
@@ -3463,8 +3462,8 @@ bindLoginKeyboard();
           </div>
         </div>
         <section class="eca-office" id="officePayRates" data-office-add1="v=office-add1" aria-label="Pay rates">
-          <div class="eca-h"><div><h3>Payroll · this week</h3><div class="eca-sub" id="officePayNote">Holiday hours at 1.5×</div></div></div>
-          <div class="eca-scroll"><table class="eca-table" id="officePayTable"><thead><tr><th>Aide</th><th>Regular hrs</th><th>Holiday hrs</th><th>Rate</th><th>Est. pay</th></tr></thead><tbody id="officePayBody"></tbody></table></div>
+          <div class="eca-h"><div><h3>Payroll · this week</h3><div class="eca-sub" id="officePayNote">Hourly rates for this week.</div></div></div>
+          <div class="eca-scroll"><table class="eca-table" id="officePayTable"><thead><tr><th>Aide</th><th>Hours</th><th>Rate</th><th>Est. pay</th></tr></thead><tbody id="officePayBody"></tbody></table></div>
           <p id="officePayEmpty" class="eca-empty" hidden>Pay rates are not on file yet.</p>
         </section>
         <div id="officePayLock" class="eca-office" data-office-add1="v=office-add1" hidden>
@@ -46516,10 +46515,8 @@ function officeAdd1Holiday(iso){
   var map=officeAdd1HolidayMap(Number(day.slice(0,4)));
   return map[day]||'';
 }
-function officeAdd1HolidayPayLine(iso, role){
-  if(!officeAdd1Holiday(iso))return '';
-  if(String(role||'').toLowerCase()!=='admin')return '';
-  return 'Holiday pay 1.5x';
+function officeAdd1HolidayPayLine(){
+  return '';
 }
 function officeAdd1CountShifts(weekStart, weekdays, untilIso){
   var start=officeAdd1DateOnly(weekStart);
@@ -46808,7 +46805,7 @@ function officeAdd1PaintToday(model){
     var items=[
       ['🩺', model.missed.length+' missed', 'Reasons are on the missed-visit report', 'missed'],
       ['📍', 'Clock-ins farther than 1,000 ft', 'Needs a look filter', 'visits'],
-      ['🦃', 'Holiday on the schedule', officeAdd1IsAdmin()?'Holiday pay 1.5× is on the Thursday column':'Holiday name is on the column', 'schedule'],
+      ['🦃', 'Holiday on the schedule', 'Named so the office can plan around the bank closure', 'schedule'],
       ['🛟', model.open.length+' open shift'+(model.open.length===1?'':'s'), 'Find cover from the day', 'schedule']
     ];
     todo.innerHTML=items.map(function(it){
@@ -46820,7 +46817,7 @@ function officeAdd1PaintToday(model){
     if(!officeAdd1IsAdmin()){owner.innerHTML='';owner.hidden=true;}
     else{
       owner.hidden=false;
-      owner.innerHTML='<div class="eca-card eca-admin-only"><h3>Payroll this week <span class="eca-pill gray">Admin only</span></h3><div class="eca-sub">Holiday hours use 1.5×. Open payroll for rates.</div><button type="button" class="eca-btn eca-btn-sm eca-btn-light" style="margin-top:10px" onclick="showTab(\'payroll\')">Open payroll</button></div>';
+      owner.innerHTML='<div class="eca-card eca-admin-only"><h3>Payroll this week <span class="eca-pill gray">Admin only</span></h3><div class="eca-sub">Open payroll for rates.</div><button type="button" class="eca-btn eca-btn-sm eca-btn-light" style="margin-top:10px" onclick="showTab(\'payroll\')">Open payroll</button></div>';
     }
   }
   var note=officeAdd1El('officeTodayNote');
@@ -46874,21 +46871,19 @@ function officeAdd1DecorateHead(){
   var banner=officeAdd1El('officeHolidayBanner');
   if(banner){banner.hidden=true;banner.innerHTML='';}
   if(!head||!head.querySelectorAll)return;
-  var old=head.querySelectorAll('.office-hol,.office-hol-pay');
+  var old=head.querySelectorAll('.office-hol');
   for(var i=0;i<old.length;i++){if(old[i].parentNode)old[i].parentNode.removeChild(old[i]);}
   var body=officeAdd1El('schedBody');
   if(body&&body.querySelectorAll){
-    var oldCells=body.querySelectorAll('.office-holiday-cell,.office-cell-pay');
+    var oldCells=body.querySelectorAll('.office-holiday-cell');
     for(var c=0;c<oldCells.length;c++){
       if(oldCells[c].classList)oldCells[c].classList.remove('office-holiday-cell');
-      if(oldCells[c].classList&&oldCells[c].classList.contains('office-cell-pay')&&oldCells[c].parentNode)oldCells[c].parentNode.removeChild(oldCells[c]);
     }
   }
   var week='';
   try{if(typeof schedEnsureWeek==='function')week=schedEnsureWeek();}catch(e){week='';}
   if(!week)week=officeAdd1Monday(officeAdd1Preview?'2026-11-26':officeAdd1TodayNy());
   var ths=head.querySelectorAll('th');
-  var admin=officeAdd1IsAdmin();
   var holName='';
   var holPretty='';
   for(var d=0;d<7;d++){
@@ -46905,12 +46900,6 @@ function officeAdd1DecorateHead(){
     hol.className='office-hol';
     hol.textContent=name;
     th.appendChild(hol);
-    if(admin){
-      var pay=document.createElement('span');
-      pay.className='office-hol-pay';
-      pay.textContent='Holiday pay 1.5×';
-      th.appendChild(pay);
-    }
     if(body&&body.querySelectorAll){
       var rows=body.querySelectorAll('tr');
       for(var r=0;r<rows.length;r++){
@@ -46918,19 +46907,12 @@ function officeAdd1DecorateHead(){
         var td=tds[d+1];
         if(!td)continue;
         td.classList.add('office-holiday-cell');
-        if(admin&&td.querySelector&&td.querySelector('.sched-chip')&&!td.querySelector('.office-cell-pay')){
-          var em=document.createElement('em');
-          em.className='office-hol-pay office-cell-pay';
-          em.textContent='Holiday pay 1.5×';
-          td.appendChild(em);
-        }
       }
     }
   }
   if(banner&&holName){
     banner.hidden=false;
-    var payBit=admin?' Holiday pay is flagged at 1.5×.':'';
-    banner.innerHTML='<div class="eca-hol">'+officeAdd1Esc(holPretty+' is '+holName+'.')+officeAdd1Esc(payBit)+'</div>';
+    banner.innerHTML='<div class="eca-hol">'+officeAdd1Esc(holPretty+' is '+holName+'.')+'</div>';
   }
 }
 function officeAdd1DayOfSlot(client, slot){
@@ -47621,9 +47603,7 @@ function officeAdd1RatesFromReport(report){
     rows.push({
       aide:String(a.aide_name||a.name||a.username||'Aide'),
       rate:Number(rate),
-      hours:a.paid_hours!=null?a.paid_hours:(a.hours!=null?a.hours:''),
-      holidayHours:a.holiday_hours!=null?a.holiday_hours:'',
-      multiplier:a.holiday_multiplier!=null?Number(a.holiday_multiplier):1.5
+      hours:a.paid_hours!=null?a.paid_hours:(a.hours!=null?a.hours:'')
     });
   });
   return rows;
@@ -47652,7 +47632,7 @@ function officeAdd1PaintPay(pack){
   if(lock)lock.hidden=true;
   if(box)box.hidden=false;
   var rows=pack.rows||[];
-  if(note)note.textContent=pack.note||(rows.length?'Holiday hours at 1.5×':'');
+  if(note)note.textContent=pack.note||(rows.length?'Hourly rates for this week.':'');
   if(!body)return;
   if(!rows.length){
     body.innerHTML='';
@@ -47662,17 +47642,13 @@ function officeAdd1PaintPay(pack){
   if(empty)empty.hidden=true;
   body.innerHTML=rows.map(function(r){
     var rate=Number(r.rate);
-    var hol=r.holidayHours===''||r.holidayHours==null?0:Number(r.holidayHours);
-    var hrs=r.hours===''||r.hours==null?0:Number(r.hours);
-    var reg=isFinite(hrs)&&isFinite(hol)?Math.max(0, hrs-hol):hrs;
-    var mult=r.multiplier!=null&&isFinite(Number(r.multiplier))?Number(r.multiplier):1.5;
-    var est=isFinite(rate)?(reg*rate+hol*rate*mult):NaN;
-    var holCell=hol?'<span class="eca-pill warn">'+officeAdd1Esc(String(hol))+'</span>':'0';
-    return '<tr><td><b>'+officeAdd1Esc(r.aide)+'</b></td><td>'+officeAdd1Esc(String(reg))+'</td><td>'+holCell+'</td><td>'+officeAdd1Esc(officeAdd1Money(rate))+'</td><td>'+officeAdd1Esc(isFinite(est)?officeAdd1Money(est):'—')+'</td></tr>';
+    var hrs=r.hours===''||r.hours==null?null:Number(r.hours);
+    var est=(isFinite(rate)&&hrs!=null&&isFinite(hrs))?hrs*rate:NaN;
+    return '<tr><td><b>'+officeAdd1Esc(r.aide)+'</b></td><td>'+officeAdd1Esc(hrs==null?'—':String(hrs))+'</td><td>'+officeAdd1Esc(officeAdd1Money(rate))+'</td><td>'+officeAdd1Esc(isFinite(est)?officeAdd1Money(est):'—')+'</td></tr>';
   }).join('');
 }
 function officeAdd1SamplePay(){
-  return {rows:[{aide:'Aide One', rate:18, hours:32, holidayHours:4, multiplier:1.5}], note:'Preview rates. Not live payroll.'};
+  return {rows:[{aide:'Aide One', rate:18, hours:32}], note:'Preview rates. Not live payroll.'};
 }
 async function officeAdd1LoadPay(){
   if(!officeAdd1IsAdmin()){
@@ -47695,9 +47671,7 @@ async function officeAdd1LoadPay(){
         rows.push({
           aide:String(r.aide_name||r.name||r.aide_id||'Aide'),
           rate:Number(rate),
-          hours:r.hours!=null?r.hours:'',
-          holidayHours:r.holiday_hours!=null?r.holiday_hours:'',
-          multiplier:r.holiday_multiplier!=null?Number(r.holiday_multiplier):1.5
+          hours:r.hours!=null?r.hours:''
         });
       });
     }else if(officeAdd1RpcMissing(got))missing=true;

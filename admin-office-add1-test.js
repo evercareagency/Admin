@@ -56,7 +56,7 @@ const end = html.indexOf('// OFFICE_ADD1_END');
 assert.ok(start > 0 && end > start, 'office module markers');
 const src = html.slice(start, end);
 assert.ok(src.includes('↻ weekly'), 'weekly mark copy');
-assert.ok(src.includes('Holiday pay 1.5x'), 'holiday pay copy');
+assert.ok(!/holiday pay/i.test(src), 'no holiday pay copy in the office module');
 assert.ok(src.includes('admin_list_aide_pay_rates'), 'pay rate RPC name');
 assert.ok(!src.includes('gpsDistanceUi') && !src.includes('buildPrintHtml') && !src.includes('printTimesheetSheet'), 'module does not call timesheet printers');
 
@@ -107,7 +107,7 @@ vm.runInContext(src, sandbox);
 
 assert.strictEqual(sandbox.officeAdd1Holiday('2026-11-26'), 'Thanksgiving');
 assert.strictEqual(sandbox.officeAdd1Holiday('2026-11-25'), '');
-assert.strictEqual(sandbox.officeAdd1HolidayPayLine('2026-11-26', 'Admin'), 'Holiday pay 1.5x');
+assert.strictEqual(sandbox.officeAdd1HolidayPayLine('2026-11-26', 'Admin'), '');
 assert.strictEqual(sandbox.officeAdd1HolidayPayLine('2026-11-26', 'Scheduler'), '');
 assert.strictEqual(sandbox.officeAdd1HolidayPayLine('2026-11-26', 'Nurse'), '');
 assert.strictEqual(sandbox.officeAdd1NeedsLook(1000), false);
