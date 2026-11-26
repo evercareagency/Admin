@@ -806,6 +806,10 @@ tr.client-on-hold td.sched-name{background:#fcfaff;}
 #adminScreen .bottom-tab .ni{font-size:1.05rem;width:auto;line-height:1;}
 #adminScreen .bottom-tab.active{background:var(--teal-light);color:var(--teal-dark);box-shadow:inset 0 2px 0 var(--teal);}
 #adminScreen .bottom-tab[hidden]{display:none !important;}
+@media(max-width:430px){
+  #adminScreen #bottomNav .bottom-tab{font-size:0.58rem;padding:5px 0 6px;line-height:1.05;letter-spacing:-0.03em;}
+  #adminScreen #bottomNav .bottom-tab .ni{font-size:0.95rem;}
+}
 /* v=tabbar-8 — 8 primary tabs + More. Tighten labels so nine slots stay on screen. */
 #adminScreen .bottom-nav.is-tight .bottom-tab{font-size:8px;letter-spacing:-0.05em;padding:3px 0 4px;line-height:1.05;gap:1px;white-space:nowrap;overflow:hidden;}
 #adminScreen .bottom-nav.is-tight .bottom-tab .ni{font-size:14px;}
@@ -3357,6 +3361,7 @@ bindLoginKeyboard();
     <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1" data-remi-msg-tab1="v=remi-msg-tab1" data-login-land-schedule1="v=login-land-schedule1" data-list-search-az1="v=list-search-az1">
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
       <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
+      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1" onclick="showTab('today')" id="nav_today" aria-label="Dashboard"><span class="ni">📊</span> Dashboard</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-remi-msg-tab1="v=remi-msg-tab1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('more')" id="nav_more" aria-label="More"><span class="ni">☰</span> More <span class="nav-badge" id="aideOfficeMoreBadge" hidden>0</span></button>
@@ -3478,6 +3483,13 @@ bindLoginKeyboard();
             </div>
             <button class="eca-btn eca-btn-sm" type="button" onclick="showTab('schedule')">＋ New shift</button>
           </div>
+          <div class="eca-filters" id="officeDashLinks" aria-label="Office">
+            <button type="button" onclick="showTab('coverage')">Find cover</button>
+            <button type="button" onclick="showTab('visits')">Visits</button>
+            <button type="button" onclick="showTab('supervision')">Supervision</button>
+            <button type="button" onclick="showTab('missed')">Missed report</button>
+            <button type="button" id="officeDashPayroll" data-layout-roles="Admin" onclick="showTab('payroll')">Payroll</button>
+          </div>
           <div id="officeTodayAlerts"></div>
           <div class="eca-stats" id="officeTodayStats" aria-label="Today counts"></div>
           <p class="eca-sub" id="officeTodayNote"></p>
@@ -3584,10 +3596,6 @@ bindLoginKeyboard();
         </div>
         <div class="more-list" id="moreList">
           <button type="button" class="nav-item more-row" data-layout-roles="Admin" data-remi-payroll-ins1="v=remi-payroll-ins1" onclick="showTab('payroll')" id="nav_payroll"><span class="ni">💵</span> Payroll report</button>
-          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1" onclick="showTab('today')" id="nav_today"><span class="ni">📊</span> Dashboard</button>
-          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1" onclick="showTab('visits')" id="nav_visits"><span class="ni">📍</span> Visits</button>
-          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1" onclick="showTab('supervision')" id="nav_supervision"><span class="ni">🩺</span> 60-day supervision</button>
-          <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1" onclick="showTab('missed')" id="nav_missed"><span class="ni">📄</span> Missed visits</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-cover-desk1="v=cover-desk1" onclick="showTab('coverage')" id="nav_coverage"><span class="ni">🛟</span> Cover</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" onclick="showTab('backups')" id="nav_backups" aria-label="Backup"><span class="ni">☁️</span> Backup</button>
           <button type="button" class="nav-item more-row" data-layout-roles="Admin Scheduler" data-clienthrs1d="v=clienthrs1d" onclick="showTab('notifications')" id="nav_notifications"><span class="ni">🔔</span> Notifications</button>
@@ -6142,6 +6150,7 @@ function layoutA1Primary(tab){
       if(picked)return picked;
     }catch(e){}
   }
+  if(tab==='today'||tab==='visits'||tab==='supervision'||tab==='missed')return 'today';
   if(tab==='timesheets'||tab==='schedule'||tab==='aides'||tab==='backups'||tab==='aidechat')return tab;
   return 'more';
 }
@@ -6322,6 +6331,7 @@ var NAV_EDIT_META={
   broadcast:{label:'Broadcast Alert',icon:'📢',short:'Broadcast'},
   links:{label:'Links',icon:'🔗',short:''},
   activity:{label:'Activity Log',icon:'📜',short:'Activity'},
+  today:{label:'Dashboard',icon:'📊',short:'Dash',tight:'Dash'},
   aidechat:{label:'Messages',icon:'💬',short:'Messages'},
   notifications:{label:'Notifications',icon:'🔔',short:'Alerts'}
 };
@@ -6333,10 +6343,10 @@ var navEditFresh={};
 var navEditDrag=null;
 var navEditIgnoreClick=false;
 function navEditDefaults(){
-  return ['timesheets','schedule','aides','aidechat'];
+  return ['timesheets','schedule','today','aides','aidechat'];
 }
 function navEditCatalog(){
-  return ['timesheets','schedule','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity','aidechat','notifications'];
+  return ['timesheets','schedule','today','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity','aidechat','notifications'];
 }
 function navEditRoleOk(tab){
   if(navEditCatalog().indexOf(tab)<0)return false;
@@ -46774,7 +46784,7 @@ function officeAdd1PaintToday(model){
   if(alerts){
     var ah='';
     model.late.forEach(function(r){
-      ah+='<div class="eca-alert"><div class="eca-k">Needs you</div><b>'+officeAdd1Esc(r.aide)+' has not clocked in at '+officeAdd1Esc(r.client)+'</b><div class="eca-sub">'+(r.when?officeAdd1Esc(r.when):'Late')+'</div><div class="eca-actions"><button type="button" class="eca-btn eca-btn-sm" onclick="showTab(\'schedule\')">Find cover</button></div></div>';
+      ah+='<div class="eca-alert"><div class="eca-k">Needs you</div><b>'+officeAdd1Esc(r.aide)+' has not clocked in at '+officeAdd1Esc(r.client)+'</b><div class="eca-sub">'+(r.when?officeAdd1Esc(r.when):'Late')+'</div><div class="eca-actions"><button type="button" class="eca-btn eca-btn-sm" onclick="showTab(\'coverage\')">Find cover</button></div></div>';
     });
     if(officeAdd1Preview){
       ah+='<div class="eca-alert warn"><div class="eca-k">Needs a look</div><b>A clock-in is farther than 1,000 ft from the client address</b><div class="eca-actions"><button type="button" class="eca-btn eca-btn-sm eca-btn-light" onclick="showTab(\'visits\')">Open visits</button></div></div>';
@@ -47866,6 +47876,17 @@ function officeAdd1Install(){
     layoutA1ApplyRoles=roleWrap;
   }
   try{officeAdd1BindRepeat();}catch(eBind){}
+  if(typeof navEditApply==='function'&&!navEditApply.__officeAdd1){
+    var navApplyBase=navEditApply;
+    var navApplyWrap=function(){
+      var out=navApplyBase.apply(this, arguments);
+      try{officeAdd1PinDashboard();}catch(ePin){}
+      return out;
+    };
+    navApplyWrap.__officeAdd1=1;
+    navEditApply=navApplyWrap;
+  }
+  try{officeAdd1PinDashboard();}catch(ePin0){}
   if(typeof enforceAdminSessionTimeout==='function'&&!enforceAdminSessionTimeout.__officeAdd1){
     var timeoutBase=enforceAdminSessionTimeout;
     var timeoutWrap=function(){
@@ -47943,6 +47964,15 @@ function officeAdd1PreviewOpenSchedule(){
       sc.scrollLeft=left;
     }catch(e2){}
   }
+}
+function officeAdd1PinDashboard(){
+  var bar=officeAdd1El('bottomNav');
+  var dash=officeAdd1El('nav_today');
+  var sched=officeAdd1El('nav_schedule');
+  if(!bar||!dash||!sched||!bar.insertBefore)return;
+  var next=sched.nextSibling;
+  if(next===dash)return;
+  bar.insertBefore(dash, next);
 }
 function officeAdd1HideSessionToast(){
   var el=officeAdd1El('nciToast');

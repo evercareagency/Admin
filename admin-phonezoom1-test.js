@@ -79,8 +79,8 @@ function plain(expr){
 }
 assert.ok(plain('navEditPool(navEditRead())').indexOf('coverage') >= 0, 'Cover starts in More until Edit tabs adds it');
 assert.strictEqual(plain('navEditPool(navEditRead())').indexOf('aidechat'), -1, 'Messages starts on the bar');
-assert.deepStrictEqual(plain("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','coverage')"), ['timesheets','schedule','aides','coverage'], 'Cover can still be swapped onto a short bar');
-assert.deepStrictEqual(plain('navEditRead()'), ['timesheets','schedule','aides','aidechat'], 'empty storage pins Messages');
+assert.deepStrictEqual(plain("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','coverage')"), ['timesheets','schedule','aides','coverage','today'], 'Cover can still be swapped onto a short bar');
+assert.deepStrictEqual(plain('navEditRead()'), ['timesheets','schedule','today','aides','aidechat'], 'empty storage pins Dashboard and Messages');
 
 function loadPuppeteer(){
   try{return require('puppeteer-core');}

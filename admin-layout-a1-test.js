@@ -34,7 +34,7 @@ let at = -1;
 });
 assert.ok(nav.includes('Timesheets') && nav.includes('> Schedule') && nav.includes('> Aides') && nav.includes('> Messages') && nav.includes('> More'), 'locked tab labels');
 assert.ok(admin.includes('id="nav_backups"'), 'Backup stays in the shell');
-assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'five bottom tabs');
+assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 6, 'five bottom tabs');
 
 const bak = admin.slice(admin.indexOf('id="tab_backups"'), admin.indexOf('id="tab_aides"'));
 assert.ok(bak.includes('Phone-change draft'), 'backup tab is phone-change drafts');
