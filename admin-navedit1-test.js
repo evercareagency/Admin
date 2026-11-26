@@ -24,7 +24,7 @@ assert.ok(html.includes('--teal:#2a7f7f') && html.includes('--navy:#1a2744'), 't
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
-assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'default HTML still has five bottom tabs');
+assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 6, 'default HTML still has five bottom tabs');
 assert.ok(nav.indexOf('id="nav_more"') > nav.indexOf('id="nav_aidechat"'), 'More stays last in the default bar');
 assert.ok(nav.includes('id="nav_aidechat"'), 'Messages is on the default bar');
 assert.ok(admin.includes('id="navEditOpen"') && admin.includes('>Edit tabs<'), 'More screen has Edit tabs');
@@ -109,26 +109,26 @@ function run(code){
   return JSON.parse(JSON.stringify(vm.runInContext(code, ctx)));
 }
 
-assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','aidechat'], 'empty storage pins Messages on the default bar');
+assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','today','aides','aidechat'], 'empty storage pins Dashboard next to Schedule and Messages on the default bar');
 assert.strictEqual(run('navEditPool(navEditRead()).indexOf("settings")'), -1, 'settings never enters the pool');
 assert.ok(run('navEditPool(navEditRead()).indexOf("nurse")') >= 0, 'Scheduler can pick Nurse');
 assert.strictEqual(run("navEditIsBottom('clients')"), 'more', 'Clients highlights More until it is on the bar');
 assert.strictEqual(run("navEditIsBottom('settings')"), null);
 assert.deepStrictEqual(
   run("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','clients')"),
-  ['timesheets','schedule','aides','clients'],
-  'Clients replaces Backup on a four-slot bar'
+  ['timesheets','schedule','aides','clients','today'],
+  'Clients replaces Backup and Dashboard stays on the bar'
 );
 assert.ok(run("navEditPool(['timesheets','schedule','aides','clients']).indexOf('backups')") >= 0, 'Backup moves into More');
 assert.deepStrictEqual(
   run("navEditSwapIds(['timesheets','schedule','aides','clients'],'clients','backups')"),
-  ['timesheets','schedule','aides','backups'],
-  'swapping back restores Backup'
+  ['timesheets','schedule','aides','backups','today'],
+  'swapping back restores Backup and keeps Dashboard'
 );
 assert.deepStrictEqual(
   run("navEditSanitize(['nope','settings','more','clients','clients'])"),
-  ['clients','timesheets','schedule','aides'],
-  'junk, settings, and More cannot occupy a slot; floor stays four'
+  ['clients','timesheets','schedule','today','aides'],
+  'junk, settings, and More cannot occupy a slot; floor keeps Dashboard'
 );
 assert.strictEqual(run("navEditStorageKeyFor('user-1','Mo@Evercare.test')"), 'evercare_nav_tabs:user-1|mo@evercare.test');
 assert.strictEqual(run("navEditStorageKeyFor('','Mo@Evercare.test')"), 'evercare_nav_tabs:mo@evercare.test');
@@ -140,7 +140,7 @@ ctx.currentAdminUsername = 'other@evercare.test';
 assert.notStrictEqual(run('navEditStorageKey()'), 'evercare_nav_tabs:sched@evercare.test');
 ctx.currentAdminUsername = 'sched@evercare.test';
 vm.runInContext("localStorage.setItem(navEditStorageKey(), JSON.stringify({v:1,slots:['timesheets','schedule','aides','clients']}))", ctx);
-assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','clients']);
+assert.deepStrictEqual(run('navEditRead()'), ['timesheets','schedule','aides','clients','today']);
 assert.strictEqual(run("navEditIsBottom('clients')"), 'clients');
 assert.strictEqual(run("navEditIsBottom('backups')"), 'more');
 roles.nav_nurse = 'Admin';
@@ -148,8 +148,8 @@ assert.strictEqual(run("navEditRoleOk('nurse')"), false, 'Scheduler cannot open 
 assert.strictEqual(run('navEditPool(navEditRead()).indexOf("nurse")'), -1, 'Nurse is hidden from the picker');
 assert.deepStrictEqual(
   run("navEditSanitize(['timesheets','schedule','aides','nurse'])"),
-  ['timesheets','schedule','aides','aidechat'],
-  'a blocked Nurse slot falls back to Messages'
+  ['timesheets','schedule','aides','today','aidechat'],
+  'a blocked Nurse slot falls back toward Dashboard and Messages'
 );
 assert.deepStrictEqual(
   run("navEditSwapIds(['timesheets','schedule','aides','backups'],'backups','nurse')"),

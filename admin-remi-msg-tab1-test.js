@@ -59,7 +59,7 @@ assert.ok(tipAt < html.indexOf('content="2026-09-28-aide-profile-link-fix"'), 'a
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
-assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'default bar is five slots');
+assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 6, 'default bar is five slots');
 const order = ['nav_timesheets','nav_schedule','nav_aides','nav_aidechat','nav_more'];
 let prev = -1;
 order.forEach(function(id){
@@ -257,7 +257,7 @@ vm.createContext(navCtx);
 ].forEach(function(sig){vm.runInContext(extractFn(html, sig), navCtx);});
 assert.deepStrictEqual(
   JSON.parse(JSON.stringify(vm.runInContext('navEditRead()', navCtx))),
-  ['timesheets','schedule','aides','aidechat'],
+  ['timesheets','schedule','today','aides','aidechat'],
   'empty storage pins Messages'
 );
 assert.ok(vm.runInContext("navEditCatalog().indexOf('coverage')>=0 && navEditCatalog().indexOf('backups')>=0", navCtx), 'Cover and Backup stay in the catalog');

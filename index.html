@@ -9,6 +9,10 @@
 <title>EverCare — Admin Portal</title>
 <!-- remi float hide1b 2026-09-27 v=remi-float-hide1b admin-build 2026-09-27-remi-float-hide1b. GHOST-REMI-FLOAT-HIDE1-CONTRACT-v1. Ace CALLABLE. MERGE HOLD. Do not claim LIVE. Do not squash-merge. Do not merge until Probe and Friday MERGE GO. Live Pages still painted Float pool on Coverage confirm after v=remi-float-hide1: the hide1 override won the chip function, but the confirm card still printed Float pool in the copy, and the ideas763 Why open button still said Blast float pool. This tip paints Coverage confirm as Open shift plus Ranked · same-day yes / 30d and Rest of list only. The chip and section titles are never Float pool. When ranked[] already has rows, paint those plus rest as-is. When ranked[] is empty, only rows with same_day_yes_30d > 0 from rest, aides, or float_pool move into Ranked. Ace clears is_float, so a 0 same-day yes row stays in Rest of list. If nobody has a same-day yes, Rest-only is correct. float_pool is never a chip or section. hide_float_ui stays true, and is_float is always false on painted copies. Confirm blast opens a gate first: Confirm sends admin_blast_cover_request, and Not yet or Cancel writes nothing. Confirm blast still posts admin_blast_cover_request. No-show rescue cards stay. Remi stays the corner chip, the phone sheet, and the desktop right rail. No full-page Remi. No Auth reseal. No Quo/SMS. Dates people read are MM/DD/YYYY. Prior markers stay, including v=remi-phone-rail1, v=remi-chat-bleed1, v=remi-float-hide1, v=list-az1, v=remi-float-noshow1, v=remi-payroll1, v=coverage-simple1, v=nosvc-reason-draft1, v=hold-clear1, and v=hold-autosave1. -->
 <meta name="admin-build" content="2026-09-27-remi-float-hide1b">
+<!-- office add 2026-11-26 v=office-add1 ?v=office-add1 admin-build 2026-11-26-office-add1. OFFICE_ADD1. PREVIEW DRAFT. Do not claim LIVE. Do not merge. Do not apply SQL. Admin and Scheduler share Today, Schedule find-cover, Repeat weekly, Visits, the 60-day supervision tracker, and the missed-visit report. Payroll and pay rates are Admin only. Scheduler does not see them and does not call pay RPCs. Schedule columns still name holidays, such as Thanksgiving, so the office can plan around bank closures. Caregiver timesheet layout and the timesheet PDF are unchanged. Wide grids scroll sideways. Dates people read are MM/DD/YYYY. Existing reads: list_schedule_week, admin_list_open_shifts, admin_rank_backup_aides, get_supervisory_compliance, and timesheet day distance when a visit RPC is missing. Anything not on file stays an empty state. The unapplied change list is sql/office-add1-PREVIEW-DO-NOT-APPLY.sql. The first admin-build meta stays 2026-09-27-remi-float-hide1b. admin-build.txt stays 2026-09-29-pages-cache-fresh1. -->
+<meta name="admin-build" content="2026-11-26-office-add1">
+<script>var OFFICE_ADD1_MARKER='v=office-add1';var OFFICE_ADD1_BUILD='2026-11-26-office-add1';</script>
+
 <!-- pay admin1 2026-10-08 v=pay-admin1 ?v=pay-admin1 admin-build 2026-10-08-pay-admin1. PAY_ADMIN1. Payroll is Admin-only. Scheduler and Nurse share this portal but must not see pay UI and must not call pay or payroll RPCs. The gate reads currentAdminRole, the signed-in session role set by applyAdminSession, the same source layoutA1ApplyRoles already uses. It does not read a control a person can toggle. #payReady is data-layout-roles Admin. payAdmin1MaybeLoad skips payReadyLoad unless that role is Admin, and payReadyFetchAce, payReadyHold, and payReadyExport return before sbRestRpc for admin_timesheet_pay_readiness, admin_set_timesheet_pay_hold, and admin_timesheet_pay_export. The rest of the Timesheets tab stays for Scheduler. The Messages Remi pay-dispute card stays Admin-only: admin_get_pay_dispute_evidence and admin_draft_pay_dispute_reply are not called for Scheduler or Nurse. remiIdeas763OfficeOk still lets Scheduler use Why open and bilingual cover. A Scheduler payroll range ask in Remi chat is answered Payroll is Admin-only and does not post admin_parse_remi_payroll_range. remiPayroll1OfficeOk is Admin-only, so payroll load, run, confirm, and export stay off that RPC for Scheduler and Nurse. Admin behavior stays. pages-cache-fresh1 stays: admin-build.txt stays 2026-09-29-pages-cache-fresh1, the first admin-build meta stays 2026-09-27-remi-float-hide1b, and the Home Screen URL is not rewritten to a sticky ?v=. Remi notes keyboard and compose, sec1-ui login, forgot, and idle, and nurse activity and compliance stay. -->
 <meta name="admin-build" content="2026-10-08-pay-admin1">
 <script>var PAY_ADMIN1='PAY_ADMIN1';var PAY_ADMIN1_MARKER='v=pay-admin1';var PAY_ADMIN1_BUILD='2026-10-08-pay-admin1';</script>
@@ -802,6 +806,10 @@ tr.client-on-hold td.sched-name{background:#fcfaff;}
 #adminScreen .bottom-tab .ni{font-size:1.05rem;width:auto;line-height:1;}
 #adminScreen .bottom-tab.active{background:var(--teal-light);color:var(--teal-dark);box-shadow:inset 0 2px 0 var(--teal);}
 #adminScreen .bottom-tab[hidden]{display:none !important;}
+@media(max-width:430px){
+  #adminScreen #bottomNav .bottom-tab{font-size:0.58rem;padding:5px 0 6px;line-height:1.05;letter-spacing:-0.03em;}
+  #adminScreen #bottomNav .bottom-tab .ni{font-size:0.95rem;}
+}
 /* v=tabbar-8 — 8 primary tabs + More. Tighten labels so nine slots stay on screen. */
 #adminScreen .bottom-nav.is-tight .bottom-tab{font-size:8px;letter-spacing:-0.05em;padding:3px 0 4px;line-height:1.05;gap:1px;white-space:nowrap;overflow:hidden;}
 #adminScreen .bottom-nav.is-tight .bottom-tab .ni{font-size:14px;}
@@ -2874,6 +2882,236 @@ body.ts-print-open{overflow:hidden;}
   .is-result-qa .ans{margin-left:0;}
 }
 .is-results-foot{justify-content:space-between;flex-shrink:0;margin-top:10px;padding-top:12px;border-top:1px solid var(--border);}
+
+/* v=office-add1 — office additions. Timesheet print CSS is unchanged. */
+.office-exempt-banner{position:fixed;top:0;left:0;right:0;height:34px;z-index:400;background:#c0392b;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 10px;font-size:0.74rem;font-weight:800;letter-spacing:.02em;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.office-exempt-banner[hidden]{display:none !important;}
+body.office-exempt-preview{padding-top:34px;}
+body.office-exempt-preview #adminScreen .shell-top{top:34px;}
+body.office-exempt-preview #adminScreen .main-content{padding:0 0 calc(78px + env(safe-area-inset-bottom,0px));max-width:none;}
+#tab_aides.office-exempt-host > :not(#officeExemptRoot){display:none !important;}
+#officeExemptRoot[hidden]{display:none !important;}
+#officeExemptRoot{color:var(--text);}
+#officeExemptRoot .ox-wrap{max-width:1100px;margin:0 auto;padding:10px 14px 16px;width:100%;}
+#officeExemptRoot .ox-page{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
+#officeExemptRoot h1{font-family:'DM Sans',system-ui,sans-serif;font-weight:700;font-size:1.45rem;color:var(--navy);letter-spacing:-0.02em;line-height:1.15;margin:0;}
+#officeExemptRoot .ox-sub{font-size:0.8rem;color:var(--muted);font-weight:600;margin-top:3px;}
+#officeExemptRoot .ox-back{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:var(--teal-dark);font-weight:800;font-size:0.9rem;cursor:pointer;padding:0 0 8px;min-height:32px;}
+#officeExemptRoot .ox-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:10px;font-size:0.92rem;font-weight:700;cursor:pointer;border:none;min-height:44px;white-space:nowrap;}
+#officeExemptRoot .ox-btn-teal,#officeExemptModal .ox-btn-teal{background:var(--teal);color:#fff;}
+#officeExemptRoot .ox-btn-full{width:100%;}
+#officeExemptRoot .ox-search{display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#f4f7fb;margin:0 0 8px;}
+#officeExemptRoot .ox-search input{border:none;background:transparent;flex:1;min-width:0;font-size:0.95rem;color:var(--text);outline:none;min-height:40px;font-family:inherit;}
+#officeExemptRoot .ox-search .ox-ico{color:var(--muted);flex-shrink:0;}
+#officeExemptRoot .ox-filters{display:flex;gap:8px;margin:0 0 8px;overflow-x:auto;}
+#officeExemptRoot .ox-filters button{flex:1;min-width:0;min-height:40px;border-radius:999px;border:1.5px solid var(--border);background:#fff;color:var(--navy);font-weight:800;font-size:0.8rem;cursor:pointer;padding:6px 8px;white-space:nowrap;font-family:inherit;}
+#officeExemptRoot .ox-filters button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+#officeExemptRoot .ox-filters button .n{font-weight:700;opacity:.75;margin-left:2px;}
+#officeExemptRoot .ox-filters button.on .n{opacity:.9;}
+#officeExemptRoot .ox-note{font-size:0.74rem;color:var(--muted);line-height:1.4;font-weight:600;margin:0 2px 6px;}
+#officeExemptRoot .ox-note.center{text-align:center;margin-top:8px;}
+#officeExemptRoot .ox-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 8px 3px 6px;font-size:0.68rem;font-weight:800;letter-spacing:.01em;line-height:1.2;white-space:nowrap;}
+#officeExemptRoot .ox-chip svg{width:14px;height:14px;flex-shrink:0;display:block;}
+#officeExemptRoot .ox-chip.clock{background:var(--teal-light);color:var(--teal-dark);border:1px solid #c5dddd;}
+#officeExemptRoot .ox-chip.exempt{background:#f3efe6;color:#3f3d6b;border:1px solid #e4d9c8;}
+#officeExemptRoot .ox-list{display:flex;flex-direction:column;gap:6px;}
+#officeExemptRoot .ox-row{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:14px;padding:8px 8px 8px 10px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.04);min-height:58px;font-family:inherit;}
+#officeExemptRoot .ox-av{width:40px;height:40px;border-radius:50%;background:var(--teal-light);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0;}
+#officeExemptRoot .ox-main{flex:1;min-width:0;}
+#officeExemptRoot .ox-main b{display:block;color:var(--navy);font-size:0.95rem;line-height:1.2;}
+#officeExemptRoot .ox-main span{display:block;font-size:0.75rem;color:var(--muted);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#officeExemptRoot .ox-chev{color:var(--muted);font-size:1.15rem;flex-shrink:0;}
+#officeExemptRoot .ox-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+#officeExemptRoot .ox-field label,#officeExemptRoot .ox-choice-lbl{font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+#officeExemptRoot .ox-choice-lbl{font-size:0.72rem;font-weight:800;color:var(--navy);margin:4px 0 8px;}
+#officeExemptRoot input[type=text],#officeExemptRoot input[type=tel],#officeExemptRoot input[type=date]{padding:11px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;color:var(--text);background:#fff;width:100%;min-height:46px;font-family:inherit;}
+#officeExemptRoot input:focus{outline:none;border-color:var(--teal);}
+#officeExemptRoot .ox-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+#officeExemptRoot .ox-choices{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
+#officeExemptRoot .ox-choice{display:block;width:100%;text-align:left;background:#fff;border:2px solid var(--border);border-radius:14px;padding:14px 14px 12px;cursor:pointer;color:var(--text);font-family:inherit;}
+#officeExemptRoot .ox-ct{display:flex;align-items:flex-start;gap:10px;}
+#officeExemptRoot .ox-cico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#officeExemptRoot .ox-cico svg{width:22px;height:22px;}
+#officeExemptRoot .ox-choice.clock .ox-cico{background:var(--teal-light);color:var(--teal-dark);}
+#officeExemptRoot .ox-choice.exempt .ox-cico{background:#f3efe6;color:#3f3d6b;}
+#officeExemptRoot .ox-choice b{display:block;color:var(--navy);font-size:0.98rem;line-height:1.25;}
+#officeExemptRoot .ox-choice small{display:block;font-size:0.8rem;color:var(--muted);font-weight:600;line-height:1.35;margin-top:4px;}
+#officeExemptRoot .ox-choice.on.clock{border-color:var(--teal);background:#f4fbfb;box-shadow:0 0 0 3px rgba(42,127,127,.15);}
+#officeExemptRoot .ox-choice.on.exempt{border-color:#3f3d6b;background:#fbf9f4;box-shadow:0 0 0 3px rgba(63,61,107,.12);}
+#officeExemptRoot .ox-extra{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin:-2px 0 12px;}
+#officeExemptRoot .ox-hero{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 14px 10px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);text-align:center;}
+#officeExemptRoot .ox-hero .ox-av{width:56px;height:56px;font-size:1.05rem;margin:0 auto 6px;}
+#officeExemptRoot .ox-hero h2{font-family:'Playfair Display',Georgia,serif;font-size:1.35rem;color:var(--navy);font-weight:700;margin:0 0 6px;}
+#officeExemptRoot .ox-hero .ox-chip{font-size:0.78rem;padding:5px 10px 5px 8px;}
+#officeExemptRoot .ox-hero .ox-chip svg{width:16px;height:16px;}
+#officeExemptRoot .ox-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+#officeExemptRoot .ox-card h3{font-family:'Playfair Display',Georgia,serif;font-size:1.02rem;color:var(--navy);margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--border);font-weight:700;}
+#officeExemptRoot .ox-line{display:flex;justify-content:space-between;gap:10px;font-size:0.9rem;padding:6px 0;border-bottom:1px solid var(--border);}
+#officeExemptRoot .ox-line:last-of-type{border-bottom:none;}
+#officeExemptRoot .ox-line span{color:var(--muted);}
+#officeExemptRoot .ox-line b{color:var(--navy);text-align:right;font-weight:700;}
+#officeExemptRoot .ox-desk{display:none;}
+#officeExemptRoot table.ox-grid{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+#officeExemptRoot .ox-grid th,#officeExemptRoot .ox-grid td{padding:7px 14px;text-align:left;border-bottom:1px solid var(--border);font-size:0.92rem;vertical-align:middle;}
+#officeExemptRoot .ox-grid th{background:#eef3f7;font-size:0.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:800;}
+#officeExemptRoot .ox-grid tr:last-child td{border-bottom:none;}
+#officeExemptRoot .ox-grid .ox-who{background:none;border:none;display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;padding:0;color:var(--navy);font:inherit;font-weight:700;}
+#officeExemptRoot .ox-grid .muted{color:var(--muted);font-weight:600;font-size:0.85rem;}
+#officeExemptModal[hidden]{display:none !important;}
+#officeExemptModal.ox-modal-bg{position:fixed;inset:0;background:rgba(26,39,68,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;}
+#officeExemptModal .ox-modal{background:#fff;border-radius:14px;padding:22px 20px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;}
+#officeExemptModal .ox-mi{width:48px;height:48px;border-radius:50%;background:#f3efe6;color:#3f3d6b;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+#officeExemptModal .ox-mi svg{width:24px;height:24px;}
+#officeExemptModal h3{font-family:'Playfair Display',Georgia,serif;font-size:1.3rem;color:var(--navy);margin:0 0 8px;}
+#officeExemptModal p{font-size:0.95rem;color:var(--muted);line-height:1.5;margin:0;}
+#officeExemptModal .ox-mrow{display:flex;gap:10px;margin-top:16px;}
+#officeExemptModal .ox-mrow .ox-btn{flex:1;min-height:44px;border-radius:10px;font-weight:700;font-size:0.92rem;cursor:pointer;font-family:inherit;}
+#officeExemptModal .ox-btn-ghost{background:#fff;color:var(--navy);border:1.5px solid var(--border);}
+@media(min-width:800px){
+  #officeExemptRoot .ox-wrap{padding-top:18px;}
+  #officeExemptRoot .ox-phone{display:none;}
+  #officeExemptRoot .ox-desk{display:block;}
+  #officeExemptRoot .ox-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  #officeExemptRoot .ox-filters button{flex:0 0 auto;padding:6px 16px;}
+}
+.office-banner{margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#fff6e8;color:#8a4b08;font-size:0.84rem;font-weight:700;line-height:1.4;}
+.office-banner[hidden]{display:none !important;}
+.office-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.office-row{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:0 0 8px;background:#fff;}
+.office-row strong{display:block;color:var(--navy);font-size:0.92rem;}
+.office-row span{display:block;color:var(--muted);font-size:0.8rem;margin-top:2px;overflow-wrap:anywhere;}
+.office-row .tag{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;font-size:0.72rem;font-weight:800;}
+.office-row .tag.is-late,.tag.is-due{background:#fff6e8;color:#8a4b08;}
+.office-row .tag.is-miss,.office-row .tag.is-over,.office-row .tag.is-look,.tag.is-over{background:#fde8e8;color:#9f1239;}
+.office-row .tag.is-open{background:#e8f0fa;color:#1e4e8c;}
+.office-row .tag.is-ok{background:#e7f6ee;color:#1e7a45;}
+.office-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+.office-scroll table{min-width:680px;}
+.office-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;}
+.office-filters button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy);}
+.office-hol{display:block;margin-top:4px;color:#f6c56b;font-size:0.68rem;font-weight:800;line-height:1.2;}
+#tab_today .cover-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px;}
+#tab_today .cover-stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 8px;min-width:0;}
+#tab_today .cover-stat .lbl{font-size:0.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+#tab_today .cover-stat .val{font-size:1.35rem;font-weight:800;color:var(--navy);line-height:1.1;margin-top:2px;}
+#tab_today .cover-stat .val.is-hot{color:#9a3412;}
+#tab_today .cover-stat .val.is-warn{color:#9f1239;}
+@media(max-width:899px){
+  #tab_today .cover-stats{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+.office-weekly{display:inline-block;margin-left:4px;padding:0 4px;border-radius:4px;background:#fff;color:var(--teal-dark);font-size:0.62rem;font-weight:800;white-space:nowrap;}
+.office-repeat{margin:8px 0 12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--off);}
+.office-find{margin-top:12px;}
+.office-find h3{margin:12px 0 6px;font-size:0.95rem;color:var(--navy);}
+.office-lock{padding:18px;border:1.5px dashed var(--border);border-radius:12px;background:var(--off);color:var(--navy);font-weight:700;line-height:1.45;}
+.office-paper{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;}
+.office-paper h2{margin:0 0 4px;color:var(--navy);font-size:1.15rem;}
+#officeRepeatUntil,#officeMissedFrom,#officeMissedTo{min-height:44px;width:100%;}
+.office-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.office-actions .btn{min-height:44px;}
+.office-distance{font-size:1.05rem;font-weight:800;color:var(--navy);margin:8px 0;}
+@media(max-width:899px){
+  .office-grid-3{grid-template-columns:1fr;}
+  .office-paper{padding:12px;}
+}
+
+
+/* office-add1 visual match: EverCare tenant from the approved office mock */
+#tab_today,#tab_visits,#tab_supervision,#tab_missed,#tab_payroll{background:#f4f6fb;}
+.eca-office{color:#1d2638;font-family:'DM Sans',sans-serif;}
+.eca-office h3{font-family:'Playfair Display',Georgia,serif;font-size:1.25rem;color:#1a2744;font-weight:700;margin:0;}
+.eca-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 12px;}
+.eca-sub{font-size:.8rem;color:#687489;line-height:1.4;margin-top:2px;}
+.eca-k{font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.eca-lbl{display:block;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#687489;margin:12px 0 6px;}
+.eca-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:none;border-radius:12px;background:#2a7f7f;color:#fff;font-weight:800;font-size:.95rem;padding:10px 16px;cursor:pointer;}
+.eca-btn-sm{min-height:40px;font-size:.86rem;width:auto;padding:8px 14px;border-radius:10px;}
+.eca-btn-light{background:#fff;color:#1a2744;border:1.5px solid #dde3ee;}
+.eca-back{background:none;border:none;color:#1e6060;font-weight:800;padding:4px 0 10px;font-size:.95rem;cursor:pointer;}
+.eca-card{background:#fff;border:1px solid #dde3ee;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(20,30,60,.05);}
+.eca-card h3{margin-bottom:8px;}
+.eca-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.eca-stat{background:#fff;border:1px solid #dde3ee;border-radius:12px;padding:12px;min-width:0;}
+.eca-stat b{display:block;font-size:1.5rem;color:#1a2744;line-height:1.1;}
+.eca-stat span{font-size:.75rem;color:#687489;}
+.eca-stat.accent{border-left:4px solid #2a7f7f;}
+.eca-stat.bad{border-left:4px solid #c0392b;}
+.eca-stat.warn{border-left:4px solid #d9822b;}
+.eca-alert{border-radius:14px;padding:14px;margin-bottom:12px;color:#1a2744;background:#fff6ec;border:1.5px solid #f3c48d;}
+.eca-alert b{display:block;font-size:1rem;}
+.eca-alert .eca-k{color:#a35a0b;}
+.eca-alert.warn{background:#fdeeee;border-color:#f0b4ad;}
+.eca-alert.warn .eca-k{color:#a8291c;}
+.eca-alert.ok{background:#e9f7ef;border-color:#a9dcbc;}
+.eca-alert.ok .eca-k{color:#17723f;}
+.eca-alert .eca-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.eca-cols{display:grid;grid-template-columns:1fr;gap:0 14px;}
+.eca-live,.eca-todo{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #dde3ee;padding:12px 2px;min-height:56px;color:#1d2638;cursor:pointer;}
+.eca-live:last-child,.eca-todo:last-child{border-bottom:none;}
+.eca-live b,.eca-todo b{display:block;font-size:.92rem;color:#1a2744;margin-bottom:3px;}
+.eca-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.eca-dot.green{background:#1f9d55;}.eca-dot.red{background:#c0392b;}.eca-dot.gray{background:#b5bdca;}
+.eca-ti{font-size:1.3rem;width:30px;text-align:center;flex-shrink:0;}
+.eca-pill{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:800;padding:3px 9px;border-radius:999px;background:#e8f4f4;color:#1e6060;white-space:nowrap;}
+.eca-pill.ok{background:#e5f6ec;color:#17723f;}
+.eca-pill.warn{background:#fff2e0;color:#a35a0b;}
+.eca-pill.bad{background:#fde8e6;color:#a8291c;}
+.eca-pill.gray{background:#eef0f4;color:#5b6577;}
+.eca-filters{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch;}
+.eca-filters button{flex-shrink:0;border:1.5px solid #dde3ee;background:#fff;border-radius:999px;padding:8px 14px;font-weight:800;font-size:.84rem;color:#1a2744;min-height:40px;cursor:pointer;}
+.eca-filters button.on{background:#1a2744;border-color:#1a2744;color:#fff;}
+.eca-inp{min-height:44px;border:1.5px solid #dde3ee;border-radius:10px;padding:10px 12px;background:#fff;color:#1d2638;font:inherit;min-width:0;flex:1;}
+.eca-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;border:1px solid #dde3ee;border-radius:12px;background:#fff;margin-bottom:14px;}
+.eca-table{width:100%;border-collapse:collapse;font-size:.84rem;min-width:640px;background:#fff;}
+.eca-table th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#687489;padding:9px 10px;border-bottom:1px solid #dde3ee;background:#f4f6fb;white-space:nowrap;}
+.eca-table td{padding:10px;border-bottom:1px solid #dde3ee;white-space:nowrap;color:#1d2638;}
+.eca-vrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #dde3ee;padding:12px 2px;color:#1d2638;cursor:pointer;}
+.eca-vrow:last-child{border-bottom:none;}
+.eca-vrow b{display:block;color:#1a2744;margin-bottom:2px;}
+.eca-vd{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:5px;}
+.eca-vd span{font-size:.78rem;color:#1a2744;}
+.eca-kv{display:grid;grid-template-columns:1fr 1fr;gap:14px 12px;}
+.eca-kv .k{display:block;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#687489;margin-bottom:3px;}
+.eca-kv b{font-size:.95rem;color:#1a2744;font-family:'DM Sans',sans-serif;}
+.eca-badge{display:flex;align-items:center;gap:12px;border:1.5px dashed #2a7f7f;background:#e8f4f4;border-radius:14px;padding:14px;margin:8px 0;color:#1a2744;font-weight:800;}
+.eca-badge.far{border-color:#c0392b;background:#fdeeee;}
+.eca-badge .pin{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#2a7f7f;color:#fff;flex-shrink:0;}
+.eca-badge.far .pin{background:#c0392b;}
+.eca-lock{background:#fff;border:1px solid #dde3ee;border-radius:14px;padding:28px 18px;text-align:center;box-shadow:0 1px 6px rgba(20,30,60,.05);}
+.eca-lock-ico{font-size:2rem;margin-bottom:6px;}
+.eca-lock p{color:#687489;margin-top:6px;}
+.eca-empty{color:#687489;padding:12px 0;}
+.eca-person{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #dde3ee;}
+.eca-person:last-child{border-bottom:none;}
+.eca-avatar{width:38px;height:38px;border-radius:50%;background:#e8f4f4;color:#1e6060;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;}
+.eca-person-main{flex:1;min-width:0;}
+.eca-person-main b{display:block;color:#1a2744;}
+.eca-person-main span{font-size:.78rem;color:#687489;}
+.eca-switch{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-top:8px;padding:12px;border-radius:12px;border:1.5px solid #dde3ee;background:#fff;color:#1a2744;cursor:pointer;}
+.eca-switch.on{background:#e8f4f4;border-color:#2a7f7f;}
+.eca-switch .eca-box{width:26px;height:26px;border-radius:7px;border:2px solid #2a7f7f;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;}
+.eca-switch.on .eca-box{background:#2a7f7f;}
+.eca-switch .eca-sub{display:block;}
+.eca-summary{margin:12px 0 0;color:#1a2744;font-size:.92rem;}
+.eca-print{background:#fff;max-width:900px;margin:8px auto 20px;padding:16px;border:1px solid #dde3ee;border-radius:12px;}
+.eca-print-bar{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.eca-print-head{display:flex;flex-direction:column;gap:2px;border-bottom:2px solid #1a2744;padding-bottom:10px;margin-bottom:12px;}
+.eca-print-head b{font-size:1.1rem;color:#1a2744;}
+.eca-admin-only{border-style:dashed;}
+.eca-hol{background:#fff1db;border:1px solid #f6d29c;color:#6b3a04;border-radius:12px;padding:10px 12px;font-size:.85rem;margin:0 0 10px;}
+#schedHead th.holiday{background:#fff1db !important;color:#8a4b06 !important;}
+#schedHead th.holiday .office-hol{display:inline-block;margin:3px 3px 0 0;background:#ffe2b8;color:#8a4b06;border-radius:6px;padding:1px 6px;font-size:.66rem;font-weight:800;}
+#schedBody td.office-holiday-cell{background:#fffaf0;}
+#schedSlotDays .day-chip{flex-direction:row;border-radius:999px;min-width:48px;min-height:42px;padding:6px 12px;}
+#schedSlotDays .day-chip .circle{display:none;}
+#schedSlotDays .day-chip.on{background:#2a7f7f;border-color:#2a7f7f;color:#fff;}
+#schedSlotDays .day-chip.on .abbr::before{content:'✓ ';}
+@media(min-width:900px){
+  .eca-stats{grid-template-columns:repeat(4,1fr);}
+  .eca-cols{grid-template-columns:1fr 1fr;}
+  .eca-kv{grid-template-columns:repeat(4,1fr);}
+}
+
 </style>
 
 <!-- PWA -->
@@ -3196,6 +3434,8 @@ bindLoginKeyboard();
 </div>
 
 <!-- ADMIN -->
+<div id="officeExemptBanner" class="office-exempt-banner" data-office-add1="v=office-add1" hidden>PREVIEW, FAKE TEST DATA, nothing is sent</div>
+<div id="officeExemptModal" data-office-add1="v=office-add1" hidden></div>
 <div class="screen" id="adminScreen">
   <div class="admin-layout layout-a1">
     <header class="shell-top" data-punch-leftovers1="v=punch-leftovers1" data-phone-safe-header1="v=phone-safe-header1">
@@ -3212,11 +3452,14 @@ bindLoginKeyboard();
     <nav class="bottom-nav" id="bottomNav" aria-label="Admin" data-tabbar-8="v=tabbar-8" data-remi-phone-rail1="v=remi-phone-rail1" data-remi-msg-tab1="v=remi-msg-tab1" data-login-land-schedule1="v=login-land-schedule1" data-list-search-az1="v=list-search-az1">
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('timesheets')" id="nav_timesheets"><span class="ni">📋</span> Timesheets</button>
       <button type="button" class="nav-item bottom-tab active" data-layout-roles="Admin Scheduler" onclick="showTab('schedule')" id="nav_schedule" aria-label="Schedule"><span class="ni">📅</span> Schedule</button>
+      <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1" onclick="showTab('today')" id="nav_today" aria-label="Dashboard"><span class="ni">📊</span> Dashboard</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('aides')" id="nav_aides"><span class="ni">👥</span> Aides</button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" data-aidechat1="v=aidechat1" data-aide-office-vis1="v=aide-office-vis1" data-remi-msg-tab1="v=remi-msg-tab1" onclick="showTab('aidechat')" id="nav_aidechat" aria-label="Messages"><span class="ni">💬</span> Messages <span class="nav-badge" id="aideOfficeMsgBadge" hidden>0</span></button>
       <button type="button" class="nav-item bottom-tab" data-layout-roles="Admin Scheduler" onclick="showTab('more')" id="nav_more" aria-label="More"><span class="ni">☰</span> More <span class="nav-badge" id="aideOfficeMoreBadge" hidden>0</span></button>
     </nav>
     <div class="main-content">
+
+      <p class="office-banner" id="officePreviewBanner" data-office-add1="v=office-add1" hidden>PREVIEW — sample office data, not live. Nothing is saved.</p>
 
       <!-- TIMESHEETS TAB -->
       <div class="tab-panel" id="tab_timesheets" data-aide-manage-delete1="v=aide-manage-delete1">
@@ -3308,6 +3551,115 @@ bindLoginKeyboard();
             <button type="button" class="ins1-chip" data-plan="caresource">CareSource</button>
             <button type="button" class="ins1-chip" data-plan="passport">Passport</button>
             <button type="button" class="ins1-chip" data-plan="other">Other</button>
+          </div>
+        </div>
+        <section class="eca-office" id="officePayRates" data-office-add1="v=office-add1" aria-label="Pay rates">
+          <div class="eca-h"><div><h3>Payroll · this week</h3><div class="eca-sub" id="officePayNote">Hourly rates for this week.</div></div></div>
+          <div class="eca-scroll"><table class="eca-table" id="officePayTable"><thead><tr><th>Aide</th><th>Hours</th><th>Rate</th><th>Est. pay</th></tr></thead><tbody id="officePayBody"></tbody></table></div>
+          <p id="officePayEmpty" class="eca-empty" hidden>Pay rates are not on file yet.</p>
+        </section>
+        <div id="officePayLock" class="eca-office" data-office-add1="v=office-add1" hidden>
+          <div class="eca-h"><h3>Payroll</h3></div>
+          <div class="eca-lock"><div class="eca-lock-ico" aria-hidden="true">🔒</div><h3>Admin only</h3><p>Payroll is locked. Schedulers can’t see payroll.</p></div>
+        </div>
+      </div>
+
+
+      <div class="tab-panel" id="tab_today" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1">
+        <div class="eca-office" id="officeTodayRoot">
+          <div class="eca-h">
+            <div>
+              <h3 id="officeTodayTitle">Today</h3>
+              <div class="eca-sub" id="officeTodayWhen">Visits in progress, late or missed, and open shifts.</div>
+            </div>
+            <button class="eca-btn eca-btn-sm" type="button" onclick="showTab('schedule')">＋ New shift</button>
+          </div>
+          <div class="eca-filters" id="officeDashLinks" aria-label="Office">
+            <button type="button" onclick="showTab('coverage')">Find cover</button>
+            <button type="button" onclick="showTab('visits')">Visits</button>
+            <button type="button" onclick="showTab('supervision')">Supervision</button>
+            <button type="button" onclick="showTab('missed')">Missed report</button>
+            <button type="button" id="officeDashPayroll" data-layout-roles="Admin" onclick="showTab('payroll')">Payroll</button>
+          </div>
+          <div id="officeTodayAlerts"></div>
+          <div class="eca-stats" id="officeTodayStats" aria-label="Today counts"></div>
+          <p class="eca-sub" id="officeTodayNote"></p>
+          <div class="eca-cols">
+            <div class="eca-card" id="officeLiveCard"><h3>Today, live</h3><div id="officeTodayLive"></div></div>
+            <div class="eca-card" id="officeTodoCard"><h3>To do today</h3><div id="officeTodayTodo"></div></div>
+          </div>
+          <div class="eca-cols" id="officeOwnerRow" data-layout-roles="Admin"></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab_visits" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1">
+        <div class="eca-office" id="officeVisitRoot">
+          <div id="officeVisitListWrap">
+            <div class="eca-h"><div><h3>Visits</h3><div class="eca-sub" id="officeVisitNote">Distance from the client address at clock-in.</div></div></div>
+            <div class="eca-filters" role="group" aria-label="Visit filter">
+              <button type="button" id="officeVisitFilterAll" class="on" aria-pressed="true" onclick="officeAdd1SetVisitFilter('all')">All</button>
+              <button type="button" id="officeVisitFilterLook" aria-pressed="false" onclick="officeAdd1SetVisitFilter('look')">⚠ Needs a look (<span id="officeVisitLookCount">0</span>)</button>
+            </div>
+            <div class="eca-card" id="officeVisitList"></div>
+          </div>
+          <article id="officeVisitRecord" hidden aria-label="Visit record">
+            <button type="button" class="eca-back" onclick="officeAdd1CloseVisit()">‹ Visits</button>
+            <div class="eca-h">
+              <div><h3 id="officeVisitRecordTitle">Visit record</h3><div class="eca-sub" id="officeVisitRecordMeta"></div></div>
+            </div>
+            <div id="officeVisitRecordFlag"></div>
+            <div class="eca-card"><div class="eca-kv" id="officeVisitRecordKv"></div></div>
+            <div class="eca-card">
+              <h3>Where they clocked</h3>
+              <div class="eca-badge" id="officeVisitRecordDistance"></div>
+              <p class="eca-sub">Green means close to the client address. Red means farther than 1,000 ft. Static distance badge.</p>
+            </div>
+            <button type="button" class="eca-btn" id="officeVisitCheck" onclick="officeAdd1MarkChecked()">✓ Mark as checked</button>
+            <p class="eca-sub" id="officeVisitCheckNote"></p>
+          </article>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab_supervision" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1">
+        <div class="eca-office">
+          <div class="eca-h">
+            <div><h3>Supervision</h3><div class="eca-sub" id="officeSupNote">Each client gets a supervisory visit on a 60-day cadence.</div></div>
+          </div>
+          <div class="eca-stats" id="officeSupStats"></div>
+          <div class="eca-filters" role="group" aria-label="Supervision filter">
+            <button type="button" id="officeSupFilterAll" class="on" onclick="officeAdd1SetSupFilter('all')">All</button>
+            <button type="button" id="officeSupFilterOver" onclick="officeAdd1SetSupFilter('overdue')">Overdue</button>
+            <button type="button" id="officeSupFilterDue" onclick="officeAdd1SetSupFilter('due')">Due soon</button>
+          </div>
+          <div class="eca-scroll"><table class="eca-table" id="officeSupTable"><thead><tr><th>Client</th><th>Last check</th><th>Next due</th><th>Status</th></tr></thead><tbody id="officeSupBody"></tbody></table></div>
+          <p id="officeSupEmpty" class="eca-empty" hidden>Supervision dates are not on file yet.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab_missed" data-layout-roles="Admin Scheduler" data-office-add1="v=office-add1">
+        <div class="eca-office" id="officeMissedReport">
+          <div class="eca-h">
+            <div><h3>Reports · Missed visits</h3><div class="eca-sub" id="officeMissedNote">Office report. This does not change the caregiver timesheet.</div></div>
+            <button class="eca-btn eca-btn-sm" type="button" id="officeMissedPrint" onclick="officeAdd1ShowMissedPrint()">🖨️ Print</button>
+          </div>
+          <div class="eca-filters">
+            <input id="officeMissedFrom" class="eca-inp" type="text" inputmode="numeric" placeholder="From MM/DD/YYYY" maxlength="10" autocomplete="off" aria-label="From">
+            <input id="officeMissedTo" class="eca-inp" type="text" inputmode="numeric" placeholder="To MM/DD/YYYY" maxlength="10" autocomplete="off" aria-label="To">
+            <button class="eca-btn eca-btn-sm" type="button" onclick="officeAdd1LoadMissed()">Show</button>
+          </div>
+          <div class="eca-card" id="officeMissedReasons"></div>
+          <div class="eca-scroll"><table class="eca-table"><thead><tr><th>Date</th><th>Client</th><th>Aide</th><th>Booked</th><th>Reason</th></tr></thead><tbody id="officeMissedBody"></tbody></table></div>
+          <p id="officeMissedEmpty" class="eca-empty" hidden>No missed visits in this range.</p>
+          <p class="eca-sub" id="officeMissedPrintNote"></p>
+        </div>
+        <div class="eca-office" id="officeMissedSheet" hidden aria-label="Print view">
+          <div class="eca-print">
+            <div class="eca-print-bar">
+              <button type="button" class="eca-btn eca-btn-light eca-btn-sm" onclick="officeAdd1HideMissedPrint()">‹ Back</button>
+              <button type="button" class="eca-btn eca-btn-sm" onclick="officeAdd1PrintMissed()">🖨️ Print now</button>
+            </div>
+            <div class="eca-print-head"><b>EverCare Home Agency</b><div class="eca-sub" id="officeMissedPrintSub">Missed-visit report</div></div>
+            <div class="eca-scroll"><table class="eca-table"><thead><tr><th>Date</th><th>Client</th><th>Aide</th><th>Booked</th><th>Reason</th></tr></thead><tbody id="officeMissedSheetBody"></tbody></table></div>
           </div>
         </div>
       </div>
@@ -3605,6 +3957,7 @@ bindLoginKeyboard();
       </div>
 
       <div class="tab-panel" id="tab_aides" data-aides-info1="v=aides-info1" data-list-az-sticky1="v=list-az-sticky1" data-aide-manage-delete1="v=aide-manage-delete1" data-manage-clean1="v=manage-clean1" data-manage-done1="v=manage-done1" data-manage-dots-creds1="v=manage-dots-creds1" data-aide-profile-link-fix="v=aide-profile-link-fix" data-sched-creds1="v=sched-creds1">
+        <div id="officeExemptRoot" data-office-add1="v=office-add1" hidden></div>
         <div id="aideProfilePage" data-aide-profile-link-fix="v=aide-profile-link-fix" hidden>
           <button type="button" class="aide-profile-back" id="aideProfileBack" onclick="aideProfileLinkFixBack()">← Back</button>
           <div class="aide-profile-head">
@@ -3857,6 +4210,7 @@ bindLoginKeyboard();
             </div>
           </div>
           <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" type="button" id="officeTodayBtn" data-office-add1="v=office-add1" data-layout-roles="Admin Scheduler" onclick="showTab('today')">Dashboard</button>
             <button class="btn btn-teal" type="button" id="schedAddUsualBtn" onclick="schedOpenUsual()">Edit usual pattern</button>
           </div>
         </div>
@@ -3874,6 +4228,7 @@ bindLoginKeyboard();
             <button class="btn btn-ghost btn-sm" type="button" id="schedFilterHold" aria-pressed="false" onclick="schedSetFilter('hold')">On hold</button>
           </div>
         </div>
+        <div class="eca-office" id="officeHolidayBanner" hidden></div>
         <div class="ins-legend" id="schedInsLegend" data-client-ins1="v=client-ins1" aria-label="Insurance">
           <strong>Insurance</strong>
           <span class="ins-leg ins-caresource"><span class="dot"></span>CareSource</span>
@@ -3958,6 +4313,7 @@ bindLoginKeyboard();
             <div class="sched-week-stat" id="schedSlotWeekStat" hidden></div>
             <div class="sched-day-sum" id="schedSlotDaySum">Tap a day on the week board.</div>
             <div id="schedSlotCards"></div>
+            <section id="officeFindCover" class="eca-office" data-office-add1="v=office-add1" data-layout-roles="Admin Scheduler" hidden aria-label="Find cover"></section>
             <div class="mode-pills" role="tablist" aria-label="Shift form mode">
               <button type="button" class="on" id="schedSlotModeEdit" onclick="schedSetSlotFormMode('edit')">Edit shift</button>
               <button type="button" id="schedSlotModeAdd" onclick="schedSetSlotFormMode('add')">Add another</button>
@@ -3986,6 +4342,13 @@ bindLoginKeyboard();
               <div class="field"><label for="schedSlotAide">Usual aide</label><select id="schedSlotAide"></select></div>
               <div class="field"><label for="schedSlotHoursView">Hours</label><input id="schedSlotHoursView" class="auto-hours" type="text" value="" readonly aria-readonly="true"></div>
               <p class="hours-note" id="schedSlotHoursNote">from start–end</p>
+              <div class="eca-office" id="officeRepeatWeekly" data-office-add1="v=office-add1" data-layout-roles="Admin Scheduler">
+                <button type="button" class="eca-switch" id="officeRepeatCard" onclick="officeAdd1ToggleRepeat()"><span class="eca-box" id="officeRepeatBox"></span><span><b>Repeat every week</b><span class="eca-sub">Same shift on the days you pick above</span></span></button>
+                <input type="checkbox" id="officeRepeatOn" hidden>
+                <label class="eca-lbl" for="officeRepeatUntil">Until</label>
+                <input class="eca-inp" type="text" id="officeRepeatUntil" inputmode="numeric" placeholder="MM/DD/YYYY" maxlength="10" autocomplete="off">
+                <p class="eca-summary" id="officeRepeatPreview">Turn on Repeat every week to count shifts through the Until date.</p>
+              </div>
               <div class="sched-slim-keep" aria-hidden="true">
                 <select id="schedSlotWeekday">
                   <option value="">Select a day</option>
@@ -5879,6 +6242,7 @@ function layoutA1Primary(tab){
       if(picked)return picked;
     }catch(e){}
   }
+  if(tab==='today'||tab==='visits'||tab==='supervision'||tab==='missed')return 'today';
   if(tab==='timesheets'||tab==='schedule'||tab==='aides'||tab==='backups'||tab==='aidechat')return tab;
   return 'more';
 }
@@ -6059,6 +6423,7 @@ var NAV_EDIT_META={
   broadcast:{label:'Broadcast Alert',icon:'📢',short:'Broadcast'},
   links:{label:'Links',icon:'🔗',short:''},
   activity:{label:'Activity Log',icon:'📜',short:'Activity'},
+  today:{label:'Dashboard',icon:'📊',short:'Dash',tight:'Dash'},
   aidechat:{label:'Messages',icon:'💬',short:'Messages'},
   notifications:{label:'Notifications',icon:'🔔',short:'Alerts'}
 };
@@ -6070,10 +6435,10 @@ var navEditFresh={};
 var navEditDrag=null;
 var navEditIgnoreClick=false;
 function navEditDefaults(){
-  return ['timesheets','schedule','aides','aidechat'];
+  return ['timesheets','schedule','today','aides','aidechat'];
 }
 function navEditCatalog(){
-  return ['timesheets','schedule','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity','aidechat','notifications'];
+  return ['timesheets','schedule','today','aides','backups','coverage','clients','nurse','inservices','broadcast','links','activity','aidechat','notifications'];
 }
 function navEditRoleOk(tab){
   if(navEditCatalog().indexOf(tab)<0)return false;
@@ -46068,7 +46433,2044 @@ if(typeof window!=='undefined'&&typeof document!=='undefined'){
 }
 // end admin sched chat push1 v=admin-sched-chat-push1
 try{if(typeof loginLandSchedule1BindNav==='function')loginLandSchedule1BindNav();}catch(eLandNav){}
+// OFFICE_ADD1_START
+var OFFICE_ADD1='OFFICE_ADD1';
+var officeAdd1Preview=false;
+var officeAdd1Series=[];
+var officeAdd1Checked={};
+var officeAdd1VisitFilter='all';
+var officeAdd1SupRows=[];
+var officeAdd1SupFilter='all';
+var officeAdd1Visits=[];
+var officeAdd1SelectedVisit=null;
+var officeAdd1LastToast=null;
+var officeAdd1PreviewRpc=[];
+
+function officeAdd1Esc(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function officeAdd1Role(){
+  try{return currentAdminRole==null?'':String(currentAdminRole);}catch(e){return '';}
+}
+function officeAdd1IsAdmin(){
+  return officeAdd1Role().toLowerCase()==='admin';
+}
+function officeAdd1IsOffice(){
+  var k=officeAdd1Role().toLowerCase();
+  return k==='admin'||k==='scheduler';
+}
+function officeAdd1El(id){
+  try{return document.getElementById(id);}catch(e){return null;}
+}
+function officeAdd1Query(name){
+  var search='';
+  try{search=String(location.search||'');}catch(e){search='';}
+  var m=search.match(new RegExp('[?&]'+name+'=([^&]*)'));
+  if(!m)return '';
+  try{return decodeURIComponent(String(m[1]||'').replace(/\+/g,' '));}catch(e2){return String(m[1]||'');}
+}
+function officeAdd1PreviewOn(){
+  var search='';
+  try{search=String(location.search||'');}catch(e){search='';}
+  return /(?:^|[?&])officePreview=1(?:&|$)/.test(search);
+}
+function officeAdd1IsoFromDate(dt){
+  var y=dt.getFullYear();
+  var m=String(dt.getMonth()+1).padStart(2,'0');
+  var d=String(dt.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+d;
+}
+function officeAdd1AddDays(iso, n){
+  var p=String(iso||'').split('-');
+  var dt=new Date(Number(p[0]), Number(p[1])-1, Number(p[2]));
+  if(!isFinite(dt.getTime()))return '';
+  dt.setDate(dt.getDate()+Number(n||0));
+  return officeAdd1IsoFromDate(dt);
+}
+function officeAdd1Weekday(iso){
+  var p=String(iso||'').split('-');
+  var dt=new Date(Number(p[0]), Number(p[1])-1, Number(p[2]));
+  if(!isFinite(dt.getTime()))return 0;
+  var js=dt.getDay();
+  return js===0?7:js;
+}
+function officeAdd1Monday(iso){
+  var wd=officeAdd1Weekday(iso);
+  if(!wd)return '';
+  return officeAdd1AddDays(iso, 1-wd);
+}
+function officeAdd1LongDate(iso){
+  var p=String(iso||'').split('-');
+  if(p.length<3)return officeAdd1Pretty(iso);
+  var dt=new Date(Number(p[0]), Number(p[1])-1, Number(p[2]));
+  if(!isFinite(dt.getTime()))return officeAdd1Pretty(iso);
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return days[dt.getDay()]+', '+months[dt.getMonth()]+' '+dt.getDate();
+}
+function officeAdd1Pretty(iso){
+  var p=String(iso||'').split('-');
+  if(p.length<3||!p[0])return '';
+  return p[1]+'/'+p[2]+'/'+p[0];
+}
+function officeAdd1ParseMdy(s){
+  var t=String(s||'').trim();
+  var iso=t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(iso)return iso[1]+'-'+iso[2]+'-'+iso[3];
+  var m=t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m)return '';
+  var mm=Number(m[1]);
+  var dd=Number(m[2]);
+  if(mm<1||mm>12||dd<1||dd>31)return '';
+  return m[3]+'-'+String(mm).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+}
+function officeAdd1DateOnly(v){
+  var m=String(v==null?'':v).match(/(\d{4}-\d{2}-\d{2})/);
+  return m?m[1]:'';
+}
+function officeAdd1TodayNy(now){
+  try{
+    var fmt=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
+    var parts=fmt.formatToParts(now||new Date());
+    var y='',m='',d='';
+    parts.forEach(function(p){
+      if(p.type==='year')y=p.value;
+      if(p.type==='month')m=p.value;
+      if(p.type==='day')d=p.value;
+    });
+    if(y&&m&&d)return y+'-'+m+'-'+d;
+  }catch(e){}
+  return officeAdd1IsoFromDate(now||new Date());
+}
+function officeAdd1NowMinutesNy(now){
+  try{
+    var fmt=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+    var parts=fmt.formatToParts(now||new Date());
+    var h=0,mi=0;
+    parts.forEach(function(p){
+      if(p.type==='hour')h=Number(p.value);
+      if(p.type==='minute')mi=Number(p.value);
+    });
+    if(isFinite(h)&&isFinite(mi))return h*60+mi;
+  }catch(e){}
+  var d=now||new Date();
+  return d.getHours()*60+d.getMinutes();
+}
+function officeAdd1Minutes(t){
+  var m=String(t||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return null;
+  return Number(m[1])*60+Number(m[2]);
+}
+function officeAdd1ClockLabel(t){
+  var m=String(t||'').match(/^(\d{1,2}):(\d{2})/);
+  if(!m)return '';
+  var h=Number(m[1]);
+  var suf=h>=12?' PM':' AM';
+  var h12=h%12;
+  if(h12===0)h12=12;
+  return h12+':'+m[2]+suf;
+}
+function officeAdd1NthWeekday(year, month, jsDow, n){
+  var d=new Date(year, month-1, 1);
+  var add=(jsDow-d.getDay()+7)%7;
+  d.setDate(1+add+(n-1)*7);
+  return officeAdd1IsoFromDate(d);
+}
+function officeAdd1LastWeekday(year, month, jsDow){
+  var d=new Date(year, month, 0);
+  while(d.getDay()!==jsDow)d.setDate(d.getDate()-1);
+  return officeAdd1IsoFromDate(d);
+}
+function officeAdd1HolidayMap(year){
+  var y=Number(year);
+  var map={};
+  function put(iso, name){
+    if(!iso)return;
+    map[iso]=name;
+    var wd=officeAdd1Weekday(iso);
+    if(wd===6)map[officeAdd1AddDays(iso,-1)]=name+' observed';
+    if(wd===7)map[officeAdd1AddDays(iso,1)]=name+' observed';
+  }
+  put(y+'-01-01','New Year\'s Day');
+  put(officeAdd1NthWeekday(y,1,1,3),'MLK Day');
+  put(officeAdd1NthWeekday(y,2,1,3),'Presidents Day');
+  put(officeAdd1LastWeekday(y,5,1),'Memorial Day');
+  put(y+'-06-19','Juneteenth');
+  put(y+'-07-04','Independence Day');
+  put(officeAdd1NthWeekday(y,9,1,1),'Labor Day');
+  put(officeAdd1NthWeekday(y,11,4,4),'Thanksgiving');
+  put(y+'-12-25','Christmas');
+  return map;
+}
+function officeAdd1Holiday(iso){
+  var day=officeAdd1DateOnly(iso);
+  if(!day)return '';
+  var map=officeAdd1HolidayMap(Number(day.slice(0,4)));
+  return map[day]||'';
+}
+function officeAdd1HolidayPayLine(){
+  return '';
+}
+function officeAdd1CountShifts(weekStart, weekdays, untilIso){
+  var start=officeAdd1DateOnly(weekStart);
+  var until=officeAdd1DateOnly(untilIso);
+  if(!start||!until||until<start)return 0;
+  var set={};
+  (weekdays||[]).forEach(function(d){set[Number(d)]=true;});
+  var n=0;
+  var iso=start;
+  var guard=0;
+  while(iso&&iso<=until&&guard<800){
+    if(set[officeAdd1Weekday(iso)])n++;
+    iso=officeAdd1AddDays(iso,1);
+    guard++;
+  }
+  return n;
+}
+function officeAdd1RepeatPreviewText(snap){
+  if(!snap||!snap.on)return 'Turn on Repeat weekly to count shifts through the Until date.';
+  if(!snap.days||!snap.days.length)return 'Check at least one day.';
+  if(!snap.until)return 'Add an Until date (MM/DD/YYYY).';
+  if(snap.week&&snap.until<snap.week)return 'Until is before this week.';
+  var n=officeAdd1CountShifts(snap.week, snap.days, snap.until);
+  var noun=n===1?'shift':'shifts';
+  return n+' '+noun+' · Sun–Sat through '+officeAdd1Pretty(snap.until);
+}
+function officeAdd1DistanceFt(row){
+  if(!row||typeof row!=='object')return null;
+  var ft=row.distance_ft!=null?row.distance_ft:row.distanceFt;
+  if(ft!=null&&ft!==''&&isFinite(Number(ft)))return Number(ft);
+  var mi=row.distance_mi!=null?row.distance_mi:row.distanceMi;
+  if(mi!=null&&mi!==''&&isFinite(Number(mi)))return Number(mi)*5280;
+  if(typeof resolveDistanceMiles==='function'&&(row.distanceMi!=null||row.distanceFt!=null||row.distance_mi!=null||row.distance_ft!=null)){
+    var miles=resolveDistanceMiles(row);
+    if(isFinite(miles))return miles*5280;
+  }
+  var lat=Number(row.clock_lat!=null?row.clock_lat:(row.lat!=null?row.lat:row.clockLat));
+  var lng=Number(row.clock_lng!=null?row.clock_lng:(row.lng!=null?row.lng:row.clockLng));
+  var clat=Number(row.client_lat!=null?row.client_lat:row.clientLat);
+  var clng=Number(row.client_lng!=null?row.client_lng:row.clientLng);
+  if([lat,lng,clat,clng].every(function(n){return isFinite(n);}))return officeAdd1HaversineFt(lat,lng,clat,clng);
+  return null;
+}
+function officeAdd1HaversineFt(lat1,lng1,lat2,lng2){
+  var earth=20902464;
+  var p=Math.PI/180;
+  var dLat=(lat2-lat1)*p;
+  var dLng=(lng2-lng1)*p;
+  var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*p)*Math.cos(lat2*p)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*earth*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+function officeAdd1NeedsLook(ft){
+  return ft!=null&&isFinite(Number(ft))&&Number(ft)>1000;
+}
+function officeAdd1FormatFt(ft){
+  if(ft==null||!isFinite(Number(ft)))return 'Distance not on file';
+  var n=Math.round(Number(ft));
+  var shown=n.toLocaleString('en-US')+' ft';
+  if(n>1000){
+    var mi=(Number(ft)/5280).toFixed(2);
+    return mi+' mi ('+shown+')';
+  }
+  return shown;
+}
+function officeAdd1SplitAides(aides){
+  var available=[];
+  var onCall=[];
+  (aides||[]).forEach(function(a){
+    if(!a)return;
+    var flag=a.on_call===true||a.is_on_call===true||a.on_call_today===true||String(a.availability||'').toLowerCase()==='on_call';
+    if(flag)onCall.push(a);
+    else available.push(a);
+  });
+  return {available:available, onCall:onCall};
+}
+function officeAdd1SupervisionStatus(row, todayIso){
+  var today=officeAdd1DateOnly(todayIso)||officeAdd1TodayNy();
+  var last=officeAdd1DateOnly(row&&(row.last||row.lastVisitOn||row.last_visit_on||row.last_supervisory_visit||row.last_supervisory_on)||'');
+  var visits=row&&row.visits!=null?Number(row.visits):null;
+  if(last){
+    var due=officeAdd1AddDays(last,60);
+    if(today>due)return {status:'overdue', due:due, last:last};
+    var soon=officeAdd1AddDays(today,14);
+    if(due<=soon)return {status:'due', due:due, last:last};
+    return {status:'ok', due:due, last:last};
+  }
+  var left=row&&(row.daysLeft!=null?row.daysLeft:row.daysInWindow);
+  left=left==null||left===''?null:Number(left);
+  if(visits===0)return {status:'overdue', due:'', last:'', reason:'No supervisory visit on file'};
+  if(left!=null&&isFinite(left)){
+    if(left<=0)return {status:'overdue', due:'', last:''};
+    if(left<=14)return {status:'due', due:'', last:''};
+    return {status:'ok', due:'', last:''};
+  }
+  return {status:'unknown', due:'', last:''};
+}
+function officeAdd1ClockKnown(clients){
+  var known=false;
+  (clients||[]).forEach(function(c){
+    var days=c&&c.days||{};
+    Object.keys(days).forEach(function(k){
+      (days[k]&&days[k].slots||[]).forEach(function(s){
+        if(!s)return;
+        if(Object.prototype.hasOwnProperty.call(s,'clock_in')||Object.prototype.hasOwnProperty.call(s,'clockIn'))known=true;
+      });
+    });
+  });
+  return known;
+}
+function officeAdd1SlotRow(client, slot){
+  var start=officeAdd1ClockLabel(slot.start_local||slot.startLocal);
+  var end=officeAdd1ClockLabel(slot.end_local||slot.endLocal);
+  var when=[start,end].filter(Boolean).join(' – ');
+  if(!when&&slot.hours!=null)when=String(slot.hours)+'h';
+  return {
+    client:String(client&&(client.name||client.client_name)||'Client'),
+    aide:String(slot.aide_name||slot.aideName||slot.usual_aide_id||'Open'),
+    when:when,
+    note:String(slot.miss_reason||slot.note||'')
+  };
+}
+function officeAdd1ShiftDay(shift){
+  return officeAdd1DateOnly(shift&&(shift.on_date||shift.shift_date||shift.shift_start||shift.startsAt||shift.starts_at)||'');
+}
+function officeAdd1BuildToday(clients, openShifts, todayIso, nowMinutes){
+  var today=officeAdd1DateOnly(todayIso);
+  var nowMin=Number(nowMinutes);
+  if(!isFinite(nowMin))nowMin=0;
+  var clockKnown=officeAdd1ClockKnown(clients);
+  var progress=[];
+  var late=[];
+  var missed=[];
+  var open=[];
+  (clients||[]).forEach(function(client){
+    var days=client&&client.days||{};
+    Object.keys(days).forEach(function(k){
+      var day=days[k];
+      if(!day)return;
+      var on=officeAdd1DateOnly(day.on_date);
+      if(on&&on!==today)return;
+      if(!on&&String(k)!==String(officeAdd1Weekday(today)))return;
+      (day.slots||[]).forEach(function(slot){
+        if(!slot)return;
+        var row=officeAdd1SlotRow(client, slot);
+        var mark=String(slot.mark||'').toLowerCase();
+        if(mark==='missed'){missed.push(row);return;}
+        if(slot.called_off||mark==='call_off'){open.push(row);return;}
+        var aide=slot.usual_aide_id||slot.aide_name||slot.aideName;
+        if(!aide){open.push(row);return;}
+        var start=officeAdd1Minutes(slot.start_local||slot.startLocal);
+        var end=officeAdd1Minutes(slot.end_local||slot.endLocal);
+        var clock=slot.clock_in||slot.clockIn||'';
+        if(clockKnown&&!clock&&start!=null&&nowMin>=start+15&&(end==null||nowMin<end)){late.push(row);return;}
+        if(start!=null&&end!=null&&nowMin>=start&&nowMin<end)progress.push(row);
+      });
+    });
+  });
+  (openShifts||[]).forEach(function(shift){
+    if(!shift)return;
+    var day=officeAdd1ShiftDay(shift);
+    if(day&&day!==today)return;
+    var st=String(shift.status||'open').toLowerCase().replace(/[\s-]+/g,'_');
+    if(st&&st!=='open'&&st!=='awaiting_client'&&st!=='call_off')return;
+    open.push({
+      client:String(shift.client_name||shift.clientName||'Client'),
+      aide:String(shift.regular_aide_name||shift.aide_name||'Called off'),
+      when:officeAdd1ClockLabel(String(shift.shift_start||shift.startsAt||'').split('T').pop()||'')||'Open',
+      note:'Open shift'
+    });
+  });
+  return {progress:progress, late:late, missed:missed, open:open, today:today, clockKnown:clockKnown};
+}
+function officeAdd1RpcMissing(got){
+  if(!got||got.ok===true)return false;
+  if(got.status===404||got.status===405)return true;
+  var err=String(got.error||got.message||'');
+  return /PGRST202|could not find the function|schema cache|not find the function/i.test(err);
+}
+function officeAdd1List(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){return [];}
+  }
+  if(Array.isArray(node))return node;
+  if(!node||typeof node!=='object')return [];
+  if(Array.isArray(node.shifts))return node.shifts;
+  if(Array.isArray(node.rows))return node.rows;
+  if(Array.isArray(node.aides))return node.aides;
+  if(Array.isArray(node.visits))return node.visits;
+  if(Array.isArray(node.data))return node.data;
+  if(node.data&&typeof node.data==='object')return officeAdd1List(node.data);
+  return [];
+}
+function officeAdd1ClientsFromWeek(data){
+  var node=data;
+  if(typeof node==='string'){
+    try{node=JSON.parse(node);}catch(e){node=null;}
+  }
+  if(Array.isArray(node)&&node.length===1)node=node[0];
+  if(node&&node.data&&node.data.clients)node=node.data;
+  if(!node||!Array.isArray(node.clients))return [];
+  return node.clients.map(function(c){
+    var days={};
+    var raw=c.days&&typeof c.days==='object'?c.days:{};
+    Object.keys(raw).forEach(function(k){
+      var day=raw[k]||{};
+      var slots=Array.isArray(day.slots)?day.slots.slice():[];
+      if(!slots.length&&(day.aide_id||day.aide_name||day.aideName||day.source||day.exception_kind)){
+        slots.push({
+          aide_name:day.aide_name||day.aideName||'',
+          usual_aide_id:day.aide_id||day.aideId||'',
+          start_local:day.start_local||day.startLocal||'',
+          end_local:day.end_local||day.endLocal||'',
+          mark:day.mark||'',
+          note:day.note||'',
+          called_off:String(day.exception_kind||day.kind||'')==='call_off',
+          hours:day.hours
+        });
+      }
+      slots.forEach(function(s){
+        if(!s)return;
+        if(String(s.exception_kind||s.kind||'')==='call_off')s.called_off=true;
+      });
+      days[String(k)]={on_date:officeAdd1DateOnly(day.on_date)||'', slots:slots};
+    });
+    return {id:String(c.client_id||c.clientId||c.id||''), name:String(c.client_name||c.clientName||c.name||'Client'), days:days};
+  });
+}
+function officeAdd1RowHtml(row, tag, tagClass){
+  var bits='<strong>'+officeAdd1Esc(row.client)+'</strong>';
+  var sub=[row.aide, row.when].filter(Boolean).join(' · ');
+  if(sub)bits+='<span>'+officeAdd1Esc(sub)+'</span>';
+  if(row.note)bits+='<span>'+officeAdd1Esc(row.note)+'</span>';
+  if(tag)bits+='<span class="tag '+tagClass+'">'+officeAdd1Esc(tag)+'</span>';
+  return '<article class="office-row">'+bits+'</article>';
+}
+function officeAdd1FillColumn(id, rows, emptyText, tag, tagClass){
+  var el=officeAdd1El(id);
+  if(!el)return;
+  if(!rows||!rows.length){
+    el.innerHTML='<p class="empty-state">'+officeAdd1Esc(emptyText)+'</p>';
+    return;
+  }
+  el.innerHTML=rows.map(function(row){return officeAdd1RowHtml(row, tag, tagClass);}).join('');
+}
+function officeAdd1PaintToday(model){
+  model=model||{progress:[],late:[],missed:[],open:[],today:'',clockKnown:false};
+  var title=officeAdd1El('officeTodayTitle');
+  var when=officeAdd1El('officeTodayWhen');
+  var pretty=model.today?officeAdd1LongDate(model.today):'Today';
+  if(title)title.textContent=pretty;
+  if(when)when.textContent=(model.today?officeAdd1Pretty(model.today)+' · ':'')+'Live office · visits in progress, late or missed, and open shifts.';
+  var stats=officeAdd1El('officeTodayStats');
+  if(stats){
+    stats.innerHTML=''
+      +'<div class="eca-stat accent"><b>'+model.progress.length+'</b><span>On a visit now</span></div>'
+      +'<div class="eca-stat"><b>'+model.late.length+'</b><span>Not clocked in</span></div>'
+      +'<div class="eca-stat"><b>'+model.missed.length+'</b><span>Missed</span></div>'
+      +'<div class="eca-stat"><b>'+model.open.length+'</b><span>Open shifts</span></div>';
+  }
+  var alerts=officeAdd1El('officeTodayAlerts');
+  if(alerts){
+    var ah='';
+    model.late.forEach(function(r){
+      ah+='<div class="eca-alert"><div class="eca-k">Needs you</div><b>'+officeAdd1Esc(r.aide)+' has not clocked in at '+officeAdd1Esc(r.client)+'</b><div class="eca-sub">'+(r.when?officeAdd1Esc(r.when):'Late')+'</div><div class="eca-actions"><button type="button" class="eca-btn eca-btn-sm" onclick="showTab(\'coverage\')">Find cover</button></div></div>';
+    });
+    if(officeAdd1Preview){
+      ah+='<div class="eca-alert warn"><div class="eca-k">Needs a look</div><b>A clock-in is farther than 1,000 ft from the client address</b><div class="eca-actions"><button type="button" class="eca-btn eca-btn-sm eca-btn-light" onclick="showTab(\'visits\')">Open visits</button></div></div>';
+    }
+    alerts.innerHTML=ah;
+  }
+  function liveRow(r, dot, pill){
+    return '<button type="button" class="eca-live" onclick="showTab(\'visits\')"><span class="eca-dot '+dot+'"></span><span class="eca-person-main"><b>'+officeAdd1Esc(r.aide)+' with '+officeAdd1Esc(r.client)+'</b>'+pill+'</span><span class="eca-sub">'+officeAdd1Esc(r.when||'')+'</span></button>';
+  }
+  var live=officeAdd1El('officeTodayLive');
+  if(live){
+    var lh='';
+    model.progress.forEach(function(r){lh+=liveRow(r,'green','<span class="eca-pill ok">On a visit</span>');});
+    model.late.forEach(function(r){lh+=liveRow(r,'red','<span class="eca-pill bad">Not clocked in</span>');});
+    model.missed.forEach(function(r){lh+=liveRow(r,'red','<span class="eca-pill bad">Missed</span>');});
+    model.open.forEach(function(r){lh+=liveRow(r,'gray','<span class="eca-pill warn">Open</span>');});
+    live.innerHTML=lh||'<p class="eca-sub">Nothing on the board for this day.</p>';
+  }
+  var todo=officeAdd1El('officeTodayTodo');
+  if(todo){
+    var items=[
+      ['🩺', model.missed.length+' missed', 'Reasons are on the missed-visit report', 'missed'],
+      ['📍', 'Clock-ins farther than 1,000 ft', 'Needs a look filter', 'visits'],
+      ['🦃', 'Holiday on the schedule', 'Named so the office can plan around the bank closure', 'schedule'],
+      ['🛟', model.open.length+' open shift'+(model.open.length===1?'':'s'), 'Find cover from the day', 'schedule']
+    ];
+    todo.innerHTML=items.map(function(it){
+      return '<button type="button" class="eca-todo" onclick="showTab(\''+it[3]+'\')"><span class="eca-ti">'+it[0]+'</span><span class="eca-person-main"><b>'+officeAdd1Esc(it[1])+'</b><span>'+officeAdd1Esc(it[2])+'</span></span><span class="eca-sub">›</span></button>';
+    }).join('');
+  }
+  var owner=officeAdd1El('officeOwnerRow');
+  if(owner){
+    if(!officeAdd1IsAdmin()){owner.innerHTML='';owner.hidden=true;}
+    else{
+      owner.hidden=false;
+      owner.innerHTML='<div class="eca-card eca-admin-only"><h3>Payroll this week <span class="eca-pill gray">Admin only</span></h3><div class="eca-sub">Open payroll for rates.</div><button type="button" class="eca-btn eca-btn-sm eca-btn-light" style="margin-top:10px" onclick="showTab(\'payroll\')">Open payroll</button></div>';
+    }
+  }
+  var note=officeAdd1El('officeTodayNote');
+  if(note)note.textContent=model.error?String(model.error):(model.clockKnown?'':'Late uses clock-in time. When clock-in is not on file, nothing is marked late.');
+}
+function officeAdd1SampleClients(){
+  function day(iso, slots){return {on_date:iso, slots:slots};}
+  var mon='2026-11-23', tue='2026-11-24', wed='2026-11-25', thu='2026-11-26', fri='2026-11-27', sat='2026-11-28', sun='2026-11-29';
+  return [
+    {
+      id:'sample-north',
+      name:'North Sample',
+      days:{
+        '1':day(mon,[{slot_key:'am', aide_name:'Aide One', usual_aide_id:'sample-aide-1', start_local:'08:00', end_local:'12:00', hours:4, repeat_weekly:true, clock_in:'08:01'}]),
+        '2':day(tue,[]),
+        '3':day(wed,[]),
+        '4':day(thu,[
+          {slot_key:'early', aide_name:'Aide One', usual_aide_id:'sample-aide-1', start_local:'07:00', end_local:'08:00', hours:1, mark:'missed', miss_reason:'No-show', clock_in:''},
+          {slot_key:'am', aide_name:'Aide One', usual_aide_id:'sample-aide-1', start_local:'08:00', end_local:'12:00', hours:4, repeat_weekly:true, clock_in:'08:02'},
+          {slot_key:'pm', aide_name:'', usual_aide_id:'', start_local:'13:00', end_local:'17:00', hours:4, open_shift_id:'sample-open-1', clock_in:''}
+        ]),
+        '5':day(fri,[{slot_key:'am', aide_name:'Aide One', usual_aide_id:'sample-aide-1', start_local:'08:00', end_local:'12:00', hours:4, repeat_weekly:true}]),
+        '6':day(sat,[]),
+        '7':day(sun,[])
+      }
+    },
+    {
+      id:'sample-east',
+      name:'East Sample',
+      days:{
+        '1':day(mon,[]),
+        '2':day(tue,[]),
+        '3':day(wed,[{slot_key:'am', aide_name:'Aide Two', usual_aide_id:'sample-aide-2', start_local:'09:00', end_local:'13:00', mark:'missed', miss_reason:'Client declined service'}]),
+        '4':day(thu,[
+          {slot_key:'am', aide_name:'Aide Two', usual_aide_id:'sample-aide-2', start_local:'09:00', end_local:'11:30', hours:2.5, clock_in:'', called_off:false}
+        ]),
+        '5':day(fri,[]),
+        '6':day(sat,[]),
+        '7':day(sun,[])
+      }
+    }
+  ];
+}
+function officeAdd1SampleToday(){
+  var model=officeAdd1BuildToday(officeAdd1SampleClients(), [], '2026-11-26', 10*60+30);
+  model.preview=true;
+  return model;
+}
+function officeAdd1DecorateHead(){
+  var head=officeAdd1El('schedHead');
+  var banner=officeAdd1El('officeHolidayBanner');
+  if(banner){banner.hidden=true;banner.innerHTML='';}
+  if(!head||!head.querySelectorAll)return;
+  var old=head.querySelectorAll('.office-hol');
+  for(var i=0;i<old.length;i++){if(old[i].parentNode)old[i].parentNode.removeChild(old[i]);}
+  var body=officeAdd1El('schedBody');
+  if(body&&body.querySelectorAll){
+    var oldCells=body.querySelectorAll('.office-holiday-cell');
+    for(var c=0;c<oldCells.length;c++){
+      if(oldCells[c].classList)oldCells[c].classList.remove('office-holiday-cell');
+    }
+  }
+  var week='';
+  try{if(typeof schedEnsureWeek==='function')week=schedEnsureWeek();}catch(e){week='';}
+  if(!week)week=officeAdd1Monday(officeAdd1Preview?'2026-11-26':officeAdd1TodayNy());
+  var ths=head.querySelectorAll('th');
+  var holName='';
+  var holPretty='';
+  for(var d=0;d<7;d++){
+    var th=ths[d+1];
+    if(!th)continue;
+    th.classList.remove('holiday');
+    var iso=officeAdd1AddDays(week,d);
+    var name=officeAdd1Holiday(iso);
+    if(!name)continue;
+    th.classList.add('holiday');
+    holName=name;
+    holPretty=officeAdd1Pretty(iso);
+    var hol=document.createElement('span');
+    hol.className='office-hol';
+    hol.textContent=name;
+    th.appendChild(hol);
+    if(body&&body.querySelectorAll){
+      var rows=body.querySelectorAll('tr');
+      for(var r=0;r<rows.length;r++){
+        var tds=rows[r].querySelectorAll('td');
+        var td=tds[d+1];
+        if(!td)continue;
+        td.classList.add('office-holiday-cell');
+      }
+    }
+  }
+  if(banner&&holName){
+    banner.hidden=false;
+    banner.innerHTML='<div class="eca-hol">'+officeAdd1Esc(holPretty+' is '+holName+'.')+'</div>';
+  }
+}
+function officeAdd1DayOfSlot(client, slot){
+  if(!client||!client.days||!slot)return null;
+  for(var wd=1;wd<=7;wd++){
+    var day=client.days[String(wd)];
+    var list=day&&day.slots||[];
+    for(var i=0;i<list.length;i++){
+      if(list[i]===slot)return day;
+    }
+  }
+  return null;
+}
+function officeAdd1SlotRepeats(slot, client){
+  if(!slot)return false;
+  if(slot.repeat_weekly===true||slot.repeats_weekly===true)return true;
+  var day=officeAdd1DayOfSlot(client, slot);
+  var wd=day?Number(day.weekday||officeAdd1Weekday(day.on_date)):0;
+  var on=day?officeAdd1DateOnly(day.on_date):'';
+  for(var i=0;i<officeAdd1Series.length;i++){
+    var s=officeAdd1Series[i];
+    if(!s)continue;
+    if(client&&String(s.clientId)!==String(client.id))continue;
+    if(s.slotKey&&slot.slot_key&&s.slotKey!==slot.slot_key)continue;
+    if(s.days&&s.days.length&&wd&&s.days.indexOf(wd)<0)continue;
+    if(s.until&&on&&on>s.until)continue;
+    return true;
+  }
+  return false;
+}
+function officeAdd1ReadRepeat(){
+  var onEl=officeAdd1El('officeRepeatOn');
+  var untilEl=officeAdd1El('officeRepeatUntil');
+  var days=[];
+  try{if(typeof schedReadDayChecks==='function')days=schedReadDayChecks()||[];}catch(e){days=[];}
+  var week='';
+  try{if(typeof schedEnsureWeek==='function')week=schedEnsureWeek();}catch(e2){week='';}
+  var clientId='';
+  var start='';
+  var end='';
+  var slotKey='';
+  var aideId='';
+  var clientEl=officeAdd1El('schedSlotClient');
+  var startEl=officeAdd1El('schedSlotStart');
+  var endEl=officeAdd1El('schedSlotEnd');
+  var keyEl=officeAdd1El('schedSlotKey');
+  var aideEl=officeAdd1El('schedSlotAide');
+  if(clientEl)clientId=String(clientEl.value||'');
+  if(startEl)start=String(startEl.value||'');
+  if(endEl)end=String(endEl.value||'');
+  if(keyEl)slotKey=String(keyEl.value||'');
+  if(aideEl)aideId=String(aideEl.value||'');
+  return {
+    on:!!(onEl&&onEl.checked),
+    until:officeAdd1ParseMdy(untilEl&&untilEl.value),
+    days:days,
+    week:week,
+    clientId:clientId,
+    start:start,
+    end:end,
+    slotKey:slotKey,
+    aideId:aideId
+  };
+}
+function officeAdd1RefreshRepeatPreview(){
+  var el=officeAdd1El('officeRepeatPreview');
+  var on=officeAdd1El('officeRepeatOn');
+  var card=officeAdd1El('officeRepeatCard');
+  var mark=officeAdd1El('officeRepeatBox');
+  var checked=!!(on&&on.checked);
+  if(card&&card.classList)card.classList.toggle('on', checked);
+  if(mark)mark.textContent=checked?'✓':'';
+  if(!el)return '';
+  var text=officeAdd1RepeatPreviewText(officeAdd1ReadRepeat());
+  el.textContent=text;
+  return text;
+}
+function officeAdd1ToggleRepeat(){
+  var box=officeAdd1El('officeRepeatOn');
+  if(box)box.checked=!box.checked;
+  officeAdd1RefreshRepeatPreview();
+}
+function officeAdd1RememberSeries(snap){
+  if(!snap||!snap.on)return;
+  officeAdd1Series.push({
+    clientId:snap.clientId,
+    slotKey:snap.slotKey,
+    days:(snap.days||[]).slice(),
+    until:snap.until
+  });
+}
+function officeAdd1DayNeedsCover(day){
+  var slots=day&&day.slots||[];
+  if(!slots.length)return false;
+  for(var i=0;i<slots.length;i++){
+    var s=slots[i];
+    if(!s)continue;
+    if(s.called_off||String(s.mark||'')==='call_off'||s.open_shift_id)return true;
+    if(!s.usual_aide_id&&!s.aide_name&&String(s.mark||'')!=='missed'&&String(s.mark||'')!=='on_hold')return true;
+  }
+  return false;
+}
+function officeAdd1AideLabel(a){
+  var name=String(a.name||a.full_name||a.fullName||a.username||'Aide');
+  var miles=a.distance_miles!=null?a.distance_miles:a.miles;
+  if(miles!=null&&miles!==''&&isFinite(Number(miles)))name+=' · '+Number(miles).toFixed(1)+' mi';
+  return name;
+}
+function officeAdd1PaintFindCover(){
+  var host=officeAdd1El('officeFindCover');
+  if(!host)return;
+  var client=null;
+  var day=null;
+  try{
+    if(typeof schedSlotSelected!=='undefined'&&schedSlotSelected&&typeof schedFindSlotClient==='function'){
+      client=schedFindSlotClient(schedSlotSelected.clientId);
+      day=client&&client.days?client.days[String(schedSlotSelected.weekday)]:null;
+    }
+  }catch(e){client=null;day=null;}
+  if(!officeAdd1DayNeedsCover(day)){
+    host.hidden=true;
+    host.innerHTML='';
+    return;
+  }
+  host.hidden=false;
+  var lists=officeAdd1Preview?officeAdd1SplitAides(officeAdd1SampleAides()):{available:[], onCall:[], pending:true};
+  if(!officeAdd1Preview){
+    host.innerHTML='<h3>Find cover</h3><p class="field-hint">Looking up available and on-call aides…</p>';
+    officeAdd1LoadFindCover(client, day);
+    return;
+  }
+  host.innerHTML=officeAdd1FindCoverHtml(lists, 'Sample list. Nothing is assigned.');
+}
+function officeAdd1FindCoverHtml(lists, note){
+  function initials(name){
+    var parts=String(name||'').trim().split(/\s+/).filter(Boolean);
+    if(!parts.length)return '•';
+    return parts.slice(0,2).map(function(p){return p.charAt(0).toUpperCase();}).join('');
+  }
+  function row(a){
+    var name=String(a.name||a.full_name||a.fullName||a.username||'Aide');
+    var miles=a.distance_miles!=null?a.distance_miles:(a.miles!=null?a.miles:null);
+    var bits=[a.on_call?'On call':'Available'];
+    if(miles!=null&&miles!==''&&isFinite(Number(miles)))bits.push(Number(miles).toFixed(1)+' mi away');
+    var knows=a.knows_client?'<div><span class="eca-pill ok">Knows this client</span></div>':'';
+    return '<div class="eca-person"><div class="eca-avatar">'+officeAdd1Esc(initials(name))+'</div><div class="eca-person-main"><b>'+officeAdd1Esc(name)+'</b><span>'+officeAdd1Esc(bits.join(' · '))+'</span>'+knows+'</div><button type="button" class="eca-btn eca-btn-sm" onclick="showTab(\'coverage\')">Pick</button></div>';
+  }
+  var avail=(lists.available||[]).map(row).join('');
+  var oncall=(lists.onCall||[]).map(row).join('');
+  var html='<div class="eca-alert"><div class="eca-k">Missed / no-show</div><b>Open or called-off shift</b><div class="eca-sub">'+officeAdd1Esc(note||'These aides are free now. Closest first.')+'</div></div>';
+  html+='<div class="eca-card"><h3>Free aides</h3>';
+  html+='<div class="eca-k">Available</div>'+(avail||'<p class="eca-sub">No available aides on this list.</p>');
+  html+='<div class="eca-k" style="margin-top:8px">On call</div>'+(oncall||'<p class="eca-sub">No on-call aides on this list.</p>');
+  html+='</div>';
+  return html;
+}
+function officeAdd1SampleAides(){
+  return [
+    {aide_id:'sample-aide-1', name:'Aide One', on_call:false, distance_miles:2.4, knows_client:true},
+    {aide_id:'sample-aide-2', name:'Aide Two', on_call:true, distance_miles:1.1},
+    {aide_id:'sample-aide-3', name:'Aide Three', on_call:false, distance_miles:5.0}
+  ];
+}
+async function officeAdd1LoadFindCover(client, day){
+  var host=officeAdd1El('officeFindCover');
+  if(!host)return;
+  var ranked=[];
+  var roster=[];
+  var missingRank=false;
+  var missingOnCall=false;
+  var openId='';
+  (day.slots||[]).forEach(function(s){if(s&&s.open_shift_id)openId=String(s.open_shift_id);});
+  if(typeof sbRestRpc==='function'){
+    if(openId){
+      var got=await sbRestRpc('admin_rank_backup_aides',{p_open_shift_id:openId,p_limit:20});
+      if(got&&got.ok)ranked=officeAdd1List(got.data);
+      else if(officeAdd1RpcMissing(got))missingRank=true;
+    }else missingRank=true;
+    var onGot=await sbRestRpc('admin_list_on_call_aides',{});
+    var onRows=[];
+    if(onGot&&onGot.ok)onRows=officeAdd1List(onGot.data);
+    else if(officeAdd1RpcMissing(onGot))missingOnCall=true;
+    var onIds={};
+    onRows.forEach(function(a){if(a&&(a.aide_id||a.id))onIds[String(a.aide_id||a.id)]=true;});
+    try{roster=typeof schedAideRosters==='function'?schedAideRosters():[];}catch(e){roster=[];}
+    roster.forEach(function(a){
+      if(a&&(a.on_call===true||a.is_on_call===true))onIds[String(a.id||a.aide_id||'')]=true;
+    });
+    var source=ranked.length?ranked:roster.map(function(a){
+      return {aide_id:a.id||a.aide_id, name:a.name||a.full_name||a.username, on_call:!!onIds[String(a.id||a.aide_id||'')]||a.on_call===true||a.is_on_call===true};
+    });
+    source.forEach(function(a){
+      var id=String(a.aide_id||a.id||'');
+      if(onIds[id])a.on_call=true;
+    });
+    var lists=officeAdd1SplitAides(source);
+    var note='';
+    if(!source.length)note=missingRank?'Ranked cover is not on file yet. On-call is not on file yet.':'No aides to list for this shift yet.';
+    else if(missingOnCall&&!onRows.length)note='On-call flag is not on file. Everyone here is listed as available.';
+    else if(!ranked.length)note='Showing the office aide list. A ranked list needs an open shift id.';
+    host.innerHTML=officeAdd1FindCoverHtml(lists, note);
+    return;
+  }
+  host.innerHTML=officeAdd1FindCoverHtml({available:[], onCall:[]}, 'Sign in to load available and on-call aides.');
+}
+function officeAdd1SampleVisits(){
+  return [
+    {id:'sample-visit-1', client:'North Sample', aide:'Aide One', on:'2026-11-26', clock:'8:02 AM', booked:'8:00 AM – 12:00 PM', ft:72, source:'sample'},
+    {id:'sample-visit-2', client:'East Sample', aide:'Aide Two', on:'2026-11-26', clock:'9:10 AM', booked:'9:00 AM – 11:30 AM', ft:140, source:'sample'},
+    {id:'sample-visit-3', client:'West Sample', aide:'Aide Three', on:'2026-11-25', clock:'8:04 AM', booked:'8:00 AM – 12:00 PM', ft:3200, source:'sample'},
+    {id:'sample-visit-4', client:'South Sample', aide:'Aide One', on:'2026-11-24', clock:'1:02 PM', booked:'1:00 PM – 5:00 PM', ft:130, source:'sample'},
+    {id:'sample-visit-5', client:'Central Sample', aide:'Aide Two', on:'2026-11-23', clock:'', booked:'2:00 PM – 6:00 PM', ft:null, source:'sample'}
+  ];
+}
+function officeAdd1VisitsFromRecords(records){
+  var out=[];
+  (records||[]).forEach(function(rec){
+    if(!rec||typeof rec!=='object')return;
+    var days=rec.days;
+    var list=[];
+    if(Array.isArray(days))list=days;
+    else if(days&&typeof days==='object'){
+      Object.keys(days).forEach(function(k){if(days[k]&&typeof days[k]==='object')list.push(days[k]);});
+    }
+    list.forEach(function(d, i){
+      var worked=d.tin||d.in||d.hrs||d.distanceFt!=null||d.distanceMi!=null||d.distance_ft!=null||d.distance_mi!=null;
+      if(!worked)return;
+      var ft=officeAdd1DistanceFt(d);
+      out.push({
+        id:String(rec.id||'ts')+':'+String(d.date||i),
+        client:String(rec.clientName||rec.client||'Client'),
+        aide:String(rec.empName||rec.aideName||rec.aide||'Aide'),
+        on:officeAdd1DateOnly(d.date)||String(d.date||''),
+        clock:String(d.tin||d.in||d.clock_in||''),
+        ft:ft,
+        source:'timesheet'
+      });
+    });
+  });
+  return out;
+}
+function officeAdd1PaintVisits(){
+  var list=officeAdd1El('officeVisitList');
+  var count=officeAdd1El('officeVisitLookCount');
+  var rows=officeAdd1Visits||[];
+  var look=rows.filter(function(r){return officeAdd1NeedsLook(r.ft);});
+  if(count)count.textContent=String(look.length);
+  var allBtn=officeAdd1El('officeVisitFilterAll');
+  var lookBtn=officeAdd1El('officeVisitFilterLook');
+  if(allBtn)allBtn.textContent='All ('+rows.length+')';
+  if(lookBtn&&count){}
+  var shown=officeAdd1VisitFilter==='look'?look:rows;
+  if(!list)return;
+  if(!shown.length){
+    list.innerHTML='<p class="eca-sub">'+(officeAdd1VisitFilter==='look'?'Nothing needs a look.':'No visits on file.')+'</p>';
+    return;
+  }
+  list.innerHTML=shown.map(function(r){
+    var pill=r.ft==null?'<span class="eca-pill gray">No clock yet</span>':(officeAdd1NeedsLook(r.ft)?'<span class="eca-pill bad">Far from address</span>':'<span class="eca-pill ok">Close by</span>');
+    return '<button type="button" class="eca-vrow" data-office-visit="'+officeAdd1Esc(r.id)+'" onclick="officeAdd1OpenVisit(this.getAttribute(\'data-office-visit\'))"><span class="eca-person-main"><b>'+officeAdd1Esc(r.client)+' · '+officeAdd1Esc(r.aide)+'</b><span>'+officeAdd1Esc(officeAdd1Pretty(r.on)||r.on||'')+(r.booked?' · booked '+officeAdd1Esc(r.booked):'')+'</span><span class="eca-vd"><span>In: '+officeAdd1Esc(officeAdd1FormatFt(r.ft))+' '+pill+'</span></span></span><span class="eca-sub">›</span></button>';
+  }).join('');
+}
+function officeAdd1OpenVisit(id){
+  var row=null;
+  (officeAdd1Visits||[]).forEach(function(r){if(String(r.id)===String(id))row=r;});
+  officeAdd1SelectedVisit=row;
+  var wrap=officeAdd1El('officeVisitListWrap');
+  if(wrap)wrap.hidden=!!row;
+  officeAdd1PaintVisitRecord(row);
+}
+function officeAdd1CloseVisit(keep){
+  if(!keep)officeAdd1SelectedVisit=null;
+  var wrap=officeAdd1El('officeVisitListWrap');
+  var card=officeAdd1El('officeVisitRecord');
+  if(wrap)wrap.hidden=false;
+  if(card)card.hidden=true;
+}
+function officeAdd1PaintVisitRecord(row, flags){
+  var card=officeAdd1El('officeVisitRecord');
+  if(!card)return;
+  if(!row){card.hidden=true;return;}
+  card.hidden=false;
+  flags=flags||{};
+  var title=officeAdd1El('officeVisitRecordTitle');
+  var meta=officeAdd1El('officeVisitRecordMeta');
+  var flag=officeAdd1El('officeVisitRecordFlag');
+  var kv=officeAdd1El('officeVisitRecordKv');
+  var dist=officeAdd1El('officeVisitRecordDistance');
+  var note=officeAdd1El('officeVisitCheckNote');
+  var btn=officeAdd1El('officeVisitCheck');
+  if(title)title.textContent='Visit record';
+  if(meta)meta.textContent=[officeAdd1Pretty(row.on)||row.on, row.client, row.aide?'with '+row.aide:''].filter(Boolean).join(' · ');
+  var far=officeAdd1NeedsLook(row.ft);
+  var checked=!!officeAdd1Checked[row.id]||!!row.checked_at;
+  if(flag){
+    if(checked)flag.innerHTML='<div class="eca-alert ok"><div class="eca-k">Checked</div><b>Marked as checked.</b></div>';
+    else if(far)flag.innerHTML='<div class="eca-alert warn"><div class="eca-k">Far from address · Needs a look</div><b>The clock-in was '+officeAdd1Esc(officeAdd1FormatFt(row.ft))+' from the client home.</b><div class="eca-sub">Check with the aide.</div></div>';
+    else flag.innerHTML='';
+  }
+  function cell(k,v){return '<div><span class="k">'+officeAdd1Esc(k)+'</span><b>'+v+'</b></div>';}
+  var pill=row.ft==null?'':(far?' <span class="eca-pill bad">Far from address</span>':' <span class="eca-pill ok">Close by</span>');
+  if(kv)kv.innerHTML=cell('Client', officeAdd1Esc(row.client))+cell('Aide', officeAdd1Esc(row.aide||'—'))+cell('Booked', officeAdd1Esc(row.booked||'—'))+cell('Clock in', officeAdd1Esc(row.clock||'—'))+cell('Location at clock-in', officeAdd1Esc(officeAdd1FormatFt(row.ft))+pill);
+  if(dist){
+    dist.className='eca-badge'+(far?' far':'');
+    dist.innerHTML='<span class="pin" aria-hidden="true">'+(far?'!':'●')+'</span><span>'+officeAdd1Esc(officeAdd1FormatFt(row.ft))+(far?' · farther than 1,000 ft':' · close to the address')+'</span>';
+  }
+  if(btn){
+    btn.disabled=checked;
+    btn.textContent=checked?'Checked':'✓ Mark as checked';
+  }
+  if(note){
+    if(!checked)note.textContent='';
+    else if(flags.saved)note.textContent='Marked as checked.';
+    else if(flags.preview)note.textContent='Preview only. This check was not saved.';
+    else note.textContent='Marked on this screen only. It is not saved until the check column is on file.';
+  }
+}
+function officeAdd1SetVisitFilter(which){
+  officeAdd1VisitFilter=which==='look'?'look':'all';
+  var all=officeAdd1El('officeVisitFilterAll');
+  var look=officeAdd1El('officeVisitFilterLook');
+  function press(el, on){
+    if(!el)return;
+    el.setAttribute('aria-pressed', on?'true':'false');
+    if(el.classList)el.classList.toggle('on', !!on);
+  }
+  press(all, officeAdd1VisitFilter==='all');
+  press(look, officeAdd1VisitFilter==='look');
+  officeAdd1PaintVisits();
+}
+async function officeAdd1MarkChecked(){
+  var row=officeAdd1SelectedVisit;
+  if(!row)return {ok:false};
+  if(officeAdd1Role()&&!officeAdd1IsOffice())return {ok:false, forbidden:true};
+  if(officeAdd1Preview){
+    officeAdd1Checked[row.id]=true;
+    officeAdd1PaintVisitRecord(row,{preview:true,saved:false});
+    return {ok:true, preview:true, saved:false};
+  }
+  var saved=false;
+  var missing=true;
+  if(typeof sbRestRpc==='function'){
+    var got=await sbRestRpc('admin_mark_visit_checked',{p_visit_id:String(row.id)});
+    if(got&&got.ok===true){saved=true;missing=false;}
+    else if(!officeAdd1RpcMissing(got))missing=false;
+  }
+  officeAdd1Checked[row.id]=true;
+  officeAdd1PaintVisitRecord(row,{saved:saved, missing:missing});
+  return {ok:true, saved:saved, missing:missing};
+}
+async function officeAdd1LoadVisits(){
+  if(officeAdd1Preview){
+    officeAdd1Visits=officeAdd1SampleVisits();
+    officeAdd1PaintVisits();
+    officeAdd1CloseVisit(true);
+    if(officeAdd1Query('officeScreen')==='visit'){
+      var first=officeAdd1Visits.filter(function(r){return officeAdd1NeedsLook(r.ft);})[0]||officeAdd1Visits[0];
+      if(first)officeAdd1OpenVisit(first.id);
+    }
+    return {ok:true, preview:true};
+  }
+  var rows=[];
+  var note='';
+  var missing=false;
+  if(typeof sbRestRpc==='function'){
+    var got=await sbRestRpc('admin_list_office_visits',{p_on_date:null});
+    if(got&&got.ok){
+      rows=officeAdd1List(got.data).map(function(r){
+        return {
+          id:String(r.id||r.visit_id||r.visit_key||''),
+          client:String(r.client_name||r.clientName||'Client'),
+          aide:String(r.aide_name||r.aideName||'Aide'),
+          on:officeAdd1DateOnly(r.on_date||r.on||r.date),
+          clock:String(r.clock_in||r.clockIn||''),
+          ft:officeAdd1DistanceFt(r),
+          checked_at:r.checked_at||'',
+          source:'rpc'
+        };
+      }).filter(function(r){return r.id;});
+    }else if(officeAdd1RpcMissing(got))missing=true;
+    else note=(got&&got.error)||'Could not load visits.';
+  }else missing=true;
+  if(!rows.length){
+    var recs=[];
+    try{recs=(typeof allRecords!=='undefined'&&allRecords)?allRecords:[];}catch(e){recs=[];}
+    if(!recs.length&&typeof renderTimesheets==='function'){
+      try{await renderTimesheets();}catch(e2){}
+      try{recs=(typeof allRecords!=='undefined'&&allRecords)?allRecords:[];}catch(e3){recs=[];}
+    }
+    var fromTs=officeAdd1VisitsFromRecords(recs);
+    if(fromTs.length){
+      rows=fromTs;
+      note='Distances already stored on timesheet days. A separate visit list is not on file yet.';
+    }
+  }
+  officeAdd1Visits=rows;
+  officeAdd1PaintVisits();
+  var hint=officeAdd1El('officeVisitNote');
+  if(hint){
+    if(!rows.length&&missing)hint.textContent='No visit distances on file yet.';
+    else hint.textContent=note||'';
+  }
+  officeAdd1CloseVisit(true);
+  if(!rows.length)officeAdd1PaintVisitRecord(null);
+  return {ok:true, missing:missing&&!rows.length};
+}
+async function officeAdd1LoadSupervision(){
+  if(officeAdd1Role()&&!officeAdd1IsOffice()){
+    officeAdd1PaintSupervision({rows:[], error:'Scheduler and Admin share this tracker.'});
+    return {ok:false, forbidden:true};
+  }
+  if(officeAdd1Preview){
+    officeAdd1PaintSupervision({rows:officeAdd1SampleSupervision()});
+    return {ok:true, preview:true};
+  }
+  var list=[];
+  var err='';
+  var missing=false;
+  try{
+    var data=null;
+    if(typeof sbNurseComplianceDispatch==='function'&&typeof evercareSbEnabled==='function'&&evercareSbEnabled()){
+      data=await sbNurseComplianceDispatch({action:'get_supervisory_compliance'});
+    }else if(typeof sbRestRpc==='function'){
+      var got=await sbRestRpc('get_supervisory_compliance',{});
+      if(got&&got.ok)data=got.data;
+      else if(officeAdd1RpcMissing(got))missing=true;
+      else err=(got&&got.error)||'Could not load supervision.';
+    }else missing=true;
+    var raw=[];
+    if(data&&data.success&&Array.isArray(data.data))raw=data.data;
+    else if(data&&Array.isArray(data))raw=data;
+    else raw=officeAdd1List(data);
+    var today=officeAdd1TodayNy();
+    list=raw.map(function(r){
+      var hydrated=r;
+      try{if(typeof hydrateNurseComplianceRow==='function')hydrated=hydrateNurseComplianceRow(r);}catch(eH){hydrated=r;}
+      var last=officeAdd1DateOnly(hydrated.lastVisitOn||hydrated.last_visit_on||hydrated.last_supervisory_visit||hydrated.last_supervisory_on||'');
+      var st=officeAdd1SupervisionStatus({
+        last:last,
+        visits:hydrated.visits,
+        daysLeft:hydrated.daysLeft,
+        daysInWindow:hydrated.daysInWindow
+      }, today);
+      return {client:String(hydrated.clientName||hydrated.client_name||'Client'), last:st.last, due:st.due, status:st.status, visits:hydrated.visits, reason:st.reason||''};
+    });
+  }catch(e){err='Could not load supervision.';}
+  officeAdd1PaintSupervision({rows:list, error:missing?'missing':err, missing:missing&&!list.length});
+  return {ok:!err, missing:missing&&!list.length};
+}
+function officeAdd1SampleSupervision(){
+  var today='2026-11-26';
+  return [
+    {client:'North Sample', last:'2026-09-14'},
+    {client:'East Sample', last:'2026-10-06'},
+    {client:'West Sample', last:'2026-11-07'},
+    {client:'South Sample', last:'2026-09-22'},
+    {client:'Central Sample', last:'2026-10-20'},
+    {client:'Harbor Sample', last:'2026-11-18'}
+  ].map(function(r){
+    var st=officeAdd1SupervisionStatus(r, today);
+    return {client:r.client, last:st.last, due:st.due, status:st.status, reason:st.reason||''};
+  });
+}
+function officeAdd1DaySpan(a,b){
+  var pa=String(a||'').split('-'), pb=String(b||'').split('-');
+  if(pa.length<3||pb.length<3)return null;
+  var da=new Date(Number(pa[0]), Number(pa[1])-1, Number(pa[2]));
+  var db=new Date(Number(pb[0]), Number(pb[1])-1, Number(pb[2]));
+  if(!isFinite(da.getTime())||!isFinite(db.getTime()))return null;
+  return Math.round((db-da)/86400000);
+}
+function officeAdd1PaintSupervision(pack){
+  pack=pack||{rows:[]};
+  officeAdd1SupRows=pack.rows||[];
+  var rows=officeAdd1SupRows;
+  var note=officeAdd1El('officeSupNote');
+  var body=officeAdd1El('officeSupBody');
+  var empty=officeAdd1El('officeSupEmpty');
+  var stats=officeAdd1El('officeSupStats');
+  if(note){
+    if(pack.error&&pack.error!=='missing')note.textContent=String(pack.error);
+    else note.textContent='Each client gets a supervisory visit on a 60-day cadence.';
+  }
+  var over=rows.filter(function(r){return r.status==='overdue';});
+  var due=rows.filter(function(r){return r.status==='due';});
+  var ok=rows.filter(function(r){return r.status==='ok';});
+  if(stats){
+    stats.innerHTML='<div class="eca-stat bad"><b>'+over.length+'</b><span>Overdue</span></div><div class="eca-stat warn"><b>'+due.length+'</b><span>Due in 14 days</span></div><div class="eca-stat"><b>'+ok.length+'</b><span>Up to date</span></div><div class="eca-stat"><b>60</b><span>Days between checks</span></div>';
+  }
+  var fOver=officeAdd1El('officeSupFilterOver');
+  var fDue=officeAdd1El('officeSupFilterDue');
+  if(fOver)fOver.textContent='Overdue ('+over.length+')';
+  if(fDue)fDue.textContent='Due soon ('+due.length+')';
+  var shown=rows.filter(function(r){
+    if(officeAdd1SupFilter==='overdue')return r.status==='overdue';
+    if(officeAdd1SupFilter==='due')return r.status==='due';
+    return true;
+  });
+  if(!body)return;
+  if(!shown.length){
+    body.innerHTML='';
+    if(empty){
+      empty.hidden=false;
+      empty.textContent=pack.missing||pack.error==='missing'?'Supervision dates are not on file yet.':'No clients in this filter.';
+    }
+    return;
+  }
+  if(empty)empty.hidden=true;
+  var today=officeAdd1Preview?'2026-11-26':officeAdd1TodayNy();
+  body.innerHTML=shown.map(function(r){
+    var label='Date not on file';
+    var cls='gray';
+    if(r.status==='overdue'){
+      var late=r.due?officeAdd1DaySpan(r.due, today):null;
+      label=late!=null&&late>0?'Overdue '+late+' days':'Overdue';
+      cls='bad';
+    }else if(r.status==='due'){
+      var left=r.due?officeAdd1DaySpan(today, r.due):null;
+      label=left!=null?'Due in '+left+' days':'Due';
+      cls='warn';
+    }else if(r.status==='ok'){
+      var leftOk=r.due?officeAdd1DaySpan(today, r.due):null;
+      label=leftOk!=null?'OK · '+leftOk+' days left':'On track';
+      cls='ok';
+    }
+    if(r.reason)label=r.reason;
+    return '<tr><td><b>'+officeAdd1Esc(r.client)+'</b></td><td>'+officeAdd1Esc(r.last?officeAdd1Pretty(r.last):'—')+'</td><td>'+officeAdd1Esc(r.due?officeAdd1Pretty(r.due):'—')+'</td><td><span class="eca-pill '+cls+'">'+officeAdd1Esc(label)+'</span></td></tr>';
+  }).join('');
+}
+function officeAdd1SetSupFilter(which){
+  officeAdd1SupFilter=which==='overdue'?'overdue':(which==='due'?'due':'all');
+  [['officeSupFilterAll','all'],['officeSupFilterOver','overdue'],['officeSupFilterDue','due']].forEach(function(pair){
+    var el=officeAdd1El(pair[0]);
+    if(el&&el.classList)el.classList.toggle('on', officeAdd1SupFilter===pair[1]);
+  });
+  officeAdd1PaintSupervision({rows:officeAdd1SupRows});
+}
+function officeAdd1MissedFromClients(clients){
+  var rows=[];
+  (clients||[]).forEach(function(client){
+    var days=client.days||{};
+    Object.keys(days).forEach(function(k){
+      var day=days[k];
+      (day&&day.slots||[]).forEach(function(slot){
+        if(!slot||String(slot.mark||'')!=='missed')return;
+        rows.push({
+          on:officeAdd1DateOnly(day.on_date),
+          client:client.name||'Client',
+          aide:slot.aide_name||slot.usual_aide_id||'—',
+          when:[officeAdd1ClockLabel(slot.start_local), officeAdd1ClockLabel(slot.end_local)].filter(Boolean).join(' – '),
+          reason:slot.miss_reason||slot.note||'Missed'
+        });
+      });
+    });
+  });
+  rows.sort(function(a,b){return String(a.on).localeCompare(String(b.on));});
+  return rows;
+}
+function officeAdd1SampleMissed(){
+  return officeAdd1MissedFromClients(officeAdd1SampleClients());
+}
+function officeAdd1PaintMissed(rows, note){
+  var body=officeAdd1El('officeMissedBody');
+  var empty=officeAdd1El('officeMissedEmpty');
+  var hint=officeAdd1El('officeMissedNote');
+  var sheet=officeAdd1El('officeMissedSheetBody');
+  var reasons=officeAdd1El('officeMissedReasons');
+  var sub=officeAdd1El('officeMissedPrintSub');
+  if(hint)hint.textContent=note||'Office report. This does not change the caregiver timesheet.';
+  if(sub)sub.textContent='Missed-visit report'+(rows&&rows.length?' · '+rows.length+' rows':'');
+  var counts={};
+  (rows||[]).forEach(function(r){var k=r.reason||'Missed';counts[k]=(counts[k]||0)+1;});
+  if(reasons){
+    var keys=Object.keys(counts);
+    reasons.innerHTML=keys.length?'<h3>Reasons</h3>'+keys.map(function(k){return '<span class="eca-pill">'+officeAdd1Esc(k)+' · '+counts[k]+'</span>';}).join(' '):'';
+    reasons.hidden=!keys.length;
+  }
+  var html='';
+  (rows||[]).forEach(function(r){
+    html+='<tr><td>'+officeAdd1Esc(officeAdd1Pretty(r.on)||'—')+'</td><td>'+officeAdd1Esc(r.client)+'</td><td>'+officeAdd1Esc(r.aide)+'</td><td>'+officeAdd1Esc(r.when||'—')+'</td><td><b>'+officeAdd1Esc(r.reason||'Missed')+'</b></td></tr>';
+  });
+  if(body)body.innerHTML=html;
+  if(sheet)sheet.innerHTML=html;
+  if(empty)empty.hidden=!!(rows&&rows.length);
+}
+function officeAdd1ShowMissedPrint(){
+  var report=officeAdd1El('officeMissedReport');
+  var sheet=officeAdd1El('officeMissedSheet');
+  if(report)report.hidden=true;
+  if(sheet)sheet.hidden=false;
+}
+function officeAdd1HideMissedPrint(){
+  var report=officeAdd1El('officeMissedReport');
+  var sheet=officeAdd1El('officeMissedSheet');
+  if(report)report.hidden=false;
+  if(sheet)sheet.hidden=true;
+}
+function officeAdd1MissedPrintDocument(rows){
+  var body='';
+  (rows||[]).forEach(function(r){
+    body+='<tr><td>'+officeAdd1Esc(officeAdd1Pretty(r.on)||'')+'</td><td>'+officeAdd1Esc(r.client)+'</td><td>'+officeAdd1Esc(r.aide)+'</td><td>'+officeAdd1Esc(r.when||'')+'</td><td>'+officeAdd1Esc(r.reason||'')+'</td></tr>';
+  });
+  if(!body)body='<tr><td colspan="5">No missed visits in this range.</td></tr>';
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Missed visits</title><style>body{font-family:Georgia,serif;color:#1a2744;margin:24px;}h1{font-size:22px;margin:0 0 4px;}p{margin:0 0 16px;color:#1e6060;}table{border-collapse:collapse;width:100%;}th,td{border-bottom:1px solid #dce4ef;text-align:left;padding:8px;font-size:14px;}th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;}</style></head><body><h1>EverCare — Missed visits</h1><p>Office report. This is not a caregiver timesheet.</p><table><thead><tr><th>Date</th><th>Client</th><th>Aide</th><th>Time</th><th>Reason</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
+}
+function officeAdd1PrintMissed(){
+  var rows=officeAdd1MissedRows||[];
+  var html=officeAdd1MissedPrintDocument(rows);
+  var w=null;
+  try{w=window.open('','_blank','noopener,noreferrer,width=800,height=900');}catch(e){w=null;}
+  if(!w){
+    var note=officeAdd1El('officeMissedPrintNote');
+    if(note)note.textContent='The print window was blocked. The report on this page is the print view.';
+    return {ok:false, blocked:true};
+  }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  try{w.focus();w.print();}catch(e2){}
+  return {ok:true};
+}
+async function officeAdd1LoadMissed(){
+  if(officeAdd1Preview){
+    officeAdd1MissedRows=officeAdd1SampleMissed();
+    officeAdd1PaintMissed(officeAdd1MissedRows, 'Preview week of 11/23/2026. Nothing is saved.');
+    return {ok:true, preview:true};
+  }
+  var fromEl=officeAdd1El('officeMissedFrom');
+  var toEl=officeAdd1El('officeMissedTo');
+  var start=officeAdd1ParseMdy(fromEl&&fromEl.value);
+  var end=officeAdd1ParseMdy(toEl&&toEl.value);
+  if(!start||!end){
+    var today=officeAdd1TodayNy();
+    start=officeAdd1Monday(today);
+    end=officeAdd1AddDays(start,6);
+    if(fromEl&&!fromEl.value)fromEl.value=officeAdd1Pretty(start);
+    if(toEl&&!toEl.value)toEl.value=officeAdd1Pretty(end);
+  }
+  var rows=[];
+  var note='';
+  var missing=false;
+  if(typeof sbRestRpc==='function'){
+    var got=await sbRestRpc('admin_list_missed_visits',{p_start:start,p_end:end});
+    if(got&&got.ok){
+      rows=officeAdd1List(got.data).map(function(r){
+        return {
+          on:officeAdd1DateOnly(r.on_date||r.on||r.date),
+          client:String(r.client_name||r.clientName||'Client'),
+          aide:String(r.aide_name||r.aideName||'—'),
+          when:String(r.when||r.time||''),
+          reason:String(r.reason||r.miss_reason||'Missed')
+        };
+      });
+    }else if(officeAdd1RpcMissing(got))missing=true;
+    else note=(got&&got.error)||'';
+  }else missing=true;
+  if(!rows.length){
+    var week=officeAdd1Monday(start||officeAdd1TodayNy());
+    var clients=[];
+    try{
+      if(typeof schedSlotClients!=='undefined'&&schedSlotClients&&schedSlotClients.length&&typeof schedEnsureWeek==='function'&&schedEnsureWeek()===week){
+        clients=schedSlotClients;
+      }
+    }catch(e){clients=[];}
+    if(!clients.length&&typeof sbRestRpc==='function'){
+      var sched=await sbRestRpc('list_schedule_week',{p_week_start:week});
+      if(sched&&sched.ok)clients=officeAdd1ClientsFromWeek(sched.data);
+    }
+    rows=officeAdd1MissedFromClients(clients).filter(function(r){
+      if(!r.on)return true;
+      if(start&&r.on<start)return false;
+      if(end&&r.on>end)return false;
+      return true;
+    });
+    if(missing)note='Showing missed marks already on the schedule week. A longer report is not on file yet.';
+  }
+  officeAdd1MissedRows=rows;
+  officeAdd1PaintMissed(rows, note);
+  return {ok:true, missing:missing};
+}
+function officeAdd1RatesFromReport(report){
+  var aides=report&&Array.isArray(report.aides)?report.aides:[];
+  var rows=[];
+  aides.forEach(function(a){
+    if(!a)return;
+    var rate=a.hourly_rate!=null?a.hourly_rate:(a.pay_rate!=null?a.pay_rate:a.rate);
+    if(rate==null||rate==='')return;
+    rows.push({
+      aide:String(a.aide_name||a.name||a.username||'Aide'),
+      rate:Number(rate),
+      hours:a.paid_hours!=null?a.paid_hours:(a.hours!=null?a.hours:'')
+    });
+  });
+  return rows;
+}
+function officeAdd1Money(n){
+  var x=Number(n);
+  if(!isFinite(x))return '—';
+  return '$'+x.toFixed(2);
+}
+function officeAdd1PaintPay(pack){
+  pack=pack||{rows:[]};
+  var lock=officeAdd1El('officePayLock');
+  var box=officeAdd1El('officePayRates');
+  var body=officeAdd1El('officePayBody');
+  var empty=officeAdd1El('officePayEmpty');
+  var note=officeAdd1El('officePayNote');
+  if(!officeAdd1IsAdmin()){
+    if(box)box.hidden=true;
+    if(lock){
+      lock.hidden=false;
+      if(String(lock.textContent||'').indexOf('Payroll is locked')<0)lock.textContent='Admin only. Payroll is locked. Schedulers can’t see payroll.';
+    }
+    if(body)body.innerHTML='';
+    return;
+  }
+  if(lock)lock.hidden=true;
+  if(box)box.hidden=false;
+  var rows=pack.rows||[];
+  if(note)note.textContent=pack.note||(rows.length?'Hourly rates for this week.':'');
+  if(!body)return;
+  if(!rows.length){
+    body.innerHTML='';
+    if(empty){empty.hidden=false;empty.textContent='Pay rates are not on file yet.';}
+    return;
+  }
+  if(empty)empty.hidden=true;
+  body.innerHTML=rows.map(function(r){
+    var rate=Number(r.rate);
+    var hrs=r.hours===''||r.hours==null?null:Number(r.hours);
+    var est=(isFinite(rate)&&hrs!=null&&isFinite(hrs))?hrs*rate:NaN;
+    return '<tr><td><b>'+officeAdd1Esc(r.aide)+'</b></td><td>'+officeAdd1Esc(hrs==null?'—':String(hrs))+'</td><td>'+officeAdd1Esc(officeAdd1Money(rate))+'</td><td>'+officeAdd1Esc(isFinite(est)?officeAdd1Money(est):'—')+'</td></tr>';
+  }).join('');
+}
+function officeAdd1SamplePay(){
+  return {rows:[{aide:'Aide One', rate:18, hours:32}], note:'Preview rates. Not live payroll.'};
+}
+async function officeAdd1LoadPay(){
+  if(!officeAdd1IsAdmin()){
+    officeAdd1PaintPay({rows:[]});
+    return {ok:false, forbidden:true};
+  }
+  if(officeAdd1Preview){
+    officeAdd1PaintPay(officeAdd1SamplePay());
+    return {ok:true, preview:true};
+  }
+  var rows=[];
+  var missing=false;
+  var note='';
+  if(typeof sbRestRpc==='function'){
+    var got=await sbRestRpc('admin_list_aide_pay_rates',{});
+    if(got&&got.ok){
+      officeAdd1List(got.data).forEach(function(r){
+        var rate=r.hourly_rate!=null?r.hourly_rate:r.pay_rate;
+        if(rate==null||rate==='')return;
+        rows.push({
+          aide:String(r.aide_name||r.name||r.aide_id||'Aide'),
+          rate:Number(rate),
+          hours:r.hours!=null?r.hours:''
+        });
+      });
+    }else if(officeAdd1RpcMissing(got))missing=true;
+    else note=(got&&got.error)||'Could not load pay rates.';
+  }else missing=true;
+  var report=null;
+  try{report=(typeof remiPayroll1Report!=='undefined')?remiPayroll1Report:null;}catch(e){report=null;}
+  var fromReport=officeAdd1RatesFromReport(report);
+  if(!rows.length&&fromReport.length)rows=fromReport;
+  if(!rows.length&&missing)note='Pay rates are not on file yet.';
+  officeAdd1PaintPay({rows:rows, note:note});
+  return {ok:true, missing:missing&&!rows.length, forbidden:false};
+}
+async function officeAdd1LoadToday(){
+  if(officeAdd1Preview){
+    officeAdd1PaintToday(officeAdd1SampleToday());
+    return {ok:true, preview:true};
+  }
+  var today=officeAdd1TodayNy();
+  var week=officeAdd1Monday(today);
+  var clients=[];
+  var opens=[];
+  var err='';
+  if(typeof sbRestRpc!=='function'){
+    officeAdd1PaintToday({progress:[],late:[],missed:[],open:[],today:today,clockKnown:false,error:'Sign in to load today.'});
+    return {ok:false};
+  }
+  var sched=await sbRestRpc('list_schedule_week',{p_week_start:week});
+  if(sched&&sched.ok)clients=officeAdd1ClientsFromWeek(sched.data);
+  else err=(sched&&sched.error)||'Could not load the schedule.';
+  var og=await sbRestRpc('admin_list_open_shifts',{p_include_resolved:false});
+  if(og&&og.ok)opens=officeAdd1List(og.data);
+  var model=officeAdd1BuildToday(clients, opens, today, officeAdd1NowMinutesNy(new Date()));
+  model.error=err;
+  officeAdd1PaintToday(model);
+  return {ok:!err, error:err};
+}
+var officeExemptActive=false;
+var officeExemptSkipReset=false;
+var officeExemptView='list';
+var officeExemptAideId='test';
+var officeExemptFilter='all';
+var officeExemptQ='';
+var officeExemptConfirm=false;
+var officeExemptAdd={first:'',last:'',phone:'(614) 555-0100',evv:'clock',reason:'',effective:'2026-11-30'};
+var officeExemptEdit=null;
+var officeExemptIcoCal='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3.5v4M16 3.5v4M3.5 10h17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="8" y="13" width="3" height="3" rx=".5" fill="currentColor"/></svg>';
+var officeExemptIcoClk='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7.5v5l3.2 1.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function officeExemptAides(){
+  return [
+    {id:'test', name:'Test Aide', initials:'TA', role:'Home Health Aide', clients:'Sample Client', evv:'exempt', reason:'Family caregiver', effective:'2026-11-30', phone:'(614) 555-0101'},
+    {id:'one', name:'Aide One', initials:'A1', role:'Home Health Aide', clients:'Sample Client A', evv:'clock', reason:'', effective:'', phone:'(614) 555-0102'},
+    {id:'two', name:'Aide Two', initials:'A2', role:'Home Health Aide', clients:'East Sample', evv:'clock', reason:'', effective:'', phone:'(614) 555-0103'},
+    {id:'three', name:'Aide Three', initials:'A3', role:'Home Health Aide', clients:'Sample Client B', evv:'exempt', reason:'Live-in family', effective:'2026-11-02', phone:'(614) 555-0104'},
+    {id:'four', name:'Aide Four', initials:'A4', role:'Home Health Aide', clients:'Sample Client C', evv:'clock', reason:'', effective:'', phone:'(614) 555-0105'},
+    {id:'five', name:'Aide Five', initials:'A5', role:'Home Health Aide', clients:'Sample Client D', evv:'exempt', reason:'Family caregiver', effective:'2026-10-12', phone:'(614) 555-0106'},
+    {id:'sample', name:'Sample Aide', initials:'SA', role:'Home Health Aide', clients:'Sample Client E', evv:'clock', reason:'', effective:'', phone:'(614) 555-0107'},
+    {id:'six', name:'Aide Six', initials:'A6', role:'Home Health Aide', clients:'Sample Client F', evv:'clock', reason:'', effective:'', phone:'(614) 555-0108'}
+  ];
+}
+function officeExemptCounts(rows){
+  rows=rows||officeExemptAides();
+  var clock=0, exempt=0;
+  rows.forEach(function(a){if(a&&a.evv==='exempt')exempt++;else clock++;});
+  return {all:rows.length, clock:clock, exempt:exempt};
+}
+function officeExemptFind(id){
+  var rows=officeExemptAides();
+  for(var i=0;i<rows.length;i++){if(rows[i].id===id)return rows[i];}
+  return rows[0];
+}
+function officeExemptClone(a){
+  a=a||officeExemptFind('test');
+  return {id:a.id,name:a.name,initials:a.initials,role:a.role,clients:a.clients,evv:a.evv,reason:a.reason,effective:a.effective||'2026-11-30',phone:a.phone,orig:a.evv};
+}
+function officeExemptPretty(iso){
+  if(!iso)return '\u2014';
+  var p=String(iso).split('-');
+  var mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var m=mon[Number(p[1])-1];
+  if(!m||p.length<3)return String(iso);
+  return m+' '+Number(p[2])+', '+p[0];
+}
+function officeExemptChip(kind, long){
+  if(kind==='exempt')return '<span class="ox-chip exempt">'+officeExemptIcoCal+'Exempt, manual entry</span>';
+  return '<span class="ox-chip clock">'+officeExemptIcoClk+(long?'Clock in at each visit':'Clock in')+'</span>';
+}
+function officeExemptChoices(sel, act){
+  return '<div class="ox-choice-lbl">How this aide enters time</div>'+
+    '<div class="ox-choices">'+
+      '<button type="button" class="ox-choice clock'+(sel==='clock'?' on':'')+'" data-ox="'+act+'" data-v="clock">'+
+        '<div class="ox-ct"><span class="ox-cico">'+officeExemptIcoClk+'</span><div>'+
+          '<b>Clock in at each visit (Sandata EVV)</b>'+
+          '<small>This aide will see Clock In on their phone and must clock in at the member\u2019s home.</small>'+
+        '</div></div></button>'+
+      '<button type="button" class="ox-choice exempt'+(sel==='exempt'?' on':'')+'" data-ox="'+act+'" data-v="exempt">'+
+        '<div class="ox-ct"><span class="ox-cico">'+officeExemptIcoCal+'</span><div>'+
+          '<b>Exempt, manual weekly entry</b>'+
+          '<small>This aide will not see Clock In. They enter hours on a Monday\u2013Sunday timesheet at the end of the week.</small>'+
+        '</div></div></button>'+
+    '</div>';
+}
+function officeExemptFields(obj){
+  if(!obj||obj.evv!=='exempt')return '';
+  return '<div class="ox-extra">'+
+    '<div class="ox-field"><label for="oxReason">Reason for exemption (optional)</label>'+
+    '<input id="oxReason" type="text" placeholder="e.g. Family caregiver" value="'+officeAdd1Esc(obj.reason||'')+'"></div>'+
+    '<div class="ox-field" style="margin-bottom:0"><label for="oxEff">Effective from</label>'+
+    '<input id="oxEff" type="date" value="'+officeAdd1Esc(obj.effective||'2026-11-30')+'"></div>'+
+    '</div>';
+}
+function officeExemptRead(){
+  function val(id){var el=document.getElementById(id);return el?String(el.value||''):null;}
+  if(officeExemptView==='add'){
+    var first=val('oxFirst'); if(first!=null)officeExemptAdd.first=first;
+    var last=val('oxLast'); if(last!=null)officeExemptAdd.last=last;
+    var phone=val('oxPhone'); if(phone!=null)officeExemptAdd.phone=phone;
+    var reason=val('oxReason'); if(reason!=null)officeExemptAdd.reason=reason;
+    var eff=val('oxEff'); if(eff!=null&&eff)officeExemptAdd.effective=eff;
+  }else if(officeExemptView==='edit'&&officeExemptEdit){
+    var name=val('oxName'); if(name!=null)officeExemptEdit.name=name;
+    var ephone=val('oxPhone'); if(ephone!=null)officeExemptEdit.phone=ephone;
+    var ereason=val('oxReason'); if(ereason!=null)officeExemptEdit.reason=ereason;
+    var eeff=val('oxEff'); if(eeff!=null&&eeff)officeExemptEdit.effective=eeff;
+  }
+  var q=val('oxQ'); if(q!=null)officeExemptQ=q;
+}
+function officeExemptChrome(on){
+  var banner=document.getElementById('officeExemptBanner');
+  if(banner)banner.hidden=!on;
+  if(document.body&&document.body.classList)document.body.classList.toggle('office-exempt-preview', !!on);
+  var av=document.getElementById('avatarMenuBtn');
+  if(!av)return;
+  if(on){
+    if(!av.getAttribute('data-ox-letter'))av.setAttribute('data-ox-letter', av.textContent||'A');
+    av.textContent=officeAdd1IsAdmin()?'A':'S';
+  }else if(av.hasAttribute('data-ox-letter')){
+    av.textContent=av.getAttribute('data-ox-letter');
+    av.removeAttribute('data-ox-letter');
+  }
+}
+function officeExemptSetHost(on){
+  var tab=document.getElementById('tab_aides');
+  var root=document.getElementById('officeExemptRoot');
+  if(tab&&tab.classList)tab.classList.toggle('office-exempt-host', !!on);
+  if(root)root.hidden=!on;
+}
+function officeExemptPaintList(){
+  var rows=officeExemptAides().filter(function(a){
+    if(officeExemptFilter==='clock'&&a.evv!=='clock')return false;
+    if(officeExemptFilter==='exempt'&&a.evv!=='exempt')return false;
+    if(officeExemptQ){
+      var hay=(a.name+' '+a.clients+' '+a.evv).toLowerCase();
+      if(hay.indexOf(officeExemptQ.toLowerCase())<0)return false;
+    }
+    return true;
+  });
+  var c=officeExemptCounts();
+  var f=officeExemptFilter||'all';
+  var list=rows.map(function(a){
+    return '<button type="button" class="ox-row" data-ox="detail" data-id="'+officeAdd1Esc(a.id)+'">'+
+      '<span class="ox-av">'+officeAdd1Esc(a.initials)+'</span>'+
+      '<span class="ox-main"><b>'+officeAdd1Esc(a.name)+'</b><span>'+officeAdd1Esc(a.role)+' \u00b7 '+officeAdd1Esc(a.clients)+'</span></span>'+
+      officeExemptChip(a.evv,false)+
+      '<span class="ox-chev">\u203a</span></button>';
+  }).join('');
+  var table='<table class="ox-grid"><thead><tr><th>Aide</th><th>Status</th><th>Reason</th><th>Clients</th></tr></thead><tbody>'+
+    rows.map(function(a){
+      return '<tr><td><button type="button" class="ox-who" data-ox="detail" data-id="'+officeAdd1Esc(a.id)+'"><span class="ox-av">'+officeAdd1Esc(a.initials)+'</span>'+officeAdd1Esc(a.name)+'</button></td>'+
+        '<td>'+officeExemptChip(a.evv,false)+'</td>'+
+        '<td class="muted">'+(a.evv==='exempt'?officeAdd1Esc(a.reason||'\u2014'):'\u2014')+'</td>'+
+        '<td class="muted">'+officeAdd1Esc(a.clients)+'</td></tr>';
+    }).join('')+'</tbody></table>';
+  return '<div class="ox-wrap">'+
+    '<div class="ox-page"><div><h1>Aides</h1><div class="ox-sub">'+officeAdd1Esc(c.all+' aides \u00b7 '+c.clock+' Clock in \u00b7 '+c.exempt+' Exempt')+'</div></div>'+
+    '<button class="ox-btn ox-btn-teal" type="button" data-ox="add">+ Add aide</button></div>'+
+    '<div class="ox-search"><span class="ox-ico">\u2315</span><input id="oxQ" type="text" placeholder="Find an aide\u2026" value="'+officeAdd1Esc(officeExemptQ)+'"></div>'+
+    '<div class="ox-filters">'+
+      '<button type="button" class="'+(f==='all'?'on':'')+'" data-ox="filter" data-v="all">All <span class="n">'+c.all+'</span></button>'+
+      '<button type="button" class="'+(f==='clock'?'on':'')+'" data-ox="filter" data-v="clock">Clock in <span class="n">'+c.clock+'</span></button>'+
+      '<button type="button" class="'+(f==='exempt'?'on':'')+'" data-ox="filter" data-v="exempt">Exempt <span class="n">'+c.exempt+'</span></button>'+
+    '</div>'+
+    '<p class="ox-note">Admin and Scheduler can both set this.</p>'+
+    '<div class="ox-phone"><div class="ox-list">'+list+'</div></div>'+
+    '<div class="ox-desk">'+table+'</div>'+
+    '</div>';
+}
+function officeExemptPaintAdd(){
+  var a=officeExemptAdd;
+  return '<div class="ox-wrap">'+
+    '<button class="ox-back" type="button" data-ox="list">\u2039 Aides</button>'+
+    '<div class="ox-page"><div><h1>Add aide</h1><div class="ox-sub">Set how they will enter time.</div></div></div>'+
+    '<div class="ox-row2">'+
+      '<div class="ox-field"><label for="oxFirst">First name</label><input id="oxFirst" type="text" value="'+officeAdd1Esc(a.first)+'" placeholder="First"></div>'+
+      '<div class="ox-field"><label for="oxLast">Last name</label><input id="oxLast" type="text" value="'+officeAdd1Esc(a.last)+'" placeholder="Last"></div>'+
+    '</div>'+
+    '<div class="ox-field"><label for="oxPhone">Phone</label><input id="oxPhone" type="tel" value="'+officeAdd1Esc(a.phone)+'" placeholder="(614) 555-0100"></div>'+
+    officeExemptChoices(a.evv,'addevv')+
+    officeExemptFields(a)+
+    '<p class="ox-note" style="margin-bottom:12px">Admin and Scheduler can set this, same as other aide fields.</p>'+
+    '<button class="ox-btn ox-btn-teal ox-btn-full" type="button" data-ox="saveadd">Save aide</button>'+
+    '<p class="ox-note center">Mock only. Nothing is saved.</p>'+
+    '</div>';
+}
+function officeExemptPaintEdit(){
+  if(!officeExemptEdit)officeExemptEdit=officeExemptClone(officeExemptFind(officeExemptAideId));
+  var a=officeExemptEdit;
+  return '<div class="ox-wrap">'+
+    '<button class="ox-back" type="button" data-ox="detail" data-id="'+officeAdd1Esc(a.id)+'">\u2039 '+officeAdd1Esc(a.name)+'</button>'+
+    '<div class="ox-page"><div><h1>Edit aide</h1><div class="ox-sub">'+officeAdd1Esc(a.name)+'</div></div></div>'+
+    '<div class="ox-row2">'+
+      '<div class="ox-field"><label for="oxName">Name</label><input id="oxName" type="text" value="'+officeAdd1Esc(a.name)+'"></div>'+
+      '<div class="ox-field"><label for="oxPhone">Phone</label><input id="oxPhone" type="tel" value="'+officeAdd1Esc(a.phone)+'"></div>'+
+    '</div>'+
+    officeExemptChoices(a.evv,'editevv')+
+    officeExemptFields(a)+
+    '<p class="ox-note" style="margin-bottom:12px">Admin and Scheduler can set this, same as other aide fields.</p>'+
+    '<button class="ox-btn ox-btn-teal ox-btn-full" type="button" data-ox="saveedit">Save changes</button>'+
+    '<p class="ox-note center">Mock only. Nothing is saved.</p>'+
+    '</div>';
+}
+function officeExemptPaintDetail(){
+  var a=officeExemptFind(officeExemptAideId);
+  var status=a.evv==='exempt'?'Exempt, manual entry':'Clock in at each visit';
+  var see=a.evv==='exempt'?'Weekly hours grid, no Clock In':'Clock In at each visit';
+  var extra=a.evv==='exempt'?'<div class="ox-line"><span>Reason</span><b>'+officeAdd1Esc(a.reason||'\u2014')+'</b></div>'+
+    '<div class="ox-line"><span>Effective from</span><b>'+officeAdd1Esc(officeExemptPretty(a.effective))+'</b></div>':'';
+  return '<div class="ox-wrap">'+
+    '<button class="ox-back" type="button" data-ox="list">\u2039 Aides</button>'+
+    '<div class="ox-hero"><div class="ox-av">'+officeAdd1Esc(a.initials)+'</div><h2>'+officeAdd1Esc(a.name)+'</h2>'+officeExemptChip(a.evv,true)+'</div>'+
+    '<div class="ox-card"><h3>Time entry</h3>'+
+      '<div class="ox-line"><span>Status</span><b>'+officeAdd1Esc(status)+'</b></div>'+extra+
+      '<div class="ox-line"><span>What they see</span><b>'+officeAdd1Esc(see)+'</b></div>'+
+      '<p class="ox-note" style="margin-top:8px">Admin and Scheduler can change this, same as other aide fields.</p>'+
+    '</div>'+
+    '<div class="ox-card"><h3>Aide</h3>'+
+      '<div class="ox-line"><span>Role</span><b>'+officeAdd1Esc(a.role)+'</b></div>'+
+      '<div class="ox-line"><span>Phone</span><b>'+officeAdd1Esc(a.phone)+'</b></div>'+
+      '<div class="ox-line"><span>Clients</span><b>'+officeAdd1Esc(a.clients)+'</b></div>'+
+    '</div>'+
+    '<button class="ox-btn ox-btn-teal ox-btn-full" type="button" data-ox="edit" data-id="'+officeAdd1Esc(a.id)+'">Edit aide</button>'+
+    '</div>';
+}
+function officeExemptPaintConfirm(a){
+  var modal=document.getElementById('officeExemptModal');
+  if(!modal)return;
+  if(!officeExemptConfirm||!a){modal.hidden=true;modal.innerHTML='';modal.className='';return;}
+  modal.hidden=false;
+  modal.className='ox-modal-bg';
+  modal.innerHTML='<div class="ox-modal" role="dialog" aria-modal="true" aria-label="Confirm change">'+
+    '<div class="ox-mi">'+officeExemptIcoCal+'</div>'+
+    '<h3>Switch to weekly hours?</h3>'+
+    '<p>From next week, '+officeAdd1Esc(a.name)+' enters hours weekly and won\'t see Clock In.</p>'+
+    '<div class="ox-mrow">'+
+      '<button class="ox-btn ox-btn-ghost" type="button" data-ox="closeconfirm">Not now</button>'+
+      '<button class="ox-btn ox-btn-teal" type="button" data-ox="okconfirm">Switch</button>'+
+    '</div></div>';
+}
+function officeExemptPaint(){
+  if(!officeAdd1Preview)return;
+  var root=document.getElementById('officeExemptRoot');
+  if(!root)return;
+  officeExemptActive=true;
+  officeExemptSetHost(true);
+  officeExemptChrome(true);
+  var focusQ=document.activeElement&&document.activeElement.id==='oxQ';
+  var html='';
+  if(officeExemptView==='add')html=officeExemptPaintAdd();
+  else if(officeExemptView==='edit')html=officeExemptPaintEdit();
+  else if(officeExemptView==='detail')html=officeExemptPaintDetail();
+  else html=officeExemptPaintList();
+  root.innerHTML=html;
+  if(officeExemptView==='edit'&&officeExemptConfirm)officeExemptPaintConfirm(officeExemptEdit);
+  else officeExemptPaintConfirm(null);
+  if(focusQ){
+    var el=document.getElementById('oxQ');
+    if(el){el.focus();try{el.setSelectionRange(el.value.length, el.value.length);}catch(e){}}
+  }
+}
+function officeExemptEnter(screen){
+  var id=officeAdd1Query('officeAide')||'test';
+  officeExemptAideId=id;
+  officeExemptConfirm=officeAdd1Query('officeExemptConfirm')==='1';
+  if(screen==='aideadd'){
+    officeExemptView='add';
+    officeExemptAdd={first:'',last:'',phone:'(614) 555-0100',evv:officeAdd1Query('evv')==='exempt'?'exempt':'clock',reason:'',effective:'2026-11-30'};
+    officeExemptConfirm=false;
+  }else if(screen==='aideedit'){
+    officeExemptView='edit';
+    officeExemptEdit=officeExemptClone(officeExemptFind(id));
+    if(officeExemptConfirm)officeExemptEdit.evv='exempt';
+  }else if(screen==='aidedetail'){
+    officeExemptView='detail';
+    officeExemptConfirm=false;
+  }else{
+    officeExemptView='list';
+    officeExemptConfirm=false;
+  }
+  officeExemptSkipReset=true;
+  officeExemptActive=true;
+  if(typeof showTab==='function')showTab('aides');
+  officeExemptSkipReset=false;
+}
+function officeExemptClick(e){
+  if(!officeAdd1Preview)return;
+  var node=e.target;
+  if(node&&node.classList&&node.classList.contains('ox-modal-bg')){
+    officeExemptConfirm=false;
+    officeExemptPaint();
+    return;
+  }
+  var t=node&&node.closest?node.closest('[data-ox]'):null;
+  if(!t)return;
+  var act=t.getAttribute('data-ox');
+  officeExemptRead();
+  if(act==='list'){officeExemptView='list';officeExemptConfirm=false;officeExemptPaint();return;}
+  if(act==='add'){officeExemptView='add';officeExemptConfirm=false;officeExemptPaint();return;}
+  if(act==='detail'){officeExemptAideId=t.getAttribute('data-id')||'test';officeExemptView='detail';officeExemptConfirm=false;officeExemptPaint();return;}
+  if(act==='edit'){
+    officeExemptAideId=t.getAttribute('data-id')||officeExemptAideId;
+    officeExemptEdit=officeExemptClone(officeExemptFind(officeExemptAideId));
+    officeExemptView='edit';
+    officeExemptConfirm=false;
+    officeExemptPaint();
+    return;
+  }
+  if(act==='filter'){officeExemptFilter=t.getAttribute('data-v')||'all';officeExemptPaint();return;}
+  if(act==='addevv'){officeExemptAdd.evv=t.getAttribute('data-v')==='exempt'?'exempt':'clock';officeExemptPaint();return;}
+  if(act==='editevv'){
+    var v=t.getAttribute('data-v')==='exempt'?'exempt':'clock';
+    var prev=officeExemptEdit?officeExemptEdit.evv:'clock';
+    if(prev==='clock'&&v==='exempt'){
+      officeExemptEdit.evv='exempt';
+      officeExemptConfirm=true;
+      officeExemptPaint();
+      return;
+    }
+    if(officeExemptEdit)officeExemptEdit.evv=v;
+    officeExemptConfirm=false;
+    officeExemptPaint();
+    return;
+  }
+  if(act==='closeconfirm'){
+    officeExemptConfirm=false;
+    if(officeExemptEdit)officeExemptEdit.evv='clock';
+    officeExemptPaint();
+    return;
+  }
+  if(act==='okconfirm'){
+    officeExemptConfirm=false;
+    if(officeExemptEdit){
+      officeExemptEdit.evv='exempt';
+      if(!officeExemptEdit.reason)officeExemptEdit.reason='Family caregiver';
+      if(!officeExemptEdit.effective)officeExemptEdit.effective='2026-11-30';
+    }
+    officeExemptPaint();
+    return;
+  }
+  if(act==='saveadd'||act==='saveedit'){
+    officeExemptView='list';
+    officeExemptConfirm=false;
+    officeExemptPaint();
+  }
+}
+function officeExemptInput(e){
+  if(!officeAdd1Preview)return;
+  var t=e.target;
+  if(!t||!t.id)return;
+  if(t.id==='oxQ'){officeExemptQ=t.value;officeExemptPaint();return;}
+  officeExemptRead();
+}
+
+function officeAdd1AfterTab(tab){
+  if(tab==='today')officeAdd1LoadToday();
+  else if(tab==='visits')officeAdd1LoadVisits();
+  else if(tab==='supervision')officeAdd1LoadSupervision();
+  else if(tab==='missed')officeAdd1LoadMissed();
+  else if(tab==='payroll')officeAdd1LoadPay();
+  else if(tab==='aides'&&officeAdd1Preview){
+    if(!officeExemptSkipReset)officeExemptView='list';
+    officeExemptPaint();
+  }else if(officeExemptActive){
+    officeExemptActive=false;
+    officeExemptChrome(false);
+    officeExemptSetHost(false);
+    officeExemptPaintConfirm(null);
+  }
+}
+function officeAdd1BindRepeat(){
+  var on=officeAdd1El('officeRepeatOn');
+  var until=officeAdd1El('officeRepeatUntil');
+  var days=officeAdd1El('schedSlotDays');
+  function go(){officeAdd1RefreshRepeatPreview();}
+  if(on&&on.dataset&&on.dataset.officeBound!=='1'){on.dataset.officeBound='1';on.addEventListener('change',go);}
+  if(until&&until.dataset&&until.dataset.officeBound!=='1'){until.dataset.officeBound='1';until.addEventListener('input',go);}
+  if(days&&days.dataset&&days.dataset.officeRepeat!=='1'){
+    days.dataset.officeRepeat='1';
+    days.addEventListener('click',function(){setTimeout(go,0);});
+  }
+}
+function officeAdd1Install(){
+  if(officeAdd1Install.done)return;
+  officeAdd1Install.done=true;
+  if(typeof schedChipHtml==='function'&&!schedChipHtml.__officeAdd1){
+    var chipBase=schedChipHtml;
+    var chipWrap=function(slot, idx, client){
+      var html=chipBase.apply(this, arguments);
+      if(!officeAdd1SlotRepeats(slot, client))return html;
+      return String(html).replace(/<\/span>\s*$/,'<span class="office-weekly">↻ weekly</span></span>');
+    };
+    chipWrap.__officeAdd1=1;
+    schedChipHtml=chipWrap;
+  }
+  if(typeof schedNormSlot==='function'&&!schedNormSlot.__officeAdd1){
+    var normBase=schedNormSlot;
+    var normWrap=function(raw){
+      var slot=normBase.apply(this, arguments);
+      if(!slot||!raw||typeof raw!=='object')return slot;
+      if(raw.repeat_weekly===true||raw.repeatWeekly===true||raw.repeats_weekly===true)slot.repeat_weekly=true;
+      if(raw.repeat_until||raw.repeatUntil)slot.repeat_until=officeAdd1DateOnly(raw.repeat_until||raw.repeatUntil);
+      if(raw.called_off===true||raw.calledOff===true||String(raw.exception_kind||raw.kind||'')==='call_off')slot.called_off=true;
+      if(Object.prototype.hasOwnProperty.call(raw,'clock_in')||Object.prototype.hasOwnProperty.call(raw,'clockIn'))slot.clock_in=String(raw.clock_in||raw.clockIn||'');
+      if(raw.open_shift_id||raw.openShiftId)slot.open_shift_id=String(raw.open_shift_id||raw.openShiftId);
+      return slot;
+    };
+    normWrap.__officeAdd1=1;
+    schedNormSlot=normWrap;
+  }
+  if(typeof schedPaintSlotGrid==='function'&&!schedPaintSlotGrid.__officeAdd1){
+    var gridBase=schedPaintSlotGrid;
+    var gridWrap=function(){
+      var out=gridBase.apply(this, arguments);
+      try{officeAdd1DecorateHead();}catch(e){}
+      return out;
+    };
+    gridWrap.__officeAdd1=1;
+    schedPaintSlotGrid=gridWrap;
+  }
+  if(typeof schedPaintSingle==='function'&&!schedPaintSingle.__officeAdd1){
+    var singleBase=schedPaintSingle;
+    var singleWrap=function(){
+      var out=singleBase.apply(this, arguments);
+      try{officeAdd1DecorateHead();}catch(e){}
+      return out;
+    };
+    singleWrap.__officeAdd1=1;
+    schedPaintSingle=singleWrap;
+  }
+  if(typeof schedPaintSlotDetail==='function'&&!schedPaintSlotDetail.__officeAdd1){
+    var detailBase=schedPaintSlotDetail;
+    var detailWrap=function(){
+      var out=detailBase.apply(this, arguments);
+      try{officeAdd1PaintFindCover();}catch(e){}
+      try{officeAdd1RefreshRepeatPreview();}catch(e2){}
+      return out;
+    };
+    detailWrap.__officeAdd1=1;
+    schedPaintSlotDetail=detailWrap;
+  }
+  if(typeof schedToast==='function'&&!schedToast.__officeAdd1){
+    var toastBase=schedToast;
+    var toastWrap=function(msg, color){
+      officeAdd1LastToast={msg:msg, color:color};
+      return toastBase.apply(this, arguments);
+    };
+    toastWrap.__officeAdd1=1;
+    schedToast=toastWrap;
+  }
+  if(typeof schedSaveSlotPattern==='function'&&!schedSaveSlotPattern.__officeAdd1){
+    var saveBase=schedSaveSlotPattern;
+    var saveWrap=async function(){
+      var snap=officeAdd1ReadRepeat();
+      if(officeAdd1Preview){
+        if(typeof schedToast==='function')schedToast('Preview only. This shift was not saved.','var(--warn)');
+        if(snap.on)officeAdd1RememberSeries(snap);
+        return {ok:false, preview:true};
+      }
+      officeAdd1LastToast=null;
+      var out=await saveBase.apply(this, arguments);
+      if(snap.on&&officeAdd1LastToast&&officeAdd1LastToast.color==='var(--success)'){
+        await officeAdd1SaveRepeat(snap);
+      }
+      return out;
+    };
+    saveWrap.__officeAdd1=1;
+    schedSaveSlotPattern=saveWrap;
+  }
+  if(typeof loadAdminSchedule==='function'&&!loadAdminSchedule.__officeAdd1){
+    var loadBase=loadAdminSchedule;
+    var loadWrap=async function(){
+      if(officeAdd1Preview){
+        officeAdd1InstallSampleSchedule();
+        try{if(typeof schedPaint==='function')schedPaint();}catch(e){}
+        return;
+      }
+      return loadBase.apply(this, arguments);
+    };
+    loadWrap.__officeAdd1=1;
+    loadAdminSchedule=loadWrap;
+  }
+  if(typeof showTab==='function'&&!showTab.__officeAdd1){
+    var tabBase=showTab;
+    var tabWrap=function(tab){
+      var requested=tab;
+      if(officeAdd1Preview&&tab==='aides')officeExemptActive=true;
+      var out=tabBase.apply(this, arguments);
+      try{officeAdd1AfterTab(requested);}catch(e){}
+      return out;
+    };
+    tabWrap.__officeAdd1=1;
+    showTab=tabWrap;
+  }
+  if(typeof layoutA1ApplyRoles==='function'&&!layoutA1ApplyRoles.__officeAdd1){
+    var roleBase=layoutA1ApplyRoles;
+    var roleWrap=function(){
+      var out=roleBase.apply(this, arguments);
+      try{officeAdd1DecorateHead();}catch(e){}
+      return out;
+    };
+    roleWrap.__officeAdd1=1;
+    layoutA1ApplyRoles=roleWrap;
+  }
+  try{officeAdd1BindRepeat();}catch(eBind){}
+  if(typeof navEditApply==='function'&&!navEditApply.__officeAdd1){
+    var navApplyBase=navEditApply;
+    var navApplyWrap=function(){
+      var out=navApplyBase.apply(this, arguments);
+      try{officeAdd1PinDashboard();}catch(ePin){}
+      return out;
+    };
+    navApplyWrap.__officeAdd1=1;
+    navEditApply=navApplyWrap;
+  }
+  try{officeAdd1PinDashboard();}catch(ePin0){}
+  if(typeof renderAides==='function'&&!renderAides.__officeExempt){
+    var aidesBase=renderAides;
+    var aidesWrap=async function(){
+      if(officeExemptActive)return;
+      return aidesBase.apply(this, arguments);
+    };
+    aidesWrap.__officeExempt=1;
+    renderAides=aidesWrap;
+  }
+  if(!officeAdd1Install.exemptBound&&document.addEventListener){
+    officeAdd1Install.exemptBound=true;
+    document.addEventListener('click', officeExemptClick);
+    document.addEventListener('input', officeExemptInput);
+  }
+  if(typeof enforceAdminSessionTimeout==='function'&&!enforceAdminSessionTimeout.__officeAdd1){
+    var timeoutBase=enforceAdminSessionTimeout;
+    var timeoutWrap=function(){
+      if(officeAdd1Preview||officeAdd1PreviewOn())return;
+      return timeoutBase.apply(this, arguments);
+    };
+    timeoutWrap.__officeAdd1=1;
+    enforceAdminSessionTimeout=timeoutWrap;
+  }
+}
+async function officeAdd1SaveRepeat(snap){
+  if(!snap||!snap.on)return {ok:true, skipped:true};
+  officeAdd1RememberSeries(snap);
+  if(typeof sbRestRpc!=='function'){
+    if(typeof schedToast==='function')schedToast('This week is saved. Weekly repeat is not on file yet.','var(--warn)');
+    return {ok:false, missing:true};
+  }
+  var got=await sbRestRpc('admin_set_shift_repeat',{
+    p_client_id:snap.clientId||null,
+    p_slot_key:snap.slotKey||null,
+    p_weekdays:snap.days||[],
+    p_until:snap.until||null,
+    p_start_local:snap.start||null,
+    p_end_local:snap.end||null,
+    p_usual_aide_id:snap.aideId||null
+  });
+  if(!got||got.ok!==true){
+    if(typeof schedToast==='function')schedToast(officeAdd1RpcMissing(got)?'This week is saved. Weekly repeat is not on file yet.':'Weekly repeat did not save.','var(--warn)');
+    return {ok:false, missing:officeAdd1RpcMissing(got)};
+  }
+  return {ok:true, saved:true};
+}
+function officeAdd1InstallSampleSchedule(){
+  var clients=officeAdd1SampleClients();
+  try{
+    schedWeekStart='2026-11-23';
+    schedSlotMode=true;
+    schedSlotClients=clients;
+    schedSlotView='week';
+    schedLoadError='';
+    schedWeekRows=clients.map(function(c){return {id:c.id, name:c.name};});
+    schedUseWeekRows=true;
+  }catch(e){}
+}
+function officeAdd1ShowScreens(){
+  var login=officeAdd1El('loginScreen');
+  var admin=officeAdd1El('adminScreen');
+  var nurse=officeAdd1El('nurseScreen');
+  if(login&&login.classList)login.classList.remove('active');
+  if(nurse&&nurse.classList)nurse.classList.remove('active');
+  if(admin&&admin.classList)admin.classList.add('active');
+  var banner=officeAdd1El('officePreviewBanner');
+  if(banner)banner.hidden=true;
+}
+function officeAdd1PreviewOpenSchedule(){
+  try{
+    schedSlotDrawerClosed=false;
+    schedSlotFormMode='add';
+    schedSlotSelected={clientId:'sample-north', onDate:'2026-11-26', weekday:4};
+    if(typeof schedPaintSlots==='function')schedPaintSlots();
+    if(typeof schedSetDayChecks==='function')schedSetDayChecks([1,3,5]);
+  }catch(e){}
+  var box=officeAdd1El('officeRepeatOn');
+  if(box)box.checked=true;
+  var until=officeAdd1El('officeRepeatUntil');
+  if(until)until.value='01/31/2027';
+  officeAdd1RefreshRepeatPreview();
+  officeAdd1PaintFindCover();
+  var sc=officeAdd1El('schedScroll');
+  if(sc){
+    try{
+      var ths=sc.querySelectorAll('th');
+      var thu=ths&&ths[4];
+      var left=thu&&thu.offsetLeft?Math.max(0, thu.offsetLeft-140):Math.round((sc.scrollWidth||0)*0.45);
+      sc.scrollLeft=left;
+    }catch(e2){}
+  }
+}
+function officeAdd1PinDashboard(){
+  var bar=officeAdd1El('bottomNav');
+  var dash=officeAdd1El('nav_today');
+  var sched=officeAdd1El('nav_schedule');
+  if(!bar||!dash||!sched||!bar.insertBefore)return;
+  var next=sched.nextSibling;
+  if(next===dash)return;
+  bar.insertBefore(dash, next);
+}
+function officeAdd1HideSessionToast(){
+  var el=officeAdd1El('nciToast');
+  if(!el)return;
+  el.style.display='none';
+  el.textContent='';
+}
+function officeAdd1ShowLockedPayroll(){
+  document.querySelectorAll('#adminScreen .tab-panel').forEach(function(p){
+    p.classList.remove('active');
+    p.hidden=true;
+  });
+  var panel=officeAdd1El('tab_payroll');
+  if(panel){
+    panel.hidden=false;
+    panel.classList.add('active');
+  }
+  var host=officeAdd1El('remiPayrollIns1Host');
+  if(host)host.innerHTML='';
+  officeAdd1PaintPay({rows:[]});
+}
+function officeAdd1EnterPreview(){
+  officeAdd1Preview=true;
+  if(typeof sbRestRpc==='function'&&!sbRestRpc.__officePreview){
+    var rpcBase=sbRestRpc;
+    var rpcWrap=async function(name){
+      officeAdd1PreviewRpc.push(String(name||''));
+      return {ok:false, status:404, error:'preview'};
+    };
+    rpcWrap.__officePreview=1;
+    rpcWrap.__officeBase=rpcBase;
+    sbRestRpc=rpcWrap;
+  }
+  var role=officeAdd1Query('officeRole')||'Admin';
+  role=role.toLowerCase()==='scheduler'?'Scheduler':'Admin';
+  try{
+    currentAdminRole=role;
+    currentAdminUsername=role;
+  }catch(e){}
+  officeAdd1ShowScreens();
+  var who=officeAdd1El('sidebarRoleName');
+  if(who)who.textContent=role;
+  officeAdd1HideSessionToast();
+  try{if(typeof layoutA1ApplyRoles==='function')layoutA1ApplyRoles();}catch(eRole){}
+  if(typeof remiPayrollIns1OnShow==='function'){
+    remiPayrollIns1OnShow=function(){return Promise.resolve({ok:true, preview:true});};
+  }
+  officeAdd1InstallSampleSchedule();
+  var screen=officeAdd1Query('officeScreen')||'today';
+  if(screen==='visit')screen='visits';
+  if(screen==='aides'||screen==='aideadd'||screen==='aideedit'||screen==='aidedetail'){
+    officeExemptEnter(screen);
+    return;
+  }
+  if(screen==='payroll'&&role!=='Admin'){
+    officeAdd1ShowLockedPayroll();
+    return;
+  }
+  if(typeof showTab==='function')showTab(screen);
+  if(screen==='schedule')officeAdd1PreviewOpenSchedule();
+}
+function officeAdd1MaybePreview(){
+  if(!officeAdd1PreviewOn())return;
+  try{officeAdd1EnterPreview();}catch(e){}
+}
+var officeAdd1MissedRows=[];
+// OFFICE_ADD1_END
+
+officeAdd1Install();
 bootAdminPortal();
+officeAdd1MaybePreview();
+
 if(typeof adminSchedChatPush1ConsumeLocation==='function'){
   try{adminSchedChatPush1ConsumeLocation();}catch(ePushBoot){}
 }
@@ -46081,6 +48483,7 @@ document.addEventListener('visibilitychange',function(){
   if(document.visibilityState==='visible')enforceAdminSessionTimeout();
 });
 window.addEventListener('load',()=>{renderBroadcastPreview();if(typeof nciBindDateMask==='function')nciBindDateMask();if(typeof nciBindPhoneMask==='function')nciBindPhoneMask();});
+window.addEventListener('load', function(){ try{officeAdd1MaybePreview();}catch(eOfficePreview){} });
 </script>
 </body>
 </html>

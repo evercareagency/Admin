@@ -27,7 +27,7 @@ assert.ok(html.indexOf('content="2026-09-25-remiask1"') < html.indexOf('content=
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
-assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
+assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 6, 'bottom bar stays five tabs');
 assert.ok(nav.includes('id="nav_aidechat"'), 'Messages is a default bottom tab');
 const more = admin.slice(admin.indexOf('id="moreList"'), admin.indexOf('class="more-account"'));
 assert.ok(!more.includes('id="nav_aidechat"'), 'Messages is not only under More');

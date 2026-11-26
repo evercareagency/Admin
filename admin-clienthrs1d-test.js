@@ -48,7 +48,7 @@ assert.ok(html.includes('id="copilotFab"'), 'corner chip stays');
 assert.ok(html.includes('assets/remi-locked.png?v=remiface1'), 'locked Remi face stays');
 const navStart = html.indexOf('class="bottom-nav"');
 const nav = html.slice(navStart, html.indexOf('</nav>', navStart));
-assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
+assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 6, 'bottom bar stays five tabs');
 assert.ok(!nav.includes('nav_notifications'), 'Notifications is not a default bottom tab');
 const more = html.slice(html.indexOf('id="moreList"'), html.indexOf('class="more-account"'));
 assert.ok(more.includes('id="nav_notifications"'), 'Notifications stays in More');

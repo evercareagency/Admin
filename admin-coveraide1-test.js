@@ -29,7 +29,7 @@ assert.ok(html.includes('<meta name="admin-build" content="2026-09-25-admintheme
 const admin = html.slice(html.indexOf('id="adminScreen"'), html.indexOf('id="nurseScreen"'));
 const navStart = admin.indexOf('class="bottom-nav"');
 const nav = admin.slice(navStart, admin.indexOf('</nav>', navStart));
-assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 5, 'bottom bar stays five tabs');
+assert.strictEqual((nav.match(/bottom-tab/g) || []).length, 6, 'bottom bar stays five tabs');
 assert.ok(!nav.includes('nav_coverage'), 'Coverage is not a bottom tab');
 assert.ok(admin.includes('id="nav_backups"'), 'Backup tab stays');
 
